@@ -3,7 +3,7 @@ Warehouse Management System for advance logistic with Odoo
 
 ## RFC
 
-Work in progress and track in this issue: https://github.com/OCA/stock-logistics-warehouse/issues/621
+Work in progress and track in this issue #1
 
 ## Reference document
 
