@@ -1,0 +1,59 @@
+image: vauxoo/odoo-80-image-shippable-auto
+stages:
+  - test
+
+variables:
+    PSQL_VERSION: "9.5"
+    VERSION: "12.0"
+    ODOO_REPO: "odoo/odoo"
+    ODOO_BRANCH: "12.0"
+    TRAVIS_BUILD_DIR: "$CI_PROJECT_DIR"
+    TRAVIS_PYTHON_VERSION: "3.5"
+    # GIT_DEPTH: "3" - Lower clone depth for better performance
+
+# If you need to clone other private repositories except the current one
+# before_script:
+#     - eval "$(ssh-agent -s)"
+#     - mkdir -p ~/.ssh
+#     - chmod 700 ~/.ssh
+#     - ssh-keyscan github.com >> ~/.ssh/known_hosts
+#     # Repeat for as many hosts as needed
+#     # Store ssh config file and id_rsa private key in Settings -> CI/CD -> Secret variables and use here
+#     - echo "$SSH_CONFIG" > ~/.ssh/config
+#     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add  - > /dev/null
+#     - chmod 600 ~/.ssh/ -R
+
+lint:
+  stage: test
+  tags:
+    - lint
+  variables:
+    LINT_CHECK: "1"
+    TESTS: "0"
+  script:
+    # In some cases gitlab-runners might override the default $PATH defined within the image
+    # when that happens things will fail as pointers to the proper binaries are lost, uncomment if this happens
+    #- source ${REPO_REQUIREMENTS}/virtualenv/python${TRAVIS_PYTHON_VERSION}/bin/activate
+    #- source ${REPO_REQUIREMENTS}/virtualenv/nodejs/bin/activate
+    - git clone https://github.com/OCA/maintainer-quality-tools.git -b master ${HOME}/maintainer-quality-tools
+    - export PATH=${HOME}/maintainer-quality-tools/travis:${HOME}/gitlab_tools:${PATH}
+    - travis_install_nightly
+    - travis_run_tests
+    - travis_after_tests_success || true
+
+test:
+  stage: test
+  tags:
+    - test
+  variables:
+    LINT_CHECK: "0"
+    TESTS: "1"
+  script:
+    #- source ${REPO_REQUIREMENTS}/virtualenv/python${TRAVIS_PYTHON_VERSION}/bin/activate
+    #- source ${REPO_REQUIREMENTS}/virtualenv/nodejs/bin/activate
+    - git clone https://github.com/OCA/maintainer-quality-tools.git -b master ${HOME}/maintainer-quality-tools
+    - export PATH=${HOME}/maintainer-quality-tools/travis:${HOME}/gitlab_tools:${PATH}
+    - travis_install_nightly
+    - travis_run_tests
+    - travis_after_tests_success || true
+  coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
