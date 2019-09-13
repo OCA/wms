@@ -1,10 +1,19 @@
-[![Runbot Status](https://runbot.odoo-community.org/runbot/badge/flat/${REPO_ID}/${BRANCH_NAME}.svg)](https://runbot.odoo-community.org/runbot/repo/github-com-oca-${REPO_NAME}-${REPO_ID})
-[![Build Status](https://travis-ci.com/OCA/${REPO_NAME}.svg?branch=${BRANCH_NAME})](https://travis-ci.com/OCA/${REPO_NAME})
-[![codecov](https://codecov.io/gh/OCA/${REPO_NAME}/branch/${BRANCH_NAME}/graph/badge.svg)](https://codecov.io/gh/OCA/${REPO_NAME})
+[![Runbot Status](https://runbot.odoo-community.org/runbot/badge/flat/285/12.0.svg)](https://runbot.odoo-community.org/runbot/repo/github-com-oca-wms-285)
+[![Build Status](https://travis-ci.com/OCA/wms.svg?branch=12.0)](https://travis-ci.com/OCA/wms)
+[![codecov](https://codecov.io/gh/OCA/wms/branch/12.0/graph/badge.svg)](https://codecov.io/gh/OCA/wms)
 
-# ${REPO_NAME_VERBOSE}
+# WMS - Warehouse Management System
 
-${REPO_DESCRIPTION}
+Warehouse Management System for advanced logistics processes with Odoo.
+
+## RFC
+
+Work in progress and track in this issue https://github.com/OCA/wms/issues/1
+
+## Reference document
+
+ - https://docs.google.com/document/d/1mct6bFFWJqW01wGFcjc-uQNEjyCxvh6Y9TuFdRhe-b0/edit#heading=h.k0bwq3398e7m
+
 
 [//]: # (addons)
 This part will be replaced when running the oca-gen-addons-table script from OCA/maintainer-tools.
