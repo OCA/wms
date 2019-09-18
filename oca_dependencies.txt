@@ -16,3 +16,7 @@ stock-logistics-warehouse
 #
 # To provide both the URL and a branch, use:
 # sale-workflow https://github.com/OCA/sale-workflow branchname
+
+stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_add_stock_location_attribute
+stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_add_stock_location_bin_name
+stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_rework_stock_location_zone
