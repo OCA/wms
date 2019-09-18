@@ -20,3 +20,17 @@ stock-logistics-warehouse
 stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_add_stock_location_attribute
 stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_add_stock_location_bin_name
 stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_rework_stock_location_zone
+stock-logistics-warehouse https://github.com/guewen/stock-logistics-warehouse 12.0-add-vertical-lift
+stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_add_stock_putaway_rule
+stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_add_stock_putaway_recursive
+stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_add_stock_putaway_abc
+stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_add_stock_putaway_abc_move_location_dest_constraint
+stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_add_stock_move_location_dest_constraint_base
+stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_add_stock_move_location_dest_constraint_tags
+stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_add_stock_move_location_dest_constraint_empty
+stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_add_stock_picking_completion_info
+stock-logistics-warehouse https://github.com/guewen/stock-logistics-warehouse 12.0-add-stock_picking_zone
+stock-logistics-warehouse https://github.com/guewen/stock-logistics-warehouse 12.0-add-reservation-zone-rules
+
+
+
