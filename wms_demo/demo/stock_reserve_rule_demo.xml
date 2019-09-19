@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <record id="reserve_rule_sch_output_take_all" model="stock.reserve.rule">
+        <field name="sequence" eval="0"/>
+        <field name="name">SCH Output take all</field>
+        <field name="active" eval="1"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="stock.stock_location_output"/>
+        <field name="removal_strategy">default</field>
+    </record>
+
+    <record id="reserve_rule_wer_output_take_all" model="stock.reserve.rule">
+        <field name="sequence" eval="0"/>
+        <field name="name">WER Output take all</field>
+        <field name="active" eval="1"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="stock_location_wer_output"/>
+        <field name="removal_strategy">default</field>
+    </record>
+
+    <record id="reserve_rule_wer_input_take_all" model="stock.reserve.rule">
+        <field name="sequence" eval="0"/>
+        <field name="name">WER Input take all</field>
+        <field name="active" eval="1"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="stock_location_wer_input"/>
+        <field name="removal_strategy">default</field>
+    </record>
+
+    <record id="reserve_rule_sch_input_take_all" model="stock.reserve.rule">
+        <field name="sequence" eval="0"/>
+        <field name="name">SCH Input take all</field>
+        <field name="active" eval="1"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="stock.stock_location_company"/>
+        <field name="removal_strategy">default</field>
+    </record>
+
+    <record id="reserve_rule_sch_packing_take_all" model="stock.reserve.rule">
+        <field name="sequence" eval="0"/>
+        <field name="name">SCH Packing take all</field>
+        <field name="active" eval="1"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="stock.location_pack_zone"/>
+        <field name="removal_strategy">default</field>
+    </record>
+
+    <record id="reserve_rule_1" model="stock.reserve.rule">
+        <field name="sequence" eval="1"/>
+        <field name="name">Preference 1 to empty TRA area</field>
+        <field name="active" eval="1"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="location_zone_TransferToSchlieren"/>
+        <field name="removal_strategy">default</field>
+    </record>
+
+    <record id="reserve_rule_2" model="stock.reserve.rule">
+        <field name="sequence" eval="2"/>
+        <field name="name">Preference 2 to empty position in high bay</field>
+        <field name="active" eval="1"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="location_zone_HighBay"/>
+        <field name="removal_strategy">empty_bin</field>
+    </record>
+
+    <record id="reserve_rule_3" model="stock.reserve.rule">
+        <field name="sequence" eval="3"/>
+        <field name="name">Preference 3 to take full outer cases from picking (kardex)</field>
+        <field name="active" eval="1"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="location_zone_Kardex"/>
+        <field name="removal_strategy">packaging</field>
+    </record>
+
+    <record id="reserve_rule_4" model="stock.reserve.rule">
+        <field name="sequence" eval="5"/>
+        <field name="name">Preference 5 to complete lower then GRVE quantities from picking (Kardex)(INCL in 3)</field>
+        <field name="active" eval="1"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="location_zone_Kardex"/>
+        <field name="removal_strategy">default</field>
+    </record>
+
+    <record id="reserve_rule_5" model="stock.reserve.rule">
+        <field name="sequence" eval="5"/>
+        <field name="name">Preference 5 to complete lower then GRVE quantities from picking (Sample)(INCL in 3)</field>
+        <field name="active" eval="1"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="location_zone_Sample"/>
+        <field name="removal_strategy">default</field>
+    </record>
+
+    <record id="reserve_rule_6" model="stock.reserve.rule">
+        <field name="sequence" eval="3"/>
+        <field name="name">Preference 3 to take full outer cases from picking</field>
+        <field name="active" eval="1"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="location_zone_Shelving"/>
+        <field name="removal_strategy">packaging</field>
+    </record>
+
+    <record id="reserve_rule_7" model="stock.reserve.rule">
+        <field name="sequence" eval="4"/>
+        <field name="name">Preference 4 to take full outer cases from reserve (NOT WORKING)</field>
+        <field name="active" eval="0"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="location_zone_Shelving"/>
+        <field name="removal_strategy">packaging</field>
+    </record>
+
+    <record id="reserve_rule_8" model="stock.reserve.rule">
+        <field name="sequence" eval="5"/>
+        <field name="name">Preference 5 to complete lower then GRVE quantities from picking (INCL in 3)</field>
+        <field name="active" eval="0"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="location_zone_Shelving"/>
+        <field name="removal_strategy">default</field>
+    </record>
+
+    <record id="reserve_rule_9" model="stock.reserve.rule">
+        <field name="sequence" eval="6"/>
+        <field name="name">Preference 6 to complete lower than GRVE quantities from reserve (NOT WORKING)</field>
+        <field name="active" eval="0"/>
+        <field name="rule_domain">[]</field>
+        <field name="quant_domain">[]</field>
+        <field name="location_id" ref="location_zone_HighBay"/>
+        <field name="removal_strategy">default</field>
+    </record>
+
+</odoo>

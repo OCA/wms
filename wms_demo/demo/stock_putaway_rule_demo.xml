@@ -1,0 +1,477 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+    <record id="putaway_rule_1" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_company"/>
+        <field name="category_id" ref="product.product_category_all"/>
+        <field name="method">fixed</field>
+        <field name="location_out_id" ref="location_area_WAE"/>
+    </record>
+    <record id="putaway_rule_2" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock_location_wer_input"/>
+        <field name="category_id" ref="product.product_category_all"/>
+        <field name="method">fixed</field>
+        <field name="location_out_id" ref="location_area_KTL-WA-WER"/>
+    </record>
+    <record id="putaway_rule_17" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_SPUIn"/>
+        <field name="product_id" ref="product_109000260"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_18" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_SPUIn"/>
+        <field name="product_id" ref="product_124005113"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_19" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_zone_Shelving"/>
+        <field name="product_id" ref="product_132003147"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_20" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_zone_Shelving"/>
+        <field name="product_id" ref="product_138009390"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_21" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_SPUIn"/>
+        <field name="product_id" ref="product_163000587"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_22" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_SPUIn"/>
+        <field name="product_id" ref="product_170004065"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_23" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_SPUIn"/>
+        <field name="product_id" ref="product_202001508"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_24" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_SPUIn"/>
+        <field name="product_id" ref="product_207009108"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_25" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_SPUIn"/>
+        <field name="product_id" ref="product_232509793"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_26" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_SPUIn"/>
+        <field name="product_id" ref="product_248000630"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_27" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_SPUIn"/>
+        <field name="product_id" ref="product_248000857"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_28" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_SPUIn"/>
+        <field name="product_id" ref="product_248001030"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_29" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_SPUIn"/>
+        <field name="product_id" ref="product_248004036"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_30" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_LAN"/>
+        <field name="product_id" ref="product_163005216"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_31" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_UGPIn"/>
+        <field name="product_id" ref="product_312001918"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_32" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_UGPIn"/>
+        <field name="product_id" ref="product_200106094"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_34" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_UGPIn"/>
+        <field name="product_id" ref="product_395700438"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_35" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_UGPIn"/>
+        <field name="product_id" ref="product_379002117"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_36" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_UGPIn"/>
+        <field name="product_id" ref="product_170009521"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_37" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_UGPIn"/>
+        <field name="product_id" ref="product_104000190"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_38" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_UGPIn"/>
+        <field name="product_id" ref="product_163005551"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_39" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_UGPIn"/>
+        <field name="product_id" ref="product_620002065"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_40" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_UGPIn"/>
+        <field name="product_id" ref="product_409880440"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_41" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_UGPIn"/>
+        <field name="product_id" ref="product_200000001"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_42" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_buffer_UGPIn"/>
+        <field name="product_id" ref="product_200000002"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_43" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_MU"/>
+        <field name="product_id" ref="product_300000001"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_49" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock_location_wer"/>
+        <field name="location_out_id" ref="stock_location_wer"/>
+        <field name="product_id" ref="product_245004412"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_50" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock_location_wer"/>
+        <field name="location_out_id" ref="stock_location_wer"/>
+        <field name="product_id" ref="product_130000004"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_51" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock_location_wer"/>
+        <field name="location_out_id" ref="stock_location_wer"/>
+        <field name="product_id" ref="product_104007620"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_52" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock_location_wer"/>
+        <field name="location_out_id" ref="stock_location_wer"/>
+        <field name="product_id" ref="product_200106094"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_53" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock_location_wer"/>
+        <field name="location_out_id" ref="stock_location_wer"/>
+        <field name="product_id" ref="product_379002117"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_58" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_bin_DLR-01_008_01"/>
+        <field name="product_id" ref="product_105007997"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_59" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_bin_DLR-01_009_02"/>
+        <field name="product_id" ref="product_379005300"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_60" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_bin_DLR-01_006_01"/>
+        <field name="product_id" ref="product_105000621"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_61" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_bin_PAL-02_002_03"/>
+        <field name="product_id" ref="product_312004805"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_62" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_bin_PAL-01_005_01"/>
+        <field name="product_id" ref="product_245004412"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_63" model="stock.putaway.rule">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_bin_PAL-02_004_01"/>
+        <field name="product_id" ref="product_130000004"/>
+        <field name="method">fixed</field>
+    </record>
+    <record id="putaway_rule_64" model="stock.putaway.rule">
+        <field name="location_in_id" ref="location_area_HRL"/>
+        <field name="abc_priority">a</field>
+        <field name="product_id" ref="product_312001918"/>
+        <field name="method">abc</field>
+    </record>
+    <record id="putaway_rule_65" model="stock.putaway.rule">
+        <field name="location_in_id" ref="location_area_HRL"/>
+        <field name="abc_priority">a</field>
+        <field name="product_id" ref="product_200106094"/>
+        <field name="method">abc</field>
+    </record>
+    <record id="putaway_rule_66" model="stock.putaway.rule">
+        <field name="location_in_id" ref="location_area_HRL"/>
+        <field name="abc_priority">a</field>
+        <field name="product_id" ref="product_379002117"/>
+        <field name="method">abc</field>
+    </record>
+    <record id="putaway_rule_67" model="stock.putaway.rule">
+        <field name="location_in_id" ref="location_area_HRL"/>
+        <field name="abc_priority">b</field>
+        <field name="product_id" ref="product_395700438"/>
+        <field name="method">abc</field>
+    </record>
+    <record id="putaway_rule_68" model="stock.putaway.rule">
+        <field name="location_in_id" ref="location_area_HRL"/>
+        <field name="abc_priority">b</field>
+        <field name="product_id" ref="product_379002117"/>
+        <field name="method">abc</field>
+    </record>
+    <record id="putaway_rule_69" model="stock.putaway.rule">
+        <field name="location_in_id" ref="location_area_HRL"/>
+        <field name="abc_priority">b</field>
+        <field name="product_id" ref="product_170009521"/>
+        <field name="method">abc</field>
+    </record>
+    <record id="putaway_rule_70" model="stock.putaway.rule">
+        <field name="location_in_id" ref="location_area_HRL"/>
+        <field name="abc_priority">c</field>
+        <field name="product_id" ref="product_104000190"/>
+        <field name="method">abc</field>
+    </record>
+    <record id="putaway_rule_71" model="stock.putaway.rule">
+        <field name="location_in_id" ref="location_area_HRL"/>
+        <field name="abc_priority">c</field>
+        <field name="product_id" ref="product_163005551"/>
+        <field name="method">abc</field>
+    </record>
+    <record id="putaway_rule_72" model="stock.putaway.rule">
+        <field name="location_in_id" ref="location_area_HRL"/>
+        <field name="abc_priority">c</field>
+        <field name="product_id" ref="product_620002065"/>
+        <field name="method">abc</field>
+    </record>
+    <record id="putaway_rule_73" model="stock.putaway.rule">
+        <field name="location_in_id" ref="location_area_HRL"/>
+        <field name="abc_priority">a</field>
+        <field name="product_id" ref="product_409880440"/>
+        <field name="method">abc</field>
+    </record>
+    <record id="putaway_rule_74" model="stock.putaway.rule">
+        <field name="location_in_id" ref="location_area_HRL"/>
+        <field name="abc_priority">a</field>
+        <field name="product_id" ref="product_200000001"/>
+        <field name="method">abc</field>
+    </record>
+    <record id="putaway_rule_75" model="stock.putaway.rule">
+        <field name="location_in_id" ref="location_area_HRL"/>
+        <field name="abc_priority">b</field>
+        <field name="product_id" ref="product_200000002"/>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_76_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_504000354"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_76_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_504000354"/>
+        <field name="abc_priority">a</field>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_77_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_167001020"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_77_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_167001020"/>
+        <field name="abc_priority">a</field>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_78_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_395000653"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_78_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_395000653"/>
+        <field name="abc_priority">a</field>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_79_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_170006808"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_79_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_170006808"/>
+        <field name="abc_priority">b</field>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_80_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_170034517"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_80_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_170034517"/>
+        <field name="abc_priority">b</field>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_81_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_396009294"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_81_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_396009294"/>
+        <field name="abc_priority">b</field>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_82_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_650005420"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_82_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_650005420"/>
+        <field name="abc_priority">c</field>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_83_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_197000016"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_83_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_197000016"/>
+        <field name="abc_priority">c</field>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_84_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_104007620"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_84_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_104007620"/>
+        <field name="abc_priority">c</field>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_85_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_180002461"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_85_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_180002461"/>
+        <field name="abc_priority">a</field>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_86_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_400008525"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_86_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_400008525"/>
+        <field name="abc_priority">a</field>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_87_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_156000309"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_87_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_156000309"/>
+        <field name="abc_priority">b</field>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_88_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_100003103"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_88_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_100003103"/>
+        <field name="abc_priority">b</field>
+        <field name="method">abc</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_89_fixed">
+        <field name="location_in_id" ref="stock.stock_location_stock"/>
+        <field name="location_out_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_396001471"/>
+        <field name="method">fixed</field>
+    </record>
+    <record model="stock.putaway.rule" id="putaway_rule_89_abc">
+        <field name="location_in_id" ref="location_area_FBG"/>
+        <field name="product_id" ref="product_396001471"/>
+        <field name="abc_priority">a</field>
+        <field name="method">abc</field>
+    </record>
+</odoo>

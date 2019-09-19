@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <record id="stock.warehouse0" model="stock.warehouse">
+        <field name="name">Schlieren</field>
+        <field name="code">SCH</field>
+        <field name="delivery_steps">pick_pack_ship</field>
+        <field name="reception_steps">two_steps</field>
+    </record>
+
+    <record id="warehouse_wer" model="stock.warehouse">
+        <field name="name">Werrikon</field>
+        <field name="code">WER</field>
+        <field name="delivery_steps">pick_ship</field>
+        <field name="reception_steps">two_steps</field>
+    </record>
+
+</odoo>

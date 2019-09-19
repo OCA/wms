@@ -1,0 +1,572 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+  <function model="ir.model.data" name="_update_xmlids">
+    <value model="base" eval="[
+      {'xml_id': 'wms_demo.location_root_sch',
+       'record': obj().env.ref('stock.warehouse0').view_location_id,
+       'noupdate': True,
+       },
+      {'xml_id': 'wms_demo.root_location_wer',
+       'record': obj().env.ref('wms_demo.warehouse_wer').view_location_id,
+       'noupdate': True,
+       },
+      {'xml_id': 'wms_demo.stock_location_wer',
+       'record': obj().env.ref('wms_demo.warehouse_wer').lot_stock_id,
+       'noupdate': True,
+       },
+      {'xml_id': 'wms_demo.stock_location_wer_input',
+       'record': obj().env.ref('wms_demo.warehouse_wer').wh_input_stock_loc_id,
+       'noupdate': True,
+       },
+      {'xml_id': 'wms_demo.stock_location_wer_output',
+       'record': obj().env.ref('wms_demo.warehouse_wer').wh_output_stock_loc_id,
+       'noupdate': True,
+       },
+      {'xml_id': 'wms_demo.stock_location_wer_pack',
+       'record': obj().env.ref('wms_demo.warehouse_wer').wh_pack_stock_loc_id,
+       'noupdate': True,
+       },
+
+    ]"/>
+  </function>
+
+
+  <record id="location_zone_HighBay" model="stock.location">
+      <field name="name">HighBay</field>
+      <field name="location_id" ref="stock.stock_location_stock"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+  <record id="location_zone_Kardex" model="stock.location">
+      <field name="name">Kardex</field>
+      <field name="location_id" ref="stock.stock_location_stock"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+  <record id="location_zone_Shelving" model="stock.location">
+      <field name="name">Shelving</field>
+      <field name="location_id" ref="stock.stock_location_stock"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+  <record id="stock_location_wer" model="stock.location">
+      <field name="name">Werrikon</field>
+      <field name="location_id" ref="stock.stock_location_stock"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+  <record id="location_zone_TransferToSchlieren" model="stock.location">
+      <field name="name">Transfer To Schlieren</field>
+      <field name="location_id" ref="stock_location_wer"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+  <record id="location_zone_OPLogistic" model="stock.location">
+      <field name="name">OP Logistic</field>
+      <field name="location_id" ref="stock.stock_location_stock"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+  <record id="location_zone_Sample" model="stock.location">
+      <field name="name">Sample</field>
+      <field name="location_id" ref="stock.stock_location_stock"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+  <record id="location_area_HRL" model="stock.location">
+      <field name="name">HRL</field>
+      <field name="location_id" ref="location_zone_HighBay"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_SHU" model="stock.location">
+      <field name="name">SHU</field>
+      <field name="location_id" ref="location_zone_Kardex"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="vertical_lift_location" eval="1"/>
+  </record>
+
+  <record id="location_area_FBG" model="stock.location">
+      <field name="name">FBG</field>
+      <field name="location_id" ref="location_zone_Shelving"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_DLR" model="stock.location">
+      <field name="name">DLR</field>
+      <field name="location_id" ref="location_zone_Shelving"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_PAL" model="stock.location">
+      <field name="name">PAL</field>
+      <field name="location_id" ref="location_zone_Shelving"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_LAN" model="stock.location">
+      <field name="name">LAN</field>
+      <field name="location_id" ref="location_zone_Shelving"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_KGL" model="stock.location">
+      <field name="name">KGL</field>
+      <field name="location_id" ref="location_zone_Shelving"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_TRA" model="stock.location">
+      <field name="name">TRA</field>
+      <field name="location_id" ref="location_zone_TransferToSchlieren"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_OPL" model="stock.location">
+      <field name="name">OPL</field>
+      <field name="location_id" ref="location_zone_OPLogistic"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_MU" model="stock.location">
+      <field name="name">MU</field>
+      <field name="location_id" ref="location_zone_Sample"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_WEG" model="stock.location">
+      <field name="name">WEG</field>
+      <field name="location_id" ref="stock_location_wer"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_WEG-QUA" model="stock.location">
+      <field name="name">WEG-QUA</field>
+      <field name="location_id" ref="stock_location_wer_input"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_WUG" model="stock.location">
+      <field name="name">WUG</field>
+      <field name="location_id" ref="stock_location_wer"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_WVU" model="stock.location">
+      <field name="name">WVU</field>
+      <field name="location_id" ref="stock_location_wer"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_WVO" model="stock.location">
+      <field name="name">WVO</field>
+      <field name="location_id" ref="stock_location_wer"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_WEG-VSDShip" model="stock.location">
+      <field name="name">WEG-VSD Ship</field>
+      <field name="location_id" ref="stock_location_wer_output"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_WEG-NSBShip" model="stock.location">
+      <field name="name">WEG-NSB Ship</field>
+      <field name="location_id" ref="stock_location_wer_output"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_KTL-WA-WER" model="stock.location">
+      <field name="name">KTL-WA-WER</field>
+      <field name="location_id" ref="stock_location_wer_input"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_WEG-TRA77" model="stock.location">
+      <field name="name">WEG-TRA77</field>
+      <field name="location_id" ref="location_zone_TransferToSchlieren"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_shuttle_SHUSH1" model="stock.location">
+      <field name="name">SH1</field>
+      <field name="location_id" ref="location_area_SHU"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_tray_T011" model="stock.location">
+      <field name="name">T011</field>
+      <field name="location_id" ref="location_shuttle_SHUSH1"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="tray_type_id" ref="stock_location_tray.stock_location_tray_type_small_8x"/>
+  </record>
+
+  <record id="location_shuttle_SHUSH2" model="stock.location">
+      <field name="name">SH2</field>
+      <field name="location_id" ref="location_area_SHU"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+<!--  <record id="location_tray_T0012" model="stock.location">-->
+<!--      <field name="name">T0012</field>-->
+<!--      <field name="location_id" ref="location_shuttle_SHUSH2"/>-->
+<!--      <field name="usage">internal</field>-->
+<!--      <field name="active" eval="True"/>-->
+<!--      <field name="tray_type_id" ref="stock_location_tray.stock_location_tray_type_small_8x"/>-->
+<!--  </record>-->
+
+  <record id="location_shuttle_SHUSH3" model="stock.location">
+      <field name="name">SH3</field>
+      <field name="location_id" ref="location_area_SHU"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_shuttle_SHUSH4" model="stock.location">
+      <field name="name">SH4</field>
+      <field name="location_id" ref="location_area_SHU"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_shuttle_SHUSH5" model="stock.location">
+      <field name="name">SH5</field>
+      <field name="location_id" ref="location_area_SHU"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_shuttle_SHUSH6" model="stock.location">
+      <field name="name">SH6</field>
+      <field name="location_id" ref="location_area_SHU"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_shuttle_SHUSH7" model="stock.location">
+      <field name="name">SH7</field>
+      <field name="location_id" ref="location_area_SHU"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_shuttle_SHUSH8" model="stock.location">
+      <field name="name">SH8</field>
+      <field name="location_id" ref="location_area_SHU"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_zone_SCHOut" model="stock.location">
+      <field name="name">SCH Out</field>
+      <field name="location_id" ref="stock.stock_location_customers"/>
+      <field name="usage">view</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+  <record id="location_gate_SchlierenTOR1" model="stock.location">
+      <field name="name">TOR1</field>
+      <field name="location_id" ref="location_zone_SCHOut"/>
+      <field name="usage">customer</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_gate_SchlierenTOR2" model="stock.location">
+      <field name="name">TOR2</field>
+      <field name="location_id" ref="location_zone_SCHOut"/>
+      <field name="usage">customer</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_gate_SchlierenTOR3" model="stock.location">
+      <field name="name">TOR3</field>
+      <field name="location_id" ref="location_zone_SCHOut"/>
+      <field name="usage">customer</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_gate_SchlierenTOR4" model="stock.location">
+      <field name="name">TOR4</field>
+      <field name="location_id" ref="location_zone_SCHOut"/>
+      <field name="usage">customer</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_gate_SchlierenTOR5" model="stock.location">
+      <field name="name">TOR5</field>
+      <field name="location_id" ref="location_zone_SCHOut"/>
+      <field name="usage">customer</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_gate_SchlierenTOR6" model="stock.location">
+      <field name="name">TOR6</field>
+      <field name="location_id" ref="location_zone_SCHOut"/>
+      <field name="usage">customer</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_gate_SchlierenTOR7" model="stock.location">
+      <field name="name">TOR7</field>
+      <field name="location_id" ref="location_zone_SCHOut"/>
+      <field name="usage">customer</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_gate_SchlierenTOR8" model="stock.location">
+      <field name="name">TOR8</field>
+      <field name="location_id" ref="location_zone_SCHOut"/>
+      <field name="usage">customer</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_gate_SchlierenTOR9" model="stock.location">
+      <field name="name">TOR9</field>
+      <field name="location_id" ref="location_zone_SCHOut"/>
+      <field name="usage">customer</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_zone_WEROut" model="stock.location">
+      <field name="name">WER Out</field>
+      <field name="location_id" ref="stock.stock_location_customers"/>
+      <field name="usage">view</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+  <record id="location_gate_WEG-TOR1" model="stock.location">
+      <field name="name">WEG-TOR1</field>
+      <field name="location_id" ref="location_zone_WEROut"/>
+      <field name="usage">customer</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_gate_WEG-TOR2" model="stock.location">
+      <field name="name">WEG-TOR2</field>
+      <field name="location_id" ref="location_zone_WEROut"/>
+      <field name="usage">customer</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_gate_WEG-TOR3" model="stock.location">
+      <field name="name">WEG-TOR3</field>
+      <field name="location_id" ref="location_zone_WEROut"/>
+      <field name="usage">customer</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_gate_WEG-TOR4" model="stock.location">
+      <field name="name">WEG-TOR4</field>
+      <field name="location_id" ref="location_zone_WEROut"/>
+      <field name="usage">customer</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="stock.stock_location_company" model="stock.location">
+      <field name="name">Input</field>
+      <field name="location_id" ref="location_root_sch"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+  <record id="location_area_WAE" model="stock.location">
+      <field name="name">WAE</field>
+      <field name="location_id" ref="stock.stock_location_company"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_QUA" model="stock.location">
+      <field name="name">QUA</field>
+      <field name="location_id" ref="stock.stock_location_company"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="stock.stock_location_output" model="stock.location">
+      <field name="name">Output</field>
+      <field name="location_id" ref="location_root_sch"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+  <record id="location_area_VSDShip" model="stock.location">
+      <field name="name">VSD Ship</field>
+      <field name="location_id" ref="stock.stock_location_output"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_OPship" model="stock.location">
+      <field name="name">OP ship</field>
+      <field name="location_id" ref="stock.stock_location_output"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="stock.location_pack_zone" model="stock.location">
+      <field name="name">Packing</field>
+      <field name="location_id" ref="location_root_sch"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+  <record id="location_area_CCOROL" model="stock.location">
+      <field name="name">CCOROL</field>
+      <field name="location_id" ref="stock.location_pack_zone"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_CCOPAL" model="stock.location">
+      <field name="name">CCOPAL</field>
+      <field name="location_id" ref="stock.location_pack_zone"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_CCOOP" model="stock.location">
+      <field name="name">CCOOP</field>
+      <field name="location_id" ref="stock.location_pack_zone"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_CCOPOST" model="stock.location">
+      <field name="name">CCOPOST</field>
+      <field name="location_id" ref="stock.location_pack_zone"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_CCOWER" model="stock.location">
+      <field name="name">CCOWER</field>
+      <field name="location_id" ref="stock_location_wer_pack"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_buffer_UGPIn" model="stock.location">
+      <field name="name">UGP In</field>
+      <field name="location_id" ref="location_zone_HighBay"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_buffer_UGPOut" model="stock.location">
+      <field name="name">UGP Out</field>
+      <field name="location_id" ref="stock.stock_location_stock"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_buffer_HPU" model="stock.location">
+      <field name="name">HPU</field>
+      <field name="location_id" ref="location_zone_Shelving"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_buffer_SPUIn" model="stock.location">
+      <field name="name">SPU In</field>
+      <field name="location_id" ref="location_zone_Kardex"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_buffer_SPUOut" model="stock.location">
+      <field name="name">SPU Out</field>
+      <field name="location_id" ref="location_zone_Shelving"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_ReserveHRL" model="stock.location">
+      <field name="name">Reserve HRL</field>
+      <field name="location_id" ref="location_zone_HighBay"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_buffer_NSB" model="stock.location">
+      <field name="name">NSB</field>
+      <field name="location_id" ref="location_root_sch"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="location_area_HRLRes" model="stock.location">
+      <field name="name">HRL Res</field>
+      <field name="location_id" ref="location_area_ReserveHRL"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+  </record>
+
+  <record id="stock_location_wer_input" model="stock.location">
+      <field name="name">Input</field>
+      <field name="location_id" ref="root_location_wer"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+  <record id="stock.stock_location_stock" model="stock.location">
+      <field name="name">Stock</field>
+      <field name="location_id" ref="location_root_sch"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+      <field name="removal_strategy_id" ref="product_expiry.removal_fefo"/>
+  </record>
+
+  <record id="stock_location_wer_output" model="stock.location">
+      <field name="name">Output</field>
+      <field name="location_id" ref="root_location_wer"/>
+      <field name="usage">internal</field>
+      <field name="active" eval="True"/>
+      <field name="is_zone" eval="True" />
+  </record>
+
+</odoo>

@@ -1,0 +1,378 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <function model="ir.model.data" name="_update_xmlids">
+        <value model="base" eval="[
+                      {'xml_id': 'wms_demo.sch_delivery_pick',
+                      'record': obj().env.ref('stock.warehouse0').pick_type_id,
+                      'noupdate': True,
+                      },
+                      {'xml_id': 'wms_demo.sch_input_pick',
+                      'record': obj().env.ref('stock.warehouse0').in_type_id,
+                      'noupdate': True,
+                      },
+                      {'xml_id': 'wms_demo.sch_delivery_out',
+                      'record': obj().env.ref('stock.warehouse0').out_type_id,
+                      'noupdate': True,
+                      },
+                      {'xml_id': 'wms_demo.sch_delivery_pack',
+                      'record': obj().env.ref('stock.warehouse0').pack_type_id,
+                      'noupdate': True,
+                      },
+                      {'xml_id': 'wms_demo.wer_input_pick',
+                      'record': obj().env.ref('wms_demo.warehouse_wer').in_type_id,
+                      'noupdate': True,
+                      },
+                      {'xml_id': 'wms_demo.wer_delivery_pick',
+                      'record': obj().env.ref('wms_demo.warehouse_wer').pick_type_id,
+                      'noupdate': True,
+                      },
+                      ]"/>
+    </function>
+
+
+    <record id="stock_picking_type_pick_mu" model="stock.picking.type">
+        <field name="name">Pick Sample</field>
+        <field name="sequence_id" ref="sequence_stock_picking_type_pick_mu"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_zone_Sample"/>
+        <field name="default_location_dest_id" ref="stock.location_pack_zone"/>
+        <field name="routing_operation_location_ids" eval="[(6, 0, [ref('location_zone_Sample')])]"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="0"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="5"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="1"/>
+    </record>
+
+    <record id="stock_picking_type_pick_hrl" model="stock.picking.type">
+        <field name="name">Pre-Pick Highbay</field>
+        <field name="sequence_id" ref="sequence_stock_picking_type_highbay_output"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_area_HRL"/>
+        <field name="default_location_dest_id" ref="location_buffer_UGPOut"/>
+        <field name="routing_operation_location_ids" eval="[(6, 0, [ref('location_area_HRL')])]"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="1"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="5"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="stock_picking_type_pick_kardex" model="stock.picking.type">
+        <field name="name">Pre-Pick Kardex</field>
+        <field name="sequence_id" ref="sequence_stock_picking_type_pick_kardex"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_area_SHU"/>
+        <field name="default_location_dest_id" ref="location_buffer_SPUOut"/>
+        <field name="routing_operation_location_ids" eval="[(6, 0, [ref('location_area_SHU')])]"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="1"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="5"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="1"/>
+    </record>
+
+    <record id="stock_picking_type_pick_op" model="stock.picking.type">
+        <field name="name">Pick OP Logistic</field>
+        <field name="sequence_id" ref="sequence_stock_picking_type_pick_op"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_zone_OPLogistic"/>
+        <field name="default_location_dest_id" ref="location_area_CCOOP"/>
+        <field name="routing_operation_location_ids" eval="[(6, 0, [ref('location_zone_OPLogistic')])]"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="1"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="5"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="stock_picking_type_pack_op" model="stock.picking.type">
+        <field name="name">Pack OP</field>
+        <field name="sequence_id" ref="sequence_sch_pick_packing"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_area_CCOOP"/>
+        <field name="default_location_dest_id" ref="location_area_OPship"/>
+        <field name="routing_operation_location_ids" eval="[(6, 0, [ref('location_area_CCOOP')])]"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="1"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="6"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="stock_picking_type_pack_pal" model="stock.picking.type">
+        <field name="name">Pack PAL</field>
+        <field name="sequence_id" ref="sequence_sch_pick_packing"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_area_CCOPAL"/>
+        <field name="default_location_dest_id" ref="location_area_VSDShip"/>
+        <field name="routing_operation_location_ids" eval="[(6, 0, [ref('location_area_CCOPAL')])]"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="1"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="6"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="stock_picking_type_pack_post" model="stock.picking.type">
+        <field name="name">Pack POST</field>
+        <field name="sequence_id" ref="sequence_sch_pick_packing"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_area_CCOPOST"/>
+        <field name="default_location_dest_id" ref="location_area_VSDShip"/>
+        <field name="routing_operation_location_ids" eval="[(6, 0, [ref('location_area_CCOPOST')])]"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="1"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="6"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="stock_picking_type_pack_rol" model="stock.picking.type">
+        <field name="name">Pack ROL</field>
+        <field name="sequence_id" ref="sequence_sch_pick_packing"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_area_CCOROL"/>
+        <field name="default_location_dest_id" ref="location_area_VSDShip"/>
+        <field name="routing_operation_location_ids" eval="[(6, 0, [ref('location_area_CCOROL')])]"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="1"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="6"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="stock_picking_type_pack_wer" model="stock.picking.type">
+        <field name="name">Pack WER</field>
+        <field name="sequence_id" ref="sequence_sch_pick_packing"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_area_CCOWER"/>
+        <field name="default_location_dest_id" ref="location_area_OPship"/>
+        <field name="routing_operation_location_ids" eval="[(6, 0, [ref('location_area_CCOWER')])]"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="1"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="6"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="sch_input_pick" model="stock.picking.type">
+        <field name="name">Receipts</field>
+        <field name="sequence_id" ref="sequence_sch_pick_in"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_dest_id" ref="stock.stock_location_company"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="0"/>
+        <field name="use_create_lots" eval="1"/>
+        <field name="use_existing_lots" eval="0"/>
+        <field name="color" eval="1"/>
+        <field name="code">incoming</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="stock_picking_type_put_away" model="stock.picking.type">
+        <field name="name">Put away</field>
+        <field name="sequence_id" ref="sequence_stock_picking_type_putaway_stock"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="stock.stock_location_company"/>
+        <field name="default_location_dest_id" ref="stock.stock_location_stock"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="0"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="2"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="stock_picking_type_put_kadrex" model="stock.picking.type">
+        <field name="name">Put Kardex</field>
+        <field name="sequence_id" ref="sequence_stock_picking_type_put_kardex"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_buffer_SPUIn"/>
+        <field name="default_location_dest_id" ref="location_area_SHU"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="0"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="4"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="stock_picking_type_put_hrl" model="stock.picking.type">
+        <field name="name">Put HRL</field>
+        <field name="sequence_id" ref="sequence_stock_picking_type_put_hrl"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_buffer_UGPIn"/>
+        <field name="default_location_dest_id" ref="location_area_HRL"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="0"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="4"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="stock_picking_type_put_hpu" model="stock.picking.type">
+        <field name="name">Put HPU</field>
+        <field name="sequence_id" ref="sequence_stock_picking_type_put_hpu"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_buffer_UGPIn"/>
+        <field name="default_location_dest_id" ref="location_buffer_HPU"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="0"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="4"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="stock_picking_type_pick_ugp" model="stock.picking.type">
+        <field name="name">Pick UGP</field>
+        <field name="sequence_id" ref="sequence_stock_picking_type_pick_ugp"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_buffer_UGPOut"/>
+        <field name="default_location_dest_id" ref="stock.location_pack_zone"/>
+        <field name="routing_operation_location_ids" eval="[(6, 0, [ref('location_buffer_UGPOut')])]"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="1"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="4"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="1"/>
+    </record>
+
+    <record id="sch_delivery_out" model="stock.picking.type">
+        <field name="name">Delivery Orders</field>
+        <field name="sequence_id" ref="sequence_sch_pick_out"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="stock.stock_location_output"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="1"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="8"/>
+        <field name="code">outgoing</field>
+        <field name="show_operations" eval="1"/>
+    </record>
+
+    <record id="stock_picking_type_replenish_hrl" model="stock.picking.type">
+        <field name="name">Replenish HRL</field>
+        <field name="sequence_id" ref="sequence_stock_picking_type_replenish_hrl"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="location_area_ReserveHRL"/>
+        <field name="default_location_dest_id" ref="location_zone_HighBay"/>
+        <field name="routing_operation_location_ids" eval="[(6, 0, [ref('location_area_ReserveHRL')])]"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="0"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="3"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="1"/>
+    </record>
+
+    <record id="sch_delivery_pick" model="stock.picking.type">
+        <field name="name">Roundtrip Pick</field>
+        <field name="sequence_id" ref="sequence_sch_pick_picking"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="stock.stock_location_stock"/>
+        <field name="default_location_dest_id" ref="stock.location_pack_zone"/>
+        <field name="display_completion_info" eval="1"/>
+        <field name="show_entire_packs" eval="1"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="5"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="1"/>
+    </record>
+
+    <record id="wer_input_pick" model="stock.picking.type">
+        <field name="name">Receipts</field>
+        <field name="sequence_id" ref="sequence_wer_pick_in"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="warehouse_wer"/>
+        <field name="default_location_dest_id" ref="stock_location_wer_input"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="0"/>
+        <field name="use_create_lots" eval="1"/>
+        <field name="use_existing_lots" eval="0"/>
+        <field name="color" eval="1"/>
+        <field name="code">incoming</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="stock_picking_type_put_away_wer" model="stock.picking.type">
+        <field name="name">Put away</field>
+        <field name="sequence_id" ref="sequence_stock_picking_type_putaway_stock_wer"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="warehouse_wer"/>
+        <field name="default_location_src_id" ref="stock_location_wer_input"/>
+        <field name="default_location_dest_id" ref="stock_location_wer"/>
+        <field name="display_completion_info" eval="0"/>
+        <field name="show_entire_packs" eval="0"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="2"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="0"/>
+    </record>
+
+    <record id="wer_delivery_pick" model="stock.picking.type">
+        <field name="name">Pick</field>
+        <field name="sequence_id" ref="sequence_wer_pick_picking"/>
+        <field name="sequence" eval="10"/>
+        <field name="warehouse_id" ref="warehouse_wer"/>
+        <field name="default_location_src_id" ref="stock_location_wer"/>
+        <field name="default_location_dest_id" ref="stock_location_wer_pack"/>
+        <field name="display_completion_info" eval="1"/>
+        <field name="show_entire_packs" eval="1"/>
+        <field name="use_create_lots" eval="0"/>
+        <field name="use_existing_lots" eval="1"/>
+        <field name="color" eval="5"/>
+        <field name="code">internal</field>
+        <field name="show_operations" eval="1"/>
+    </record>
+
+</odoo>

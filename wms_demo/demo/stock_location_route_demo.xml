@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+  <function model="ir.model.data" name="_update_xmlids">
+    <value model="base" eval="[
+      {'xml_id': 'wms_demo.sch_receive_in_2_steps',
+       'record': obj().env['stock.location.route'].search([('name', '=', 'Schlieren: Receive in 2 steps (input + stock)')], limit=1)[0],
+       'noupdate': True,
+       },
+    ]"/>
+    <value model="base" eval="[
+      {'xml_id': 'wms_demo.wer_receive_in_2_steps',
+       'record': obj().env['stock.location.route'].search([('name', '=', 'Werrikon: Receive in 2 steps (input + stock)')], limit=1)[0],
+       'noupdate': True,
+       },
+    ]"/>
+  </function>
+
+  <function model="ir.model.data" name="_update_xmlids">
+    <value model="base" eval="[
+      {'xml_id': 'wms_demo.sch_input_to_stock',
+       'record': obj().env['stock.rule'].search([('name', '=', 'SCH: Input → Stock')], limit=1)[0],
+       'noupdate': True,
+       },
+    ]"/>
+    <value model="base" eval="[
+      {'xml_id': 'wms_demo.wer_input_to_stock',
+       'record': obj().env['stock.rule'].search([('name', '=', 'WER: Input → Stock')], limit=1)[0],
+       'noupdate': True,
+       },
+    ]"/>
+  </function>
+
+
+  <record id="stock_route_PutawayHRL" model="stock.location.route">
+      <field name="name">Put away HRL</field>
+      <field name="sequence" eval="0"/>
+      <field name="product_selectable" eval="0"/>
+      <field name="warehouse_selectable" eval="1"/>
+      <field name="warehouse_ids">stock.warehouse0</field>
+  </record>
+
+  <record id="stock_route_PutawayKardex" model="stock.location.route">
+      <field name="name">Put away Kardex</field>
+      <field name="sequence" eval="0"/>
+      <field name="product_selectable" eval="0"/>
+      <field name="warehouse_selectable" eval="1"/>
+      <field name="warehouse_ids">stock.warehouse0</field>
+  </record>
+
+</odoo>

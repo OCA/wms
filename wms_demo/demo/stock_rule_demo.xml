@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+  <record id="stock_rule_PushtoHRL" model="stock.rule">
+      <field name="name">Push to HRL</field>
+      <field name="action">push</field>
+      <field name="auto">manual</field>
+      <field name="location_src_id" ref="location_buffer_UGPIn"/>
+      <field name="location_id" ref="location_area_HRL"/>
+      <field name="procure_method">make_to_stock</field>
+      <field name="picking_type_id" ref="stock_picking_type_put_hrl"/>
+      <field name="route_id" ref="stock_route_PutawayHRL"/>
+  </record>
+
+  <record id="stock_rule_PushtoKardex" model="stock.rule">
+      <field name="name">Push to Kardex</field>
+      <field name="action">push</field>
+      <field name="auto">manual</field>
+      <field name="location_src_id" ref="location_buffer_SPUIn"/>
+      <field name="location_id" ref="location_area_SHU"/>
+      <field name="procure_method">make_to_stock</field>
+      <field name="picking_type_id" ref="stock_picking_type_put_kadrex"/>
+      <field name="route_id" ref="stock_route_PutawayKardex"/>
+  </record>
+
+  <record id="sch_input_to_stock" model="stock.rule">
+      <field name="name">SCH: Input → Stock</field>
+      <field name="action">pull</field>
+      <field name="auto">manual</field>
+      <field name="location_src_id" ref="stock.stock_location_company"/>
+      <field name="location_id" ref="stock.stock_location_stock"/>
+      <field name="procure_method">make_to_order</field>
+      <field name="picking_type_id" ref="stock_picking_type_put_away"/>
+      <field name="route_id" ref="sch_receive_in_2_steps"/>
+  </record>
+
+</odoo>
