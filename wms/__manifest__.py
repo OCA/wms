@@ -16,6 +16,7 @@
     'data': [
         'views/wms_views.xml',
         'views/res_config_settings_views.xml',
+        'security/wms_security.xml',
     ],
     'installable': True,
     'license': 'AGPL-3',

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <record id="base.group_user" model="res.groups">
+        <field name="implied_ids" eval="[
+                     (4, ref('stock.group_stock_multi_locations')),
+                     (4, ref('stock.group_stock_multi_warehouses')),
+                     (4, ref('stock.group_adv_location')),
+                     ]"/>
+    </record>
+
+
+</odoo>
