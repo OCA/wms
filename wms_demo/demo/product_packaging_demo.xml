@@ -1,0 +1,970 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <record id="product_100003103inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_100003103"/>
+    </record>
+
+    <record id="product_104000190inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_104000190"/>
+    </record>
+
+    <record id="product_104007620inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_104007620"/>
+    </record>
+
+    <record id="product_105000621inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_105000621"/>
+    </record>
+
+    <record id="product_105007997inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_105007997"/>
+    </record>
+
+    <record id="product_109000260inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_109000260"/>
+    </record>
+
+    <record id="product_124005113inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_124005113"/>
+    </record>
+
+    <record id="product_130000004inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_130000004"/>
+    </record>
+
+    <record id="product_132003147inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_132003147"/>
+    </record>
+
+    <record id="product_138009390inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_138009390"/>
+    </record>
+
+    <record id="product_156000309inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_156000309"/>
+    </record>
+
+    <record id="product_163000587inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_163000587"/>
+    </record>
+
+    <record id="product_163005216inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_163005216"/>
+    </record>
+
+    <record id="product_163005551inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_163005551"/>
+    </record>
+
+    <record id="product_167001020inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_167001020"/>
+    </record>
+
+    <record id="product_170004065inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_170004065"/>
+    </record>
+
+    <record id="product_170006808inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_170006808"/>
+    </record>
+
+    <record id="product_170009521inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_170009521"/>
+    </record>
+
+    <record id="product_170034517inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_170034517"/>
+    </record>
+
+    <record id="product_180002461inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_180002461"/>
+    </record>
+
+    <record id="product_197000016inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_197000016"/>
+    </record>
+
+    <record id="product_200106094inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_200106094"/>
+    </record>
+
+    <record id="product_202001508inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_202001508"/>
+    </record>
+
+    <record id="product_207009108inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_207009108"/>
+    </record>
+
+    <record id="product_232509793inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_232509793"/>
+    </record>
+
+    <record id="product_245004412inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_245004412"/>
+    </record>
+
+    <record id="product_248000630inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_248000630"/>
+    </record>
+
+    <record id="product_248000857inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_248000857"/>
+    </record>
+
+    <record id="product_248001030inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_248001030"/>
+    </record>
+
+    <record id="product_248004036inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_248004036"/>
+    </record>
+
+    <record id="product_312001918inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_312001918"/>
+    </record>
+
+    <record id="product_312004805inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_312004805"/>
+    </record>
+
+    <record id="product_379002117inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_379002117"/>
+    </record>
+
+    <record id="product_379005300inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_379005300"/>
+    </record>
+
+    <record id="product_395000653inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_395000653"/>
+    </record>
+
+    <record id="product_395700438inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_395700438"/>
+    </record>
+
+    <record id="product_396001471inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_396001471"/>
+    </record>
+
+    <record id="product_396009294inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_396009294"/>
+    </record>
+
+    <record id="product_400008525inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_400008525"/>
+    </record>
+
+    <record id="product_409880440inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_409880440"/>
+    </record>
+
+    <record id="product_504000354inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_504000354"/>
+    </record>
+
+    <record id="product_620002065inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_620002065"/>
+    </record>
+
+    <record id="product_650005420inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_650005420"/>
+    </record>
+
+    <record id="product_200000001inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_200000001"/>
+    </record>
+
+    <record id="product_200000002inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_200000002"/>
+    </record>
+
+    <record id="product_300000001inner_box" model="product.packaging">
+        <field name="name">inner_box</field>
+        <field name="qty" eval="10"/>
+        <field name="sequence" eval="1"/>
+        <field name="product_id" ref="product_300000001"/>
+    </record>
+
+    <record id="product_100003103outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_100003103"/>
+    </record>
+
+    <record id="product_104000190outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_104000190"/>
+    </record>
+
+    <record id="product_104007620outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_104007620"/>
+    </record>
+
+    <record id="product_105000621outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_105000621"/>
+    </record>
+
+    <record id="product_105007997outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_105007997"/>
+    </record>
+
+    <record id="product_109000260outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_109000260"/>
+    </record>
+
+    <record id="product_124005113outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_124005113"/>
+    </record>
+
+    <record id="product_130000004outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_130000004"/>
+    </record>
+
+    <record id="product_132003147outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_132003147"/>
+    </record>
+
+    <record id="product_138009390outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_138009390"/>
+    </record>
+
+    <record id="product_156000309outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_156000309"/>
+    </record>
+
+    <record id="product_163000587outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_163000587"/>
+    </record>
+
+    <record id="product_163005216outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_163005216"/>
+    </record>
+
+    <record id="product_163005551outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_163005551"/>
+    </record>
+
+    <record id="product_167001020outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_167001020"/>
+    </record>
+
+    <record id="product_170004065outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_170004065"/>
+    </record>
+
+    <record id="product_170006808outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_170006808"/>
+    </record>
+
+    <record id="product_170009521outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_170009521"/>
+    </record>
+
+    <record id="product_170034517outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_170034517"/>
+    </record>
+
+    <record id="product_180002461outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_180002461"/>
+    </record>
+
+    <record id="product_197000016outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_197000016"/>
+    </record>
+
+    <record id="product_200106094outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_200106094"/>
+    </record>
+
+    <record id="product_202001508outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_202001508"/>
+    </record>
+
+    <record id="product_207009108outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_207009108"/>
+    </record>
+
+    <record id="product_232509793outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_232509793"/>
+    </record>
+
+    <record id="product_245004412outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_245004412"/>
+    </record>
+
+    <record id="product_248000630outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_248000630"/>
+    </record>
+
+    <record id="product_248000857outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_248000857"/>
+    </record>
+
+    <record id="product_248001030outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_248001030"/>
+    </record>
+
+    <record id="product_248004036outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_248004036"/>
+    </record>
+
+    <record id="product_312001918outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_312001918"/>
+    </record>
+
+    <record id="product_312004805outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_312004805"/>
+    </record>
+
+    <record id="product_379002117outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_379002117"/>
+    </record>
+
+    <record id="product_379005300outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_379005300"/>
+    </record>
+
+    <record id="product_395000653outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_395000653"/>
+    </record>
+
+    <record id="product_395700438outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_395700438"/>
+    </record>
+
+    <record id="product_396001471outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_396001471"/>
+    </record>
+
+    <record id="product_396009294outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_396009294"/>
+    </record>
+
+    <record id="product_400008525outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_400008525"/>
+    </record>
+
+    <record id="product_409880440outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_409880440"/>
+    </record>
+
+    <record id="product_504000354outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_504000354"/>
+    </record>
+
+    <record id="product_620002065outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_620002065"/>
+    </record>
+
+    <record id="product_650005420outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_650005420"/>
+    </record>
+
+    <record id="product_200000001outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_200000001"/>
+    </record>
+
+    <record id="product_200000002outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_200000002"/>
+    </record>
+
+    <record id="product_300000001outer_box" model="product.packaging">
+        <field name="name">outer_box</field>
+        <field name="qty" eval="50"/>
+        <field name="sequence" eval="2"/>
+        <field name="product_id" ref="product_300000001"/>
+    </record>
+
+    <record id="product_100003103Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_100003103"/>
+    </record>
+
+    <record id="product_104000190Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_104000190"/>
+    </record>
+
+    <record id="product_104007620Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_104007620"/>
+    </record>
+
+    <record id="product_105000621Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_105000621"/>
+    </record>
+
+    <record id="product_105007997Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_105007997"/>
+    </record>
+
+    <record id="product_109000260Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_109000260"/>
+    </record>
+
+    <record id="product_124005113Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_124005113"/>
+    </record>
+
+    <record id="product_130000004Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_130000004"/>
+    </record>
+
+    <record id="product_132003147Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_132003147"/>
+    </record>
+
+    <record id="product_138009390Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_138009390"/>
+    </record>
+
+    <record id="product_156000309Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_156000309"/>
+    </record>
+
+    <record id="product_163000587Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_163000587"/>
+    </record>
+
+    <record id="product_163005216Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_163005216"/>
+    </record>
+
+    <record id="product_163005551Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_163005551"/>
+    </record>
+
+    <record id="product_167001020Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_167001020"/>
+    </record>
+
+    <record id="product_170004065Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_170004065"/>
+    </record>
+
+    <record id="product_170006808Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_170006808"/>
+    </record>
+
+    <record id="product_170009521Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_170009521"/>
+    </record>
+
+    <record id="product_170034517Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_170034517"/>
+    </record>
+
+    <record id="product_180002461Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_180002461"/>
+    </record>
+
+    <record id="product_197000016Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_197000016"/>
+    </record>
+
+    <record id="product_200106094Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_200106094"/>
+    </record>
+
+    <record id="product_202001508Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_202001508"/>
+    </record>
+
+    <record id="product_207009108Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_207009108"/>
+    </record>
+
+    <record id="product_232509793Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_232509793"/>
+    </record>
+
+    <record id="product_245004412Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_245004412"/>
+    </record>
+
+    <record id="product_248000630Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_248000630"/>
+    </record>
+
+    <record id="product_248000857Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_248000857"/>
+    </record>
+
+    <record id="product_248001030Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_248001030"/>
+    </record>
+
+    <record id="product_248004036Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_248004036"/>
+    </record>
+
+    <record id="product_312001918Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_312001918"/>
+    </record>
+
+    <record id="product_312004805Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_312004805"/>
+    </record>
+
+    <record id="product_379002117Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_379002117"/>
+    </record>
+
+    <record id="product_379005300Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_379005300"/>
+    </record>
+
+    <record id="product_395000653Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_395000653"/>
+    </record>
+
+    <record id="product_395700438Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_395700438"/>
+    </record>
+
+    <record id="product_396001471Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_396001471"/>
+    </record>
+
+    <record id="product_396009294Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_396009294"/>
+    </record>
+
+    <record id="product_400008525Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_400008525"/>
+    </record>
+
+    <record id="product_409880440Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_409880440"/>
+    </record>
+
+    <record id="product_504000354Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_504000354"/>
+    </record>
+
+    <record id="product_620002065Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_620002065"/>
+    </record>
+
+    <record id="product_650005420Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_650005420"/>
+    </record>
+
+    <record id="product_200000001Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_200000001"/>
+    </record>
+
+    <record id="product_200000002Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_200000002"/>
+    </record>
+
+    <record id="product_300000001Pallet" model="product.packaging">
+        <field name="name">Pallet</field>
+        <field name="qty" eval="500"/>
+        <field name="sequence" eval="3"/>
+        <field name="product_id" ref="product_300000001"/>
+    </record>
+
+</odoo>

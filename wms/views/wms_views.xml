@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem name="WMS"
+              id="menu_wms_root"
+              groups="stock.group_stock_manager,stock.group_stock_user"
+              web_icon="wms,static/description/icon.png"
+              sequence="25"/>
+
+    <menuitem id="menu_wms_management" name="WMS"
+              parent="menu_wms_root" sequence="1" />
+
+    <menuitem id="menu_wms_config" name="Configuration" parent="menu_wms_root" sequence="100" groups="stock.group_stock_manager"/>
+
+</odoo>

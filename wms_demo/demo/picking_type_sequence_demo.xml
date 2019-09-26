@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <function model="ir.model.data" name="_update_xmlids">
+        <value model="base" eval="[
+                      {'xml_id': 'wms_demo.sequence_sch_pick_in',
+                      'record': obj().env.ref('stock.warehouse0').in_type_id.sequence_id,
+                      'noupdate': True,
+                      },
+                      {'xml_id': 'wms_demo.sequence_sch_pick_out',
+                      'record': obj().env.ref('stock.warehouse0').out_type_id.sequence_id,
+                      'noupdate': True,
+                      },
+                      {'xml_id': 'wms_demo.sequence_sch_pick_packing',
+                      'record': obj().env.ref('stock.warehouse0').pack_type_id.sequence_id,
+                      'noupdate': True,
+                      },
+                      {'xml_id': 'wms_demo.sequence_sch_pick_picking',
+                      'record': obj().env.ref('stock.warehouse0').pick_type_id.sequence_id,
+                      'noupdate': True,
+                      },
+                      {'xml_id': 'wms_demo.sequence_sch_pick_internal',
+                      'record': obj().env.ref('stock.warehouse0').int_type_id.sequence_id,
+                      'noupdate': True,
+                      },
+                      {'xml_id': 'wms_demo.sequence_wer_pick_in',
+                      'record': obj().env.ref('wms_demo.warehouse_wer').in_type_id.sequence_id,
+                      'noupdate': True,
+                      },
+                      {'xml_id': 'wms_demo.sequence_wer_pick_picking',
+                      'record': obj().env.ref('wms_demo.warehouse_wer').pick_type_id.sequence_id,
+                      'noupdate': True,
+                      },
+                      ]"/>
+    </function>
+
+    <record id="sequence_stock_picking_type_highbay_output" model="ir.sequence">
+        <field name="name">Pick HRL</field>
+        <field name="number_next_actual" eval="1"/>
+        <field name="implementation">standard</field>
+        <field name="prefix">HRL/</field>
+        <field name="code">stock.ho</field>
+        <field name="padding" eval="5"/>
+        <field name="number_increment" eval="1"/>
+    </record>
+
+    <record id="sequence_stock_picking_type_pick_mu" model="ir.sequence">
+        <field name="name">Pick MU</field>
+        <field name="number_next_actual" eval="1"/>
+        <field name="implementation">standard</field>
+        <field name="prefix">MU/</field>
+        <field name="code">stock.mu</field>
+        <field name="padding" eval="5"/>
+        <field name="number_increment" eval="1"/>
+    </record>
+
+    <record id="sequence_stock_picking_type_pick_kardex" model="ir.sequence">
+        <field name="name">Pick SHU</field>
+        <field name="number_next_actual" eval="1"/>
+        <field name="implementation">standard</field>
+        <field name="prefix">SHU/</field>
+        <field name="code">stock.shu</field>
+        <field name="padding" eval="5"/>
+        <field name="number_increment" eval="1"/>
+    </record>
+
+    <record id="sequence_stock_picking_type_pick_op" model="ir.sequence">
+        <field name="name">Pick OP</field>
+        <field name="number_next_actual" eval="1"/>
+        <field name="implementation">standard</field>
+        <field name="prefix">OP/</field>
+        <field name="code">stock.oppick</field>
+        <field name="padding" eval="5"/>
+        <field name="number_increment" eval="1"/>
+    </record>
+
+    <record id="sequence_stock_picking_type_putaway_stock" model="ir.sequence">
+        <field name="name">Put away</field>
+        <field name="number_next_actual" eval="1"/>
+        <field name="implementation">standard</field>
+        <field name="prefix">PAY/</field>
+        <field name="code">stock.pay</field>
+        <field name="padding" eval="5"/>
+        <field name="number_increment" eval="1"/>
+    </record>
+
+    <record id="sequence_stock_picking_type_put_hrl" model="ir.sequence">
+        <field name="name">Put HRL</field>
+        <field name="number_next_actual" eval="1"/>
+        <field name="implementation">standard</field>
+        <field name="prefix">PHRL/</field>
+        <field name="code">stock.phrl</field>
+        <field name="padding" eval="5"/>
+        <field name="number_increment" eval="1"/>
+    </record>
+
+    <record id="sequence_stock_picking_type_put_kardex" model="ir.sequence">
+        <field name="name">Put Kardex</field>
+        <field name="number_next_actual" eval="1"/>
+        <field name="implementation">standard</field>
+        <field name="prefix">PSHU/</field>
+        <field name="code">stock.pshu</field>
+        <field name="padding" eval="5"/>
+        <field name="number_increment" eval="1"/>
+    </record>
+
+    <record id="sequence_stock_picking_type_put_hpu" model="ir.sequence">
+        <field name="name">Put HPU</field>
+        <field name="number_next_actual" eval="1"/>
+        <field name="implementation">standard</field>
+        <field name="prefix">PHPU/</field>
+        <field name="code">stock.phpu</field>
+        <field name="padding" eval="5"/>
+        <field name="number_increment" eval="1"/>
+    </record>
+
+    <record id="sequence_stock_picking_type_replenish_hrl" model="ir.sequence">
+        <field name="name">Replenish HRL</field>
+        <field name="number_next_actual" eval="1"/>
+        <field name="implementation">standard</field>
+        <field name="prefix">RHRL/</field>
+        <field name="code">stock.rhrl</field>
+        <field name="padding" eval="5"/>
+        <field name="number_increment" eval="1"/>
+    </record>
+
+    <record id="sequence_stock_picking_type_pick_ugp" model="ir.sequence">
+        <field name="name">Pick UGP</field>
+        <field name="number_next_actual" eval="1"/>
+        <field name="implementation">standard</field>
+        <field name="prefix">UGP/</field>
+        <field name="code">stock.ugp</field>
+        <field name="padding" eval="5"/>
+        <field name="number_increment" eval="1"/>
+    </record>
+
+    <record id="sequence_stock_picking_type_putaway_stock_wer" model="ir.sequence">
+        <field name="name">Put away</field>
+        <field name="number_next_actual" eval="1"/>
+        <field name="implementation">standard</field>
+        <field name="prefix">WER/PAY/</field>
+        <field name="code">stock.wer.pay</field>
+        <field name="padding" eval="5"/>
+        <field name="number_increment" eval="1"/>
+    </record>
+
+</odoo>

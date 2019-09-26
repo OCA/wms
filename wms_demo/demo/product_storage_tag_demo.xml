@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <record id="storagetag_Liquid" model="product.storage.tag">
+        <field name="name">Liquid</field>
+        <field name="sequence" eval="10"/>
+    </record>
+
+    <record id="storagetag_DangerousGoods" model="product.storage.tag">
+        <field name="name">Dangerous Goods</field>
+        <field name="sequence" eval="10"/>
+    </record>
+
+</odoo>

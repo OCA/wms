@@ -1,0 +1,422 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <record id="product_100003103" model="product.product">
+        <field name="default_code" eval="100003103"/>
+        <field name="name">Spritze Terumo 3-teilig 3ml zentrisch Luer-Lockntrisch Luer-Lock</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="118"/>
+        <field name="standard_price" eval="108"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_104000190" model="product.product">
+        <field name="default_code" eval="104000190"/>
+        <field name="name">Handtuch Tork Advanced V-Falz 2-lg weiss 23x23cm (BxL)2-lg weiss 23x23cm (BxL)</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="85"/>
+        <field name="standard_price" eval="75"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_104007620" model="product.product">
+        <field name="default_code" eval="104007620"/>
+        <field name="name">Servietten Tork Advanced 39 1/8 Falz 3-lg rot/8 Falz 3-lg rot</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="283"/>
+        <field name="standard_price" eval="273"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_105000621" model="product.product">
+        <field name="default_code" eval="105000621"/>
+        <field name="name">Geschlossenes System atmungsaktiv TENA Slip Ultima Ltiv TENA Slip Ultima L</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="93"/>
+        <field name="standard_price" eval="83"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_105007997" model="product.product">
+        <field name="default_code" eval="105007997"/>
+        <field name="name">Reinigungstücher TENA Wet Wipe</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="161"/>
+        <field name="standard_price" eval="151"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_109000260" model="product.product">
+        <field name="default_code" eval="109000260"/>
+        <field name="name">Frischhaltefolie Freshstar 30cmx300m Grossrolle in Cutterboxmx300m Grossrolle in Cutterbox</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="124"/>
+        <field name="standard_price" eval="114"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_124005113" model="product.product">
+        <field name="default_code" eval="124005113"/>
+        <field name="name">PTFE-Band für hm 450</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="233"/>
+        <field name="standard_price" eval="223"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_130000004" model="product.product">
+        <field name="default_code" eval="130000004"/>
+        <field name="name">Sanitärreiniger &amp; Kalklöser MILIZID 1LiterLIZID 1Liter</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="239"/>
+        <field name="standard_price" eval="229"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_132003147" model="product.product">
+        <field name="default_code" eval="132003147"/>
+        <field name="name">Sanitärreiniger AvenisFoam Schaumreiniger Sprühflasche 750mlaumreiniger Sprühflasche 750ml</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="272"/>
+        <field name="standard_price" eval="262"/>
+        <field name="type">product</field>
+        <field name="product_storage_tag_ids" eval="[(6, 0, [ref('storagetag_Liquid')])]"/>
+    </record>
+
+    <record id="product_138009390" model="product.product">
+        <field name="default_code" eval="138009390"/>
+        <field name="name">Edelstahlpflege Chromol 500ml</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="97"/>
+        <field name="standard_price" eval="87"/>
+        <field name="type">product</field>
+        <field name="product_storage_tag_ids" eval="[(6, 0, [ref('storagetag_Liquid'),ref('storagetag_DangerousGoods')])]"/>
+    </record>
+
+    <record id="product_156000309" model="product.product">
+        <field name="default_code" eval="156000309"/>
+        <field name="name">Trinkbecher 2dl geeicht glasklar PP geripptar PP gerippt</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="151"/>
+        <field name="standard_price" eval="141"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_163000587" model="product.product">
+        <field name="default_code" eval="163000587"/>
+        <field name="name">Tortenspitzen rund Ø 23cm weisss</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="73"/>
+        <field name="standard_price" eval="63"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_163005216" model="product.product">
+        <field name="default_code" eval="163005216"/>
+        <field name="name">Tischtuchrolle Dunisilk 120cmx25m weiss25m weiss</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="233"/>
+        <field name="standard_price" eval="223"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_163005551" model="product.product">
+        <field name="default_code" eval="163005551"/>
+        <field name="name">Servietten Duni 40x40cm 1/4 Falz 3-lagig mandarinlz 3-lagig mandarin</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="273"/>
+        <field name="standard_price" eval="263"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_167001020" model="product.product">
+        <field name="default_code" eval="167001020"/>
+        <field name="name">Tuberkulinspritze HSW Soft-Ject 3-teilig 1mlt 3-teilig 1ml</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="214"/>
+        <field name="standard_price" eval="204"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_170004065" model="product.product">
+        <field name="default_code" eval="170004065"/>
+        <field name="name">Klappdeckel für Mikrozid-Spray</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="284"/>
+        <field name="standard_price" eval="274"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_170006808" model="product.product">
+        <field name="default_code" eval="170006808"/>
+        <field name="name">Händedesinfektion Desderman pure 1 Liter Flaschere 1 Liter Flasche</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="224"/>
+        <field name="standard_price" eval="214"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_170009521" model="product.product">
+        <field name="default_code" eval="170009521"/>
+        <field name="name">Spendereimer Schülke Wipes</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="145"/>
+        <field name="standard_price" eval="135"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_170034517" model="product.product">
+        <field name="default_code" eval="170034517"/>
+        <field name="name">Durgol 1000ml</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="59"/>
+        <field name="standard_price" eval="49"/>
+        <field name="type">product</field>
+        <field name="product_storage_tag_ids" eval="[(6, 0, [ref('storagetag_Liquid')])]"/>
+    </record>
+
+    <record id="product_180002461" model="product.product">
+        <field name="default_code" eval="180002461"/>
+        <field name="name">Beinbeutel Careline steril 750ml Schlauchlänge 8.5cmml Schlauchlänge 8.5cm</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="133"/>
+        <field name="standard_price" eval="123"/>
+        <field name="type">product</field>
+        <field name="product_storage_tag_ids" eval="[(6, 0, [ref('storagetag_Liquid')])]"/>
+    </record>
+
+    <record id="product_197000016" model="product.product">
+        <field name="default_code" eval="197000016"/>
+        <field name="name">Einspritzkappe Luer-Lock männlich sterilich steril</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="121"/>
+        <field name="standard_price" eval="111"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_200106094" model="product.product">
+        <field name="default_code" eval="200106094"/>
+        <field name="name">Schutzserviette Finess gefaltet 2-lg 37x70cm ungebleichtt 2-lg 37x70cm ungebleicht</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="80"/>
+        <field name="standard_price" eval="70"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_202001508" model="product.product">
+        <field name="default_code" eval="202001508"/>
+        <field name="name">Batterie Industrial Duracell 9V Block (MN1604/6LF22/ST10)V Block (MN1604/6LF22/ST10)</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="74"/>
+        <field name="standard_price" eval="64"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_207009108" model="product.product">
+        <field name="default_code" eval="207009108"/>
+        <field name="name">Redon-Nadel CH08 165mm gerade</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="110"/>
+        <field name="standard_price" eval="100"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_232509793" model="product.product">
+        <field name="default_code" eval="232509793"/>
+        <field name="name">Digitalthermometer weiss</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="292"/>
+        <field name="standard_price" eval="282"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_245004412" model="product.product">
+        <field name="default_code" eval="245004412"/>
+        <field name="name">OP-Maske mit Ohrschlaufen blau Typ IIRTyp IIR</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="181"/>
+        <field name="standard_price" eval="171"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_248000630" model="product.product">
+        <field name="default_code" eval="248000630"/>
+        <field name="name">run ultralight socks electric blue/green women IVblue/green women IV</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="158"/>
+        <field name="standard_price" eval="148"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_248000857" model="product.product">
+        <field name="default_code" eval="248000857"/>
+        <field name="name">low-cut socks sunset/pink women IVn IV</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="278"/>
+        <field name="standard_price" eval="268"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_248001030" model="product.product">
+        <field name="default_code" eval="248001030"/>
+        <field name="name">Textilhandschuhe mediven M</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="286"/>
+        <field name="standard_price" eval="276"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_248004036" model="product.product">
+        <field name="default_code" eval="248004036"/>
+        <field name="name">Kniestrumpf travel women M caramel kurzamel kurz</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="97"/>
+        <field name="standard_price" eval="87"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_312001918" model="product.product">
+        <field name="default_code" eval="312001918"/>
+        <field name="name">Darmrohr CH18 40cm Dahlhausen</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="159"/>
+        <field name="standard_price" eval="149"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_312004805" model="product.product">
+        <field name="default_code" eval="312004805"/>
+        <field name="name">Beatmungsmaske für Erwachsene grossgross</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="269"/>
+        <field name="standard_price" eval="259"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_379002117" model="product.product">
+        <field name="default_code" eval="379002117"/>
+        <field name="name">Einlagebeutel 28-35Liter transparent Verschlussbandparent Verschlussband</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="152"/>
+        <field name="standard_price" eval="142"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_379005300" model="product.product">
+        <field name="default_code" eval="379005300"/>
+        <field name="name">Kehrichtsack 35lt schwarz neutral Bändelverschlussral Bändelverschluss</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="188"/>
+        <field name="standard_price" eval="178"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_395000653" model="product.product">
+        <field name="default_code" eval="395000653"/>
+        <field name="name">Betteinlage San-Med mit Seitenlaschen 75x100cmlaschen 75x100cm</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="180"/>
+        <field name="standard_price" eval="170"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_395700438" model="product.product">
+        <field name="default_code" eval="395700438"/>
+        <field name="name">Universal-Set Abdominal KSA 3M</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="66"/>
+        <field name="standard_price" eval="56"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_396001471" model="product.product">
+        <field name="default_code" eval="396001471"/>
+        <field name="name">Sterilisationsvlies Halyard Smart-Fold H650 101x119cmart-Fold H650 101x119cm</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="135"/>
+        <field name="standard_price" eval="125"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_396009294" model="product.product">
+        <field name="default_code" eval="396009294"/>
+        <field name="name">OP-Kittel BASICS L/x-lang</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="178"/>
+        <field name="standard_price" eval="168"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_400008525" model="product.product">
+        <field name="default_code" eval="400008525"/>
+        <field name="name">OP-Maske Sandel Zellulosebeschichtung Bänder weiss Typ IIRichtung Bänder weiss Typ IIR</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="132"/>
+        <field name="standard_price" eval="122"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_409880440" model="product.product">
+        <field name="default_code" eval="409880440"/>
+        <field name="name">MRI Patientensicherheits-Set Grösse S/Mrösse S/M</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="170"/>
+        <field name="standard_price" eval="160"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_504000354" model="product.product">
+        <field name="default_code" eval="504000354"/>
+        <field name="name">Overall PP-Vlies premium mit Kragen dunkelblau XLragen dunkelblau XL</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="246"/>
+        <field name="standard_price" eval="236"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_620002065" model="product.product">
+        <field name="default_code" eval="620002065"/>
+        <field name="name">Treteimer Brabantia NewIcon 5 Liter whiteLiter white</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="115"/>
+        <field name="standard_price" eval="105"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_650005420" model="product.product">
+        <field name="default_code" eval="650005420"/>
+        <field name="name">Zellstoffwattetupfer Cellodent 12-fach 4x5cm steril12-fach 4x5cm steril</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="228"/>
+        <field name="standard_price" eval="218"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_200000001" model="product.product">
+        <field name="default_code" eval="200000001"/>
+        <field name="name">OP set test product 1</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="300"/>
+        <field name="standard_price" eval="200"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_200000002" model="product.product">
+        <field name="default_code" eval="200000002"/>
+        <field name="name">OP set test product 2</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="300"/>
+        <field name="standard_price" eval="200"/>
+        <field name="type">product</field>
+    </record>
+
+    <record id="product_300000001" model="product.product">
+        <field name="default_code" eval="300000001"/>
+        <field name="name">Sample test product</field>
+        <field name="tracking">none</field>
+        <field name="list_price" eval="5"/>
+        <field name="standard_price" eval="3"/>
+        <field name="type">product</field>
+    </record>
+
+</odoo>
