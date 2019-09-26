@@ -10,6 +10,8 @@ Warehouse Management System for advanced logistics processes with Odoo.
 
 Work in progress, tracked in this issue https://github.com/OCA/wms/issues/1
 
+![General module architecture](https://user-images.githubusercontent.com/151794/65694568-5c406e80-e076-11e9-8d1c-37716c0ef4b3.png)
+
 ## Reference document
 
  - Draft of the requirements: https://docs.google.com/document/d/1mct6bFFWJqW01wGFcjc-uQNEjyCxvh6Y9TuFdRhe-b0/edit#heading=h.k0bwq3398e7m
