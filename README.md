@@ -8,7 +8,7 @@ Warehouse Management System for advanced logistics processes with Odoo.
 
 ## RFC
 
-Work in progress and track in this issue https://github.com/OCA/wms/issues/1
+Work in progress, tracked in this issue https://github.com/OCA/wms/issues/1
 
 ## Reference document
 
