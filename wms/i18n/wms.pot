@@ -1,0 +1,148 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* wms
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 12.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: wms
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "A location can be configured to insert an operation with a different picking type to move goods."
+msgstr ""
+
+#. module: wms
+#: model:ir.model.fields,field_description:wms.field_res_config_settings__module_stock_putaway_abc
+msgid "ABC chaotic storage Put-Away"
+msgstr ""
+
+#. module: wms
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "Add an option to allow only bins for Put-Away rules."
+msgstr ""
+
+#. module: wms
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "Add an option to filter bins for Put-Away rules based on matching tags."
+msgstr ""
+
+#. module: wms
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "Add integration with Vertical Lift for Kardex hardware."
+msgstr ""
+
+#. module: wms
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "Adds rules for advanced reservation / removal strategies."
+msgstr ""
+
+#. module: wms
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "Chain rules recursively."
+msgstr ""
+
+#. module: wms
+#: model:ir.model,name:wms.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: wms
+#: model:ir.model.fields,field_description:wms.field_res_config_settings__module_stock_putaway_rule
+msgid "Configurable Put-Away Rules"
+msgstr ""
+
+#. module: wms
+#: model:ir.ui.menu,name:wms.menu_wms_config
+msgid "Configuration"
+msgstr ""
+
+#. module: wms
+#: model:ir.model.fields,field_description:wms.field_res_config_settings__module_stock_reserve_rule
+msgid "Configure reservation rules by location"
+msgstr ""
+
+#. module: wms
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "Display on current document completion information about next operations."
+msgstr ""
+
+#. module: wms
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "Extend Put-Away rules with ABC Chaotic Storage."
+msgstr ""
+
+#. module: wms
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "If enabled, install Vertical Lift integration for Kardex hardware."
+msgstr ""
+
+#. module: wms
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "Manage putaway with rules as in odoo v13.0"
+msgstr ""
+
+#. module: wms
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "Put-Away"
+msgstr ""
+
+#. module: wms
+#: model:ir.model.fields,field_description:wms.field_res_config_settings__module_stock_move_location_dest_constraint_empty
+msgid "Put-Away Constraint: Empty bin"
+msgstr ""
+
+#. module: wms
+#: model:ir.model.fields,field_description:wms.field_res_config_settings__module_stock_move_location_dest_constraint_tag
+msgid "Put-Away Constraint: Tags Matching"
+msgstr ""
+
+#. module: wms
+#: model:ir.model.fields,field_description:wms.field_res_config_settings__module_stock_putaway_recursive
+msgid "Recursive Put-Away rules"
+msgstr ""
+
+#. module: wms
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "Reservation"
+msgstr ""
+
+#. module: wms
+#: model:ir.model.fields,field_description:wms.field_res_config_settings__module_stock_picking_type_routing_operation
+msgid "Route extra operation depending on source location"
+msgstr ""
+
+#. module: wms
+#: model:ir.actions.act_window,name:wms.action_wms_configuration
+#: model:ir.ui.menu,name:wms.menu_wms_general_settings
+msgid "Settings"
+msgstr ""
+
+#. module: wms
+#: model:ir.model.fields,field_description:wms.field_res_config_settings__module_stock_picking_completion_info
+msgid "Show Operations completion details"
+msgstr ""
+
+#. module: wms
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "Vertical Lift"
+msgstr ""
+
+#. module: wms
+#: model:ir.model.fields,field_description:wms.field_res_config_settings__module_stock_vertical_lift_kardex
+msgid "Vertical Lift Using Kardex"
+msgstr ""
+
+#. module: wms
+#: model:ir.ui.menu,name:wms.menu_wms_management
+#: model:ir.ui.menu,name:wms.menu_wms_root
+#: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
+msgid "WMS"
+msgstr ""
+
