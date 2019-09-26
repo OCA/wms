@@ -1,0 +1,615 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* wms_demo
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 12.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_202001508
+#: model:product.template,name:wms_demo.product_202001508_product_template
+msgid "Batterie Industrial Duracell 9V Block (MN1604/6LF22/ST10)V Block (MN1604/6LF22/ST10)"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_312004805
+#: model:product.template,name:wms_demo.product_312004805_product_template
+msgid "Beatmungsmaske für Erwachsene grossgross"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_180002461
+#: model:product.template,name:wms_demo.product_180002461_product_template
+msgid "Beinbeutel Careline steril 750ml Schlauchlänge 8.5cmml Schlauchlänge 8.5cm"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_395000653
+#: model:product.template,name:wms_demo.product_395000653_product_template
+msgid "Betteinlage San-Med mit Seitenlaschen 75x100cmlaschen 75x100cm"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_312001918
+#: model:product.template,name:wms_demo.product_312001918_product_template
+msgid "Darmrohr CH18 40cm Dahlhausen"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.sch_delivery_out
+msgid "Delivery Orders"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_232509793
+#: model:product.template,name:wms_demo.product_232509793_product_template
+msgid "Digitalthermometer weiss"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_170034517
+#: model:product.template,name:wms_demo.product_170034517_product_template
+msgid "Durgol 1000ml"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_138009390
+#: model:product.template,name:wms_demo.product_138009390_product_template
+msgid "Edelstahlpflege Chromol 500ml"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_379002117
+#: model:product.template,name:wms_demo.product_379002117_product_template
+msgid "Einlagebeutel 28-35Liter transparent Verschlussbandparent Verschlussband"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_197000016
+#: model:product.template,name:wms_demo.product_197000016_product_template
+msgid "Einspritzkappe Luer-Lock männlich sterilich steril"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_109000260
+#: model:product.template,name:wms_demo.product_109000260_product_template
+msgid "Frischhaltefolie Freshstar 30cmx300m Grossrolle in Cutterboxmx300m Grossrolle in Cutterbox"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_105000621
+#: model:product.template,name:wms_demo.product_105000621_product_template
+msgid "Geschlossenes System atmungsaktiv TENA Slip Ultima Ltiv TENA Slip Ultima L"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_104000190
+#: model:product.template,name:wms_demo.product_104000190_product_template
+msgid "Handtuch Tork Advanced V-Falz 2-lg weiss 23x23cm (BxL)2-lg weiss 23x23cm (BxL)"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_170006808
+#: model:product.template,name:wms_demo.product_170006808_product_template
+msgid "Händedesinfektion Desderman pure 1 Liter Flaschere 1 Liter Flasche"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_379005300
+#: model:product.template,name:wms_demo.product_379005300_product_template
+msgid "Kehrichtsack 35lt schwarz neutral Bändelverschlussral Bändelverschluss"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_170004065
+#: model:product.template,name:wms_demo.product_170004065_product_template
+msgid "Klappdeckel für Mikrozid-Spray"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_248004036
+#: model:product.template,name:wms_demo.product_248004036_product_template
+msgid "Kniestrumpf travel women M caramel kurzamel kurz"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_409880440
+#: model:product.template,name:wms_demo.product_409880440_product_template
+msgid "MRI Patientensicherheits-Set Grösse S/Mrösse S/M"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_200000001
+#: model:product.template,name:wms_demo.product_200000001_product_template
+msgid "OP set test product 1"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_200000002
+#: model:product.template,name:wms_demo.product_200000002_product_template
+msgid "OP set test product 2"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_396009294
+#: model:product.template,name:wms_demo.product_396009294_product_template
+msgid "OP-Kittel BASICS L/x-lang"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_400008525
+#: model:product.template,name:wms_demo.product_400008525_product_template
+msgid "OP-Maske Sandel Zellulosebeschichtung Bänder weiss Typ IIRichtung Bänder weiss Typ IIR"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_245004412
+#: model:product.template,name:wms_demo.product_245004412_product_template
+msgid "OP-Maske mit Ohrschlaufen blau Typ IIRTyp IIR"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_504000354
+#: model:product.template,name:wms_demo.product_504000354_product_template
+msgid "Overall PP-Vlies premium mit Kragen dunkelblau XLragen dunkelblau XL"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_124005113
+#: model:product.template,name:wms_demo.product_124005113_product_template
+msgid "PTFE-Band für hm 450"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.sch_delivery_pack
+msgid "Pack"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_pack_op
+msgid "Pack OP"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_pack_pal
+msgid "Pack PAL"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_pack_post
+msgid "Pack POST"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_pack_rol
+msgid "Pack ROL"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_pack_wer
+msgid "Pack WER"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.wer_delivery_pick
+msgid "Pick"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_pick_op
+msgid "Pick OP Logistic"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_pick_mu
+msgid "Pick Sample"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_pick_ugp
+msgid "Pick UGP"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_pick_hrl
+msgid "Pre-Pick Highbay"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_pick_kardex
+msgid "Pre-Pick Kardex"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.rule,name:wms_demo.stock_rule_PushtoHRL
+msgid "Push to HRL"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.rule,name:wms_demo.stock_rule_PushtoKardex
+msgid "Push to Kardex"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_put_hpu
+msgid "Put HPU"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_put_hrl
+msgid "Put HRL"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_put_kadrex
+msgid "Put Kardex"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_put_away
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_put_away_wer
+msgid "Put away"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.location.route,name:wms_demo.stock_route_PutawayHRL
+msgid "Put away HRL"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.location.route,name:wms_demo.stock_route_PutawayKardex
+msgid "Put away Kardex"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.sch_input_pick
+#: model:stock.picking.type,name:wms_demo.wer_input_pick
+msgid "Receipts"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_207009108
+#: model:product.template,name:wms_demo.product_207009108_product_template
+msgid "Redon-Nadel CH08 165mm gerade"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_105007997
+#: model:product.template,name:wms_demo.product_105007997_product_template
+msgid "Reinigungstücher TENA Wet Wipe"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.stock_picking_type_replenish_hrl
+msgid "Replenish HRL"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.picking.type,name:wms_demo.sch_delivery_pick
+msgid "Roundtrip Pick"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.rule,name:wms_demo.sch_input_to_stock
+msgid "SCH: Input → Stock"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_300000001
+#: model:product.template,name:wms_demo.product_300000001_product_template
+msgid "Sample test product"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_130000004
+#: model:product.template,name:wms_demo.product_130000004_product_template
+msgid "Sanitärreiniger & Kalklöser MILIZID 1LiterLIZID 1Liter"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_132003147
+#: model:product.template,name:wms_demo.product_132003147_product_template
+msgid "Sanitärreiniger AvenisFoam Schaumreiniger Sprühflasche 750mlaumreiniger Sprühflasche 750ml"
+msgstr ""
+
+#. module: wms_demo
+#: model:stock.location.route,name:wms_demo.sch_receive_in_2_steps
+msgid "Schlieren: Receive in 2 steps (input + stock)"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_200106094
+#: model:product.template,name:wms_demo.product_200106094_product_template
+msgid "Schutzserviette Finess gefaltet 2-lg 37x70cm ungebleichtt 2-lg 37x70cm ungebleicht"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_163005551
+#: model:product.template,name:wms_demo.product_163005551_product_template
+msgid "Servietten Duni 40x40cm 1/4 Falz 3-lagig mandarinlz 3-lagig mandarin"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_104007620
+#: model:product.template,name:wms_demo.product_104007620_product_template
+msgid "Servietten Tork Advanced 39 1/8 Falz 3-lg rot/8 Falz 3-lg rot"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_170009521
+#: model:product.template,name:wms_demo.product_170009521_product_template
+msgid "Spendereimer Schülke Wipes"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_100003103
+#: model:product.template,name:wms_demo.product_100003103_product_template
+msgid "Spritze Terumo 3-teilig 3ml zentrisch Luer-Lockntrisch Luer-Lock"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_396001471
+#: model:product.template,name:wms_demo.product_396001471_product_template
+msgid "Sterilisationsvlies Halyard Smart-Fold H650 101x119cmart-Fold H650 101x119cm"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_248001030
+#: model:product.template,name:wms_demo.product_248001030_product_template
+msgid "Textilhandschuhe mediven M"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_163005216
+#: model:product.template,name:wms_demo.product_163005216_product_template
+msgid "Tischtuchrolle Dunisilk 120cmx25m weiss25m weiss"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_163000587
+#: model:product.template,name:wms_demo.product_163000587_product_template
+msgid "Tortenspitzen rund Ø 23cm weisss"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_620002065
+#: model:product.template,name:wms_demo.product_620002065_product_template
+msgid "Treteimer Brabantia NewIcon 5 Liter whiteLiter white"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_156000309
+#: model:product.template,name:wms_demo.product_156000309_product_template
+msgid "Trinkbecher 2dl geeicht glasklar PP geripptar PP gerippt"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_167001020
+#: model:product.template,name:wms_demo.product_167001020_product_template
+msgid "Tuberkulinspritze HSW Soft-Ject 3-teilig 1mlt 3-teilig 1ml"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,uom_name:wms_demo.product_100003103
+#: model:product.product,uom_name:wms_demo.product_104000190
+#: model:product.product,uom_name:wms_demo.product_104007620
+#: model:product.product,uom_name:wms_demo.product_105000621
+#: model:product.product,uom_name:wms_demo.product_105007997
+#: model:product.product,uom_name:wms_demo.product_109000260
+#: model:product.product,uom_name:wms_demo.product_124005113
+#: model:product.product,uom_name:wms_demo.product_130000004
+#: model:product.product,uom_name:wms_demo.product_132003147
+#: model:product.product,uom_name:wms_demo.product_138009390
+#: model:product.product,uom_name:wms_demo.product_156000309
+#: model:product.product,uom_name:wms_demo.product_163000587
+#: model:product.product,uom_name:wms_demo.product_163005216
+#: model:product.product,uom_name:wms_demo.product_163005551
+#: model:product.product,uom_name:wms_demo.product_167001020
+#: model:product.product,uom_name:wms_demo.product_170004065
+#: model:product.product,uom_name:wms_demo.product_170006808
+#: model:product.product,uom_name:wms_demo.product_170009521
+#: model:product.product,uom_name:wms_demo.product_170034517
+#: model:product.product,uom_name:wms_demo.product_180002461
+#: model:product.product,uom_name:wms_demo.product_197000016
+#: model:product.product,uom_name:wms_demo.product_200000001
+#: model:product.product,uom_name:wms_demo.product_200000002
+#: model:product.product,uom_name:wms_demo.product_200106094
+#: model:product.product,uom_name:wms_demo.product_202001508
+#: model:product.product,uom_name:wms_demo.product_207009108
+#: model:product.product,uom_name:wms_demo.product_232509793
+#: model:product.product,uom_name:wms_demo.product_245004412
+#: model:product.product,uom_name:wms_demo.product_248000630
+#: model:product.product,uom_name:wms_demo.product_248000857
+#: model:product.product,uom_name:wms_demo.product_248001030
+#: model:product.product,uom_name:wms_demo.product_248004036
+#: model:product.product,uom_name:wms_demo.product_300000001
+#: model:product.product,uom_name:wms_demo.product_312001918
+#: model:product.product,uom_name:wms_demo.product_312004805
+#: model:product.product,uom_name:wms_demo.product_379002117
+#: model:product.product,uom_name:wms_demo.product_379005300
+#: model:product.product,uom_name:wms_demo.product_395000653
+#: model:product.product,uom_name:wms_demo.product_395700438
+#: model:product.product,uom_name:wms_demo.product_396001471
+#: model:product.product,uom_name:wms_demo.product_396009294
+#: model:product.product,uom_name:wms_demo.product_400008525
+#: model:product.product,uom_name:wms_demo.product_409880440
+#: model:product.product,uom_name:wms_demo.product_504000354
+#: model:product.product,uom_name:wms_demo.product_620002065
+#: model:product.product,uom_name:wms_demo.product_650005420
+#: model:product.template,uom_name:wms_demo.product_100003103_product_template
+#: model:product.template,uom_name:wms_demo.product_104000190_product_template
+#: model:product.template,uom_name:wms_demo.product_104007620_product_template
+#: model:product.template,uom_name:wms_demo.product_105000621_product_template
+#: model:product.template,uom_name:wms_demo.product_105007997_product_template
+#: model:product.template,uom_name:wms_demo.product_109000260_product_template
+#: model:product.template,uom_name:wms_demo.product_124005113_product_template
+#: model:product.template,uom_name:wms_demo.product_130000004_product_template
+#: model:product.template,uom_name:wms_demo.product_132003147_product_template
+#: model:product.template,uom_name:wms_demo.product_138009390_product_template
+#: model:product.template,uom_name:wms_demo.product_156000309_product_template
+#: model:product.template,uom_name:wms_demo.product_163000587_product_template
+#: model:product.template,uom_name:wms_demo.product_163005216_product_template
+#: model:product.template,uom_name:wms_demo.product_163005551_product_template
+#: model:product.template,uom_name:wms_demo.product_167001020_product_template
+#: model:product.template,uom_name:wms_demo.product_170004065_product_template
+#: model:product.template,uom_name:wms_demo.product_170006808_product_template
+#: model:product.template,uom_name:wms_demo.product_170009521_product_template
+#: model:product.template,uom_name:wms_demo.product_170034517_product_template
+#: model:product.template,uom_name:wms_demo.product_180002461_product_template
+#: model:product.template,uom_name:wms_demo.product_197000016_product_template
+#: model:product.template,uom_name:wms_demo.product_200000001_product_template
+#: model:product.template,uom_name:wms_demo.product_200000002_product_template
+#: model:product.template,uom_name:wms_demo.product_200106094_product_template
+#: model:product.template,uom_name:wms_demo.product_202001508_product_template
+#: model:product.template,uom_name:wms_demo.product_207009108_product_template
+#: model:product.template,uom_name:wms_demo.product_232509793_product_template
+#: model:product.template,uom_name:wms_demo.product_245004412_product_template
+#: model:product.template,uom_name:wms_demo.product_248000630_product_template
+#: model:product.template,uom_name:wms_demo.product_248000857_product_template
+#: model:product.template,uom_name:wms_demo.product_248001030_product_template
+#: model:product.template,uom_name:wms_demo.product_248004036_product_template
+#: model:product.template,uom_name:wms_demo.product_300000001_product_template
+#: model:product.template,uom_name:wms_demo.product_312001918_product_template
+#: model:product.template,uom_name:wms_demo.product_312004805_product_template
+#: model:product.template,uom_name:wms_demo.product_379002117_product_template
+#: model:product.template,uom_name:wms_demo.product_379005300_product_template
+#: model:product.template,uom_name:wms_demo.product_395000653_product_template
+#: model:product.template,uom_name:wms_demo.product_395700438_product_template
+#: model:product.template,uom_name:wms_demo.product_396001471_product_template
+#: model:product.template,uom_name:wms_demo.product_396009294_product_template
+#: model:product.template,uom_name:wms_demo.product_400008525_product_template
+#: model:product.template,uom_name:wms_demo.product_409880440_product_template
+#: model:product.template,uom_name:wms_demo.product_504000354_product_template
+#: model:product.template,uom_name:wms_demo.product_620002065_product_template
+#: model:product.template,uom_name:wms_demo.product_650005420_product_template
+msgid "Unit(s)"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_395700438
+#: model:product.template,name:wms_demo.product_395700438_product_template
+msgid "Universal-Set Abdominal KSA 3M"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_650005420
+#: model:product.template,name:wms_demo.product_650005420_product_template
+msgid "Zellstoffwattetupfer Cellodent 12-fach 4x5cm steril12-fach 4x5cm steril"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,weight_uom_name:wms_demo.product_100003103
+#: model:product.product,weight_uom_name:wms_demo.product_104000190
+#: model:product.product,weight_uom_name:wms_demo.product_104007620
+#: model:product.product,weight_uom_name:wms_demo.product_105000621
+#: model:product.product,weight_uom_name:wms_demo.product_105007997
+#: model:product.product,weight_uom_name:wms_demo.product_109000260
+#: model:product.product,weight_uom_name:wms_demo.product_124005113
+#: model:product.product,weight_uom_name:wms_demo.product_130000004
+#: model:product.product,weight_uom_name:wms_demo.product_132003147
+#: model:product.product,weight_uom_name:wms_demo.product_138009390
+#: model:product.product,weight_uom_name:wms_demo.product_156000309
+#: model:product.product,weight_uom_name:wms_demo.product_163000587
+#: model:product.product,weight_uom_name:wms_demo.product_163005216
+#: model:product.product,weight_uom_name:wms_demo.product_163005551
+#: model:product.product,weight_uom_name:wms_demo.product_167001020
+#: model:product.product,weight_uom_name:wms_demo.product_170004065
+#: model:product.product,weight_uom_name:wms_demo.product_170006808
+#: model:product.product,weight_uom_name:wms_demo.product_170009521
+#: model:product.product,weight_uom_name:wms_demo.product_170034517
+#: model:product.product,weight_uom_name:wms_demo.product_180002461
+#: model:product.product,weight_uom_name:wms_demo.product_197000016
+#: model:product.product,weight_uom_name:wms_demo.product_200000001
+#: model:product.product,weight_uom_name:wms_demo.product_200000002
+#: model:product.product,weight_uom_name:wms_demo.product_200106094
+#: model:product.product,weight_uom_name:wms_demo.product_202001508
+#: model:product.product,weight_uom_name:wms_demo.product_207009108
+#: model:product.product,weight_uom_name:wms_demo.product_232509793
+#: model:product.product,weight_uom_name:wms_demo.product_245004412
+#: model:product.product,weight_uom_name:wms_demo.product_248000630
+#: model:product.product,weight_uom_name:wms_demo.product_248000857
+#: model:product.product,weight_uom_name:wms_demo.product_248001030
+#: model:product.product,weight_uom_name:wms_demo.product_248004036
+#: model:product.product,weight_uom_name:wms_demo.product_300000001
+#: model:product.product,weight_uom_name:wms_demo.product_312001918
+#: model:product.product,weight_uom_name:wms_demo.product_312004805
+#: model:product.product,weight_uom_name:wms_demo.product_379002117
+#: model:product.product,weight_uom_name:wms_demo.product_379005300
+#: model:product.product,weight_uom_name:wms_demo.product_395000653
+#: model:product.product,weight_uom_name:wms_demo.product_395700438
+#: model:product.product,weight_uom_name:wms_demo.product_396001471
+#: model:product.product,weight_uom_name:wms_demo.product_396009294
+#: model:product.product,weight_uom_name:wms_demo.product_400008525
+#: model:product.product,weight_uom_name:wms_demo.product_409880440
+#: model:product.product,weight_uom_name:wms_demo.product_504000354
+#: model:product.product,weight_uom_name:wms_demo.product_620002065
+#: model:product.product,weight_uom_name:wms_demo.product_650005420
+#: model:product.template,weight_uom_name:wms_demo.product_100003103_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_104000190_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_104007620_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_105000621_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_105007997_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_109000260_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_124005113_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_130000004_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_132003147_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_138009390_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_156000309_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_163000587_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_163005216_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_163005551_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_167001020_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_170004065_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_170006808_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_170009521_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_170034517_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_180002461_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_197000016_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_200000001_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_200000002_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_200106094_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_202001508_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_207009108_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_232509793_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_245004412_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_248000630_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_248000857_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_248001030_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_248004036_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_300000001_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_312001918_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_312004805_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_379002117_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_379005300_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_395000653_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_395700438_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_396001471_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_396009294_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_400008525_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_409880440_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_504000354_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_620002065_product_template
+#: model:product.template,weight_uom_name:wms_demo.product_650005420_product_template
+msgid "kg"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_248000857
+#: model:product.template,name:wms_demo.product_248000857_product_template
+msgid "low-cut socks sunset/pink women IVn IV"
+msgstr ""
+
+#. module: wms_demo
+#: model:product.product,name:wms_demo.product_248000630
+#: model:product.template,name:wms_demo.product_248000630_product_template
+msgid "run ultralight socks electric blue/green women IVblue/green women IV"
+msgstr ""
+
