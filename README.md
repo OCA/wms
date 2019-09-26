@@ -12,7 +12,8 @@ Work in progress and track in this issue https://github.com/OCA/wms/issues/1
 
 ## Reference document
 
- - https://docs.google.com/document/d/1mct6bFFWJqW01wGFcjc-uQNEjyCxvh6Y9TuFdRhe-b0/edit#heading=h.k0bwq3398e7m
+ - Draft of the requirements: https://docs.google.com/document/d/1mct6bFFWJqW01wGFcjc-uQNEjyCxvh6Y9TuFdRhe-b0/edit#heading=h.k0bwq3398e7m
+ - OCA Days presentation: https://docs.google.com/presentation/d/1wTbnkjvbId3lZHTCB-VfNr8pDqAFKC4N4UnoIAQEpbo/edit#slide=id.g61dc817660_0_25
 
 
 [//]: # (addons)
