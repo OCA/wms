@@ -44,13 +44,21 @@ class StockReceptionScreen(models.Model):
             "label": _("Set Quantity"),
             "next_steps": [
                 {
+                    "next": "set_location",
+                },
+            ],
+        },
+        "set_location": {
+            "label": _("Set Destination"),
+            "next_steps": [
+                {
                     # Loop until all moves are processed
-                    "before": "_before_set_quantity_to_select_move",
+                    "before": "_before_set_location_to_select_move",
                     "next": "select_move",
                 },
                 {
                     # Only if there are remaining moves to process}
-                    "before": "_before_set_quantity_to_select_product",
+                    "before": "_before_set_location_to_select_product",
                     "next": "select_product",
                 },
                 {
@@ -89,12 +97,10 @@ class StockReceptionScreen(models.Model):
     # current move
     current_move_id = fields.Many2one(comodel_name="stock.move", copy=False)
     current_move_location_dest_id = fields.Many2one(
+        comodel_name="stock.location",
         string="Destination",
-        related="current_move_id.location_dest_id",
-    )
-    current_move_location_dest_id2 = fields.Many2one(
-        string="Destination",
-        compute="_compute_current_move_location_dest_id2"
+        compute="_compute_current_move_location_dest_id",
+        inverse="_inverse_current_move_location_dest_id",
     )
     current_move_product_display_name = fields.Char(
         related="current_move_id.product_id.display_name", string="Product")
@@ -157,19 +163,19 @@ class StockReceptionScreen(models.Model):
                 wiz.current_step_descr = step_descr
 
     @api.depends("current_move_id.location_dest_id")
-    def _compute_current_move_location_dest_id2(self):
+    def _compute_current_move_location_dest_id(self):
         for wiz in self:
-            wiz.current_move_location_dest_id2 = False
             move = wiz.current_move_id
-            rule = self.env["stock.putaway.rule"].search(
-                [
-                    ("product_id", "=", move.product_id.id),
-                    ("location_in_id", "=", move.location_dest_id.id),
-                ],
-                limit=1
-            )
-            if rule:
-                wiz.current_move_location_dest_id2 = rule.location_out_id
+            wiz.current_move_location_dest_id = move.location_dest_id
+            location = move_line.location_dest_id.get_putaway_strategy(
+                move_line.product_id)
+            if location:
+                wiz.current_move_location_dest_id = location
+
+    def _inverse_current_move_location_dest_id(self):
+        for wiz in self:
+            move_line = wiz.current_move_line_id
+            move_line.location_dest_id = wiz.current_move_location_dest_id
 
     @api.depends("current_move_line_id.qty_done")
     def _compute_current_move_line_qty_status(self):
@@ -326,7 +332,7 @@ class StockReceptionScreen(models.Model):
             # Go to the next step automatically if only one move has been found
             self.process_select_move()
 
-    def _before_set_quantity_to_select_move(self):
+    def _before_set_location_to_select_move(self):
         """Check if there is remaining moves to process for the
         selected product.
         """
@@ -341,7 +347,7 @@ class StockReceptionScreen(models.Model):
         return moves_to_process_ok
 
 
-    def _before_set_quantity_to_select_product(self):
+    def _before_set_location_to_select_product(self):
         """Check if there is remaining products/moves to process."""
         moves_to_process_ok = any(
             move.quantity_done < move.product_uom_qty
@@ -390,6 +396,15 @@ class StockReceptionScreen(models.Model):
             self.env.user.notify_warning(
                 message="",
                 title=_("You have to set the received quantity."),
+            )
+            return
+        self.next_step()
+
+    def process_set_location(self):
+        if not self.current_move_location_dest_id:
+            self.env.user.notify_warning(
+                message="",
+                title=_("You have to set the destination."),
             )
             return
         self.next_step()

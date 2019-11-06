@@ -75,15 +75,6 @@
               <div>
                 <field name="current_move_product_display_name" class="mr8"/>
               </div>
-              <label for="current_move_location_dest_id"/>
-              <div>
-                <field name="current_move_location_dest_id" class="mr8"
-                  attrs="{'invisible': [('current_move_location_dest_id2', '!=', False)]}"
-                  options="{'no_open': True}"/>
-                <field name="current_move_location_dest_id2" class="mr8"
-                  attrs="{'invisible': [('current_move_location_dest_id2', '=', False)]}"
-                  options="{'no_open': True}"/>
-              </div>
               <hr colspan="2"/>
             </group>
             <group attrs="{'invisible': [('current_move_line_id', '=', False)]}" name="step_in_progress">
@@ -120,6 +111,15 @@
                     attrs="{'invisible': [('current_move_line_qty_status', '!=', 'eq')]}"/>
                   <div class="o_screen_disk" style="background-color: dodgerblue;"
                     attrs="{'invisible': [('current_move_line_qty_status', '!=', 'gt')]}"/>
+                </div>
+                <label for="current_move_location_dest_id"/>
+                <div>
+                  <field name="current_move_location_dest_id" class="mr8"
+                    attrs="{
+                      'required': [('current_step', '=', 'set_location')],
+                      'readonly': [('current_step', '!=', 'set_location')],
+                    }"
+                    options="{'no_open': True, 'no_create_edit': True}"/>
                 </div>
               </group>
               <group colspan="1">
