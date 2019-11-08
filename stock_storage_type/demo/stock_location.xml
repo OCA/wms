@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+    <record id="stock_location_cardboxes" model="stock.location">
+        <field name="name">Cardboxes storage area</field>
+        <field name="location_id" model="stock.location"
+            eval="obj().env.ref('stock.warehouse0').lot_stock_id.id"/>
+        <field name="stock_location_storage_type_ids" eval="[(6,0,[ref('location_storage_type_cardboxes')])]" />
+    </record>
+    <record id="stock_location_cardboxes_bin_1" model="stock.location">
+        <field name="name">Bin 1</field>
+        <field name="location_id" ref="stock_location_cardboxes" />
+    </record>
+    <record id="stock_location_cardboxes_bin_2" model="stock.location">
+        <field name="name">Bin 2</field>
+        <field name="location_id" ref="stock_location_cardboxes" />
+    </record>
+    <record id="stock_location_cardboxes_bin_3" model="stock.location">
+        <field name="name">Bin 3</field>
+        <field name="location_id" ref="stock_location_cardboxes" />
+    </record>
+
+    <record id="stock_location_pallets" model="stock.location">
+        <field name="name">Pallets storage area</field>
+        <field name="location_id" model="stock.location"
+            eval="obj().env.ref('stock.warehouse0').lot_stock_id.id"/>
+        <field name="stock_location_storage_type_ids" eval="[(6,0,[ref('location_storage_type_pallets')])]" />
+    </record>
+    <record id="stock_location_pallets_bin_1" model="stock.location">
+        <field name="name">Pallets Bin 1</field>
+        <field name="location_id" ref="stock_location_pallets" />
+    </record>
+    <record id="stock_location_pallets_bin_2" model="stock.location">
+        <field name="name">Pallets Bin 2</field>
+        <field name="location_id" ref="stock_location_pallets" />
+    </record>
+    <record id="stock_location_pallets_bin_3" model="stock.location">
+        <field name="name">Pallets Bin 3</field>
+        <field name="location_id" ref="stock_location_pallets" />
+    </record>
+</odoo>
