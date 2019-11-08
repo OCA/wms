@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+    <record id="location_storage_type_pallets" model="stock.location.storage.type">
+        <field name="name">Pallets</field>
+    </record>
+    <record id="location_storage_type_cardboxes" model="stock.location.storage.type">
+        <field name="name">Cardboxes</field>
+    </record>
+</odoo>
