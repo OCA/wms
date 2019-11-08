@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="location_storage_type_tree_view" model="ir.ui.view">
+        <field name="name">stock.location.storage.type.tree.view</field>
+        <field name="model">stock.location.storage.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="stock_package_storage_type_ids" widget="many2many_tags" />
+            </tree>
+        </field>
+    </record>
+    <record id="location_storage_type_form_view" model="ir.ui.view">
+        <field name="name">stock.location.storage.type.form.view</field>
+        <field name="model">stock.location.storage.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group name="main">
+                        <group name="package_storage_types" string="Package Storage Types">
+                            <field name="stock_package_storage_type_ids" widget="many2many_tags" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="location_storage_type_action" model="ir.actions.act_window">
+        <field name="name">Location Storage Types</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.location.storage.type</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>
