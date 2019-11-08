@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="stock_putaway_rule_product_9_stock_cardboxes" model="stock.putaway.rule">
+        <field name="product_id" ref="product.product_product_9" />
+        <field name="location_in_id" ref="stock.stock_location_stock" />
+        <field name="location_out_id" ref="stock_storage_type.stock_location_cardboxes" />
+    </record>
+    <record id="stock_putaway_rule_product_9_stock_pallets" model="stock.putaway.rule">
+        <field name="product_id" ref="product.product_product_9" />
+        <field name="location_in_id" ref="stock.stock_location_stock" />
+        <field name="location_out_id" ref="stock_storage_type.stock_location_pallets" />
+    </record>
+</odoo>

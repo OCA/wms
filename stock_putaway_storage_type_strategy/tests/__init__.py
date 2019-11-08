@@ -1,0 +1,1 @@
+from . import test_putaway_storage_type_strategy

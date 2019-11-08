@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="location_storage_type_form_view_inherit" model="ir.ui.view">
+        <field name="name">stock.location.storage.type.form.view.inherit</field>
+        <field name="model">stock.location.storage.type</field>
+        <field name="inherit_id" ref="stock_storage_type.location_storage_type_form_view"/>
+        <field name="arch" type="xml">
+            <group name="package_storage_types" position="after">
+                <group name="restrictions" string="Restrictions">
+                    <field name="only_empty" />
+                    <field name="do_not_mix_products" />
+                    <field name="do_not_mix_lots" attrs="{'invisible': [('do_not_mix_products', '=', False)]}"/>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>
