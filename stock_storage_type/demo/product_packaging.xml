@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<odoo>
+<odoo noupdate="1">
     <record id="product_product_9_packaging_single_bag" model="product.packaging">
         <field name="name">Single bag</field>
         <field name="qty">1</field>

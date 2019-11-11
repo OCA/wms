@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<odoo>
+<odoo noupdate="1">
     <record id="package_storage_type_pallets" model="stock.package.storage.type">
         <field name="name">Pallets</field>
         <field name="stock_location_storage_type_id" ref="location_storage_type_pallets" />
