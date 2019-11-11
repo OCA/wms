@@ -15,7 +15,7 @@ class StockLocationStorageType(models.Model):
     do_not_mix_lots = fields.Boolean(
         help="If checked, moves to the destination location will only be "
              "allowed if the location contains product of the same "
-             "stock.production.lot"
+             "lot."
     )
     do_not_mix_products = fields.Boolean(
         help="If checked, moves to the destination location will only be "
