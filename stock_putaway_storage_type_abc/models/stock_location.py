@@ -18,11 +18,14 @@ class StockLocation(models.Model):
     )
     abc_storage = fields.Selection(ABC_SELECTION, required=True, default='b')
 
-    @api.depends('location_id', 'location_id.pack_storage_strategy')
+    @api.depends(
+        'location_id', 'location_id.pack_storage_strategy',
+        'location_id.display_abc_storage'
+    )
     def _compute_display_abc_storage(self):
         for location in self:
             current_location = location.location_id
-            display_abc_storage = False
+            display_abc_storage = current_location.display_abc_storage
             while current_location and not display_abc_storage:
                 if current_location.pack_storage_strategy == 'abc':
                     display_abc_storage = True
@@ -41,14 +44,16 @@ class StockLocation(models.Model):
             [('id', 'child_of', self.ids), ('id', '!=', self.id)],
             order='abc_storage ASC'
         )
-        product_abc = product.abc_storage
+        return locations._sort_abc_locations(product.abc_storage)
+
+    def _sort_abc_locations(self, product_abc):
+        locations = self
         if product_abc == 'a':
             # Already ordered, no need to reorder
             pass
         else:
-            # TODO improve ugly code
             a_locations = b_locations = c_locations = self.browse()
-            for loc in locations:
+            for loc in self:
                 if loc.abc_storage == 'a':
                     a_locations |= loc
                 elif loc.abc_storage == 'b':
