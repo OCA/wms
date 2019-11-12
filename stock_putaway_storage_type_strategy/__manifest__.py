@@ -14,6 +14,7 @@
     "depends": [
         "stock_putaway_rule",
         "stock_storage_type",
+        "stock_quant_package_product_packaging",
     ],
     "data": [
         "views/stock_location.xml",

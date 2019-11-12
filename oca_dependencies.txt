@@ -12,6 +12,7 @@
 # sale-workflow https://github.com/OCA/sale-workflow
 
 wms https://github.com/grindtildeath/wms 12.0_add_stock_storage_type
+stock-logistics-workflow https://github.com/grindtildeath/stock-logistics-workflow 12.0-add-stock_quant_package_product_packaging
 
 #
 # To provide both the URL and a branch, use:
