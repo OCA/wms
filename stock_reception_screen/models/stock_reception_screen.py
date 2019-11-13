@@ -167,8 +167,8 @@ class StockReceptionScreen(models.Model):
         for wiz in self:
             move = wiz.current_move_id
             wiz.current_move_location_dest_id = move.location_dest_id
-            location = move_line.location_dest_id.get_putaway_strategy(
-                move_line.product_id)
+            location = move.location_dest_id.get_putaway_strategy(
+                move.product_id)
             if location:
                 wiz.current_move_location_dest_id = location
 
