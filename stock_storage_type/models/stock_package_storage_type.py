@@ -9,8 +9,11 @@ class StockPackageStorageType(models.Model):
     _description = 'Stock package storage type'
 
     name = fields.Char(required=True)
-    stock_location_storage_type_id = fields.Many2one(
-        'stock.location.storage.type'
+    stock_location_storage_type_ids = fields.Many2many(
+        'stock.location.storage.type',
+        'stock_location_package_storage_type_rel',
+        'stock_package_storage_type_id',
+        'stock_location_storage_type_id',
     )
     product_packaging_ids = fields.One2many(
         'product.packaging', 'stock_package_storage_type_id',

@@ -22,6 +22,9 @@ class StockLocationStorageType(models.Model):
         'stock_location_id',
         readonly=True,
     )
-    stock_package_storage_type_ids = fields.One2many(
-        'stock.package.storage.type', 'stock_location_storage_type_id'
+    stock_package_storage_type_ids = fields.Many2many(
+        'stock.package.storage.type',
+        'stock_location_package_storage_type_rel',
+        'stock_location_storage_type_id',
+        'stock_package_storage_type_id',
     )
