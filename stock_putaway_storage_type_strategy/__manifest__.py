@@ -19,6 +19,7 @@
     "data": [
         "views/stock_location.xml",
         "views/stock_location_storage_type.xml",
+        "views/stock_quant_package.xml",
     ],
     "demo": [
         "demo/stock_putaway_rule.xml",

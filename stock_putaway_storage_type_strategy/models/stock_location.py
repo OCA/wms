@@ -46,7 +46,7 @@ class StockLocation(models.Model):
         quant = self.env.context.get('putaway_quant')
         package_storage_type = False
         if quant:
-            package_storage_type = quant.package_id.packaging_id.stock_package_storage_type_id
+            package_storage_type = quant.package_id.stock_package_storage_type_id
         if not package_storage_type:
             return super()._get_putaway_rule_location(
                 product=product, category=category

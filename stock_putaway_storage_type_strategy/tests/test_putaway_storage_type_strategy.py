@@ -120,14 +120,14 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
         in_picking.move_line_ids.qty_done = 4.0
         first_package = in_picking.put_in_pack()
         # Ensure packaging is set properly on pack
-        first_package.packaging_id = self.product_cardbox_product_packaging
+        first_package.product_packaging_id = self.product_cardbox_product_packaging
         # Put in pack again
         ml_without_package = in_picking.move_line_ids.filtered(
             lambda ml: not ml.result_package_id)
         ml_without_package.qty_done = 4.0
         second_pack = in_picking.put_in_pack()
         # Ensure packaging is set properly on pack
-        second_pack.packaging_id = self.product_cardbox_product_packaging
+        second_pack.product_packaging_id = self.product_cardbox_product_packaging
 
         # Validate picking
         in_picking.button_validate()
@@ -168,14 +168,14 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
         in_picking.move_line_ids.qty_done = 48.0
         first_package = in_picking.put_in_pack()
         # Ensure packaging is set properly on pack
-        first_package.packaging_id = self.product_pallet_product_packaging
+        first_package.product_packaging_id = self.product_pallet_product_packaging
         # Put in pack again
         ml_without_package = in_picking.move_line_ids.filtered(
             lambda ml: not ml.result_package_id)
         ml_without_package.qty_done = 48.0
         second_pack = in_picking.put_in_pack()
         # Ensure packaging is set properly on pack
-        second_pack.packaging_id = self.product_pallet_product_packaging
+        second_pack.product_packaging_id = self.product_pallet_product_packaging
 
         # Validate picking
         in_picking.button_validate()
@@ -232,7 +232,7 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
         ).qty_done = 4.0
         product_first_package = in_picking.put_in_pack()
         # Ensure packaging is set properly on pack
-        product_first_package.packaging_id = self.product_cardbox_product_packaging
+        product_first_package.product_packaging_id = self.product_cardbox_product_packaging
         # Put in pack product again
         product_ml_without_package = in_picking.move_line_ids.filtered(
             lambda ml: not ml.result_package_id and ml.product_id == self.product
@@ -240,7 +240,7 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
         product_ml_without_package.qty_done = 4.0
         product_second_pack = in_picking.put_in_pack()
         # Ensure packaging is set properly on pack
-        product_second_pack.packaging_id = self.product_cardbox_product_packaging
+        product_second_pack.product_packaging_id = self.product_cardbox_product_packaging
 
         # Put in pack product lot
         product_lot_ml = in_picking.move_line_ids.filtered(
@@ -249,7 +249,7 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
         product_lot_ml.write({'qty_done': 5.0, 'lot_name': 'A0001'})
         product_lot_first_pack = in_picking.put_in_pack()
         # Ensure packaging is set properly on pack
-        product_lot_first_pack.packaging_id = self.product_lot_cardbox_product_packaging
+        product_lot_first_pack.product_packaging_id = self.product_lot_cardbox_product_packaging
         # Put in pack product lot again
         product_lot_ml_without_package = in_picking.move_line_ids.filtered(
             lambda ml: not ml.result_package_id and ml.product_id == self.product_lot
@@ -257,7 +257,7 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
         product_lot_ml_without_package.write({'qty_done': 5.0, 'lot_name': 'A0002'})
         product_lot_second_pack = in_picking.put_in_pack()
         # Ensure packaging is set properly on pack
-        product_lot_second_pack.packaging_id = self.product_lot_cardbox_product_packaging
+        product_lot_second_pack.product_packaging_id = self.product_lot_cardbox_product_packaging
 
         # Validate picking
         in_picking.button_validate()
