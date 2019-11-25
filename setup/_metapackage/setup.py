@@ -8,6 +8,7 @@ setuptools.setup(
     description="Meta package for oca-wms Odoo addons",
     version=version,
     install_requires=[
+        'odoo12-addon-stock_storage_type',
         'odoo12-addon-wms',
         'odoo12-addon-wms_demo',
     ],
