@@ -24,6 +24,7 @@ Available addons
 ----------------
 addon | version | summary
 --- | --- | ---
+[stock_storage_type](stock_storage_type/) | 12.0.1.0.0 | Manage packages and locations storage types
 [wms](wms/) | 12.0.1.0.0 | Warehouse Management System
 [wms_demo](wms_demo/) | 12.0.1.0.0 | Warehouse Management System
 
