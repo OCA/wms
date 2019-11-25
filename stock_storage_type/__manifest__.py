@@ -12,6 +12,7 @@
     "application": False,
     "installable": True,
     "depends": [
+        "base_m2m_custom_field",
         "stock",
     ],
     "data": [
@@ -20,7 +21,7 @@
         "views/stock_location.xml",
         "views/stock_location_storage_type.xml",
         "views/stock_package_storage_type.xml",
-        "views/stock_picking.xml",
+        "views/stock_location_package_storage_type_rel.xml",
         "views/storage_type_menus.xml",
     ],
     "demo": [

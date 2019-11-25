@@ -14,3 +14,7 @@ This module introduces two new models in order to manage stock moves with
 Therefore a Stock location storage type can include different Stock package
 storage type in order to validate the destination of a move with package into a
 stock location.
+Moreover Stock location storage type can include product, size or lot
+restrictions for the stock locations it's defined on, so that a move with
+package will only be allowed if it doesn't violate the restrictions defined
+(cf stock_location_storage_type_strategy).
