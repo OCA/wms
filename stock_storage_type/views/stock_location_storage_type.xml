@@ -24,6 +24,11 @@
                         <group name="package_storage_types" string="Package Storage Types">
                             <field name="stock_package_storage_type_ids" widget="many2many_tags" />
                         </group>
+                        <group name="restrictions" string="Restrictions">
+                            <field name="only_empty" />
+                            <field name="do_not_mix_products" />
+                            <field name="do_not_mix_lots" attrs="{'invisible': [('do_not_mix_products', '=', False)]}"/>
+                        </group>
                     </group>
                 </sheet>
             </form>
