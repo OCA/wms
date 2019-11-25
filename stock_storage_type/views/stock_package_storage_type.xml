@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <record id="package_storage_type_tree_view" model="ir.ui.view">
-        <field name="name">storage.unit.type.tree.view</field>
+        <field name="name">package.storage.type.tree.view</field>
         <field name="model">stock.package.storage.type</field>
         <field name="arch" type="xml">
             <tree>
@@ -11,7 +11,7 @@
         </field>
     </record>
     <record id="package_storage_type_form_view" model="ir.ui.view">
-        <field name="name">storage.unit.type.tree.view</field>
+        <field name="name">package.storage.type.form.view</field>
         <field name="model">stock.package.storage.type</field>
         <field name="arch" type="xml">
             <form>
