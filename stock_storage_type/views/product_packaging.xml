@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="product.product_packaging_tree_view" />
         <field name="arch" type="xml">
             <field name="product_uom_id" position="after">
-                <field name="stock_package_storage_type_id" />
+                <field name="package_storage_type_id" />
             </field>
         </field>
     </record>
@@ -17,7 +17,7 @@
         <field name="arch" type="xml">
             <group name="qty" position="after">
                 <group name="storage">
-                    <field name="stock_package_storage_type_id" />
+                    <field name="package_storage_type_id" />
                 </group>
             </group>
         </field>

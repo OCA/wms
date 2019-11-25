@@ -2,10 +2,14 @@
 <odoo noupdate="1">
     <record id="package_storage_type_pallets" model="stock.package.storage.type">
         <field name="name">Pallets</field>
-        <field name="stock_location_storage_type_ids" eval="[(4, ref('location_storage_type_pallets'))]" />
+        <field name="location_storage_type_ids" eval="[(4, ref('location_storage_type_pallets')), (4, ref('location_storage_type_pallets_uk'))]" />
+    </record>
+    <record id="package_storage_type_pallets_uk" model="stock.package.storage.type">
+        <field name="name">Pallets UK</field>
+        <field name="location_storage_type_ids" eval="[(4, ref('location_storage_type_pallets_uk'))]" />
     </record>
     <record id="package_storage_type_cardboxes" model="stock.package.storage.type">
         <field name="name">Cardboxes</field>
-        <field name="stock_location_storage_type_ids" eval="[(4, ref('location_storage_type_cardboxes'))]" />
+        <field name="location_storage_type_ids" eval="[(4, ref('location_storage_type_cardboxes'))]" />
     </record>
 </odoo>
