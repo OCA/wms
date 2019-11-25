@@ -1,0 +1,129 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* stock_storage_type
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 12.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__allowed_location_ids
+msgid "Allowed Location"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__allowed_stock_location_storage_type_ids
+msgid "Allowed Stock Location Storage Type"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__create_uid
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__create_date
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__display_name
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__id
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__id
+msgid "ID"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model,name:stock_storage_type.model_stock_location
+msgid "Inventory Locations"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type____last_update
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__write_uid
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__write_date
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__location_ids
+msgid "Location"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.actions.act_window,name:stock_storage_type.location_storage_type_action
+#: model:ir.ui.menu,name:stock_storage_type.menu_location_storage_type_action
+msgid "Location Storage Types"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__name
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__name
+msgid "Name"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.actions.act_window,name:stock_storage_type.package_storage_type_action
+#: model:ir.ui.menu,name:stock_storage_type.menu_package_storage_type_action
+#: model_terms:ir.ui.view,arch_db:stock_storage_type.location_storage_type_form_view
+msgid "Package Storage Types"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model,name:stock_storage_type.model_product_packaging
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__product_packaging_ids
+msgid "Product Packaging"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__stock_location_storage_type_ids
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__stock_location_storage_type_ids
+msgid "Stock Location Storage Type"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_product_packaging__stock_package_storage_type_id
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__stock_package_storage_type_ids
+msgid "Stock Package Storage Type"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model,name:stock_storage_type.model_stock_location_storage_type
+msgid "Stock location storage type"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model,name:stock_storage_type.model_stock_package_storage_type
+msgid "Stock package storage type"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.ui.menu,name:stock_storage_type.storage_type_menu
+msgid "Storage Types"
+msgstr ""
+
