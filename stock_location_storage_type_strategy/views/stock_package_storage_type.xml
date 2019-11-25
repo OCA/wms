@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="package_storage_type_form_view_inherit" model="ir.ui.view">
+        <field name="name">package.storage.type.form.view.inherit</field>
+        <field name="model">stock.package.storage.type</field>
+        <field name="inherit_id" ref="stock_storage_type.package_storage_type_form_view" />
+        <field name="arch" type="xml">
+            <div class="oe_title" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button string="Storage locations"
+                        class="oe_stat_button"
+                        icon="fa-location-arrow" name="action_view_storage_locations" type="object"
+                        />
+                </div>
+            </div>
+        </field>
+    </record>
+</odoo>
