@@ -42,17 +42,18 @@ class StockLocation(models.Model):
             location.display_pack_storage_strategy = display
 
     def get_putaway_strategy(self, product):
-        dest_location = super().get_putaway_strategy(product)
+        putaway_location = super().get_putaway_strategy(product)
         quant = self.env.context.get('storage_quant')
         package_storage_type = False
         if quant:
             package_storage_type = quant.package_id.stock_package_storage_type_id
         if not package_storage_type:
-            return dest_location
-        dest_children_locations = dest_location._get_ordered_children_locations() or self._get_ordered_children_locations()
-        package_locations = package_storage_type.package_storage_location_ids.filtered(
-            lambda psl: psl.location_id in dest_children_locations
-        )
+            return putaway_location
+        dest_location = putaway_location or self
+        package_locations = self.env['stock.package.storage.location'].search([
+            ('package_storage_type_id', '=', package_storage_type.id),
+            ('location_id', 'child_of', dest_location.ids),
+        ])
         for pack_loc in package_locations:
             pref_loc = pack_loc.location_id
             if (
@@ -70,7 +71,7 @@ class StockLocation(models.Model):
             )
             if allowed_location:
                 return allowed_location
-        return dest_location
+        return putaway_location
 
     def get_storage_locations(self, product=None):
         self.ensure_one()
