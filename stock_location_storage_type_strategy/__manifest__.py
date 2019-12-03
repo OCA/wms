@@ -12,6 +12,7 @@
     "application": False,
     "installable": True,
     "depends": [
+        "product_packaging_dimension",
         "stock_storage_type",
         "stock_quant_package_product_packaging",
     ],
