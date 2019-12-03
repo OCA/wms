@@ -43,16 +43,14 @@ class StockLocationStorageType(models.Model):
         help="If checked, moves to the destination location will only be "
              "allowed if the location contains the same product."
     )
-    # max_height = fields.Boolean(
-    #     help="If checked, moves to the destination location will only be "
-    #          "allowed if the packaging height is lower than this maximum."
-    # )
-    # max_height_value = fields.Float()
-    # max_volume = fields.Boolean(
-    #     help="If checked, moves to the destination location will only be "
-    #          "allowed if the packaging volume is lower than this maximum."
-    # )
-    # max_volume_value = fields.Float()
+    max_height = fields.Float(
+        help="If defined, moves to the destination location will only be "
+             "allowed if the packaging height is lower than this maximum."
+    )
+    max_weight = fields.Float(
+        help="If defined, moves to the destination location will only be "
+             "allowed if the packaging wight is lower than this maximum."
+    )
 
     @api.constrains('only_empty', 'do_not_mix_lots', 'do_not_mix_products')
     def _check_empty_mix(self):
@@ -84,13 +82,3 @@ class StockLocationStorageType(models.Model):
     def _onchange_do_not_mix_products(self):
         if not self.do_not_mix_products:
             self.do_not_mix_lots = False
-
-    # @api.constrains('max_height', 'max_height_value', 'max_height_uom')
-    # def _check_max_height(self):
-    #     pass
-    #     # A value must be specified
-    #
-    # @api.constrains('max_volume', 'max_volume_value', 'max_volume_uom')
-    # def _check_max_volume(self):
-    #     pass
-    #     # A value must be specified
