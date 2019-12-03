@@ -342,8 +342,7 @@ class StockReceptionScreen(models.Model):
             remaining_qty = (
                 self.current_move_id.product_uom_qty
                 - self.current_move_line_id.qty_done)
-            new_move_id = self.current_move_id._split(remaining_qty)
-            new_move = self.env["stock.move"].browse(new_move_id)
+            self.current_move_id._split(remaining_qty)
             # We use the 'is_scrap' context key to avoid the generation of a
             # backorder when validating the move (see _action_done() method in
             # stock/models/stock_move.py).
