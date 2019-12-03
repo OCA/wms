@@ -215,7 +215,7 @@ class StockReceptionScreen(models.Model):
                 self.env.ref("stock.action_picking_tree_ready").id,
                 self.picking_id.id,
                 self.picking_id._name,
-                self.picking_id.id,
+                self.picking_id.picking_type_id.id,
             )
         )
         return {
@@ -332,10 +332,29 @@ class StockReceptionScreen(models.Model):
             # Go to the next step automatically if only one move has been found
             self.process_select_move()
 
+    def _validate_current_move(self):
+        """Split the current move with the move line qty done and
+        validate it.
+        It is performed right after the processing of the current move (so
+        before checking the next move to process).
+        """
+        if self.current_move_line_id and self.current_move_id:
+            remaining_qty = (
+                self.current_move_id.product_uom_qty
+                - self.current_move_line_id.qty_done)
+            new_move_id = self.current_move_id._split(remaining_qty)
+            new_move = self.env["stock.move"].browse(new_move_id)
+            # We use the 'is_scrap' context key to avoid the generation of a
+            # backorder when validating the move (see _action_done() method in
+            # stock/models/stock_move.py).
+            self.current_move_id.with_context(is_scrap=True)._action_done()
+            self.picking_id.action_assign()
+
     def _before_set_location_to_select_move(self):
         """Check if there is remaining moves to process for the
         selected product.
         """
+        self._validate_current_move()
         if not self.current_filter_product:
             return False
         moves_to_process_ok = any(

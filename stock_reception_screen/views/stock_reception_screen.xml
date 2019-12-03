@@ -150,10 +150,18 @@
                   <field name="reception_screen_current_step" invisible="1"/>
                   <button name="action_select_product" type="object"
                     string="Select" class="btn-primary" style="padding: 0.2em;"
-                    attrs="{'invisible': [('reception_screen_current_step', '!=', 'select_product')]}"/>
+                    attrs="{'invisible': [
+                      '|',
+                      ('reception_screen_current_step', '!=', 'select_product'),
+                      ('state', 'in', ('cancel', 'done')),
+                    ]}"/>
                   <button name="action_select_move" type="object"
                     string="Select" class="btn-primary" style="padding: 0.2em;"
-                    attrs="{'invisible': [('reception_screen_current_step', 'not in', ('select_move', 'done'))]}"/>
+                    attrs="{'invisible': [
+                      '|',
+                      ('reception_screen_current_step', 'not in', ('select_move', 'done')),
+                      ('state', 'in', ('cancel', 'done')),
+                    ]}"/>
                   <field name="state" invisible="1"/>
                 </tree>
                 <form>
@@ -166,7 +174,11 @@
                         <field name="qty_done"/>
                         <field name="product_uom_id"/>
                         <button name="action_select_move_line" type="object"
-                          string="Select" class="btn-primary" style="padding: 0.2em;"/>
+                          string="Select" class="btn-primary" style="padding: 0.2em;"
+                          attrs="{'invisible': [
+                            ('state', 'in', ('cancel', 'done')),
+                          ]}"/>
+                        <field name="state" invisible="1"/>
                       </tree>
                       <form>
                         <group>
