@@ -20,16 +20,16 @@
                         <label for="name" class="oe_edit_only"/>
                         <h1><field name="name"/></h1>
                     </div>
-                    <group name="package_storage_types" string="Package Storage Types">
+                    <group name="package_storage_types">
                         <field name="stock_package_storage_type_ids" widget="many2many_tags" />
                     </group>
-                    <group name="restrictions" string="Restrictions">
-                        <group string="Content restrictions">
+                    <group name="restrictions">
+                        <group name="content" string="Content restrictions">
                             <field name="only_empty" />
                             <field name="do_not_mix_products" />
                             <field name="do_not_mix_lots" attrs="{'invisible': [('do_not_mix_products', '=', False)]}"/>
                         </group>
-                        <group string="Size restrictions">
+                        <group name="size" string="Size restrictions">
                             <field name="max_height" />
                             <field name="max_weight" />
                         </group>
