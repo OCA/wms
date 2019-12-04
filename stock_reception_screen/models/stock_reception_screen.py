@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class StockReceptionScreen(models.Model):
@@ -58,6 +59,7 @@ class StockReceptionScreen(models.Model):
                 {
                     "before": "_before_set_pid_to_select_packaging",
                     "next": "select_packaging",
+                    "after": "_after_select_packaging",
                 }
             ],
         },
@@ -510,6 +512,25 @@ class StockReceptionScreen(models.Model):
 
     def process_select_packaging(self):
         self.next_step()
+
+    def _after_select_packaging(self):
+        """Check that the filled packaging exists on the product,
+        otherwise we ask the user to add it.
+        """
+        packaging = self.current_move_line_product_packaging_id
+        no_packaging = packaging not in self.current_move_product_packaging_ids
+        product_packaging = packaging & self.current_move_product_packaging_ids
+        qty_differ = False
+        if product_packaging:
+            qty_differ = packaging.qty != product_packaging
+        if no_packaging or qty_differ:
+            raise UserError(
+                _("The packaging {} (qty={}) does not exist on the "
+                  "product {}.\nYou have to configure it on the product "
+                  "before going further.").format(
+                      packaging.name,
+                      packaging.qty,
+                      packaging.product_id.display_name))
 
     def _after_step_done(self):
         """Reset the current selected move line."""

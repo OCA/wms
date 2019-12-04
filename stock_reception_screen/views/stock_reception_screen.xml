@@ -134,7 +134,10 @@
                     class="mr8"
                     style="width: 15em;"
                     options="{'no_open': True, 'no_create': True}"
-                    attrs="{'readonly': [('current_step', '!=', 'select_packaging')]}"/>
+                    attrs="{
+                      'required': [('current_step', '=', 'select_packaging')],
+                      'readonly': [('current_step', '!=', 'select_packaging')],
+                    }"/>
                 </div>
                 <label for="current_move_line_storage_type"/>
                 <div>
@@ -142,7 +145,10 @@
                           class="mr8"
                           style="width: 15em;"
                           options="{'no_open': True, 'no_create': True}"
-                          attrs="{'readonly': ['|', ('current_step', '!=', 'select_packaging')]}"/>
+                          attrs="{
+                            'required': [('current_step', '=', 'select_packaging')],
+                            'readonly': [('current_step', '!=', 'select_packaging')],
+                          }"/>
                 </div>
               </group>
               <group colspan="1">
