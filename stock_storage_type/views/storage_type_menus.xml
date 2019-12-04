@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <menuitem id="storage_type_menu" name="Storage Types" parent="stock.menu_stock_config_settings"
-        sequence="9"/>
+        sequence="9" groups="stock.group_adv_location"/>
     <menuitem id="menu_package_storage_type_action" action="package_storage_type_action"
         name="Package Storage Types"
         parent="storage_type_menu" sequence="10"/>
