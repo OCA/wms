@@ -20,7 +20,6 @@
         "views/stock_location.xml",
         "views/stock_location_storage_type.xml",
         "views/stock_package_storage_type.xml",
-        "views/stock_picking.xml",
         "views/storage_type_menus.xml",
     ],
     "demo": [
