@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class StockReceptionScreen(models.Model):
@@ -50,6 +51,19 @@ class StockReceptionScreen(models.Model):
         },
         "set_location": {
             "label": _("Set Destination"),
+            "next_steps": [{"next": "set_pid"}],
+        },
+        "set_pid": {
+            "label": _("Set PID"),
+            "next_steps": [
+                {
+                    "before": "_before_set_pid_to_select_packaging",
+                    "next": "select_packaging",
+                }
+            ],
+        },
+        "select_packaging": {
+            "label": _("Select Packaging"),
             "next_steps": [
                 {
                     # Loop until all moves are processed
@@ -102,6 +116,8 @@ class StockReceptionScreen(models.Model):
         compute="_compute_current_move_location_dest_id",
         inverse="_inverse_current_move_location_dest_id",
     )
+    current_move_product_id = fields.Many2one(
+        related="current_move_id.product_id")
     current_move_product_display_name = fields.Char(
         related="current_move_id.product_id.display_name", string="Product")
     current_move_product_uom_qty = fields.Float(
@@ -134,6 +150,23 @@ class StockReceptionScreen(models.Model):
     current_move_line_qty_status = fields.Char(
         string="Qty Status",
         compute="_compute_current_move_line_qty_status")
+    current_move_line_pid = fields.Char(
+        compute="_compute_current_move_line_pid",
+        inverse="_inverse_current_move_line_pid",
+        string="PID",
+    )
+    current_move_line_product_packaging_id = fields.Many2one(
+        related="current_move_line_id.result_package_id.product_packaging_id",
+        domain="[('product_id', '=', current_move_product_id)]",
+        readonly=False,
+    )
+    current_move_line_storage_type = fields.Many2one(
+        related=(
+            "current_move_line_id.result_package_id."
+            "stock_package_storage_type_id"
+        ),
+        readonly=False,
+    )
 
     @api.depends("picking_id.move_lines", "current_filter_product")
     def _compute_picking_filtered_move_lines(self):
@@ -151,7 +184,6 @@ class StockReceptionScreen(models.Model):
                 ]
                 moves = moves.search(search_args)
                 screen.picking_filtered_move_lines = moves
-
 
     @api.depends("current_step")
     def _compute_current_step_descr(self):
@@ -197,6 +229,26 @@ class StockReceptionScreen(models.Model):
                 wiz.current_move_line_qty_status = "lt"
             else:
                 wiz.current_move_line_qty_status = "eq"
+
+    @api.depends(
+        "current_move_line_id.result_package_id.stock_package_storage_type_id"
+    )
+    def _compute_current_move_line_pid(self):
+        for wiz in self:
+            self.current_move_line_pid = False
+            if wiz.current_move_line_id.result_package_id:
+                package = wiz.current_move_line_id.result_package_id
+                self.current_move_line_pid = package.name
+
+    def _inverse_current_move_line_pid(self):
+        package_model = self.env["stock.quant.package"]
+        for wiz in self:
+            move_line = wiz.current_move_line_id
+            pid = wiz.current_move_line_pid
+            if not move_line or not pid or move_line.result_package_id:
+                continue
+            vals = {"name": pid}
+            move_line.result_package_id = package_model.create(vals)
 
     def get_reception_screen_steps(self):
         """Aim to be overloaded to update the reception steps."""
@@ -319,12 +371,35 @@ class StockReceptionScreen(models.Model):
         # Finally if there is no corresponding move line we create one
         # with a remaining qty to process equals to the difference between
         # the planned qty and the already processed qty.
+        # TODO: need to check if it is still necessary as we are now validating
+        # stock.move at the end of each reception flow
         if not move_lines:
             move_lines = self._create_remaining_move_line(self.current_move_id)
         self.current_move_line_id = move_lines[0]
         # Set the lot
         self.current_move_line_id.lot_id = lot
         self.process_set_lot_number()
+
+    def on_barcode_scanned_set_pid(self, barcode):
+        """Set the PID on the move line."""
+        self.current_move_line_pid = barcode
+
+    def on_barcode_scanned_select_packaging(self, barcode):
+        """Set the packaging on the move."""
+        packaging = self.current_move_product_packaging_ids.filtered(
+            lambda o: o.barcode == barcode
+        )[:1]
+        self._handle_product_packaging(packaging)
+
+    def _handle_product_packaging(self, packaging):
+        if packaging:
+            # Set the product packaging on the move and on the package
+            self.current_move_id.product_packaging = packaging
+            package = self.current_move_line_id.result_package_id
+            package.product_packaging_id = packaging
+            # Set the storage type on the package
+            storage_type = packaging.stock_package_storage_type_id
+            package.stock_package_storage_type_id = storage_type
 
     def process_select_product(self):
         self.next_step()
@@ -339,15 +414,12 @@ class StockReceptionScreen(models.Model):
         before checking the next move to process).
         """
         if self.current_move_line_id and self.current_move_id:
-            remaining_qty = (
-                self.current_move_id.product_uom_qty
-                - self.current_move_line_id.qty_done)
-            self.current_move_id._split(remaining_qty)
             # We use the 'is_scrap' context key to avoid the generation of a
             # backorder when validating the move (see _action_done() method in
             # stock/models/stock_move.py).
             self.current_move_id.with_context(is_scrap=True)._action_done()
-            self.picking_id.action_assign()
+            if self.picking_id.state == "confirmed":
+                self.picking_id.action_assign()
 
     def _before_set_location_to_select_move(self):
         """Check if there is remaining moves to process for the
@@ -364,7 +436,6 @@ class StockReceptionScreen(models.Model):
             self.current_move_line_id = False
         return moves_to_process_ok
 
-
     def _before_set_location_to_select_product(self):
         """Check if there is remaining products/moves to process."""
         moves_to_process_ok = any(
@@ -379,12 +450,10 @@ class StockReceptionScreen(models.Model):
     def process_select_move(self):
         self.next_step()
         # Select the move line to process for the remaining qty
-        # (creating one if necessary)
-        move_line = self.current_move_id.move_line_ids.filtered(
-            lambda o: not o.qty_done)
-        if not move_line:
-            move_line = self._create_remaining_move_line(self.current_move_id)
-        self.current_move_line_id = move_line[0]
+        # NOTE: we should always have one move line available since we run
+        # 'action_assign' on the picking each time we validate a move.
+        move_line = fields.first(self.current_move_id.move_line_ids)
+        self.current_move_line_id = move_line
 
     def _before_select_move_to_set_lot_number(self):
         """Decide if we have to handle lots on the current move."""
@@ -427,6 +496,40 @@ class StockReceptionScreen(models.Model):
             return
         self.next_step()
 
+    def process_set_pid(self):
+        self.next_step()
+
+    def _before_set_pid_to_select_packaging(self):
+        """Set the product packaging matching the qty (if there is one)
+        and the related package storage type.
+        """
+        qty_done = self.current_move_line_qty_done
+        if qty_done:
+            packaging = self.current_move_product_packaging_ids.filtered(
+                lambda o: o.qty == qty_done
+            )[:1]
+            self._handle_product_packaging(packaging)
+        return True
+
+    def process_select_packaging(self):
+        if self._check_storage_type():
+            self.next_step()
+
+    def _check_storage_type(self):
+        """Check that the storage type is set.
+        It is done this way to not set the field required on the form
+        (allowing to quit the reception screen via the exit button and resume
+        the step later).
+        """
+        if not self.current_move_line_storage_type:
+            msg = _("The storage type is mandatory before going further.")
+            self.env.user.notify_warning(
+                message="",
+                title=msg,
+            )
+            return False
+        return True
+
     def _after_step_done(self):
         """Reset the current selected move line."""
         self.current_filter_product = False
@@ -450,5 +553,6 @@ class StockReceptionScreen(models.Model):
         self.ensure_one()
         self.current_step = self._step_start
         self.current_filter_product = False
+        self.current_move_line_qty_done = 0
         self.current_move_id = self.current_move_line_id = False
         return True
