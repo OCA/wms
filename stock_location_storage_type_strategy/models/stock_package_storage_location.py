@@ -11,4 +11,4 @@ class StockPackageStorageLocation(models.Model):
 
     package_storage_type_id = fields.Many2one('stock.package.storage.type', required=True)
     sequence = fields.Integer(required=True)
-    location_id = fields.Many2one('stock.location', required=True)
+    location_id = fields.Many2one('stock.location', required=True, domain="[('pack_storage_strategy', '!=', 'none')]")

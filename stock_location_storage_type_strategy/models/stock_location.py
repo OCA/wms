@@ -1,7 +1,8 @@
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
-from odoo import api, models, fields
+from odoo import _, api, models, fields
 from odoo.osv.expression import AND, OR
+from odoo.exceptions import ValidationError
 
 
 class StockLocation(models.Model):
@@ -16,30 +17,26 @@ class StockLocation(models.Model):
         string='Packs storage strategy',
         help='TODO',
     )
-    display_pack_storage_strategy = fields.Boolean(
-        compute='_compute_display_pack_storage_strategy'
+    package_storage_location_ids = fields.One2many(
+        'stock.package.storage.location',
+        'location_id',
+        string='Storage locations',
     )
 
-    @api.depends(
-        'child_ids', 'location_id', 'location_id.pack_storage_strategy',
-        'location_id.display_pack_storage_strategy'
-    )
-    def _compute_display_pack_storage_strategy(self):
+    @api.constrains('pack_storage_strategy', 'package_storage_location_ids')
+    def _check_pack_storage_strategy(self):
         for location in self:
-            # Do not display on locations without children
-            if not location.child_ids:
-                location.display_pack_storage_strategy = False
-                continue
-            current_location = location.location_id
-            display = True
-            while current_location:
-                # If a parent has pack_storage_strategy set, we don't display
-                # it on its children
-                if current_location.pack_storage_strategy != 'none':
-                    display = False
-                    break
-                current_location = current_location.location_id
-            location.display_pack_storage_strategy = display
+            if (
+                location.pack_storage_strategy == 'none'
+                and location.package_storage_location_ids
+            ):
+                raise ValidationError(
+                    _(
+                        "Changing Packs storage strategy to 'None' is not "
+                        "allowed as the location %s is used in a Storage "
+                        "locations for package storage type."
+                    ) % location.name
+                )
 
     def get_putaway_strategy(self, product):
         putaway_location = super().get_putaway_strategy(product)
