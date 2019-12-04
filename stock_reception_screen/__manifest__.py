@@ -11,6 +11,8 @@
     "depends": [
         "stock",
         "product_expiry",
+        # OCA/wms
+        "stock_location_storage_type_strategy",
         # OCA/web
         "web_notify",
     ],

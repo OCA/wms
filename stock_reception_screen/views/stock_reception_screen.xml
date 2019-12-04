@@ -121,6 +121,29 @@
                     }"
                     options="{'no_open': True, 'no_create_edit': True}"/>
                 </div>
+                <label for="current_move_line_pid"/>
+                <div>
+                  <field name="current_move_line_pid"
+                    class="mr8"
+                    style="width: 15em;"
+                    attrs="{'readonly': [('current_step', '!=', 'set_pid')]}"/>
+                </div>
+                <label for="current_move_line_product_packaging_id"/>
+                <div>
+                  <field name="current_move_line_product_packaging_id"
+                    class="mr8"
+                    style="width: 15em;"
+                    options="{'no_open': True, 'no_create': True}"
+                    attrs="{'readonly': [('current_step', '!=', 'select_packaging')]}"/>
+                </div>
+                <label for="current_move_line_storage_type"/>
+                <div>
+                    <field name="current_move_line_storage_type"
+                          class="mr8"
+                          style="width: 15em;"
+                          options="{'no_open': True, 'no_create': True}"
+                          attrs="{'readonly': ['|', ('current_step', '!=', 'select_packaging')]}"/>
+                </div>
               </group>
               <group colspan="1">
                 <div>
@@ -171,6 +194,7 @@
                         <field name="product_id"/>
                         <field name="lot_id"/>
                         <field name="lot_life_date"/>
+                        <field name="result_package_id"/>
                         <field name="qty_done"/>
                         <field name="product_uom_id"/>
                         <button name="action_select_move_line" type="object"
@@ -185,6 +209,7 @@
                           <field name="product_id" options="{'no_open': True}"/>
                           <field name="lot_id" options="{'no_open': True}"/>
                           <field name="lot_life_date"/>
+                          <field name="result_package_id" options="{'no_open': True}"/>
                           <field name="qty_done"/>
                           <field name="product_uom_id" options="{'no_open': True}"/>
                         </group>
