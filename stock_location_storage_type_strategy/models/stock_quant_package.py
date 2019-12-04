@@ -12,10 +12,13 @@ class StockQuantPackage(models.Model):
     )
 
     @api.onchange('product_packaging_id')
-    def onchange_product_packaging_set_storage_type(self):
+    def onchange_product_packaging_id(self):
+        res = super().onchange_product_packaging_id()
         packaging = self.product_packaging_id
         storage_type = packaging.stock_package_storage_type_id
-        self.stock_package_storage_type_id = storage_type
+        if storage_type:
+            self.stock_package_storage_type_id = storage_type
+        return res
 
     @api.model
     def create(self, vals):

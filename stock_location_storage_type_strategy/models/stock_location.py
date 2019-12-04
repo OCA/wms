@@ -157,12 +157,12 @@ class StockLocation(models.Model):
             return self.env['stock.location.storage.type']
 
     def _max_height_allowed(self, location_storage_type, quant):
-        height = quant.package_id.product_packaging_id.height
+        height = quant.package_id.height
         max_height = location_storage_type.max_height
         return not (max_height and height and height > max_height)
 
     def _max_weight_allowed(self, location_storage_type, quant):
-        pack_weight = quant.package_id.product_packaging_id.weight
+        pack_weight = quant.package_id.weight
         max_weight = location_storage_type.max_weight
         return not (max_weight and pack_weight and pack_weight > max_weight)
 

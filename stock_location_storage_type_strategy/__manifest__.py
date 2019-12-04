@@ -12,9 +12,8 @@
     "application": False,
     "installable": True,
     "depends": [
-        "product_packaging_dimension",
         "stock_storage_type",
-        "stock_quant_package_product_packaging",
+        "stock_quant_package_dimension",
     ],
     "data": [
         "security/ir.model.access.csv",
@@ -24,6 +23,7 @@
         "views/stock_package_storage_type.xml",
     ],
     "demo": [
+        "demo/product_packaging.xml",
         "demo/stock_location.xml",
         "demo/stock_location_storage_type.xml",
         "demo/stock_package_storage_location.xml",

@@ -197,6 +197,69 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
             self.pallets_bin_1_location | self.pallets_bin_3_location
         )
 
+    def test_storage_strategy_max_weight_ordered_locations_pallets(self):
+        self.areas.write({'pack_storage_strategy': 'ordered_locations'})
+        # Define new pallets location type with a max weight on bin 2
+        light_location_storage_type = self.pallets_location_storage_type.copy(
+            {
+                'only_empty': True,
+                'max_weight': 50,
+            }
+        )
+        self.pallets_bin_2_location.write({
+            'stock_location_storage_type_ids': [(6, 0, light_location_storage_type.ids)]
+        })
+        self.assertEqual(
+            self.pallets_bin_2_location.stock_location_storage_type_ids,
+            light_location_storage_type
+        )
+        # Create picking
+        in_picking = self.env['stock.picking'].create({
+            'picking_type_id': self.receipts_picking_type.id,
+            'location_id': self.suppliers_location.id,
+            'location_dest_id': self.input_location.id,
+            'move_lines': [(0, 0, {
+                'name': self.product.name,
+                'product_id': self.product.id,
+                'product_uom_qty': 96.0,
+                'product_uom': self.product.uom_id.id,
+            })],
+        })
+        # Mark as todo
+        in_picking.action_confirm()
+        # Put in pack
+        in_picking.move_line_ids.qty_done = 48.0
+        first_package = in_picking.put_in_pack()
+        # Ensure packaging is set properly on pack
+        first_package.product_packaging_id = self.product_pallet_product_packaging
+        import pdb; pdb.set_trace()
+        first_package.onchange_product_packaging_id()
+        self.assertEqual(first_package.weight, 60)
+        # Put in pack again
+        ml_without_package = in_picking.move_line_ids.filtered(
+            lambda ml: not ml.result_package_id)
+        ml_without_package.qty_done = 48.0
+        second_pack = in_picking.put_in_pack()
+        # Ensure packaging is set properly on pack
+        second_pack.product_packaging_id = self.product_pallet_product_packaging
+        second_pack.onchange_product_packaging_id()
+        self.assertEqual(second_pack.weight, 60)
+        # Validate picking
+        in_picking.button_validate()
+        # Assign internal picking
+        int_picking = in_picking.move_lines.move_dest_ids.picking_id
+        int_picking.action_assign()
+        self.assertEqual(int_picking.location_dest_id, self.stock_location)
+        self.assertEqual(int_picking.move_lines.mapped('location_dest_id'),
+                         self.stock_location)
+        # First move line goes into pallets bin 1
+        # Second move line goes into pallets bin 3 as bin 1 is planned for
+        # first move line and bin 2 is already used
+        self.assertEqual(
+            int_picking.move_line_ids.mapped('location_dest_id'),
+            self.pallets_bin_1_location | self.pallets_bin_3_location
+        )
+
     def test_storage_strategy_no_products_lots_mix_ordered_locations_cardboxes(self):
         self.areas.write({'pack_storage_strategy': 'ordered_locations'})
         self.cardboxes_location_storage_type.write({
