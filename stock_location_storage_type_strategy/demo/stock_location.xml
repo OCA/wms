@@ -10,7 +10,7 @@
         <field name="name">Pallets reserve storage area</field>
         <field name="location_id" model="stock.location"
             eval="obj().env.ref('stock.warehouse0').lot_stock_id.id"/>
-        <field name="stock_location_storage_type_ids" eval="[(6,0,[ref('stock_storage_type.location_storage_type_pallets')])]" />
+        <field name="location_storage_type_ids" eval="[(6,0,[ref('stock_storage_type.location_storage_type_pallets')])]" />
         <field name="pack_storage_strategy">ordered_locations</field>
     </record>
     <record id="stock_location_pallets_reserve_bin_1" model="stock.location">
@@ -29,7 +29,7 @@
         <field name="name">Cardboxes reserve storage area</field>
         <field name="location_id" model="stock.location"
             eval="obj().env.ref('stock.warehouse0').lot_stock_id.id"/>
-        <field name="stock_location_storage_type_ids" eval="[(6,0,[ref('stock_storage_type.location_storage_type_cardboxes')])]" />
+        <field name="location_storage_type_ids" eval="[(6,0,[ref('stock_storage_type.location_storage_type_cardboxes')])]" />
         <field name="pack_storage_strategy">ordered_locations</field>
     </record>
     <record id="stock_location_cardboxes_reserve_bin_1" model="stock.location">

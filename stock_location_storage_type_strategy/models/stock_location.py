@@ -43,7 +43,7 @@ class StockLocation(models.Model):
         quant = self.env.context.get('storage_quant')
         package_storage_type = False
         if quant:
-            package_storage_type = quant.package_id.stock_package_storage_type_id
+            package_storage_type = quant.package_id.package_storage_type_id
         if not package_storage_type:
             return putaway_location
         dest_location = putaway_location or self
@@ -96,13 +96,13 @@ class StockLocation(models.Model):
 
     def _package_storage_type_allowed(self, package_storage_type, quant, product):
         self.ensure_one()
-        matching_location_storage_types = self.allowed_stock_location_storage_type_ids.filtered(
-            lambda slst: package_storage_type in slst.stock_package_storage_type_ids
+        matching_location_storage_types = self.allowed_location_storage_type_ids.filtered(
+            lambda slst: package_storage_type in slst.package_storage_type_ids
         )
         allowed_location_storage_types = self.filter_restrictions(
             matching_location_storage_types, quant, product
         )
-        return not self.allowed_stock_location_storage_type_ids or allowed_location_storage_types
+        return not self.allowed_location_storage_type_ids or allowed_location_storage_types
 
     def filter_restrictions(self, matching_location_storage_types, quant, product):
         allowed_location_storage_types = self.env['stock.location.storage.type']

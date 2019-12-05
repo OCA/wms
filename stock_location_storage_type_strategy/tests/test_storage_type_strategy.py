@@ -79,14 +79,14 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
             'name': '5 units cardbox',
             'qty': 5,
             'product_id': cls.product_lot.id,
-            'stock_package_storage_type_id': cls.cardboxes_package_storage_type.id,
+            'package_storage_type_id': cls.cardboxes_package_storage_type.id,
         })
         cls.product_lot_pallets_product_packaging = cls.env[
             'product.packaging'].create({
                 'name': '20 units pallet',
                 'qty': 20,
                 'product_id': cls.product_lot.id,
-                'stock_package_storage_type_id': cls.pallets_package_storage_type.id,
+                'package_storage_type_id': cls.pallets_package_storage_type.id,
             })
 
         # cls.product_pallets_putaway = ref(
@@ -207,10 +207,10 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
             }
         )
         self.pallets_bin_2_location.write({
-            'stock_location_storage_type_ids': [(6, 0, light_location_storage_type.ids)]
+            'location_storage_type_ids': [(6, 0, light_location_storage_type.ids)]
         })
         self.assertEqual(
-            self.pallets_bin_2_location.stock_location_storage_type_ids,
+            self.pallets_bin_2_location.location_storage_type_ids,
             light_location_storage_type
         )
         # Create picking

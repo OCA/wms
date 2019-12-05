@@ -7,7 +7,7 @@ class StockQuantPackage(models.Model):
 
     _inherit = "stock.quant.package"
 
-    stock_package_storage_type_id = fields.Many2one(
+    package_storage_type_id = fields.Many2one(
         'stock.package.storage.type'
     )
 
@@ -15,9 +15,9 @@ class StockQuantPackage(models.Model):
     def onchange_product_packaging_id(self):
         res = super().onchange_product_packaging_id()
         packaging = self.product_packaging_id
-        storage_type = packaging.stock_package_storage_type_id
+        storage_type = packaging.package_storage_type_id
         if storage_type:
-            self.stock_package_storage_type_id = storage_type
+            self.package_storage_type_id = storage_type
         return res
 
     @api.model
@@ -33,10 +33,10 @@ class StockQuantPackage(models.Model):
         packaging_id = vals.get('product_packaging_id')
         if packaging_id:
             packaging = self.env['product.packaging'].browse(packaging_id)
-            storage_type = packaging.stock_package_storage_type_id
+            storage_type = packaging.package_storage_type_id
             if storage_type:
                 vals = dict(
                     vals,
-                    stock_package_storage_type_id=storage_type.id
+                    package_storage_type_id=storage_type.id
                 )
         return vals
