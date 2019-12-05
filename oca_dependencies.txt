@@ -31,6 +31,7 @@ stock-logistics-warehouse https://github.com/guewen/stock-logistics-warehouse wm
 # stock-logistics-warehouse https://github.com/grindtildeath/stock-logistics-warehouse 12.0_add_stock_picking_completion_info
 # stock-logistics-warehouse https://github.com/guewen/stock-logistics-warehouse 12.0-add-stock_picking_zone
 # stock-logistics-warehouse https://github.com/guewen/stock-logistics-warehouse 12.0-add-reservation-zone-rules
+server-tools https://github.com/grindtildeath/server-tools 12.0-add-base_m2m_custom_field
 
 
 
