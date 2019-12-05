@@ -15,7 +15,14 @@ class StockLocation(models.Model):
         required=True,
         default='none',
         string='Packs storage strategy',
-        help='TODO',
+        help='This defines the storage strategy to use when packs are putaway '
+             'in this location.\n'
+             'None: when a pack is moved to this location, it will not be put'
+             ' away any further.\n'
+             'Ordered Children Locations: when a pack is moved to this '
+             'location, a suitable location will be searched in its children'
+             'locations according to the restrictions defined on their'
+             'respective location storage types.',
     )
     storage_location_sequence_ids = fields.One2many(
         'stock.storage.location.sequence',
