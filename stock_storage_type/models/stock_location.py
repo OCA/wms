@@ -12,6 +12,9 @@ class StockLocation(models.Model):
         'stock_location_location_storage_type_rel',
         'location_id',
         'location_storage_type_id',
+        help="Location storage types defined here will be applied on all the "
+             "children locations that do not define their own location "
+             "storage types."
     )
 
     allowed_location_storage_type_ids = fields.Many2many(
@@ -21,6 +24,9 @@ class StockLocation(models.Model):
         'location_storage_type_id',
         compute='_compute_allowed_location_storage_type_ids',
         store=True,
+        help="Locations storage types that this location can accept. (If no "
+             "location storage types are defined on this specific location, "
+             "the location storage types of the parent location are applied)."
     )
 
     @api.depends(

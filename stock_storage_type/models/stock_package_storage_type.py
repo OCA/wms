@@ -16,6 +16,8 @@ class StockPackageStorageType(models.Model):
         'location_storage_type_id',
         create_table=False,
         string='Allowed locations storage types',
+        help="Locations storage types that can accept such a package storage "
+             "type."
     )
     product_packaging_ids = fields.One2many(
         'product.packaging', 'package_storage_type_id',

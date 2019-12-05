@@ -31,6 +31,8 @@ class StockLocationStorageType(models.Model):
         'package_storage_type_id',
         create_table=False,
         string='Allowed packages storage types',
+        help="Package storage types that are allowed on locations "
+             "where this location storage type is defined."
     )
 
     only_empty = fields.Boolean(
