@@ -59,7 +59,6 @@ class StockReceptionScreen(models.Model):
                 {
                     "before": "_before_set_pid_to_select_packaging",
                     "next": "select_packaging",
-                    "after": "_after_select_packaging",
                 }
             ],
         },
@@ -117,15 +116,14 @@ class StockReceptionScreen(models.Model):
         compute="_compute_current_move_location_dest_id",
         inverse="_inverse_current_move_location_dest_id",
     )
+    current_move_product_id = fields.Many2one(
+        related="current_move_id.product_id")
     current_move_product_display_name = fields.Char(
         related="current_move_id.product_id.display_name", string="Product")
     current_move_product_uom_qty = fields.Float(
         related="current_move_id.product_uom_qty")
     current_move_product_uom_id = fields.Many2one(
         related="current_move_id.product_uom")
-    current_move_line_product_packaging_id = fields.Many2one(
-        related="current_move_line_id.result_package_id.product_packaging_id"
-    )
     current_move_product_packaging_ids = fields.One2many(
         related="current_move_id.product_id.packaging_ids")
     # current move line
@@ -157,11 +155,17 @@ class StockReceptionScreen(models.Model):
         inverse="_inverse_current_move_line_pid",
         string="PID",
     )
+    current_move_line_product_packaging_id = fields.Many2one(
+        related="current_move_line_id.result_package_id.product_packaging_id",
+        domain="[('product_id', '=', current_move_product_id)]",
+        readonly=False,
+    )
     current_move_line_storage_type = fields.Many2one(
         related=(
             "current_move_line_id.result_package_id."
             "stock_package_storage_type_id"
-        )
+        ),
+        readonly=False,
     )
 
     @api.depends("picking_id.move_lines", "current_filter_product")
@@ -511,26 +515,17 @@ class StockReceptionScreen(models.Model):
         return True
 
     def process_select_packaging(self):
+        self._check_storage_type()
         self.next_step()
 
-    def _after_select_packaging(self):
-        """Check that the filled packaging exists on the product,
-        otherwise we ask the user to add it.
+    def _check_storage_type(self):
+        """Check that the storage type is set.
+        It is done this way to not set the field required on the form
+        (allowing to quit the reception screen).
         """
-        packaging = self.current_move_line_product_packaging_id
-        no_packaging = packaging not in self.current_move_product_packaging_ids
-        product_packaging = packaging & self.current_move_product_packaging_ids
-        qty_differ = False
-        if product_packaging:
-            qty_differ = packaging.qty != product_packaging
-        if no_packaging or qty_differ:
+        if not self.current_move_line_storage_type:
             raise UserError(
-                _("The packaging {} (qty={}) does not exist on the "
-                  "product {}.\nYou have to configure it on the product "
-                  "before going further.").format(
-                      packaging.name,
-                      packaging.qty,
-                      packaging.product_id.display_name))
+                _("The storage type is mandatory before going further."))
 
     def _after_step_done(self):
         """Reset the current selected move line."""

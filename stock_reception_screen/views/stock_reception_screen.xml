@@ -65,6 +65,7 @@
 
         <field name="current_step" invisible="1"/>
         <field name="current_move_id" invisible="1"/>
+        <field name="current_move_product_id" invisible="1"/>
         <field name="current_move_line_id" invisible="1"/>
 
         <div class="o_screen_data">
@@ -135,7 +136,6 @@
                     style="width: 15em;"
                     options="{'no_open': True, 'no_create': True}"
                     attrs="{
-                      'required': [('current_step', '=', 'select_packaging')],
                       'readonly': [('current_step', '!=', 'select_packaging')],
                     }"/>
                 </div>
@@ -146,7 +146,6 @@
                           style="width: 15em;"
                           options="{'no_open': True, 'no_create': True}"
                           attrs="{
-                            'required': [('current_step', '=', 'select_packaging')],
                             'readonly': [('current_step', '!=', 'select_packaging')],
                           }"/>
                 </div>
