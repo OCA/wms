@@ -149,6 +149,15 @@
                             'readonly': [('current_step', '!=', 'select_packaging')],
                           }"/>
                 </div>
+                <label for="current_move_line_height"/>
+                <div>
+                    <field name="current_move_line_height"
+                          class="mr8"
+                          style="width: 15em;"
+                          attrs="{
+                            'readonly': [('current_step', '!=', 'select_packaging')],
+                          }"/>
+                </div>
               </group>
               <group colspan="1">
                 <div>
