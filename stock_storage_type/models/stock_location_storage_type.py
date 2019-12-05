@@ -23,11 +23,13 @@ class StockLocationStorageType(models.Model):
         'stock_location_id',
         readonly=True,
     )
-    stock_package_storage_type_ids = fields.Many2many(
+
+    package_storage_type_ids = fields.Many2manyCustom(
         'stock.package.storage.type',
         'stock_location_package_storage_type_rel',
-        'stock_location_storage_type_id',
-        'stock_package_storage_type_id',
+        'location_storage_type_id',
+        'package_storage_type_id',
+        create_table=False,
     )
 
     only_empty = fields.Boolean(
