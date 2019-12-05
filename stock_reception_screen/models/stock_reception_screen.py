@@ -167,6 +167,10 @@ class StockReceptionScreen(models.Model):
         ),
         readonly=False,
     )
+    current_move_line_height = fields.Integer(
+        related="current_move_line_id.result_package_id.height",
+        readonly=False,
+    )
 
     @api.depends("picking_id.move_lines", "current_filter_product")
     def _compute_picking_filtered_move_lines(self):
@@ -400,6 +404,8 @@ class StockReceptionScreen(models.Model):
             # Set the storage type on the package
             storage_type = packaging.stock_package_storage_type_id
             package.stock_package_storage_type_id = storage_type
+            # Set the height on the package
+            package.height = packaging.height
 
     def process_select_product(self):
         self.next_step()
@@ -512,10 +518,10 @@ class StockReceptionScreen(models.Model):
         return True
 
     def process_select_packaging(self):
-        if self._check_storage_type():
+        if self._check_package_data():
             self.next_step()
 
-    def _check_storage_type(self):
+    def _check_package_data(self):
         """Check that the storage type is set.
         It is done this way to not set the field required on the form
         (allowing to quit the reception screen via the exit button and resume
@@ -523,6 +529,13 @@ class StockReceptionScreen(models.Model):
         """
         if not self.current_move_line_storage_type:
             msg = _("The storage type is mandatory before going further.")
+            self.env.user.notify_warning(
+                message="",
+                title=msg,
+            )
+            return False
+        if not self.current_move_line_height:
+            msg = _("The height is mandatory before going further.")
             self.env.user.notify_warning(
                 message="",
                 title=msg,
@@ -553,6 +566,5 @@ class StockReceptionScreen(models.Model):
         self.ensure_one()
         self.current_step = self._step_start
         self.current_filter_product = False
-        self.current_move_line_qty_done = 0
         self.current_move_id = self.current_move_line_id = False
         return True

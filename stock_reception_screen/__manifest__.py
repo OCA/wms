@@ -11,6 +11,10 @@
     "depends": [
         "stock",
         "product_expiry",
+        # OCA/product-attribute
+        "product_packaging_dimension",
+        # OCA/stock-logistics-workflow
+        "stock_quant_package_dimension",
         # OCA/wms
         "stock_location_storage_type_strategy",
         # OCA/web
