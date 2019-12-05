@@ -19,13 +19,13 @@
         "security/ir.model.access.csv",
         "views/stock_location.xml",
         "views/stock_quant_package.xml",
-        "views/stock_package_storage_location.xml",
         "views/stock_package_storage_type.xml",
+        "views/stock_storage_location_sequence.xml",
     ],
     "demo": [
         "demo/product_packaging.xml",
         "demo/stock_location.xml",
         "demo/stock_location_storage_type.xml",
-        "demo/stock_package_storage_location.xml",
+        "demo/stock_storage_location_sequence.xml",
     ],
 }

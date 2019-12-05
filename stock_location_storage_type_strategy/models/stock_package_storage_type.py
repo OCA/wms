@@ -24,13 +24,15 @@ class StockPackageStorageType(models.Model):
                 msg = _(
                     "When a package with storage type %s is put away, the "
                     "strategy will look for an allowed location in the "
-                    "following locations (as long as these locations are "
-                    "children of the stock move destination location or as "
-                    "long as these locations are children of the destination "
-                    "location after the (product or category) putaway is "
-                    "applied): %s"
+                    "following locations: <br/><br/>"
+                    "%s <br/><br/>"
+                    "<b>Note</b>: this happens as long as these locations <u>"
+                    "are children of the stock move destination location</u> "
+                    "or as long as these locations are children of the "
+                    "destination location after the (product or category) "
+                    "putaway is applied."
                 ) % (
-                    pst.name, '\n'.join(
+                    pst.name, '<br/>'.join(
                         [
                             sl._format_package_storage_type_message()
                             for sl in storage_locations
