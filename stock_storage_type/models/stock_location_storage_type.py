@@ -7,7 +7,7 @@ from odoo.exceptions import ValidationError
 class StockLocationStorageType(models.Model):
 
     _name = 'stock.location.storage.type'
-    _description = 'Stock location storage type'
+    _description = 'Location storage type'
 
     name = fields.Char(required=True)
     location_ids = fields.Many2many(
@@ -30,6 +30,7 @@ class StockLocationStorageType(models.Model):
         'location_storage_type_id',
         'package_storage_type_id',
         create_table=False,
+        string='Allowed packages storage types',
     )
 
     only_empty = fields.Boolean(

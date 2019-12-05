@@ -6,7 +6,7 @@ from odoo import models, fields
 class StockPackageStorageType(models.Model):
 
     _name = 'stock.package.storage.type'
-    _description = 'Stock package storage type'
+    _description = 'Package storage type'
 
     name = fields.Char(required=True)
     location_storage_type_ids = fields.Many2manyCustom(
@@ -15,6 +15,7 @@ class StockPackageStorageType(models.Model):
         'package_storage_type_id',
         'location_storage_type_id',
         create_table=False,
+        string='Allowed locations storage types',
     )
     product_packaging_ids = fields.One2many(
         'product.packaging', 'package_storage_type_id',
