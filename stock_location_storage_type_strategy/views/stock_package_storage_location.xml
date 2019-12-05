@@ -2,7 +2,7 @@
 <odoo>
     <record id="package_storage_location_tree_view" model="ir.ui.view">
         <field name="name">package.storage.location.tree.view</field>
-        <field name="model">stock.package.storage.location</field>
+        <field name="model">stock.storage.location.sequence</field>
         <field name="arch" type="xml">
             <tree string="Storage locations" editable="bottom">
                 <field name="sequence" widget="handle" />

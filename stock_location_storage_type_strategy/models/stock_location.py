@@ -17,18 +17,18 @@ class StockLocation(models.Model):
         string='Packs storage strategy',
         help='TODO',
     )
-    package_storage_location_ids = fields.One2many(
-        'stock.package.storage.location',
+    storage_location_sequence_ids = fields.One2many(
+        'stock.storage.location.sequence',
         'location_id',
         string='Storage locations',
     )
 
-    @api.constrains('pack_storage_strategy', 'package_storage_location_ids')
+    @api.constrains('pack_storage_strategy', 'storage_location_sequence_ids')
     def _check_pack_storage_strategy(self):
         for location in self:
             if (
                 location.pack_storage_strategy == 'none'
-                and location.package_storage_location_ids
+                and location.storage_location_sequence_ids
             ):
                 raise ValidationError(
                     _(
@@ -47,7 +47,7 @@ class StockLocation(models.Model):
         if not package_storage_type:
             return putaway_location
         dest_location = putaway_location or self
-        package_locations = self.env['stock.package.storage.location'].search([
+        package_locations = self.env['stock.storage.location.sequence'].search([
             ('package_storage_type_id', '=', package_storage_type.id),
             ('location_id', 'child_of', dest_location.ids),
         ])
