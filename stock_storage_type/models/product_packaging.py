@@ -7,6 +7,6 @@ class ProductPackaging(models.Model):
 
     _inherit = 'product.packaging'
 
-    stock_package_storage_type_id = fields.Many2one(
+    package_storage_type_id = fields.Many2one(
         'stock.package.storage.type'
     )
