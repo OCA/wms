@@ -371,6 +371,8 @@ class StockReceptionScreen(models.Model):
         # Finally if there is no corresponding move line we create one
         # with a remaining qty to process equals to the difference between
         # the planned qty and the already processed qty.
+        # TODO: need to check if it is still necessary as we are now validating
+        # stock.move at the end of each reception flow
         if not move_lines:
             move_lines = self._create_remaining_move_line(self.current_move_id)
         self.current_move_line_id = move_lines[0]
@@ -412,15 +414,12 @@ class StockReceptionScreen(models.Model):
         before checking the next move to process).
         """
         if self.current_move_line_id and self.current_move_id:
-            remaining_qty = (
-                self.current_move_id.product_uom_qty
-                - self.current_move_line_id.qty_done)
-            self.current_move_id._split(remaining_qty)
             # We use the 'is_scrap' context key to avoid the generation of a
             # backorder when validating the move (see _action_done() method in
             # stock/models/stock_move.py).
             self.current_move_id.with_context(is_scrap=True)._action_done()
-            self.picking_id.action_assign()
+            if self.picking_id.state == "confirmed":
+                self.picking_id.action_assign()
 
     def _before_set_location_to_select_move(self):
         """Check if there is remaining moves to process for the
@@ -451,12 +450,10 @@ class StockReceptionScreen(models.Model):
     def process_select_move(self):
         self.next_step()
         # Select the move line to process for the remaining qty
-        # (creating one if necessary)
-        move_line = self.current_move_id.move_line_ids.filtered(
-            lambda o: not o.qty_done)
-        if not move_line:
-            move_line = self._create_remaining_move_line(self.current_move_id)
-        self.current_move_line_id = move_line[0]
+        # NOTE: we should always have one move line available since we run
+        # 'action_assign' on the picking each time we validate a move.
+        move_line = fields.first(self.current_move_id.move_line_ids)
+        self.current_move_line_id = move_line
 
     def _before_select_move_to_set_lot_number(self):
         """Decide if we have to handle lots on the current move."""
@@ -515,17 +512,23 @@ class StockReceptionScreen(models.Model):
         return True
 
     def process_select_packaging(self):
-        self._check_storage_type()
-        self.next_step()
+        if self._check_storage_type():
+            self.next_step()
 
     def _check_storage_type(self):
         """Check that the storage type is set.
         It is done this way to not set the field required on the form
-        (allowing to quit the reception screen).
+        (allowing to quit the reception screen via the exit button and resume
+        the step later).
         """
         if not self.current_move_line_storage_type:
-            raise UserError(
-                _("The storage type is mandatory before going further."))
+            msg = _("The storage type is mandatory before going further.")
+            self.env.user.notify_warning(
+                message="",
+                title=msg,
+            )
+            return False
+        return True
 
     def _after_step_done(self):
         """Reset the current selected move line."""
@@ -550,5 +553,6 @@ class StockReceptionScreen(models.Model):
         self.ensure_one()
         self.current_step = self._step_start
         self.current_filter_product = False
+        self.current_move_line_qty_done = 0
         self.current_move_id = self.current_move_line_id = False
         return True
