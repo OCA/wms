@@ -35,9 +35,11 @@ class StockLocation(models.Model):
             location.display_abc_storage = display_abc_storage
 
     def get_storage_locations(self, product=None):
-        if not self.pack_putaway_strategy == 'abc':
-            return super().get_storage_locations()
-        return self._get_abc_locations(product)
+        if product is None:
+            product = self.env['product.product']
+        if self.pack_putaway_strategy == 'abc':
+            return self._get_abc_locations(product)
+        return super().get_storage_locations(product)
 
     def _get_abc_locations(self, product):
         locations = self.search(
