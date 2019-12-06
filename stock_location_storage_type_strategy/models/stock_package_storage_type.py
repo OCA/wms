@@ -10,7 +10,7 @@ class StockPackageStorageType(models.Model):
     storage_location_sequence_ids = fields.One2many(
         'stock.storage.location.sequence',
         'package_storage_type_id',
-        string='Storage locations sequence',
+        string='Put-Away sequence',
     )
     storage_type_message = fields.Html(
         compute='_compute_storage_type_message'
@@ -21,6 +21,15 @@ class StockPackageStorageType(models.Model):
         for pst in self:
             storage_locations = pst.storage_location_sequence_ids
             if storage_locations:
+                formatted_storage_locations_msgs = []
+                last = False
+                for sl in storage_locations:
+                    # check if we're on the last element
+                    if sl == storage_locations[-1]:
+                        last = True
+                    formatted_storage_locations_msgs.append(
+                        sl._format_package_storage_type_message(last=last)
+                    )
                 msg = _(
                     "When a package with storage type %s is put away, the "
                     "strategy will look for an allowed location in the "
@@ -30,26 +39,21 @@ class StockPackageStorageType(models.Model):
                     "are children of the stock move destination location</u> "
                     "or as long as these locations are children of the "
                     "destination location after the (product or category) "
-                    "putaway is applied."
+                    "put-away is applied."
                 ) % (
-                    pst.name, '<br/>'.join(
-                        [
-                            sl._format_package_storage_type_message()
-                            for sl in storage_locations
-                        ]
-                    )
+                    pst.name, '<br/>'.join(formatted_storage_locations_msgs)
                 )
             else:
                 msg = _(
-                    "The 'Storage locations sequence' must be defined in "
-                    "order to put away packages using this package storage "
-                    "type (%s)."
+                    '<span style="color: red;">The "Put-Away sequence" '
+                    'must be defined in order to put away packages using '
+                    'this package storage type (%s).</span>'
                 ) % pst.name
             pst.storage_type_message = msg
 
     def action_view_storage_locations(self):
         return {
-            'name': _('Storage locations'),
+            'name': _('Put-away sequence'),
             'type': 'ir.actions.act_window',
             'res_model': 'stock.storage.location.sequence',
             'view_mode': 'list',

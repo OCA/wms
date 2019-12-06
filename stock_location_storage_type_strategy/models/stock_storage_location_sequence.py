@@ -6,7 +6,7 @@ from odoo import _, fields, models
 class StockStorageLocationSequence(models.Model):
 
     _name = 'stock.storage.location.sequence'
-    _description = 'Storage locations sequence'
+    _description = 'Sequence of locations to put-away the package storage type'
     _order = 'sequence'
 
     package_storage_type_id = fields.Many2one(
@@ -19,8 +19,9 @@ class StockStorageLocationSequence(models.Model):
         domain="[('pack_putaway_strategy', '!=', 'none')]",
     )
 
-    def _format_package_storage_type_message(self):
+    def _format_package_storage_type_message(self, last=False):
         self.ensure_one()
+        # TODO improve ugly code
         type_matching_locations = self.location_id.get_storage_locations().filtered(
             lambda l: self.package_storage_type_id
                       in l.allowed_location_storage_type_ids.mapped(
@@ -31,15 +32,28 @@ class StockStorageLocationSequence(models.Model):
             # Get the selection description
             pack_storage_strat = None
             pack_storage_strat_selection = self.location_id._fields[
-                'pack_storage_strategy']._description_selection(self.env)
+                'pack_putaway_strategy']._description_selection(self.env)
             for strat in pack_storage_strat_selection:
-                if strat[0] == self.location_id.pack_storage_strategy:
+                if strat[0] == self.location_id.pack_putaway_strategy:
                     pack_storage_strat = strat[1]
                     break
-
             msg = ' * <span style="color: green;">%s (%s)</span>' % (
                 self.location_id.name, pack_storage_strat
             )
+            if last:
+                # If last, we want to check if restrictions are defined on
+                # location storage types accepting this package storage type
+                # TODO improve ugly code
+                loc_st = type_matching_locations.mapped('allowed_location_storage_type_ids').filtered(
+                    lambda lst: self.package_storage_type_id in lst.package_storage_type_ids
+                    and not lst.has_restrictions
+                )
+                if not loc_st:
+                    msg = _(
+                        ' * <span style="color: orange;">%s (WARNING: '
+                        'restrictions are active on location storage types '
+                        'matching this package storage type)</span>'
+                    ) % self.location_id.name
         else:
             msg = _(
                 ' * <span style="color: red;">%s '
