@@ -9,14 +9,14 @@ class StockLocation(models.Model):
 
     _inherit = 'stock.location'
 
-    pack_storage_strategy = fields.Selection(
+    pack_putaway_strategy = fields.Selection(
         selection=[('none', 'None'),
                    ('ordered_locations', 'Ordered Children Locations')],
         required=True,
         default='none',
-        string='Packs storage strategy',
-        help='This defines the storage strategy to use when packs are putaway '
-             'in this location.\n'
+        string='Packs Put-Away Strategy',
+        help='This defines the storage strategy to use when packs are put '
+             'away in this location.\n'
              'None: when a pack is moved to this location, it will not be put'
              ' away any further.\n'
              'Ordered Children Locations: when a pack is moved to this '
@@ -30,11 +30,11 @@ class StockLocation(models.Model):
         string='Storage locations sequences',
     )
 
-    @api.constrains('pack_storage_strategy', 'storage_location_sequence_ids')
-    def _check_pack_storage_strategy(self):
+    @api.constrains('pack_putaway_strategy', 'storage_location_sequence_ids')
+    def _check_pack_putaway_strategy(self):
         for location in self:
             if (
-                location.pack_storage_strategy == 'none'
+                location.pack_putaway_strategy == 'none'
                 and location.storage_location_sequence_ids
             ):
                 raise ValidationError(
@@ -48,9 +48,9 @@ class StockLocation(models.Model):
     def get_putaway_strategy(self, product):
         putaway_location = super().get_putaway_strategy(product)
         quant = self.env.context.get('storage_quant')
-        return self.get_pack_storage_strategy(putaway_location, quant, product)
+        return self.get_pack_putaway_strategy(putaway_location, quant, product)
 
-    def get_pack_storage_strategy(self, putaway_location, quant, product):
+    def get_pack_putaway_strategy(self, putaway_location, quant, product):
         package_storage_type = False
         if quant:
             package_storage_type = quant.package_id.package_storage_type_id
@@ -64,7 +64,7 @@ class StockLocation(models.Model):
         for pack_loc in package_locations:
             pref_loc = pack_loc.location_id
             if (
-                pref_loc.pack_storage_strategy == 'none' and
+                pref_loc.pack_putaway_strategy == 'none' and
                 pref_loc._package_storage_type_allowed(
                     package_storage_type, quant, product
                 )
@@ -83,9 +83,9 @@ class StockLocation(models.Model):
     def get_storage_locations(self, product=None):
         self.ensure_one()
         locations = self.browse()
-        if self.pack_storage_strategy == 'none':
+        if self.pack_putaway_strategy == 'none':
             locations = self
-        elif self.pack_storage_strategy == 'ordered_locations':
+        elif self.pack_putaway_strategy == 'ordered_locations':
             locations = self._get_ordered_children_locations()
         return locations
 

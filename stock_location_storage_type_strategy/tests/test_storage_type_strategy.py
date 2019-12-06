@@ -105,7 +105,7 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
         # pick_types.write({'show_entire_packs': True})
 
     def test_storage_strategy_ordered_locations_cardboxes(self):
-        self.areas.write({'pack_storage_strategy': 'ordered_locations'})
+        self.areas.write({'pack_putaway_strategy': 'ordered_locations'})
         # Create picking
         in_picking = self.env['stock.picking'].create({
             'picking_type_id': self.receipts_picking_type.id,
@@ -147,7 +147,7 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
         )
 
     def test_storage_strategy_only_empty_ordered_locations_pallets(self):
-        self.areas.write({'pack_storage_strategy': 'ordered_locations'})
+        self.areas.write({'pack_putaway_strategy': 'ordered_locations'})
         # Set pallets location type as only empty
         self.pallets_location_storage_type.write({'only_empty': True})
         # Set a quantity in pallet bin 2 to make sure constraint is applied
@@ -198,7 +198,7 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
         )
 
     def test_storage_strategy_max_weight_ordered_locations_pallets(self):
-        self.areas.write({'pack_storage_strategy': 'ordered_locations'})
+        self.areas.write({'pack_putaway_strategy': 'ordered_locations'})
         # Define new pallets location type with a max weight on bin 2
         light_location_storage_type = self.pallets_location_storage_type.copy(
             {
@@ -261,7 +261,7 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
         )
 
     def test_storage_strategy_no_products_lots_mix_ordered_locations_cardboxes(self):
-        self.areas.write({'pack_storage_strategy': 'ordered_locations'})
+        self.areas.write({'pack_putaway_strategy': 'ordered_locations'})
         self.cardboxes_location_storage_type.write({
             'do_not_mix_products': True,
             'do_not_mix_lots': True

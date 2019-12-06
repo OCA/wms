@@ -16,7 +16,7 @@ class StockStorageLocationSequence(models.Model):
     location_id = fields.Many2one(
         'stock.location',
         required=True,
-        domain="[('pack_storage_strategy', '!=', 'none')]",
+        domain="[('pack_putaway_strategy', '!=', 'none')]",
     )
 
     def _format_package_storage_type_message(self):

@@ -1,8 +1,8 @@
-- Pack storage strategy
+- Pack put-away strategy
 
-On stock locations, you can define a "Pack storage strategy" as "Ordered bins",
+On stock locations, you can define a "Pack put-away strategy" as "Ordered bins",
 so that any move, having this locations as its destination, will be put-away
-on a child location, according to the restrictions from storage types.
+on a children location, according to the restrictions from storage types.
 
 - Storage locations
 
