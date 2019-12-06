@@ -16,7 +16,7 @@
         # OCA/stock-logistics-workflow
         "stock_quant_package_dimension",
         # OCA/wms
-        "stock_location_storage_type_strategy",
+        "stock_storage_type_putaway_strategy",
         # OCA/web
         "web_notify",
     ],

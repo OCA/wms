@@ -21,7 +21,7 @@ class TestReceptionScreen(SavepointCase):
                 "name": "PKG TEST",
                 "product_id": cls.product.id,
                 "qty": 4,
-                "stock_package_storage_type_id": cls.storage_type_pallet.id,
+                "package_storage_type_id": cls.storage_type_pallet.id,
                 "height": 10,
             }
         )

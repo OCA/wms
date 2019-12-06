@@ -162,7 +162,7 @@ class StockReceptionScreen(models.Model):
     current_move_line_storage_type = fields.Many2one(
         related=(
             "current_move_line_id.result_package_id."
-            "stock_package_storage_type_id"
+            "package_storage_type_id"
         ),
         readonly=False,
     )
@@ -234,7 +234,7 @@ class StockReceptionScreen(models.Model):
                 wiz.current_move_line_qty_status = "eq"
 
     @api.depends(
-        "current_move_line_id.result_package_id.stock_package_storage_type_id"
+        "current_move_line_id.result_package_id.package_storage_type_id"
     )
     def _compute_current_move_line_pid(self):
         for wiz in self:
@@ -401,8 +401,8 @@ class StockReceptionScreen(models.Model):
             package = self.current_move_line_id.result_package_id
             package.product_packaging_id = packaging
             # Set the storage type on the package
-            storage_type = packaging.stock_package_storage_type_id
-            package.stock_package_storage_type_id = storage_type
+            storage_type = packaging.package_storage_type_id
+            package.package_storage_type_id = storage_type
             # Set the height on the package
             package.height = packaging.height
 
