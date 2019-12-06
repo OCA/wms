@@ -25,7 +25,7 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
             'stock_storage_type.stock_location_pallets'
         )
         cls.pallets_reserve_location = ref(
-            'stock_location_storage_type_strategy.stock_location_pallets_reserve'
+            'stock_storage_type_putaway_strategy.stock_location_pallets_reserve'
         )
         cls.areas = cls.cardboxes_location | cls.pallets_location | cls.pallets_reserve_location
         # cls.putaway_locations = cls.cardboxes_location | cls.pallets_location
