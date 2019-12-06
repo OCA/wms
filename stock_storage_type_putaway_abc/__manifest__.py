@@ -12,7 +12,7 @@
     "application": False,
     "installable": True,
     "depends": [
-        "stock_location_storage_type_strategy",
+        "stock_storage_type_putaway_strategy",
     ],
     "data": [
         "views/product.xml",

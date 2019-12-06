@@ -10,7 +10,7 @@ class StockLocation(models.Model):
 
     _inherit = 'stock.location'
 
-    pack_storage_strategy = fields.Selection(
+    pack_putaway_strategy = fields.Selection(
         selection_add=[('abc', 'Chaotic ABC')]
     )
     display_abc_storage = fields.Boolean(
@@ -19,7 +19,7 @@ class StockLocation(models.Model):
     abc_storage = fields.Selection(ABC_SELECTION, required=True, default='b')
 
     @api.depends(
-        'location_id', 'location_id.pack_storage_strategy',
+        'location_id', 'location_id.pack_putaway_strategy',
         'location_id.display_abc_storage'
     )
     def _compute_display_abc_storage(self):
@@ -27,7 +27,7 @@ class StockLocation(models.Model):
             current_location = location.location_id
             display_abc_storage = current_location.display_abc_storage
             while current_location and not display_abc_storage:
-                if current_location.pack_storage_strategy == 'abc':
+                if current_location.pack_putaway_strategy == 'abc':
                     display_abc_storage = True
                     break
                 else:
@@ -35,7 +35,7 @@ class StockLocation(models.Model):
             location.display_abc_storage = display_abc_storage
 
     def get_storage_locations(self, product=None):
-        if not self.pack_storage_strategy == 'abc':
+        if not self.pack_putaway_strategy == 'abc':
             return super().get_storage_locations()
         return self._get_abc_locations(product)
 

@@ -38,14 +38,14 @@ class TestAbcLocation(SavepointCase):
         cls.product = ref('product.product_product_9')
 
     def test_display_abc_storage_one_level(self):
-        self.cardboxes_location.write({'pack_storage_strategy': 'abc'})
+        self.cardboxes_location.write({'pack_putaway_strategy': 'abc'})
         self.assertTrue(self.cardboxes_bin_1_location.display_abc_storage)
         self.assertTrue(self.cardboxes_bin_2_location.display_abc_storage)
         self.assertTrue(self.cardboxes_bin_3_location.display_abc_storage)
         self.assertFalse(self.pallets_bin_1_location.display_abc_storage)
         self.assertFalse(self.pallets_bin_2_location.display_abc_storage)
         self.assertFalse(self.pallets_bin_3_location.display_abc_storage)
-        self.cardboxes_location.write({'pack_storage_strategy': 'ordered_locations'})
+        self.cardboxes_location.write({'pack_putaway_strategy': 'ordered_locations'})
         self.assertFalse(self.cardboxes_bin_1_location.display_abc_storage)
         self.assertFalse(self.cardboxes_bin_2_location.display_abc_storage)
         self.assertFalse(self.cardboxes_bin_3_location.display_abc_storage)
@@ -54,14 +54,14 @@ class TestAbcLocation(SavepointCase):
         self.assertFalse(self.pallets_bin_3_location.display_abc_storage)
 
     def test_display_abc_storage_two_levels(self):
-        self.stock_location.write({'pack_storage_strategy': 'abc'})
+        self.stock_location.write({'pack_putaway_strategy': 'abc'})
         self.assertTrue(self.cardboxes_bin_1_location.display_abc_storage)
         self.assertTrue(self.cardboxes_bin_2_location.display_abc_storage)
         self.assertTrue(self.cardboxes_bin_3_location.display_abc_storage)
         self.assertTrue(self.pallets_bin_1_location.display_abc_storage)
         self.assertTrue(self.pallets_bin_2_location.display_abc_storage)
         self.assertTrue(self.pallets_bin_3_location.display_abc_storage)
-        self.stock_location.write({'pack_storage_strategy': 'none'})
+        self.stock_location.write({'pack_putaway_strategy': 'none'})
         self.assertFalse(self.cardboxes_bin_1_location.display_abc_storage)
         self.assertFalse(self.cardboxes_bin_2_location.display_abc_storage)
         self.assertFalse(self.cardboxes_bin_3_location.display_abc_storage)
@@ -70,7 +70,7 @@ class TestAbcLocation(SavepointCase):
         self.assertFalse(self.pallets_bin_3_location.display_abc_storage)
 
     def test_abc_ordered(self):
-        self.cardboxes_location.write({'pack_storage_strategy': 'abc'})
+        self.cardboxes_location.write({'pack_putaway_strategy': 'abc'})
         self.cardboxes_bin_1_location.write({'abc_storage': 'b'})
         self.cardboxes_bin_2_location.write({'abc_storage': 'a'})
         self.cardboxes_bin_3_location.write({'abc_storage': 'c'})
