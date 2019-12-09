@@ -49,7 +49,7 @@ class StockLocationStorageType(models.Model):
              "allowed if the location contains the same product."
     )
     max_height = fields.Float(
-        string="Max weight (mm)",
+        string="Max height (mm)",
         help="If defined, moves to the destination location will only be "
              "allowed if the packaging height is lower than this maximum."
     )
