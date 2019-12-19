@@ -234,7 +234,7 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
         first_package.product_packaging_id = self.product_pallet_product_packaging
         import pdb; pdb.set_trace()
         first_package.onchange_product_packaging_id()
-        self.assertEqual(first_package.weight, 60)
+        self.assertEqual(first_package.pack_weight, 60)
         # Put in pack again
         ml_without_package = in_picking.move_line_ids.filtered(
             lambda ml: not ml.result_package_id)
@@ -243,7 +243,7 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_pallet_product_packaging
         second_pack.onchange_product_packaging_id()
-        self.assertEqual(second_pack.weight, 60)
+        self.assertEqual(second_pack.pack_weight, 60)
         # Validate picking
         in_picking.button_validate()
         # Assign internal picking

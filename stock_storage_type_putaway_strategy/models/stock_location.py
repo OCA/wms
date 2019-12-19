@@ -169,7 +169,7 @@ class StockLocation(models.Model):
         return not (max_height and height and height > max_height)
 
     def _max_weight_allowed(self, location_storage_type, quant):
-        pack_weight = quant.package_id.weight
+        pack_weight = quant.package_id.pack_weight
         max_weight = location_storage_type.max_weight
         return not (max_weight and pack_weight and pack_weight > max_weight)
 
