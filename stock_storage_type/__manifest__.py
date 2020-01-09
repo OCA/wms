@@ -11,10 +11,7 @@
     "license": "AGPL-3",
     "application": False,
     "installable": True,
-    "depends": [
-        "base_m2m_custom_field",
-        "stock",
-    ],
+    "depends": ["base_m2m_custom_field", "stock"],
     "data": [
         "security/ir.model.access.csv",
         "views/product_packaging.xml",
