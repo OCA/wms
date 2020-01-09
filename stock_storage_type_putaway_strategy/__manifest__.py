@@ -3,7 +3,7 @@
 {
     "name": "Stock Location Storage Type Strategy",
     "summary": "Apply storage type strategy on move destination location",
-    "version": "12.0.1.0.0",
+    "version": "13.0.1.0.0",
     "development_status": "Alpha",
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",

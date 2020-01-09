@@ -48,12 +48,14 @@ class StockLocation(models.Model):
                     % location.name
                 )
 
-    def get_putaway_strategy(self, product):
-        putaway_location = super().get_putaway_strategy(product)
+    def _get_putaway_strategy(self, product):
+        putaway_location = super()._get_putaway_strategy(product)
         quant = self.env.context.get("storage_quant")
-        return self.get_pack_putaway_strategy(putaway_location, quant, product)
+        return self._get_pack_putaway_strategy(
+            putaway_location, quant, product
+        )
 
-    def get_pack_putaway_strategy(self, putaway_location, quant, product):
+    def _get_pack_putaway_strategy(self, putaway_location, quant, product):
         package_storage_type = False
         if quant:
             package_storage_type = quant.package_id.package_storage_type_id
