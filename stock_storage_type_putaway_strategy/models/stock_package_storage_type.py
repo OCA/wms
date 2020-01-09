@@ -5,18 +5,16 @@ from odoo import _, api, fields, models
 
 class StockPackageStorageType(models.Model):
 
-    _inherit = 'stock.package.storage.type'
+    _inherit = "stock.package.storage.type"
 
     storage_location_sequence_ids = fields.One2many(
-        'stock.storage.location.sequence',
-        'package_storage_type_id',
-        string='Put-Away sequence',
+        "stock.storage.location.sequence",
+        "package_storage_type_id",
+        string="Put-Away sequence",
     )
-    storage_type_message = fields.Html(
-        compute='_compute_storage_type_message'
-    )
+    storage_type_message = fields.Html(compute="_compute_storage_type_message")
 
-    @api.depends('storage_location_sequence_ids')
+    @api.depends("storage_location_sequence_ids")
     def _compute_storage_type_message(self):
         for pst in self:
             storage_locations = pst.storage_location_sequence_ids
@@ -40,23 +38,24 @@ class StockPackageStorageType(models.Model):
                     "or as long as these locations are children of the "
                     "destination location after the (product or category) "
                     "put-away is applied."
-                ) % (
-                    pst.name, '<br/>'.join(formatted_storage_locations_msgs)
-                )
+                ) % (pst.name, "<br/>".join(formatted_storage_locations_msgs))
             else:
-                msg = _(
-                    '<span style="color: red;">The "Put-Away sequence" '
-                    'must be defined in order to put away packages using '
-                    'this package storage type (%s).</span>'
-                ) % pst.name
+                msg = (
+                    _(
+                        '<span style="color: red;">The "Put-Away sequence" '
+                        "must be defined in order to put away packages using "
+                        "this package storage type (%s).</span>"
+                    )
+                    % pst.name
+                )
             pst.storage_type_message = msg
 
     def action_view_storage_locations(self):
         return {
-            'name': _('Put-away sequence'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'stock.storage.location.sequence',
-            'view_mode': 'list',
-            'domain': [('package_storage_type_id', '=', self.id)],
-            'context': {'default_package_storage_type_id': self.id},
+            "name": _("Put-away sequence"),
+            "type": "ir.actions.act_window",
+            "res_model": "stock.storage.location.sequence",
+            "view_mode": "list",
+            "domain": [("package_storage_type_id", "=", self.id)],
+            "context": {"default_package_storage_type_id": self.id},
         }
