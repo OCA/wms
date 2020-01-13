@@ -1,6 +1,7 @@
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo import api, fields, models
+from odoo.fields import first
 
 ABC_SELECTION = [("a", "A"), ("b", "B"), ("c", "C")]
 
@@ -30,19 +31,15 @@ class StockLocation(models.Model):
                     current_location = current_location.location_id
             location.display_abc_storage = display_abc_storage
 
-    def get_storage_locations(self, product=None):
-        if product is None:
-            product = self.env["product.product"]
+    def get_storage_locations(self, products=None):
+        if products is None:
+            products = self.env["product.product"]
         if self.pack_putaway_strategy == "abc":
-            return self._get_abc_locations(product)
-        return super().get_storage_locations(product)
+            return self._get_abc_locations(products)
+        return super().get_storage_locations(products)
 
-    def _get_abc_locations(self, product):
-        locations = self.search(
-            [("id", "child_of", self.ids), ("id", "!=", self.id)],
-            order="abc_storage ASC",
-        )
-        return locations._sort_abc_locations(product.abc_storage)
+    def _get_abc_locations(self, products):
+        return self.children_ids._sort_abc_locations(first(products).abc_storage)
 
     def _sort_abc_locations(self, product_abc):
         locations = self
