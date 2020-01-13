@@ -3,7 +3,7 @@
 {
     "name": "Stock Storage Type ABC Strategy",
     "summary": "Advanced storage strategy ABC for WMS",
-    "version": "12.0.1.0.0",
+    "version": "13.0.1.0.0",
     "development_status": "Alpha",
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",
@@ -11,7 +11,7 @@
     "license": "AGPL-3",
     "application": False,
     "installable": True,
-    "depends": ["stock_storage_type_putaway_strategy"],
+    "depends": ["stock_storage_type"],
     "data": ["views/product.xml", "views/stock_location.xml"],
     "demo": [],
 }
