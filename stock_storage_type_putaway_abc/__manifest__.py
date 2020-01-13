@@ -11,13 +11,7 @@
     "license": "AGPL-3",
     "application": False,
     "installable": True,
-    "depends": [
-        "stock_storage_type_putaway_strategy",
-    ],
-    "data": [
-        "views/product.xml",
-        "views/stock_location.xml",
-    ],
-    "demo": [
-    ],
+    "depends": ["stock_storage_type_putaway_strategy"],
+    "data": ["views/product.xml", "views/stock_location.xml"],
+    "demo": [],
 }
