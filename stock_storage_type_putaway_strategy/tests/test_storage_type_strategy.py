@@ -90,12 +90,12 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
                 "package_storage_type_id": cls.pallets_package_storage_type.id,
             }
         )
-        pick_types = cls.receipts_picking_type | cls.internal_picking_type
+        cls.internal_picking_type.write({'show_entire_packs': True})
         # show_reserved must be set here because it changes the behaviour of
         # put_in_pack operation:
         # if show_reserved: qty_done must be set on stock.picking.move_line_ids
         # if not show_reserved: qty_done must be set on stock.picking.move_line_nosuggest_ids
-        pick_types.write({'show_entire_packs': True, 'show_reserved': True})
+        cls.receipts_picking_type.write({'show_entire_packs': True, 'show_reserved': True})
 
     def test_storage_strategy_ordered_locations_cardboxes(self):
         self.areas.write({"pack_putaway_strategy": "ordered_locations"})
