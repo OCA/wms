@@ -88,19 +88,6 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
                 'product_id': cls.product_lot.id,
                 'package_storage_type_id': cls.pallets_package_storage_type.id,
             })
-
-        # cls.product_pallets_putaway = ref(
-        #     'stock_putaway_storage_type_strategy.stock_putaway_rule_product_9_stock_pallets'
-        # )
-        # cls.product_cardboxes_putaway = ref(
-        #     'stock_putaway_storage_type_strategy.stock_putaway_rule_product_9_stock_cardboxes'
-        # )
-        # cls.product_lot_pallets_putaway = cls.product_pallets_putaway.copy(
-        #     {'product_id': cls.product_lot.id}
-        # )
-        # cls.product_lot_cardboxes_putaway = cls.product_cardboxes_putaway.copy(
-        #     {'product_id': cls.product_lot.id}
-        # )
         # pick_types = cls.cls.receipts_picking_type | cls.internal_picking_type
         # pick_types.write({'show_entire_packs': True})
 
@@ -232,7 +219,6 @@ class TestPutawayStorageTypeStrategy(SavepointCase):
         first_package = in_picking.put_in_pack()
         # Ensure packaging is set properly on pack
         first_package.product_packaging_id = self.product_pallet_product_packaging
-        import pdb; pdb.set_trace()
         first_package.onchange_product_packaging_id()
         self.assertEqual(first_package.pack_weight, 60)
         # Put in pack again
