@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record name="shopfloor_group_tree_view" model="ir.ui.view">
+    <record id="shopfloor_group_tree_view" model="ir.ui.view">
         <field name="name">shopfloor group tree</field>
         <field name="model">shopfloor.group</field>
         <field name="arch" type="xml">
@@ -11,7 +11,7 @@
         </field>
     </record>
 
-    <record name="shopfloor_group_form_view" model="ir.ui.view">
+    <record id="shopfloor_group_form_view" model="ir.ui.view">
         <field name="name">shopfloor group form</field>
         <field name="model">shopfloor.group</field>
         <field name="arch" type="xml">
@@ -31,7 +31,7 @@
         </field>
     </record>
 
-    <record name="shopfloor_group_search_view" model="ir.ui.view">
+    <record id="shopfloor_group_search_view" model="ir.ui.view">
         <field name="name">shopfloor group search</field>
         <field name="model">shopfloor.group</field>
         <field name="arch" type="xml">
