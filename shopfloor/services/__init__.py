@@ -1,1 +1,1 @@
-from . shopfloor_service
+from . import shopfloor_service
