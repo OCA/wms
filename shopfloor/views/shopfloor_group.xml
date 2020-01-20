@@ -2,6 +2,7 @@
 <odoo>
     <record name="shopfloor_group_tree_view" model="ir.ui.view">
         <field name="name">shopfloor group tree</field>
+        <field name="model">shopfloor.group</field>
         <field name="arch" type="xml">
             <tree editable="bottom">
                 <field name="name"/>
@@ -12,6 +13,7 @@
 
     <record name="shopfloor_group_form_view" model="ir.ui.view">
         <field name="name">shopfloor group form</field>
+        <field name="model">shopfloor.group</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
@@ -31,6 +33,7 @@
 
     <record name="shopfloor_group_search_view" model="ir.ui.view">
         <field name="name">shopfloor group search</field>
+        <field name="model">shopfloor.group</field>
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
@@ -40,6 +43,7 @@
 
     <record id="action_shopfloor_group" model="ir.actions.act_window">
         <field name="name">Groups</field>
+        <field name="res_model">shopfloor.group</field>
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">tree,form</field>
     </record>
