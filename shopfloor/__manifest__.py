@@ -6,6 +6,7 @@
     "name": "Shopfloor",
     "summary": "manage warehouse operations with barcode scanners",
     "version": "13.0.1.0.0",
+    "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://odoo-community.org",
     "author": "Akretion, BCIM, Camptocamp, Odoo Community Association (OCA)",
