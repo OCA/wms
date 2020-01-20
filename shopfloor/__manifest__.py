@@ -17,5 +17,10 @@
         "base_rest",
     ],
     "data": [
+        "security/ir.model.access.csv",
+        "views/res_users.xml",
+        "views/shopfloor_group.xml",
+        "views/shopfloor_menu.xml",
+        "views/menus.xml",
     ],
 }
