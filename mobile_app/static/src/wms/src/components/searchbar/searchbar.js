@@ -11,14 +11,10 @@ var searchbar = Vue.component('searchbar', {
     }
   },
   methods: {
-  	search: function(e) {
+  	search: function(e,) {
   		e.preventDefault();
-  		Promise.resolve(true).then( () => { //for async simulation
-  			var result = lookup[this.entered];
-  			console.log('odoo has answered', result);
-  			this.$emit('found', result);  //talk to parent
-  			this.reset();
-  		});
+		this.$emit('found', this.entered);  //talk to parent
+		this.reset();
   	},
   	reset: function () {
   		this.entered = '';

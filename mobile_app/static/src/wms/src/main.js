@@ -1,14 +1,11 @@
 //import searchbar from 'components/searchbar/searchbar.js'
 
+import * as simple_putaway from './scenario/simple_putaway/simple_putaway.js'
+
 var vue = new Vue({
 	el: '#app',
-	data: {
-		'txt': 'search something'
-	},
-	methods: {
-		showFound: function(fff) {
-			console.log('found: ', fff);
-			this.txt = fff;
-		}
-	}
+	
 })
+
+console.log(simple_putaway);
+simple_putaway.simple_putaway();
