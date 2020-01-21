@@ -15,6 +15,7 @@
     "depends": [
         "stock",
         "base_rest",
+        "auth_api_key",
     ],
     "data": [
         "security/ir.model.access.csv",
@@ -23,4 +24,7 @@
         "views/shopfloor_menu.xml",
         "views/menus.xml",
     ],
+    "demo": [
+        "demo/auth_api_key_demo.xml",
+    ]
 }
