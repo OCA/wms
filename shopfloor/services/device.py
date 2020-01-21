@@ -1,7 +1,7 @@
 from odoo import fields
-from odoo.addons.component.core import Component
 
 from odoo.addons.base_rest.components.service import to_int
+from odoo.addons.component.core import Component
 
 
 class ShopfloorDevice(Component):
@@ -11,6 +11,7 @@ class ShopfloorDevice(Component):
     _expose_model = "shopfloor.device"
 
     def search(self, name_fragment=None):
+        """List available devices for current user"""
         domain = self._get_base_search_domain()
         if name_fragment:
             domain.append(("name", "ilike", name_fragment))
@@ -31,11 +32,7 @@ class ShopfloorDevice(Component):
 
     def _validator_search(self):
         return {
-            "name_fragment": {
-                "type": "string",
-                "nullable": True,
-                "required": False,
-            }
+            "name_fragment": {"type": "string", "nullable": True, "required": False}
         }
 
     def _validator_return_search(self):
@@ -51,13 +48,21 @@ class ShopfloorDevice(Component):
                         "warehouse": {
                             "type": "dict",
                             "schema": {
-                                "id": {"coerce": to_int, "required": True, "type": "integer"},
-                                "name": {"type": "string", "nullable": False, "required": True},
-                            }
-                        }
-                    }
-                }
-            }
+                                "id": {
+                                    "coerce": to_int,
+                                    "required": True,
+                                    "type": "integer",
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "nullable": False,
+                                    "required": True,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         }
 
     def _convert_one_record(self, record):
@@ -67,5 +72,5 @@ class ShopfloorDevice(Component):
             "warehouse": {
                 "id": record.warehouse_id.id,
                 "name": record.warehouse_id.name,
-            }
+            },
         }
