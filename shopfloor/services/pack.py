@@ -1,4 +1,4 @@
-from odoo.addons.base_rest.components.service import to_int
+from odoo.addons.base_rest.components.service import skip_secure_response, to_int
 from odoo.addons.component.core import Component
 
 
@@ -7,6 +7,8 @@ class ShopfloorPack(Component):
     _name = "shopfloor.pack"
     _usage = "pack"
 
+    # TODO define the return schema and add the validator method
+    @skip_secure_response
     def scan(self, pack_name):
         """Scan a pack barcode"""
         pack = self.env["stock.quant.package"].search([("name", "=", pack_name)])
@@ -79,9 +81,6 @@ class ShopfloorPack(Component):
 
     def _validator_scan(self):
         return {"pack_name": {"type": "string", "nullable": False, "required": True}}
-
-    def _validator_return_scan(self):
-        return {"data": self._record_return_schema}
 
     def get_by_name(self, pack_name):
         """

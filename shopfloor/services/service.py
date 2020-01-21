@@ -1,13 +1,14 @@
 from odoo import _
-from odoo.osv import expression
-from odoo.addons.component.core import AbstractComponent
 from odoo.exceptions import MissingError
+from odoo.osv import expression
+
+from odoo.addons.component.core import AbstractComponent
 
 
 class BaseShopfloorService(AbstractComponent):
     _inherit = "base.rest.service"
     _name = "base.shopfloor.service"
-    _collection = "shopfloor.services"
+    _collection = "shopfloor.service"
     _expose_model = None
 
     def _get(self, _id):
@@ -16,8 +17,7 @@ class BaseShopfloorService(AbstractComponent):
         record = self.env[self._expose_model].search(domain)
         if not record:
             raise MissingError(
-                _("The record %s %s does not exist")
-                % (self._expose_model, _id)
+                _("The record %s %s does not exist") % (self._expose_model, _id)
             )
         else:
             return record
@@ -25,7 +25,7 @@ class BaseShopfloorService(AbstractComponent):
     def _get_base_search_domain(self):
         return []
 
-    def _convert_one_record(record):
+    def _convert_one_record(self, record):
         """To implement in service Components"""
         return {}
 
@@ -40,33 +40,35 @@ class BaseShopfloorService(AbstractComponent):
         demo_api_key = self.env.ref(
             "shopfloor.api_key_demo", raise_if_not_found=False
         ).key
-        defaults.extend([
-            {
-                "name": "API-KEY",
-                "in": "header",
-                "description": "API key for Authorization",
-                "required": True,
-                "schema": {"type": "string"},
-                "style": "simple",
-                "value": demo_api_key,
-            },
-            {
-                "name": "SERVICE_CTX_PROCESS_NAME",
-                "in": "header",
-                "description": "Name of the current process",
-                "required": True,
-                "schema": {"type": "string"},
-                "style": "simple",
-                "value": "Put-Away Reach Truck",
-            },
-            {
-                "name": "SERVICE_CTX_PROCESS_MENU",
-                "in": "header",
-                "description": "Name of the current process menu",
-                "required": True,
-                "schema": {"type": "string"},
-                "style": "simple",
-                "value": "Put-Away Reach Truck",
-            }
-        ])
+        defaults.extend(
+            [
+                {
+                    "name": "API-KEY",
+                    "in": "header",
+                    "description": "API key for Authorization",
+                    "required": True,
+                    "schema": {"type": "string"},
+                    "style": "simple",
+                    "value": demo_api_key,
+                },
+                {
+                    "name": "SERVICE_CTX_PROCESS_NAME",
+                    "in": "header",
+                    "description": "Name of the current process",
+                    "required": True,
+                    "schema": {"type": "string"},
+                    "style": "simple",
+                    "value": "Put-Away Reach Truck",
+                },
+                {
+                    "name": "SERVICE_CTX_PROCESS_MENU",
+                    "in": "header",
+                    "description": "Name of the current process menu",
+                    "required": True,
+                    "schema": {"type": "string"},
+                    "style": "simple",
+                    "value": "Put-Away Reach Truck",
+                },
+            ]
+        )
         return defaults
