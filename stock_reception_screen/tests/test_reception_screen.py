@@ -14,7 +14,8 @@ class TestReceptionScreen(SavepointCase):
         super().setUpClass()
         cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
         cls.storage_type_pallet = cls.env.ref(
-            "stock_storage_type.package_storage_type_pallets")
+            "stock_storage_type.package_storage_type_pallets"
+        )
         cls.product = cls.env.ref("product.product_delivery_01")
         cls.product_packaging = cls.env["product.packaging"].create(
             {
@@ -34,15 +35,19 @@ class TestReceptionScreen(SavepointCase):
                 "location_dest_id": cls.location_dest.id,
                 "picking_type_id": cls.env.ref("stock.chi_picking_type_in").id,
                 "move_lines": [
-                    (0, False, {
-                        "name": cls.product.display_name,
-                        "product_id": cls.product.id,
-                        "product_uom": cls.product.uom_id.id,
-                        "product_uom_qty": 10,
-                        "location_id": cls.location_src.id,
-                        "location_dest_id": cls.location_dest.id,
-                    })
-                ]
+                    (
+                        0,
+                        False,
+                        {
+                            "name": cls.product.display_name,
+                            "product_id": cls.product.id,
+                            "product_uom": cls.product.uom_id.id,
+                            "product_uom_qty": 10,
+                            "location_id": cls.location_src.id,
+                            "location_dest_id": cls.location_dest.id,
+                        },
+                    )
+                ],
             }
         )
         cls.picking.action_confirm()
@@ -66,23 +71,19 @@ class TestReceptionScreen(SavepointCase):
         self.assertEqual(self.screen.current_step, "set_pid")
         self.screen.current_move_line_pid = "PID-TEST-1"
         self.assertEqual(
-            self.screen.current_move_line_id.result_package_id.name,
-            "PID-TEST-1"
+            self.screen.current_move_line_id.result_package_id.name, "PID-TEST-1"
         )
         # Check package data (automatically filled normally)
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "select_packaging")
         self.assertEqual(
-            self.screen.current_move_line_product_packaging_id,
-            self.product_packaging
+            self.screen.current_move_line_product_packaging_id, self.product_packaging
         )
         self.assertEqual(
-            self.screen.current_move_line_storage_type,
-            self.storage_type_pallet
+            self.screen.current_move_line_storage_type, self.storage_type_pallet
         )
         self.assertEqual(
-            self.screen.current_move_line_height,
-            self.product_packaging.height
+            self.screen.current_move_line_height, self.product_packaging.height
         )
         # The first 4 qties should be validated, creating a 2nd move to process
         self.assertEqual(len(self.picking.move_lines), 1)
@@ -90,15 +91,15 @@ class TestReceptionScreen(SavepointCase):
         self.assertEqual(self.screen.current_step, "select_product")
         self.assertEqual(len(self.picking.move_lines), 2)
         # Check the validated move
-        move_done = self.picking.move_lines.filtered(
-            lambda m: m.state == "done")
+        move_done = self.picking.move_lines.filtered(lambda m: m.state == "done")
         self.assertEqual(len(move_done.move_line_ids), 1)
-        self.assertEqual(
-            move_done.move_line_ids.result_package_id.name, "PID-TEST-1")
+        self.assertEqual(move_done.move_line_ids.result_package_id.name, "PID-TEST-1")
         # Receive the remaining 6 qties
         move = fields.first(
             self.screen.picking_filtered_move_lines.filtered(
-                lambda m: not m.quantity_done))
+                lambda m: not m.quantity_done
+            )
+        )
         move.action_select_product()
         self.assertEqual(self.screen.current_step, "set_quantity")
         self.screen.current_move_line_qty_done = 6
@@ -110,18 +111,13 @@ class TestReceptionScreen(SavepointCase):
         self.assertEqual(self.screen.current_step, "set_pid")
         self.screen.current_move_line_pid = "PID-TEST-2"
         self.assertEqual(
-            self.screen.current_move_line_id.result_package_id.name,
-            "PID-TEST-2"
+            self.screen.current_move_line_id.result_package_id.name, "PID-TEST-2"
         )
         # Check package data (not automatically filled as no packaging match)
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "select_packaging")
-        self.assertFalse(
-            self.screen.current_move_line_product_packaging_id,
-        )
-        self.assertFalse(
-            self.screen.current_move_line_storage_type,
-        )
+        self.assertFalse(self.screen.current_move_line_product_packaging_id)
+        self.assertFalse(self.screen.current_move_line_storage_type)
         self.assertFalse(self.screen.current_move_line_height)
         # Set mandatory package data
         self.screen.current_move_line_storage_type = self.storage_type_pallet

@@ -9,32 +9,26 @@ class StockPicking(models.Model):
     _inherit = "stock.picking"
 
     reception_screen_id = fields.Many2one(
-        comodel_name="stock.reception.screen",
-        string=u"Reception Screen",
-        copy=False,
+        comodel_name="stock.reception.screen", string=u"Reception Screen", copy=False
     )
 
     def action_reception_screen_open(self):
         self.ensure_one()
         # Do not allow to process draft or processed pickings
         if self.state != "assigned":
-            raise UserError(
-                _("Your transfer has to be ready to receive goods."))
+            raise UserError(_("Your transfer has to be ready to receive goods."))
         # Create the reception screen record
         # NOTE: it is difficult to work with a transient model as we have to
         # reference the screen from the picking/move/move_line.
         if not self.reception_screen_id:
             screen_model = self.env["stock.reception.screen"]
-            self.reception_screen_id = screen_model.create(
-                {"picking_id": self.id})
+            self.reception_screen_id = screen_model.create({"picking_id": self.id})
         # Reset the screen if we are in a final step
         steps = self.reception_screen_id.get_reception_screen_steps()
         current_step = self.reception_screen_id.current_step
         if not steps[current_step].get("next_steps"):
             self.reception_screen_id.button_reset()
-        screen_xmlid = (
-            "stock_reception_screen.stock_reception_screen_view_form"
-        )
+        screen_xmlid = "stock_reception_screen.stock_reception_screen_view_form"
         return {
             "type": "ir.actions.act_window",
             "res_model": self.reception_screen_id._name,

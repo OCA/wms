@@ -8,7 +8,8 @@ class StockMove(models.Model):
     _inherit = "stock.move"
 
     reception_screen_current_step = fields.Char(
-        related="picking_id.reception_screen_id.current_step")
+        related="picking_id.reception_screen_id.current_step"
+    )
 
     def action_select_product(self):
         """"Same than `action_select_move` excepting that as we we are in the

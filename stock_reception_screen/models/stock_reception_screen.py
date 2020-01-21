@@ -13,11 +13,7 @@ class StockReceptionScreen(models.Model):
     _steps = {
         "select_product": {
             "label": _("Select Product"),
-            "next_steps": [
-                {
-                    "next": "select_move",
-                },
-            ],
+            "next_steps": [{"next": "select_move"}],
         },
         "select_move": {
             "label": _("Select Move"),
@@ -27,9 +23,7 @@ class StockReceptionScreen(models.Model):
                     "before": "_before_select_move_to_set_lot_number",
                     "next": "set_lot_number",
                 },
-                {
-                    "next": "set_quantity",
-                },
+                {"next": "set_quantity"},
             ],
         },
         "set_lot_number": {
@@ -42,11 +36,7 @@ class StockReceptionScreen(models.Model):
         },
         "set_quantity": {
             "label": _("Set Quantity"),
-            "next_steps": [
-                {
-                    "next": "set_location",
-                },
-            ],
+            "next_steps": [{"next": "set_location"}],
         },
         "set_location": {
             "label": _("Set Destination"),
@@ -74,16 +64,10 @@ class StockReceptionScreen(models.Model):
                     "before": "_before_set_location_to_select_product",
                     "next": "select_product",
                 },
-                {
-                    "next": "done",
-                    "after": "_after_step_done",
-                },
+                {"next": "done", "after": "_after_step_done"},
             ],
         },
-        "done": {
-            "label": _("Done"),
-            "next_steps": [],
-        },
+        "done": {"label": _("Done"), "next_steps": []},
     }
 
     picking_id = fields.Many2one(
@@ -98,13 +82,11 @@ class StockReceptionScreen(models.Model):
     picking_state = fields.Selection(related="picking_id.state")
     picking_move_lines = fields.One2many(related="picking_id.move_lines")
     picking_filtered_move_lines = fields.One2many(
-        comodel_name="stock.move",
-        compute="_compute_picking_filtered_move_lines"
+        comodel_name="stock.move", compute="_compute_picking_filtered_move_lines"
     )
     current_step = fields.Char(default="select_product", copy=False)
     current_step_descr = fields.Char(
-        string="Operation",
-        compute="_compute_current_step_descr",
+        string="Operation", compute="_compute_current_step_descr"
     )
     current_filter_product = fields.Char(string="Filter product", copy=False)
     # current move
@@ -115,22 +97,21 @@ class StockReceptionScreen(models.Model):
         compute="_compute_current_move_location_dest_id",
         inverse="_inverse_current_move_location_dest_id",
     )
-    current_move_product_id = fields.Many2one(
-        related="current_move_id.product_id")
+    current_move_product_id = fields.Many2one(related="current_move_id.product_id")
     current_move_product_display_name = fields.Char(
-        related="current_move_id.product_id.display_name", string="Product")
+        related="current_move_id.product_id.display_name", string="Product"
+    )
     current_move_product_uom_qty = fields.Float(
-        related="current_move_id.product_uom_qty")
-    current_move_product_uom_id = fields.Many2one(
-        related="current_move_id.product_uom")
+        related="current_move_id.product_uom_qty"
+    )
+    current_move_product_uom_id = fields.Many2one(related="current_move_id.product_uom")
     current_move_product_packaging_ids = fields.One2many(
-        related="current_move_id.product_id.packaging_ids")
+        related="current_move_id.product_id.packaging_ids"
+    )
     # current move line
-    current_move_line_id = fields.Many2one(
-        comodel_name='stock.move.line', copy=False)
+    current_move_line_id = fields.Many2one(comodel_name="stock.move.line", copy=False)
     current_move_line_lot_id = fields.Many2one(
-        related="current_move_line_id.lot_id",
-        string="Lot NumBer",
+        related="current_move_line_id.lot_id", string="Lot NumBer"
     )
     current_move_line_lot_life_date = fields.Datetime(
         related="current_move_line_id.lot_id.life_date",
@@ -138,17 +119,14 @@ class StockReceptionScreen(models.Model):
         readonly=False,
     )
     current_move_line_qty_done = fields.Float(
-        related="current_move_line_id.qty_done",
-        string="Quantity",
-        readonly=False,
+        related="current_move_line_id.qty_done", string="Quantity", readonly=False
     )
     current_move_line_uom_id = fields.Many2one(
-        related="current_move_line_id.product_uom_id",
-        string="UoM",
+        related="current_move_line_id.product_uom_id", string="UoM"
     )
     current_move_line_qty_status = fields.Char(
-        string="Qty Status",
-        compute="_compute_current_move_line_qty_status")
+        string="Qty Status", compute="_compute_current_move_line_qty_status"
+    )
     current_move_line_pid = fields.Char(
         compute="_compute_current_move_line_pid",
         inverse="_inverse_current_move_line_pid",
@@ -160,15 +138,11 @@ class StockReceptionScreen(models.Model):
         readonly=False,
     )
     current_move_line_storage_type = fields.Many2one(
-        related=(
-            "current_move_line_id.result_package_id."
-            "package_storage_type_id"
-        ),
+        related=("current_move_line_id.result_package_id." "package_storage_type_id"),
         readonly=False,
     )
     current_move_line_height = fields.Integer(
-        related="current_move_line_id.result_package_id.height",
-        readonly=False,
+        related="current_move_line_id.result_package_id.height", readonly=False
     )
 
     @api.depends("picking_id.move_lines", "current_filter_product")
@@ -180,7 +154,8 @@ class StockReceptionScreen(models.Model):
                 filter_ = screen.current_filter_product
                 search_args = [
                     ("id", "in", moves.ids),
-                    '|', '|',
+                    "|",
+                    "|",
                     ("product_id.barcode", "=", filter_),
                     ("product_id.default_code", "=", filter_),
                     ("product_id.name", "ilike", filter_),
@@ -202,8 +177,7 @@ class StockReceptionScreen(models.Model):
         for wiz in self:
             move = wiz.current_move_id
             wiz.current_move_location_dest_id = move.location_dest_id
-            location = move.location_dest_id.get_putaway_strategy(
-                move.product_id)
+            location = move.location_dest_id.get_putaway_strategy(move.product_id)
             if location:
                 wiz.current_move_location_dest_id = location
 
@@ -233,9 +207,7 @@ class StockReceptionScreen(models.Model):
             else:
                 wiz.current_move_line_qty_status = "eq"
 
-    @api.depends(
-        "current_move_line_id.result_package_id.package_storage_type_id"
-    )
+    @api.depends("current_move_line_id.result_package_id.package_storage_type_id")
     def _compute_current_move_line_pid(self):
         for wiz in self:
             self.current_move_line_pid = False
@@ -273,11 +245,7 @@ class StockReceptionScreen(models.Model):
                 self.picking_id.picking_type_id.id,
             )
         )
-        return {
-            "type" : "ir.actions.act_url",
-            "url": picking_url,
-            "target": "self",
-        }
+        return {"type": "ir.actions.act_url", "url": picking_url, "target": "self"}
 
     def action_reception_screen_manual_barcode(self):
         """Display a window to fill manually a barcode.
@@ -286,11 +254,11 @@ class StockReceptionScreen(models.Model):
         directly on the screen.
         """
         return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'stock.picking.manual.barcode',
-            'view_mode': 'form',
-            'name': _('Barcode'),
-            'target': 'new',
+            "type": "ir.actions.act_window",
+            "res_model": "stock.picking.manual.barcode",
+            "view_mode": "form",
+            "name": _("Barcode"),
+            "target": "new",
         }
 
     def next_step(self):
@@ -312,7 +280,7 @@ class StockReceptionScreen(models.Model):
     def on_barcode_scanned(self, barcode):
         """Dispatch the barcode event to the right method (if any)."""
         self.ensure_one()
-        method = 'on_barcode_scanned_{}'.format(self.current_step)
+        method = "on_barcode_scanned_{}".format(self.current_step)
         if hasattr(self, method):
             getattr(self, method)(barcode)
 
@@ -323,15 +291,13 @@ class StockReceptionScreen(models.Model):
         move = moves.filtered(lambda o: o.product_id.barcode == barcode)
         # Then try on the product code
         if not move:
-            move = moves.filtered(
-                lambda o: o.product_id.default_code == barcode)
+            move = moves.filtered(lambda o: o.product_id.default_code == barcode)
         # And on the name
         if not move:
             move = moves.filtered(lambda o: barcode in o.product_id.name)
         if not move:
             self.env.user.notify_warning(
-                message="",
-                title=_("Product '{}' not found.").format(barcode),
+                message="", title=_("Product '{}' not found.").format(barcode)
             )
             return
         # If there are several moves/products corresponding to the search
@@ -351,7 +317,7 @@ class StockReceptionScreen(models.Model):
         """
         remaining_qty = move.product_uom_qty - move.quantity_done
         vals = move._prepare_move_line_vals(quantity=remaining_qty)
-        return self.env['stock.move.line'].create(vals)
+        return self.env["stock.move.line"].create(vals)
 
     def on_barcode_scanned_set_lot_number(self, barcode):
         """Set the lot number on a move line."""
@@ -360,8 +326,7 @@ class StockReceptionScreen(models.Model):
         lot = lot_model.search([("name", "=", barcode)])
         if lot:
             self.env.user.notify_info(
-                message="",
-                title=_("Reuse the existing lot {}.").format(barcode),
+                message="", title=_("Reuse the existing lot {}.").format(barcode)
             )
         else:
             lot_vals = {
@@ -435,7 +400,8 @@ class StockReceptionScreen(models.Model):
             return False
         moves_to_process_ok = any(
             move.quantity_done < move.product_uom_qty
-            for move in self.picking_filtered_move_lines)
+            for move in self.picking_filtered_move_lines
+        )
         if moves_to_process_ok:
             self.current_move_id = False
             self.current_move_line_id = False
@@ -445,7 +411,8 @@ class StockReceptionScreen(models.Model):
         """Check if there is remaining products/moves to process."""
         moves_to_process_ok = any(
             move.quantity_done < move.product_uom_qty
-            for move in self.picking_id.move_lines)
+            for move in self.picking_id.move_lines
+        )
         if moves_to_process_ok:
             self.current_filter_product = False
             self.current_move_id = False
@@ -467,8 +434,7 @@ class StockReceptionScreen(models.Model):
     def process_set_lot_number(self):
         if not self.current_move_line_id.lot_id:
             self.env.user.notify_warning(
-                message="",
-                title=_("You have to fill the lot number."),
+                message="", title=_("You have to fill the lot number.")
             )
             return
         self.next_step()
@@ -477,8 +443,7 @@ class StockReceptionScreen(models.Model):
         """Set the lot life date on a move line."""
         if not self.current_move_line_id.lot_id.life_date:
             self.env.user.notify_warning(
-                message="",
-                title=_("You have to set an expiry date."),
+                message="", title=_("You have to set an expiry date.")
             )
             return
         self.next_step()
@@ -486,8 +451,7 @@ class StockReceptionScreen(models.Model):
     def process_set_quantity(self):
         if not self.current_move_line_qty_done:
             self.env.user.notify_warning(
-                message="",
-                title=_("You have to set the received quantity."),
+                message="", title=_("You have to set the received quantity.")
             )
             return
         self.next_step()
@@ -495,8 +459,7 @@ class StockReceptionScreen(models.Model):
     def process_set_location(self):
         if not self.current_move_location_dest_id:
             self.env.user.notify_warning(
-                message="",
-                title=_("You have to set the destination."),
+                message="", title=_("You have to set the destination.")
             )
             return
         self.next_step()
@@ -528,17 +491,11 @@ class StockReceptionScreen(models.Model):
         """
         if not self.current_move_line_storage_type:
             msg = _("The storage type is mandatory before going further.")
-            self.env.user.notify_warning(
-                message="",
-                title=msg,
-            )
+            self.env.user.notify_warning(message="", title=msg)
             return False
         if not self.current_move_line_height:
             msg = _("The height is mandatory before going further.")
-            self.env.user.notify_warning(
-                message="",
-                title=msg,
-            )
+            self.env.user.notify_warning(message="", title=msg)
             return False
         return True
 
@@ -554,7 +511,7 @@ class StockReceptionScreen(models.Model):
         self.ensure_one()
         if not self.current_move_id and not self.current_move_line_id:
             return
-        method = 'process_{}'.format(self.current_step)
+        method = "process_{}".format(self.current_step)
         getattr(self, method)()
 
     def button_reset(self):

@@ -8,8 +8,7 @@ class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
 
     lot_life_date = fields.Datetime(
-        string="End of Life Date",
-        related="lot_id.life_date",
+        string="End of Life Date", related="lot_id.life_date"
     )
 
     def action_select_move_line(self):

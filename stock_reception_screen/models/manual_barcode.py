@@ -12,7 +12,7 @@ class StockPickingManualBarcode(models.TransientModel):
 
     def button_save(self):
         self.ensure_one()
-        record_id = self.env.context.get('active_id')
+        record_id = self.env.context.get("active_id")
         record = self.env["stock.reception.screen"].browse(record_id).exists()
         if not record:
             return
