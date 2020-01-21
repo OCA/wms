@@ -1,10 +1,10 @@
 from odoo.addons.component.core import Component
 
 
+# TODO move in a pack service
 class ShopfloorService(Component):
-    _inherit = "base.rest.service"
+    _inherit = "base.shopfloor.service"
     _name = "shopfloor.service"
-    _collection = "shopfloor.services"
     _usage = "shopfloor"
 
     def get_pack(self, pack_name):

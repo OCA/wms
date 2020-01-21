@@ -3,3 +3,5 @@
 "access_shopfloor_menu_stock_manager","shopfloor menu inventory manager","model_shopfloor_menu","stock.group_stock_manager",1,1,1,1
 "access_shopfloor_operation_group_users","shopfloor operation group","model_shopfloor_operation_group",,1,0,0,0
 "access_shopfloor_operation_group_stock_manager","shopfloor operation group inventory manager","model_shopfloor_operation_group","stock.group_stock_manager",1,1,1,1
+"access_shopfloor_device_users","shopfloor device","model_shopfloor_device",,1,0,0,0
+"access_shopfloor_device_stock_manager","shopfloor device inventory manager","model_shopfloor_device","stock.group_stock_manager",1,1,1,1
