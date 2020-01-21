@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="shopfloor_device_tree_view" model="ir.ui.view">
+        <field name="name">shopfloor.device tree</field>
+        <field name="model">shopfloor.device</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="warehouse_id"/>
+                <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="shopfloor_device_form_view" model="ir.ui.view">
+        <field name="name">shopfloor.device form</field>
+        <field name="model">shopfloor.device</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="warehouse_id"/>
+                            <field name="shopfloor_operation_group_ids" widget="many2many_tags"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="shopfloor_current_process"/>
+                            <field name="shopfloor_last_call"/>
+                            <field name="shopfloor_picking_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="shopfloor_device_search_view" model="ir.ui.view">
+        <field name="name">shopfloor.device search</field>
+        <field name="model">shopfloor.device</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="warehouse_id"/>
+                <field name="user_id"/>
+                <field name="shopfloor_operation_group_ids"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_shopfloor_device" model="ir.actions.act_window">
+        <field name="name">Devices</field>
+        <field name="res_model">shopfloor.device</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>
