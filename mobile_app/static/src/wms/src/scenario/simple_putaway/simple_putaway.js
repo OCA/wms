@@ -23,18 +23,20 @@ var sp = Vue.component('simple-pack-putaway', {
 	template: `<div>
 	<h1>Simple Putaway</h1>
     <searchbar v-on:found="scanned" v-bind:hint="hint" v-bind:placeholder="scanTip">ici lasearch</searchbar>
-    <div class="alert alert-danger error" v-if="error_msg">{{ error_msg }}</div>
+    <div class="alert alert-danger error" v-if="error_msg" role="alert">{{ error_msg }}</div>
     <operation-detail v-bind:operation="operation"></operation-detail>
-    <div v-if="confirm_with">
-    	<div style="color:red">Destination not expected</div>
-    	<p>Do you confirm ? {{ confirm_with }} </p>
-    	<form v-on:submit="do_confirm" v-on:reset="dont_confirm">
-    		<input type="submit" value="Yes"></input>
-    		<input type="reset" value="No"></input>
-    	</form>
+	<div v-if="confirm_with" class="confirm">
+		<div class="alert alert-danger error" v-if="error_msg" role="alert">
+			<h4 class="alert-heading">Destination not expected</h4>
+			<p>Do you confirm? {{ confirm_with }} </p>
+			<form v-on:submit="do_confirm" v-on:reset="dont_confirm">
+				<input class="btn btn-lg btn-success" type="submit" value="Yes"></input>
+				<input class="btn btn-lg btn-danger float-right" type="reset" value="No"></input>
+			</form>
+		</div>
     </div>
     <form v-if="show_button" v-on:reset="reset" v-on:submit="submit">
-    	<input type="reset" name="reset"></input>
+    	<input class="btn btn-danger" type="reset" name="reset"></input>
     </form>
 </div>`,
 	data: function () {
