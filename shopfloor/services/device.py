@@ -1,3 +1,4 @@
+from odoo import fields
 from odoo.addons.component.core import Component
 
 
@@ -8,12 +9,23 @@ class ShopfloorDevice(Component):
     _expose_model = "shopfloor.device"
 
     def search(self, name_fragment=None):
-        # TODO filter on shopfloor.group or user in override of _get_base_search_domain
         domain = self._get_base_search_domain()
         if name_fragment:
             domain.append(("name", "ilike", name_fragment))
         records = self.env[self._expose_model].search(domain)
         return {"size": len(records), "data": self._to_json(records)}
+
+    def _get_base_search_domain(self):
+        # shopfloor_device_ids is a one2one
+        user = self.env.user
+        assigned_device = fields.first(user.shopfloor_device_ids)
+        if assigned_device:
+            return [("id", "=", assigned_device.id)]
+        return [
+            "|",
+            ("shopfloor_operation_group_ids", "=", False),
+            ("shopfloor_operation_group_ids.user_ids", "=", user.id),
+        ]
 
     def _validator_search(self):
         return {
