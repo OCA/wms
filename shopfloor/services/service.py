@@ -40,7 +40,7 @@ class BaseShopfloorService(AbstractComponent):
         demo_api_key = self.env.ref(
             "shopfloor.api_key_demo", raise_if_not_found=False
         ).key
-        defaults.append(
+        defaults.extend([
             {
                 "name": "API-KEY",
                 "in": "header",
@@ -49,6 +49,24 @@ class BaseShopfloorService(AbstractComponent):
                 "schema": {"type": "string"},
                 "style": "simple",
                 "value": demo_api_key,
+            },
+            {
+                "name": "SERVICE_CTX_PROCESS_NAME",
+                "in": "header",
+                "description": "Name of the current process",
+                "required": True,
+                "schema": {"type": "string"},
+                "style": "simple",
+                "value": "Put-Away Reach Truck",
+            },
+            {
+                "name": "SERVICE_CTX_PROCESS_MENU",
+                "in": "header",
+                "description": "Name of the current process menu",
+                "required": True,
+                "schema": {"type": "string"},
+                "style": "simple",
+                "value": "Put-Away Reach Truck",
             }
-        )
+        ])
         return defaults
