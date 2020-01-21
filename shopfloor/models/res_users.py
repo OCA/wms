@@ -6,7 +6,5 @@ class ResUsers(models.Model):
 
     # in practice, it's a one2one
     shopfloor_device_ids = fields.One2many(
-        comodel_name="shopfloor.device",
-        inverse_name="user_id",
-        readonly=True,
+        comodel_name="shopfloor.device", inverse_name="user_id", readonly=True
     )

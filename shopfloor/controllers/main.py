@@ -17,7 +17,7 @@ class ShopfloorController(main.RestController):
         res = super(ShopfloorController, self)._get_component_context()
         headers = request.httprequest.environ
         for k, v in headers.items():
-            if k.startswith('HTTP_SERVICE_CTX_'):
+            if k.startswith("HTTP_SERVICE_CTX_"):
                 key_name = k[17:].lower()
                 res[key_name] = v
         return res
