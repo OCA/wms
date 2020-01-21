@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="src/assets/logo.png">
+    <script src="src/vendor/vue.js"></script>
+    <script src="src/components/searchbar/searchbar.js"></script>
+    <script type="module" src="src/main.js"></script>
+    <title>WMS</title>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but wms doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app">  
+        <searchbar v-on:found="showFound">ici lasearch</searchbar>
+        <div>
+          {{ txt }}
+        </div>
+    </div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
