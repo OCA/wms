@@ -1,7 +1,7 @@
 var odoo_service = {
     'fetchOperation': function (barcode) {
         console.log('ask odoo about barcode of pack', barcode.pack);
-        return Promise.resolve({ 'source': 'def', 'destination': 'abc', 'id': 1233232, 'name': 'PACK0001'});
+        return Promise.resolve({ 'source': 'def', 'destination': 'abc', 'id': 1233232, 'name': 'PACK0001', 'barcode': barcode.pack});
     },
     'scanLocation': function (barcode) {
         if (barcode.indexOf('a') != -1) {
@@ -38,7 +38,7 @@ var sp = Vue.component('simple-pack-putaway', {
     <div v-if="show_confirm" class="confirm">
         <div class="alert alert-danger error" role="alert">
             <h4 class="alert-heading">Destination not expected</h4>
-            <p>Do you confirm? {{ confirm_with }} </p>
+            <p>Do you confirm? {{ operation.location_suggested }} </p>
             <form v-on:submit="doConfirm" v-on:reset="dontConfirm">
                <input class="btn btn-lg btn-success" type="submit" value="Yes"></input>
                <input class="btn btn-lg btn-danger float-right" type="reset" value="No"></input>

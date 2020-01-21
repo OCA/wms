@@ -14,6 +14,10 @@ var operationDetail = Vue.component('operation-detail', {
           <td>{{ operation.name }}</td>
         </tr>
         <tr class="table-success">
+          <th>Barcode</th>
+          <td>{{ operation.barcode }}</td>
+        </tr>
+        <tr class="table-success">
           <th class="table-success">Source</th>
           <td>{{ operation.source }}</td>
         </tr>
