@@ -22,6 +22,8 @@
         "views/res_users.xml",
         "views/shopfloor_operation_group.xml",
         "views/shopfloor_menu.xml",
+        "views/shopfloor_process.xml",
+        "views/stock_picking_type.xml",
         "views/menus.xml",
     ],
     "demo": [
