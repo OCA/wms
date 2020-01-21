@@ -1,4 +1,4 @@
-# Copyright 2019 Camptocamp SA
+# Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from odoo import _, fields, models
@@ -36,7 +36,7 @@ class StockPicking(models.Model):
             "views": [[self.env.ref(screen_xmlid).id, "form"]],
             "target": "fullscreen",
             "flags": {
-                "headless": True,
+                "withControlPanel": False,
                 "form_view_initial_mode": "edit",
                 "no_breadcrumbs": True,
             },

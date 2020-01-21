@@ -1,7 +1,7 @@
-# Copyright 2019 Camptocamp SA
+# Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
-from odoo import _, api, fields, models
+from odoo import _, api, exceptions, fields, models
 
 
 class StockReceptionScreen(models.Model):
@@ -177,7 +177,7 @@ class StockReceptionScreen(models.Model):
         for wiz in self:
             move = wiz.current_move_id
             wiz.current_move_location_dest_id = move.location_dest_id
-            location = move.location_dest_id.get_putaway_strategy(move.product_id)
+            location = move.location_dest_id._get_putaway_strategy(move.product_id)
             if location:
                 wiz.current_move_location_dest_id = location
 
@@ -235,17 +235,13 @@ class StockReceptionScreen(models.Model):
         It'll automatically reload the picking form.
         """
         self.ensure_one()
-        picking_url = (
-            "/web/#menu_id={}&action={}&view_type=form"
-            "&id={}&model={}&active_id={}".format(
-                self.env.ref("stock.menu_stock_root").id,
-                self.env.ref("stock.action_picking_tree_ready").id,
-                self.picking_id.id,
-                self.picking_id._name,
-                self.picking_id.picking_type_id.id,
-            )
-        )
-        return {"type": "ir.actions.act_url", "url": picking_url, "target": "self"}
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": self.picking_id._name,
+            "res_id": self.picking_id.id,
+            "view_mode": "form",
+            "target": "main",  # Will restore the main menu/panel on top
+        }
 
     def action_reception_screen_manual_barcode(self):
         """Display a window to fill manually a barcode.
@@ -263,6 +259,8 @@ class StockReceptionScreen(models.Model):
 
     def next_step(self):
         """Evaluate the next step for the operator."""
+        if self.current_move_id and self.current_move_id.state in ("cancel", "done"):
+            raise exceptions.UserError(_("The move is already processed, aborting."))
         if self.current_step:
             steps = self.get_reception_screen_steps()
             step = steps[self.current_step]
@@ -323,7 +321,13 @@ class StockReceptionScreen(models.Model):
         """Set the lot number on a move line."""
         # First, check if the lot already exists
         lot_model = self.env["stock.production.lot"]
-        lot = lot_model.search([("name", "=", barcode)])
+        lot = lot_model.search(
+            [
+                ("name", "=", barcode),
+                ("product_id", "=", self.current_move_id.product_id.id),
+                ("company_id", "=", self.picking_id.company_id.id),
+            ]
+        )
         if lot:
             self.env.user.notify_info(
                 message="", title=_("Reuse the existing lot {}.").format(barcode)
@@ -332,6 +336,7 @@ class StockReceptionScreen(models.Model):
             lot_vals = {
                 "name": barcode,
                 "product_id": self.current_move_id.product_id.id,
+                "company_id": self.picking_id.company_id.id,
             }
             lot = lot_model.create(lot_vals)
         # Check for an existing move line without lot otherwise create one
@@ -523,4 +528,10 @@ class StockReceptionScreen(models.Model):
         self.current_step = self._step_start
         self.current_filter_product = False
         self.current_move_id = self.current_move_line_id = False
+        return True
+
+    def action_check_quantity(self):
+        """Used to trigger an implicit call to 'write()' on the form
+        to check the quantity.
+        """
         return True
