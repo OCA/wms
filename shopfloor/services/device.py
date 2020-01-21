@@ -1,7 +1,7 @@
 from odoo import fields
 from odoo.addons.component.core import Component
 
-from odoo.addons.base_rest.components.service import skip_secure_response
+from odoo.addons.base_rest.components.service import to_int
 
 
 class ShopfloorDevice(Component):
@@ -10,7 +10,6 @@ class ShopfloorDevice(Component):
     _usage = "device"
     _expose_model = "shopfloor.device"
 
-    @skip_secure_response
     def search(self, name_fragment=None):
         domain = self._get_base_search_domain()
         if name_fragment:
@@ -39,10 +38,34 @@ class ShopfloorDevice(Component):
             }
         }
 
+    def _validator_return_search(self):
+        return {
+            "size": {"coerce": to_int, "required": True, "type": "integer"},
+            "data": {
+                "type": "list",
+                "schema": {
+                    "type": "dict",
+                    "schema": {
+                        "id": {"coerce": to_int, "required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
+                        "warehouse": {
+                            "type": "dict",
+                            "schema": {
+                                "id": {"coerce": to_int, "required": True, "type": "integer"},
+                                "name": {"type": "string", "nullable": False, "required": True},
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     def _convert_one_record(self, record):
         return {
             "id": record.id,
             "name": record.name,
-            "warehouse_id": record.warehouse_id.id,
-            "warehouse": record.warehouse_id.name,
+            "warehouse": {
+                "id": record.warehouse_id.id,
+                "name": record.warehouse_id.name,
+            }
         }
