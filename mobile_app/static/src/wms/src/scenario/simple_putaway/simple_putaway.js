@@ -129,6 +129,7 @@ var sp = Vue.component('simple-pack-putaway', {
                         this.go_state('operationSet');
                     },
                     on_scan:(barcode) => {
+                        this.state[this.current_state].exit();
                         this.current_state = 'operationSet';
                         this.state[this.current_state].on_scan(barcode);
                     }
@@ -168,8 +169,8 @@ var sp = Vue.component('simple-pack-putaway', {
         },
         reset: function (e) {
             console.log('on reest ');
-            this.reset_view();
-            odoo_service.cancel(this.operation);
+            //this.reset_view();
+            //odoo_service.cancel(this.operation);
         },
     }
 });
