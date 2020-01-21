@@ -8,6 +8,7 @@ class ShopfloorPack(Component):
     _usage = "pack"
 
     def scan(self, pack_name):
+        """Scan a pack barcode"""
         pack = self.env["stock.quant.package"].search([("name", "=", pack_name)])
         company = self.env.user.company_id  # FIXME add logic to get proper company
         # FIXME add logic to get proper warehouse
