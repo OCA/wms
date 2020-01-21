@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="shopfloor_group_tree_view" model="ir.ui.view">
-        <field name="name">shopfloor group tree</field>
-        <field name="model">shopfloor.group</field>
+    <record id="shopfloor_operation_group_tree_view" model="ir.ui.view">
+        <field name="name">shopfloor operation group tree</field>
+        <field name="model">shopfloor.operation.group</field>
         <field name="arch" type="xml">
             <tree editable="bottom">
                 <field name="name"/>
@@ -11,9 +11,9 @@
         </field>
     </record>
 
-    <record id="shopfloor_group_form_view" model="ir.ui.view">
-        <field name="name">shopfloor group form</field>
-        <field name="model">shopfloor.group</field>
+    <record id="shopfloor_operation_group_form_view" model="ir.ui.view">
+        <field name="name">shopfloor operation group form</field>
+        <field name="model">shopfloor.operation.group</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
@@ -31,9 +31,9 @@
         </field>
     </record>
 
-    <record id="shopfloor_group_search_view" model="ir.ui.view">
-        <field name="name">shopfloor group search</field>
-        <field name="model">shopfloor.group</field>
+    <record id="shopfloor_operation_group_search_view" model="ir.ui.view">
+        <field name="name">shopfloor operation group search</field>
+        <field name="model">shopfloor.operation.group</field>
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
@@ -41,9 +41,9 @@
         </field>
     </record>
 
-    <record id="action_shopfloor_group" model="ir.actions.act_window">
-        <field name="name">Groups</field>
-        <field name="res_model">shopfloor.group</field>
+    <record id="action_shopfloor_operation_group" model="ir.actions.act_window">
+        <field name="name">Operation Groups</field>
+        <field name="res_model">shopfloor.operation.group</field>
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">tree,form</field>
     </record>

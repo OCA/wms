@@ -4,9 +4,9 @@ from odoo import fields, models
 class ResUsers(models.Model):
     _inherit = "res.users"
 
-    shopfloor_group_ids = fields.Many2many(
-        'shopfloor.group',
-        string="Shopfloor groups"
+    shopfloor_operation_group_ids = fields.Many2many(
+        'shopfloor.operation.group',
+        string="Shopfloor operation groups"
     )
     shopfloor_current_process = fields.Char()
     shopfloor_last_call = fields.Char()
