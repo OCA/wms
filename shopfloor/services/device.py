@@ -26,8 +26,8 @@ class ShopfloorDevice(Component):
             return [("id", "=", assigned_device.id)]
         return [
             "|",
-            ("shopfloor_operation_group_ids", "=", False),
-            ("shopfloor_operation_group_ids.user_ids", "=", user.id),
+            ("operation_group_ids", "=", False),
+            ("operation_group_ids.user_ids", "=", user.id),
         ]
 
     def _validator_search(self):
