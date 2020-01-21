@@ -22,11 +22,8 @@ var odoo_service = {
 var sp = Vue.component('simple-pack-putaway', {
 	template: `<div>
 	<h1>Simple Putaway</h1>
-    <searchbar v-on:found="scanned" v-bind:hint="hint">ici lasearch</searchbar>
-    <div>
-      On cherche {{ hint }}<br />
-    </div>
-    <span style="color:red">{{ error_msg }}</span>
+    <searchbar v-on:found="scanned" v-bind:hint="hint" v-bind:placeholder="scanTip">ici lasearch</searchbar>
+    <div class="alert alert-danger error" v-if="error_msg">{{ error_msg }}</div>
     <operation-detail v-bind:operation="operation"></operation-detail>
     <div v-if="confirm_with">
     	<div style="color:red">Destination not expected</div>
@@ -49,6 +46,11 @@ var sp = Vue.component('simple-pack-putaway', {
 			'confirm_with': null,
 		};
 	},
+	computed: {
+	  scanTip: function () {
+		return this.hint == 'pack' ? 'Scan pack': 'Scan location'
+	  }
+	},
 	methods: {
 		scanned: function(barcode) {
 			this.error_msg = ''
@@ -56,7 +58,7 @@ var sp = Vue.component('simple-pack-putaway', {
 				odoo_service.scanPack(barcode).then( (value) => {
 					this.operation = value;
 					this.hint = 'location';
-					this.show_button = true;				
+					this.show_button = true;	
 				});
 			} else {
 				odoo_service.scanLocation(barcode).then( (value) => {

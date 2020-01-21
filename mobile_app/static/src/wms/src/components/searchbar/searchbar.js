@@ -10,6 +10,7 @@ var searchbar = Vue.component('searchbar', {
       entered: '',
     }
   },
+  props:['placeholder'],
   methods: {
   	search: function(e,) {
   		e.preventDefault();
@@ -21,5 +22,9 @@ var searchbar = Vue.component('searchbar', {
   	}
   },
 
-  template: '<form v-on:submit="search"><input v-model="entered" placeholder="barcode here"> </form>'
+  template: `
+  <form v-on:submit="search">
+	  <input v-model="entered" :placeholder="placeholder" class="form-control form-control-lg mb-2" />
+  </form>
+  `
 })

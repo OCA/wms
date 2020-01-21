@@ -6,25 +6,23 @@ var operationDetail = Vue.component('operation-detail', {
   props:['operation'],
   methods: {},
   template: `
-<div>
-  <table>
-    <tr>
-      <th>Source Location</th>
-      <td>{{ operation.source }}</td>
-    </tr>
-    <tr>
-      <th>Destination Location</th>
-      <td>{{ operation.destination }}</td>
-    </tr>
-    <tr>
-      <th>Id</th>
-      <td>{{ operation.id }}</td>
-    </tr>
-    <tr>
-      <th>name</th>
-      <td>{{ operation.name }}</td>
-    </tr>
-  </table>
-</div>
-  `
+  <div class="detail operation-detail">
+    <div class="table-responsive">
+      <table class="table">
+        <tr class="table-success">
+          <th>Name</th>
+          <td>{{ operation.name }}</td>
+        </tr>
+        <tr class="table-success">
+          <th class="table-success">Source</th>
+          <td>{{ operation.source }}</td>
+        </tr>
+        <tr class="table-warning">
+          <th>Destination</th>
+          <td>{{ operation.destination }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+`
 })
