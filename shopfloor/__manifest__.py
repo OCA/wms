@@ -28,5 +28,7 @@
     ],
     "demo": [
         "demo/auth_api_key_demo.xml",
+        "demo/shopfloor_operation_group_demo.xml",
+        "demo/shopfloor_device_demo.xml",
     ]
 }
