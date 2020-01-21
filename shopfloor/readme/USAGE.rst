@@ -1,5 +1,2 @@
-To add your own REST service you must provides at least 2 classes.
-
-* A Component providing the business logic of your service,
-* A Controller to register your service.
-write me
+An API key is created in the Demo data (for development), using
+the Demo user. The key to use in the HTTP header ``API-KEY`` is: 72B044F7AC780DAC
