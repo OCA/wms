@@ -11,6 +11,7 @@ class ShopfloorDevice(models.Model):
         required=True,
         default=lambda self: self._default_warehouse_id(),
     )
+    # TODO: remove shopfloor_ prefix
     shopfloor_operation_group_ids = fields.Many2many(
         "shopfloor.operation.group",
         string="Shopfloor Operation Groups",
