@@ -14,7 +14,7 @@ class ShopfloorService(Component):
         pack = self.env['stock.quant.package'].search([('name', '=', pack_name)])
         return self._to_json(pack)
 
-    def _validator_search(self):
+    def _validator_get_pack(self):
         return {"pack_name": {"type": "string", "nullable": False, "required": True}}
 
     def _to_json(self, pack):
