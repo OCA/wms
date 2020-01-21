@@ -10,7 +10,7 @@
                 <page name="shopfloor" string="Shopfloor">
                     <group>
                         <group>
-                            <field name="shopfloor_group_ids" widget="many2many_tags"/>
+                            <field name="shopfloor_operation_group_ids" widget="many2many_tags"/>
                         </group>
                         <group readonly="1">
                             <field name="shopfloor_current_process"/>
