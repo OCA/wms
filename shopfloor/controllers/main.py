@@ -8,16 +8,6 @@ class ShopfloorController(main.RestController):
     _collection_name = "shopfloor.services"
     _default_auth = "api_key"
 
-    @classmethod
-    def _get_process_from_headers(cls, headers):
-        process_name = headers.get("HTTP_SERVICE_CTX_PROCESS_NAME")
-        return process_name
-
-    @classmethod
-    def _get_process_menu_from_headers(cls, headers):
-        process_menu = headers.get("HTTP_SERVICE_CTX_PROCESS_MENU")
-        return process_menu
-
     def _get_component_context(self):
         """
         This method adds the component context:
@@ -26,6 +16,8 @@ class ShopfloorController(main.RestController):
         """
         res = super(ShopfloorController, self)._get_component_context()
         headers = request.httprequest.environ
-        res["process_name"] = self._get_process_from_headers(headers)
-        res["process_menu"] = self._get_process_menu_from_headers(headers)
+        for k, v in headers.items():
+            if k.startswith('HTTP_SERVICE_CTX_'):
+                key_name = k[17:].lower()
+                res[key_name] = v
         return res
