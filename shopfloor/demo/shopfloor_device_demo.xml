@@ -1,0 +1,21 @@
+<odoo noupdate="1">
+
+    <record id="shopfloor_device_hb_truck_1_demo" model="shopfloor.device">
+        <field name="name">Highbay Truck 1</field>
+        <field name="user_id" eval="False" />
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+    </record>
+
+    <record id="shopfloor_device_hb_truck_2_demo" model="shopfloor.device">
+        <field name="name">Highbay Truck 2</field>
+        <field name="user_id" eval="False" />
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+    </record>
+
+    <record id="shopfloor_device_shelf_1_demo" model="shopfloor.device">
+        <field name="name">Shelf 1</field>
+        <field name="user_id" eval="False" />
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+    </record>
+
+</odoo>
