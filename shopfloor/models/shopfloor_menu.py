@@ -8,8 +8,8 @@ class ShopfloorMenu(models.Model):
 
     name = fields.Char(translate=True)
     sequence = fields.Integer()
-    group_ids = fields.Many2many(
-        'shopfloor.group',
+    operation_group_ids = fields.Many2many(
+        'shopfloor.operation.group',
         string="Groups",
         help="visible for these groups",
     )
