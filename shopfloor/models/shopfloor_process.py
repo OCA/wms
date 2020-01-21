@@ -7,5 +7,5 @@ class ShopfloorProcess(models.Model):
 
     name = fields.Char(required=True)
     picking_type_ids = fields.One2many(
-        'stock.picking.type', 'process_id', string="Operation types"
+        "stock.picking.type", "process_id", string="Operation types"
     )
