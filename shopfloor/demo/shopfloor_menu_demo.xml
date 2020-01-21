@@ -1,0 +1,9 @@
+<odoo noupdate="1">
+
+    <record id="shopfloor_menu_put_away_reach_truck" model="shopfloor.menu">
+        <field name="name">Put-Away Reach Truck</field>
+        <field name="sequence">10</field>
+        <field name="process_id" ref="shopfloor_process_put_away_reach_truck"/>
+    </record>
+
+</odoo>
