@@ -4,9 +4,10 @@
         <field name="name">shopfloor.device tree</field>
         <field name="model">shopfloor.device</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree editable="bottom">
                 <field name="name"/>
                 <field name="warehouse_id"/>
+                <field name="shopfloor_operation_group_ids" widget="many2many_tags" />
                 <field name="user_id"/>
             </tree>
         </field>
