@@ -1,11 +1,11 @@
-from odoo.addons.base_rest.controllers import main
-from odoo.exceptions import MissingError
 from odoo.http import request
+
+from odoo.addons.base_rest.controllers import main
 
 
 class ShopfloorController(main.RestController):
     _root_path = "/shopfloor/"
-    _collection_name = "shopfloor.services"
+    _collection_name = "shopfloor.service"
     _default_auth = "api_key"
 
     def _get_component_context(self):
