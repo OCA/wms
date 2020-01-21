@@ -13,7 +13,9 @@ class ShopfloorDevice(models.Model):
     )
     shopfloor_operation_group_ids = fields.Many2many(
         "shopfloor.operation.group",
-        string="Shopfloor Operation Groups"
+        string="Shopfloor Operation Groups",
+        help="When unset, all users can use the device. When set,"
+        "only users belonging to at least one group can use the device.",
     )
     user_id = fields.Many2one(
         "res.users",

@@ -1,0 +1,8 @@
+<odoo noupdate="1">
+
+    <record id="shopfloor_operation_group_highbay_demo" model="shopfloor.operation.group">
+        <field name="name">HighBay</field>
+        <field name="user_ids" eval="[(4, ref('base.user_demo'))]" />
+    </record>
+
+</odoo>
