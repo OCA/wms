@@ -17,6 +17,7 @@ class ShopfloorMenu(Component):
         ]
 
     def search(self, name_fragment=None):
+        """List available menu entries for current user"""
         domain = self._get_base_search_domain()
         if name_fragment:
             domain.append(("name", "ilike", name_fragment))
