@@ -1,6 +1,8 @@
 from odoo import fields
 from odoo.addons.component.core import Component
 
+from odoo.addons.base_rest.components.service import skip_secure_response
+
 
 class ShopfloorDevice(Component):
     _inherit = "base.shopfloor.service"
@@ -8,6 +10,7 @@ class ShopfloorDevice(Component):
     _usage = "device"
     _expose_model = "shopfloor.device"
 
+    @skip_secure_response
     def search(self, name_fragment=None):
         domain = self._get_base_search_domain()
         if name_fragment:
