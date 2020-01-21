@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # © 2020 Camptocamp, Akretion, BCIM
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
@@ -10,13 +9,9 @@
     "category": "Inventory",
     "website": "https://odoo-community.org",
     "author": "Akretion, BCIM, Camptocamp, Odoo Community Association (OCA)",
-    "licence": "AGPL-3",
+    "license": "AGPL-3",
     "application": True,
-    "depends": [
-        "stock",
-        "base_rest",
-        "auth_api_key",
-    ],
+    "depends": ["stock", "base_rest", "auth_api_key"],
     "data": [
         "security/ir.model.access.csv",
         "views/shopfloor_operation_group.xml",
@@ -32,5 +27,5 @@
         "demo/shopfloor_menu_demo.xml",
         "demo/shopfloor_operation_group_demo.xml",
         "demo/shopfloor_device_demo.xml",
-    ]
+    ],
 }

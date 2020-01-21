@@ -8,7 +8,5 @@ class ShopfloorOperationGroup(models.Model):
     name = fields.Char(required=True)
     user_ids = fields.Many2many("res.users", string="Members")
     menu_ids = fields.Many2many(
-        'shopfloor.menu',
-        string="Menus",
-        help="Can see these menus",
+        "shopfloor.menu", string="Menus", help="Can see these menus"
     )
