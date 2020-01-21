@@ -9,6 +9,7 @@
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="operation_group_ids" widget="many2many_tags"/>
+                <field name="process_id" required="1"/>
             </tree>
         </field>
     </record>

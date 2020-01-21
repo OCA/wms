@@ -13,3 +13,4 @@ class ShopfloorMenu(models.Model):
         string="Groups",
         help="visible for these groups",
     )
+    process_id = fields.Many2one('shopfloor.process', name="Process")
