@@ -6,7 +6,8 @@ from odoo.addons.component.core import Component
 
 
 class ShopfloorProfile(Component):
-    """Profile storing the configuration for the interaction from the client.
+    """
+    Profile storing the configuration for the interaction from the client.
 
     A client application must use a profile, passed to every request in the
     HTTP header (TODO put the name of the header).
@@ -16,13 +17,13 @@ class ShopfloorProfile(Component):
     * If the profile has operation groups, the profile can be used only
       if the user is at least in one of these groups.
     * If the user has an assigned profile, the user can use only this profile.
-
     """
 
     _inherit = "base.shopfloor.service"
     _name = "shopfloor.profile"
     _usage = "profile"
     _expose_model = "shopfloor.profile"
+    _description = __doc__
 
     def search(self, name_fragment=None):
         """List available profiles for current user"""

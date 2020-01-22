@@ -6,6 +6,8 @@ from odoo.addons.component.core import AbstractComponent
 
 
 class BaseShopfloorService(AbstractComponent):
+    """Base class for REST services"""
+
     _inherit = "base.rest.service"
     _name = "base.shopfloor.service"
     _collection = "shopfloor.service"
