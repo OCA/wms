@@ -11,7 +11,7 @@ class ShopfloorLocation(Component):
     _expose_model = "stock.location"
 
     def search(self, name_fragment=None):
-        """List available devices for current user"""
+        """List available locations for current user"""
         domain = self._get_base_search_domain()
         if name_fragment:
             domain = expression.AND(
@@ -28,7 +28,7 @@ class ShopfloorLocation(Component):
         return {"size": len(records), "data": self._to_json(records)}
 
     def _get_base_search_domain(self):
-        # TODO add filter on warehouse of the device
+        # TODO add filter on warehouse of the current profile
         return super()._get_base_search_domain()
 
     def _validator_search(self):
