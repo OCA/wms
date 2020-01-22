@@ -18,7 +18,7 @@
         "views/shopfloor_menu.xml",
         "views/shopfloor_process.xml",
         "views/stock_picking_type.xml",
-        "views/shopfloor_device_views.xml",
+        "views/shopfloor_profile_views.xml",
         "views/menus.xml",
     ],
     "demo": [
@@ -26,6 +26,6 @@
         "demo/shopfloor_process_demo.xml",
         "demo/shopfloor_menu_demo.xml",
         "demo/shopfloor_operation_group_demo.xml",
-        "demo/shopfloor_device_demo.xml",
+        "demo/shopfloor_profile_demo.xml",
     ],
 }
