@@ -1,3 +1,5 @@
+from odoo.osv import expression
+
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
@@ -9,12 +11,18 @@ class ShopfloorMenu(Component):
     _expose_model = "shopfloor.menu"
 
     def _get_base_search_domain(self):
+        base_domain = super()._get_base_search_domain()
         user = self.env.user
-        return [
-            "|",
-            ("operation_group_ids", "=", False),
-            ("operation_group_ids.user_ids", "=", user.id),
-        ]
+        return expression.AND(
+            [
+                base_domain,
+                [
+                    "|",
+                    ("operation_group_ids", "=", False),
+                    ("operation_group_ids.user_ids", "=", user.id),
+                ],
+            ]
+        )
 
     def search(self, name_fragment=None):
         """List available menu entries for current user"""
