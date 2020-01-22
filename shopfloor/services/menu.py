@@ -5,10 +5,19 @@ from odoo.addons.component.core import Component
 
 
 class ShopfloorMenu(Component):
+    """
+    Menu Structure for the client application.
+
+    The list of menus is restricted by the operation groups. A menu without
+    groups is visible for all users, a menu with group(s) is visible if the
+    user is in at least one of the groups.
+    """
+
     _inherit = "base.shopfloor.service"
     _name = "shopfloor.menu"
     _usage = "menu"
     _expose_model = "shopfloor.menu"
+    _description = __doc__
 
     def _get_base_search_domain(self):
         base_domain = super()._get_base_search_domain()
