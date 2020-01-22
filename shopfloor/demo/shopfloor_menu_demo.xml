@@ -6,4 +6,10 @@
         <field name="process_id" ref="shopfloor_process_put_away_reach_truck"/>
     </record>
 
+    <record id="shopfloor_menu_single_pallet_transfer" model="shopfloor.menu">
+        <field name="name">Single Pallet Transfer</field>
+        <field name="sequence">20</field>
+        <field name="process_id" ref="shopfloor_process_single_pallet_transfer"/>
+    </record>
+
 </odoo>

@@ -11,4 +11,5 @@ class ShopfloorMenu(models.Model):
     operation_group_ids = fields.Many2many(
         "shopfloor.operation.group", string="Groups", help="visible for these groups"
     )
-    process_id = fields.Many2one("shopfloor.process", name="Process")
+    process_id = fields.Many2one("shopfloor.process", name="Process", required=True)
+    process_code = fields.Selection(related="process_id.code", readonly=True)
