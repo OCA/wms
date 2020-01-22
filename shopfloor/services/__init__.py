@@ -2,3 +2,4 @@ from . import service
 from . import device
 from . import menu
 from . import pack
+from . import location
