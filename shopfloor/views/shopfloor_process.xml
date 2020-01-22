@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
+                <field name="code"/>
                 <field name="picking_type_ids" widget="many2many_tags"/>
             </tree>
         </field>
@@ -20,6 +21,7 @@
                     <group>
                         <group>
                             <field name="name"/>
+                            <field name="code"/>
                         </group>
                         <group>
                             <field name="picking_type_ids" widget="many2many_tags"/>
@@ -36,6 +38,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
+                <field name="code"/>
             </search>
         </field>
     </record>

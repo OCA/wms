@@ -6,6 +6,14 @@ class ShopfloorProcess(models.Model):
     _description = "a process to be run from the scanners"
 
     name = fields.Char(required=True)
+    code = fields.Selection(selection="_selection_code", required=True)
     picking_type_ids = fields.One2many(
         "stock.picking.type", "process_id", string="Operation types"
     )
+
+    def _selection_code(self):
+        return [
+            # these must match a REST service
+            ("single_pack_putaway", "Single Pack Put-away"),
+            ("single_pack_transfer", "Single Pack Transfer"),
+        ]
