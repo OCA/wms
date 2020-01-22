@@ -1,4 +1,5 @@
 from odoo import fields
+from odoo.osv import expression
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -20,15 +21,22 @@ class ShopfloorDevice(Component):
 
     def _get_base_search_domain(self):
         # shopfloor_device_ids is a one2one
+        base_domain = super()._get_base_search_domain()
         user = self.env.user
         assigned_device = fields.first(user.shopfloor_device_ids)
         if assigned_device:
-            return [("id", "=", assigned_device.id)]
-        return [
-            "|",
-            ("operation_group_ids", "=", False),
-            ("operation_group_ids.user_ids", "=", user.id),
-        ]
+            return expression.AND([base_domain, [("id", "=", assigned_device.id)]])
+
+        return expression.AND(
+            [
+                base_domain,
+                [
+                    "|",
+                    ("operation_group_ids", "=", False),
+                    ("operation_group_ids.user_ids", "=", user.id),
+                ],
+            ]
+        )
 
     def _validator_search(self):
         return {
