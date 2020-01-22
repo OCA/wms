@@ -30,7 +30,7 @@ var odoo_service = {
 
 var sp = Vue.component('simple-pack-putaway', {
     template: `<div>
-    <h1>Simple Putaway</h1>
+    <h1><a href="#" class="btn btn-large btn-outline-secondary" style="margin-right:10px;">&lt;</a>Simple Putaway</h1>
     {{ current_state }}
     <searchbar v-on:found="scanned" v-bind:hint="hint" v-bind:placeholder="scanTip">ici lasearch</searchbar>
     <div class="alert alert-danger error" v-if="error_msg" role="alert">{{ error_msg }}</div>
