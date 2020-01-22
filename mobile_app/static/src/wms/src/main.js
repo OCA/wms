@@ -17,7 +17,7 @@ const Routes = {
 var app = new Vue({
     el: '#app',
     data: {
-        currentRoute: '',
+        currentRoute: window.location.hash.slice(1),
         // To not be bothered with the login page during dev
         // This is set true set to false to see the login page
         authenticated: true,
