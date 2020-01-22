@@ -3,9 +3,12 @@ from odoo.addons.component.core import Component
 
 
 class ShopfloorPack(Component):
+    """Expose data about Stock Quant Packages"""
+
     _inherit = "base.shopfloor.service"
     _name = "shopfloor.pack"
     _usage = "pack"
+    _description = __doc__
 
     # TODO define the return schema and add the validator method
     @skip_secure_response
