@@ -5,10 +5,13 @@ from odoo.addons.component.core import Component
 
 
 class ShopfloorLocation(Component):
+    """Expose Stock Locations data for the current warehouse."""
+
     _inherit = "base.shopfloor.service"
     _name = "shopfloor.location"
     _usage = "location"
     _expose_model = "stock.location"
+    _description = __doc__
 
     def search(self, name_fragment=None):
         """List available locations for current user"""
