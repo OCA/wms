@@ -1,17 +1,33 @@
 //import searchbar from 'components/searchbar/searchbar.js'
 
 import * as simple_putaway from './scenario/simple_putaway/simple_putaway.js'
+import {Config} from './services/config.js'
 
 const NotFound = { template: '<p>Page not found</p>' }
 const Home = { template: '<home-page v-bind:routes="routes"></home-page>', props: {routes:"myroutes"}} // { props: {routes: AllRoutes} }}
-const PutAway = { template: '<simple-pack-putaway></simple-pack-putaway>' }
-const PalletTransfer = { template: '<pallet-transfer></pallet-transfer>' }
 const LoginPage = { template: '<login-page></login-page>' }
 
-const Routes = {
-    '': Home,
-    'putaway': PutAway,
-    'pallettransfer': PalletTransfer,
+const ScenarioTemplate = {
+   single_pack_putaway: {template: "<simple-pack-putaway></simple-pack-putaway>"},
+   single_pack_transfer: {template: "<pallet-transfer></pallet-transfer>"},
+}
+
+var AppConfig = new Config()
+
+class Routes {
+    static get(path) {
+        if (path == '') {
+            return Home
+        } else {
+           var menu = AppConfig.get('menu')
+           for (var idx in menu) {
+                if (menu[idx]['hash'] == path) {
+                    return ScenarioTemplate[menu[idx]['scenario']]
+                }
+            };
+            return NotFound;
+        }
+    }
 }
 
 var app = new Vue({
@@ -20,13 +36,14 @@ var app = new Vue({
         currentRoute: window.location.hash.slice(1),
         // To not be bothered with the login page during dev
         // This is set true set to false to see the login page
-        authenticated: true,
+        authenticated: false,
         using_demo_url: false,
+        config: AppConfig,
     },
     computed: {
         ViewComponent () {
             if (this.authenticated) {
-                return Routes[this.currentRoute] || NotFound;
+                return Routes.get(this.currentRoute);
             } else {
                 return LoginPage;
             }

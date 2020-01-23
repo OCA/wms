@@ -1,18 +1,17 @@
 var loginpage = Vue.component('login-page', {
     data: function(){ return {
-        'username': '',
-        'password': '',
-        'accessbadge': '',
+        'apikey': '',
     }},
     methods: {
         login: function() {
-            if ((this.username == this.password) || (accessbadge == '123') ) {
+            // call odoo application load => set the result in the local storage in json
+
+            if (this.apikey == '123') {
                 this.$root.authenticated = true;
-                // this.$root.currentRoute = '';
+                this.$root.config.reset(this.apikey)
             } else {
                 this.$root.authenticated = false;
-                this.username = '';
-                this.password = '';
+                this.accessbagde = '';
             }
         }
     },
@@ -21,17 +20,7 @@ var loginpage = Vue.component('login-page', {
     <form>
     <h1 class="text-center">WMS</h1>
   <div class="form-group">
-    <input type="text" class="form-control" v-model="accessbadge" placeholder="Scan your access badge" autofocus>
-  </div>
-  <div class="form-group">
-    <label class="text-muted">Or enter your credentials</label>
-  </div>
-
-  <div class="form-group">
-    <input type="text" class="form-control" v-model="username" placeholder="Username">
-  </div>
-  <div class="form-group">
-    <input type="password" class="form-control" v-model="password" placeholder="Password">
+    <input type="text" class="form-control" v-model="apikey" placeholder="Scan your access badge or fill your credential" autofocus>
   </div>
   <button type="button" class="btn btn-primary btn-block" v-on:click="login()">Login</button>
 </form>
