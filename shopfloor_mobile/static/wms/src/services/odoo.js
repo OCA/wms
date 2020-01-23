@@ -160,8 +160,8 @@ export class Odoo {
 
     constructor(params) {
         this.params = params;
-        this.process_name = this.params.process_name;
-        this.process_menu = this.params.process_menu;
+        this.process_id = this.params.process_id;
+        this.process_menu_id = this.params.process_menu_id;
         // FIXME: get a real one from input
         this.api_key = '72B044F7AC780DAC'
     }
