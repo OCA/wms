@@ -33,15 +33,17 @@ class ShopfloorMenu(Component):
             ]
         )
 
-    def search(self, name_fragment=None):
-        """List available menu entries for current user"""
+    def _search(self, name_fragment=None):
         domain = self._get_base_search_domain()
         if name_fragment:
             domain.append(("name", "ilike", name_fragment))
         records = self.env[self._expose_model].search(domain)
-        return self._response(
-            data={"size": len(records), "records": self._to_json(records)}
-        )
+        return self._to_json(records)
+
+    def search(self, name_fragment=None):
+        """List available menu entries for current user"""
+        json_records = self._search(name_fragment=name_fragment)
+        return self._response(data={"size": len(json_records), "records": json_records})
 
     def _validator_search(self):
         return {
@@ -55,29 +57,18 @@ class ShopfloorMenu(Component):
                 "records": {
                     "type": "list",
                     "required": True,
-                    "schema": {
-                        "type": "dict",
-                        "schema": {
-                            "id": {
-                                "coerce": to_int,
-                                "required": True,
-                                "type": "integer",
-                            },
-                            "name": {
-                                "type": "string",
-                                "nullable": False,
-                                "required": True,
-                            },
-                            "process": {
-                                "type": "string",
-                                "nullable": False,
-                                "required": True,
-                            },
-                        },
-                    },
+                    "schema": {"type": "dict", "schema": self._record_return_schema},
                 },
             }
         )
+
+    @property
+    def _record_return_schema(self):
+        return {
+            "id": {"coerce": to_int, "required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+            "process": {"type": "string", "nullable": False, "required": True},
+        }
 
     def _convert_one_record(self, record):
         return {"id": record.id, "name": record.name, "process": record.process_code}
