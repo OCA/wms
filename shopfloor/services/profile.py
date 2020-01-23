@@ -31,7 +31,9 @@ class ShopfloorProfile(Component):
         if name_fragment:
             domain.append(("name", "ilike", name_fragment))
         records = self.env[self._expose_model].search(domain)
-        return {"data": {"size": len(records), "records": self._to_json(records)}}
+        return self._response(
+            data={"size": len(records), "records": self._to_json(records)}
+        )
 
     def _get_base_search_domain(self):
         # shopfloor_profile_ids is a one2one in practice.
