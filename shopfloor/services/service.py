@@ -37,6 +37,27 @@ class BaseShopfloorService(AbstractComponent):
             res.append(self._convert_one_record(record))
         return res
 
+    def _response_schema(self, data_schema=None):
+        if not data_schema:
+            data_schema = {}
+        return {
+            "data": {"type": "dict", "required": False, "schema": data_schema},
+            "state": {"type": "string", "required": False},
+            "message": {
+                "type": "dict",
+                "required": False,
+                "schema": {
+                    "message_type": {
+                        "type": "string",
+                        "required": True,
+                        "allowed": ["info", "warning", "error"],
+                    },
+                    "title": {"type": "string", "required": False},
+                    "message": {"type": "string", "required": True},
+                },
+            },
+        }
+
     def _get_openapi_default_parameters(self):
         defaults = super()._get_openapi_default_parameters()
         demo_api_key = self.env.ref(
