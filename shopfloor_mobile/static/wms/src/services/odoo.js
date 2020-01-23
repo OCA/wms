@@ -1,161 +1,3 @@
-var CASE_1 = {
-    'fetch' : {
-        "data": {
-            "id": 1,
-            "location_src": {
-                "id": 1,
-                "name":  'Location foo baz',
-            },
-            "location_dst": {
-                "id": 2,
-                "name": 'Location bar',
-            },
-            "product": {"id": 1, "name": 'product name'},
-            "picking": {"id": 1, "name": 'picking name'},
-        },
-        "state": "scan_location",
-        "message": undefined
-    },
-    'validate' : {
-        "data": undefined,
-        "state": "scan_pack",
-        "message": {
-            'body': 'Validation OK',
-            'message_type': 'info',
-        }
-    },
-    'cancel' : {
-        "data": {
-            "id": 1,
-            "location_src": {
-                "id": 1,
-                "name":  'Location foo baz',
-            },
-            "location_dst": {
-                "id": 2,
-                "name": 'Location bar',
-            },
-            "product": {"id": 1, "name": 'product name'},
-            "picking": {"id": 1, "name": 'picking name'},
-        },
-        "state": "scan_location",
-        "message": {"message_type": "", "title": "", "body": ""}
-    }
-}
-
-var CASE_2 = {
-    'fetch' : {
-        "data": undefined,
-        "state": "scan_pack",
-        "message": {"message_type": "error", "body": "You cannot do that!"}
-    },
-}
-var CASE_3 = {
-    'fetch' : {
-        "data": undefined,
-        "state": "scan_pack",
-        "message": {"message_type": "error", "body": "No pkg found"}
-    },
-}
-var CASE_4 = {
-    'fetch' : {
-        "data": undefined,
-        "state": "takeover",
-        "message": {"message_type": "info", "body": "Benoit is at the toilette: do you take over?"}
-    },
-}
-var CASE_5 = {
-    'fetch' : {
-        "data": {
-            "id": 1,
-            "location_src": {
-                "id": 1,
-                "name":  'Location foo baz',
-            },
-            "location_dst": {
-                "id": 2,
-                "name": 'Location Benoit',
-            },
-            "product": {"id": 1, "name": 'product name'},
-            "picking": {"id": 1, "name": 'picking name'},
-        },
-        "state": "scan_location",
-        "message": undefined
-    },
-    'cancel' : {
-        "data": undefined,
-        "state": "scan_pack",
-        "message": undefined,
-    }
-}
-var CASE_5 = {
-    'fetch' : {
-        "data": {
-            "id": 1,
-            "location_src": {
-                "id": 1,
-                "name":  'Location foo baz',
-            },
-            "location_dst": {
-                "id": 2,
-                "name": 'Location Benoit',
-            },
-            "product": {"id": 1, "name": 'product name'},
-            "picking": {"id": 1, "name": 'picking name'},
-        },
-        "state": "scan_location",
-        "message": undefined
-    },
-    'validate1' : {
-        "data": undefined,
-        "state": "confirm_location",
-        "message": {"message_type": "warning", "body": "Are you sure of this location?"}
-    },
-    'validate2' : {
-        "data": undefined,
-        "state": "scan_pack",
-        "message": undefined,
-    },
-}
-var CASE_6 = {
-    'fetch' : {
-        "data": {
-            "id": 1,
-            "location_src": {
-                "id": 1,
-                "name":  'Location foo baz',
-            },
-            "location_dst": {
-                "id": 2,
-                "name": 'Location Benoit',
-            },
-            "product": {"id": 1, "name": 'product name'},
-            "picking": {"id": 1, "name": 'picking name'},
-        },
-        "state": "scan_location",
-        "message": undefined
-    },
-    'validate' : {
-        "data": undefined,
-        "state": "scan_location",
-        "message": {"message_type": "error", "body": "You cannot move to this location"}
-    },
-}
-
-
-
-var CASES = {
-    "1": CASE_1,
-    "2": CASE_1,
-    "3": CASE_1,
-    "4": CASE_1,
-    "5": CASE_1,
-    "6": CASE_1,
-};
-
-var CASE = CASES["1"];
-
-
 export class Odoo {
 
     constructor(params) {
@@ -206,13 +48,13 @@ export class Odoo {
     }
     fetchOperation (barcode) {
         console.log('Fetch', barcode);
-        CASE = CASES[barcode];
-        // return this._call('scan_pack', 'POST', {'barcode': barcode})
-        return Promise.resolve(CASE['fetch'])
+        window.CASE = window.CASES[barcode];
+        // return this._call('start', 'POST', {'barcode': barcode})
+        return Promise.resolve(window.CASE['fetch'])
     }
     validate (operation, confirmed) {
         console.log('Validate', operation);
-        return Promise.resolve(CASE['validate'])
+        return Promise.resolve(window.CASE['validate'])
     }
     __validate (operation, confirmed) {
         console.log('Validate', operation);
@@ -225,10 +67,10 @@ export class Odoo {
     }
     cancel(id) {
         console.log('Cancelling', id);
-        return Promise.resolve(CASE['cancel'])
+        return Promise.resolve(window.CASE['cancel'])
     }
     scanLocation (barcode) {
-        return Promise.resolve(CASE['scan_loc'])
+        return Promise.resolve(window.CASE['scan_loc'])
         // return this._call('scan_location', 'GET', {'barcode': barcode})
     }
 
