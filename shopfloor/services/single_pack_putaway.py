@@ -95,11 +95,12 @@ class SinglePackPutaway(Component):
         product = pack.quant_ids[
             0
         ].product_id  # FIXME we consider only one product per pack
+        default_location_dest = picking_type.default_location_dest_id
         move_vals = {
             "picking_type_id": picking_type.id,
             "product_id": product.id,
             "location_id": pack.location_id.id,
-            "location_dest_id": picking_type.default_location_dest_id.id,
+            "location_dest_id": default_location_dest.id,
             "name": product.name,
             "product_uom": product.uom_id.id,
             "product_uom_qty": pack.quant_ids[0].quantity,
@@ -107,11 +108,18 @@ class SinglePackPutaway(Component):
         }
         move = self.env["stock.move"].create(move_vals)
         move._action_confirm()
+        location_dest_id = (
+            default_location_dest._get_putaway_strategy(product).id
+            or default_location_dest.id
+        )
         self.env["stock.package_level"].create(
             {
                 "package_id": pack.id,
-                "move_ids": [(6, 0, [move.id])],
+                "move_ids": [(4, move.id)],
                 "company_id": company.id,
+                "is_done": True,
+                "location_id": pack.location_id.id,
+                "location_dest_id": location_dest_id,
             }
         )
         move.picking_id.action_assign()
@@ -127,7 +135,7 @@ class SinglePackPutaway(Component):
                     "id": move.move_line_ids[0].location_dest_id.id,
                     "name": move.move_line_ids[0].location_dest_id.name,
                 },
-                "product": {"id": move.product_id.name, "name": move.product_id.name},
+                "product": {"id": move.product_id.id, "name": move.product_id.name},
                 "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
             },
         }
