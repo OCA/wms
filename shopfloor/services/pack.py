@@ -25,7 +25,7 @@ class ShopfloorPack(Component):
         return {"pack_name": {"type": "string", "nullable": False, "required": True}}
 
     def _validator_return_get_by_name(self):
-        return {"data": self._record_return_schema}
+        return self._response_schema(self._record_return_schema)
 
     def _convert_one_record(self, record):
         return {
@@ -37,16 +37,13 @@ class ShopfloorPack(Component):
     @property
     def _record_return_schema(self):
         return {
-            "type": "dict",
-            "schema": {
-                "id": {"coerce": to_int, "required": True, "type": "integer"},
-                "name": {"type": "string", "nullable": False, "required": True},
-                "location": {
-                    "type": "dict",
-                    "schema": {
-                        "id": {"coerce": to_int, "required": True, "type": "integer"},
-                        "name": {"type": "string", "nullable": False, "required": True},
-                    },
+            "id": {"coerce": to_int, "required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+            "location": {
+                "type": "dict",
+                "schema": {
+                    "id": {"coerce": to_int, "required": True, "type": "integer"},
+                    "name": {"type": "string", "nullable": False, "required": True},
                 },
             },
         }
