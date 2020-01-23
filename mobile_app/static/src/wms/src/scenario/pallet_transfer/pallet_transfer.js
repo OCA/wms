@@ -12,6 +12,7 @@ var pt = Vue.component('pallet-transfer', {
         <h1><a href="#" class="btn btn-large btn-outline-secondary" style="margin-right:10px;">&lt;</a>Pallet Transfer</h1>
         {{ current_state }}
         <searchbar v-on:found="scanned" v-bind:hint="hint" v-bind:placeholder="scanTip">ici lasearch</searchbar>
+        <user-information v-if="user_notification.message" v-bind:message="user_notification.message" v-bind:message_type="user_notification.message_type"></user-information>
         <user-confirmation v-if="current_state=='confirmPallet'" v-on:user-confirmation="onUserConfirmation" v-bind:title="user_confirmation.title" v-bind:question="user_confirmation.question"></user-confirmation>
     </div>
     `,
@@ -20,6 +21,10 @@ var pt = Vue.component('pallet-transfer', {
             'user_confirmation': {
                 'title': 'Pallet looks good.',
                 'question': 'Is that the goood one?',
+            },
+            'user_notification': {
+                'message': '',
+                'message_type': '',
             },
             'hint': 'pallet',
             'operation': {},
@@ -64,6 +69,8 @@ var pt = Vue.component('pallet-transfer', {
                 },
                 'transferDone': {
                     enter: () => {
+                        this.user_notification.message = "Good job!";
+                        this.user_notification.message_type = "success";
                         this.go_state('getPallet');
                     }
                 },
@@ -85,6 +92,7 @@ var pt = Vue.component('pallet-transfer', {
             this.state[this.current_state].on_answer(answer);
         },
         scanned: function(barcode) {
+            this.user_notification.message = "";
             this.state[this.current_state].on_scan(barcode);
         },
         go_state: function(state, promise) {
