@@ -9,8 +9,8 @@ var sp = Vue.component('simple-pack-putaway', {
     <h1><a href="#" class="btn btn-large btn-outline-secondary" style="margin-right:10px;">&lt;</a>Simple Putaway</h1>
     {{ current_state }}
     <searchbar v-on:found="scanned" v-bind:hint="hint" v-bind:placeholder="scanTip">ici lasearch</searchbar>
-    <user-information v-if="user_notification.message" v-bind:message="user_notification.message" v-bind:message_type="user_notification.message_type"></user-information>
-    <user-confirmation v-if="current_state=='confirmLocation'" v-on:user-confirmation="onUserConfirmation" v-bind:title="user_confirmation.title" v-bind:question="user_confirmation.question"></user-confirmation>
+    <user-information v-if="!need_confirmation && user_notification.message" v-bind:message="user_notification.message" v-bind:message_type="user_notification.message_type"></user-information>
+    <user-confirmation v-if="need_confirmation" v-on:user-confirmation="onUserConfirmation" v-bind:question="user_notification.message"></user-confirmation>
     <operation-detail v-bind:operation="operation"></operation-detail>
     <form v-if="show_button" v-on:reset="reset">
         <input type="reset" name="reset"></input>
@@ -18,14 +18,11 @@ var sp = Vue.component('simple-pack-putaway', {
 </div>`,
     data: function () {
         return {
-            'user_confirmation': {
-                'title': '',
-                'question': '',
-            },
             'user_notification': {
                 'message': '',
                 'message_type': '',
             },
+            'need_confirmation': false,
             'hint': 'pack',
             'show_button': false,
             'operation': {},
@@ -36,62 +33,45 @@ var sp = Vue.component('simple-pack-putaway', {
                         this.hint = 'pack';
                     },
                     on_scan: (scanned) => {
+                        this.user_notification.message = false;
                         this.go_state(
-                            'waitFetchOperation',
-                            odoo_service.fetchOperation({
-                                'pack': scanned
-                            })
+                            'wait_call',
+                            odoo_service.fetchOperation(scanned)
                         );
                     },
                 },
-                'waitFetchOperation': {
+                'wait_call': {
                     success: (result) => {
                         this.operation = result;
-                        this.go_state('scan_location');
-                    },
-                    error: (result) => {
-                        this.user_notification.message = 'Operation not found';
-                        this.user_notification.message_type = 'danger';
-                        this.go_state('scan_pack');
+                        this.go_state(result.state);
                     }
                 },
                 'scan_location': {
                     enter: () => {
                         this.hint = 'location';
-                        this.operation.location_suggested = null;
+                        this.operation.location_barcode = null;
                     },
                     on_scan: (scanned) => {
-                        this.operation.location_suggested = scanned
-                        this.go_state('waitOperationValidation',
+                        this.operation.location_barcode = scanned
+                        this.go_state('wait_validation',
                             odoo_service.validate(this.operation));
                     }
                 },
-                'waitOperationValidation': {
-                    'success': (result) => {
+                'wait_validation': {
+                    success: (result) => {
                         this.go_state(result.state);
                     },
-                    'error': (result) => {
+                    error: (result) => {
                         this.go_state('scan_location');
                     },
                 },
-                'operationValided': {
-                    enter: () => {
-                        this.user_notification.message = 'Operation done, congrats.';
-                        this.user_notification.message_type = 'success';
-                        this.go_state('scan_pack');
-                    }
-                },
                 'confirm_location': { // this one may be mered with scan_location
-                    enter: () => {
-                        this.user_confirmation.title = 'Destination not expected'
-                        this.user_confirmation.question = 'Do you confirm the change ' + this.operation.location + '?';
-                    },
-                    exit: () => {},
                     on_confirmation: (answer) => {
                         if (answer == 'yes'){
-                            this.operation.confirmLocation = true;
-                            this.go_state('waitOperationValidation',
-                                odoo_service.validate(this.operation));
+                            this.go_state(
+                                'wait_validation',
+                                odoo_service.validate(this.operation, true)
+                            );
                         } else {
                             this.go_state('scan_location');
                         }
@@ -104,10 +84,11 @@ var sp = Vue.component('simple-pack-putaway', {
                 },
                 'takeover': { // this one may be mered with scan_location
                     enter: () => {
-                        this.user_confirmation.title = 'Destination not expected'
-                        this.user_confirmation.question = 'Do you confirm the change ' + this.operation.location + '?';
+                        this.need_confirmation = true;
                     },
-                    exit: () => {},
+                    exit: () => {
+                        this.need_confirmation = false;
+                    },
                     on_confirmation: (answer) => {
                         if (answer == 'yes'){
                             this.go_state('scan_location');
@@ -136,16 +117,26 @@ var sp = Vue.component('simple-pack-putaway', {
             this.current_state = state;
             if (promise) {
                 promise.then(
-                    this.state[state].success,
-                    this.state[state].error,
+                    this.on_success,
+                    this.on_error,
                 );
             } else {
                 if (this.state[this.current_state].enter)
                     this.state[this.current_state].enter();
             }
         },
+        on_success: function (result) {
+            if (result.message) {
+                this.user_notification.message = result.message.body;
+                this.user_notification.message_type = result.message.message_type;
+                console.log('USER NOTIF', this.user_notification);
+            }
+            this.state[this.current_state].success(result);
+        },
+        on_error: function (result) {
+            this.state[this.current_state].error(result);
+        },
         scanned: function(barcode) {
-            this.user_notification.message = "";
             this.state[this.current_state].on_scan(barcode);
         },
         reset: function (e) {
@@ -153,6 +144,8 @@ var sp = Vue.component('simple-pack-putaway', {
         },
         onUserConfirmation: function(answer){
             this.state[this.current_state].on_confirmation(answer);
+            this.need_confirmation = false;
+            this.user_notification.message = false;
         },
     }
 });
