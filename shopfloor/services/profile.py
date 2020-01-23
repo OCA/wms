@@ -31,7 +31,7 @@ class ShopfloorProfile(Component):
         if name_fragment:
             domain.append(("name", "ilike", name_fragment))
         records = self.env[self._expose_model].search(domain)
-        return {"size": len(records), "data": self._to_json(records)}
+        return {"data": {"size": len(records), "records": self._to_json(records)}}
 
     def _get_base_search_domain(self):
         # shopfloor_profile_ids is a one2one in practice.
@@ -58,34 +58,44 @@ class ShopfloorProfile(Component):
         }
 
     def _validator_return_search(self):
-        return {
-            "size": {"coerce": to_int, "required": True, "type": "integer"},
-            "data": {
-                "type": "list",
-                "schema": {
-                    "type": "dict",
+        return self._response_schema(
+            {
+                "size": {"coerce": to_int, "required": True, "type": "integer"},
+                "records": {
+                    "type": "list",
                     "schema": {
-                        "id": {"coerce": to_int, "required": True, "type": "integer"},
-                        "name": {"type": "string", "nullable": False, "required": True},
-                        "warehouse": {
-                            "type": "dict",
-                            "schema": {
-                                "id": {
-                                    "coerce": to_int,
-                                    "required": True,
-                                    "type": "integer",
-                                },
-                                "name": {
-                                    "type": "string",
-                                    "nullable": False,
-                                    "required": True,
+                        "type": "dict",
+                        "schema": {
+                            "id": {
+                                "coerce": to_int,
+                                "required": True,
+                                "type": "integer",
+                            },
+                            "name": {
+                                "type": "string",
+                                "nullable": False,
+                                "required": True,
+                            },
+                            "warehouse": {
+                                "type": "dict",
+                                "schema": {
+                                    "id": {
+                                        "coerce": to_int,
+                                        "required": True,
+                                        "type": "integer",
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "nullable": False,
+                                        "required": True,
+                                    },
                                 },
                             },
                         },
                     },
                 },
-            },
-        }
+            }
+        )
 
     def _convert_one_record(self, record):
         return {
