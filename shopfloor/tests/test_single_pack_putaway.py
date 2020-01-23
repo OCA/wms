@@ -5,6 +5,7 @@ class PutawayCase(CommonCase):
     def setUp(self, *args, **kwargs):
         super(PutawayCase, self).setUp(*args, **kwargs)
         stock_location = self.env.ref("stock.stock_location_stock")
+        out_location = stock_location.child_ids[1]
         self.productA = self.env["product.product"].create(
             {"name": "Product A", "type": "product"}
         )
@@ -23,12 +24,11 @@ class PutawayCase(CommonCase):
             {
                 "product_id": self.productA.id,
                 "location_in_id": stock_location.id,
-                "location_out_id": stock_location.child_ids[0].id,
+                "location_out_id": out_location.id,
             }
         )
-
         with self.work_on_services() as work:
-            self.service = work.component(usage="pack")
+            self.service = work.component(usage="single_pack_putaway")
 
     def test_scan_pack(self):
         barcode = self.packA.name
