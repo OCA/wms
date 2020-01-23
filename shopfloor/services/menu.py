@@ -39,7 +39,9 @@ class ShopfloorMenu(Component):
         if name_fragment:
             domain.append(("name", "ilike", name_fragment))
         records = self.env[self._expose_model].search(domain)
-        return {"data": {"size": len(records), "records": self._to_json(records)}}
+        return self._response(
+            data={"size": len(records), "records": self._to_json(records)}
+        )
 
     def _validator_search(self):
         return {
