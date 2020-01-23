@@ -21,6 +21,7 @@ var app = new Vue({
         // To not be bothered with the login page during dev
         // This is set true set to false to see the login page
         authenticated: true,
+        using_demo_url: false,
     },
     computed: {
         ViewComponent () {
@@ -31,7 +32,10 @@ var app = new Vue({
             }
         }
     },
-    render (h) { return h(this.ViewComponent) }
+    created: function () {
+        this.using_demo_url = window.location.pathname.includes('demo')
+    },
+    render (h) { return h(this.ViewComponent) },
 
 })
 
