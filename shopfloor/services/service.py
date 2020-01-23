@@ -2,7 +2,8 @@ from odoo import _
 from odoo.exceptions import MissingError
 from odoo.osv import expression
 
-from odoo.addons.component.core import AbstractComponent
+from odoo.addons.base_rest.controllers.main import _PseudoCollection
+from odoo.addons.component.core import AbstractComponent, WorkContext
 
 
 class BaseShopfloorService(AbstractComponent):
@@ -11,6 +12,7 @@ class BaseShopfloorService(AbstractComponent):
     _inherit = "base.rest.service"
     _name = "base.shopfloor.service"
     _collection = "shopfloor.service"
+    _actions_collection_name = "shopfloor.action"
     _expose_model = None
 
     def _get(self, _id):
@@ -121,3 +123,33 @@ class BaseShopfloorService(AbstractComponent):
             ]
         )
         return defaults
+
+    @property
+    def actions_collection(self):
+        return _PseudoCollection(self._actions_collection_name, self.env)
+
+    def actions_for(self, model_name):
+        """Return an Action Component for the model
+
+        Action Components are the components supporting the business logic of
+        the processes, so we can limit the code in Services to the minimum and
+        share methods.
+        """
+        # propagate custom arguments (such as menu ID/profile ID)
+        kwargs = {
+            attr_name: getattr(self.work, attr_name)
+            for attr_name in self.work._propagate_kwargs
+            if attr_name
+            not in ("collection", "model_name", "components_registry", "model_name")
+        }
+        work = WorkContext(
+            model_name=model_name, collection=self.actions_collection, **kwargs
+        )
+        return work.component(usage="actions")
+
+    def _is_public_api_method(self, method_name):
+        # do not "hide" the "actions_for" method as internal since, we'll use
+        # it in components, so exclude it from the rest API
+        if method_name == "actions_for":
+            return False
+        return super()._is_public_api_method(method_name)
