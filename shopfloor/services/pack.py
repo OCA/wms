@@ -19,7 +19,7 @@ class ShopfloorPack(Component):
             # TODO, is it what we want? error if not found?
             limit=1,
         )
-        return self._to_json(pack)[:1]
+        return self._response(data=self._to_json(pack)[:1])
 
     def _validator_get_by_name(self):
         return {"pack_name": {"type": "string", "nullable": False, "required": True}}
