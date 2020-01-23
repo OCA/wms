@@ -4,18 +4,17 @@ from .common import CommonCase
 class PutawayCase(CommonCase):
     def setUp(self, *args, **kwargs):
         super(PutawayCase, self).setUp(*args, **kwargs)
-        in_location = self.env.ref("stock.stock_location_company").child_ids[0]
         stock_location = self.env.ref("stock.stock_location_stock")
         self.productA = self.env["product.product"].create(
             {"name": "Product A", "type": "product"}
         )
         self.packA = self.env["stock.quant.package"].create(
-            {"location_id": in_location.id}
+            {"location_id": stock_location.id}
         )
         self.quantA = self.env["stock.quant"].create(
             {
                 "product_id": self.productA.id,
-                "location_id": in_location.id,
+                "location_id": stock_location.id,
                 "quantity": 1,
                 "package_id": self.packA.id,
             }
@@ -32,11 +31,15 @@ class PutawayCase(CommonCase):
             self.service = work.component(usage="pack")
 
     def test_scan_pack(self):
-        pack_name = self.packA.name
-        params = {"pack_name": pack_name}
+        barcode = self.packA.name
+        params = {"barcode": barcode}
         response = self.service.dispatch("scan", params=params)
-        move_id = response["move_id"]
-        params = {"move_id": move_id, "location_name": response["location_dest_name"]}
+        package_level = self.env["stock.package_level"].browse(response["data"]["id"])
+        move_id = package_level.move_line_ids[0].move_id.id
+        params = {
+            "package_level_id": package_level.id,
+            "location_name": response["data"]["location_dst"]["name"],
+        }
         location_dest_id = (
             self.env["stock.location"]
             .search([("name", "=", params["location_name"])])
