@@ -15,6 +15,15 @@ class BaseShopfloorService(AbstractComponent):
     _actions_collection_name = "shopfloor.action"
     _expose_model = None
 
+    @property
+    def picking_types(self):
+        """
+        Get the current picking type based on the menu and the warehouse of the profile.
+        """
+        return self.work.menu.process_id.picking_type_ids.filtered(
+            lambda p: p.warehouse_id == self.work.profile.warehouse_id
+        )
+
     def _get(self, _id):
         domain = expression.normalize_domain(self._get_base_search_domain())
         domain = expression.AND([domain, [("id", "=", _id)]])
