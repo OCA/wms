@@ -6,5 +6,5 @@ class ShopFloorProcessAction(AbstractComponent):
     _collection = "shopfloor.action"
     _usage = "actions"
 
-    def actions_for(self, model_name):
-        return self.component(usage="actions", model_name=model_name)
+    def actions_for(self, usage):
+        return self.component(usage=usage)
