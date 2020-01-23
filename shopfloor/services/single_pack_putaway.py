@@ -198,94 +198,42 @@ class SinglePackPutaway(Component):
         }
 
     def _validator_return_validate(self):
-        return {
-            "success": {"type": "boolean", "nullable": True, "required": True},
-            "code": {"type": "string", "nullable": True, "required": False},
-            "message": {
-                "type": "dict",
-                "schema": {
-                    "body": {"type": "string", "nullable": False, "required": True}
-                },
-            },
-        }
+        return self._response_schema()
 
     def _validator_scan(self):
         return {"barcode": {"type": "string", "nullable": False, "required": True}}
 
     def _validator_return_scan(self):
-        return {
-            "success": {"type": "boolean", "nullable": True, "required": True},
-            "code": {"type": "string", "nullable": True, "required": False},
-            "message": {
-                "type": "dict",
-                "schema": {
-                    "body": {"type": "string", "nullable": False, "required": True}
-                },
-            },
-            "data": {
-                "type": "dict",
-                "schema": {
-                    "id": {"coerce": to_int, "required": True, "type": "integer"},
-                    "location_src": {
-                        "type": "dict",
-                        "schema": {
-                            "id": {
-                                "coerce": to_int,
-                                "required": True,
-                                "type": "integer",
-                            },
-                            "name": {
-                                "type": "string",
-                                "nullable": False,
-                                "required": True,
-                            },
-                        },
-                    },
-                    "location_dst": {
-                        "type": "dict",
-                        "schema": {
-                            "id": {
-                                "coerce": to_int,
-                                "required": True,
-                                "type": "integer",
-                            },
-                            "name": {
-                                "type": "string",
-                                "nullable": False,
-                                "required": True,
-                            },
-                        },
-                    },
-                    "product": {
-                        "type": "dict",
-                        "schema": {
-                            "id": {
-                                "coerce": to_int,
-                                "required": True,
-                                "type": "integer",
-                            },
-                            "name": {
-                                "type": "string",
-                                "nullable": False,
-                                "required": True,
-                            },
-                        },
-                    },
-                    "picking": {
-                        "type": "dict",
-                        "schema": {
-                            "id": {
-                                "coerce": to_int,
-                                "required": True,
-                                "type": "integer",
-                            },
-                            "name": {
-                                "type": "string",
-                                "nullable": False,
-                                "required": True,
-                            },
-                        },
+        return self._response_schema(
+            {
+                "id": {"coerce": to_int, "required": True, "type": "integer"},
+                "location_src": {
+                    "type": "dict",
+                    "schema": {
+                        "id": {"coerce": to_int, "required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
                     },
                 },
-            },
-        }
+                "location_dst": {
+                    "type": "dict",
+                    "schema": {
+                        "id": {"coerce": to_int, "required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
+                    },
+                },
+                "product": {
+                    "type": "dict",
+                    "schema": {
+                        "id": {"coerce": to_int, "required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
+                    },
+                },
+                "picking": {
+                    "type": "dict",
+                    "schema": {
+                        "id": {"coerce": to_int, "required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
+                    },
+                },
+            }
+        )
