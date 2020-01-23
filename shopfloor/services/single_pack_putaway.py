@@ -12,45 +12,124 @@ class SinglePackPutaway(Component):
     _usage = "single_pack_putaway"
     _description = __doc__
 
-    def scan(self, barcode):
+    def _response_for_several_picking_types(self):
+        return self._response(
+            state="start",
+            message={
+                "message_type": "error",
+                "title": _("Configuration error"),
+                "message": _("Several picking types found for this menu and profile"),
+            },
+        )
+
+    def _response_for_package_not_found(self, barcode):
+        return self._response(
+            state="start",
+            message={
+                "message_type": "error",
+                "title": _("Pack not found"),
+                "message": _("The pack %s doesn't exist") % barcode,
+            },
+        )
+
+    def _response_for_forbidden_package(self, barcode, picking_type):
+        return self._response(
+            state="start",
+            message={
+                "message_type": "error",
+                "title": _("Cannot proceed"),
+                "message": _("pack %s is not in %s location")
+                % (barcode, picking_type.default_location_src_id.name),
+            },
+        )
+
+    def _response_for_forbidden_start(self, existing_operations):
+        return self._response(
+            state="start",
+            message={
+                "message_type": "error",
+                "title": _("Cannot proceed"),
+                "message": _(
+                    "An operation exists in %s %s. "
+                    "You cannot process it with this shopfloor process."
+                )
+                % (
+                    existing_operations[0].picking_id.picking_type_id.name,
+                    existing_operations[0].picking_id.name,
+                ),
+            },
+        )
+
+    def _response_for_start_to_confirm(self, existing_operations, pack):
+        move = existing_operations.move_id
+        return self._response(
+            data={
+                "id": existing_operations[0].package_level_id.id,
+                "location_src": {
+                    "id": pack.location_id.id,
+                    "name": pack.location_id.name,
+                },
+                "location_dst": {
+                    "id": existing_operations[0].location_dest_id.id,
+                    "name": existing_operations[0].location_dest_id.name,
+                },
+                "product": {"id": move.product_id.name, "name": move.product_id.name},
+                "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
+            },
+            state="confirm_start",
+            message={
+                "message_type": "warning",
+                "title": _("Already started"),
+                "message": _(
+                    "Operation already running. Would you like to take it over ?"
+                ),
+            },
+        )
+
+    def _response_for_start_success(self, move, pack):
+        return self._response(
+            state="scan_location",
+            message={
+                "message_type": "info",
+                "title": _("Start"),
+                "message": _(
+                    "The move is ready, you can scan the destination location."
+                ),
+            },
+            data={
+                "id": move.move_line_ids[0].package_level_id.id,
+                "location_src": {
+                    "id": pack.location_id.id,
+                    "name": pack.location_id.name,
+                },
+                "location_dst": {
+                    "id": move.move_line_ids[0].location_dest_id.id,
+                    "name": move.move_line_ids[0].location_dest_id.name,
+                },
+                "product": {"id": move.product_id.id, "name": move.product_id.name},
+                "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
+            },
+        )
+
+    def start(self, barcode):
         """Scan a pack barcode"""
+
         picking_type = self.picking_types
         if len(picking_type) > 1:
-            return self._response(
-                state="start",
-                message={
-                    "message_type": "error",
-                    "title": _("Configuration error"),
-                    "message": _(
-                        "Several picking types found for this menu and profile"
-                    ),
-                },
-            )
+            return self._response_from_several_picking_types()
         company = self.env.user.company_id  # FIXME add logic to get proper company
         # TODO define on what we search (pack name, pack barcode ...)
+
         pack = self.env["stock.quant.package"].search([("name", "=", barcode)])
         if not pack:
-            return self._response(
-                state="start",
-                message={
-                    "message_type": "error",
-                    "title": _("Pack not found"),
-                    "message": _("The pack %s doesn't exist") % barcode,
-                },
-            )
+            return self._response_for_package_not_found(barcode)
+
         allowed_locations = self.env["stock.location"].search(
             [("id", "child_of", picking_type.default_location_src_id.id)]
         )
         if pack.location_id not in allowed_locations:
-            return self._response(
-                state="start",
-                message={
-                    "message_type": "error",
-                    "title": _("Cannot proceed"),
-                    "message": _("pack %s is not in %s location")
-                    % (barcode, picking_type.default_location_src_id.name),
-                },
-            )
+            return self._response_for_forbidden_package(barcode, picking_type)
+
         quantity = pack.quant_ids[0].quantity
         existing_operations = self.env["stock.move.line"].search(
             [("qty_done", "=", quantity), ("package_id", "=", pack.id)]
@@ -59,49 +138,9 @@ class SinglePackPutaway(Component):
             existing_operations
             and existing_operations[0].picking_id.picking_type_id != picking_type
         ):
-            return self._response(
-                state="start",
-                message={
-                    "message_type": "error",
-                    "title": _("Cannot proceed"),
-                    "message": _(
-                        "An operation exists in %s %s. "
-                        "You cannot process it with this shopfloor process."
-                    )
-                    % (
-                        existing_operations[0].picking_id.picking_type_id.name,
-                        existing_operations[0].picking_id.name,
-                    ),
-                },
-            )
+            return self._response_for_forbidden_start(existing_operations)
         elif existing_operations:
-            move = existing_operations.move_id
-            return self._response(
-                data={
-                    "id": move.move_line_ids[0].package_level_id.id,
-                    "location_src": {
-                        "id": pack.location_id.id,
-                        "name": pack.location_id.name,
-                    },
-                    "location_dst": {
-                        "id": move.move_line_ids[0].location_dest_id.id,
-                        "name": move.move_line_ids[0].location_dest_id.name,
-                    },
-                    "product": {
-                        "id": move.product_id.name,
-                        "name": move.product_id.name,
-                    },
-                    "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
-                },
-                state="confirm_start",
-                message={
-                    "message_type": "warning",
-                    "title": _("Already started"),
-                    "message": _(
-                        "Operation already running. Would you like to take it over ?"
-                    ),
-                },
-            )
+            return self._response_for_start_to_confirm(existing_operations, pack)
         product = pack.quant_ids[
             0
         ].product_id  # FIXME we consider only one product per pack
@@ -130,34 +169,13 @@ class SinglePackPutaway(Component):
                 "is_done": True,
                 "location_id": pack.location_id.id,
                 "location_dest_id": location_dest_id,
+                "picking_id": move.picking_id.id,
             }
         )
-        move.picking_id.action_assign()
-        return self._response(
-            state="scan_location",
-            message={
-                "message_type": "info",
-                "title": _("Start"),
-                "message": _(
-                    "The move is ready, you can scan the destination location."
-                ),
-            },
-            data={
-                "id": move.move_line_ids[0].package_level_id.id,
-                "location_src": {
-                    "id": pack.location_id.id,
-                    "name": pack.location_id.name,
-                },
-                "location_dst": {
-                    "id": move.move_line_ids[0].location_dest_id.id,
-                    "name": move.move_line_ids[0].location_dest_id.name,
-                },
-                "product": {"id": move.product_id.id, "name": move.product_id.name},
-                "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
-            },
-        )
+        move._action_assign()
+        return self._response_for_start_success(move, pack)
 
-    def _response_for_package_not_found(self):
+    def _response_for_package_level_not_found(self):
         return self._response(
             state="start",
             message={
@@ -213,7 +231,7 @@ class SinglePackPutaway(Component):
 
         package = self.env["stock.package_level"].browse(package_level_id)
         if not package.exists():
-            return self._response_for_package_not_found()
+            return self._response_for_package_level_not_found()
 
         move = package.move_line_ids[0].move_id
         if not pack_transfer.is_move_state_valid(move):
@@ -231,7 +249,7 @@ class SinglePackPutaway(Component):
             else:
                 return self._response_for_location_need_confirm()
 
-        pack_transfer.set_destination_and_done()
+        pack_transfer.set_destination_and_done(move, scanned_location)
         return self._response_for_validate_success()
 
     def cancel(self, package_level_id):
@@ -269,10 +287,10 @@ class SinglePackPutaway(Component):
     def _validator_return_validate(self):
         return self._response_schema()
 
-    def _validator_scan(self):
+    def _validator_start(self):
         return {"barcode": {"type": "string", "nullable": False, "required": True}}
 
-    def _validator_return_scan(self):
+    def _validator_return_start(self):
         return self._response_schema(
             {
                 "id": {"coerce": to_int, "required": True, "type": "integer"},

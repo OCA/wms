@@ -39,10 +39,10 @@ class PutawayCase(CommonCase):
         with self.work_on_services(menu=menu, profile=profile) as work:
             self.service = work.component(usage="single_pack_putaway")
 
-    def test_scan_pack(self):
+    def test_single_pack_putaway(self):
         barcode = self.packA.name
         params = {"barcode": barcode}
-        response = self.service.dispatch("scan", params=params)
+        response = self.service.dispatch("start", params=params)
         package_level = self.env["stock.package_level"].browse(response["data"]["id"])
         move_id = package_level.move_line_ids[0].move_id.id
         location_dest = self.env["stock.location"].browse(
