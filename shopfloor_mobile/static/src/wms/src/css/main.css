@@ -1,0 +1,22 @@
+body {
+  padding: 1em;
+}
+.screen {
+  margin: 3em 0;
+  padding: 3em 0;
+  border-bottom: 4px dashed #ccc;
+}
+.wrapper {
+  padding: 0.5em;
+}
+.pack-info li,
+.menu button {
+  height: 5em;
+}
+.pack-info li {
+  font-size: 1.3rem;
+}
+
+.bottom-actions button {
+  height: 3em;
+}
