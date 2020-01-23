@@ -33,7 +33,10 @@ class PutawayCase(CommonCase):
                 "location_out_id": out_location.id,
             }
         )
-        with self.work_on_services() as work:
+        menu = self.env.ref("shopfloor.shopfloor_menu_put_away_reach_truck")
+        profile = self.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
+        profile.warehouse_id.int_type_id.process_id = menu.process_id.id
+        with self.work_on_services(menu=menu, profile=profile) as work:
             self.service = work.component(usage="single_pack_putaway")
 
     def test_scan_pack(self):
