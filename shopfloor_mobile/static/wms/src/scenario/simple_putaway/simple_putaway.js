@@ -1,31 +1,7 @@
-var odoo_service = {
-    'fetchOperation': function (barcode) {
-        console.log('ask odoo about barcode of pack', barcode.pack);
-        return Promise.resolve({ 'source': 'def', 'destination': 'abc', 'id': 1233232, 'name': 'PACK0001', 'barcode': barcode.pack});
-    },
-    'scanLocation': function (barcode) {
-        if (barcode.indexOf('a') != -1) {
-            return Promise.resolve(barcode);
-        } else {
-            return Promise.reject('Invalid Location');
-        } 
-    },
-    'cancel': function (operation) {
-        console.log('tell odoo to cancel the move', operation.id);
-    },
-    'validate': function(operation) {
-        console.log('Validate the move ', operation.id, ' on location dest: ', operation.location_suggested);
-        if (operation.confirmLocation) {
-            console.log('the guy confirmed, we accept then')
-            return Promise.resolve({ pleaseConfirm: false});
-        }
-        if (operation.location_suggested == operation.destination) {
-            return Promise.resolve({ pleaseConfirm: false});
-        } else {
-            return Promise.resolve({ pleaseConfirm: true});
-        }
-    },
-}
+import {Odoo} from "../../services/odoo.js";
+
+// TODO: init at component init
+var odoo_service = new Odoo({"process_id": 1, "process_menu_id": 1})
 
 
 var sp = Vue.component('simple-pack-putaway', {
@@ -53,11 +29,10 @@ var sp = Vue.component('simple-pack-putaway', {
             'hint': 'pack',
             'show_button': false,
             'operation': {},
-            'current_state': 'init',
+            'current_state': 'scan_pack',
             'state': {
-                'init': {
+                'scan_pack': {
                     enter: () => {
-                        this.reset();
                         this.hint = 'pack';
                     },
                     on_scan: (scanned) => {
@@ -72,15 +47,15 @@ var sp = Vue.component('simple-pack-putaway', {
                 'waitFetchOperation': {
                     success: (result) => {
                         this.operation = result;
-                        this.go_state('operationSet');
+                        this.go_state('scan_location');
                     },
-                    'error': (result) => {
+                    error: (result) => {
                         this.user_notification.message = 'Operation not found';
                         this.user_notification.message_type = 'danger';
-                        this.go_state('init');
+                        this.go_state('scan_pack');
                     }
                 },
-                'operationSet': {
+                'scan_location': {
                     enter: () => {
                         this.hint = 'location';
                         this.operation.location_suggested = null;
@@ -93,24 +68,20 @@ var sp = Vue.component('simple-pack-putaway', {
                 },
                 'waitOperationValidation': {
                     'success': (result) => {
-                        if (result.pleaseConfirm) {
-                            this.go_state('confirmLocation');
-                        } else {
-                            this.go_state('operationValided');
-                        }
+                        this.go_state(result.state);
                     },
                     'error': (result) => {
-                        this.go_state('operationSet');
+                        this.go_state('scan_location');
                     },
                 },
                 'operationValided': {
                     enter: () => {
                         this.user_notification.message = 'Operation done, congrats.';
                         this.user_notification.message_type = 'success';
-                        this.go_state('init');
+                        this.go_state('scan_pack');
                     }
                 },
-                'confirmLocation': { // this one may be mered with operationSet
+                'confirm_location': { // this one may be mered with scan_location
                     enter: () => {
                         this.user_confirmation.title = 'Destination not expected'
                         this.user_confirmation.question = 'Do you confirm the change ' + this.operation.location + '?';
@@ -122,12 +93,31 @@ var sp = Vue.component('simple-pack-putaway', {
                             this.go_state('waitOperationValidation',
                                 odoo_service.validate(this.operation));
                         } else {
-                            this.go_state('operationSet');
+                            this.go_state('scan_location');
                         }
                     },
                     on_scan:(barcode) => {
                         this.state[this.current_state].exit();
-                        this.current_state = 'operationSet';
+                        this.current_state = 'scan_location';
+                        this.state[this.current_state].on_scan(barcode);
+                    }
+                },
+                'takeover': { // this one may be mered with scan_location
+                    enter: () => {
+                        this.user_confirmation.title = 'Destination not expected'
+                        this.user_confirmation.question = 'Do you confirm the change ' + this.operation.location + '?';
+                    },
+                    exit: () => {},
+                    on_confirmation: (answer) => {
+                        if (answer == 'yes'){
+                            this.go_state('scan_location');
+                        } else {
+                            this.go_state('scan_pack');
+                        }
+                    },
+                    on_scan:(barcode) => {
+                        this.state[this.current_state].exit();
+                        this.current_state = 'scan_location';
                         this.state[this.current_state].on_scan(barcode);
                     }
                 },
@@ -150,7 +140,8 @@ var sp = Vue.component('simple-pack-putaway', {
                     this.state[state].error,
                 );
             } else {
-                this.state[state].enter();
+                if (this.state[this.current_state].enter)
+                    this.state[this.current_state].enter();
             }
         },
         scanned: function(barcode) {
@@ -158,9 +149,7 @@ var sp = Vue.component('simple-pack-putaway', {
             this.state[this.current_state].on_scan(barcode);
         },
         reset: function (e) {
-            console.log('on reest ');
-            //this.reset_view();
-            //odoo_service.cancel(this.operation);
+            console.log('on reset ');
         },
         onUserConfirmation: function(answer){
             this.state[this.current_state].on_confirmation(answer);
