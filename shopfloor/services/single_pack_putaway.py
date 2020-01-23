@@ -152,11 +152,20 @@ class SinglePackPutaway(Component):
             },
         )
 
-    def validate(self, package_level_id, location_name, confirmation=False):
+    def validate(self, package_level_id, location_barcode, confirmation=False):
         package = self.env["stock.package_level"].browse(package_level_id)
         move = package.move_line_ids[0].move_id
+        if move.state == "cancel":
+            return self._response(
+                state="start",
+                message={
+                    "message_type": "warning",
+                    "title": _("Restart"),
+                    "message": _("Restart the operation, someone has canceled it."),
+                },
+            )
         dest_location = self.env["stock.location"].search(
-            [("name", "=", location_name)]
+            [("barcode", "=", location_barcode)]
         )
         move_dest_location = move.move_line_ids[0].location_dest_id
         allowed_locations = self.env["stock.location"].search(
@@ -180,28 +189,18 @@ class SinglePackPutaway(Component):
                     "message": _("You cannot place it here"),
                 },
             )
-        elif (
-            dest_location in allowed_locations
-            and dest_location not in zone_locations
-            and confirmation
-        ):
-            return self._response(
-                state="confirm_location",
-                message={
-                    "message_type": "warning",
-                    "title": _("Confirm"),
-                    "message": _("Are you sure?"),
-                },
-            )
-        if move.state == "cancel":
-            return self._response(
-                state="start",
-                message={
-                    "message_type": "warning",
-                    "title": _("Restart"),
-                    "message": _("Restart the operation, someone has canceled it."),
-                },
-            )
+        elif dest_location in allowed_locations and dest_location not in zone_locations:
+            if confirmation:
+                move.location_dest_id = dest_location.id
+            else:
+                return self._response(
+                    state="confirm_location",
+                    message={
+                        "message_type": "warning",
+                        "title": _("Confirm"),
+                        "message": _("Are you sure?"),
+                    },
+                )
         move.move_line_ids[0].location_dest_id = dest_location.id
         move._action_done()
         return self._response(
@@ -242,7 +241,7 @@ class SinglePackPutaway(Component):
     def _validator_validate(self):
         return {
             "package_level_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "location_name": {"type": "string", "nullable": False, "required": True},
+            "location_barcode": {"type": "string", "nullable": False, "required": True},
         }
 
     def _validator_return_validate(self):
