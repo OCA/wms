@@ -33,29 +33,26 @@ var sp = Vue.component('simple-pack-putaway', {
     <h1><a href="#" class="btn btn-large btn-outline-secondary" style="margin-right:10px;">&lt;</a>Simple Putaway</h1>
     {{ current_state }}
     <searchbar v-on:found="scanned" v-bind:hint="hint" v-bind:placeholder="scanTip">ici lasearch</searchbar>
-    <div class="alert alert-danger error" v-if="error_msg" role="alert">{{ error_msg }}</div>
+    <user-information v-if="user_notification.message" v-bind:message="user_notification.message" v-bind:message_type="user_notification.message_type"></user-information>
+    <user-confirmation v-if="current_state=='confirmLocation'" v-on:user-confirmation="onUserConfirmation" v-bind:title="user_confirmation.title" v-bind:question="user_confirmation.question"></user-confirmation>
     <operation-detail v-bind:operation="operation"></operation-detail>
-    <div v-if="show_confirm" class="confirm">
-        <div class="alert alert-danger error" role="alert">
-            <h4 class="alert-heading">Destination not expected</h4>
-            <p>Do you confirm? {{ operation.location_suggested }} </p>
-            <form v-on:submit="doConfirm" v-on:reset="dontConfirm">
-               <input class="btn btn-lg btn-success" type="submit" value="Yes"></input>
-               <input class="btn btn-lg btn-danger float-right" type="reset" value="No"></input>
-            </form>
-        </div>
-    </div>
     <form v-if="show_button" v-on:reset="reset">
         <input type="reset" name="reset"></input>
     </form>
 </div>`,
     data: function () {
         return {
+            'user_confirmation': {
+                'title': '',
+                'question': '',
+            },
+            'user_notification': {
+                'message': '',
+                'message_type': '',
+            },
             'hint': 'pack',
             'show_button': false,
             'operation': {},
-            'error_msg': '',
-            'show_confirm': false,
             'current_state': 'init',
             'state': {
                 'init': {
@@ -78,7 +75,8 @@ var sp = Vue.component('simple-pack-putaway', {
                         this.go_state('operationSet');
                     },
                     'error': (result) => {
-                        console.error('no operation found');
+                        this.user_notification.message = 'Operation not found';
+                        this.user_notification.message_type = 'danger';
                         this.go_state('init');
                     }
                 },
@@ -102,31 +100,30 @@ var sp = Vue.component('simple-pack-putaway', {
                         }
                     },
                     'error': (result) => {
-                        'operationSet'
+                        this.go_state('operationSet');
                     },
                 },
                 'operationValided': {
                     enter: () => {
-                        console.log('display congratulation');
+                        this.user_notification.message = 'Operation done, congrats.';
+                        this.user_notification.message_type = 'success';
                         this.go_state('init');
                     }
-                }, // = done
+                },
                 'confirmLocation': { // this one may be mered with operationSet
                     enter: () => {
-                        this.show_confirm = true;
+                        this.user_confirmation.title = 'Destination not expected'
+                        this.user_confirmation.question = 'Do you confirm the change ' + this.operation.location + '?';
                     },
-                    exit: () => {
-                        console.log('exit');
-                        this.show_confirm = false;
-                    },
-                    'doConfirm': () => { //confirm location
-                        // tell the server we are sure
-                        this.operation.confirmLocation = true;
-                        this.go_state('waitOperationValidation',
-                            odoo_service.validate(this.operation));
-                    },
-                    'dontConfirm': () => {
-                        this.go_state('operationSet');
+                    exit: () => {},
+                    on_confirmation: (answer) => {
+                        if (answer == 'yes'){
+                            this.operation.confirmLocation = true;
+                            this.go_state('waitOperationValidation',
+                                odoo_service.validate(this.operation));
+                        } else {
+                            this.go_state('operationSet');
+                        }
                     },
                     on_scan:(barcode) => {
                         this.state[this.current_state].exit();
@@ -157,20 +154,16 @@ var sp = Vue.component('simple-pack-putaway', {
             }
         },
         scanned: function(barcode) {
+            this.user_notification.message = "";
             this.state[this.current_state].on_scan(barcode);
-        },
-        doConfirm: function (e) {
-            e.preventDefault();
-            this.state[this.current_state].doConfirm();
-        },
-        dontConfirm: function (e) {
-            e.preventDefault();
-            this.state[this.current_state].dontConfirm();
         },
         reset: function (e) {
             console.log('on reest ');
             //this.reset_view();
             //odoo_service.cancel(this.operation);
+        },
+        onUserConfirmation: function(answer){
+            this.state[this.current_state].on_confirmation(answer);
         },
     }
 });
