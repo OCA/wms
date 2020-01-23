@@ -14,14 +14,19 @@ class SinglePackPutaway(Component):
 
     def scan(self, barcode):
         """Scan a pack barcode"""
-
+        picking_type = self.picking_types
+        if len(picking_type) > 1:
+            return self._response(
+                state="start",
+                message={
+                    "message_type": "error",
+                    "title": _("Configuration error"),
+                    "message": _(
+                        "Several picking types found for this menu and profile"
+                    ),
+                },
+            )
         company = self.env.user.company_id  # FIXME add logic to get proper company
-        # FIXME add logic to get proper warehouse
-        warehouse = self.env["stock.warehouse"].search([])[0]
-        picking_type = (
-            warehouse.int_type_id
-        )  # FIXME add logic to get picking type properly
-
         # TODO define on what we search (pack name, pack barcode ...)
         pack = self.env["stock.quant.package"].search([("name", "=", barcode)])
         if not pack:
@@ -93,7 +98,7 @@ class SinglePackPutaway(Component):
                     "message_type": "warning",
                     "title": _("Already started"),
                     "message": _(
-                        "Operation already running. " "Would you like to take it over ?"
+                        "Operation already running. Would you like to take it over ?"
                     ),
                 },
             )
