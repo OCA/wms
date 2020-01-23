@@ -95,3 +95,6 @@ class SinglePackTransfer(Component):
             "location_barcode": {"type": "string", "nullable": False, "required": True},
             "confirmation": {"type": "boolean", "required": False},
         }
+
+    def _validator_return_validate(self):
+        return self._response_schema()
