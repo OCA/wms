@@ -37,7 +37,33 @@ class BaseShopfloorService(AbstractComponent):
             res.append(self._convert_one_record(record))
         return res
 
+    def _response(self, data=None, state=None, message=None):
+        """Base "envelope" for the responses
+
+        All the keys are optional.
+
+        :param data: dictionary of values
+        :param state: string describing the next state that the client
+        application must reach
+        :param message: dictionary for the message to show in the client
+        application (see ``_response_schema`` for the keys)
+        """
+        response = {}
+        if data:
+            response["data"] = data
+        if state:
+            response["state"] = state
+        if message:
+            response["message"] = message
+        return response
+
     def _response_schema(self, data_schema=None):
+        """Schema for the return validator
+
+        Must be used for the schema of all responses.
+        The "data" part can be customized and is optional,
+        it must be a dictionary.
+        """
         if not data_schema:
             data_schema = {}
         return {
