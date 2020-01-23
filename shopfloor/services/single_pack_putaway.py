@@ -15,9 +15,7 @@ class SinglePackPutaway(Component):
     def scan(self, barcode):
         """Scan a pack barcode"""
 
-        company = (
-            self.env.user.company_id
-        )  # FIXME add logic to get proper company
+        company = self.env.user.company_id  # FIXME add logic to get proper company
         # FIXME add logic to get proper warehouse
         warehouse = self.env["stock.warehouse"].search([])[0]
         picking_type = (
@@ -54,8 +52,7 @@ class SinglePackPutaway(Component):
         )
         if (
             existing_operations
-            and existing_operations[0].picking_id.picking_type_id
-            != picking_type
+            and existing_operations[0].picking_id.picking_type_id != picking_type
         ):
             return self._response(
                 state="start",
@@ -89,18 +86,14 @@ class SinglePackPutaway(Component):
                         "id": move.product_id.name,
                         "name": move.product_id.name,
                     },
-                    "picking": {
-                        "id": move.picking_id.id,
-                        "name": move.picking_id.name,
-                    },
+                    "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
                 },
                 state="confirm_start",
                 message={
                     "message_type": "warning",
                     "title": _("Already started"),
                     "message": _(
-                        "Operation already running. "
-                        "Would you like to take it over ?"
+                        "Operation already running. " "Would you like to take it over ?"
                     ),
                 },
             )
@@ -154,14 +147,8 @@ class SinglePackPutaway(Component):
                     "id": move.move_line_ids[0].location_dest_id.id,
                     "name": move.move_line_ids[0].location_dest_id.name,
                 },
-                "product": {
-                    "id": move.product_id.id,
-                    "name": move.product_id.name,
-                },
-                "picking": {
-                    "id": move.picking_id.id,
-                    "name": move.picking_id.name,
-                },
+                "product": {"id": move.product_id.id, "name": move.product_id.name},
+                "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
             },
         )
 
@@ -184,9 +171,7 @@ class SinglePackPutaway(Component):
                 message={
                     "message_type": "warning",
                     "title": _("Restart"),
-                    "message": _(
-                        "Restart the operation, someone has canceled it."
-                    ),
+                    "message": _("Restart the operation, someone has canceled it."),
                 },
             )
         dest_location = self.env["stock.location"].search(
@@ -214,10 +199,7 @@ class SinglePackPutaway(Component):
                     "message": _("You cannot place it here"),
                 },
             )
-        elif (
-            dest_location in allowed_locations
-            and dest_location not in zone_locations
-        ):
+        elif dest_location in allowed_locations and dest_location not in zone_locations:
             if confirmation:
                 move.location_dest_id = dest_location.id
             else:
@@ -236,9 +218,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "info",
                 "title": _("Start"),
-                "message": _(
-                    "The pack has been moved, you can scan a new pack."
-                ),
+                "message": _("The pack has been moved, you can scan a new pack."),
             },
         )
 
@@ -259,42 +239,26 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "info",
                 "title": _("Start"),
-                "message": _(
-                    "The move has been canceled, you can scan a new pack."
-                ),
+                "message": _("The move has been canceled, you can scan a new pack."),
             },
         )
 
     def _validator_cancel(self):
         return {
-            "package_level_id": {
-                "coerce": to_int,
-                "required": True,
-                "type": "integer",
-            }
+            "package_level_id": {"coerce": to_int, "required": True, "type": "integer"}
         }
 
     def _validator_validate(self):
         return {
-            "package_level_id": {
-                "coerce": to_int,
-                "required": True,
-                "type": "integer",
-            },
-            "location_barcode": {
-                "type": "string",
-                "nullable": False,
-                "required": True,
-            },
+            "package_level_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "location_barcode": {"type": "string", "nullable": False, "required": True},
         }
 
     def _validator_return_validate(self):
         return self._response_schema()
 
     def _validator_scan(self):
-        return {
-            "barcode": {"type": "string", "nullable": False, "required": True}
-        }
+        return {"barcode": {"type": "string", "nullable": False, "required": True}}
 
     def _validator_return_scan(self):
         return self._response_schema(
@@ -303,61 +267,29 @@ class SinglePackPutaway(Component):
                 "location_src": {
                     "type": "dict",
                     "schema": {
-                        "id": {
-                            "coerce": to_int,
-                            "required": True,
-                            "type": "integer",
-                        },
-                        "name": {
-                            "type": "string",
-                            "nullable": False,
-                            "required": True,
-                        },
+                        "id": {"coerce": to_int, "required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
                     },
                 },
                 "location_dst": {
                     "type": "dict",
                     "schema": {
-                        "id": {
-                            "coerce": to_int,
-                            "required": True,
-                            "type": "integer",
-                        },
-                        "name": {
-                            "type": "string",
-                            "nullable": False,
-                            "required": True,
-                        },
+                        "id": {"coerce": to_int, "required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
                     },
                 },
                 "product": {
                     "type": "dict",
                     "schema": {
-                        "id": {
-                            "coerce": to_int,
-                            "required": True,
-                            "type": "integer",
-                        },
-                        "name": {
-                            "type": "string",
-                            "nullable": False,
-                            "required": True,
-                        },
+                        "id": {"coerce": to_int, "required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
                     },
                 },
                 "picking": {
                     "type": "dict",
                     "schema": {
-                        "id": {
-                            "coerce": to_int,
-                            "required": True,
-                            "type": "integer",
-                        },
-                        "name": {
-                            "type": "string",
-                            "nullable": False,
-                            "required": True,
-                        },
+                        "id": {"coerce": to_int, "required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
                     },
                 },
             }
