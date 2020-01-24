@@ -4,7 +4,7 @@ var userConfirmation = Vue.component('user-confirmation', {
   template: `
 
     <div class="confirm">
-        <div class="alert alert-danger error" role="alert">
+        <div class="alert alert-warning" role="alert">
             <h4 class="alert-heading">{{ this.title }}</h4>
             <p>{{ question }}</p>
             <form>
