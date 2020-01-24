@@ -2,6 +2,7 @@
 
 import * as simple_putaway from './scenario/simple_putaway/simple_putaway.js'
 import {Config} from './services/config.js'
+import {Storage} from './services/storage.js'
 
 const NotFound = { template: '<p>Page not found</p>' }
 const Home = { template: '<home-page v-bind:routes="routes"></home-page>', props: {routes:"myroutes"}} // { props: {routes: AllRoutes} }}
@@ -19,10 +20,10 @@ class Routes {
         if (path == '') {
             return Home
         } else {
-           var menu = AppConfig.get('menu')
-           for (var idx in menu) {
-                if (menu[idx]['hash'] == path) {
-                    return ScenarioTemplate[menu[idx]['scenario']]
+           var menus = AppConfig.get('menus')
+           for (var idx in menus) {
+                if (menus[idx]['hash'] == path) {
+                    return ScenarioTemplate[menus[idx]['process']]
                 }
             };
             return NotFound;
@@ -30,19 +31,20 @@ class Routes {
     }
 }
 
+if ( Storage.apikey ) {
+    AppConfig.load()
+}
+
 var app = new Vue({
     el: '#app',
     data: {
         currentRoute: window.location.hash.slice(1),
-        // To not be bothered with the login page during dev
-        // This is set true set to false to see the login page
-        authenticated: false,
         using_demo_url: false,
         config: AppConfig,
     },
     computed: {
         ViewComponent () {
-            if (this.authenticated) {
+            if (this.config.authenticated) {
                 return Routes.get(this.currentRoute);
             } else {
                 return LoginPage;

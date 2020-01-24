@@ -1,37 +1,26 @@
+import {Odoo} from './odoo.js'
+import {Storage} from './storage.js'
+
 export class Config {
   constructor() {
-    this.apikey = localStorage.getItem('apikey');
     this.data = {}
-    this.load()
+    this.authenticated = false
   }
 
   get(key) {
     return this.data[key]
   }
 
-  reset(apikey) {
-    this.apikey=apikey;
-    localStorage.setItem("apikey", apikey);
-    this.load();
-  }
-
   load() {
-      // call odoo
-      this.data = {
-          'menu': [
-              {name: 'Putaway', id: 1, scenario: 'single_pack_putaway'},
-              {name: 'Transfer', id: 2, scenario: 'single_pack_transfer'},
-          ],
-          'profile': [
-              {name: 'Test'},
-              {name: 'Test'},
-          ]
-      }
-      for (var idx in this.data['menu']) {
-          var menu = this.data['menu'][idx]
-          menu['hash'] = menu['scenario'] + menu['id']
-      }
+      var odoo = new Odoo({process_name:"app"});
+      return odoo._call('user_config', 'POST', {})
+          .then((data) => {
+              this.data = data['data'];
+              for (var idx in this.data['menus']) {
+                  var menu = this.data['menus'][idx]
+                  menu['hash'] = menu['process'] + '_' + menu['id']
+              };
+              this.authenticated = true
+          });
   }
 }
-
-
