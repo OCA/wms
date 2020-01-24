@@ -100,7 +100,7 @@ var sp = Vue.component('simple-pack-putaway', {
                         }
                     },
                     on_scan:(barcode) => {
-                        this.state[this.current_state].exit();
+                        this.on_exit();
                         this.current_state = 'scan_location';
                         this.state[this.current_state].on_scan(barcode);
                     }
