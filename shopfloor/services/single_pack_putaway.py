@@ -243,7 +243,7 @@ class SinglePackPutaway(Component):
         if not pack_transfer.is_dest_location_valid(move, scanned_location):
             return self._response_for_forbidden_location()
 
-        if not pack_transfer.is_dest_location_to_confirm(move, scanned_location):
+        if pack_transfer.is_dest_location_to_confirm(move, scanned_location):
             if confirmation:
                 # keep the move in sync otherwise we would have a move line outside
                 # the dest location of the move
