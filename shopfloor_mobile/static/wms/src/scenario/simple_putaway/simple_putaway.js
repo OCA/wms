@@ -9,7 +9,7 @@ var sp = Vue.component('simple-pack-putaway', {
     <h1><a href="#" class="btn btn-large btn-outline-secondary" style="margin-right:10px;">&lt;</a>Simple Putaway</h1>
     {{ current_state }}
     <searchbar v-on:found="scanned" v-bind:hint="hint" v-bind:placeholder="scanTip">ici lasearch</searchbar>
-    <user-information v-if="!need_confirmation && user_notification.message" v-bind:message="user_notification.message" v-bind:message_type="user_notification.message_type"></user-information>
+    <user-information v-if="!need_confirmation && user_notification.message" v-bind:info="user_notification"></user-information>
     <user-confirmation v-if="need_confirmation" v-on:user-confirmation="onUserConfirmation" v-bind:question="user_notification.message"></user-confirmation>
     <operation-detail :operation="erp_data.operation"></operation-detail>
     <form v-if="show_button" v-on:reset="reset">

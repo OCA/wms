@@ -1,16 +1,24 @@
 var userInformation = Vue.component('user-information', {
-    props: ['message', 'message_type'],
+    props: ['info'],
     methods: {},
     template: `
 
-    <div v-bind:class="class_alert_type" role="alert">
-        <p>{{ message }}</p>
+    <div v-bind:class="alert_class" role="alert">
+        <p>{{ info.message }}</p>
     </div>
-
     `,
     computed: {
-        class_alert_type: function () {
-            return 'alert alert-' + (this.message_type || 'silent')
+        alert_class: function () {
+            // TODO: make this mapping configurable
+            let mapping = {
+                'default': 'alert-info',
+                'info': 'alert-info',
+                'error': 'alert-danger',
+            }
+            _class = mapping['default'];
+            if (this.info.message_type in mapping)
+                _class = mapping[this.info.message_type]
+            return 'alert ' + _class
         }
     },
 
