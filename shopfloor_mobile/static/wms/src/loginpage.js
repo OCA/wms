@@ -1,19 +1,20 @@
+import {Storage} from './services/storage.js'
+
 var loginpage = Vue.component('login-page', {
     data: function(){ return {
-        'apikey': '',
+        'apikey': '72B044F7AC780DAC',
+        'error': '',
     }},
     methods: {
         login: function(evt) {
             evt.preventDefault();
             // call odoo application load => set the result in the local storage in json
+            Storage.apikey = this.apikey;
+            this.error = "";
+            this.$root.config.load().catch((error) => {
+              this.error = "Invalid API KEY";
+          });
 
-            if (this.apikey == '123') {
-                this.$root.authenticated = true;
-                this.$root.config.reset(this.apikey)
-            } else {
-                this.$root.authenticated = false;
-                this.accessbagde = '';
-            }
         }
     },
     template: `
@@ -21,6 +22,8 @@ var loginpage = Vue.component('login-page', {
     <form v-on:submit="login">
     <h1 class="text-center">WMS</h1>
   <div class="form-group">
+
+    <p>{{ error }}</p>
     <input type="text" class="form-control" v-model="apikey" placeholder="Scan your access badge or fill your credential" autofocus>
   </div>
   <input type="submit" class="btn btn-primary btn-block" >Login</button>

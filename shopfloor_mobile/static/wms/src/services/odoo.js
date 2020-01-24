@@ -1,11 +1,12 @@
+import {Storage} from './storage.js'
+
 export class Odoo {
 
     constructor(params) {
         this.params = params;
+        this.process_name = params.process_name;
         this.process_id = this.params.process_id;
         this.process_menu_id = this.params.process_menu_id;
-        // FIXME: get a real one from input
-        this.api_key = '72B044F7AC780DAC'
     }
 
     _call(endpoint, method, data) {
@@ -21,25 +22,27 @@ export class Odoo {
                 params['body'] = JSON.stringify(data);
             }
         }
-        fetch(
+        return fetch(
             this._get_url(endpoint), params
         )
         .then((response) => {
-            return response.json()
-        })
-        .then((data) => {
-            console.log('Success:', data);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
+            if (response.status === 403) {
+                // invalid api key we clean it
+                Storage.apikey = "";
+                throw "Invalid API KEY";
+            } else {
+                return response.json()
+            }
         });
     }
+
     _get_headers() {
+        console.log('APIKEY', Storage.apikey)
         return {
             'Content-Type': 'application/json',
             'SERVICE_CTX_MENU_ID': 1,
             'SERVICE_CTX_PROFILE_ID': 1,
-            'API_KEY': this.api_key,
+            'API_KEY': Storage.apikey,
         }
     }
 
