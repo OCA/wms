@@ -2,6 +2,15 @@ from odoo.addons.component.core import Component
 
 
 class PackTransferValidateAction(Component):
+    """Pack Transfer shared business logic
+
+
+    This component is shared by the "validate" action of the processes:
+
+    * single_pack_putaway
+    * single_pack_transfer
+    """
+
     _name = "shopfloor.pack.transfer.validate.action"
     _inherit = "shopfloor.process.action"
     _usage = "pack.transfer.validate"
