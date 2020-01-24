@@ -40,7 +40,7 @@ class PackTransferValidateAction(Component):
         zone_locations = self.env["stock.location"].search(
             [("id", "child_of", move_dest_location.id)]
         )
-        return scanned_location in zone_locations
+        return scanned_location not in zone_locations
 
     def set_destination_and_done(self, move, scanned_location):
 

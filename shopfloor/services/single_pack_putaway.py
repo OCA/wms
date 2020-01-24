@@ -12,6 +12,16 @@ class SinglePackPutaway(Component):
     _usage = "single_pack_putaway"
     _description = __doc__
 
+    def _response_for_no_picking_type(self):
+        return self._response(
+            state="start",
+            message={
+                "message_type": "error",
+                "title": _("Configuration error"),
+                "message": _("No picking types found for this menu and profile"),
+            },
+        )
+
     def _response_for_several_picking_types(self):
         return self._response(
             state="start",
@@ -118,10 +128,12 @@ class SinglePackPutaway(Component):
 
         picking_type = self.picking_types
         if len(picking_type) > 1:
-            return self._response_from_several_picking_types()
-        company = self.env.user.company_id  # FIXME add logic to get proper company
-        # TODO define on what we search (pack name, pack barcode ...)
+            return self._response_for_several_picking_types()
+        elif not picking_type:
+            return self._response_for_no_picking_type()
+        company = self.env.company
 
+        # TODO define on what we search (pack name, pack barcode ...)
         pack = self.env["stock.quant.package"].search([("name", "=", barcode)])
         if not pack:
             return self._response_for_package_not_found(barcode)
@@ -265,6 +277,7 @@ class SinglePackPutaway(Component):
                     "message": _("This operation does not exist anymore."),
                 },
             )
+        # TODO cancel() does not exist
         package.move_ids[0].cancel()
         return self._response(
             state="start",
