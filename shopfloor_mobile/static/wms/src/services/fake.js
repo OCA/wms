@@ -1,7 +1,10 @@
+/* eslint no-use-before-define: 0 */  // --> OFF
+
 var CASE_1 = {
     'fetch' : {
         "data": {
             "id": 1,
+            "name": "A nice pack 1",
             "location_src": {
                 "id": 1,
                 "name":  'Location foo baz',
@@ -76,6 +79,7 @@ var CASE_5 = {
     'fetch' : {
         "data": {
             "id": 1,
+            "name": "A nice pack 5",
             "location_src": {
                 "id": 1,
                 "name":  'Location foo baz',
@@ -104,10 +108,11 @@ var CASE_5 = {
         }
     },
 }
-var CASE_5 = {
+var CASE_6 = {
     'fetch' : {
         "data": {
             "id": 1,
+            "name": "A nice pack 6",
             "location_src": {
                 "id": 1,
                 "name":  'Location foo baz',
@@ -133,10 +138,11 @@ var CASE_5 = {
         "message": undefined,
     },
 }
-var CASE_6 = {
+var CASE_7 = {
     'fetch' : {
         "data": {
             "id": 1,
+            "name": "A nice pack 7",
             "location_src": {
                 "id": 1,
                 "name":  'Location foo baz',
@@ -167,6 +173,9 @@ window.CASES = {
     "4": CASE_4,
     "5": CASE_5,
     "6": CASE_6,
+    "7": CASE_7,
 };
 
 window.CASE = window.CASES["1"];
+
+/* eslint no-use-before-define: 2 */  // --> ON
