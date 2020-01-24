@@ -11,7 +11,7 @@ var sp = Vue.component('simple-pack-putaway', {
     <searchbar v-on:found="scanned" v-bind:hint="hint" v-bind:placeholder="scanTip">ici lasearch</searchbar>
     <user-information v-if="!need_confirmation && user_notification.message" v-bind:message="user_notification.message" v-bind:message_type="user_notification.message_type"></user-information>
     <user-confirmation v-if="need_confirmation" v-on:user-confirmation="onUserConfirmation" v-bind:question="user_notification.message"></user-confirmation>
-    <operation-detail v-bind:operation="operation"></operation-detail>
+    <operation-detail :operation="erp_data.operation"></operation-detail>
     <form v-if="show_button" v-on:reset="reset">
         <input type="reset" name="reset"></input>
     </form>
@@ -25,12 +25,15 @@ var sp = Vue.component('simple-pack-putaway', {
             'need_confirmation': false,
             'hint': 'pack',
             'show_button': false,
-            'operation': {},
+            'erp_data': {
+                'operation': {}
+            },
             'current_state': 'scan_pack',
             'state': {
                 'scan_pack': {
                     enter: () => {
                         this.hint = 'pack';
+                        this.reset_erp_data('operation')
                     },
                     on_scan: (scanned) => {
                         this.user_notification.message = false;
@@ -42,19 +45,20 @@ var sp = Vue.component('simple-pack-putaway', {
                 },
                 'wait_call': {
                     success: (result) => {
-                        this.operation = result;
-                        this.go_state(result.state);
+                        if (result.data != undefined)
+                            this.set_erp_data('operation', result.data)
+                        this.go_state(result.state)
                     }
                 },
                 'scan_location': {
                     enter: () => {
                         this.hint = 'location';
-                        this.operation.location_barcode = null;
+                        this.erp_data.operation.location_barcode = null;
                     },
                     on_scan: (scanned) => {
-                        this.operation.location_barcode = scanned
+                        this.erp_data.operation.location_barcode = scanned
                         this.go_state('wait_validation',
-                            odoo_service.validate(this.operation));
+                            odoo_service.validate(this.erp_data.operation));
                     }
                 },
                 'wait_validation': {
@@ -70,7 +74,7 @@ var sp = Vue.component('simple-pack-putaway', {
                         if (answer == 'yes'){
                             this.go_state(
                                 'wait_validation',
-                                odoo_service.validate(this.operation, true)
+                                odoo_service.validate(this.erp_data.operation, true)
                             );
                         } else {
                             this.go_state('scan_location');
@@ -150,6 +154,13 @@ var sp = Vue.component('simple-pack-putaway', {
             this.need_confirmation = false;
             this.user_notification.message = false;
         },
+        set_erp_data: function (key, data) {
+            this.$set(this.erp_data, key, data)
+        },
+        reset_erp_data: function (key) {
+            // FIXME
+            this.$set(this.erp_data, key, {})
+        }
     }
 });
 
