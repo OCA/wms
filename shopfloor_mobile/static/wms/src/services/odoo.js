@@ -52,12 +52,16 @@ export class Odoo {
     fetchOperation (barcode) {
         console.log('Fetch', barcode);
         window.CASE = window.CASES[barcode];
+        let res = window.CASE['fetch'];
+        console.log(res);
+        return Promise.resolve(res)
         // return this._call('start', 'POST', {'barcode': barcode})
-        return Promise.resolve(window.CASE['fetch'])
     }
     validate (operation, confirmed) {
         console.log('Validate', operation);
-        return Promise.resolve(window.CASE['validate'])
+        let res = window.CASE['validate'];
+        console.log(res);
+        return Promise.resolve(res)
     }
     __validate (operation, confirmed) {
         console.log('Validate', operation);
@@ -70,7 +74,9 @@ export class Odoo {
     }
     cancel(id) {
         console.log('Cancelling', id);
-        return Promise.resolve(window.CASE['cancel'])
+        let res = window.CASE['cancel'];
+        console.log(res);
+        return Promise.resolve(res)
     }
     scanLocation (barcode) {
         return Promise.resolve(window.CASE['scan_loc'])
