@@ -45,7 +45,6 @@ export class Odoo {
             'API_KEY': Storage.apikey,
         }
     }
-
     _get_url (endpoint) {
         return '/shopfloor/' + this.process_name + '/' + endpoint;
     }
@@ -60,6 +59,8 @@ export class Odoo {
     validate (operation, confirmed) {
         console.log('Validate', operation);
         let res = window.CASE['validate'];
+        if (operation.location_barcode in window.CASE)
+            res = window.CASE[operation.location_barcode]
         console.log(res);
         return Promise.resolve(res)
     }
