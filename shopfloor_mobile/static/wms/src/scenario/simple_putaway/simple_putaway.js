@@ -110,6 +110,9 @@ var sp = Vue.component('simple-pack-putaway', {
         return this.hint == 'pack' ? 'Scan pack': 'Scan location'
       }
     },
+    mounted() {
+        this.go_state('scan_pack');
+    },
     methods: {
         go_state: function(state, promise) {
             if (this.state[this.current_state].exit)
