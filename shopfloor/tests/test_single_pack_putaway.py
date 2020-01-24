@@ -9,13 +9,9 @@ class PutawayCase(CommonCase):
         super().setUpClass(*args, **kwargs)
         stock_location = cls.env.ref("stock.stock_location_stock")
         cls.stock_location = stock_location
-        out_location = cls.env["stock.location"].search(
-            [
-                ("location_id", "=", stock_location.id),
-                ("barcode", "!=", False),
-                ("usage", "=", "internal"),
-            ]
-        )[0]
+        cls.dispatch_location = cls.env.ref("stock.location_dispatch_zone")
+        cls.input_location = cls.env.ref("stock.stock_location_company")
+        cls.out_location = cls.env.ref("stock.stock_location_output")
         cls.productA = cls.env["product.product"].create(
             {"name": "Product A", "type": "product"}
         )
@@ -25,16 +21,9 @@ class PutawayCase(CommonCase):
         cls.quantA = cls.env["stock.quant"].create(
             {
                 "product_id": cls.productA.id,
-                "location_id": stock_location.id,
+                "location_id": cls.dispatch_location.id,
                 "quantity": 1,
                 "package_id": cls.packA.id,
-            }
-        )
-        cls.env["stock.putaway.rule"].create(
-            {
-                "product_id": cls.productA.id,
-                "location_in_id": stock_location.id,
-                "location_out_id": out_location.id,
             }
         )
         cls.shelf1 = cls.env.ref("stock.stock_location_components")
@@ -42,7 +31,6 @@ class PutawayCase(CommonCase):
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_put_away_reach_truck")
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
-        cls.wh.int_type_id.process_id = cls.menu.process_id.id
 
     def setUp(self):
         super().setUp()
@@ -52,40 +40,28 @@ class PutawayCase(CommonCase):
     def test_single_pack_putaway(self):
         barcode = self.packA.name
         params = {"barcode": barcode}
+        # Simulate the client scanning a package's barcode, which
+        # in turns should start the operation in odoo
         response = self.service.dispatch("start", params=params)
+        # the response
+
+        # Checks:
         package_level = self.env["stock.package_level"].browse(response["data"]["id"])
-        move_id = package_level.move_line_ids[0].move_id.id
-        location_dest = self.env["stock.location"].browse(
-            response["data"]["location_dst"]["id"]
+        move_line = package_level.move_line_ids
+        move = move_line.move_id
+
+        self.assertRecordValues(
+            move_line, [{"qty_done": 1.0, "location_dest_id": self.stock_location.id}]
         )
-        params = {
-            "package_level_id": package_level.id,
-            "location_barcode": location_dest.barcode,
-        }
-        new_loc_quant = self.env["stock.quant"].search(
-            [
-                ("product_id", "=", self.productA.id),
-                ("location_id", "=", location_dest.id),
-            ]
+        self.assertRecordValues(
+            move, [{"state": "assigned", "location_dest_id": self.stock_location.id}]
         )
-        self.assertFalse(new_loc_quant)
-        response = self.service.dispatch("validate", params=params)
-        new_loc_quant = self.env["stock.quant"].search(
-            [
-                ("product_id", "=", self.productA.id),
-                ("location_id", "=", location_dest.id),
-            ]
-        )
-        move = self.env["stock.move"].browse(move_id)
-        self.assertEquals(move.state, "done")
-        self.assertEquals(self.quantA.quantity, 0)
-        self.assertEquals(new_loc_quant.quantity, move.product_uom_qty)
 
     def test_validate(self):
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
         picking_form = Form(self.env["stock.picking"])
-        picking_form.picking_type_id = self.wh.int_type_id
+        picking_form.picking_type_id = self.menu.process_id.picking_type_ids
         with picking_form.move_ids_without_package.new() as move:
             move.product_id = self.productA
             move.product_uom_qty = 1
