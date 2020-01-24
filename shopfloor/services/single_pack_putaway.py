@@ -171,22 +171,16 @@ class SinglePackPutaway(Component):
         }
         move = self.env["stock.move"].create(move_vals)
         move._action_confirm(merge=False)
-        location_dest_id = (
-            default_location_dest._get_putaway_strategy(product).id
-            or default_location_dest.id
-        )
-        self.env["stock.package_level"].create(
+        package_level = self.env["stock.package_level"].create(
             {
                 "package_id": pack.id,
                 "move_ids": [(4, move.id)],
                 "company_id": company.id,
-                "is_done": True,
-                "location_id": pack.location_id.id,
-                "location_dest_id": location_dest_id,
                 "picking_id": move.picking_id.id,
             }
         )
         move._action_assign()
+        package_level.is_done = True
         return self._response_for_start_success(move, pack)
 
     def _response_for_package_level_not_found(self):
