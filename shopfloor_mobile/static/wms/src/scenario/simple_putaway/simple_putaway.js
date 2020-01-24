@@ -36,7 +36,6 @@ var sp = Vue.component('simple-pack-putaway', {
                         this.reset_erp_data('operation')
                     },
                     on_scan: (scanned) => {
-                        this.user_notification.message = false;
                         this.go_state(
                             'wait_call',
                             odoo_service.fetchOperation(scanned)
@@ -119,8 +118,8 @@ var sp = Vue.component('simple-pack-putaway', {
     },
     methods: {
         go_state: function(state, promise) {
-            if (this.state[this.current_state].exit)
-                this.state[this.current_state].exit();
+            console.log('GO TO STATE', state)
+            this.on_exit()
             this.current_state = state;
             if (promise) {
                 promise.then(
@@ -128,15 +127,22 @@ var sp = Vue.component('simple-pack-putaway', {
                     this.on_error,
                 );
             } else {
-                if (this.state[this.current_state].enter)
-                    this.state[this.current_state].enter();
+                this.on_enter()
             }
+        },
+        on_enter: function () {
+            if (this.state[this.current_state].enter)
+                this.state[this.current_state].enter();
+        },
+        on_exit: function () {
+            if (this.state[this.current_state].exit)
+                this.state[this.current_state].exit();
         },
         on_success: function (result) {
             if (result.message) {
-                this.user_notification.message = result.message.body;
-                this.user_notification.message_type = result.message.message_type;
-                console.log('USER NOTIF', this.user_notification);
+                this.set_notification(result.message)
+            } else {
+                this.reset_notification()
             }
             this.state[this.current_state].success(result);
         },
@@ -152,7 +158,17 @@ var sp = Vue.component('simple-pack-putaway', {
         onUserConfirmation: function(answer){
             this.state[this.current_state].on_confirmation(answer);
             this.need_confirmation = false;
+            this.reset_notification();
+        },
+        set_notification: function(message) {
+            this.user_notification.message = message.body;
+            this.user_notification.message_type = message.message_type;
+            console.log('USER NOTIF SET', this.user_notification);
+        },
+        reset_notification: function() {
             this.user_notification.message = false;
+            this.user_notification.message_type = false;
+            console.log('USER NOTIF HIDE');
         },
         set_erp_data: function (key, data) {
             this.$set(this.erp_data, key, data)
