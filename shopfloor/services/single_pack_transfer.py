@@ -61,6 +61,7 @@ class SinglePackTransfer(Component):
         return self._response(
             data={
                 "id": existing_operations[0].package_level_id.id,
+                "name": pack.name,
                 "location_src": {
                     "id": pack.location_id.id,
                     "name": pack.location_id.name,
@@ -94,6 +95,7 @@ class SinglePackTransfer(Component):
             },
             data={
                 "id": move.move_line_ids[0].package_level_id.id,
+                "name": pack.name,
                 "location_src": {
                     "id": pack.location_id.id,
                     "name": pack.location_id.name,
@@ -145,6 +147,7 @@ class SinglePackTransfer(Component):
         return self._response_schema(
             {
                 "id": {"coerce": to_int, "required": True, "type": "integer"},
+                "name": {"type": "string", "nullable": False, "required": True},
                 "location_src": {
                     "type": "dict",
                     "schema": {
