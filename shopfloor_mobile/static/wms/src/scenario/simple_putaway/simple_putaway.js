@@ -5,19 +5,23 @@ var odoo_service = new Odoo({"process_id": 1, "process_menu_id": 1})
 
 
 var sp = Vue.component('simple-pack-putaway', {
-    template: `<div>
-    <h1><a href="#" class="btn btn-large btn-outline-secondary" style="margin-right:10px;">&lt;</a>Simple Putaway</h1>
-    {{ current_state }}
-    <searchbar v-on:found="scanned" v-bind:hint="hint" v-bind:placeholder="scanTip">ici lasearch</searchbar>
-    <user-information v-if="!need_confirmation && user_notification.message" v-bind:info="user_notification"></user-information>
-    <user-confirmation v-if="need_confirmation" v-on:user-confirmation="onUserConfirmation" v-bind:question="user_notification.message"></user-confirmation>
-    <operation-detail :operation="erp_data.operation"></operation-detail>
-    <form v-if="show_button" v-on:reset="reset">
-        <input type="reset" name="reset"></input>
-    </form>
-</div>`,
+    template: `
+        <Screen>
+            <ScreenHeader :screen_title="screen_title"></ScreenHeader>
+            <!-- FOR DEBUG -->
+            <!-- {{ current_state }} -->
+            <searchbar v-on:found="scanned" v-bind:hint="hint" v-bind:placeholder="scanTip">ici lasearch</searchbar>
+            <user-information v-if="!need_confirmation && user_notification.message" v-bind:info="user_notification"></user-information>
+            <user-confirmation v-if="need_confirmation" v-on:user-confirmation="onUserConfirmation" v-bind:question="user_notification.message"></user-confirmation>
+            <operation-detail :operation="erp_data.operation"></operation-detail>
+            <form v-if="show_button" v-on:reset="reset">
+                <input type="reset" name="reset"></input>
+            </form>
+        </Screen>
+    `,
     data: function () {
         return {
+            'screen_title': 'Simple putaway',
             'user_notification': {
                 'message': '',
                 'message_type': '',

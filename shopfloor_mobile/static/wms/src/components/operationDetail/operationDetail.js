@@ -1,7 +1,7 @@
 
 var operationDetail = Vue.component('operation-detail', {
   data: function () {
-    return {};
+    return {}
   },
   props:['operation'],
   template: `

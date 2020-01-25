@@ -37,6 +37,7 @@ if ( Storage.apikey ) {
 
 var app = new Vue({
     el: '#app',
+    vuetify: new Vuetify(),
     data: {
         currentRoute: window.location.hash.slice(1),
         using_demo_url: false,
