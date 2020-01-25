@@ -6,8 +6,7 @@ var odoo_service = new Odoo({"process_id": 1, "process_menu_id": 1})
 
 var sp = Vue.component('simple-pack-putaway', {
     template: `
-        <Screen>
-            <ScreenHeader :screen_title="screen_title"></ScreenHeader>
+        <Screen title="Single pack putaway">
             <!-- FOR DEBUG -->
             <!-- {{ current_state }} -->
             <searchbar v-on:found="scanned" v-bind:hint="hint" v-bind:placeholder="scanTip">ici lasearch</searchbar>

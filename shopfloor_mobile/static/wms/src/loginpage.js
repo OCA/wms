@@ -1,6 +1,6 @@
 import {Storage} from './services/storage.js'
 
-var loginpage = Vue.component('login-page', {
+Vue.component('login-page', {
     data: function(){ return {
         'apikey': '72B044F7AC780DAC',
         'error': '',
@@ -28,9 +28,6 @@ var loginpage = Vue.component('login-page', {
   </div>
   <input type="submit" class="btn btn-primary btn-block" >Login</button>
 </form>
-
-
-
     `
 });
 

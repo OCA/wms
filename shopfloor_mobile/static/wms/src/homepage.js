@@ -6,16 +6,15 @@ var homepage = Vue.component('home-page', {
         },
     props:['routes'],
     template: `
-        <Screen>
-            <v-navigation-drawer
-            class="deep-purple accent-4"
-            dark
-            permanent
+        <Screen
+            title="Barcode scanner"
+            :show-menu="false"
             >
-            <v-list>
+            <v-list class="deep-purple accent-4">
                 <v-list-item
                     v-for="item in navigation"
                     :key="item.name"
+                    :href="'#' + item.hash"
                     link
                     >
                     <v-list-item-content>
@@ -24,13 +23,6 @@ var homepage = Vue.component('home-page', {
                 </v-list-item>
             </v-list>
 
-            </v-navigation-drawer>
-            <div class="btn-group-vertical">
-                <a v-for="nav in this.navigation" v-bind:href="nav.hash"
-                class="btn btn-primary btn-lg btn-block">
-                    <span>{{ nav.name }}</span>
-                </a>
-            </div>
             <div class="alert alert-warning text-center" v-if="this.$root.using_demo_url">Using demo url</div>
         </Screen>
     `

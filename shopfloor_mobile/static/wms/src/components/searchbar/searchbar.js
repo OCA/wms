@@ -23,8 +23,11 @@ var searchbar = Vue.component('searchbar', {
   },
 
   template: `
-  <form v-on:submit="search">
-	  <input v-model="entered" :placeholder="placeholder" class="form-control form-control-lg mb-2" />
-  </form>
+  <v-form
+      v-on:submit="search"
+      ref="form"
+      >
+    <v-text-field required v-model="entered" :placeholder="placeholder" ></v-text-field>
+  </v-form>
   `
 })
