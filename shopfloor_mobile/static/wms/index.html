@@ -7,20 +7,27 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
     <link rel="icon" href="src/assets/logo.png">
+    <link href="src/vendor/fonts/roboto.css" rel="stylesheet">
+    <link href="src/vendor/vuetify/materialdesignicons.min.css" rel="stylesheet">
+    <link href="src/vendor/vuetify/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <link rel="stylesheet" href="src/css/main.css">
-    <link rel="stylesheet" href="src/vendor/bootstrap/css/bootstrap.min.css" />
+    <!-- <link rel="stylesheet" href="src/vendor/bootstrap/css/bootstrap.min.css" /> -->
 
     <script src="src/vendor/jquery-3.4.1.slim.min.js"></script>
     <script src="src/vendor/popper.min.js"></script>
     <script src="src/vendor/lodash.js"></script>
-    <script src="src/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!-- <script src="src/vendor/bootstrap/js/bootstrap.min.js"></script> -->
     <script src="src/vendor/vue.js"></script>
+    <script src="src/vendor/vuetify/vuetify.js"></script>
     <script src="src/services/fake.js"></script>
     <script src="src/services/odoo.js" type="module"></script>
     <script src="src/services/storage.js" type="module"></script>
     <script src="src/services/config.js" type="module"></script>
     <script src="src/homepage.js"></script>
-    <script src="src/loginpage.js" type="module"></script>
+    <script src="src/loginpage.js"></script>
+    <script src="src/components/screen.js"></script>
+    <script src="src/components/screenHeader/screenHeader.js"></script>
     <script src="src/components/searchbar/searchbar.js"></script>
     <script src="src/components/operationDetail/operationDetail.js"></script>
     <script src="src/components/userConfirmation/userConfirmation.js"></script>
@@ -33,8 +40,12 @@
     <noscript>
       <strong>We're sorry but wms doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app">
-        <simple-pack-putaway></simple-pack-putaway>
+    <div id="app">  
+      <v-app>
+        <v-content>
+          <v-container>Hello world</v-container>
+        </v-content>
+      </v-app>
     </div>
     <!-- built files will be auto injected -->
   </body>

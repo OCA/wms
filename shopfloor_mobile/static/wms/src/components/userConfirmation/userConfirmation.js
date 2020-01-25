@@ -5,7 +5,7 @@ var userConfirmation = Vue.component('user-confirmation', {
 
     <div class="confirm">
         <div class="alert alert-warning" role="alert">
-            <h4 class="alert-heading">{{ this.title }}</h4>
+            <!--h4 class="alert-heading">{{ title }}</h4-->
             <p>{{ question }}</p>
             <form>
                <input v-on:click="$emit('user-confirmation', 'yes')" class="btn btn-lg btn-success" type="submit" value="Yes"></input>
