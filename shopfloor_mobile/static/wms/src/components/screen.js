@@ -8,7 +8,7 @@ Vue.component('Screen', {
     },
     computed: {
         navigation () {
-            return this.$root.config.get('menus');
+            return this.$root.config.get('menus')
         }
     },
     data: () => ({
@@ -62,7 +62,7 @@ Vue.component('Screen', {
                     <v-list-item-title>Option {{ n }}</v-list-item-title>
                     </v-list-item>
                 </v-list>
-                </v-menu>
+            </v-menu>
         </v-app-bar>
         <v-content>
             <v-container>
