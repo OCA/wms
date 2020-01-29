@@ -10,7 +10,7 @@ var homepage = Vue.component('home-page', {
             title="Barcode scanner"
             :show-menu="false"
             >
-            <v-list class="deep-purple accent-4">
+            <v-list>
                 <v-list-item
                     v-for="item in navigation"
                     :key="item.name"

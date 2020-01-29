@@ -34,7 +34,7 @@ Vue.component('Screen', {
             </v-list>
         </v-navigation-drawer>
         <v-app-bar
-                color="purple accent-4"
+                color="#491966"
                 dark
                 flat
                 app
