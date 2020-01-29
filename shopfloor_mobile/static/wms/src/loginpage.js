@@ -9,10 +9,10 @@ Vue.component('login-page', {
         login: function(evt) {
             evt.preventDefault();
             // call odoo application load => set the result in the local storage in json
-            Storage.apikey = this.apikey;
-            this.error = "";
+            Storage.apikey = this.apikey
+            this.error = ""
             this.$root.config.load().catch((error) => {
-              this.error = "Invalid API KEY";
+              this.error = "Invalid API KEY"
           });
 
         }

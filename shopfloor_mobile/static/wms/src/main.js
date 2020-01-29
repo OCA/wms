@@ -62,8 +62,8 @@ var app = new Vue({
 window.addEventListener('popstate', (e) => {
     // Using the hash of the url for navigation
     // To use url fragment we need a proper server in the backend
-    app.currentRoute = window.location.hash.slice(1);
+    app.currentRoute = window.location.hash.slice(1)
 });
 
-console.log(simple_putaway);
-simple_putaway.simple_putaway();
+console.log(simple_putaway)
+simple_putaway.simple_putaway()
