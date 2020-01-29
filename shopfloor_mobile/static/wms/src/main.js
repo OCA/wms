@@ -35,9 +35,26 @@ if ( Storage.apikey ) {
     AppConfig.load()
 }
 
+const vuetify_themes = {
+    light: {
+        primary: '#491966',
+        secondary: '#424242',
+        accent: '#82B1FF',
+        error: '#FF5252',
+        info: '#2196F3',
+        success: '#4CAF50',
+        warning: '#FFC107',
+    }
+}
+
 var app = new Vue({
     el: '#app',
-    vuetify: new Vuetify(),
+    vuetify: new Vuetify({
+        // FIXME: has no effect
+        // theme: {
+        //     themes: vuetify_themes
+        // }
+    }),
     data: {
         currentRoute: window.location.hash.slice(1),
         using_demo_url: false,
