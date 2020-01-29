@@ -11,6 +11,7 @@ export class Odoo {
 
     _call(endpoint, method, data) {
         console.log('CALL', endpoint);
+        let self = this;
         let params = {
             method: method,
             headers: this._get_headers()
@@ -26,16 +27,27 @@ export class Odoo {
             this._get_url(endpoint), params
         )
         .then((response) => {
-            if (response.status === 403) {
-                // invalid api key we clean it
-                Storage.apikey = "";
-                throw "Invalid API KEY";
-            } else {
+            if (response.ok) {
                 return response.json()
+            }
+            else {
+                let handler = self['_handle_' + response.status.toString()]
+                if (handler !== undefined) {
+                    handler(response);
+                } else {
+                    console.log(response.statusText)
+                }
             }
         });
     }
-
+    _handle_403(response) {
+        Storage.apikey = "";
+        throw "Invalid API KEY";
+    }
+    _handle_404(response) {
+        throw `Endpoint not found, please check your odoo configuration.
+        URL: ` + response.url
+    }
     _get_headers() {
         console.log('APIKEY', Storage.apikey)
         return {
