@@ -73,6 +73,9 @@ Vue.component('Screen', {
                 <div :class="'screen screen-' + klass">
                     <div class="wrapper">
                         <slot>Screen content</slot>
+                        <!--form v-if="show_reset_button" v-on:reset="reset">
+                            <input type="reset" name="reset"></input>
+                        </form-->
                     </div>
                 </div>
             </v-container>

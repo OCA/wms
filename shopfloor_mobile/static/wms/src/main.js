@@ -1,6 +1,5 @@
 //import searchbar from 'components/searchbar/searchbar.js'
 
-import * as simple_putaway from './scenario/simple_putaway/simple_putaway.js'
 import {Config} from './services/config.js'
 import {Storage} from './services/storage.js'
 
@@ -81,6 +80,3 @@ window.addEventListener('popstate', (e) => {
     // To use url fragment we need a proper server in the backend
     app.currentRoute = window.location.hash.slice(1)
 });
-
-console.log(simple_putaway)
-simple_putaway.simple_putaway()

@@ -1,16 +1,10 @@
-console.log('searchbar !');
-var lookup =  {
-      	"un": "oooooo",
-      	"123": "[ic 231] Ice Cream", 
-      };
-
-var searchbar = Vue.component('searchbar', {
+Vue.component('searchbar', {
   data: function () {
     return {
       entered: '',
     }
   },
-  props:['placeholder'],
+  props:['input_placeholder'],
   methods: {
   	search: function(e,) {
   		e.preventDefault();
@@ -27,7 +21,7 @@ var searchbar = Vue.component('searchbar', {
       v-on:submit="search"
       ref="form"
       >
-    <v-text-field required v-model="entered" :placeholder="placeholder" ></v-text-field>
+    <v-text-field required v-model="entered" :placeholder="input_placeholder" ></v-text-field>
   </v-form>
   `
 })
