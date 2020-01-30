@@ -1,8 +1,6 @@
-var userInformation = Vue.component('user-information', {
+Vue.component('user-information', {
     props: ['info'],
-    methods: {},
     template: `
-
     <v-alert :type="alert_type">
     {{ info.message }}
     </v-alert>
@@ -12,5 +10,4 @@ var userInformation = Vue.component('user-information', {
             return this.info.message_type
         }
     },
-
 })
