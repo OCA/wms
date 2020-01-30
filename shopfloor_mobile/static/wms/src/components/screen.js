@@ -5,6 +5,10 @@ Vue.component('Screen', {
             'type': Boolean,
             'default': true,
         },
+        'klass': {
+            'type': String,
+            'default': 'generic',
+        },
     },
     computed: {
         navigation () {
@@ -66,7 +70,7 @@ Vue.component('Screen', {
         </v-app-bar>
         <v-content>
             <v-container>
-                <div class="screen">
+                <div :class="'screen screen-' + klass">
                     <div class="wrapper">
                         <slot>Screen content</slot>
                     </div>

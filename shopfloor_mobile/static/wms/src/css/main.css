@@ -9,3 +9,8 @@
 .v-data-table tbody tr:not(:last-child) td:not(.v-data-table__mobile-row) {
     border-bottom: 2px solid white !important;
 }
+
+.screen-home .v-list-item:not(:last-child) {
+    margin-bottom: 0.5rem;
+    border-bottom: 2px dotted !important;
+}

@@ -4,7 +4,7 @@ var userConfirmation = Vue.component('user-confirmation', {
   template: `
 
     <div class="confirm mt-4">
-        <v-alert type="warning">
+        <v-alert type="warning" prominent>
             {{ question }}
             <v-form class="mt-4">
                 <v-btn
@@ -19,7 +19,6 @@ var userConfirmation = Vue.component('user-confirmation', {
                     type="reset"
                     value="no"
                     @click="$emit('user-confirmation', 'no')">No</v-btn>
-            
             </v-form>
         </v-alert>
     </div>
