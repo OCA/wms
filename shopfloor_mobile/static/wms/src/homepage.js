@@ -8,6 +8,7 @@ var homepage = Vue.component('home-page', {
     template: `
         <Screen
             title="Barcode scanner"
+            klass="home"
             :show-menu="false"
             >
             <v-list>
