@@ -1,67 +1,52 @@
-import {Odoo} from "../../services/odoo.js";
+import {ScenarioBaseMixin} from "../mixins.js";
 
-// TODO: init at component init
-var odoo_service = new Odoo({"process_id": 1, "process_menu_id": 1})
-
-
-var sp = Vue.component('simple-pack-putaway', {
+Vue.component('simple-pack-putaway', {
+    mixins: [ScenarioBaseMixin],
     template: `
         <Screen title="Single pack putaway">
             <!-- FOR DEBUG -->
             <!-- {{ current_state }} -->
-            <searchbar v-on:found="scanned" v-bind:hint="hint" v-bind:placeholder="scanTip">ici lasearch</searchbar>
+            <searchbar v-on:found="scanned" :input_placeholder="search_input_placeholder"></searchbar>
             <user-information v-if="!need_confirmation && user_notification.message" v-bind:info="user_notification"></user-information>
             <user-confirmation v-if="need_confirmation" v-on:user-confirmation="onUserConfirmation" v-bind:question="user_notification.message"></user-confirmation>
-            <operation-detail :operation="erp_data.operation"></operation-detail>
-            <form v-if="show_button" v-on:reset="reset">
-                <input type="reset" name="reset"></input>
-            </form>
+            <operation-detail :operation="erp_data.data"></operation-detail>
         </Screen>
     `,
     data: function () {
         return {
-            'screen_title': 'Simple putaway',
-            'user_notification': {
-                'message': '',
-                'message_type': '',
-            },
-            'need_confirmation': false,
-            'hint': 'pack',
-            'show_button': false,
-            'erp_data': {
-                'operation': {}
-            },
             'current_state': 'scan_pack',
             'state': {
                 'scan_pack': {
                     enter: () => {
                         this.hint = 'pack'
-                        this.reset_erp_data('operation')
+                        this.reset_erp_data('data')
                     },
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            odoo_service.fetchOperation(scanned)
+                            this.odoo.fetchOperation(scanned)
                         )
                     },
+                    scan_placeholder: 'Scan pack',
                 },
                 'wait_call': {
                     success: (result) => {
                         if (result.data != undefined)
-                            this.set_erp_data('operation', result.data)
+                            this.set_erp_data('data', result.data)
                         this.go_state(result.state)
                     }
                 },
                 'scan_location': {
                     enter: () => {
                         this.hint = 'location'
-                        this.erp_data.operation.location_barcode = false
+                        this.erp_data.data.location_barcode = false
                     },
                     on_scan: (scanned) => {
-                        this.erp_data.operation.location_barcode = scanned
+                        this.erp_data.data.location_barcode = scanned
                         this.go_state('wait_validation',
-                            odoo_service.validate(this.erp_data.operation))
-                    }
+                            this.odoo.validate(this.erp_data.data))
+                    },
+                    scan_placeholder: 'Scan location',
                 },
                 'wait_validation': {
                     success: (result) => {
@@ -76,7 +61,7 @@ var sp = Vue.component('simple-pack-putaway', {
                         if (answer == 'yes'){
                             this.go_state(
                                 'wait_validation',
-                                odoo_service.validate(this.erp_data.operation, true)
+                                this.odoo.validate(this.erp_data.data, true)
                             )
                         } else {
                             this.go_state('scan_location')
@@ -111,77 +96,4 @@ var sp = Vue.component('simple-pack-putaway', {
             }
         }
     },
-    computed: {
-      scanTip: function () {
-        return this.hint == 'pack' ? 'Scan pack': 'Scan location'
-      }
-    },
-    mounted() {
-        this.go_state('scan_pack');
-    },
-    methods: {
-        go_state: function(state, promise) {
-            console.log('GO TO STATE', state)
-            this.on_exit()
-            this.current_state = state
-            if (promise) {
-                promise.then(
-                    this.on_success,
-                    this.on_error,
-                )
-            } else {
-                this.on_enter()
-            }
-        },
-        on_enter: function () {
-            if (this.state[this.current_state].enter)
-                this.state[this.current_state].enter()
-        },
-        on_exit: function () {
-            if (this.state[this.current_state].exit)
-                this.state[this.current_state].exit()
-        },
-        on_success: function (result) {
-            if (result.message) {
-                this.set_notification(result.message)
-            } else {
-                this.reset_notification()
-            }
-            this.state[this.current_state].success(result)
-        },
-        on_error: function (result) {
-            this.state[this.current_state].error(result)
-        },
-        scanned: function(barcode) {
-            this.state[this.current_state].on_scan(barcode)
-        },
-        reset: function (e) {
-            console.log('on reset ')
-        },
-        onUserConfirmation: function(answer){
-            this.state[this.current_state].on_confirmation(answer)
-            this.need_confirmation = false
-            this.reset_notification()
-        },
-        set_notification: function(message) {
-            this.user_notification.message = message.body
-            this.user_notification.message_type = message.message_type
-            console.log('USER NOTIF SET', this.user_notification)
-        },
-        reset_notification: function() {
-            this.user_notification.message = false
-            this.user_notification.message_type = false
-            console.log('USER NOTIF RESET')
-        },
-        set_erp_data: function (key, data) {
-            this.$set(this.erp_data, key, data)
-        },
-        reset_erp_data: function (key) {
-            // FIXME
-            this.$set(this.erp_data, key, {})
-        }
-    }
 })
-
-
-export function simple_putaway () { return sp }
