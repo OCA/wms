@@ -14,7 +14,7 @@ class SinglePackPutaway(Component):
 
     def _response_for_no_picking_type(self):
         return self._response(
-            state="start",
+            state="scan_pack",
             message={
                 "message_type": "error",
                 "title": _("Configuration error"),
@@ -24,7 +24,7 @@ class SinglePackPutaway(Component):
 
     def _response_for_several_picking_types(self):
         return self._response(
-            state="start",
+            state="scan_pack",
             message={
                 "message_type": "error",
                 "title": _("Configuration error"),
@@ -34,7 +34,7 @@ class SinglePackPutaway(Component):
 
     def _response_for_package_not_found(self, barcode):
         return self._response(
-            state="start",
+            state="scan_pack",
             message={
                 "message_type": "error",
                 "title": _("Pack not found"),
@@ -44,7 +44,7 @@ class SinglePackPutaway(Component):
 
     def _response_for_forbidden_package(self, barcode, picking_type):
         return self._response(
-            state="start",
+            state="scan_pack",
             message={
                 "message_type": "error",
                 "title": _("Cannot proceed"),
@@ -53,9 +53,9 @@ class SinglePackPutaway(Component):
             },
         )
 
-    def _response_for_forbidden_start(self, existing_operations):
+    def _response_for_forbidden_scan_pack(self, existing_operations):
         return self._response(
-            state="start",
+            state="scan_pack",
             message={
                 "message_type": "error",
                 "title": _("Cannot proceed"),
@@ -70,7 +70,7 @@ class SinglePackPutaway(Component):
             },
         )
 
-    def _response_for_start_to_confirm(self, existing_operations, pack):
+    def _response_for_scan_pack_to_confirm(self, existing_operations, pack):
         move = existing_operations.move_id
         return self._response(
             data={
@@ -87,7 +87,7 @@ class SinglePackPutaway(Component):
                 "product": {"id": move.product_id.name, "name": move.product_id.name},
                 "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
             },
-            state="confirm_start",
+            state="takeover",
             message={
                 "message_type": "warning",
                 "title": _("Already started"),
@@ -97,7 +97,7 @@ class SinglePackPutaway(Component):
             },
         )
 
-    def _response_for_start_success(self, move, pack):
+    def _response_for_scan_pack_success(self, move, pack):
         return self._response(
             state="scan_location",
             message={
@@ -123,7 +123,7 @@ class SinglePackPutaway(Component):
             },
         )
 
-    def start(self, barcode):
+    def scan_pack(self, barcode):
         """Scan a pack barcode"""
 
         picking_type = self.picking_types
@@ -152,9 +152,9 @@ class SinglePackPutaway(Component):
             existing_operations
             and existing_operations[0].picking_id.picking_type_id != picking_type
         ):
-            return self._response_for_forbidden_start(existing_operations)
+            return self._response_for_forbidden_scan_pack(existing_operations)
         elif existing_operations:
-            return self._response_for_start_to_confirm(existing_operations, pack)
+            return self._response_for_scan_pack_to_confirm(existing_operations, pack)
         product = pack.quant_ids[
             0
         ].product_id  # FIXME we consider only one product per pack
@@ -181,11 +181,11 @@ class SinglePackPutaway(Component):
         )
         move._action_assign()
         package_level.is_done = True
-        return self._response_for_start_success(move, pack)
+        return self._response_for_scan_pack_success(move, pack)
 
     def _response_for_package_level_not_found(self):
         return self._response(
-            state="start",
+            state="scan_pack",
             message={
                 "message_type": "error",
                 "title": _("Start again"),
@@ -195,7 +195,7 @@ class SinglePackPutaway(Component):
 
     def _response_for_move_canceled(self):
         return self._response(
-            state="start",
+            state="scan_pack",
             message={
                 "message_type": "warning",
                 "title": _("Restart"),
@@ -225,7 +225,7 @@ class SinglePackPutaway(Component):
 
     def _response_for_validate_success(self):
         return self._response(
-            state="start",
+            state="scan_pack",
             message={
                 "message_type": "info",
                 "title": _("Start"),
@@ -264,7 +264,7 @@ class SinglePackPutaway(Component):
         package = self.env["stock.package_level"].browse(package_level_id)
         if not package.exists():
             return self._response(
-                state="start",
+                state="scan_pack",
                 message={
                     "message_type": "error",
                     "title": _("Start again"),
@@ -274,7 +274,7 @@ class SinglePackPutaway(Component):
         # TODO cancel() does not exist
         package.move_ids[0].cancel()
         return self._response(
-            state="start",
+            state="scan_pack",
             message={
                 "message_type": "info",
                 "title": _("Start"),
@@ -296,10 +296,10 @@ class SinglePackPutaway(Component):
     def _validator_return_validate(self):
         return self._response_schema()
 
-    def _validator_start(self):
+    def _validator_scan_pack(self):
         return {"barcode": {"type": "string", "nullable": False, "required": True}}
 
-    def _validator_return_start(self):
+    def _validator_return_scan_pack(self):
         return self._response_schema(
             {
                 "id": {"coerce": to_int, "required": True, "type": "integer"},
