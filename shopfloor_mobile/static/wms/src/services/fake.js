@@ -1,6 +1,6 @@
 /* eslint no-use-before-define: 0 */  // --> OFF
 
-var CASE_1 = {
+var DEMO_SINGLE_PUTAWAY_1 = {
     'fetch' : {
         "data": {
             "id": 1,
@@ -46,21 +46,21 @@ var CASE_1 = {
     }
 }
 
-var CASE_2 = {
+var DEMO_SINGLE_PUTAWAY_2 = {
     'fetch' : {
         "data": undefined,
         "state": "scan_pack",
         "message": {"message_type": "error", "body": "You cannot do that!"}
     },
 }
-var CASE_3 = {
+var DEMO_SINGLE_PUTAWAY_3 = {
     'fetch' : {
         "data": undefined,
         "state": "scan_pack",
         "message": {"message_type": "error", "body": "No pkg found"}
     },
 }
-var CASE_4 = {
+var DEMO_SINGLE_PUTAWAY_4 = {
     'fetch' : {
         "data": {
             "id": 1,
@@ -88,7 +88,7 @@ var CASE_4 = {
         }
     },
 }
-var CASE_5 = {
+var DEMO_SINGLE_PUTAWAY_5 = {
     'fetch' : {
         "data": {
             "id": 1,
@@ -121,7 +121,7 @@ var CASE_5 = {
         }
     },
 }
-var CASE_6 = {
+var DEMO_SINGLE_PUTAWAY_6 = {
     'fetch' : {
         "data": {
             "id": 1,
@@ -154,7 +154,7 @@ var CASE_6 = {
         }
     },
 }
-var CASE_7 = {
+var DEMO_SINGLE_PUTAWAY_7 = {
     'fetch' : {
         "data": {
             "id": 1,
@@ -190,16 +190,19 @@ var CASE_7 = {
 
 
 
-window.CASES = {
-    "1": CASE_1,
-    "2": CASE_2,
-    "3": CASE_3,
-    "4": CASE_4,
-    "5": CASE_5,
-    "6": CASE_6,
-    "7": CASE_7,
+window.DEMO_SINGLE_PUTAWAY = {
+    "1": DEMO_SINGLE_PUTAWAY_1,
+    "2": DEMO_SINGLE_PUTAWAY_2,
+    "3": DEMO_SINGLE_PUTAWAY_3,
+    "4": DEMO_SINGLE_PUTAWAY_4,
+    "5": DEMO_SINGLE_PUTAWAY_5,
+    "6": DEMO_SINGLE_PUTAWAY_6,
+    "7": DEMO_SINGLE_PUTAWAY_7,
 };
 
-window.CASE = window.CASES["1"];
+window.DEMO_CASES = {
+    "single_pack_putaway": window.DEMO_SINGLE_PUTAWAY,
+}
+window.DEMO_CASE = {}
 
 /* eslint no-use-before-define: 2 */  // --> ON
