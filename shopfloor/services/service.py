@@ -90,7 +90,7 @@ class BaseShopfloorService(AbstractComponent):
                         "allowed": ["info", "warning", "error"],
                     },
                     "title": {"type": "string", "required": False},
-                    "message": {"type": "string", "required": True},
+                    "body": {"type": "string", "required": True},
                 },
             },
         }
