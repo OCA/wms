@@ -21,7 +21,6 @@ Vue.component('simple-pack-putaway', {
             'state': {
                 'scan_pack': {
                     enter: () => {
-                        this.hint = 'pack'
                         this.reset_erp_data('data')
                     },
                     on_scan: (scanned) => {
@@ -41,7 +40,6 @@ Vue.component('simple-pack-putaway', {
                 },
                 'scan_location': {
                     enter: () => {
-                        this.hint = 'location'
                         this.erp_data.data.location_barcode = false
                     },
                     on_scan: (scanned) => {

@@ -1,3 +1,7 @@
+#app.demo_mode {
+    border: 5px dotted orange;
+}
+
 .v-data-table th,
 .v-data-table td
 {

@@ -1,6 +1,7 @@
 import {Storage} from './storage.js'
 
-export class Odoo {
+
+export class OdooMixin {
 
     constructor(params) {
         this.params = params;
@@ -60,7 +61,12 @@ export class Odoo {
     _get_url (endpoint) {
         return '/shopfloor/' + this.process_name + '/' + endpoint;
     }
-    fetchOperation (barcode) {
+}
+
+
+export class OdooMocked extends OdooMixin{
+    
+    scan_pack (barcode) {
         console.log('Fetch', barcode);
         window.CASE = window.CASES[barcode];
         let res = window.CASE['fetch'];
@@ -76,7 +82,25 @@ export class Odoo {
         console.log(res);
         return Promise.resolve(res)
     }
-    __validate (operation, confirmed) {
+    cancel(id) {
+        console.log('Cancelling', id);
+        let res = window.CASE['cancel'];
+        console.log(res);
+        return Promise.resolve(res)
+    }
+    scan_location (barcode) {
+        return Promise.resolve(window.CASE['scan_loc'])
+    }
+
+}
+
+
+export class Odoo extends OdooMixin{
+    
+    scan_pack (barcode) {
+        return this._call('scan_pack', 'POST', {'barcode': barcode})
+    }
+    validate (operation, confirmed) {
         console.log('Validate', operation);
         let data = {
             'id': operation.id, 'location_barcode': operation.location_barcode
@@ -87,13 +111,10 @@ export class Odoo {
     }
     cancel(id) {
         console.log('Cancelling', id);
-        let res = window.CASE['cancel'];
-        console.log(res);
-        return Promise.resolve(res)
+        return this._call('cancel', 'POST', {'barcode': barcode})
     }
-    scanLocation (barcode) {
-        return Promise.resolve(window.CASE['scan_loc'])
-        // return this._call('scan_location', 'GET', {'barcode': barcode})
+    scan_location (barcode) {
+        return this._call('scan_location', 'POST', {'barcode': barcode})
     }
 
 }

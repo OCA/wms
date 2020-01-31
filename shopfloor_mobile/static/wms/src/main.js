@@ -16,15 +16,17 @@ var AppConfig = new Config()
 
 class Routes {
     static get(path) {
+        // support demo mode via hash eg: `#demo/single_pack_putaway`
+        path = path.replace('demo/', '')
         if (path == '') {
             return Home
         } else {
-           var menus = AppConfig.get('menus')
-           for (var idx in menus) {
+            var menus = AppConfig.get('menus')
+            for (var idx in menus) {
                 if (menus[idx]['hash'] == path) {
                     return ScenarioTemplate[menus[idx]['process']]
                 }
-            };
+            }
             return NotFound;
         }
     }
@@ -56,7 +58,7 @@ var app = new Vue({
     }),
     data: {
         currentRoute: window.location.hash.slice(1),
-        using_demo_url: false,
+        demo_mode: false,
         config: AppConfig,
     },
     computed: {
@@ -69,7 +71,8 @@ var app = new Vue({
         }
     },
     created: function () {
-        this.using_demo_url = window.location.pathname.includes('demo')
+        this.demo_mode = window.location.hash.includes('demo')
+        console.log('DEMO MODE: ON!')
     },
     render (h) { return h(this.ViewComponent) },
 
