@@ -1,4 +1,4 @@
-import {Odoo} from "../services/odoo.js";
+import {Odoo, OdooMocked} from "../services/odoo.js";
 
 export var ScenarioBaseMixin = {
     data: function () {
@@ -18,8 +18,11 @@ export var ScenarioBaseMixin = {
         }
     },
     mounted: function () {
-        // FIXME: init data should come from specific scenario
-        this.odoo = new Odoo({"process_id": 1, "process_menu_id": 1})
+        if (this.$root.demo_mode)
+            this.odoo = new OdooMocked({"process_id": 1, "process_menu_id": 1})
+        else
+            // FIXME: init data should come from specific scenario
+            this.odoo = new Odoo({"process_id": 1, "process_menu_id": 1})
     },
     computed: {
         search_input_placeholder: function () {

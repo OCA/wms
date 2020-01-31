@@ -19,7 +19,7 @@ Vue.component('Screen', {
         drawer: null,
     }),
     template: `
-    <v-app>
+    <v-app :class="$root.demo_mode ? 'demo_mode': ''">
         <v-navigation-drawer
                 v-model="drawer"
                 app
