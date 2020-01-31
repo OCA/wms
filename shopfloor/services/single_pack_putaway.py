@@ -18,7 +18,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "error",
                 "title": _("Configuration error"),
-                "message": _("No picking types found for this menu and profile"),
+                "body": _("No picking types found for this menu and profile"),
             },
         )
 
@@ -28,7 +28,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "error",
                 "title": _("Configuration error"),
-                "message": _("Several picking types found for this menu and profile"),
+                "body": _("Several picking types found for this menu and profile"),
             },
         )
 
@@ -38,7 +38,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "error",
                 "title": _("Pack not found"),
-                "message": _("The pack %s doesn't exist") % barcode,
+                "body": _("The pack %s doesn't exist") % barcode,
             },
         )
 
@@ -48,7 +48,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "error",
                 "title": _("Cannot proceed"),
-                "message": _("pack %s is not in %s location")
+                "body": _("pack %s is not in %s location")
                 % (barcode, picking_type.default_location_src_id.name),
             },
         )
@@ -59,7 +59,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "error",
                 "title": _("Cannot proceed"),
-                "message": _(
+                "body": _(
                     "An operation exists in %s %s. "
                     "You cannot process it with this shopfloor process."
                 )
@@ -91,7 +91,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "warning",
                 "title": _("Already started"),
-                "message": _(
+                "body": _(
                     "Operation already running. Would you like to take it over ?"
                 ),
             },
@@ -103,7 +103,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "info",
                 "title": _("Start"),
-                "message": _(
+                "body": _(
                     "The move is ready, you can scan the destination location."
                 ),
             },
@@ -189,7 +189,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "error",
                 "title": _("Start again"),
-                "message": _("This operation does not exist anymore."),
+                "body": _("This operation does not exist anymore."),
             },
         )
 
@@ -199,7 +199,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "warning",
                 "title": _("Restart"),
-                "message": _("Restart the operation, someone has canceled it."),
+                "body": _("Restart the operation, someone has canceled it."),
             },
         )
 
@@ -209,7 +209,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "error",
                 "title": _("Forbidden"),
-                "message": _("You cannot place it here"),
+                "body": _("You cannot place it here"),
             },
         )
 
@@ -219,7 +219,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "warning",
                 "title": _("Confirm"),
-                "message": _("Are you sure?"),
+                "body": _("Are you sure?"),
             },
         )
 
@@ -229,7 +229,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "info",
                 "title": _("Start"),
-                "message": _("The pack has been moved, you can scan a new pack."),
+                "body": _("The pack has been moved, you can scan a new pack."),
             },
         )
 
@@ -268,7 +268,7 @@ class SinglePackPutaway(Component):
                 message={
                     "message_type": "error",
                     "title": _("Start again"),
-                    "message": _("This operation does not exist anymore."),
+                    "body": _("This operation does not exist anymore."),
                 },
             )
         # TODO cancel() does not exist
@@ -278,7 +278,7 @@ class SinglePackPutaway(Component):
             message={
                 "message_type": "info",
                 "title": _("Start"),
-                "message": _("The move has been canceled, you can scan a new pack."),
+                "body": _("The move has been canceled, you can scan a new pack."),
             },
         )
 

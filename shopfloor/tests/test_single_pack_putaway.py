@@ -87,7 +87,7 @@ class PutawayCase(CommonCase):
             response,
             {
                 "message": {
-                    "message": "The pack has been moved," " you can scan a new pack.",
+                    "body": "The pack has been moved," " you can scan a new pack.",
                     "message_type": "info",
                     "title": "Start",
                 },
