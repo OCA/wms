@@ -5,7 +5,7 @@ export class OdooMixin {
 
     constructor(params) {
         this.params = params;
-        this.process_name = params.process_name;
+        this.usage = params.usage;
         this.process_id = this.params.process_id;
         this.process_menu_id = this.params.process_menu_id;
     }
@@ -59,7 +59,7 @@ export class OdooMixin {
         }
     }
     _get_url (endpoint) {
-        return '/shopfloor/' + this.process_name + '/' + endpoint;
+        return '/shopfloor/' + this.usage + '/' + endpoint;
     }
 }
 

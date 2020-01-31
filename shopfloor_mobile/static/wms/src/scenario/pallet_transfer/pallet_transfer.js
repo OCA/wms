@@ -1,6 +1,6 @@
 
 var odoo_service = {
-    'fetchOperation': function (barcode) {
+    'scan_pack': function (barcode) {
         console.log('ask odoo about barcode of pack', barcode.pack);
         return Promise.resolve({ 'source': 'def', 'destination': 'abc', 'id': 1233232, 'name': 'PACK0001', 'barcode': barcode.pack});
     },
@@ -38,7 +38,7 @@ var pt = Vue.component('pallet-transfer', {
                     on_scan: (scanned) => {
                         this.go_state(
                             'confirmPallet',
-                            odoo_service.fetchOperation({
+                            odoo_service.scan_pack({
                                 'pack': scanned
                             })
                         );
@@ -74,7 +74,7 @@ var pt = Vue.component('pallet-transfer', {
                         this.go_state('getPallet');
                     }
                 },
-                // 'waitFetchOperation': {
+                // 'waitscan_pack': {
                 //     success: (result) => {
                 //         this.operation = result;
                 //         this.go_state('operationSet');
