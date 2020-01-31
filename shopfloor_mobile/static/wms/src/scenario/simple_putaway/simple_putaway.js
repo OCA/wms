@@ -15,6 +15,7 @@ Vue.component('simple-pack-putaway', {
     `,
     data: function () {
         return {
+            'usage': 'single_pack_putaway',
             'show_reset_button': true,
             'initial_state': 'scan_pack',
             'current_state': 'scan_pack',
@@ -26,7 +27,7 @@ Vue.component('simple-pack-putaway', {
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.fetchOperation(scanned)
+                            this.odoo.scan_pack(scanned)
                         )
                     },
                     scan_placeholder: 'Scan pack',

@@ -15,14 +15,19 @@ export var ScenarioBaseMixin = {
             'initial_state': 'scan_pack',
             'current_state': 'scan_pack',
             'state': {},
+            'usage': '',  // match component usage on odoo
         }
     },
     mounted: function () {
         if (this.$root.demo_mode)
-            this.odoo = new OdooMocked({"process_id": 1, "process_menu_id": 1})
+            this.odoo = new OdooMocked({
+                "process_id": 1, "process_menu_id": 1, "usage": this.usage,
+            })
         else
             // FIXME: init data should come from specific scenario
-            this.odoo = new Odoo({"process_id": 1, "process_menu_id": 1})
+            this.odoo = new Odoo({
+                "process_id": 1, "process_menu_id": 1, "usage": this.usage,
+            })
     },
     computed: {
         search_input_placeholder: function () {
@@ -57,10 +62,12 @@ export var ScenarioBaseMixin = {
             } else {
                 this.reset_notification()
             }
-            this.state[this.current_state].success(result)
+            if (this.state[this.current_state].success)
+                this.state[this.current_state].success(result)
         },
         on_error: function (result) {
-            this.state[this.current_state].error(result)
+            if (this.state[this.current_state].error)
+                this.state[this.current_state].error(result)
         },
         scanned: function(barcode) {
             this.state[this.current_state].on_scan(barcode)

@@ -12,7 +12,7 @@ export class Config {
   }
 
   load() {
-      var odoo = new Odoo({process_name:"app"})
+      var odoo = new Odoo({usage: "app"})
       return odoo._call('user_config', 'POST', {})
           .then((data) => {
               this.data = data['data'];
