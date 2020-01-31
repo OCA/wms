@@ -1,5 +1,5 @@
-#app.demo_mode {
-    border: 5px dotted orange;
+#app.demo_mode header {
+    border-bottom: 5px dashed orange !important;
 }
 
 .v-data-table th,
