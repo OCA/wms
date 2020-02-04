@@ -13,7 +13,7 @@ var DEMO_SINGLE_PUTAWAY_1 = {
                 "id": 2,
                 "name": 'Location SRC 2',
             },
-            "product": {"id": 1, "name": 'Product 1'},
+            "product": [{"id": 1, "name": 'Product 1', "qty": 5}, {"id": 2, "name": 'Product 2', "qty": 2}],
             "picking": {"id": 1, "name": 'Picking 1'},
         },
         "state": "scan_location",
@@ -188,6 +188,40 @@ var DEMO_SINGLE_PUTAWAY_7 = {
     },
 }
 
+var DEMO_SCAN_ANYTHING_PACK = {
+    'fetch' : {
+        "data": {
+            "type": "pack",
+            "id": 192834,
+            "name": "PA92834",
+            "location_src": {
+                "id": 1923,
+                "name":  'B1S08A34',
+            },
+            "location_dst": {
+                "id": 224,
+                "name": 'B1S00A01',
+            },
+            "product": [{"id": 1, "name": 'Ski Thermo Sock', "qty": 36, "lot": "19102403"}, {"id": 123, "name": 'Hiking shoes', "qty": 32, "lot": "1910239"}],
+            "picking": {"id": 1, "name": 'Picking 7'},
+        },
+        "message": undefined
+    },
+}
+var DEMO_SCAN_ANYTHING_PRODUCT = {
+    'fetch' : {
+        "data": {
+            "type": "product",
+            "id": 1,
+            "name": "Super Product",
+            "location_src": {
+                "id": 1,
+                "name":  'Location DSGF',
+            },
+        },
+        "message": undefined
+    },
+}
 
 
 window.DEMO_SINGLE_PUTAWAY = {
@@ -199,9 +233,14 @@ window.DEMO_SINGLE_PUTAWAY = {
     "6": DEMO_SINGLE_PUTAWAY_6,
     "7": DEMO_SINGLE_PUTAWAY_7,
 };
+window.DEMO_SCAN_ANYTHING = {
+    "pack": DEMO_SCAN_ANYTHING_PACK,
+    "prod": DEMO_SCAN_ANYTHING_PRODUCT,
+}
 
 window.DEMO_CASES = {
     "single_pack_putaway": window.DEMO_SINGLE_PUTAWAY,
+    "scan_anything": window.DEMO_SCAN_ANYTHING,
 }
 window.DEMO_CASE = {}
 

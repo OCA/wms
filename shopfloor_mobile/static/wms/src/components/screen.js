@@ -24,6 +24,7 @@ Vue.component('Screen', {
                 v-model="drawer"
                 app
                 >
+
             <v-list>
                 <v-list-item
                     v-for="item in navigation"
@@ -44,9 +45,12 @@ Vue.component('Screen', {
                 app
                 >
             <v-app-bar-nav-icon @click.stop="drawer = !drawer" v-if="showMenu" />
-    
+
             <v-toolbar-title>{{ title }}</v-toolbar-title>
             <v-spacer></v-spacer>
+            <v-btn icon href="#scananything">
+                <v-icon >mdi-magnify</v-icon>
+            </v-btn>
             <v-menu
                 left
                 bottom
@@ -56,7 +60,7 @@ Vue.component('Screen', {
                     <v-icon>mdi-dots-vertical</v-icon>
                     </v-btn>
                 </template>
-        
+
                 <v-list>
                     <v-list-item
                     v-for="n in 5"

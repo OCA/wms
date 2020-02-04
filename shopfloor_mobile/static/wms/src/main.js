@@ -6,6 +6,7 @@ import {Storage} from './services/storage.js'
 const NotFound = { template: '<p>Page not found</p>' }
 const Home = { template: '<home-page v-bind:routes="routes"></home-page>', props: {routes:"myroutes"}} // { props: {routes: AllRoutes} }}
 const LoginPage = { template: '<login-page></login-page>' }
+const ScanAnything = { template: '<scan-anything></scan-anything>' }
 
 const ScenarioTemplate = {
    single_pack_putaway: {template: "<simple-pack-putaway></simple-pack-putaway>"},
@@ -20,6 +21,8 @@ class Routes {
         path = path.replace('demo/', '')
         if (path == '') {
             return Home
+        } else if (path == 'scananything'){
+            return ScanAnything
         } else {
             var menus = AppConfig.get('menus')
             for (var idx in menus) {
@@ -72,7 +75,6 @@ var app = new Vue({
     },
     created: function () {
         this.demo_mode = window.location.hash.includes('demo')
-        console.log('DEMO MODE: ON!')
     },
     render (h) { return h(this.ViewComponent) },
 
