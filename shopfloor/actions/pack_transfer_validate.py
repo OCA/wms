@@ -4,7 +4,6 @@ from odoo.addons.component.core import Component
 class PackTransferValidateAction(Component):
     """Pack Transfer shared business logic
 
-
     This component is shared by the "validate" action of the processes:
 
     * single_pack_putaway
