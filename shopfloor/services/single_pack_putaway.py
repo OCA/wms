@@ -134,6 +134,7 @@ class SinglePackPutaway(Component):
         company = self.env.company
 
         # TODO define on what we search (pack name, pack barcode ...)
+        # we can create a component with the search methods (easy to override)
         pack = self.env["stock.quant.package"].search([("name", "=", barcode)])
         if not pack:
             return self._response_for_package_not_found(barcode)
@@ -203,6 +204,16 @@ class SinglePackPutaway(Component):
             },
         )
 
+    def _response_for_location_not_found(self):
+        return self._response(
+            state="scan_location",
+            message={
+                "message_type": "error",
+                "title": _("Scan"),
+                "message": _("No location found for this barcode."),
+            },
+        )
+
     def _response_for_forbidden_location(self):
         return self._response(
             state="scan_location",
@@ -245,7 +256,10 @@ class SinglePackPutaway(Component):
         if not pack_transfer.is_move_state_valid(move):
             return self._response_for_move_canceled()
 
+        # TODO move scan search in a component for this?
         scanned_location = pack_transfer.location_from_scan(location_barcode)
+        if not scanned_location:
+            return self._response_for_location_not_found()
         if not pack_transfer.is_dest_location_valid(move, scanned_location):
             return self._response_for_forbidden_location()
 
@@ -263,6 +277,10 @@ class SinglePackPutaway(Component):
     def cancel(self, package_level_id):
         package = self.env["stock.package_level"].browse(package_level_id)
         if not package.exists():
+            return self._response_for_package_level_not_found()
+        # package.move_ids may be empty, it seems
+        move = package.move_line_ids.move_id
+        if move.state == "done":
             return self._response(
                 state="scan_pack",
                 message={
@@ -271,8 +289,7 @@ class SinglePackPutaway(Component):
                     "body": _("This operation does not exist anymore."),
                 },
             )
-        # TODO cancel() does not exist
-        package.move_ids[0].cancel()
+        package.move_line_ids.move_id._action_cancel()
         return self._response(
             state="scan_pack",
             message={
