@@ -65,7 +65,7 @@ export class OdooMixin {
 
 
 export class OdooMocked extends OdooMixin{
-    
+
     scan_pack (barcode) {
         console.log('Fetch', barcode);
         window.CASE = window.DEMO_CASES[this.usage][barcode];
@@ -90,6 +90,19 @@ export class OdooMocked extends OdooMixin{
     }
     scan_location (barcode) {
         return Promise.resolve(window.CASE['scan_loc'])
+    }
+    scan_anything (barcode) {
+        console.log('Scan anything', barcode, this.usage);
+        window.CASE = window.DEMO_CASES[this.usage][barcode];
+        if (!window.CASE) {
+            return Promise.resolve({
+                "message": {"message_type": "error", "body": "Unknown barcode"}
+            })
+        }
+        let res = window.CASE['fetch'];
+        // console.log(res);
+        return Promise.resolve(res)
+
     }
 
 }
