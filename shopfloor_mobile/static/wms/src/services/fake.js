@@ -222,6 +222,36 @@ var DEMO_SCAN_ANYTHING_PRODUCT = {
         "message": undefined
     },
 }
+var DEMO_SCAN_ANYTHING_LOCATION = {
+    'fetch' : {
+        "data": {
+            "type": "location",
+            "barcode": "283429834",
+            "detail_info": {
+                "id": 3231,
+                "name": "CCOROL-01",
+                "parent_name": "SCH/Packing/CCOROL",
+                "products": [
+                    {
+                        "id": 424,
+                        "name": "Sun Glasses Cat 4 High Altitude",
+                        "pack": "PID0000008", "lot": "AA8122F41",
+                        "qty_instock": 34, "qty_reserved": 12
+                    },
+                    {
+                        "id": 421,
+                        "name": "Sun Glasses Pro Glazier",
+                        "pack": "PID0000421",
+                        "lot": "AA8122F41",
+                        "qty_instock": 4,
+                        "qty_reserved": 0
+                    },
+                ],
+            }
+        },
+        "message": undefined
+    },
+}
 
 
 window.DEMO_SINGLE_PUTAWAY = {
@@ -236,6 +266,7 @@ window.DEMO_SINGLE_PUTAWAY = {
 window.DEMO_SCAN_ANYTHING = {
     "pack": DEMO_SCAN_ANYTHING_PACK,
     "prod": DEMO_SCAN_ANYTHING_PRODUCT,
+    "loc": DEMO_SCAN_ANYTHING_LOCATION,
 }
 
 window.DEMO_CASES = {
