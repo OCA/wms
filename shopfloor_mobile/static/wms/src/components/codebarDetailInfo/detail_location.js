@@ -1,15 +1,5 @@
 var moreInfo = Vue.component('detail-location', {
-    data: function () {
-        return {
-            "detailInfo": {}
-        }
-    },
     props:['locationDetail'],
-    methods: {
-        "created": function (){
-            this.detailInfo = this.locationDetail.detail_info;
-        }
-    },
     template: `
       <div>
         <v-simple-table>

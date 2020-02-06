@@ -18,3 +18,11 @@
     margin-bottom: 0.5rem;
     border-bottom: 2px dotted !important;
 }
+
+ul.packaging {
+    list-style: none;
+}
+ul.packaging span:first-child {
+    width:33%;
+    float:left;
+}

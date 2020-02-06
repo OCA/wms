@@ -7,7 +7,7 @@ Vue.component('scan-anything', {
             <searchbar v-on:found="scanned" :input_placeholder="search_input_placeholder"></searchbar>
             <user-information v-if="!need_confirmation && user_notification.message" v-bind:info="user_notification"></user-information>
             <detail-pack :packDetail="erp_data.data" v-if="erp_data.data.type=='pack'"></detail-pack>
-            <detail-product :productDetail="erp_data.data" v-if="erp_data.data.type=='product'"></detail-product>
+            <detail-product :productDetail="erp_data.data.detail_info" v-if="erp_data.data.type=='product'"></detail-product>
             <detail-location :locationDetail="erp_data.data.detail_info" v-if="erp_data.data.type=='location'"></detail-location>
             <reset-screen-button v-on:reset="on_reset" :show_reset_button="show_reset_button"></reset-screen-button>
         </Screen>
