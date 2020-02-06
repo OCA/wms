@@ -11,15 +11,10 @@ class ShopfloorPack(Component):
     _description = __doc__
 
     def get_by_name(self, pack_name):
-        """
-        Get pack informations
-        """
-        pack = self.env["stock.quant.package"].search(
-            [("name", "=", pack_name)],
-            # TODO, is it what we want? error if not found?
-            limit=1,
-        )
-        return self._response(data=self._to_json(pack)[:1])
+        """Get pack information"""
+        search = self.actions_for("search")
+        package = search.package_from_scan(pack_name)
+        return self._response(data=self._to_json(package)[:1])
 
     def _validator_get_by_name(self):
         return {"pack_name": {"type": "string", "nullable": False, "required": True}}
