@@ -80,7 +80,6 @@ class CommonCase(SavepointCase, ComponentMixin):
             {
                 "data": self.ANY,
                 "message": {
-                    "title": self.ANY,
                     "message_type": self.ANY,
                     "message": self.ANY,
                 },

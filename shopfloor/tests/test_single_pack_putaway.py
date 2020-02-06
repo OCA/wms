@@ -104,7 +104,6 @@ class PutawayCase(CommonCase):
             response,
             state="start",
             message={
-                "title": self.ANY,
                 "message_type": "error",
                 "message": "The package NOTHING_SHOULD_EXIST_WITH: 👀 doesn't exist",
             },
@@ -131,7 +130,6 @@ class PutawayCase(CommonCase):
             response,
             state="start",
             message={
-                "title": self.ANY,
                 "message_type": "error",
                 "message": "You cannot work on a package (%s) outside of location: %s"
                 % (
@@ -173,7 +171,6 @@ class PutawayCase(CommonCase):
             response,
             state="start",
             message={
-                "title": self.ANY,
                 "message_type": "error",
                 "message": "An operation exists in Delivery Orders %s. You cannot"
                 " process it with this shopfloor process." % (picking.name,),
@@ -205,7 +202,6 @@ class PutawayCase(CommonCase):
             response,
             state="confirm_start",
             message={
-                "title": self.ANY,
                 "message_type": "warning",
                 "message": "Operation's already running."
                 " Would you like to take it over?",
@@ -305,7 +301,6 @@ class PutawayCase(CommonCase):
             response,
             state="start",
             message={
-                "title": self.ANY,
                 "message_type": "error",
                 "message": "This operation does not exist anymore.",
             },
@@ -338,7 +333,6 @@ class PutawayCase(CommonCase):
             response,
             state="scan_location",
             message={
-                "title": self.ANY,
                 "message_type": "error",
                 "message": "No location found for this barcode.",
             },
@@ -374,11 +368,7 @@ class PutawayCase(CommonCase):
         self.assert_response(
             response,
             state="scan_location",
-            message={
-                "title": self.ANY,
-                "message_type": "error",
-                "message": "You cannot place it here",
-            },
+            message={"message_type": "error", "message": "You cannot place it here"},
         )
 
     def test_validate_location_to_confirm(self):
@@ -413,11 +403,7 @@ class PutawayCase(CommonCase):
         self.assert_response(
             response,
             state="confirm_location",
-            message={
-                "title": self.ANY,
-                "message_type": "warning",
-                "message": "Are you sure?",
-            },
+            message={"message_type": "warning", "message": "Are you sure?"},
         )
 
     def test_validate_location_with_confirm(self):
@@ -459,7 +445,6 @@ class PutawayCase(CommonCase):
             response,
             state="start",
             message={
-                "title": self.ANY,
                 "message_type": "info",
                 "message": "The pack has been moved, you can scan a new pack.",
             },
@@ -507,7 +492,6 @@ class PutawayCase(CommonCase):
             response,
             state="start",
             message={
-                "title": self.ANY,
                 "message_type": "info",
                 "message": "Canceled, you can scan a new pack.",
             },
@@ -550,7 +534,6 @@ class PutawayCase(CommonCase):
             response,
             state="start",
             message={
-                "title": self.ANY,
                 "message_type": "info",
                 "message": "Canceled, you can scan a new pack.",
             },
@@ -589,11 +572,7 @@ class PutawayCase(CommonCase):
         self.assert_response(
             response,
             state="start",
-            message={
-                "title": self.ANY,
-                "message_type": "info",
-                "message": "Operation already processed.",
-            },
+            message={"message_type": "info", "message": "Operation already processed."},
         )
 
     def test_cancel_not_found(self):
@@ -608,7 +587,6 @@ class PutawayCase(CommonCase):
             response,
             state="start",
             message={
-                "title": self.ANY,
                 "message_type": "error",
                 "message": "This operation does not exist anymore.",
             },
