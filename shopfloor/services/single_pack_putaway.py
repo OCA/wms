@@ -12,47 +12,24 @@ class SinglePackPutaway(Component):
     _usage = "single_pack_putaway"
     _description = __doc__
 
-    # TODO create an Action component for messages, so we use the
-    # same messages in every scenario
     def _response_for_no_picking_type(self):
-        return self._response(
-            state="start",
-            message={
-                "message_type": "error",
-                "title": _("Configuration error"),
-                "message": _("No picking types found for this menu and profile"),
-            },
-        )
+        message = self.actions_for("message")
+        return self._response(state="start", message=message.no_picking_type())
 
     def _response_for_several_picking_types(self):
-        return self._response(
-            state="start",
-            message={
-                "message_type": "error",
-                "title": _("Configuration error"),
-                "message": _("Several picking types found for this menu and profile"),
-            },
-        )
+        message = self.actions_for("message")
+        return self._response(state="start", message=message.several_picking_types())
 
     def _response_for_package_not_found(self, barcode):
+        message = self.actions_for("message")
         return self._response(
-            state="start",
-            message={
-                "message_type": "error",
-                "title": _("Pack not found"),
-                "message": _("The pack %s doesn't exist") % barcode,
-            },
+            state="start", message=message.package_not_found_for_barcode(barcode)
         )
 
     def _response_for_forbidden_package(self, barcode, picking_type):
+        message = self.actions_for("message")
         return self._response(
-            state="start",
-            message={
-                "message_type": "error",
-                "title": _("Cannot proceed"),
-                "message": _("pack %s is not in %s location")
-                % (barcode, picking_type.default_location_src_id.name),
-            },
+            state="start", message=message.package_not_allowed_in_src_location()
         )
 
     def _response_for_forbidden_start(self, existing_operations):
@@ -73,6 +50,7 @@ class SinglePackPutaway(Component):
         )
 
     def _response_for_start_to_confirm(self, existing_operations, pack):
+        message = self.actions_for("message")
         move = existing_operations.move_id
         return self._response(
             data={
@@ -90,25 +68,14 @@ class SinglePackPutaway(Component):
                 "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
             },
             state="confirm_start",
-            message={
-                "message_type": "warning",
-                "title": _("Already started"),
-                "message": _(
-                    "Operation already running. Would you like to take it over ?"
-                ),
-            },
+            message=message.already_running_ask_confirmation(),
         )
 
     def _response_for_start_success(self, move, pack):
+        message = self.actions_for("message")
         return self._response(
             state="scan_location",
-            message={
-                "message_type": "info",
-                "title": _("Start"),
-                "message": _(
-                    "The move is ready, you can scan the destination location."
-                ),
-            },
+            message=message.scan_destination(),
             data={
                 "id": move.move_line_ids[0].package_level_id.id,
                 "name": pack.name,
@@ -189,64 +156,36 @@ class SinglePackPutaway(Component):
         return self._response_for_start_success(move, pack)
 
     def _response_for_package_level_not_found(self):
-        return self._response(
-            state="start",
-            message={
-                "message_type": "error",
-                "title": _("Start again"),
-                "message": _("This operation does not exist anymore."),
-            },
-        )
+        message = self.actions_for("message")
+        return self._response(state="start", message=message.operation_not_found())
 
-    def _response_for_move_canceled(self):
+    def _response_for_move_canceled_elsewhere(self):
+        message = self.actions_for("message")
         return self._response(
-            state="start",
-            message={
-                "message_type": "warning",
-                "title": _("Restart"),
-                "message": _("Restart the operation, someone has canceled it."),
-            },
+            state="start", message=message.operation_has_been_canceled_elsewhere()
         )
 
     def _response_for_location_not_found(self):
+        message = self.actions_for("message")
         return self._response(
-            state="scan_location",
-            message={
-                "message_type": "error",
-                "title": _("Scan"),
-                "message": _("No location found for this barcode."),
-            },
+            state="scan_location", message=message.no_location_found()
         )
 
     def _response_for_forbidden_location(self):
+        message = self.actions_for("message")
         return self._response(
-            state="scan_location",
-            message={
-                "message_type": "error",
-                "title": _("Forbidden"),
-                "message": _("You cannot place it here"),
-            },
+            state="scan_location", message=message.dest_location_not_allowed()
         )
 
     def _response_for_location_need_confirm(self):
+        message = self.actions_for("message")
         return self._response(
-            state="confirm_location",
-            message={
-                "message_type": "warning",
-                "title": _("Confirm"),
-                "message": _("Are you sure?"),
-            },
+            state="confirm_location", message=message.need_confirmation()
         )
 
     def _response_for_validate_success(self):
-        return self._response(
-            state="start",
-            message={
-                "message_type": "info",
-                "title": _("Start"),
-                "message": _("The pack has been moved, you can scan a new pack."),
-            },
-        )
+        message = self.actions_for("message")
+        return self._response(state="start", message=message.confirm_pack_moved())
 
     def validate(self, package_level_id, location_barcode, confirmation=False):
         """Validate the transfer"""
@@ -259,7 +198,7 @@ class SinglePackPutaway(Component):
 
         move = package.move_line_ids[0].move_id
         if not pack_transfer.is_move_state_valid(move):
-            return self._response_for_move_canceled()
+            return self._response_for_move_canceled_elsewhere()
 
         scanned_location = search.location_from_scan(location_barcode)
         if not scanned_location:
@@ -278,6 +217,16 @@ class SinglePackPutaway(Component):
         pack_transfer.set_destination_and_done(move, scanned_location)
         return self._response_for_validate_success()
 
+    def _response_for_move_already_processed(self):
+        message = self.actions_for("message")
+        return self._response(state="start", message=message.already_done())
+
+    def _response_for_confirm_move_cancellation(self):
+        message = self.actions_for("message")
+        return self._response(
+            state="start", message=message.confirm_canceled_scan_next_pack()
+        )
+
     def cancel(self, package_level_id):
         package = self.env["stock.package_level"].browse(package_level_id)
         if not package.exists():
@@ -285,23 +234,10 @@ class SinglePackPutaway(Component):
         # package.move_ids may be empty, it seems
         move = package.move_line_ids.move_id
         if move.state == "done":
-            return self._response(
-                state="start",
-                message={
-                    "message_type": "info",
-                    "title": _("Start"),
-                    "message": _("Move already processed."),
-                },
-            )
+            return self._response_for_move_already_processed()
+
         package.move_line_ids.move_id._action_cancel()
-        return self._response(
-            state="start",
-            message={
-                "message_type": "info",
-                "title": _("Start"),
-                "message": _("The move has been canceled, you can scan a new pack."),
-            },
-        )
+        return self._response_for_confirm_move_cancellation()
 
     def _validator_cancel(self):
         return {
