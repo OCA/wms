@@ -1,6 +1,7 @@
 from odoo.addons.component.core import Component
 
 
+# TODO think about how we want to share the common methods / workflows
 class PackTransferValidateAction(Component):
     """Pack Transfer shared business logic
 
@@ -17,26 +18,31 @@ class PackTransferValidateAction(Component):
     def is_move_state_valid(self, move):
         return move.state != "cancel"
 
+    # TODO generic method "is_location_below"
     def is_dest_location_valid(self, move, scanned_location):
         """Forbid a dest location to be used"""
-        allowed_locations = self.env["stock.location"].search(
+        allowed_location = self.env["stock.location"].search_count(
             [
                 (
                     "id",
                     "child_of",
                     move.picking_id.picking_type_id.default_location_dest_id.id,
-                )
+                ),
+                ("id", "=", scanned_location.id),
             ]
         )
-        return scanned_location in allowed_locations
+        return bool(allowed_location)
 
     def is_dest_location_to_confirm(self, move, scanned_location):
         """Destination that could be used but need confirmation"""
         move_dest_location = move.move_line_ids[0].location_dest_id
-        zone_locations = self.env["stock.location"].search(
-            [("id", "child_of", move_dest_location.id)]
+        in_dest_location = self.env["stock.location"].search_count(
+            [
+                ("id", "child_of", move_dest_location.id),
+                ("id", "=", scanned_location.id),
+            ]
         )
-        return scanned_location not in zone_locations
+        return not bool(in_dest_location)
 
     def set_destination_and_done(self, move, scanned_location):
         move.move_line_ids[0].location_dest_id = scanned_location.id
