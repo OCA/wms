@@ -18,16 +18,19 @@ Vue.component('login-page', {
         }
     },
     template: `
-
-    <form v-on:submit="login">
-    <h1 class="text-center">WMS</h1>
-  <div class="form-group">
-
-    <p>{{ error }}</p>
-    <input type="text" class="form-control" v-model="apikey" placeholder="Scan your access badge or fill your credential" autofocus>
-  </div>
-  <input type="submit" class="btn btn-primary btn-block" >Login</button>
-</form>
+    <Screen title="Login"
+            klass="login"
+            :show-menu="false"
+      <v-form v-on:submit="login">
+        <p v-if="error">{{ error }}</p>
+        <v-text-field
+          v-model="apikey"
+          label="API Key"
+          placeholder="Scan your access badge or fill your credential"
+          autofocus></v-text-field>
+        <v-btn type="submit"></v-btn>
+      </v-form>
+    </Screen>
     `
 });
 
