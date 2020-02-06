@@ -36,6 +36,7 @@ class PutawayCase(CommonCase):
             }
         )
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_put_away_reach_truck")
+        cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
 
@@ -100,7 +101,147 @@ class PutawayCase(CommonCase):
             },
         )
 
+    def test_start_no_package_for_barcode(self):
+        """Test /start when no package is found for barcode
+
+        The pre-conditions:
+
+        * No Pack exists with the barcode
+
+        Expected result:
+
+        * return a message
+        """
+        params = {"barcode": "NOTHING_SHOULD_EXIST_WITH: 👀"}
+        response = self.service.dispatch("start", params=params)
+        self.assert_response(
+            response,
+            state="start",
+            message={
+                "title": self.ANY,
+                "message_type": "error",
+                "message": "The package NOTHING_SHOULD_EXIST_WITH: 👀 doesn't exist",
+            },
+        )
+
+    def test_start_package_not_in_src_location(self):
+        """Test /start when the package is not in the src location
+
+        The pre-conditions:
+
+        * Pack exists with the barcode
+        * The Pack is outside the location or sublocation of the source
+          location of the current process' picking type
+
+        Expected result:
+
+        * return a message
+        """
+        barcode = self.packA.name
+        self.packA.location_id = self.shelf1
+        params = {"barcode": barcode}
+        response = self.service.dispatch("start", params=params)
+        self.assert_response(
+            response,
+            state="start",
+            message={
+                "title": self.ANY,
+                "message_type": "error",
+                "message": "You cannot work on a package (%s) outside of location: %s"
+                % (
+                    self.packA.name,
+                    self.process.picking_type_ids.default_location_src_id.name,
+                ),
+            },
+        )
+
+    def test_start_move_in_different_picking_type(self):
+        """Test /start when the package is used in a move in a different picking type
+
+        The pre-conditions:
+
+        * Pack exists
+        * A move is created and assigned to move the package, using another picking type
+
+        Expected result:
+
+        * return a message
+        """
+        barcode = self.packA.name
+
+        # Create a move in a different picking type (trick the 'Delivery
+        # Orders' to go directly from Input to Customers)
+        picking_form = Form(self.env["stock.picking"])
+        picking_form.picking_type_id = self.wh.out_type_id
+        picking_form.location_id = self.input_location
+        with picking_form.move_ids_without_package.new() as move:
+            move.product_id = self.productA
+            move.product_uom_qty = 1
+        picking = picking_form.save()
+        picking.action_confirm()
+        picking.action_assign()
+
+        params = {"barcode": barcode}
+        response = self.service.dispatch("start", params=params)
+        self.assert_response(
+            response,
+            state="start",
+            message={
+                "title": self.ANY,
+                "message_type": "error",
+                "message": "An operation exists in Delivery Orders %s. You cannot"
+                " process it with this shopfloor process." % (picking.name,),
+            },
+        )
+
+    def test_start_move_in_same_picking_type(self):
+        """Test /start when the package is used in a move in the same picking type
+
+        The pre-conditions:
+
+        * Pack exists
+        * A move is created and assigned to move the package, using the same
+          picking type
+
+        Expected result:
+
+        * return a message
+        """
+        barcode = self.packA.name
+
+        # Create a move in a the same picking type
+        package_level = self._simulate_started()
+        move = package_level.move_line_ids.move_id
+
+        params = {"barcode": barcode}
+        response = self.service.dispatch("start", params=params)
+        self.assert_response(
+            response,
+            state="confirm_start",
+            message={
+                "title": self.ANY,
+                "message_type": "warning",
+                "message": "Operation's already running."
+                " Would you like to take it over?",
+            },
+            data={
+                "id": self.ANY,
+                "location_src": {
+                    "id": self.dispatch_location.id,
+                    "name": self.dispatch_location.name,
+                },
+                "location_dst": {"id": self.shelf1.id, "name": self.shelf1.name},
+                "name": package_level.package_id.name,
+                "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
+                "product": {"id": move.product_id.id, "name": move.product_id.name},
+            },
+        )
+
     def _simulate_started(self):
+        """Replicate what the /start endpoint would do
+
+        Used to test the next endpoints (/validate and /cancel)
+        """
         picking_form = Form(self.env["stock.picking"])
         picking_form.picking_type_id = self.menu.process_id.picking_type_ids
         with picking_form.move_ids_without_package.new() as move:
@@ -250,6 +391,99 @@ class PutawayCase(CommonCase):
                 "message_type": "error",
                 "message": "You cannot place it here",
             },
+        )
+
+    def test_validate_location_to_confirm(self):
+        """Test a call on /validate on a location to confirm
+
+        The pre-conditions:
+
+        * /start has been called
+
+        Expected result:
+
+        * No change in odoo, transition with a message
+
+        Note: a location to confirm is when a location is a child
+        of the destination location of the picking type used for the process
+        but not a child or the expected destination
+        """
+        # setup the picking as we need, like if the move line
+        # was already started by the first step (start operation)
+        package_level = self._simulate_started()
+
+        # expected destination is 'shelf1', we'll scan shelf2 which must
+        # ask a confirmation to the user (it's still in the same picking type)
+        response = self.service.dispatch(
+            "validate",
+            params={
+                "package_level_id": package_level.id,
+                "location_barcode": self.shelf2.barcode,
+            },
+        )
+
+        self.assert_response(
+            response,
+            state="confirm_location",
+            message={
+                "title": self.ANY,
+                "message_type": "warning",
+                "message": "Are you sure?",
+            },
+        )
+
+    def test_validate_location_with_confirm(self):
+        """Test a call on /validate on a different location with confirmation
+
+        The pre-conditions:
+
+        * /start has been called
+
+        Expected result:
+
+        * Ignore the fact that the scanned location is not the expected
+        * Change the destination of the move line to the scanned one
+        * The move associated to the package level is 'done'
+
+        Note: a location to confirm is when a location is a child
+        of the destination location of the picking type used for the process
+        but not a child or the expected destination.
+        In such situation, the js application has to call /validate with
+        a ``confirmation`` flag.
+        """
+        # setup the picking as we need, like if the move line
+        # was already started by the first step (start operation)
+        package_level = self._simulate_started()
+
+        # expected destination is 'shelf1', we'll scan shelf2 which must
+        # ask a confirmation to the user (it's still in the same picking type)
+        response = self.service.dispatch(
+            "validate",
+            params={
+                "package_level_id": package_level.id,
+                "location_barcode": self.shelf2.barcode,
+                # acknowledge the change of destination
+                "confirmation": True,
+            },
+        )
+
+        self.assert_response(
+            response,
+            state="start",
+            message={
+                "title": self.ANY,
+                "message_type": "info",
+                "message": "The pack has been moved, you can scan a new pack.",
+            },
+        )
+
+        self.assertRecordValues(
+            package_level.move_line_ids,
+            [{"qty_done": 1.0, "location_dest_id": self.shelf2.id, "state": "done"}],
+        )
+        self.assertRecordValues(
+            package_level.move_line_ids.move_id,
+            [{"location_dest_id": self.stock_location.id, "state": "done"}],
         )
 
     def test_cancel(self):
