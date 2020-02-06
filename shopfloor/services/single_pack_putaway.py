@@ -12,6 +12,8 @@ class SinglePackPutaway(Component):
     _usage = "single_pack_putaway"
     _description = __doc__
 
+    # TODO think about not sending back the state when we already
+    # come from the same state
     def _response_for_no_picking_type(self):
         return self._response(
             state="scan_pack",
@@ -142,19 +144,35 @@ class SinglePackPutaway(Component):
 
         # TODO this seems to be a pretty common check, consider moving
         # it to an Action Component
-        allowed_locations = self.env["stock.location"].search(
-            [("id", "child_of", picking_type.default_location_src_id.id)]
+        allowed_location = self.env["stock.location"].search_count(
+            [
+                ("id", "child_of", picking_type.default_location_src_id.id),
+                ("id", "=", pack.location_id.id),
+            ]
         )
-        if pack.location_id not in allowed_locations:
+        if not allowed_location:
             return self._response_for_forbidden_package(barcode, picking_type)
 
-        quantity = pack.quant_ids[0].quantity
-        existing_operations = self.env["stock.move.line"].search(
-            [("qty_done", "=", quantity), ("package_id", "=", pack.id)]
+        existing_operation = self.env["stock.move.line"].search(
+            [
+                ("package_id", "=", pack.id),
+                (
+                    "state",
+                    "in",
+                    (
+                        "assigned",
+                        "draft",
+                        "waiting",
+                        "confirmed",
+                        "partially_available",
+                    ),
+                ),
+            ],
+            limit=1,
         )
         if (
-            existing_operations
-            and existing_operations[0].picking_id.picking_type_id != picking_type
+            existing_operation
+            and existing_operation[0].picking_id.picking_type_id != picking_type
         ):
             return self._response_for_forbidden_scan_pack(existing_operations)
         elif existing_operations:
@@ -265,9 +283,15 @@ class SinglePackPutaway(Component):
 
         if pack_transfer.is_dest_location_to_confirm(move, scanned_location):
             if confirmation:
-                # keep the move in sync otherwise we would have a move line outside
-                # the dest location of the move
-                move.location_dest_id = scanned_location.id
+                # If the destination of the move would be incoherent
+                # (move line outside of it), we change the moves' destination
+                if not self.env["stock.location"].search_count(
+                    [
+                        ("id", "child_of", move.location_dest_id.id),
+                        ("id", "=", scanned_location.id),
+                    ]
+                ):
+                    move.location_dest_id = scanned_location.id
             else:
                 return self._response_for_location_need_confirm()
 
@@ -318,6 +342,7 @@ class SinglePackPutaway(Component):
         return {
             "package_level_id": {"coerce": to_int, "required": True, "type": "integer"},
             "location_barcode": {"type": "string", "nullable": False, "required": True},
+            "confirmation": {"type": "boolean", "nullable": True, "required": False},
         }
 
     def _validator_return_validate(self):

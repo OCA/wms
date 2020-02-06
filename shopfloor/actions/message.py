@@ -2,6 +2,8 @@ from odoo import _
 
 from odoo.addons.component.core import Component
 
+# TODO remove 'title', useless
+
 
 class MessageAction(Component):
     """Provide message templates
