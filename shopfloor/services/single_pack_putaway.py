@@ -126,12 +126,22 @@ class SinglePackPutaway(Component):
             return self._response_for_forbidden_start(existing_operations)
         elif existing_operations:
             return self._response_for_start_to_confirm(existing_operations, pack)
+
+        move_vals = self._prepare_stock_move(picking_type, pack)
+        move = self.env["stock.move"].create(move_vals)
+        move._action_confirm(merge=False)
+        package_level = self._prepare_package_level(pack, move)
+        move._action_assign()
+        package_level.is_done = True
+        return self._response_for_start_success(move, pack)
+
+    def _prepare_stock_move(self, picking_type, pack):
         # FIXME we consider only one product per pack
+        assert len(pack.quant_ids) == 1
         product = pack.quant_ids[0].product_id
         default_location_dest = picking_type.default_location_dest_id
         company = self.env.company
-        # TODO _prepare methods
-        move_vals = {
+        return {
             "picking_type_id": picking_type.id,
             "product_id": product.id,
             "location_id": pack.location_id.id,
@@ -141,19 +151,16 @@ class SinglePackPutaway(Component):
             "product_uom_qty": pack.quant_ids[0].quantity,
             "company_id": company.id,
         }
-        move = self.env["stock.move"].create(move_vals)
-        move._action_confirm(merge=False)
-        package_level = self.env["stock.package_level"].create(
+
+    def _prepare_package_level(self, pack, move):
+        return self.env["stock.package_level"].create(
             {
                 "package_id": pack.id,
                 "move_ids": [(4, move.id)],
-                "company_id": company.id,
+                "company_id": self.env.company.id,
                 "picking_id": move.picking_id.id,
             }
         )
-        move._action_assign()
-        package_level.is_done = True
-        return self._response_for_start_success(move, pack)
 
     def _response_for_package_level_not_found(self):
         message = self.actions_for("message")
