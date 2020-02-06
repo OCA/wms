@@ -126,7 +126,8 @@ class PutawayCase(CommonCase):
                 "location_barcode": self.shelf1.barcode,
             },
         )
-        self.assertDictEqual(
+
+        self.assert_response(
             response,
             {
                 "message": {
@@ -158,15 +159,14 @@ class PutawayCase(CommonCase):
             "validate",
             params={"package_level_id": -1, "location_barcode": self.shelf1.barcode},
         )
-        self.assertDictEqual(
+
+        self.assert_response(
             response,
-            {
-                "message": {
-                    "message": "This operation does not exist anymore.",
-                    "message_type": "error",
-                    "title": "Start again",
-                },
-                "state": "start",
+            state="start",
+            message={
+                "title": self.ANY,
+                "message_type": "error",
+                "message": "This operation does not exist anymore.",
             },
         )
 
@@ -192,15 +192,14 @@ class PutawayCase(CommonCase):
                 "location_barcode": "THIS_BARCODE_DOES_NOT_EXISTS",
             },
         )
-        self.assertDictEqual(
+
+        self.assert_response(
             response,
-            {
-                "message": {
-                    "message": "No location found for this barcode.",
-                    "message_type": "error",
-                    "title": "Scan",
-                },
-                "state": "scan_location",
+            state="scan_location",
+            message={
+                "title": self.ANY,
+                "message_type": "error",
+                "message": "No location found for this barcode.",
             },
         )
 
@@ -230,15 +229,14 @@ class PutawayCase(CommonCase):
                 "location_barcode": self.dispatch_location.barcode,
             },
         )
-        self.assertDictEqual(
+
+        self.assert_response(
             response,
-            {
-                "message": {
-                    "message": "You cannot place it here",
-                    "message_type": "error",
-                    "title": "Forbidden",
-                },
-                "state": "scan_location",
+            state="scan_location",
+            message={
+                "title": self.ANY,
+                "message_type": "error",
+                "message": "You cannot place it here",
             },
         )
 
@@ -271,15 +269,13 @@ class PutawayCase(CommonCase):
         self.assertFalse(package_level.move_line_ids)
         self.assertFalse(move_lines.exists())
 
-        self.assertDictEqual(
+        self.assert_response(
             response,
-            {
-                "message": {
-                    "message": "Canceled, you can scan a new pack.",
-                    "message_type": "info",
-                    "title": "Continue",
-                },
-                "state": "start",
+            state="start",
+            message={
+                "title": self.ANY,
+                "message_type": "info",
+                "message": "Canceled, you can scan a new pack.",
             },
         )
 
@@ -316,15 +312,13 @@ class PutawayCase(CommonCase):
         self.assertFalse(package_level.move_line_ids)
         self.assertFalse(move_lines.exists())
 
-        self.assertDictEqual(
+        self.assert_response(
             response,
-            {
-                "message": {
-                    "message": "Canceled, you can scan a new pack.",
-                    "message_type": "info",
-                    "title": "Continue",
-                },
-                "state": "start",
+            state="start",
+            message={
+                "title": self.ANY,
+                "message_type": "info",
+                "message": "Canceled, you can scan a new pack.",
             },
         )
 
@@ -358,15 +352,13 @@ class PutawayCase(CommonCase):
         self.assertRecordValues(move, [{"state": "done"}])
         self.assertRecordValues(picking, [{"state": "done"}])
 
-        self.assertDictEqual(
+        self.assert_response(
             response,
-            {
-                "message": {
-                    "message": "Operation already processed.",
-                    "message_type": "info",
-                    "title": "Continue",
-                },
-                "state": "start",
+            state="start",
+            message={
+                "title": self.ANY,
+                "message_type": "info",
+                "message": "Operation already processed.",
             },
         )
 
@@ -378,14 +370,12 @@ class PutawayCase(CommonCase):
         * No change in odoo, Transition with a message
         """
         response = self.service.dispatch("cancel", params={"package_level_id": -1})
-        self.assertDictEqual(
+        self.assert_response(
             response,
-            {
-                "message": {
-                    "message": "This operation does not exist anymore.",
-                    "message_type": "error",
-                    "title": "Start again",
-                },
-                "state": "start",
+            state="start",
+            message={
+                "title": self.ANY,
+                "message_type": "error",
+                "message": "This operation does not exist anymore.",
             },
         )
