@@ -14,25 +14,25 @@ class PutawayCase(CommonCase):
         cls.input_location = cls.env.ref("stock.stock_location_company")
         cls.shelf1 = cls.env.ref("stock.stock_location_components")
         cls.shelf2 = cls.env.ref("stock.stock_location_14")
-        cls.productA = cls.env["product.product"].create(
+        cls.product_a = cls.env["product.product"].create(
             {"name": "Product A", "type": "product"}
         )
-        cls.packA = cls.env["stock.quant.package"].create(
+        cls.pack_a = cls.env["stock.quant.package"].create(
             {"location_id": stock_location.id}
         )
         cls.env["stock.putaway.rule"].create(
             {
-                "product_id": cls.productA.id,
+                "product_id": cls.product_a.id,
                 "location_in_id": cls.stock_location.id,
                 "location_out_id": cls.shelf1.id,
             }
         )
         cls.quantA = cls.env["stock.quant"].create(
             {
-                "product_id": cls.productA.id,
+                "product_id": cls.product_a.id,
                 "location_id": cls.dispatch_location.id,
                 "quantity": 1,
-                "package_id": cls.packA.id,
+                "package_id": cls.pack_a.id,
             }
         )
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_put_away_reach_truck")
@@ -62,7 +62,7 @@ class PutawayCase(CommonCase):
         The next step in the workflow is to call /validate with the created
         package level that will set the move and picking to done.
         """
-        barcode = self.packA.name
+        barcode = self.pack_a.name
         params = {"barcode": barcode}
         # Simulate the client scanning a package's barcode, which
         # in turns should start the operation in odoo
@@ -137,8 +137,8 @@ class PutawayCase(CommonCase):
 
         * return a message
         """
-        barcode = self.packA.name
-        self.packA.location_id = self.shelf1
+        barcode = self.pack_a.name
+        self.pack_a.location_id = self.shelf1
         params = {"barcode": barcode}
         response = self.service.dispatch("start", params=params)
         self.assert_response(
@@ -149,7 +149,7 @@ class PutawayCase(CommonCase):
                 "message_type": "error",
                 "message": "You cannot work on a package (%s) outside of location: %s"
                 % (
-                    self.packA.name,
+                    self.pack_a.name,
                     self.process.picking_type_ids.default_location_src_id.name,
                 ),
             },
@@ -167,7 +167,7 @@ class PutawayCase(CommonCase):
 
         * return a message
         """
-        barcode = self.packA.name
+        barcode = self.pack_a.name
 
         # Create a move in a different picking type (trick the 'Delivery
         # Orders' to go directly from Input to Customers)
@@ -175,7 +175,7 @@ class PutawayCase(CommonCase):
         picking_form.picking_type_id = self.wh.out_type_id
         picking_form.location_id = self.input_location
         with picking_form.move_ids_without_package.new() as move:
-            move.product_id = self.productA
+            move.product_id = self.product_a
             move.product_uom_qty = 1
         picking = picking_form.save()
         picking.action_confirm()
@@ -207,7 +207,7 @@ class PutawayCase(CommonCase):
 
         * return a message
         """
-        barcode = self.packA.name
+        barcode = self.pack_a.name
 
         # Create a move in a the same picking type
         package_level = self._simulate_started()
@@ -245,13 +245,13 @@ class PutawayCase(CommonCase):
         picking_form = Form(self.env["stock.picking"])
         picking_form.picking_type_id = self.menu.process_id.picking_type_ids
         with picking_form.move_ids_without_package.new() as move:
-            move.product_id = self.productA
+            move.product_id = self.product_a
             move.product_uom_qty = 1
         picking = picking_form.save()
         picking.action_confirm()
         picking.action_assign()
         package_level = picking.move_line_ids.package_level_id
-        self.assertEqual(package_level.package_id, self.packA)
+        self.assertEqual(package_level.package_id, self.pack_a)
         # at this point, the package level is already set to "done", by the
         # "start" method of the pack transfer putaway
         package_level.is_done = True
