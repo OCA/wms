@@ -1,5 +1,3 @@
-from odoo import _
-
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
@@ -13,50 +11,31 @@ class SinglePackTransfer(Component):
     _description = __doc__
 
     def _response_for_empty_location(self, location):
+        message = self.actions_for("message")
         return self._response(
-            state="start",
-            message={
-                "message_type": "error",
-                "title": _("Scan package"),
-                "message": _("Location %s doesn’t contain any PACK." % location.name),
-            },
+            state="start", message=message.no_pack_in_location(location)
         )
 
     def _response_for_several_packages(self, location):
+        message = self.actions_for("message")
         return self._response(
-            state="start",
-            message={
-                "message_type": "error",
-                "title": _("Scan package"),
-                "message": _(
-                    "Several PACKs found in %s, please scan one PACK." % location.name
-                ),
-            },
+            state="start", message=message.several_packs_in_location(location)
         )
 
     def _response_for_package_not_found(self, barcode):
+        message = self.actions_for("message")
         return self._response(
-            state="start",
-            message={
-                "message_type": "error",
-                "title": _("Pack not found"),
-                "message": _("The pack %s doesn't exist") % barcode,
-            },
+            state="start", message=message.package_not_found_for_barcode(barcode)
         )
 
-    def _response_for_operation_not_found(self):
+    def _response_for_operation_not_found(self, pack):
+        message = self.actions_for("message")
         return self._response(
-            state="start",
-            message={
-                "message_type": "error",
-                "title": _("Not found"),
-                "message": _(
-                    "No pending operation exists for this PACK you cannot process it."
-                ),
-            },
+            state="start", message=message.no_pending_operation_for_pack(pack)
         )
 
     def _response_for_start_to_confirm(self, existing_operations, pack):
+        message = self.actions_for("message")
         move = existing_operations.move_id
         return self._response(
             data={
@@ -74,25 +53,14 @@ class SinglePackTransfer(Component):
                 "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
             },
             state="confirm_start",
-            message={
-                "message_type": "warning",
-                "title": _("Already started"),
-                "message": _(
-                    "Operation already running. Would you like to take it over ?"
-                ),
-            },
+            message=message.already_running_ask_confirmation(),
         )
 
     def _response_for_start_success(self, move, pack):
+        message = self.actions_for("message")
         return self._response(
             state="scan_location",
-            message={
-                "message_type": "info",
-                "title": _("Start"),
-                "message": _(
-                    "The move is ready, you can scan the destination location."
-                ),
-            },
+            message=message.scan_destination(),
             data={
                 "id": move.move_line_ids[0].package_level_id.id,
                 "name": pack.name,
@@ -137,7 +105,7 @@ class SinglePackTransfer(Component):
             ]
         )
         if not existing_operations:
-            return self._response_for_operation_not_found()
+            return self._response_for_operation_not_found(pack)
         move = existing_operations.move_id
         if existing_operations[0].package_level_id.is_done:
             return self._response_for_start_to_confirm(existing_operations, pack)
@@ -185,54 +153,30 @@ class SinglePackTransfer(Component):
         )
 
     def _response_for_package_level_not_found(self):
-        return self._response(
-            state="start",
-            message={
-                "message_type": "error",
-                "title": _("Start again"),
-                "message": _("This operation does not exist anymore."),
-            },
-        )
+        message = self.actions_for("message")
+        return self._response(state="start", message=message.operation_not_found())
 
     def _response_for_move_canceled(self):
+        message = self.actions_for("message")
         return self._response(
-            state="start",
-            message={
-                "message_type": "warning",
-                "title": _("Restart"),
-                "message": _("Restart the operation, someone has canceled it."),
-            },
+            state="start", message=message.operation_has_been_canceled_elsewhere()
         )
 
     def _response_for_forbidden_location(self):
+        message = self.actions_for("message")
         return self._response(
-            state="scan_location",
-            message={
-                "message_type": "error",
-                "title": _("Forbidden"),
-                "message": _("You cannot place it here"),
-            },
+            state="scan_location", message=message.dest_location_not_allowed()
         )
 
     def _response_for_location_need_confirm(self):
+        message = self.actions_for("message")
         return self._response(
-            state="confirm_location",
-            message={
-                "message_type": "warning",
-                "title": _("Confirm"),
-                "message": _("Are you sure?"),
-            },
+            state="confirm_location", message=message.need_confirmation()
         )
 
     def _response_for_validate_success(self):
-        return self._response(
-            state="start",
-            message={
-                "message_type": "info",
-                "title": _("Start"),
-                "message": _("The pack has been moved, you can scan a new pack."),
-            },
-        )
+        message = self.actions_for("message")
+        return self._response(state="start", message=message.confirm_pack_moved())
 
     def validate(self, package_level_id, location_barcode, confirmation=False):
         """Validate the transfer"""
@@ -271,3 +215,5 @@ class SinglePackTransfer(Component):
 
     def _validator_return_validate(self):
         return self._response_schema()
+
+    # TODO cancel
