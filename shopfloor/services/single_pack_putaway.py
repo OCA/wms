@@ -12,6 +12,8 @@ class SinglePackPutaway(Component):
     _usage = "single_pack_putaway"
     _description = __doc__
 
+    # TODO create an Action component for messages, so we use the
+    # same messages in every scenario
     def _response_for_no_picking_type(self):
         return self._response(
             state="scan_pack",
@@ -131,14 +133,15 @@ class SinglePackPutaway(Component):
             return self._response_for_several_picking_types()
         elif not picking_type:
             return self._response_for_no_picking_type()
-        company = self.env.company
 
-        # TODO define on what we search (pack name, pack barcode ...)
-        # we can create a component with the search methods (easy to override)
-        pack = self.env["stock.quant.package"].search([("name", "=", barcode)])
+        search = self.actions_for("search")
+        pack = search.package_from_scan(barcode)
         if not pack:
             return self._response_for_package_not_found(barcode)
+        assert len(pack) == 1, "We cannot have 2 packages with the same barcode"
 
+        # TODO this seems to be a pretty common check, consider moving
+        # it to an Action Component
         allowed_locations = self.env["stock.location"].search(
             [("id", "child_of", picking_type.default_location_src_id.id)]
         )
@@ -160,6 +163,8 @@ class SinglePackPutaway(Component):
             0
         ].product_id  # FIXME we consider only one product per pack
         default_location_dest = picking_type.default_location_dest_id
+        company = self.env.company
+        # TODO _prepare methods
         move_vals = {
             "picking_type_id": picking_type.id,
             "product_id": product.id,
@@ -247,6 +252,7 @@ class SinglePackPutaway(Component):
     def validate(self, package_level_id, location_barcode, confirmation=False):
         """Validate the transfer"""
         pack_transfer = self.actions_for("pack.transfer.validate")
+        search = self.actions_for("search")
 
         package = self.env["stock.package_level"].browse(package_level_id)
         if not package.exists():
@@ -256,8 +262,7 @@ class SinglePackPutaway(Component):
         if not pack_transfer.is_move_state_valid(move):
             return self._response_for_move_canceled()
 
-        # TODO move scan search in a component for this?
-        scanned_location = pack_transfer.location_from_scan(location_barcode)
+        scanned_location = search.location_from_scan(location_barcode)
         if not scanned_location:
             return self._response_for_location_not_found()
         if not pack_transfer.is_dest_location_valid(move, scanned_location):
