@@ -12,6 +12,8 @@ class SinglePackPutaway(Component):
     _usage = "single_pack_putaway"
     _description = __doc__
 
+    # TODO think about not sending back the state when we already
+    # come from the same state
     def _response_for_no_picking_type(self):
         message = self.actions_for("message")
         return self._response(state="start", message=message.no_picking_type())
@@ -29,7 +31,8 @@ class SinglePackPutaway(Component):
     def _response_for_forbidden_package(self, barcode, picking_type):
         message = self.actions_for("message")
         return self._response(
-            state="start", message=message.package_not_allowed_in_src_location()
+            state="start",
+            message=message.package_not_allowed_in_src_location(barcode, picking_type),
         )
 
     def _response_for_forbidden_start(self, existing_operations):
@@ -49,47 +52,34 @@ class SinglePackPutaway(Component):
             },
         )
 
-    def _response_for_start_to_confirm(self, existing_operations, pack):
-        message = self.actions_for("message")
-        move = existing_operations.move_id
-        return self._response(
-            data={
-                "id": existing_operations[0].package_level_id.id,
-                "name": pack.name,
-                "location_src": {
-                    "id": pack.location_id.id,
-                    "name": pack.location_id.name,
-                },
-                "location_dst": {
-                    "id": existing_operations[0].location_dest_id.id,
-                    "name": existing_operations[0].location_dest_id.name,
-                },
-                "product": {"id": move.product_id.name, "name": move.product_id.name},
-                "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
+    def _data_for_scan(self, move_line, pack):
+        move = move_line.move_id
+        return {
+            "id": move_line.package_level_id.id,
+            "name": pack.name,
+            "location_src": {"id": pack.location_id.id, "name": pack.location_id.name},
+            "location_dst": {
+                "id": move_line.location_dest_id.id,
+                "name": move_line.location_dest_id.name,
             },
+            "product": {"id": move.product_id.id, "name": move.product_id.name},
+            "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
+        }
+
+    def _response_for_start_to_confirm(self, move_line, pack):
+        message = self.actions_for("message")
+        return self._response(
+            data=self._data_for_scan(move_line, pack),
             state="confirm_start",
             message=message.already_running_ask_confirmation(),
         )
 
-    def _response_for_start_success(self, move, pack):
+    def _response_for_start_success(self, move_line, pack):
         message = self.actions_for("message")
         return self._response(
             state="scan_location",
             message=message.scan_destination(),
-            data={
-                "id": move.move_line_ids[0].package_level_id.id,
-                "name": pack.name,
-                "location_src": {
-                    "id": pack.location_id.id,
-                    "name": pack.location_id.name,
-                },
-                "location_dst": {
-                    "id": move.move_line_ids[0].location_dest_id.id,
-                    "name": move.move_line_ids[0].location_dest_id.name,
-                },
-                "product": {"id": move.product_id.id, "name": move.product_id.name},
-                "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
-            },
+            data=self._data_for_scan(move_line, pack),
         )
 
     def start(self, barcode):
@@ -109,23 +99,39 @@ class SinglePackPutaway(Component):
 
         # TODO this seems to be a pretty common check, consider moving
         # it to an Action Component
-        allowed_locations = self.env["stock.location"].search(
-            [("id", "child_of", picking_type.default_location_src_id.id)]
+        allowed_location = self.env["stock.location"].search_count(
+            [
+                ("id", "child_of", picking_type.default_location_src_id.id),
+                ("id", "=", pack.location_id.id),
+            ]
         )
-        if pack.location_id not in allowed_locations:
+        if not allowed_location:
             return self._response_for_forbidden_package(barcode, picking_type)
 
-        quantity = pack.quant_ids[0].quantity
-        existing_operations = self.env["stock.move.line"].search(
-            [("qty_done", "=", quantity), ("package_id", "=", pack.id)]
+        existing_operation = self.env["stock.move.line"].search(
+            [
+                ("package_id", "=", pack.id),
+                (
+                    "state",
+                    "in",
+                    (
+                        "assigned",
+                        "draft",
+                        "waiting",
+                        "confirmed",
+                        "partially_available",
+                    ),
+                ),
+            ],
+            limit=1,
         )
         if (
-            existing_operations
-            and existing_operations[0].picking_id.picking_type_id != picking_type
+            existing_operation
+            and existing_operation[0].picking_id.picking_type_id != picking_type
         ):
-            return self._response_for_forbidden_start(existing_operations)
-        elif existing_operations:
-            return self._response_for_start_to_confirm(existing_operations, pack)
+            return self._response_for_forbidden_start(existing_operation)
+        elif existing_operation:
+            return self._response_for_start_to_confirm(existing_operation, pack)
 
         move_vals = self._prepare_stock_move(picking_type, pack)
         move = self.env["stock.move"].create(move_vals)
@@ -133,7 +139,8 @@ class SinglePackPutaway(Component):
         package_level = self._prepare_package_level(pack, move)
         move._action_assign()
         package_level.is_done = True
-        return self._response_for_start_success(move, pack)
+        # TODO what if we have > 1 move line?
+        return self._response_for_start_success(move.move_line_ids, pack)
 
     def _prepare_stock_move(self, picking_type, pack):
         # FIXME we consider only one product per pack
@@ -215,9 +222,15 @@ class SinglePackPutaway(Component):
 
         if pack_transfer.is_dest_location_to_confirm(move, scanned_location):
             if confirmation:
-                # keep the move in sync otherwise we would have a move line outside
-                # the dest location of the move
-                move.location_dest_id = scanned_location.id
+                # If the destination of the move would be incoherent
+                # (move line outside of it), we change the moves' destination
+                if not self.env["stock.location"].search_count(
+                    [
+                        ("id", "child_of", move.location_dest_id.id),
+                        ("id", "=", scanned_location.id),
+                    ]
+                ):
+                    move.location_dest_id = scanned_location.id
             else:
                 return self._response_for_location_need_confirm()
 
@@ -255,6 +268,7 @@ class SinglePackPutaway(Component):
         return {
             "package_level_id": {"coerce": to_int, "required": True, "type": "integer"},
             "location_barcode": {"type": "string", "nullable": False, "required": True},
+            "confirmation": {"type": "boolean", "nullable": True, "required": False},
         }
 
     def _validator_return_validate(self):
