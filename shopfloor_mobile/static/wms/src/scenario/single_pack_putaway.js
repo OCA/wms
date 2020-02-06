@@ -1,6 +1,6 @@
 import {ScenarioBaseMixin} from "../mixins.js";
 
-Vue.component('simple-pack-putaway', {
+Vue.component('single-pack-putaway', {
     mixins: [ScenarioBaseMixin],
     template: `
         <Screen title="Single pack putaway">
