@@ -110,7 +110,10 @@ class SinglePackTransfer(Component):
         )
 
     def start(self, barcode):
-        location = self.env["stock.location"].search([("barcode", "=", barcode)])
+        search = self.actions_for("search")
+
+        location = search.location_from_scan(barcode)
+
         pack = self.env["stock.quant.package"]
         if location:
             pack = self.env["stock.quant.package"].search(
@@ -120,8 +123,10 @@ class SinglePackTransfer(Component):
                 return self._response_for_empty_location(location)
             if len(pack) > 1:
                 return self._response_for_several_packages(self, location)
+
         if not pack:
-            pack = self.env["stock.quant.package"].search([("name", "=", barcode)])
+            pack = search.package_from_scan(barcode)
+
         if not pack:
             return self._response_for_package_not_found(barcode)
 
@@ -232,6 +237,7 @@ class SinglePackTransfer(Component):
     def validate(self, package_level_id, location_barcode, confirmation=False):
         """Validate the transfer"""
         pack_transfer = self.actions_for("pack.transfer.validate")
+        search = self.actions_for("search")
 
         package = self.env["stock.package_level"].browse(package_level_id)
         if not package.exists():
@@ -241,7 +247,7 @@ class SinglePackTransfer(Component):
         if not pack_transfer.is_move_state_valid(move):
             return self._response_for_move_canceled()
 
-        scanned_location = pack_transfer.location_from_scan(location_barcode)
+        scanned_location = search.location_from_scan(location_barcode)
         if not pack_transfer.is_dest_location_valid(move, scanned_location):
             return self._response_for_forbidden_location()
 

@@ -14,9 +14,6 @@ class PackTransferValidateAction(Component):
     _inherit = "shopfloor.process.action"
     _usage = "pack.transfer.validate"
 
-    def location_from_scan(self, barcode):
-        return self.env["stock.location"].search([("barcode", "=", barcode)])
-
     def is_move_state_valid(self, move):
         return move.state != "cancel"
 
@@ -42,6 +39,5 @@ class PackTransferValidateAction(Component):
         return scanned_location not in zone_locations
 
     def set_destination_and_done(self, move, scanned_location):
-
         move.move_line_ids[0].location_dest_id = scanned_location.id
         move._action_done()
