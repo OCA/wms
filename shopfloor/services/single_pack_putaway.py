@@ -12,8 +12,6 @@ class SinglePackPutaway(Component):
     _usage = "single_pack_putaway"
     _description = __doc__
 
-    # TODO create an Action component for messages, so we use the
-    # same messages in every scenario
     def _response_for_no_picking_type(self):
         return self._response(
             state="scan_pack",
@@ -35,6 +33,7 @@ class SinglePackPutaway(Component):
         )
 
     def _response_for_package_not_found(self, barcode):
+        message = self.actions_for("message")
         return self._response(
             state="scan_pack",
             message={
@@ -45,6 +44,7 @@ class SinglePackPutaway(Component):
         )
 
     def _response_for_forbidden_package(self, barcode, picking_type):
+        message = self.actions_for("message")
         return self._response(
             state="scan_pack",
             message={
@@ -199,7 +199,8 @@ class SinglePackPutaway(Component):
             },
         )
 
-    def _response_for_move_canceled(self):
+    def _response_for_move_canceled_elsewhere(self):
+        message = self.actions_for("message")
         return self._response(
             state="scan_pack",
             message={
@@ -211,12 +212,7 @@ class SinglePackPutaway(Component):
 
     def _response_for_location_not_found(self):
         return self._response(
-            state="scan_location",
-            message={
-                "message_type": "error",
-                "title": _("Scan"),
-                "message": _("No location found for this barcode."),
-            },
+            state="scan_location", message=message.no_location_found()
         )
 
     def _response_for_forbidden_location(self):
@@ -260,7 +256,7 @@ class SinglePackPutaway(Component):
 
         move = package.move_line_ids[0].move_id
         if not pack_transfer.is_move_state_valid(move):
-            return self._response_for_move_canceled()
+            return self._response_for_move_canceled_elsewhere()
 
         scanned_location = search.location_from_scan(location_barcode)
         if not scanned_location:
@@ -278,6 +274,16 @@ class SinglePackPutaway(Component):
 
         pack_transfer.set_destination_and_done(move, scanned_location)
         return self._response_for_validate_success()
+
+    def _response_for_move_already_processed(self):
+        message = self.actions_for("message")
+        return self._response(state="start", message=message.already_done())
+
+    def _response_for_confirm_move_cancellation(self):
+        message = self.actions_for("message")
+        return self._response(
+            state="start", message=message.confirm_canceled_scan_next_pack()
+        )
 
     def cancel(self, package_level_id):
         package = self.env["stock.package_level"].browse(package_level_id)

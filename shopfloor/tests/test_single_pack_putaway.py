@@ -275,9 +275,9 @@ class PutawayCase(CommonCase):
             response,
             {
                 "message": {
-                    "message": "The move has been canceled, you can scan a new pack.",
+                    "message": "Canceled, you can scan a new pack.",
                     "message_type": "info",
-                    "title": "Start",
+                    "title": "Continue",
                 },
                 "state": "start",
             },
@@ -320,9 +320,9 @@ class PutawayCase(CommonCase):
             response,
             {
                 "message": {
-                    "message": "The move has been canceled, you can scan a new pack.",
+                    "message": "Canceled, you can scan a new pack.",
                     "message_type": "info",
-                    "title": "Start",
+                    "title": "Continue",
                 },
                 "state": "start",
             },
@@ -362,9 +362,9 @@ class PutawayCase(CommonCase):
             response,
             {
                 "message": {
-                    "message": "Move already processed.",
+                    "message": "Operation already processed.",
                     "message_type": "info",
-                    "title": "Start",
+                    "title": "Continue",
                 },
                 "state": "start",
             },
