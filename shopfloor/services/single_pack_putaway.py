@@ -164,8 +164,7 @@ class SinglePackPutaway(Component):
         ].product_id  # FIXME we consider only one product per pack
         default_location_dest = picking_type.default_location_dest_id
         company = self.env.company
-        # TODO _prepare methods
-        move_vals = {
+        return {
             "picking_type_id": picking_type.id,
             "product_id": product.id,
             "location_id": pack.location_id.id,
@@ -175,13 +174,13 @@ class SinglePackPutaway(Component):
             "product_uom_qty": pack.quant_ids[0].quantity,
             "company_id": company.id,
         }
-        move = self.env["stock.move"].create(move_vals)
-        move._action_confirm(merge=False)
-        package_level = self.env["stock.package_level"].create(
+
+    def _prepare_package_level(self, pack, move):
+        return self.env["stock.package_level"].create(
             {
                 "package_id": pack.id,
                 "move_ids": [(4, move.id)],
-                "company_id": company.id,
+                "company_id": self.env.company.id,
                 "picking_id": move.picking_id.id,
             }
         )
