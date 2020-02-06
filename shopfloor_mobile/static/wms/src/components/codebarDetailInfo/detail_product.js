@@ -7,19 +7,59 @@ Vue.component('detail-product', {
     methods: {
     },
     template: `
+        <v-simple-table>
+        <template v-slot:default>
 
-        <v-card outlined>
-    <v-card-title>{{ productDetail.name }}</v-card-title>
-    <v-card-text>
-      <p>Lot ID 029348</p>
-      <p class="display-1 text--primary">
-        Expiry date
-      </p>
-      <div class="text--primary">
-        And whatever other info.<br>
-        Need to show a picture as well.
-      </div>
-    </v-card-text>
-        </v-card>
-    `
+          <tbody>
+          <tr class="teal lighten-2">
+            <td colspan="2">
+                {{ productDetail.name }}
+            </td>
+          </tr>
+          <tr class="teal lighten-2">
+            <td colspan="2">
+                <v-img :src="productDetail.image" max-height="200"></v-img>
+            </td>
+          </tr>
+          <tr class="teal lighten-2">
+            <th>Lot</th>
+            <td>
+                {{ productDetail.lot }}
+            </td>
+          </tr>
+          <tr class="teal lighten-2">
+            <th>Expiry date</th>
+            <td>
+                {{ productDetail.expiry_date }}
+            </td>
+          </tr>
+          <tr class="teal lighten-2">
+            <th>Internal ref</th>
+            <td>
+                {{ productDetail.default_code }}
+            </td>
+          </tr>
+          <tr class="teal lighten-2">
+            <th>Supplier ref</th>
+            <td>
+                {{ productDetail.supplier_code }}
+            </td>
+          </tr>
+          <tr class="teal lighten-2">
+            <td colspan="2">
+                <div>Packaging</div>
+                <ul class="packaging">
+                    <li v-for="pack in productDetail.packaging">
+                        <span>{{ pack.name }}</span><span>{{ pack.qty }} {{ pack.qty_unit }}</span>
+                    </li>
+                </ul>
+            </td>
+          </tr>
+
+          </tbody>
+
+        </template>
+      </v-simple-table>
+
+    `,
 })
