@@ -95,8 +95,7 @@ export class OdooMocked extends OdooMixin{
     }
     scan_anything (barcode) {
         console.log('Scan anything', barcode, this.usage);
-        if (_.isEmpty(window.DEMO_CASE))
-            window.DEMO_CASE = window.DEMO_CASES[this.usage][barcode]
+        window.DEMO_CASE = window.DEMO_CASES[this.usage][barcode]
         if (!window.DEMO_CASE) {
             return Promise.resolve({
                 "message": {"message_type": "error", "body": "Unknown barcode"}

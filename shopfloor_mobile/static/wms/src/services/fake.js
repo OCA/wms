@@ -1,4 +1,9 @@
 /* eslint no-use-before-define: 0 */  // --> OFF
+var CANCEL_MSG_DEFAULT = {
+    'body': 'Operation cancelled',
+    'message_type': 'info',
+}
+
 
 var DEMO_SINGLE_PUTAWAY_1 = {
     'fetch' : {
@@ -28,21 +33,8 @@ var DEMO_SINGLE_PUTAWAY_1 = {
         }
     },
     'cancel' : {
-        "data": {
-            "id": 1,
-            "location_src": {
-                "id": 1,
-                "name":  'Location SRC 1 cancel',
-            },
-            "location_dst": {
-                "id": 2,
-                "name": 'Location DST 1 cancel',
-            },
-            "product": {"id": 1, "name": 'Product 1'},
-            "picking": {"id": 1, "name": 'Picking 1'},
-        },
-        "state": "scan_location",
-        "message": undefined
+        "state": "start",
+        "message": CANCEL_MSG_DEFAULT
     }
 }
 
@@ -108,9 +100,8 @@ var DEMO_SINGLE_PUTAWAY_5 = {
         "message": undefined
     },
     'cancel' : {
-        "data": undefined,
-        "state": "scan_pack",
-        "message": undefined,
+        "state": "start",
+        "message": CANCEL_MSG_DEFAULT
     },
     'validate' : {
         "data": undefined,
@@ -292,21 +283,8 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
         }
     },
     'cancel' : {
-        "data": {
-            "id": 1,
-            "location_src": {
-                "id": 1,
-                "name":  'Location SRC 1 cancel',
-            },
-            "location_dst": {
-                "id": 2,
-                "name": 'Location DST 1 cancel',
-            },
-            "product": {"id": 1, "name": 'Product 1'},
-            "picking": {"id": 1, "name": 'Picking 1'},
-        },
-        "state": "scan_location",
-        "message": undefined
+        "state": "start",
+        "message": CANCEL_MSG_DEFAULT
     },
     'LOC1' : {
         "data": undefined,
@@ -346,6 +324,7 @@ window.DEMO_SINGLE_PUTAWAY = {
 }
 window.DEMO_SINGLE_PACK_TRANSFER = {
     "PACK1": DEMO_SINGLE_PACK_TRANSFER_1,
+    "LOC1": DEMO_SINGLE_PACK_TRANSFER_1,
 }
 window.DEMO_SCAN_ANYTHING = {
     "pack": DEMO_SCAN_ANYTHING_PACK,

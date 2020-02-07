@@ -13,7 +13,7 @@ Vue.component('single-pack-transfer', {
             <user-confirmation v-if="need_confirmation" v-on:user-confirmation="on_user_confirm" v-bind:question="user_notification.message"></user-confirmation>
             <operation-detail :operation="erp_data.data"></operation-detail>
             <last-operation v-if="current_state == 'last_operation'" v-on:confirm="state['last_operation'].on_confirm"></last-operation>
-            <reset-screen-button v-on:reset="on_reset" :show_reset_button="show_reset_button"></reset-screen-button>
+            <cancel-button v-on:cancel="on_cancel" v-if="show_cancel_button"></cancel-button>
         </Screen>
     `,
     data: function () {

@@ -33,3 +33,8 @@ ul.packaging span:first-child {
 }
 .v-dialog.v-dialog--active.v-dialog--fullscreen .v-alert__wrapper .message {
 }
+
+
+.action {
+    margin-top: 2rem;
+}

@@ -17,7 +17,7 @@ Vue.component('searchbar', {
         type: e.target.dataset.type
       });  //talk to parent
       this.reset();
-      },
+    },
   	reset: function () {
   		this.entered = '';
   	}

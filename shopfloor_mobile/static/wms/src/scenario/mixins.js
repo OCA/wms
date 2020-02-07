@@ -32,6 +32,9 @@ export var ScenarioBaseMixin = {
     computed: {
         search_input_placeholder: function () {
             return this.state[this.current_state].scan_placeholder
+        },
+        show_cancel_button: function () {
+            return this.state[this.current_state].show_cancel_button
         }
     },
     methods: {
@@ -146,7 +149,12 @@ export var GenericStatesMixin = {
                         this.go_state('wait_validation',
                             this.odoo.validate(this.erp_data.data))
                     },
+                    on_cancel: () => {
+                        this.go_state('wait_cancel',
+                            this.odoo.cancel(this.erp_data.data))
+                    },
                     scan_placeholder: 'Scan location',
+                    show_cancel_button: true
                 },
                 'wait_validation': {
                     success: (result) => {
@@ -154,6 +162,14 @@ export var GenericStatesMixin = {
                     },
                     error: (result) => {
                         this.go_state('scan_location')
+                    },
+                },
+                'wait_cancel': {
+                    success: (result) => {
+                        this.go_state('start')
+                    },
+                    error: (result) => {
+                        this.go_state('start')
                     },
                 },
                 'confirm_location': { // this one may be mered with scan_location
