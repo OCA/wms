@@ -3,7 +3,7 @@ from odoo.tests.common import Form
 from .common import CommonCase
 
 
-class SinglePackPutawayCase(CommonCase):
+class SinglePackTransferCase(CommonCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
@@ -13,66 +13,79 @@ class SinglePackPutawayCase(CommonCase):
         cls.pack_a = cls.env["stock.quant.package"].create(
             {"location_id": cls.stock_location.id}
         )
-        cls.env["stock.putaway.rule"].create(
-            {
-                "product_id": cls.product_a.id,
-                "location_in_id": cls.stock_location.id,
-                "location_out_id": cls.shelf1.id,
-            }
-        )
         cls.quant_a = cls.env["stock.quant"].create(
             {
                 "product_id": cls.product_a.id,
-                "location_id": cls.dispatch_location.id,
+                "location_id": cls.shelf1.id,
                 "quantity": 1,
                 "package_id": cls.pack_a.id,
             }
         )
-        cls.menu = cls.env.ref("shopfloor.shopfloor_menu_put_away_reach_truck")
+        cls.menu = cls.env.ref("shopfloor.shopfloor_menu_single_pallet_transfer")
         cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
+        cls.picking_type = cls.process.picking_type_ids
+        cls.picking = cls._create_initial_move()
 
     def setUp(self):
         super().setUp()
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
-            self.service = work.component(usage="single_pack_putaway")
+            self.service = work.component(usage="single_pack_transfer")
+
+    @classmethod
+    def _create_initial_move(cls):
+        """Create the move to satisfy the pre-condition before /start"""
+        picking_form = Form(cls.env["stock.picking"])
+        picking_form.picking_type_id = cls.picking_type
+        picking_form.location_id = cls.shelf1
+        picking_form.location_dest_id = cls.shelf2
+        with picking_form.move_ids_without_package.new() as move:
+            move.product_id = cls.product_a
+            move.product_uom_qty = 1
+        picking = picking_form.save()
+        picking.action_confirm()
+        picking.action_assign()
+        return picking
+
+    def _simulate_started(self):
+        """Replicate what the /start endpoint would do
+
+        Used to test the next endpoints (/validate and /cancel)
+        """
+        package_level = self.picking.move_line_ids.package_level_id
+        package_level.is_done = True
+        return package_level
 
     def test_start(self):
-        """Test the happy path for single pack putaway /start endpoint
+        """Test the happy path for single pack transfer /start endpoint
+
+        We scan the barcode of the pack (simplest use case).
 
         The pre-conditions:
 
-        * A Pack exists in the Input Location (presumably brought there by a
-          reception for a PO)
-        * A put-away rule moves the product of the Pack from Stock to Stock/Shelf 1
+        * A Pack exists in Stock/Shelf1.
+        * A stock picking exists to move the Pack from Stock/Shelf1 to
+          Stock/Shelf2. The move is "assigned".
 
         Expected result:
 
-        * A move is created from Input to Stock/Shelf 1. It is assigned and the package
-        level is set to Done.
+        * The package level of the move is set to "is_done".
 
-        The next step in the workflow is to call /validate with the created
+        The next step in the workflow is to call /validate with the
         package level that will set the move and picking to done.
         """
         barcode = self.pack_a.name
         params = {"barcode": barcode}
+
+        package_level = self.picking.move_line_ids.package_level_id
+        self.assertFalse(package_level.is_done)
+
         # Simulate the client scanning a package's barcode, which
         # in turns should start the operation in odoo
         response = self.service.dispatch("start", params=params)
 
-        # Checks:
-        package_level = self.env["stock.package_level"].browse(response["data"]["id"])
-        move_line = package_level.move_line_ids
-        move = move_line.move_id
-
-        # the put-away rule should have set the shelf1 for the move line
-        self.assertRecordValues(
-            move_line, [{"qty_done": 1.0, "location_dest_id": self.shelf1.id}]
-        )
-        self.assertRecordValues(
-            move, [{"state": "assigned", "location_dest_id": self.stock_location.id}]
-        )
+        self.assertTrue(package_level.is_done)
         self.assert_response(
             response,
             state="scan_location",
@@ -82,54 +95,179 @@ class SinglePackPutawayCase(CommonCase):
             },
             data={
                 "id": self.ANY,
-                "location_src": {
-                    "id": self.dispatch_location.id,
-                    "name": self.dispatch_location.name,
-                },
-                "location_dst": {"id": self.shelf1.id, "name": self.shelf1.name},
                 "name": package_level.package_id.name,
-                "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
-                "product": {"id": move.product_id.id, "name": move.product_id.name},
+                "location_src": {"id": self.shelf1.id, "name": self.shelf1.name},
+                "location_dst": {"id": self.shelf2.id, "name": self.shelf2.name},
+                "picking": {"id": self.picking.id, "name": self.picking.name},
+                "product": {"id": self.product_a.id, "name": self.product_a.name},
             },
         )
 
-    def test_start_no_package_for_barcode(self):
-        """Test /start when no package is found for barcode
+    def test_start_no_operation(self):
+        """Test /start when there is no operation to move the pack
 
         The pre-conditions:
 
-        * No Pack exists with the barcode
+        * A Pack exists in Stock/Shelf1.
+        * No stock picking exists to move the Pack from Stock/Shelf1 to
+          Stock/Shelf2, or the state is not assigned.
 
         Expected result:
 
-        * return a message
+        * Return a message
         """
-        params = {"barcode": "NOTHING_SHOULD_EXIST_WITH: 👀"}
+        barcode = self.pack_a.name
+        params = {"barcode": barcode}
+        self.picking.do_unreserve()
+
+        # Simulate the client scanning a package's barcode, which
+        # in turns should start the operation in odoo
+        response = self.service.dispatch("start", params=params)
+
+        self.assert_response(
+            response,
+            state="start",
+            message={
+                "message_type": "error",
+                "message": "No pending operation for package {}.".format(
+                    self.pack_a.name
+                ),
+            },
+        )
+
+    def test_start_barcode_not_known(self):
+        """Test /start when the barcode is unknown
+
+        The pre-conditions:
+
+        * Nothing
+
+        Expected result:
+
+        * Return a message
+        """
+        params = {"barcode": "THIS_BARCODE_DOES_NOT_EXIST"}
         response = self.service.dispatch("start", params=params)
         self.assert_response(
             response,
             state="start",
             message={
                 "message_type": "error",
-                "message": "The package NOTHING_SHOULD_EXIST_WITH: 👀 doesn't exist",
+                "message": "The package THIS_BARCODE_DOES_NOT_EXIST" " doesn't exist",
             },
         )
 
-    def test_start_package_not_in_src_location(self):
-        """Test /start when the package is not in the src location
+    def test_start_pack_from_location(self):
+        """Test /start, finding the pack from location's barcode
+
+        When we scan a location which contains only one pack,
+        we want to move this pack.
 
         The pre-conditions:
 
-        * Pack exists with the barcode
-        * The Pack is outside the location or sublocation of the source
-          location of the current process' picking type
+        * A Pack exists in Stock/Shelf1.
+        * A stock picking exists to move the Pack from Stock/Shelf1 to
+          Stock/Shelf2. The move is "assigned".
 
         Expected result:
 
-        * return a message
+        * The package level of the move is set to "is_done".
+
+        The next step in the workflow is to call /validate with the
+        package level that will set the move and picking to done.
         """
+        barcode = self.shelf1.barcode
+        params = {"barcode": barcode}
+        response = self.service.dispatch("start", params=params)
+        self.assert_response(
+            # We only care about the fact that we jump to the next
+            # screen, so it found the pack. The details are already
+            # checked in the test_start test.
+            response,
+            state="scan_location",
+            message=self.ANY,
+            data=self.ANY,
+        )
+
+    def test_start_pack_from_location_empty(self):
+        """Test /start, scan location's barcode without pack
+
+        When we scan a location which contains no packs,
+        we ask the user to scan a pack.
+
+        The pre-conditions:
+
+        * No packs exists in Stock/Shelf2
+
+        Expected result:
+
+        * Return a message
+        """
+        barcode = self.shelf2.barcode
+        params = {"barcode": barcode}
+        response = self.service.dispatch("start", params=params)
+        self.assert_response(
+            response,
+            state="start",
+            message={
+                "message_type": "error",
+                "message": "Location %s doesn't contain any package."
+                % (self.shelf2.name,),
+            },
+        )
+
+    def test_start_pack_from_location_several_packs(self):
+        """Test /start, scan location's barcode with several packs
+
+        When we scan a location which contains several packs,
+        we ask the user to scan a pack.
+
+        The pre-conditions:
+
+        * 2 packs exists in Stock/Shelf1.
+
+        Expected result:
+
+        * Return a message
+        """
+        pack_b = self.env["stock.quant.package"].create(
+            {"location_id": self.stock_location.id}
+        )
+        self.env["stock.quant"].create(
+            {
+                "product_id": self.product_a.id,
+                "location_id": self.shelf1.id,
+                "quantity": 1,
+                "package_id": pack_b.id,
+            }
+        )
+        barcode = self.shelf1.barcode
+        params = {"barcode": barcode}
+        response = self.service.dispatch("start", params=params)
+        self.assert_response(
+            response,
+            state="start",
+            message={
+                "message_type": "error",
+                "message": "Several packages found in %s, please scan a package."
+                % (self.shelf1.name,),
+            },
+        )
+
+    def test_start_pack_outside_of_location(self):
+        """Test /start, scan a pack outside of the picking type location
+
+        The pre-conditions:
+
+        * A pack exists in a location outside of Stock (the default source
+          location of the picking type associated with the process)
+
+        Expected result:
+
+        * Return a message
+        """
+        self.pack_a.location_id = self.dispatch_location
         barcode = self.pack_a.name
-        self.pack_a.location_id = self.shelf1
         params = {"barcode": barcode}
         response = self.service.dispatch("start", params=params)
         self.assert_response(
@@ -138,74 +276,39 @@ class SinglePackPutawayCase(CommonCase):
             message={
                 "message_type": "error",
                 "message": "You cannot work on a package (%s) outside of location: %s"
-                % (
-                    self.pack_a.name,
-                    self.process.picking_type_ids.default_location_src_id.name,
-                ),
+                % (self.pack_a.name, self.picking_type.default_location_src_id.name),
             },
         )
 
-    def test_start_move_in_different_picking_type(self):
-        """Test /start when the package is used in a move in a different picking type
+    def test_start_already_started(self):
+        """Test /start when it was already started
+
+        We scan the barcode of the pack (simplest use case).
 
         The pre-conditions:
 
-        * Pack exists
-        * A move is created and assigned to move the package, using another picking type
+        * A Pack exists in Stock/Shelf1.
+        * A stock picking exists to move the Pack from Stock/Shelf1 to
+          Stock/Shelf2. The move is "assigned".
+        * Start is already called once
 
         Expected result:
 
-        * return a message
+        * Transition for confirmation with such message
+
+        The next step in the workflow is to call /validate with the
+        package level that will set the move and picking to done.
         """
         barcode = self.pack_a.name
-
-        # Create a move in a different picking type (trick the 'Delivery
-        # Orders' to go directly from Input to Customers)
-        picking_form = Form(self.env["stock.picking"])
-        picking_form.picking_type_id = self.wh.out_type_id
-        picking_form.location_id = self.input_location
-        with picking_form.move_ids_without_package.new() as move:
-            move.product_id = self.product_a
-            move.product_uom_qty = 1
-        picking = picking_form.save()
-        picking.action_confirm()
-        picking.action_assign()
-
         params = {"barcode": barcode}
-        response = self.service.dispatch("start", params=params)
-        self.assert_response(
-            response,
-            state="start",
-            message={
-                "message_type": "error",
-                "message": "An operation exists in Delivery Orders %s. You cannot"
-                " process it with this shopfloor process." % (picking.name,),
-            },
-        )
 
-    def test_start_move_already_exist(self):
-        """Test /start when the move for the package already exists
-
-        Because it was already started.
-
-        The pre-conditions:
-
-        * Pack exists
-        * A move is created and assigned to move the package, using the same
-          picking type
-
-        Expected result:
-
-        * return a message to confirm
-        """
-        barcode = self.pack_a.name
-
-        # Create a move in a the same picking type
         package_level = self._simulate_started()
-        move = package_level.move_line_ids.move_id
+        self.assertTrue(package_level.is_done)
 
-        params = {"barcode": barcode}
+        # Simulate the client scanning a package's barcode, which
+        # in turns should start the operation in odoo
         response = self.service.dispatch("start", params=params)
+
         self.assert_response(
             response,
             state="confirm_start",
@@ -216,39 +319,16 @@ class SinglePackPutawayCase(CommonCase):
             },
             data={
                 "id": self.ANY,
-                "location_src": {
-                    "id": self.dispatch_location.id,
-                    "name": self.dispatch_location.name,
-                },
-                "location_dst": {"id": self.shelf1.id, "name": self.shelf1.name},
                 "name": package_level.package_id.name,
-                "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
+                "location_src": {"id": self.shelf1.id, "name": self.shelf1.name},
+                "location_dst": {"id": self.shelf2.id, "name": self.shelf2.name},
+                "picking": {"id": self.picking.id, "name": self.picking.name},
                 "product": {"id": self.product_a.id, "name": self.product_a.name},
             },
         )
 
-    def _simulate_started(self):
-        """Replicate what the /start endpoint would do
-
-        Used to test the next endpoints (/validate and /cancel)
-        """
-        picking_form = Form(self.env["stock.picking"])
-        picking_form.picking_type_id = self.menu.process_id.picking_type_ids
-        with picking_form.move_ids_without_package.new() as move:
-            move.product_id = self.product_a
-            move.product_uom_qty = 1
-        picking = picking_form.save()
-        picking.action_confirm()
-        picking.action_assign()
-        package_level = picking.move_line_ids.package_level_id
-        self.assertEqual(package_level.package_id, self.pack_a)
-        # at this point, the package level is already set to "done", by the
-        # "start" method of the pack transfer putaway
-        package_level.is_done = True
-        return package_level
-
     def test_validate(self):
-        """Test the happy path for single pack putaway /validate endpoint
+        """Test the happy path for single pack transfer /validate endpoint
 
         The pre-conditions:
 
@@ -268,7 +348,7 @@ class SinglePackPutawayCase(CommonCase):
             "validate",
             params={
                 "package_level_id": package_level.id,
-                "location_barcode": self.shelf1.barcode,
+                "location_barcode": self.shelf2.barcode,
             },
         )
 
@@ -283,11 +363,11 @@ class SinglePackPutawayCase(CommonCase):
 
         self.assertRecordValues(
             package_level.move_line_ids,
-            [{"qty_done": 1.0, "location_dest_id": self.shelf1.id, "state": "done"}],
+            [{"qty_done": 1.0, "location_dest_id": self.shelf2.id, "state": "done"}],
         )
         self.assertRecordValues(
             package_level.move_line_ids.move_id,
-            [{"location_dest_id": self.stock_location.id, "state": "done"}],
+            [{"location_dest_id": self.shelf2.id, "state": "done"}],
         )
 
     def test_validate_not_found(self):
@@ -395,13 +475,13 @@ class SinglePackPutawayCase(CommonCase):
         # was already started by the first step (start operation)
         package_level = self._simulate_started()
 
-        # expected destination is 'shelf1', we'll scan shelf2 which must
+        # expected destination is 'shelf2', we'll scan shelf1 which must
         # ask a confirmation to the user (it's still in the same picking type)
         response = self.service.dispatch(
             "validate",
             params={
                 "package_level_id": package_level.id,
-                "location_barcode": self.shelf2.barcode,
+                "location_barcode": self.shelf1.barcode,
             },
         )
 
@@ -461,11 +541,11 @@ class SinglePackPutawayCase(CommonCase):
         )
         self.assertRecordValues(
             package_level.move_line_ids.move_id,
-            [{"location_dest_id": self.stock_location.id, "state": "done"}],
+            [{"location_dest_id": self.shelf2.id, "state": "done"}],
         )
 
     def test_cancel(self):
-        """Test the happy path for single pack putaway /cancel endpoint
+        """Test the happy path for single pack transfer /cancel endpoint
 
         The pre-conditions:
 
@@ -473,25 +553,24 @@ class SinglePackPutawayCase(CommonCase):
 
         Expected result:
 
-        * The move associated to the package level is 'cancel'
+        * The package level has is_done to False
         """
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
         package_level = self._simulate_started()
+        self.assertTrue(package_level.is_done)
 
         # keep references for later checks
         move = package_level.move_line_ids.move_id
-        move_lines = package_level.move_line_ids
         picking = move.picking_id
 
         # now, call the service to cancel
         response = self.service.dispatch(
             "cancel", params={"package_level_id": package_level.id}
         )
-        self.assertRecordValues(move, [{"state": "cancel"}])
-        self.assertRecordValues(picking, [{"state": "cancel"}])
-        self.assertFalse(package_level.move_line_ids)
-        self.assertFalse(move_lines.exists())
+        self.assertRecordValues(move, [{"state": "assigned"}])
+        self.assertRecordValues(picking, [{"state": "assigned"}])
+        self.assertRecordValues(package_level, [{"is_done": False}])
 
         self.assert_response(
             response,
@@ -503,12 +582,12 @@ class SinglePackPutawayCase(CommonCase):
         )
 
     def test_cancel_already_canceled(self):
-        """Test a call on /cancel for already canceled move
+        """Test a call on /cancel for already canceled package level
 
         The pre-conditions:
 
         * /start has been called
-        * /cancel has been called elsewhere or the move canceled on Odoo
+        * /cancel has been called elsewhere or 'is_done' removed in odoo
 
         Expected result:
 

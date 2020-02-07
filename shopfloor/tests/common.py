@@ -49,6 +49,17 @@ class CommonCase(SavepointCase, ComponentMixin):
             context=dict(cls.env.context, tracking_disable=cls.tracking_disable)
         )
         cls.setUpComponent()
+        cls.setUpClassVars()
+
+    @classmethod
+    def setUpClassVars(cls):
+        stock_location = cls.env.ref("stock.stock_location_stock")
+        cls.stock_location = stock_location
+        cls.dispatch_location = cls.env.ref("stock.location_dispatch_zone")
+        cls.dispatch_location.barcode = "DISPATCH"
+        cls.input_location = cls.env.ref("stock.stock_location_company")
+        cls.shelf1 = cls.env.ref("stock.stock_location_components")
+        cls.shelf2 = cls.env.ref("stock.stock_location_14")
 
     def assert_response(self, response, state=None, message=None, data=None):
         """Assert a response from the webservice
