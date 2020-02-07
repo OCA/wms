@@ -29,7 +29,7 @@ Vue.component('Screen', {
                 <v-list-item
                     v-for="item in navigation"
                     :key="item.name"
-                    :href="'#' + $root.make_menu_item_url(item)"
+                    :href="'#/' + item.process_code"
                     link
                     >
                     <v-list-item-content>
@@ -53,7 +53,7 @@ Vue.component('Screen', {
 
             <v-toolbar-title>{{ title }}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon href="#scananything">
+            <v-btn icon @click="$router.push('scananything')">
                 <v-icon >mdi-magnify</v-icon>
             </v-btn>
             <v-menu

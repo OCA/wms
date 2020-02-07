@@ -1,6 +1,6 @@
 import {ScenarioBaseMixin} from "./mixins.js";
 
-Vue.component('scan-anything', {
+export var ScanAnything = Vue.component('scan-anything', {
     mixins: [ScenarioBaseMixin],
     template: `
         <Screen title="Scan Anything">
@@ -13,6 +13,31 @@ Vue.component('scan-anything', {
             <reset-screen-button v-on:reset="on_reset" :show_reset_button="show_reset_button"></reset-screen-button>
         </Screen>
     `,
+    mounted () {
+        if (this.$route.params["codebar"]){
+            this.go_state(
+                'wait_call',
+                this.odoo.scan_anything(this.$route.params["codebar"])
+            )
+        }
+    },
+    beforeRouteUpdate (to, from, next) {
+        this.current_state = this.initial_state
+        if (to.params["codebar"]){
+            this.go_state(
+                'wait_call',
+                this.odoo.scan_anything(to.params["codebar"])
+            )
+        }
+        next()
+    },
+    methods: {
+        on_reset: function (e) {
+            this.reset_notification()
+            this.reset_erp_data('data')
+            this.$router.push({ name: "scananything", params: {codebar: undefined}})
+        },
+    },
     data: function () {
         return {
             'usage': 'scan_anything',
@@ -25,10 +50,10 @@ Vue.component('scan-anything', {
                         this.reset_erp_data('data')
                     },
                     on_scan: (scanned) => {
-                        this.go_state(
-                            'wait_call',
-                            this.odoo.scan_anything(scanned.text)
-                        )
+                        this.$router.push({
+                            "name": "scananything",
+                            params: {"codebar": scanned.text}
+                        })
                     },
                     scan_placeholder: 'Scan anything...',
                 },
@@ -48,8 +73,10 @@ Vue.component('scan-anything', {
                     },
                     on_scan: (scanned) => {
                         this.erp_data.data.location_barcode = scanned.text
-                        this.go_state('wait_call',
-                            this.odoo.scan_anything(scanned.text))
+                        this.$router.push({
+                            "name": "scananything",
+                            params: {"codebar": scanned.text}
+                        })
                     },
                 },
             }

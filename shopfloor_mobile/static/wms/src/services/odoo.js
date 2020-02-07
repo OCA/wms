@@ -109,7 +109,7 @@ export class OdooMocked extends OdooMixin{
         window.DEMO_CASE = window.DEMO_CASES[this.usage][barcode]
         if (!window.DEMO_CASE) {
             return Promise.resolve({
-                "message": {"message_type": "error", "body": "Unknown barcode"}
+                "message": {"message_type": "error", "message": "Unknown barcode"}
             })
         }
         let res = window.DEMO_CASE['fetch'];
