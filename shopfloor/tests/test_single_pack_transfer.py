@@ -28,6 +28,10 @@ class SinglePackTransferCase(CommonCase):
         cls.picking_type = cls.process.picking_type_ids
         cls.picking = cls._create_initial_move()
 
+        # disable the completion on the picking type, we'll have specific test(s)
+        # to check the behavior of this screen
+        cls.picking_type.display_completion_info = False
+
     def setUp(self):
         super().setUp()
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
@@ -333,6 +337,7 @@ class SinglePackTransferCase(CommonCase):
         The pre-conditions:
 
         * /start has been called
+        * "completion info" is not active on the picking type
 
         Expected result:
 
@@ -368,6 +373,52 @@ class SinglePackTransferCase(CommonCase):
         self.assertRecordValues(
             package_level.move_line_ids.move_id,
             [{"location_dest_id": self.shelf2.id, "state": "done"}],
+        )
+
+    def test_validate_completion_info(self):
+        """Test /validate when the picking is the last (show completion info)
+
+        When the picking is the last, we display an information screen on the
+        js application.
+
+        The pre-conditions:
+
+        * /start has been called
+        * "completion info" is active on the picking type
+        * the picking must be the last (it must not have destination moves with
+          unprocessed origin moves)
+
+        Expected result:
+
+        * The move associated to the package level is 'done'
+        * The transition goes to the completion info screen instead of starting
+          over
+        """
+        # setup the picking as we need, like if the move line
+        # was already started by the first step (start operation)
+        package_level = self._simulate_started()
+
+        # activate the computation of this field, so we have a chance to
+        # transition to the 'show completion info' screen.
+        self.picking_type.display_completion_info = True
+
+        # now, call the service to proceed with validation of the
+        # movement
+        response = self.service.dispatch(
+            "validate",
+            params={
+                "package_level_id": package_level.id,
+                "location_barcode": self.shelf2.barcode,
+            },
+        )
+
+        self.assert_response(
+            response,
+            state="show_completion_info",
+            message={
+                "message_type": "info",
+                "message": "The pack has been moved, you can scan a new pack.",
+            },
         )
 
     def test_validate_not_found(self):
