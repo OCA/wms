@@ -35,6 +35,7 @@ export var ScenarioBaseMixin = {
         }
     },
     methods: {
+        // generic states methods
         go_state: function(state, promise) {
             console.log('GO TO STATE', state)
             this.on_exit()
@@ -72,17 +73,22 @@ export var ScenarioBaseMixin = {
             if (this.state[this.current_state].error)
                 this.state[this.current_state].error(result)
         },
-        scanned: function(scanned) {
-            if (this.state[this.current_state].on_scan)
-                this.state[this.current_state].on_scan(scanned)
-        },
         on_reset: function (e) {
             this.reset_erp_data()
             this.reset_notification()
             this.go_state(this.initial_state)
         },
-        onUserConfirmation: function(answer){
-            this.state[this.current_state].on_confirmation(answer)
+        // specific states methods
+        on_scan: function(scanned) {
+            if (this.state[this.current_state].on_scan)
+                this.state[this.current_state].on_scan(scanned)
+        },
+        on_cancel: function() {
+            if (this.state[this.current_state].on_cancel)
+                this.state[this.current_state].on_cancel()
+        },
+        on_user_confirm: function(answer){
+            this.state[this.current_state].on_user_confirm(answer)
             this.need_confirmation = false
             this.reset_notification()
         },
@@ -151,7 +157,7 @@ export var GenericStatesMixin = {
                     },
                 },
                 'confirm_location': { // this one may be mered with scan_location
-                    on_confirmation: (answer) => {
+                    on_user_confirm: (answer) => {
                         if (answer == 'yes'){
                             this.go_state(
                                 'wait_validation',
@@ -174,7 +180,7 @@ export var GenericStatesMixin = {
                     exit: () => {
                         this.need_confirmation = false
                     },
-                    on_confirmation: (answer) => {
+                    on_user_confirm: (answer) => {
                         if (answer == 'yes'){
                             this.go_state('scan_location')
                         } else {
