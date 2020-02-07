@@ -325,6 +325,9 @@ class SinglePackPutaway(Component):
             "package_level_id": {"coerce": to_int, "required": True, "type": "integer"}
         }
 
+    def _validator_return_cancel(self):
+        return self._response_schema()
+
     def _validator_validate(self):
         return {
             "package_level_id": {"coerce": to_int, "required": True, "type": "integer"},
