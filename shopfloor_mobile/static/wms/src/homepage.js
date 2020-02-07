@@ -15,7 +15,7 @@ var homepage = Vue.component('home-page', {
                 <v-list-item
                     v-for="item in navigation"
                     :key="item.name"
-                    :href="'#' + item.hash"
+                    :href="'#' + ($root.demo_mode ? 'demo/': '') + item.hash"
                     link
                     >
                     <v-list-item-content>
@@ -24,7 +24,7 @@ var homepage = Vue.component('home-page', {
                 </v-list-item>
             </v-list>
 
-            <div class="alert alert-warning text-center" v-if="this.$root.using_demo_url">Using demo url</div>
+            <v-alert class="mt10" color="warning" v-if="$root.demo_mode">DEMO MODE ON</v-alert>
         </Screen>
     `
 });
