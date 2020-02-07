@@ -1,4 +1,4 @@
-import {ScenarioBaseMixin} from "../mixins.js";
+import {ScenarioBaseMixin} from "./mixins.js";
 
 Vue.component('scan-anything', {
     mixins: [ScenarioBaseMixin],
@@ -26,7 +26,7 @@ Vue.component('scan-anything', {
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.scan_anything(scanned)
+                            this.odoo.scan_anything(scanned.text)
                         )
                     },
                     scan_placeholder: 'Scan anything...',
@@ -46,9 +46,9 @@ Vue.component('scan-anything', {
                         this.erp_data.data.location_barcode = false
                     },
                     on_scan: (scanned) => {
-                        this.erp_data.data.location_barcode = scanned
+                        this.erp_data.data.location_barcode = scanned.text
                         this.go_state('wait_call',
-                            this.odoo.scan_anything(scanned))
+                            this.odoo.scan_anything(scanned.text))
                     },
                 },
             }

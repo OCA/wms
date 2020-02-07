@@ -38,6 +38,9 @@ export var ScenarioBaseMixin = {
         go_state: function(state, promise) {
             console.log('GO TO STATE', state)
             this.on_exit()
+            if (state == 'start')
+                // alias "start" to the initial state
+                state = this.initial_state
             this.current_state = state
             if (promise) {
                 promise.then(
@@ -69,8 +72,9 @@ export var ScenarioBaseMixin = {
             if (this.state[this.current_state].error)
                 this.state[this.current_state].error(result)
         },
-        scanned: function(barcode) {
-            this.state[this.current_state].on_scan(barcode)
+        scanned: function(scanned) {
+            if (this.state[this.current_state].on_scan)
+                this.state[this.current_state].on_scan(scanned)
         },
         on_reset: function (e) {
             this.reset_erp_data()
@@ -98,7 +102,92 @@ export var ScenarioBaseMixin = {
         reset_erp_data: function (key) {
             // FIXME
             this.$set(this.erp_data, key, {})
+        },
+    }
+}
+
+
+export var GenericStatesMixin = {
+
+    data: function () {
+        return {
+            'state': {
+                'scan_pack': {
+                    enter: () => {
+                        this.reset_erp_data('data')
+                    },
+                    on_scan: (scanned) => {
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.scan_pack(scanned.text)
+                        )
+                    },
+                    scan_placeholder: 'Scan pack',
+                },
+                'wait_call': {
+                    success: (result) => {
+                        if (result.data != undefined)
+                            this.set_erp_data('data', result.data)
+                        this.go_state(result.state)
+                    }
+                },
+                'scan_location': {
+                    enter: () => {
+                        this.erp_data.data.location_barcode = false
+                    },
+                    on_scan: (scanned) => {
+                        this.erp_data.data.location_barcode = scanned.text
+                        this.go_state('wait_validation',
+                            this.odoo.validate(this.erp_data.data))
+                    },
+                    scan_placeholder: 'Scan location',
+                },
+                'wait_validation': {
+                    success: (result) => {
+                        this.go_state(result.state)
+                    },
+                    error: (result) => {
+                        this.go_state('scan_location')
+                    },
+                },
+                'confirm_location': { // this one may be mered with scan_location
+                    on_confirmation: (answer) => {
+                        if (answer == 'yes'){
+                            this.go_state(
+                                'wait_validation',
+                                this.odoo.validate(this.erp_data.data, true)
+                            )
+                        } else {
+                            this.go_state('scan_location')
+                        }
+                    },
+                    on_scan: (scanned) => {
+                        this.on_exit()
+                        this.current_state = 'scan_location'
+                        this.state[this.current_state].on_scan(scanned)
+                    }
+                },
+                'takeover': { // this one may be mered with scan_location
+                    enter: () => {
+                        this.need_confirmation = true
+                    },
+                    exit: () => {
+                        this.need_confirmation = false
+                    },
+                    on_confirmation: (answer) => {
+                        if (answer == 'yes'){
+                            this.go_state('scan_location')
+                        } else {
+                            this.go_state('scan_pack')
+                        }
+                    },
+                    on_scan:(scanned) => {
+                        this.on_exit()
+                        this.current_state = 'scan_location'
+                        this.state[this.current_state].on_scan(scanned)
+                    }
+                },
+            }
         }
     }
 }
-  
