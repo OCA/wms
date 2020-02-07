@@ -68,38 +68,41 @@ export class OdooMocked extends OdooMixin{
 
     scan_pack (barcode) {
         console.log('Fetch', barcode);
-        window.CASE = window.DEMO_CASES[this.usage][barcode];
-        let res = window.CASE['fetch'];
+        window.DEMO_CASE = window.DEMO_CASES[this.usage][barcode];
+        let res = window.DEMO_CASE['fetch'];
         console.log(res);
         return Promise.resolve(res)
         // return this._call('start', 'POST', {'barcode': barcode})
     }
     validate (operation, confirmed) {
         console.log('Validate', operation);
-        let res = window.CASE['validate'];
-        if (operation.location_barcode in window.CASE)
-            res = window.CASE[operation.location_barcode]
+        let res = window.DEMO_CASE['validate'];
+        if (operation.location_barcode in window.DEMO_CASE)
+            res = window.DEMO_CASE[operation.location_barcode]
         console.log(res);
         return Promise.resolve(res)
     }
     cancel(id) {
         console.log('Cancelling', id);
-        let res = window.CASE['cancel'];
+        let res = window.DEMO_CASE['cancel'];
         console.log(res);
         return Promise.resolve(res)
     }
     scan_location (barcode) {
-        return Promise.resolve(window.CASE['scan_loc'])
+        if (_.isEmpty(window.DEMO_CASE))
+            window.DEMO_CASE = window.DEMO_CASES[this.usage][barcode]
+        return Promise.resolve(window.DEMO_CASE['scan_loc'])
     }
     scan_anything (barcode) {
         console.log('Scan anything', barcode, this.usage);
-        window.CASE = window.DEMO_CASES[this.usage][barcode];
-        if (!window.CASE) {
+        if (_.isEmpty(window.DEMO_CASE))
+            window.DEMO_CASE = window.DEMO_CASES[this.usage][barcode]
+        if (!window.DEMO_CASE) {
             return Promise.resolve({
                 "message": {"message_type": "error", "body": "Unknown barcode"}
             })
         }
-        let res = window.CASE['fetch'];
+        let res = window.DEMO_CASE['fetch'];
         // console.log(res);
         return Promise.resolve(res)
 
@@ -128,6 +131,10 @@ export class Odoo extends OdooMixin{
     }
     scan_location (barcode) {
         return this._call('scan_location', 'POST', {'barcode': barcode})
+    }
+    scan_anything (barcode) {
+        console.log('Scan anything', barcode, this.usage);
+        throw 'NOT IMPLEMENTED!'
     }
 
 }

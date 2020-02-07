@@ -26,3 +26,10 @@ ul.packaging span:first-child {
     width:33%;
     float:left;
 }
+.v-dialog.v-dialog--active.v-dialog--fullscreen .v-alert__wrapper {
+    display: block;
+    height: 100vh;
+    margin: 0;
+}
+.v-dialog.v-dialog--active.v-dialog--fullscreen .v-alert__wrapper .message {
+}

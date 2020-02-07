@@ -9,8 +9,8 @@ const LoginPage = { template: '<login-page></login-page>' }
 const ScanAnything = { template: '<scan-anything></scan-anything>' }
 
 const ScenarioTemplate = {
-   single_pack_putaway: {template: "<simple-pack-putaway></simple-pack-putaway>"},
-   single_pack_transfer: {template: "<pallet-transfer></pallet-transfer>"},
+   single_pack_putaway: {template: "<single-pack-putaway></single-pack-putaway>"},
+   single_pack_transfer: {template: "<single-pack-transfer></single-pack-transfer>"},
 }
 
 var AppConfig = new Config()

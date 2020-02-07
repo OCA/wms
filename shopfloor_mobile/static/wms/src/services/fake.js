@@ -263,6 +263,76 @@ var DEMO_SCAN_ANYTHING_LOCATION = {
         "message": undefined
     },
 }
+var DEMO_SINGLE_PACK_TRANSFER_1 = {
+    'fetch' : {
+        "data": {
+            "type": "pack",
+            "id": 1,
+            "name": "A nice pack 1",
+            "location_src": {
+                "id": 1,
+                "name":  'Location SRC 1',
+            },
+            "location_dst": {
+                "id": 2,
+                "name": 'Location SRC 2',
+            },
+            "product": [{"id": 1, "name": 'Product 1', "qty": 5}, {"id": 2, "name": 'Product 2', "qty": 2}],
+            "picking": {"id": 1, "name": 'Picking 1'},
+        },
+        "state": "scan_location",
+        "message": undefined
+    },
+    'validate' : {
+        "data": undefined,
+        "state": "start",
+        "message": {
+            'body': 'Pack validated',
+            'message_type': 'info',
+        }
+    },
+    'cancel' : {
+        "data": {
+            "id": 1,
+            "location_src": {
+                "id": 1,
+                "name":  'Location SRC 1 cancel',
+            },
+            "location_dst": {
+                "id": 2,
+                "name": 'Location DST 1 cancel',
+            },
+            "product": {"id": 1, "name": 'Product 1'},
+            "picking": {"id": 1, "name": 'Picking 1'},
+        },
+        "state": "scan_location",
+        "message": undefined
+    },
+    'LOC1' : {
+        "data": undefined,
+        "state": "start",
+        "message": {
+            'body': 'Pack validated',
+            'message_type': 'info',
+        }
+    },
+    'LOC2' : {
+        "data": {
+            'last_operation_name': 'Last operation XYZ',
+            'next_operation_name': 'Next operation XYZ',
+        },
+        "state": "last_operation",
+        "message": {}
+    },
+    'LOC3' : {
+        "data": undefined,
+        "state": "start",
+        "message": {
+            'body': 'Pack validated',
+            'message_type': 'info',
+        }
+    },
+}
 
 
 window.DEMO_SINGLE_PUTAWAY = {
@@ -273,7 +343,10 @@ window.DEMO_SINGLE_PUTAWAY = {
     "5": DEMO_SINGLE_PUTAWAY_5,
     "6": DEMO_SINGLE_PUTAWAY_6,
     "7": DEMO_SINGLE_PUTAWAY_7,
-};
+}
+window.DEMO_SINGLE_PACK_TRANSFER = {
+    "PACK1": DEMO_SINGLE_PACK_TRANSFER_1,
+}
 window.DEMO_SCAN_ANYTHING = {
     "pack": DEMO_SCAN_ANYTHING_PACK,
     "prod": DEMO_SCAN_ANYTHING_PRODUCT,
@@ -282,6 +355,7 @@ window.DEMO_SCAN_ANYTHING = {
 
 window.DEMO_CASES = {
     "single_pack_putaway": window.DEMO_SINGLE_PUTAWAY,
+    "single_pack_transfer": window.DEMO_SINGLE_PACK_TRANSFER,
     "scan_anything": window.DEMO_SCAN_ANYTHING,
 }
 window.DEMO_CASE = {}
