@@ -190,9 +190,12 @@ class SinglePackTransfer(Component):
             state="confirm_location", message=message.need_confirmation()
         )
 
-    def _response_for_validate_success(self):
+    def _response_for_validate_success(self, last=False):
         message = self.actions_for("message")
-        return self._response(state="start", message=message.confirm_pack_moved())
+        state = "start"
+        if last:
+            state = "show_completion_info"
+        return self._response(state=state, message=message.confirm_pack_moved())
 
     def validate(self, package_level_id, location_barcode, confirmation=False):
         """Validate the transfer"""
@@ -224,7 +227,8 @@ class SinglePackTransfer(Component):
                 return self._response_for_location_need_confirm()
 
         pack_transfer.set_destination_and_done(move, scanned_location)
-        return self._response_for_validate_success()
+        last = move.picking_id.completion_info == "next_picking_ready"
+        return self._response_for_validate_success(last=last)
 
     def _validator_validate(self):
         return {
