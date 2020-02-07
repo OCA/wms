@@ -96,15 +96,7 @@ class SinglePackPutaway(Component):
             return self._response_for_package_not_found(barcode)
         assert len(pack) == 1, "We cannot have 2 packages with the same barcode"
 
-        # TODO this seems to be a pretty common check, consider moving
-        # it to an Action Component
-        allowed_location = self.env["stock.location"].search_count(
-            [
-                ("id", "child_of", picking_type.default_location_src_id.id),
-                ("id", "=", pack.location_id.id),
-            ]
-        )
-        if not allowed_location:
+        if not pack.location_id.is_sublocation_of(picking_type.default_location_src_id):
             return self._response_for_forbidden_package(barcode, picking_type)
 
         existing_operation = self.env["stock.move.line"].search(
@@ -223,12 +215,7 @@ class SinglePackPutaway(Component):
             if confirmation:
                 # If the destination of the move would be incoherent
                 # (move line outside of it), we change the moves' destination
-                if not self.env["stock.location"].search_count(
-                    [
-                        ("id", "child_of", move.location_dest_id.id),
-                        ("id", "=", scanned_location.id),
-                    ]
-                ):
+                if not scanned_location.is_sublocation_of(move.location_dest_id):
                     move.location_dest_id = scanned_location.id
             else:
                 return self._response_for_location_need_confirm()
