@@ -51,7 +51,7 @@ class SinglePackPutaway(Component):
             },
         )
 
-    def _data_for_scan(self, move_line, pack):
+    def _data_after_package_scanned(self, move_line, pack):
         move = move_line.move_id
         return {
             "id": move_line.package_level_id.id,
@@ -68,7 +68,7 @@ class SinglePackPutaway(Component):
     def _response_for_start_to_confirm(self, move_line, pack):
         message = self.actions_for("message")
         return self._response(
-            data=self._data_for_scan(move_line, pack),
+            data=self._data_after_package_scanned(move_line, pack),
             state="confirm_start",
             message=message.already_running_ask_confirmation(),
         )
@@ -78,7 +78,7 @@ class SinglePackPutaway(Component):
         return self._response(
             state="scan_location",
             message=message.scan_destination(),
-            data=self._data_for_scan(move_line, pack),
+            data=self._data_after_package_scanned(move_line, pack),
         )
 
     def start(self, barcode):
@@ -249,6 +249,9 @@ class SinglePackPutaway(Component):
         return {
             "package_level_id": {"coerce": to_int, "required": True, "type": "integer"}
         }
+
+    def _validator_return_cancel(self):
+        return self._response_schema()
 
     def _validator_validate(self):
         return {
