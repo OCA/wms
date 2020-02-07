@@ -1,5 +1,6 @@
 //import searchbar from 'components/searchbar/searchbar.js'
 
+import {router} from './router.js'
 import {Config} from './services/config.js'
 import {Storage} from './services/storage.js'
 
@@ -52,8 +53,8 @@ const vuetify_themes = {
     }
 }
 
-var app = new Vue({
-    el: '#app',
+const app = new Vue({
+    router: router,
     vuetify: new Vuetify({
         // FIXME: has no effect
         // theme: {
@@ -61,43 +62,12 @@ var app = new Vue({
         // }
     }),
     data: {
-        currentRoute: window.location.hash.slice(1),
         demo_mode: false,
         config: AppConfig,
     },
-    computed: {
-        ViewComponent () {
-            if (this.config.authenticated) {
-                // TMP hack to be able to pass around params via querystring.
-                // We'll use proper routing later.
-                return Routes.get(this.currentRoute.split('?')[0]);
-            } else {
-                return LoginPage;
-            }
-        }
-    },
     created: function () {
         this.demo_mode = window.location.hash.includes('demo')
-    },
-    render (h) { return h(this.ViewComponent) },
-    methods: {
-        make_menu_item_url (menu_item) {
-            // TODO: once we'll have proper routing in place this will change
-            let params = {
-                'menu_id': menu_item.id,
-                'process_id': menu_item.process.id,
-            }
-            let url = menu_item.process.code + '?' + new URLSearchParams(params).toString()
-            if (this.$root.demo_mode)
-                url = 'demo/' + url
-            return url
-        }
+        this.demo_mode = true;
     },
 
-})
-
-window.addEventListener('popstate', (e) => {
-    // Using the hash of the url for navigation
-    // To use url fragment we need a proper server in the backend
-    app.currentRoute = window.location.hash.slice(1)
-});
+}).$mount('#app');

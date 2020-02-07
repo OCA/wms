@@ -20,6 +20,7 @@
     <script src="src/vendor/popper.min.js"></script>
     <script src="src/vendor/lodash.js"></script>
     <script src="src/vendor/vue.js"></script>
+    <script src="src/vendor/vue-router.js"></script>
     <script src="src/vendor/vuetify/vuetify.js"></script>
     <script src="src/services/fake.js"></script>
     <script src="src/services/odoo.js" type="module"></script>
@@ -46,10 +47,12 @@
     <noscript>
       <strong>We're sorry but wms doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app">  
+    <div id="app">
       <v-app>
         <v-content>
-          <v-container>Hello world</v-container>
+          <!-- <v-container> -->
+            <router-view></router-view>
+         <!-- </v-container> -->
         </v-content>
       </v-app>
     </div>
