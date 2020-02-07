@@ -4,7 +4,7 @@ Vue.component('scan-anything', {
     mixins: [ScenarioBaseMixin],
     template: `
         <Screen title="Scan Anything">
-            <searchbar v-on:found="scanned" :input_placeholder="search_input_placeholder"></searchbar>
+            <searchbar v-on:found="on_scan" :input_placeholder="search_input_placeholder"></searchbar>
             <user-information v-if="!need_confirmation && user_notification.message" v-bind:info="user_notification"></user-information>
             <detail-pack :packDetail="erp_data.data" v-if="erp_data.data.type=='pack'"></detail-pack>
             <detail-product :productDetail="erp_data.data.detail_info" v-if="erp_data.data.type=='product'"></detail-product>
