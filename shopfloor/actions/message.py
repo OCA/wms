@@ -95,14 +95,14 @@ class MessageAction(Component):
     def no_pack_in_location(self, location):
         return {
             "message_type": "error",
-            "message": _("Location %s doesn’t contain any package." % location.name),
+            "message": _("Location %s doesn't contain any package." % location.name),
         }
 
     def several_packs_in_location(self, location):
         return {
             "message_type": "error",
             "message": _(
-                "Several PACKs found in %s, please scan one PACK." % location.name
+                "Several packages found in %s, please scan a package." % location.name
             ),
         }
 
