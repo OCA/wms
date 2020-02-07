@@ -11,7 +11,13 @@
     "author": "Akretion, BCIM, Camptocamp, Odoo Community Association (OCA)",
     "license": "AGPL-3",
     "application": True,
-    "depends": ["stock", "base_rest", "auth_api_key"],
+    "depends": [
+        "stock",
+        "base_rest",
+        "auth_api_key",
+        # https://github.com/OCA/stock-logistics-warehouse/pull/808
+        "stock_picking_completion_info",
+    ],
     "data": [
         "security/ir.model.access.csv",
         "views/shopfloor_operation_group.xml",
