@@ -9,6 +9,7 @@ Vue.component('scan-anything', {
             <detail-pack :packDetail="erp_data.data" v-if="erp_data.data.type=='pack'"></detail-pack>
             <detail-product :productDetail="erp_data.data.detail_info" v-if="erp_data.data.type=='product'"></detail-product>
             <detail-location :locationDetail="erp_data.data.detail_info" v-if="erp_data.data.type=='location'"></detail-location>
+            <detail-operation :operationDetail="erp_data.data.detail_info" v-if="erp_data.data.type=='operation'"></detail-operation>
             <reset-screen-button v-on:reset="on_reset" :show_reset_button="show_reset_button"></reset-screen-button>
         </Screen>
     `,

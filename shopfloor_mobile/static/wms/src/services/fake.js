@@ -312,6 +312,44 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
     },
 }
 
+var DEMO_SCAN_ANYTHING_OPERATION = {
+    'fetch' : {
+        "data": {
+            "type": "operation",
+            "barcode": "280009834",
+            "detail_info": {
+                "id": 321311,
+                "name": "SCH/OUT/00008",
+                "customer": "BestCooperation SA",
+                "schedule_date": "2020-09-12",
+                "operation_type": "Abroad Delivery Order",
+                "destination_location": "DBACK-03",
+                "source_document": "SO0321",
+                "carrier": "",
+                "priority": 3,
+                "note": "Oh so this could be a really long text, how should it be implemented ?",
+                "moves": [
+                    {
+                        "id": 424,
+                        "name": "Sun Glasses Cat 4 High Altitude",
+                        "pack": "PID0000008",
+                        "lot": "AA8122F41",
+                        "qty": 34,
+                    },
+                    {
+                        "id": 421,
+                        "name": "Sun Glasses Pro Glazier",
+                        "pack": "PID0000421",
+                        "lot": "AA8122F41",
+                        "qty_instock": 4,
+                        "qty_reserved": 0,
+                    },
+                ],
+            }
+        },
+        "message": undefined
+    },
+}
 
 window.DEMO_SINGLE_PUTAWAY = {
     "1": DEMO_SINGLE_PUTAWAY_1,
@@ -330,6 +368,7 @@ window.DEMO_SCAN_ANYTHING = {
     "pack": DEMO_SCAN_ANYTHING_PACK,
     "prod": DEMO_SCAN_ANYTHING_PRODUCT,
     "loc": DEMO_SCAN_ANYTHING_LOCATION,
+    "op": DEMO_SCAN_ANYTHING_OPERATION,
 }
 
 window.DEMO_CASES = {
