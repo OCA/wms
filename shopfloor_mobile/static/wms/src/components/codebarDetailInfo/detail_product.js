@@ -60,6 +60,5 @@ Vue.component('detail-product', {
 
         </template>
       </v-simple-table>
-
     `,
 })
