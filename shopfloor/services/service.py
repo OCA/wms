@@ -1,4 +1,4 @@
-from odoo import _
+from odoo import _, fields
 from odoo.exceptions import MissingError
 from odoo.osv import expression
 
@@ -99,6 +99,16 @@ class BaseShopfloorService(AbstractComponent):
         demo_api_key = self.env.ref(
             "shopfloor.api_key_demo", raise_if_not_found=False
         ).key
+
+        # Try to first the first menu that implements the current service.
+        # Not all usages have a process, in that case, well set the first
+        # process found, because it should not matter for the service.
+        processes = self.env["shopfloor.process"].search([("code", "=", self._usage)])
+        menu = fields.first(processes.menu_ids)
+        if not menu:
+            menu = self.env["shopfloor.menu"].search([], limit=1)
+        profile = self.env["shopfloor.profile"].search([], limit=1)
+
         defaults.extend(
             [
                 {
@@ -117,7 +127,7 @@ class BaseShopfloorService(AbstractComponent):
                     "required": True,
                     "schema": {"type": "integer"},
                     "style": "simple",
-                    "value": "1",
+                    "value": menu.id,
                 },
                 {
                     "name": "SERVICE_CTX_PROFILE_ID",
@@ -126,7 +136,7 @@ class BaseShopfloorService(AbstractComponent):
                     "required": True,
                     "schema": {"type": "integer"},
                     "style": "simple",
-                    "value": "1",
+                    "value": profile.id,
                 },
             ]
         )
