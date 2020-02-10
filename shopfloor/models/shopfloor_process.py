@@ -10,6 +10,7 @@ class ShopfloorProcess(models.Model):
     picking_type_ids = fields.One2many(
         "stock.picking.type", "process_id", string="Operation types"
     )
+    menu_ids = fields.One2many(comodel_name="shopfloor.menu", inverse_name="process_id")
 
     def _selection_code(self):
         return [
