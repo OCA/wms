@@ -24,10 +24,11 @@ class Routes {
         } else if (path == 'scananything'){
             return ScanAnything
         } else {
-            var menu_items = AppConfig.get('menus')
+            let menu_items = AppConfig.get('menus')
             for (var idx in menu_items) {
-                if (menu_items[idx]['process_code'] == path) {
-                    return ScenarioTemplate[menu_items[idx]['process_code']]
+                let item = menu_items[idx]
+                if (item.process && item.process.code == path) {
+                    return ScenarioTemplate[item.process.code]
                 }
             }
             return NotFound;
@@ -79,6 +80,19 @@ var app = new Vue({
         this.demo_mode = window.location.hash.includes('demo')
     },
     render (h) { return h(this.ViewComponent) },
+    methods: {
+        make_menu_item_url (menu_item) {
+            // TODO: once we'll have proper routing in place this will change
+            let params = {
+                'menu_id': menu_item.id,
+                'process_id': menu_item.process.id,
+            }
+            let url = menu_item.process.code + '?' + new URLSearchParams(params).toString()
+            if (this.$root.demo_mode)
+                url = 'demo/' + url
+            return url
+        }
+    },
 
 })
 

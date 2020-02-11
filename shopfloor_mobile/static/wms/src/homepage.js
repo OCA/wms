@@ -5,14 +5,6 @@ var homepage = Vue.component('home-page', {
             }
         },
     props:['routes'],
-    methods: {
-        make_menu_item_url (menu_item) {
-            let url = menu_item['process_code'] + '?' + new URLSearchParams(menu_item).toString()
-            if (this.$root.demo_mode)
-                url = 'demo/' + url
-            return url
-        }
-    },
     template: `
         <Screen
             title="Barcode scanner"
@@ -23,7 +15,7 @@ var homepage = Vue.component('home-page', {
                 <v-list-item
                     v-for="item in navigation"
                     :key="item.name"
-                    :href="'#' + make_menu_item_url(item)"
+                    :href="'#' + $root.make_menu_item_url(item)"
                     link
                     >
                     <v-list-item-content>
