@@ -98,7 +98,7 @@ export var ScenarioBaseMixin = {
             this.reset_notification()
         },
         set_notification: function(message) {
-            this.user_notification.message = message.body
+            this.user_notification.message = message.message
             this.user_notification.message_type = message.message_type
             console.log('USER NOTIF SET', this.user_notification)
         },
