@@ -24,10 +24,10 @@ class Routes {
         } else if (path == 'scananything'){
             return ScanAnything
         } else {
-            var menus = AppConfig.get('menus')
-            for (var idx in menus) {
-                if (menus[idx]['hash'] == path) {
-                    return ScenarioTemplate[menus[idx]['process']]
+            var menu_items = AppConfig.get('menus')
+            for (var idx in menu_items) {
+                if (menu_items[idx]['process_code'] == path) {
+                    return ScenarioTemplate[menu_items[idx]['process_code']]
                 }
             }
             return NotFound;
@@ -60,7 +60,7 @@ var app = new Vue({
         // }
     }),
     data: {
-        currentRoute: window.location.hash.slice(1),
+        currentRoute: window.location.hash.slice(1).split('?')[0],
         demo_mode: false,
         config: AppConfig,
     },
