@@ -49,6 +49,9 @@ export class OdooMixin {
         throw `Endpoint not found, please check your odoo configuration.
         URL: ` + response.url
     }
+    _handle_500(response) {
+        throw response.statusText
+    }
     _get_headers() {
         console.log('APIKEY', Storage.apikey)
         return {
