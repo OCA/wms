@@ -68,7 +68,7 @@ var DEMO_SINGLE_PUTAWAY_4 = {
             "product": {"id": 1, "name": 'Product 4'},
             "picking": {"id": 1, "name": 'Picking 4'},
         },
-        "state": "takeover",
+        "state": "confirm_start",
         "message": {"message_type": "info", "body": "Benoit is at the toilette: do you take over?"}
     },
     'validate' : {
