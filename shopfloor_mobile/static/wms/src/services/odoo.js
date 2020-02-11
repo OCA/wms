@@ -33,31 +33,39 @@ export class OdooMixin {
             }
             else {
                 let handler = self['_handle_' + response.status.toString()]
-                if (handler !== undefined) {
-                    handler(response);
-                } else {
-                    console.log(response.statusText)
-                }
+                if (_.isUndefined(handler))
+                    handler = this._handle_error
+                return handler.call(this, response);
             }
         });
     }
+    _error_info (response) {
+        return {
+            'error': response.statusText,
+            'status': response.status,
+            'response': response,
+        }
+    }
     _handle_403(response) {
         Storage.apikey = "";
-        throw "Invalid API KEY";
+        return this._error_info(response)
     }
     _handle_404(response) {
-        throw `Endpoint not found, please check your odoo configuration.
-        URL: ` + response.url
+        console.log('Endpoint not found, please check your odoo configuration. URL: ', response.url)
+        return this._error_info(response)
     }
     _handle_500(response) {
-        throw response.statusText
+        return this._error_info(response)
+    }
+    _handle_error(response) {
+        console.log(response.status, response.statusText, response.url)
+        return this._error_info(response)
     }
     _get_headers() {
-        console.log('APIKEY', Storage.apikey)
         return {
             'Content-Type': 'application/json',
-            'SERVICE_CTX_MENU_ID': 1,
-            'SERVICE_CTX_PROFILE_ID': 1,
+            'SERVICE_CTX_MENU_ID': this.process_menu_id,
+            'SERVICE_CTX_PROFILE_ID': 1, // FIXME
             'API_KEY': Storage.apikey,
         }
     }
