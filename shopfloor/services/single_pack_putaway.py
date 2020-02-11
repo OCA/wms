@@ -35,9 +35,9 @@ class SinglePackPutaway(Component):
             message=message.package_not_allowed_in_src_location(barcode, picking_type),
         )
 
-    def _response_for_forbidden_scan_pack(self, existing_operations):
+    def _response_for_forbidden_start(self, existing_operations):
         return self._response(
-            state="scan_pack",
+            state="start",
             message={
                 "message_type": "error",
                 "message": _(
@@ -81,7 +81,7 @@ class SinglePackPutaway(Component):
             data=self._data_after_package_scanned(move_line, pack),
         )
 
-    def scan_pack(self, barcode):
+    def start(self, barcode):
         """Scan a pack barcode"""
 
         picking_type = self.picking_types
@@ -123,7 +123,7 @@ class SinglePackPutaway(Component):
             existing_operation
             and existing_operation[0].picking_id.picking_type_id != picking_type
         ):
-            return self._response_for_forbidden_scan_pack(existing_operation)
+            return self._response_for_forbidden_start(existing_operation)
         elif existing_operation:
             return self._response_for_start_to_confirm(existing_operation, pack)
 
@@ -266,10 +266,10 @@ class SinglePackPutaway(Component):
     def _validator_return_validate(self):
         return self._response_schema()
 
-    def _validator_scan_pack(self):
+    def _validator_start(self):
         return {"barcode": {"type": "string", "nullable": False, "required": True}}
 
-    def _validator_return_scan_pack(self):
+    def _validator_return_start(self):
         return self._response_schema(
             {
                 "id": {"coerce": to_int, "required": True, "type": "integer"},
