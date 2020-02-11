@@ -174,7 +174,7 @@ export var GenericStatesMixin = {
                         this.go_state('start')
                     },
                 },
-                'confirm_location': { // this one may be mered with scan_location
+                'confirm_location': {
                     on_user_confirm: (answer) => {
                         if (answer == 'yes'){
                             this.go_state(
@@ -191,7 +191,7 @@ export var GenericStatesMixin = {
                         this.state[this.current_state].on_scan(scanned)
                     }
                 },
-                'takeover': { // this one may be mered with scan_location
+                'confirm_start': {
                     enter: () => {
                         this.need_confirmation = true
                     },

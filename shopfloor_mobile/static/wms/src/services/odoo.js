@@ -121,10 +121,10 @@ export class Odoo extends OdooMixin{
     validate (operation, confirmed) {
         console.log('Validate', operation);
         let data = {
-            'id': operation.id, 'location_barcode': operation.location_barcode
+            'package_level_id': operation.id, 'location_barcode': operation.location_barcode
         }
         if (confirmed !== undefined)
-            data['confirmed'] = true;
+            data['confirmation'] = true;
         return this._call('validate', 'POST', data)
     }
     cancel(id) {
