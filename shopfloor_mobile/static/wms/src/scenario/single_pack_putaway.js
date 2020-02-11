@@ -17,8 +17,8 @@ Vue.component('single-pack-putaway', {
         return {
             'usage': 'single_pack_putaway',
             'show_reset_button': true,
-            'initial_state': 'scan_pack',
-            'current_state': 'scan_pack',
+            'initial_state': 'start_scan_pack',
+            'current_state': 'start_scan_pack',
         }
     },
 })

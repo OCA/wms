@@ -123,21 +123,35 @@ export var GenericStatesMixin = {
     data: function () {
         return {
             'state': {
-                'scan_pack': {
+                // generic state for when to start w/ scanning a pack
+                'start_scan_pack': {
                     enter: () => {
                         this.reset_erp_data('data')
                     },
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.scan_pack(scanned.text)
+                            this.odoo.start(scanned.text)
                         )
                     },
                     scan_placeholder: 'Scan pack',
                 },
+                // generic state for when to start w/ scanning a pack or loc
+                'start_scan_pack_or_location': {
+                    enter: () => {
+                        this.reset_erp_data('data')
+                    },
+                    on_scan: (scanned) => {
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.start(scanned.text)
+                        )
+                    },
+                    scan_placeholder: 'Scan pack or location',
+                },
                 'wait_call': {
                     success: (result) => {
-                        if (result.data != undefined)
+                        if (!_.isUndefined(result.data))
                             this.set_erp_data('data', result.data)
                         this.go_state(result.state)
                     }
