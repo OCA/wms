@@ -1,6 +1,6 @@
 import {ScenarioBaseMixin, GenericStatesMixin} from "./mixins.js";
 
-Vue.component('single-pack-putaway', {
+export var SinglePackPutAway = Vue.component('single-pack-putaway', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
     template: `
         <Screen title="Single pack putaway">
