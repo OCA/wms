@@ -27,27 +27,15 @@ Vue.component('cancel-button', {
 Vue.component('last-operation', {
     // props: ['info'],
     data: function () {
-        return {'info': {
-            'last_operation_name': 'Last operation XYZ',
-            'next_operation_name': 'Next operation XYZ',
-        }}
+        return {'info': {}}
     },
-    // methods: {
-    //     on_submit: function () {
-	// 	    this.$emit('confirm')
-    //     }
-    // },
     template: `
     <div class="last-operation">
         <v-dialog persistent fullscreen tile value=true>
             <v-alert type="info" prominent transition="scale-transition">
                 <v-card outlined color="blue lighten-1" class="message mt-10">
-                    <v-card-title>Last operation of the document</v-card-title>
-                    <v-card-text>{{info.last_operation_name}}</v-card-text>
-                </v-card>
-                <v-card outlined color="blue lighten-1" class="message mt-10">
-                    <v-card-title>Next operation ready to be processed</v-card-title>
-                    <v-card-text>{{info.next_operation_name}}</v-card-text>
+                    <v-card-title>This was the last operation of the document.</v-card-title>
+                    <v-card-text>The next operation is ready to be processed.</v-card-text>
                 </v-card>
                 <v-form class="mt-10">
                     <v-btn x-large color="success" @click="$emit('confirm')">OK</v-btn>
