@@ -67,8 +67,9 @@ class ShopfloorMenu(Component):
         return {
             "id": {"coerce": to_int, "required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
-            "process": {"type": "string", "nullable": False, "required": True},
+            "process_code": {"type": "string", "nullable": False, "required": True},
+            "process_id": {"coerce": to_int, "required": True, "type": "integer"},
         }
 
     def _convert_one_record(self, record):
-        return {"id": record.id, "name": record.name, "process": record.process_code}
+        return {"id": record.id, "name": record.name, "process_code": record.process_code, "process_id": record.process_id.id}
