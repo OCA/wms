@@ -60,14 +60,16 @@ var app = new Vue({
         // }
     }),
     data: {
-        currentRoute: window.location.hash.slice(1).split('?')[0],
+        currentRoute: window.location.hash.slice(1),
         demo_mode: false,
         config: AppConfig,
     },
     computed: {
         ViewComponent () {
             if (this.config.authenticated) {
-                return Routes.get(this.currentRoute);
+                // TMP hack to be able to pass around params via querystring.
+                // We'll use proper routing later.
+                return Routes.get(this.currentRoute.split('?')[0]);
             } else {
                 return LoginPage;
             }
