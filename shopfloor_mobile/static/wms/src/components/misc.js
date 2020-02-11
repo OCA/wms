@@ -22,7 +22,6 @@ Vue.component('cancel-button', {
     `,
 })
 
-
 // TODO: could be merged w/ userConfirmation
 Vue.component('last-operation', {
     // props: ['info'],
@@ -45,3 +44,18 @@ Vue.component('last-operation', {
     </div>
     `,
 })
+
+
+Vue.component('get-work', {
+    template: `
+    <div class="get-work">
+        <v-btn id="btn-get-work" x-large color="success" @click="$emit('get_work')">
+            Get work
+        </v-btn>
+        <v-btn id="btn-manual" color="default" @click="$emit('manual_selection')">
+            Manual selection
+        </v-btn>
+    </div>
+    `,
+})
+

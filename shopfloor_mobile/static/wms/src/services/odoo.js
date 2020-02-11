@@ -115,7 +115,27 @@ export class OdooMocked extends OdooMixin{
         let res = window.DEMO_CASE['fetch'];
         // console.log(res);
         return Promise.resolve(res)
-
+    }
+    // picking_load_trip
+    find_batch () {
+        if (_.isEmpty(window.DEMO_CASE))
+            window.DEMO_CASE = window.DEMO_CASES[this.usage]
+        return Promise.resolve(window.DEMO_CASE['find_batch'])
+    }
+    picking_batch () {
+        throw 'NOT IMPLEMENTED!'
+    }
+    unassign () {
+        throw 'NOT IMPLEMENTED!'
+    }
+    scan_line () {
+        throw 'NOT IMPLEMENTED!'
+    }
+    prepare_unload () {
+        throw 'NOT IMPLEMENTED!'
+    }
+    select () {
+        throw 'NOT IMPLEMENTED!'
     }
 
 }
@@ -144,6 +164,25 @@ export class Odoo extends OdooMixin{
     }
     scan_anything (barcode) {
         console.log('Scan anything', barcode, this.usage);
+        throw 'NOT IMPLEMENTED!'
+    }
+    // picking_load_trip
+    find_batch () {
+        throw 'NOT IMPLEMENTED!'
+    }
+    picking_batch () {
+        throw 'NOT IMPLEMENTED!'
+    }
+    unassign () {
+        throw 'NOT IMPLEMENTED!'
+    }
+    scan_line () {
+        throw 'NOT IMPLEMENTED!'
+    }
+    prepare_unload () {
+        throw 'NOT IMPLEMENTED!'
+    }
+    select () {
         throw 'NOT IMPLEMENTED!'
     }
 
