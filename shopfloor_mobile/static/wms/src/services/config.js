@@ -14,9 +14,13 @@ export class Config {
   load() {
       var odoo = new Odoo({usage: "app"})
       return odoo._call('user_config', 'POST', {})
-          .then((data) => {
-              this.data = data['data'];
+          .then((result) => {
+            if (!_.isUndefined(result.data)) {
+              this.data = result.data;
               this.authenticated = true
+            } else {
+              console.log(result)
+            }
           });
   }
 }
