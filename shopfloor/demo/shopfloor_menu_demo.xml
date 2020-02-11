@@ -12,4 +12,10 @@
         <field name="process_id" ref="shopfloor_process_single_pallet_transfer"/>
     </record>
 
+    <record id="shopfloor_menu_cluster_picking" model="shopfloor.menu">
+        <field name="name">Cluster Picking</field>
+        <field name="sequence">30</field>
+        <field name="process_id" ref="shopfloor_process_cluster_picking"/>
+    </record>
+
 </odoo>

@@ -14,7 +14,8 @@ class ShopfloorProcess(models.Model):
 
     def _selection_code(self):
         return [
-            # these must match a REST service
+            # these must match a REST service's '_usage'
             ("single_pack_putaway", "Single Pack Put-away"),
             ("single_pack_transfer", "Single Pack Transfer"),
+            ("cluster_picking", "Cluster Picking"),
         ]
