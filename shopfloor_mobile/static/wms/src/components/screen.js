@@ -29,7 +29,7 @@ Vue.component('Screen', {
                 <v-list-item
                     v-for="item in navigation"
                     :key="item.name"
-                    :href="'#' + item.hash"
+                    :href="'#' + $root.make_menu_item_url(item)"
                     link
                     >
                     <v-list-item-content>
