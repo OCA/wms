@@ -10,4 +10,9 @@
         <field name="code">single_pack_transfer</field>
     </record>
 
+    <record id="shopfloor_process_cluster_picking" model="shopfloor.process">
+        <field name="name">Cluster Picking</field>
+        <field name="code">cluster_picking</field>
+    </record>
+
 </odoo>
