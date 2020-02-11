@@ -216,7 +216,7 @@ export var GenericStatesMixin = {
                         if (answer == 'yes'){
                             this.go_state('scan_location')
                         } else {
-                            this.go_state('scan_pack')
+                            this.go_state('start')
                         }
                     },
                     on_scan:(scanned) => {
