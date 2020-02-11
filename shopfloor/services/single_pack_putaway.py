@@ -96,7 +96,10 @@ class SinglePackPutaway(Component):
             return self._response_for_package_not_found(barcode)
         assert len(pack) == 1, "We cannot have 2 packages with the same barcode"
 
-        if not pack.location_id.is_sublocation_of(picking_type.default_location_src_id):
+        location_src = picking_type.default_location_src_id
+        assert location_src, "Picking type has no default source location"
+
+        if not pack.location_id.is_sublocation_of(location_src):
             return self._response_for_forbidden_package(barcode, picking_type)
 
         existing_operation = self.env["stock.move.line"].search(
