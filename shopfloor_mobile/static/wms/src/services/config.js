@@ -16,7 +16,11 @@ export class Config {
       return odoo._call('app/user_config', 'POST', {})
           .then((result) => {
             if (!_.isUndefined(result.data)) {
-              this.data = result.data;
+              this.data = result.data
+              // TMP DEV add menu item for cluster picking
+              this.data['menus'].push({
+                'id': 3, 'name': 'Cluster picking', 'process': {'id': 5, 'code': 'cluster_picking'}
+              })
               this.authenticated = true
             } else {
               console.log(result)

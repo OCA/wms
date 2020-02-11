@@ -38,3 +38,13 @@ ul.packaging span:first-child {
 .action {
     margin-top: 2rem;
 }
+
+.get-work {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+#btn-get-work {
+    height: 70vh;
+    margin-bottom: 2rem;
+}
