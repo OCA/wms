@@ -19,15 +19,17 @@ export var ScenarioBaseMixin = {
         }
     },
     mounted: function () {
+        let params = new URLSearchParams(window.location.hash.split('?')[1])
+        let odoo_params = {
+            "process_id": params.get('process_id'),
+            "process_menu_id": params.get('id'),
+            "usage": this.usage,
+        }
         if (this.$root.demo_mode)
-            this.odoo = new OdooMocked({
-                "process_id": 1, "process_menu_id": 1, "usage": this.usage,
-            })
+            this.odoo = new OdooMocked(odoo_params)
         else
             // FIXME: init data should come from specific scenario
-            this.odoo = new Odoo({
-                "process_id": 1, "process_menu_id": 1, "usage": this.usage,
-            })
+            this.odoo = new Odoo(odoo_params)
     },
     computed: {
         search_input_placeholder: function () {

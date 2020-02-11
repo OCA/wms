@@ -16,10 +16,6 @@ export class Config {
       return odoo._call('user_config', 'POST', {})
           .then((data) => {
               this.data = data['data'];
-              for (var idx in this.data['menus']) {
-                  var menu = this.data['menus'][idx]
-                  menu['hash'] = menu['process'] + '_' + menu['id']
-              };
               this.authenticated = true
           });
   }
