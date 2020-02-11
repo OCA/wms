@@ -123,15 +123,15 @@ export class OdooMocked extends OdooMixin{
 
 export class Odoo extends OdooMixin{
     
-    scan_pack (barcode) {
-        return this._call('scan_pack', 'POST', {'barcode': barcode})
+    start (barcode) {
+        return this._call('start', 'POST', {'barcode': barcode})
     }
     validate (operation, confirmed) {
         console.log('Validate', operation);
         let data = {
             'package_level_id': operation.id, 'location_barcode': operation.location_barcode
         }
-        if (confirmed !== undefined)
+        if (!_.isUndefined(confirmed))
             data['confirmation'] = true;
         return this._call('validate', 'POST', data)
     }
