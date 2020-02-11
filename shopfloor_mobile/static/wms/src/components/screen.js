@@ -29,14 +29,14 @@ Vue.component('Screen', {
                 <v-list-item
                     v-for="item in navigation"
                     :key="item.name"
-                    :href="'#/' + item.process_code"
+                    :href="'#/' + item.process.code"
                     link
                     >
                     <v-list-item-content>
                         <v-list-item-title>{{ item.name }}</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-                <v-list-item href="#" link>
+                <v-list-item @click="$router.push({'name': 'home'})" link>
                     <v-list-item-content>
                         <v-list-item-title>Main menu</v-list-item-title>
                     </v-list-item-content>

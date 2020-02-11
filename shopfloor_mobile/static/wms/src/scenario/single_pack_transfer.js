@@ -1,6 +1,6 @@
 import {ScenarioBaseMixin, GenericStatesMixin} from "./mixins.js";
 
-Vue.component('single-pack-transfer', {
+export var SinglePackTransfer = Vue.component('single-pack-transfer', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
     template: `
         <Screen title="Single pack transfer">

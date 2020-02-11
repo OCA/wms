@@ -15,7 +15,7 @@ var homepage = Vue.component('home-page', {
                 <v-list-item
                     v-for="item in navigation"
                     :key="item.name"
-                    :href="'#' + $root.make_menu_item_url(item)"
+                    :href="'#/' + item['process'].code"
                     link
                     >
                     <v-list-item-content>
