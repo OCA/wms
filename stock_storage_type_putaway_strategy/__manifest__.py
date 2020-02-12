@@ -16,6 +16,7 @@
         "security/ir.model.access.csv",
         "views/stock_location.xml",
         "views/stock_quant_package.xml",
+        "views/stock_package_level.xml",
         "views/stock_package_storage_type.xml",
         "views/stock_storage_location_sequence.xml",
     ],

@@ -102,6 +102,16 @@ class StockLocation(models.Model):
                 return location
         return self.browse()
 
+    def select_allowed_locations(self, package_storage_type, quants, products):
+        # TODO merge with select_first_allowed_location ?
+        allowed_ids = set()
+        for location in self:
+            if location._package_storage_type_allowed(
+                package_storage_type, quants, products
+            ):
+                allowed_ids.add(location.id)
+        return self.browse(allowed_ids)
+
     def _get_ordered_children_locations(self):
         return self.search([("id", "child_of", self.ids), ("id", "!=", self.id)])
 
