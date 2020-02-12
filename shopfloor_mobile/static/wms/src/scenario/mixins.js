@@ -13,9 +13,9 @@ export var ScenarioBaseMixin = {
             'erp_data': {
                 'data': {}
             },
-            'initial_state': 'scan_pack',
-            'current_state': 'scan_pack',
-            'state': {},
+            'initial_state_key': 'scan_pack',
+            'current_state_key': 'scan_pack',
+            'states': {},
             'usage': '',  // match component usage on odoo
         }
     },
@@ -32,22 +32,28 @@ export var ScenarioBaseMixin = {
             this.odoo = new Odoo(odoo_params)
     },
     computed: {
+        current_state: function () {
+            return this.states[this.current_state_key]
+        },
         search_input_placeholder: function () {
-            return this.state[this.current_state].scan_placeholder
+            return this.current_state.scan_placeholder
         },
         show_cancel_button: function () {
-            return this.state[this.current_state].show_cancel_button
+            return this.current_state.show_cancel_button
         }
     },
     methods: {
+        is_state: function(state_key) {
+            return state_key == this.current_state_key
+        },
         // generic states methods
-        go_state: function(state, promise) {
-            console.log('GO TO STATE', state)
+        go_state: function(state_key, promise) {
+            console.log('GO TO STATE', state_key)
             this.on_exit()
-            if (state == 'start')
+            if (state_key == 'start')
                 // alias "start" to the initial state
-                state = this.initial_state
-            this.current_state = state
+                state_key = this.initial_state_key
+            this.current_state_key = state_key
             if (promise) {
                 promise.then(
                     this.on_success,
@@ -58,12 +64,12 @@ export var ScenarioBaseMixin = {
             }
         },
         on_enter: function () {
-            if (this.state[this.current_state].enter)
-                this.state[this.current_state].enter()
+            if (this.current_state.enter)
+                this.current_state.enter()
         },
         on_exit: function () {
-            if (this.state[this.current_state].exit)
-                this.state[this.current_state].exit()
+            if (this.current_state.exit)
+                this.current_state.exit()
         },
         on_success: function (result) {
             if (result.message) {
@@ -71,29 +77,29 @@ export var ScenarioBaseMixin = {
             } else {
                 this.reset_notification()
             }
-            if (this.state[this.current_state].success)
-                this.state[this.current_state].success(result)
+            if (this.current_state.success)
+                this.current_state.success(result)
         },
         on_error: function (result) {
-            if (this.state[this.current_state].error)
-                this.state[this.current_state].error(result)
+            if (this.current_state.error)
+                this.current_state.error(result)
         },
         on_reset: function (e) {
             this.reset_erp_data()
             this.reset_notification()
-            this.go_state(this.initial_state)
+            this.go_state(this.initial_state_key)
         },
         // specific states methods
         on_scan: function(scanned) {
-            if (this.state[this.current_state].on_scan)
-                this.state[this.current_state].on_scan(scanned)
+            if (this.current_state.on_scan)
+                this.current_state.on_scan(scanned)
         },
         on_cancel: function() {
-            if (this.state[this.current_state].on_cancel)
-                this.state[this.current_state].on_cancel()
+            if (this.current_state.on_cancel)
+                this.current_state.on_cancel()
         },
         on_user_confirm: function(answer){
-            this.state[this.current_state].on_user_confirm(answer)
+            this.current_state.on_user_confirm(answer)
             this.need_confirmation = false
             this.reset_notification()
         },
@@ -122,7 +128,7 @@ export var GenericStatesMixin = {
 
     data: function () {
         return {
-            'state': {
+            'states': {
                 // generic state for when to start w/ scanning a pack
                 'start_scan_pack': {
                     enter: () => {
@@ -201,8 +207,8 @@ export var GenericStatesMixin = {
                     },
                     on_scan: (scanned) => {
                         this.on_exit()
-                        this.current_state = 'scan_location'
-                        this.state[this.current_state].on_scan(scanned)
+                        this.current_state_key = 'scan_location'
+                        this.current_state.on_scan(scanned)
                     }
                 },
                 'confirm_start': {
@@ -221,8 +227,8 @@ export var GenericStatesMixin = {
                     },
                     on_scan:(scanned) => {
                         this.on_exit()
-                        this.current_state = 'scan_location'
-                        this.state[this.current_state].on_scan(scanned)
+                        this.current_state_key = 'scan_location'
+                        this.current_state.on_scan(scanned)
                     }
                 },
             }
