@@ -13,7 +13,7 @@ export class Config {
 
   load() {
       var odoo = new Odoo({usage: "app"})
-      return odoo._call('user_config', 'POST', {})
+      return odoo._call('app/user_config', 'POST', {})
           .then((result) => {
             if (!_.isUndefined(result.data)) {
               this.data = result.data;
