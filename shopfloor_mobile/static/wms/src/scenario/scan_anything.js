@@ -42,9 +42,9 @@ export var ScanAnything = Vue.component('scan-anything', {
         return {
             'usage': 'scan_anything',
             'show_reset_button': true,
-            'initial_state': 'scan_something',
-            'current_state': 'scan_something',
-            'state': {
+            'initial_state_key': 'scan_something',
+            'current_state_key': 'scan_something',
+            'states': {
                 'scan_something': {
                     enter: () => {
                         this.reset_erp_data('data')
