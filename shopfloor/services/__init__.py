@@ -7,3 +7,4 @@ from . import location
 from . import cluster_picking
 from . import single_pack_putaway
 from . import single_pack_transfer
+from . import picking_batch

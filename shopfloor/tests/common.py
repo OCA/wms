@@ -57,6 +57,7 @@ class CommonCase(SavepointCase, ComponentMixin):
         cls.stock_location = stock_location
         cls.dispatch_location = cls.env.ref("stock.location_dispatch_zone")
         cls.dispatch_location.barcode = "DISPATCH"
+        cls.packing_location = cls.env.ref("stock.location_pack_zone")
         cls.input_location = cls.env.ref("stock.stock_location_company")
         cls.shelf1 = cls.env.ref("stock.stock_location_components")
         cls.shelf2 = cls.env.ref("stock.stock_location_14")
@@ -123,3 +124,15 @@ class CommonCase(SavepointCase, ComponentMixin):
                 node_expected,
                 "\n\nNode's specs:\n%s" % (pformat(node_original_expected)),
             )
+
+    def _update_qty_in_location(self, location, product, quantity):
+        self.env["stock.quant"]._update_available_quantity(product, location, quantity)
+
+    def _fill_stock_for_pickings(self, pickings):
+        product_locations = {}
+        for move in self.all_batches.mapped("picking_ids.move_lines"):
+            key = (move.product_id, move.location_id)
+            product_locations.setdefault(key, 0)
+            product_locations[key] += move.product_qty
+        for (product, location), qty in product_locations.items():
+            self._update_qty_in_location(location, product, qty)
