@@ -70,7 +70,7 @@ export class OdooMixin {
         }
     }
     _get_url (endpoint) {
-        return '/shopfloor/' + this.usage + '/' + endpoint;
+        return '/shopfloor/' + endpoint
     }
 }
 
@@ -124,7 +124,7 @@ export class OdooMocked extends OdooMixin{
 export class Odoo extends OdooMixin{
     
     start (barcode) {
-        return this._call('start', 'POST', {'barcode': barcode})
+        return this._call(this.usage + '/start', 'POST', {'barcode': barcode})
     }
     validate (operation, confirmed) {
         console.log('Validate', operation);
@@ -133,14 +133,14 @@ export class Odoo extends OdooMixin{
         }
         if (!_.isUndefined(confirmed))
             data['confirmation'] = true;
-        return this._call('validate', 'POST', data)
+        return this._call(this.usage + '/validate', 'POST', data)
     }
     cancel(id) {
         console.log('Cancelling', id);
-        return this._call('cancel', 'POST', {'barcode': barcode})
+        return this._call(this.usage + '/cancel', 'POST', {'barcode': barcode})
     }
     scan_location (barcode) {
-        return this._call('scan_location', 'POST', {'barcode': barcode})
+        return this._call(this.usage + '/scan_location', 'POST', {'barcode': barcode})
     }
     scan_anything (barcode) {
         console.log('Scan anything', barcode, this.usage);
