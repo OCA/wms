@@ -77,7 +77,7 @@ class StockLocation(models.Model):
                 )
             ):
                 return pref_loc
-            storage_locations = pref_loc.get_storage_locations(product=product)
+            storage_locations = pref_loc.get_storage_locations(products=product)
             allowed_location = storage_locations.select_first_allowed_location(
                 package_storage_type, quant, product
             )
@@ -85,7 +85,8 @@ class StockLocation(models.Model):
                 return allowed_location
         return putaway_location
 
-    def get_storage_locations(self, product=None):
+    def get_storage_locations(self, products=None):
+        # TODO support multiple products? cf ABC
         self.ensure_one()
         locations = self.browse()
         if self.pack_putaway_strategy == "none":
@@ -94,10 +95,10 @@ class StockLocation(models.Model):
             locations = self._get_ordered_children_locations()
         return locations
 
-    def select_first_allowed_location(self, package_storage_type, quant, product):
+    def select_first_allowed_location(self, package_storage_type, quants, products):
         for location in self:
             if location._package_storage_type_allowed(
-                package_storage_type, quant, product
+                package_storage_type, quants, products
             ):
                 return location
         return self.browse()
@@ -115,82 +116,84 @@ class StockLocation(models.Model):
     def _get_ordered_children_locations(self):
         return self.search([("id", "child_of", self.ids), ("id", "!=", self.id)])
 
-    def _package_storage_type_allowed(self, package_storage_type, quant, product):
+    def _package_storage_type_allowed(self, package_storage_type, quants, products):
         self.ensure_one()
         matching_location_storage_types = self.allowed_location_storage_type_ids.filtered(
             lambda slst: package_storage_type in slst.package_storage_type_ids
         )
         allowed_location_storage_types = self.filter_restrictions(
-            matching_location_storage_types, quant, product
+            matching_location_storage_types, quants, products
         )
         return (
             not self.allowed_location_storage_type_ids or allowed_location_storage_types
         )
 
-    def filter_restrictions(self, matching_location_storage_types, quant, product):
+    def filter_restrictions(self, matching_location_storage_types, quants, products):
         allowed_location_storage_types = self.env["stock.location.storage.type"]
         for location_storage_type in matching_location_storage_types:
             if self._filter_properties(
-                location_storage_type, quant, product
-            ) and self._filter_capacity(location_storage_type, quant):
+                location_storage_type, quants, products
+            ) and self._filter_capacity(location_storage_type, quants):
                 allowed_location_storage_types |= location_storage_type
         return allowed_location_storage_types
 
-    def _filter_properties(self, location_storage_type, quant, product):
+    def _filter_properties(self, location_storage_type, quants, products):
         if location_storage_type.only_empty:
             if not self._existing_quants() and not self._existing_planned_moves():
                 return location_storage_type
         elif location_storage_type.do_not_mix_products:
             if location_storage_type.do_not_mix_lots:
-                lot = quant.lot_id
+                lot = quants.mapped('lot_id')
+                if len(lot) > 1:
+                    return False
                 if not self._existing_quants(
-                    product=product, lot=lot
-                ) and not self._existing_planned_moves(product=product, lot=lot):
+                    products=products, lot=lot
+                ) and not self._existing_planned_moves(products=products, lot=lot):
                     return location_storage_type
             else:
                 if not self._existing_quants(
-                    product=product
-                ) and not self._existing_planned_moves(product=product):
+                    products=products
+                ) and not self._existing_planned_moves(products=products):
                     return location_storage_type
         else:
             return location_storage_type
 
-    def _filter_capacity(self, location_storage_type, quant):
+    def _filter_capacity(self, location_storage_type, quants):
         if self._max_height_allowed(
-            location_storage_type, quant
-        ) and self._max_weight_allowed(location_storage_type, quant):
+            location_storage_type, quants
+        ) and self._max_weight_allowed(location_storage_type, quants):
             return location_storage_type
         else:
             return self.env["stock.location.storage.type"]
 
-    def _max_height_allowed(self, location_storage_type, quant):
-        height = quant.package_id.height
+    def _max_height_allowed(self, location_storage_type, quants):
+        height = quants.package_id.height
         max_height = location_storage_type.max_height
         return not (max_height and height and height > max_height)
 
-    def _max_weight_allowed(self, location_storage_type, quant):
-        pack_weight = quant.package_id.pack_weight
+    def _max_weight_allowed(self, location_storage_type, quants):
+        pack_weight = quants.package_id.pack_weight
         max_weight = location_storage_type.max_weight
         return not (max_weight and pack_weight and pack_weight > max_weight)
 
-    def _existing_quants(self, product=None, lot=None):
+    def _existing_quants(self, products=None, lot=None):
 
         base_domain = [("location_id", "=", self.id)]
-        domain = self._prepare_existing_domain(base_domain, product=product, lot=lot)
+        domain = self._prepare_existing_domain(base_domain, products=products, lot=lot)
         return self.env["stock.quant"].search(domain, limit=1)
 
-    def _existing_planned_moves(self, product=None, lot=None):
+    def _existing_planned_moves(self, products=None, lot=None):
         base_domain = [
             ("location_dest_id", "=", self.id),
             ("move_id.state", "not in", ("draft", "cancel", "done")),
         ]
-        domain = self._prepare_existing_domain(base_domain, product=product, lot=lot)
+        domain = self._prepare_existing_domain(base_domain, products=products, lot=lot)
         return self.env["stock.move.line"].search(domain, limit=1)
 
-    def _prepare_existing_domain(self, base_domain, product=None, lot=None):
+    def _prepare_existing_domain(self, base_domain, products=None, lot=None):
         domain = base_domain
-        if product is not None:
-            extra_domain = [("product_id", "!=", product.id)]
+        if products is not None:
+            extra_domain = [("product_id", "not in", products.ids)]
             if lot is not None:
                 extra_domain = OR([extra_domain, [("lot_id", "!=", lot.id)]])
             domain = AND([domain, extra_domain])
