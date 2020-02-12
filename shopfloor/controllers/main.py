@@ -9,7 +9,7 @@ class ShopfloorController(main.RestController):
     _root_path = "/shopfloor/"
     _collection_name = "shopfloor.service"
     _default_auth = "api_key"
-    _non_process_services = ('app', 'menu', 'profile')
+    _non_process_services = ("app", "menu", "profile")
 
     def _get_component_context(self):
         """
@@ -21,8 +21,8 @@ class ShopfloorController(main.RestController):
         res = super(ShopfloorController, self)._get_component_context()
         headers = request.httprequest.environ
 
-        res['menu'] = None
-        res['profile'] = None
+        res["menu"] = None
+        res["profile"] = None
         if self._is_process_enpoint(request.httprequest.path):
             res.update(self._get_process_context(headers, request.env))
         return res

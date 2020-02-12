@@ -13,6 +13,7 @@
     "application": True,
     "depends": [
         "stock",
+        "stock_picking_batch",
         "base_rest",
         "auth_api_key",
         # https://github.com/OCA/stock-logistics-warehouse/pull/808
