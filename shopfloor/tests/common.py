@@ -62,7 +62,7 @@ class CommonCase(SavepointCase, ComponentMixin):
         cls.shelf1 = cls.env.ref("stock.stock_location_components")
         cls.shelf2 = cls.env.ref("stock.stock_location_14")
 
-    def assert_response(self, response, state=None, message=None, data=None):
+    def assert_response(self, response, next_state=None, message=None, data=None):
         """Assert a response from the webservice
 
         The data and message dictionaries are checked using
@@ -70,8 +70,8 @@ class CommonCase(SavepointCase, ComponentMixin):
         value.
         """
         expected = {}
-        if state:
-            expected["state"] = state
+        if next_state:
+            expected["next_state"] = next_state
         if message:
             expected["message"] = message
         if data:
@@ -95,7 +95,7 @@ class CommonCase(SavepointCase, ComponentMixin):
                     "message_type": self.ANY,
                     "message": self.ANY,
                 },
-                "state": self.ANY,
+                "next_state": self.ANY,
             }
 
         Note: if ``self.ANY`` is used, the key must exist in the dictionary
