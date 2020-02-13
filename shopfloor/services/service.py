@@ -48,6 +48,20 @@ class BaseShopfloorService(AbstractComponent):
             res.append(self._convert_one_record(record))
         return res
 
+    def _get_input_validator(self, method_name):
+        # override the method to get the validator in a component
+        # instead of a method, to keep things apart
+        validator_component = self.component(usage="%s.validator" % self._usage)
+        return validator_component._get_validator(method_name)
+
+    def _get_output_validator(self, method_name):
+        # override the method to get the validator in a component
+        # instead of a method, to keep things apart
+        validator_component = self.component(
+            usage="%s.validator.response" % self._usage
+        )
+        return validator_component._get_validator(method_name)
+
     def _response(self, data=None, state=None, message=None):
         """Base "envelope" for the responses
 

@@ -323,22 +323,38 @@ class SinglePackPutaway(Component):
             },
         )
 
-    def _validator_cancel(self):
+
+class SinglePackPutawayValidator(Component):
+    """Validators for Single Pack Putaway methods"""
+
+    _inherit = "base.shopfloor.validator"
+    _name = "shopfloor.single.pack.putaway.validator"
+    _usage = "single_pack_putaway.validator"
+
+    def start(self):
+        return {"barcode": {"type": "string", "nullable": False, "required": True}}
+
+    def cancel(self):
         return {
             "package_level_id": {"coerce": to_int, "required": True, "type": "integer"}
         }
 
-    def _validator_return_cancel(self):
-        return self._response_schema()
-
-    def _validator_validate(self):
+    def validate(self):
         return {
             "package_level_id": {"coerce": to_int, "required": True, "type": "integer"},
             "location_barcode": {"type": "string", "nullable": False, "required": True},
             "confirmation": {"type": "boolean", "nullable": True, "required": False},
         }
 
-    def _validator_return_validate(self):
+
+class SinglePackPutawayValidatorResponse(Component):
+    """Validators for Single Pack Putaway methods responses"""
+
+    _inherit = "base.shopfloor.validator.response"
+    _name = "shopfloor.single.pack.putaway.validator.response"
+    _usage = "single_pack_putaway.validator.response"
+
+    def cancel(self):
         return self._response_schema()
 
     def _validator_scan_pack(self):
