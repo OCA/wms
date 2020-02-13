@@ -29,7 +29,7 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
             data_schema = {}
         return {
             "data": {"type": "dict", "required": False, "schema": data_schema},
-            "state": {"type": "string", "required": False},
+            "next_state": {"type": "string", "required": False},
             "message": {
                 "type": "dict",
                 "required": False,

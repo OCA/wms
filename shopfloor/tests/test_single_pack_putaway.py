@@ -75,7 +75,7 @@ class SinglePackPutawayCase(CommonCase):
         )
         self.assert_response(
             response,
-            state="scan_location",
+            next_state="scan_location",
             message={
                 "message_type": "info",
                 "message": "Scan the destination location",
@@ -108,7 +108,7 @@ class SinglePackPutawayCase(CommonCase):
         response = self.service.dispatch("start", params=params)
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "error",
                 "message": "The package NOTHING_SHOULD_EXIST_WITH: 👀 doesn't exist",
@@ -134,7 +134,7 @@ class SinglePackPutawayCase(CommonCase):
         response = self.service.dispatch("start", params=params)
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "error",
                 "message": "You cannot work on a package (%s) outside of location: %s"
@@ -175,7 +175,7 @@ class SinglePackPutawayCase(CommonCase):
         response = self.service.dispatch("start", params=params)
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "error",
                 "message": "An operation exists in Delivery Orders %s. You cannot"
@@ -208,7 +208,7 @@ class SinglePackPutawayCase(CommonCase):
         response = self.service.dispatch("start", params=params)
         self.assert_response(
             response,
-            state="confirm_start",
+            next_state="confirm_start",
             message={
                 "message_type": "warning",
                 "message": "Operation's already running."
@@ -274,7 +274,7 @@ class SinglePackPutawayCase(CommonCase):
 
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "info",
                 "message": "The pack has been moved, you can scan a new pack.",
@@ -304,7 +304,7 @@ class SinglePackPutawayCase(CommonCase):
 
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "error",
                 "message": "This operation does not exist anymore.",
@@ -336,7 +336,7 @@ class SinglePackPutawayCase(CommonCase):
 
         self.assert_response(
             response,
-            state="scan_location",
+            next_state="scan_location",
             message={
                 "message_type": "error",
                 "message": "No location found for this barcode.",
@@ -372,7 +372,7 @@ class SinglePackPutawayCase(CommonCase):
 
         self.assert_response(
             response,
-            state="scan_location",
+            next_state="scan_location",
             message={"message_type": "error", "message": "You cannot place it here"},
         )
 
@@ -407,7 +407,7 @@ class SinglePackPutawayCase(CommonCase):
 
         self.assert_response(
             response,
-            state="confirm_location",
+            next_state="confirm_location",
             message={"message_type": "warning", "message": "Are you sure?"},
         )
 
@@ -448,7 +448,7 @@ class SinglePackPutawayCase(CommonCase):
 
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "info",
                 "message": "The pack has been moved, you can scan a new pack.",
@@ -495,7 +495,7 @@ class SinglePackPutawayCase(CommonCase):
 
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "info",
                 "message": "Canceled, you can scan a new pack.",
@@ -537,7 +537,7 @@ class SinglePackPutawayCase(CommonCase):
 
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "info",
                 "message": "Canceled, you can scan a new pack.",
@@ -576,7 +576,7 @@ class SinglePackPutawayCase(CommonCase):
 
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={"message_type": "info", "message": "Operation already processed."},
         )
 
@@ -590,7 +590,7 @@ class SinglePackPutawayCase(CommonCase):
         response = self.service.dispatch("cancel", params={"package_level_id": -1})
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "error",
                 "message": "This operation does not exist anymore.",

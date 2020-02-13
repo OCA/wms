@@ -92,7 +92,7 @@ class SinglePackTransferCase(CommonCase):
         self.assertTrue(package_level.is_done)
         self.assert_response(
             response,
-            state="scan_location",
+            next_state="scan_location",
             message={
                 "message_type": "info",
                 "message": "Scan the destination location",
@@ -130,7 +130,7 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "error",
                 "message": "No pending operation for package {}.".format(
@@ -154,7 +154,7 @@ class SinglePackTransferCase(CommonCase):
         response = self.service.dispatch("start", params=params)
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "error",
                 "message": "The package THIS_BARCODE_DOES_NOT_EXIST" " doesn't exist",
@@ -188,7 +188,7 @@ class SinglePackTransferCase(CommonCase):
             # screen, so it found the pack. The details are already
             # checked in the test_start test.
             response,
-            state="scan_location",
+            next_state="scan_location",
             message=self.ANY,
             data=self.ANY,
         )
@@ -212,7 +212,7 @@ class SinglePackTransferCase(CommonCase):
         response = self.service.dispatch("start", params=params)
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "error",
                 "message": "Location %s doesn't contain any package."
@@ -250,7 +250,7 @@ class SinglePackTransferCase(CommonCase):
         response = self.service.dispatch("start", params=params)
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "error",
                 "message": "Several packages found in %s, please scan a package."
@@ -276,7 +276,7 @@ class SinglePackTransferCase(CommonCase):
         response = self.service.dispatch("start", params=params)
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "error",
                 "message": "You cannot work on a package (%s) outside of location: %s"
@@ -315,7 +315,7 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            state="confirm_start",
+            next_state="confirm_start",
             message={
                 "message_type": "warning",
                 "message": "Operation's already running."
@@ -359,7 +359,7 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "info",
                 "message": "The pack has been moved, you can scan a new pack.",
@@ -414,7 +414,7 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            state="show_completion_info",
+            next_state="show_completion_info",
             message={
                 "message_type": "info",
                 "message": "The pack has been moved, you can scan a new pack.",
@@ -435,7 +435,7 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "error",
                 "message": "This operation does not exist anymore.",
@@ -467,7 +467,7 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            state="scan_location",
+            next_state="scan_location",
             message={
                 "message_type": "error",
                 "message": "No location found for this barcode.",
@@ -503,7 +503,7 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            state="scan_location",
+            next_state="scan_location",
             message={"message_type": "error", "message": "You cannot place it here"},
         )
 
@@ -538,7 +538,7 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            state="confirm_location",
+            next_state="confirm_location",
             message={"message_type": "warning", "message": "Are you sure?"},
         )
 
@@ -579,7 +579,7 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "info",
                 "message": "The pack has been moved, you can scan a new pack.",
@@ -625,7 +625,7 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "info",
                 "message": "Canceled, you can scan a new pack.",
@@ -667,7 +667,7 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "info",
                 "message": "Canceled, you can scan a new pack.",
@@ -706,7 +706,7 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={"message_type": "info", "message": "Operation already processed."},
         )
 
@@ -720,7 +720,7 @@ class SinglePackTransferCase(CommonCase):
         response = self.service.dispatch("cancel", params={"package_level_id": -1})
         self.assert_response(
             response,
-            state="start",
+            next_state="start",
             message={
                 "message_type": "error",
                 "message": "This operation does not exist anymore.",
