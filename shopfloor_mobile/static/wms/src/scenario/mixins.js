@@ -1,6 +1,7 @@
 import {Odoo, OdooMocked} from "../services/odoo.js";
 
 export var ScenarioBaseMixin = {
+    props: ['menuItem'],
     data: function () {
         return {
             'user_notification': {

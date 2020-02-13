@@ -1,6 +1,6 @@
 import {Storage} from './services/storage.js'
 
-Vue.component('login-page', {
+export var LoginPage = Vue.component('login-page', {
     data: function(){ return {
         'apikey': '72B044F7AC780DAC',
         'error': '',
@@ -12,7 +12,11 @@ Vue.component('login-page', {
             Storage.apikey = this.apikey
             this.error = ""
             this.$root.config.load().catch((error) => {
-              this.error = "Invalid API KEY"
+                this.error = "Invalid API KEY"
+            }).then(() => {
+                if (this.$root.config.authenticated) {
+                    this.$router.push({'name': 'home'})
+                }
           });
 
         }

@@ -1,4 +1,4 @@
-var homepage = Vue.component('home-page', {
+export var HomePage = Vue.component('home-page', {
     computed: {
         navigation () {
             return this.$root.config.get('menus')
@@ -15,7 +15,7 @@ var homepage = Vue.component('home-page', {
                 <v-list-item
                     v-for="item in navigation"
                     :key="item.name"
-                    :href="'#' + $root.make_menu_item_url(item)"
+                    :href="'#/' + item['process'].code"
                     link
                     >
                     <v-list-item-content>
