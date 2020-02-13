@@ -42,6 +42,10 @@ class ClusterPickingCase(CommonCase):
         batch_form.picking_ids.add(picking)
         return batch_form.save()
 
+    def test_to_openapi(self):
+        # will raise if it fails to generate the openapi specs
+        self.service.to_openapi()
+
     # def test_list_manual_batch(self):
     #     """Test getting list of picking batches the user can work on"""
     #     # Simulate the client asking the list of picking batch it can

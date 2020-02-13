@@ -11,25 +11,70 @@ class BaseShopfloorValidator(AbstractComponent):
 
 
 class BaseShopfloorValidatorResponse(AbstractComponent):
-    """Base class for Validator for Responses"""
+    """Base class for Validator for Responses
+
+    When an endpoint returns data for a state, the data is enclosed
+    in a key with the same name as the state, this is in order to support
+    polymorphism in schemas (an endpoint being able to return different data
+    depending on the next state).
+
+    General idea of a schema for a method that changes state (data may vary,
+    in this example, next_state will be one of "confirm_start", "start",
+    "scan_location"):
+
+        {
+          message {
+            message_type* string
+            message*      string
+          }
+          next_state      string
+          data {
+            confirm_start {...}
+            start {...}
+            scan_location {...}
+          }
+        }
+
+    General idea of a schema for a generic method (data may vary):
+
+        {
+          message {
+            message_type* string
+            message*      string
+          }
+          data {
+            size*         integer
+            records*      integer
+          }
+        }
+
+    """
 
     _inherit = "base.rest.service"
     _name = "base.shopfloor.validator.response"
     _collection = "shopfloor.service"
     _is_rest_service_component = False
 
-    def _response_schema(self, data_schema=None):
+    def _states(self):
+        """List of possible next states
+
+        With the schema of the data send to the client to transition
+        to the next state.
+        """
+        return {}
+
+    def _response_schema(self, data_schema=None, next_states=None):
         """Schema for the return validator
 
         Must be used for the schema of all responses.
         The "data" part can be customized and is optional,
         it must be a dictionary.
+
+        next_states is a list of allowed states to which the client
+        can transition. The schema of the data needed for every state
+        of the list must be defined in the ``_states`` method.
         """
-        if not data_schema:
-            data_schema = {}
-        return {
-            "data": {"type": "dict", "required": False, "schema": data_schema},
-            "next_state": {"type": "string", "required": False},
+        response_schema = {
             "message": {
                 "type": "dict",
                 "required": False,
@@ -41,5 +86,31 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
                     },
                     "message": {"type": "string", "required": True},
                 },
-            },
+            }
         }
+        if not data_schema:
+            data_schema = {}
+
+        if next_states:
+            states_schemas = self._states()
+            unknown_states = set(next_states) - states_schemas.keys()
+            if unknown_states:
+                raise ValueError(
+                    "states {!r} are not defined in _states".format(unknown_states)
+                )
+
+            data_schema = data_schema.copy()
+            data_schema.update(
+                {
+                    state: {"type": "dict", "schema": states_schemas[state]}
+                    for state in next_states
+                }
+            )
+            response_schema["next_state"] = {"type": "string", "required": False}
+
+        response_schema["data"] = {
+            "type": "dict",
+            "required": False,
+            "schema": data_schema,
+        }
+        return response_schema

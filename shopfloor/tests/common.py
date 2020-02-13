@@ -70,11 +70,13 @@ class CommonCase(SavepointCase, ComponentMixin):
         value.
         """
         expected = {}
-        if next_state:
-            expected["next_state"] = next_state
         if message:
             expected["message"] = message
-        if data:
+        if next_state:
+            expected.update(
+                {"next_state": next_state, "data": {next_state: data or {}}}
+            )
+        elif data:
             expected["data"] = data
         self.assert_dict(response, expected)
 
@@ -122,7 +124,8 @@ class CommonCase(SavepointCase, ComponentMixin):
             self.assertDictEqual(
                 node_values,
                 node_expected,
-                "\n\nNode's specs:\n%s" % (pformat(node_original_expected)),
+                "\n\nActual:\n%s"
+                "\n\nExpected:\n%s" % (pformat(current), pformat(expected)),
             )
 
     def _update_qty_in_location(self, location, product, quantity):
