@@ -77,7 +77,7 @@ export class OdooMixin {
 
 export class OdooMocked extends OdooMixin{
 
-    scan_pack (barcode) {
+    start (barcode) {
         console.log('Fetch', barcode);
         window.DEMO_CASE = window.DEMO_CASES[this.usage][barcode];
         let res = window.DEMO_CASE['fetch'];
