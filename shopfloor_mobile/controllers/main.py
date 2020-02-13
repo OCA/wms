@@ -8,7 +8,12 @@ class ShopfloorMobileAppController(http.Controller):
     module_path = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
 
     @http.route(
-        ["/shopfloormobile/scanner/<path:path_fragment>", "/shopfloormobile/scanner"],
+        [
+            "/shopfloormobile/scanner/<path:path_fragment>",
+            "/shopfloormobile/scanner",
+            "/shopfloormobile/scanner/demo",
+            "/shopfloormobile/scanner/demo/<path:path_fragment>",
+        ],
         auth="public",
     )
     def load_app_and_assets(self, path_fragment=""):
