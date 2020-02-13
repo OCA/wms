@@ -54,9 +54,7 @@ const app = new Vue({
         config: AppConfig,
     },
     created: function () {
-        this.demo_mode = window.location.hash.includes('demo')
-        // TODO This need to be fixed so it is dynamic again
-        this.demo_mode = true;
+        this.demo_mode = window.location.pathname.includes('demo')
     },
 
 }).$mount('#app');
