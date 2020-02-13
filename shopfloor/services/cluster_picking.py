@@ -27,7 +27,7 @@ class ClusterPicking(Component):
 
     def unassign(self, batch_id):
         """Unassign and reset to draft a started picking batch"""
-        return self._response(state="start")
+        return self._response(next_state="start")
 
     def scan_line(self, move_line_id, barcode):
         """Scan a location, a pack, a product or a lots
