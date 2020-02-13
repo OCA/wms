@@ -56,32 +56,6 @@ class PickingBatch(Component):
         json_records = self._search(name_fragment=name_fragment)
         return self._response(data={"size": len(json_records), "records": json_records})
 
-    def _validator_search(self):
-        return {
-            "name_fragment": {"type": "string", "nullable": True, "required": False}
-        }
-
-    def _validator_return_search(self):
-        return self._response_schema(
-            {
-                "size": {"coerce": to_int, "required": True, "type": "integer"},
-                "records": {
-                    "type": "list",
-                    "required": True,
-                    "schema": {"type": "dict", "schema": self._record_return_schema},
-                },
-            }
-        )
-
-    @property
-    def _record_return_schema(self):
-        return {
-            "id": {"coerce": to_int, "required": True, "type": "integer"},
-            "name": {"type": "string", "nullable": False, "required": True},
-            "picking_count": {"coerce": to_int, "required": True, "type": "integer"},
-            "move_line_count": {"coerce": to_int, "required": True, "type": "integer"},
-        }
-
     def _convert_one_record(self, record):
         assigned_pickings = record.picking_ids.filtered(
             lambda picking: picking.state == "assigned"
@@ -91,4 +65,46 @@ class PickingBatch(Component):
             "name": record.name,
             "picking_count": len(assigned_pickings),
             "move_line_count": len(assigned_pickings.mapped("move_line_ids")),
+        }
+
+
+class ShopfloorPickingBatchValidator(Component):
+    """Validators for the Picking_Batch endpoints"""
+
+    _inherit = "base.shopfloor.validator"
+    _name = "shopfloor.picking.batch.validator"
+    _usage = "picking_batch.validator"
+
+    def search(self):
+        return {
+            "name_fragment": {"type": "string", "nullable": True, "required": False}
+        }
+
+
+class ShopfloorPickingBatchValidatorResponse(Component):
+    """Validators for the Picking_Batch endpoints responses"""
+
+    _inherit = "base.shopfloor.validator.response"
+    _name = "shopfloor.picking.batch.validator.response"
+    _usage = "picking_batch.validator.response"
+
+    def search(self):
+        return self._response_schema(
+            {
+                "size": {"coerce": to_int, "required": True, "type": "integer"},
+                "records": {
+                    "type": "list",
+                    "required": True,
+                    "schema": {"type": "dict", "schema": self._record_schema},
+                },
+            }
+        )
+
+    @property
+    def _record_schema(self):
+        return {
+            "id": {"coerce": to_int, "required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+            "picking_count": {"coerce": to_int, "required": True, "type": "integer"},
+            "move_line_count": {"coerce": to_int, "required": True, "type": "integer"},
         }

@@ -36,12 +36,36 @@ class ShopfloorLocation(Component):
         # TODO add filter on warehouse of the current profile
         return super()._get_base_search_domain()
 
-    def _validator_search(self):
+    def _convert_one_record(self, record):
+        return {
+            "id": record.id,
+            "name": record.name,
+            "complete_name": record.complete_name,
+            "barcode": record.barcode or "",
+        }
+
+
+class ShopfloorLocationValidator(Component):
+    """Validators for the Location endpoints"""
+
+    _inherit = "base.shopfloor.validator"
+    _name = "shopfloor.location.validator"
+    _usage = "location.validator"
+
+    def search(self):
         return {
             "name_fragment": {"type": "string", "nullable": True, "required": False}
         }
 
-    def _validator_return_search(self):
+
+class ShopfloorLocationValidatorResponse(Component):
+    """Validators for the Location endpoints responses"""
+
+    _inherit = "base.shopfloor.validator.response"
+    _name = "shopfloor.location.validator.response"
+    _usage = "location.validator.response"
+
+    def search(self):
         return self._response_schema(
             {
                 "size": {"coerce": to_int, "required": True, "type": "integer"},
@@ -75,11 +99,3 @@ class ShopfloorLocation(Component):
                 },
             }
         )
-
-    def _convert_one_record(self, record):
-        return {
-            "id": record.id,
-            "name": record.name,
-            "complete_name": record.complete_name,
-            "barcode": record.barcode or "",
-        }

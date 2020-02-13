@@ -14,10 +14,26 @@ class ShopfloorApp(Component):
         profiles = self.component("profile")._search()
         return self._response(data={"menus": menus, "profiles": profiles})
 
-    def _validator_user_config(self):
+
+class ShopfloorAppValidator(Component):
+    """Validators for the Application endpoints"""
+
+    _inherit = "base.shopfloor.validator"
+    _name = "shopfloor.app.validator"
+    _usage = "app.validator"
+
+    def user_config(self):
         return {}
 
-    def _validator_return_user_config(self):
+
+class ShopfloorAppValidatorResponse(Component):
+    """Validators for the Application endpoints responses"""
+
+    _inherit = "base.shopfloor.validator.response"
+    _name = "shopfloor.app.validator.response"
+    _usage = "app.validator.response"
+
+    def user_config(self):
         menu_service = self.component("menu")
         profile_service = self.component("profile")
         return self._response_schema(

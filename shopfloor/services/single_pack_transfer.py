@@ -123,45 +123,6 @@ class SinglePackTransfer(Component):
         existing_operations[0].package_level_id.is_done = True
         return self._response_for_start_success(existing_operations[0], pack)
 
-    def _validator_start(self):
-        return {"barcode": {"type": "string", "nullable": False, "required": True}}
-
-    def _validator_return_start(self):
-        return self._response_schema(
-            {
-                "id": {"coerce": to_int, "required": True, "type": "integer"},
-                "name": {"type": "string", "nullable": False, "required": True},
-                "location_src": {
-                    "type": "dict",
-                    "schema": {
-                        "id": {"coerce": to_int, "required": True, "type": "integer"},
-                        "name": {"type": "string", "nullable": False, "required": True},
-                    },
-                },
-                "location_dst": {
-                    "type": "dict",
-                    "schema": {
-                        "id": {"coerce": to_int, "required": True, "type": "integer"},
-                        "name": {"type": "string", "nullable": False, "required": True},
-                    },
-                },
-                "product": {
-                    "type": "dict",
-                    "schema": {
-                        "id": {"coerce": to_int, "required": True, "type": "integer"},
-                        "name": {"type": "string", "nullable": False, "required": True},
-                    },
-                },
-                "picking": {
-                    "type": "dict",
-                    "schema": {
-                        "id": {"coerce": to_int, "required": True, "type": "integer"},
-                        "name": {"type": "string", "nullable": False, "required": True},
-                    },
-                },
-            }
-        )
-
     def _response_for_package_level_not_found(self):
         message = self.actions_for("message")
         return self._response(state="start", message=message.operation_not_found())
@@ -230,16 +191,6 @@ class SinglePackTransfer(Component):
         last = move.picking_id.completion_info == "next_picking_ready"
         return self._response_for_validate_success(last=last)
 
-    def _validator_validate(self):
-        return {
-            "package_level_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "location_barcode": {"type": "string", "nullable": False, "required": True},
-            "confirmation": {"type": "boolean", "required": False},
-        }
-
-    def _validator_return_validate(self):
-        return self._response_schema()
-
     def cancel(self, package_level_id):
         package = self.env["stock.package_level"].browse(package_level_id)
         if not package.exists():
@@ -262,10 +213,75 @@ class SinglePackTransfer(Component):
             state="start", message=message.confirm_canceled_scan_next_pack()
         )
 
-    def _validator_cancel(self):
+
+class SinglePackTransferValidator(Component):
+    """Validators for Single Pack Transfer methods"""
+
+    _inherit = "base.shopfloor.validator"
+    _name = "shopfloor.single.pack.transfer.validator"
+    _usage = "single_pack_transfer.validator"
+
+    def start(self):
+        return {"barcode": {"type": "string", "nullable": False, "required": True}}
+
+    def cancel(self):
         return {
             "package_level_id": {"coerce": to_int, "required": True, "type": "integer"}
         }
 
-    def _validator_return_cancel(self):
+    def validate(self):
+        return {
+            "package_level_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "location_barcode": {"type": "string", "nullable": False, "required": True},
+            "confirmation": {"type": "boolean", "required": False},
+        }
+
+
+class SinglePackTransferValidatorResponse(Component):
+    """Validators for Single Pack Transfer methods responses"""
+
+    _inherit = "base.shopfloor.validator.response"
+    _name = "shopfloor.single.pack.transfer.validator.response"
+    _usage = "single_pack_transfer.validator.response"
+
+    def start(self):
+        return self._response_schema(
+            {
+                "id": {"coerce": to_int, "required": True, "type": "integer"},
+                "name": {"type": "string", "nullable": False, "required": True},
+                "location_src": {
+                    "type": "dict",
+                    "schema": {
+                        "id": {"coerce": to_int, "required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
+                    },
+                },
+                "location_dst": {
+                    "type": "dict",
+                    "schema": {
+                        "id": {"coerce": to_int, "required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
+                    },
+                },
+                "product": {
+                    "type": "dict",
+                    "schema": {
+                        "id": {"coerce": to_int, "required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
+                    },
+                },
+                "picking": {
+                    "type": "dict",
+                    "schema": {
+                        "id": {"coerce": to_int, "required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
+                    },
+                },
+            }
+        )
+
+    def cancel(self):
+        return self._response_schema()
+
+    def validate(self):
         return self._response_schema()

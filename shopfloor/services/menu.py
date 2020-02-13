@@ -45,25 +45,36 @@ class ShopfloorMenu(Component):
         json_records = self._search(name_fragment=name_fragment)
         return self._response(data={"size": len(json_records), "records": json_records})
 
-    def _validator_search(self):
+    def _convert_one_record(self, record):
+        return {
+            "id": record.id,
+            "name": record.name,
+            "process": {"id": record.process_id.id, "code": record.process_code},
+        }
+
+
+class ShopfloorMenuValidator(Component):
+    """Validators for the Menu endpoints"""
+
+    _inherit = "base.shopfloor.validator"
+    _name = "shopfloor.menu.validator"
+    _usage = "menu.validator"
+
+    def search(self):
         return {
             "name_fragment": {"type": "string", "nullable": True, "required": False}
         }
 
-    def _validator_return_search(self):
-        return self._response_schema(
-            {
-                "size": {"coerce": to_int, "required": True, "type": "integer"},
-                "records": {
-                    "type": "list",
-                    "required": True,
-                    "schema": {"type": "dict", "schema": self._record_return_schema},
-                },
-            }
-        )
+
+class ShopfloorMenuValidatorResponse(Component):
+    """Validators for the Menu endpoints responses"""
+
+    _inherit = "base.shopfloor.validator.response"
+    _name = "shopfloor.menu.validator.response"
+    _usage = "menu.validator.response"
 
     @property
-    def _record_return_schema(self):
+    def _record_schema(self):
         return {
             "id": {"coerce": to_int, "required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
@@ -77,9 +88,14 @@ class ShopfloorMenu(Component):
             },
         }
 
-    def _convert_one_record(self, record):
-        return {
-            "id": record.id,
-            "name": record.name,
-            "process": {"id": record.process_id.id, "code": record.process_code},
-        }
+    def return_search(self):
+        return self._response_schema(
+            {
+                "size": {"coerce": to_int, "required": True, "type": "integer"},
+                "records": {
+                    "type": "list",
+                    "required": True,
+                    "schema": {"type": "dict", "schema": self._record_schema},
+                },
+            }
+        )
