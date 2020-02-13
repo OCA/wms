@@ -58,4 +58,3 @@ Vue.component('get-work', {
     </div>
     `,
 })
-

@@ -142,7 +142,7 @@ export class OdooMocked extends OdooMixin{
 
 
 export class Odoo extends OdooMixin{
-    
+
     start (barcode) {
         return this._call(this.usage + '/start', 'POST', {'barcode': barcode})
     }
@@ -187,4 +187,3 @@ export class Odoo extends OdooMixin{
     }
 
 }
-
