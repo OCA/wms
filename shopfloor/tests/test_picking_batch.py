@@ -51,6 +51,10 @@ class BatchPickingCase(CommonCase):
         batch_form.picking_ids.add(picking)
         return batch_form.save()
 
+    def test_to_openapi(self):
+        # will raise if it fails to generate the openapi specs
+        self.service.to_openapi()
+
     def test_search_empty(self):
         """No batch is available"""
         # Simulate the client asking the list of picking batch
