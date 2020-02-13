@@ -1,10 +1,7 @@
-//import searchbar from 'components/searchbar/searchbar.js'
-
 import {router} from './router.js'
 import {Config} from './services/config.js'
 import {Storage} from './services/storage.js'
 
-const LoginPage = { template: '<login-page></login-page>' }
 import {SinglePackPutAway} from './scenario/single_pack_putaway.js'
 import {SinglePackTransfer} from './scenario/single_pack_transfer.js'
 
@@ -55,6 +52,7 @@ const app = new Vue({
     },
     created: function () {
         this.demo_mode = window.location.hash.includes('demo')
+        // TODO This need to be fixed so it is dynamic again
         this.demo_mode = true;
     },
 

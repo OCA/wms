@@ -1,4 +1,4 @@
-var homepage = Vue.component('home-page', {
+export var HomePage = Vue.component('home-page', {
     computed: {
         navigation () {
             return this.$root.config.get('menus')
