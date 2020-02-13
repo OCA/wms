@@ -224,7 +224,9 @@ class SinglePackPutaway(Component):
 
     def _response_for_location_not_found(self):
         return self._response(
-            next_state="scan_location", message=message.no_location_found()
+            next_state="scan_location",
+            message=message.no_location_found(),
+            data=self._data_after_package_scanned(move_line, pack),
         )
 
     def _response_for_forbidden_location(self):
@@ -266,15 +268,16 @@ class SinglePackPutaway(Component):
         if not package.exists():
             return self._response_for_package_level_not_found()
 
-        move = package.move_line_ids[0].move_id
+        move_line = package.move_line_ids[0]
+        move = move_line.move_id
         if not pack_transfer.is_move_state_valid(move):
             return self._response_for_move_canceled_elsewhere()
 
         scanned_location = search.location_from_scan(location_barcode)
         if not scanned_location:
-            return self._response_for_location_not_found()
+            return self._response_for_location_not_found(move_line, package.package_id)
         if not pack_transfer.is_dest_location_valid(move, scanned_location):
-            return self._response_for_forbidden_location()
+            return self._response_for_forbidden_location(move_line, package.package_id)
 
         if pack_transfer.is_dest_location_to_confirm(move, scanned_location):
             if confirmation:
@@ -354,44 +357,61 @@ class SinglePackPutawayValidatorResponse(Component):
     _name = "shopfloor.single.pack.putaway.validator.response"
     _usage = "single_pack_putaway.validator.response"
 
+    def _states(self):
+        """List of possible next states
+
+        With the schema of the data send to the client to transition
+        to the next state.
+        """
+        return {
+            "start": {},
+            "confirm_start": self._schema_for_location,
+            "scan_location": self._schema_for_location,
+            "confirm_location": {},
+        }
+
     def cancel(self):
-        return self._response_schema()
+        return self._response_schema(next_states=["start"])
 
     def _validator_scan_pack(self):
         return {"barcode": {"type": "string", "nullable": False, "required": True}}
 
     def _validator_return_scan_pack(self):
         return self._response_schema(
-            {
-                "id": {"coerce": to_int, "required": True, "type": "integer"},
-                "name": {"type": "string", "nullable": False, "required": True},
-                "location_src": {
-                    "type": "dict",
-                    "schema": {
-                        "id": {"coerce": to_int, "required": True, "type": "integer"},
-                        "name": {"type": "string", "nullable": False, "required": True},
-                    },
-                },
-                "location_dst": {
-                    "type": "dict",
-                    "schema": {
-                        "id": {"coerce": to_int, "required": True, "type": "integer"},
-                        "name": {"type": "string", "nullable": False, "required": True},
-                    },
-                },
-                "product": {
-                    "type": "dict",
-                    "schema": {
-                        "id": {"coerce": to_int, "required": True, "type": "integer"},
-                        "name": {"type": "string", "nullable": False, "required": True},
-                    },
-                },
-                "picking": {
-                    "type": "dict",
-                    "schema": {
-                        "id": {"coerce": to_int, "required": True, "type": "integer"},
-                        "name": {"type": "string", "nullable": False, "required": True},
-                    },
-                },
-            }
+            next_states=["confirm_start", "start", "scan_location"]
         )
+
+    @property
+    def _schema_for_location(self):
+        return {
+            "id": {"required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+            "location_src": {
+                "type": "dict",
+                "schema": {
+                    "id": {"required": True, "type": "integer"},
+                    "name": {"type": "string", "nullable": False, "required": True},
+                },
+            },
+            "location_dst": {
+                "type": "dict",
+                "schema": {
+                    "id": {"required": True, "type": "integer"},
+                    "name": {"type": "string", "nullable": False, "required": True},
+                },
+            },
+            "product": {
+                "type": "dict",
+                "schema": {
+                    "id": {"required": True, "type": "integer"},
+                    "name": {"type": "string", "nullable": False, "required": True},
+                },
+            },
+            "picking": {
+                "type": "dict",
+                "schema": {
+                    "id": {"required": True, "type": "integer"},
+                    "name": {"type": "string", "nullable": False, "required": True},
+                },
+            },
+        }

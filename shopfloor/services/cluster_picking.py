@@ -167,254 +167,132 @@ class ShopfloorClusterPickingValidatorResponse(Component):
     _name = "shopfloor.cluster_picking.validator.response"
     _usage = "cluster_picking.validator.response"
 
+    def _states(self):
+        """List of possible next states
+
+        With the schema of the data send to the client to transition
+        to the next state.
+        """
+        return {
+            "confirm_start": self._schema_for_batch_details,
+            "start_line": self._schema_for_single_line_details,
+            "start": {},
+            "manual_selection": {},
+            "scan_destination": self._schema_for_single_line_details,
+            "zero_check": self._schema_for_zero_check,
+            "unload_all": self._schema_for_unload_all,
+            "confirm_unload_all": self._schema_for_unload_all,
+            "unload_confirm_pack": self._schema_for_unload_single,
+            "unload_set_destination": self._schema_for_unload_single,
+            "confirm_unload_set_destination": self._schema_for_unload_single,
+            "show_completion_info": self._schema_for_unload_single,
+        }
+
     def find_batch(self):
         return self._response_schema(
-            {
-                "confirm_start": {
-                    "type": "dict",
-                    "required": True,
-                    "schema": self._schema_for_batch_details,
-                },
-                "start_line": {
-                    "type": "dict",
-                    "required": True,
-                    "schema": self._schema_for_single_line_details,
-                },
-                "start": {"type": "dict", "required": False},
-            }
+            next_states=["confirm_start", "start_line", "start"]
         )
 
     def select(self):
-        return self._response_schema(
-            {
-                "manual_selection": {"type": "dict", "required": False},
-                "confirm_start": {
-                    "type": "dict",
-                    "required": True,
-                    "schema": self._schema_for_single_line_details,
-                },
-                "start_line": {
-                    "type": "dict",
-                    "required": True,
-                    "schema": self._schema_for_single_line_details,
-                },
-            }
-        )
+        return self._response_schema(next_states=["manual_selection", "confirm_start"])
 
     def unassign(self):
-        return self._response_schema({"start": {"type": "dict", "required": False}})
+        return self._response_schema(next_states=["start"])
 
     def scan_line(self):
-        return self._response_schema(
-            {
-                "start_line": {
-                    "type": "dict",
-                    "required": True,
-                    "schema": self._schema_for_single_line_details,
-                },
-                "scan_destination": {
-                    "type": "dict",
-                    "required": True,
-                    "schema": self._schema_for_single_line_details,
-                },
-            }
-        )
+        return self._response_schema(next_states=["start_line", "scan_destination"])
 
     def scan_destination_pack(self):
         return self._response_schema(
-            # when we still have lines to process
-            {
-                "start_line": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_single_line_details,
-                },
-                "zero_check": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_zero_check,
-                },
+            next_states=[
+                # when we still have lines to process
+                "start_line",
+                # when the source location is empty
+                "zero_check",
                 # when all lines have been processed and have same
                 # destination
-                "unload_all": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_all,
-                },
+                "unload_all",
                 # when all lines have been processed and have different
                 # destinations
-                "unload_confirm_pack": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_single,
-                },
-            }
+                "unload_confirm_pack",
+            ]
         )
 
     def prepare_unload(self):
         return self._response_schema(
-            {
+            next_states=[
                 # when all lines have been processed and have same
                 # destination
-                "unload_all": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_all,
-                },
+                "unload_all",
                 # when all lines have been processed and have different
                 # destinations
-                "unload_confirm_pack": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_single,
-                },
-            }
+                "unload_confirm_pack",
+            ]
         )
 
     def is_zero(self):
         return self._response_schema(
-            {
+            next_states=[
                 # when we still have lines to process
-                "start_line": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_single_line_details,
-                },
+                "start_line",
                 # when all lines have been processed and have same
                 # destination
-                "unload_all": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_all,
-                },
+                "unload_all",
                 # when all lines have been processed and have different
                 # destinations
-                "unload_confirm_pack": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_single,
-                },
-            }
+                "unload_confirm_pack",
+            ]
         )
 
     def skip_line(self):
-        return self._response_schema(
-            {
-                "start_line": {
-                    "type": "dict",
-                    "required": True,
-                    "schema": self._schema_for_single_line_details,
-                }
-            }
-        )
+        return self._response_schema(next_states=["start_line"])
 
     def stock_issue(self):
         return self._response_schema(
-            {
+            next_states=[
                 # when we still have lines to process
-                "start_line": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_single_line_details,
-                },
+                "start_line",
                 # when all lines have been processed and have same
                 # destination
-                "unload_all": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_all,
-                },
+                "unload_all",
                 # when all lines have been processed and have different
                 # destinations
-                "unload_confirm_pack": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_single,
-                },
-            }
+                "unload_confirm_pack",
+            ]
         )
 
     def change_pack_lot(self):
-        return self._response_schema(
-            {
-                "scan_destination": {
-                    "type": "dict",
-                    "required": True,
-                    "schema": self._schema_for_single_line_details,
-                }
-            }
-        )
+        return self._response_schema(next_states=["scan_destination"])
 
     def set_destination_all(self):
         return self._response_schema(
-            {
+            next_states=[
                 # if the batch still contain lines
-                "start_line": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_single_line_details,
-                },
-                "confirm_unload_all": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_all,
-                },
-                "start": {"type": "dict", "required": False},
-            }
+                "start_line",
+                # different destination to confirm
+                "confirm_unload_all",
+                # batch finished
+                "start",
+            ]
         )
 
     def unload_split(self):
-        return self._response_schema(
-            {
-                "unload_confirm_pack": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_single,
-                }
-            }
-        )
+        return self._response_schema(next_states=["unload_confirm_pack"])
 
     def unload_scan_pack(self):
         return self._response_schema(
-            {
-                "unload_confirm_pack": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_single,
-                },
-                "unload_set_destination": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_single,
-                },
-            }
+            next_states=["unload_confirm_pack", "unload_set_destination"]
         )
 
     def unload_scan_destination(self):
         return self._response_schema(
-            {
-                "unload_confirm_pack": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_single,
-                },
-                "confirm_unload_set_destination": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_single,
-                },
-                "show_completion_info": {
-                    "type": "dict",
-                    "required": False,
-                    "schema": self._schema_for_unload_single,
-                },
-                "start": {"type": "dict", "required": False},
-                "start_line": {
-                    "type": "dict",
-                    "required": True,
-                    "schema": self._schema_for_single_line_details,
-                },
-            }
+            next_states=[
+                "unload_confirm_pack",
+                "confirm_unload_set_destination",
+                "show_completion_info",
+                "start",
+                "start_line",
+            ]
         )
 
     @property

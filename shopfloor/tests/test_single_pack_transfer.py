@@ -61,6 +61,10 @@ class SinglePackTransferCase(CommonCase):
         package_level.is_done = True
         return package_level
 
+    def test_to_openapi(self):
+        # will raise if it fails to generate the openapi specs
+        self.service.to_openapi()
+
     def test_start(self):
         """Test the happy path for single pack transfer /start endpoint
 
@@ -468,6 +472,7 @@ class SinglePackTransferCase(CommonCase):
         self.assert_response(
             response,
             next_state="scan_location",
+            data=self.ANY,
             message={
                 "message_type": "error",
                 "message": "No location found for this barcode.",
@@ -504,6 +509,7 @@ class SinglePackTransferCase(CommonCase):
         self.assert_response(
             response,
             next_state="scan_location",
+            data=self.ANY,
             message={"message_type": "error", "message": "You cannot place it here"},
         )
 
