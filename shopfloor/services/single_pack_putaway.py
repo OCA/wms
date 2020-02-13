@@ -224,7 +224,7 @@ class SinglePackPutaway(Component):
 
     def _response_for_location_not_found(self):
         return self._response(
-            state="scan_location", message=message.no_location_found()
+            next_state="scan_location", message=message.no_location_found()
         )
 
     def _response_for_forbidden_location(self):
@@ -290,12 +290,12 @@ class SinglePackPutaway(Component):
 
     def _response_for_move_already_processed(self):
         message = self.actions_for("message")
-        return self._response(state="start", message=message.already_done())
+        return self._response(next_state="start", message=message.already_done())
 
     def _response_for_confirm_move_cancellation(self):
         message = self.actions_for("message")
         return self._response(
-            state="start", message=message.confirm_canceled_scan_next_pack()
+            next_state="start", message=message.confirm_canceled_scan_next_pack()
         )
 
     def cancel(self, package_level_id):

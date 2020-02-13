@@ -62,13 +62,13 @@ class BaseShopfloorService(AbstractComponent):
         )
         return validator_component._get_validator(method_name)
 
-    def _response(self, data=None, state=None, message=None):
+    def _response(self, data=None, next_state=None, message=None):
         """Base "envelope" for the responses
 
         All the keys are optional.
 
         :param data: dictionary of values
-        :param state: string describing the next state that the client
+        :param next_state: string describing the next state that the client
         application must reach
         :param message: dictionary for the message to show in the client
         application (see ``_response_schema`` for the keys)
@@ -76,8 +76,9 @@ class BaseShopfloorService(AbstractComponent):
         response = {}
         if data:
             response["data"] = data
-        if state:
-            response["state"] = state
+        if next_state:
+            response["next_state"] = next_state
+            # TODO ensure we have at least an empty dict for the next state
         if message:
             response["message"] = message
         return response
