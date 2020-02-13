@@ -67,20 +67,36 @@ class BaseShopfloorService(AbstractComponent):
 
         All the keys are optional.
 
-        :param data: dictionary of values
+        :param data: dictionary of values, when a next_state is provided,
+        the data is enclosed in a key of the same name (to support polymorphism
+        in the schema)
         :param next_state: string describing the next state that the client
         application must reach
         :param message: dictionary for the message to show in the client
         application (see ``_response_schema`` for the keys)
         """
         response = {}
-        if data:
-            response["data"] = data
         if next_state:
-            response["next_state"] = next_state
-            # TODO ensure we have at least an empty dict for the next state
+            # data for a state is always enclosed in a key with the name
+            # of the state, so an endpoint can return to different states
+            # that need different data: the schema can be different for
+            # every state this way
+            response.update(
+                {
+                    # ensure we have an empty dict when the state
+                    # does not need any data, so the client does not need
+                    # to check this
+                    "data": {next_state: data or {}},
+                    "next_state": next_state,
+                }
+            )
+
+        elif data:
+            response["data"] = data
+
         if message:
             response["message"] = message
+
         return response
 
     def _get_openapi_default_parameters(self):

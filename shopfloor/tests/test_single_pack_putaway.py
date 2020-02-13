@@ -38,6 +38,10 @@ class SinglePackPutawayCase(CommonCase):
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="single_pack_putaway")
 
+    def test_to_openapi(self):
+        # will raise if it fails to generate the openapi specs
+        self.service.to_openapi()
+
     def test_start(self):
         """Test the happy path for single pack putaway /start endpoint
 
@@ -60,9 +64,10 @@ class SinglePackPutawayCase(CommonCase):
         # Simulate the client scanning a package's barcode, which
         # in turns should start the operation in odoo
         response = self.service.dispatch("start", params=params)
+        state_data = response["data"]["scan_location"]
 
         # Checks:
-        package_level = self.env["stock.package_level"].browse(response["data"]["id"])
+        package_level = self.env["stock.package_level"].browse(state_data["id"])
         move_line = package_level.move_line_ids
         move = move_line.move_id
 
@@ -206,6 +211,7 @@ class SinglePackPutawayCase(CommonCase):
 
         params = {"barcode": barcode}
         response = self.service.dispatch("start", params=params)
+
         self.assert_response(
             response,
             next_state="confirm_start",
@@ -341,6 +347,7 @@ class SinglePackPutawayCase(CommonCase):
                 "message_type": "error",
                 "message": "No location found for this barcode.",
             },
+            data=self.ANY,
         )
 
     def test_validate_location_forbidden(self):
@@ -374,6 +381,7 @@ class SinglePackPutawayCase(CommonCase):
             response,
             next_state="scan_location",
             message={"message_type": "error", "message": "You cannot place it here"},
+            data=self.ANY,
         )
 
     def test_validate_location_to_confirm(self):
@@ -530,6 +538,7 @@ class SinglePackPutawayCase(CommonCase):
         response = self.service.dispatch(
             "cancel", params={"package_level_id": package_level.id}
         )
+
         self.assertRecordValues(move, [{"state": "cancel"}])
         self.assertRecordValues(picking, [{"state": "cancel"}])
         self.assertFalse(package_level.move_line_ids)
