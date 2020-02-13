@@ -37,4 +37,3 @@ export var LoginPage = Vue.component('login-page', {
     </Screen>
     `
 });
-
