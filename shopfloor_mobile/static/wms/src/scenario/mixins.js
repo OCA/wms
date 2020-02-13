@@ -159,7 +159,12 @@ export var GenericStatesMixin = {
                     success: (result) => {
                         if (!_.isUndefined(result.data))
                             this.set_erp_data('data', result.data)
-                        this.go_state(result.state)
+                        if (!_.isUndefined(result) && !result.error) {
+                            this.go_state(result.state)
+                        } else {
+                            alert(result.status + ' ' + result.error)
+                        }
+
                     }
                 },
                 'scan_location': {
