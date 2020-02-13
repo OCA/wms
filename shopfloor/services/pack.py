@@ -16,12 +16,6 @@ class ShopfloorPack(Component):
         package = search.package_from_scan(pack_name)
         return self._response(data=self._to_json(package)[:1])
 
-    def _validator_get_by_name(self):
-        return {"pack_name": {"type": "string", "nullable": False, "required": True}}
-
-    def _validator_return_get_by_name(self):
-        return self._response_schema(self._record_return_schema)
-
     def _convert_one_record(self, record):
         return {
             "id": record.id,
@@ -29,8 +23,27 @@ class ShopfloorPack(Component):
             "location": {"id": record.location_id.id, "name": record.location_id.name},
         }
 
+
+class ShopfloorPackValidator(Component):
+    """Validators for the Pack endpoints"""
+
+    _inherit = "base.shopfloor.validator"
+    _name = "shopfloor.pack.validator"
+    _usage = "pack.validator"
+
+    def get_by_name(self):
+        return {"pack_name": {"type": "string", "nullable": False, "required": True}}
+
+
+class ShopfloorPackValidatorResponse(Component):
+    """Validators for the Pack endpoints responses"""
+
+    _inherit = "base.shopfloor.validator.response"
+    _name = "shopfloor.pack.validator.response"
+    _usage = "pack.validator.response"
+
     @property
-    def _record_return_schema(self):
+    def _record_schema(self):
         return {
             "id": {"coerce": to_int, "required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
@@ -42,3 +55,6 @@ class ShopfloorPack(Component):
                 },
             },
         }
+
+    def get_by_name(self):
+        return self._response_schema(self._record_schema)

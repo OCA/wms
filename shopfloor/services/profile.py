@@ -58,24 +58,50 @@ class ShopfloorProfile(Component):
             ]
         )
 
-    def _validator_search(self):
+    def _convert_one_record(self, record):
+        return {
+            "id": record.id,
+            "name": record.name,
+            "warehouse": {
+                "id": record.warehouse_id.id,
+                "name": record.warehouse_id.name,
+            },
+        }
+
+
+class ShopfloorProfileValidator(Component):
+    """Validators for the Profile endpoints"""
+
+    _inherit = "base.shopfloor.validator"
+    _name = "shopfloor.profile.validator"
+    _usage = "profile.validator"
+
+    def search(self):
         return {
             "name_fragment": {"type": "string", "nullable": True, "required": False}
         }
 
-    def _validator_return_search(self):
+
+class ShopfloorProfileValidatorResponse(Component):
+    """Validators for the Profile endpoints responses"""
+
+    _inherit = "base.shopfloor.validator.response"
+    _name = "shopfloor.profile.validator.response"
+    _usage = "profile.validator.response"
+
+    def search(self):
         return self._response_schema(
             {
                 "size": {"coerce": to_int, "required": True, "type": "integer"},
                 "records": {
                     "type": "list",
-                    "schema": {"type": "dict", "schema": self._record_return_schema},
+                    "schema": {"type": "dict", "schema": self._record_schema},
                 },
             }
         )
 
     @property
-    def _record_return_schema(self):
+    def _record_schema(self):
         return {
             "id": {"coerce": to_int, "required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
@@ -85,15 +111,5 @@ class ShopfloorProfile(Component):
                     "id": {"coerce": to_int, "required": True, "type": "integer"},
                     "name": {"type": "string", "nullable": False, "required": True},
                 },
-            },
-        }
-
-    def _convert_one_record(self, record):
-        return {
-            "id": record.id,
-            "name": record.name,
-            "warehouse": {
-                "id": record.warehouse_id.id,
-                "name": record.warehouse_id.name,
             },
         }
