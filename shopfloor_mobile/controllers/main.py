@@ -12,6 +12,7 @@ class ShopfloorMobileAppController(http.Controller):
         auth="public",
     )
     def load_app_and_assets(self, path_fragment=""):
+        # TODO Should be authorized via api.key except for the login ?
         if path_fragment.startswith("src/"):
             # Serving an asset
             payload = os.path.join(self.module_path, "static", "wms", path_fragment)
