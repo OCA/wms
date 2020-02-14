@@ -8,32 +8,34 @@ var CANCEL_MSG_DEFAULT = {
 var DEMO_SINGLE_PUTAWAY_1 = {
     'fetch' : {
         "data": {
-            "id": 1,
-            "name": "A nice pack 1",
-            "location_src": {
+            "scan_location": {
                 "id": 1,
-                "name":  'Location SRC 1',
-            },
-            "location_dst": {
-                "id": 2,
-                "name": 'Location SRC 2',
-            },
-            "product": [{"id": 1, "name": 'Product 1', "qty": 5}, {"id": 2, "name": 'Product 2', "qty": 2}],
-            "picking": {"id": 1, "name": 'Picking 1'},
+                "name": "A nice pack 1",
+                "location_src": {
+                    "id": 1,
+                    "name":  'Location SRC 1',
+                },
+                "location_dst": {
+                    "id": 2,
+                    "name": 'Location SRC 2',
+                },
+                "product": [{"id": 1, "name": 'Product 1', "qty": 5}, {"id": 2, "name": 'Product 2', "qty": 2}],
+                "picking": {"id": 1, "name": 'Picking 1'},
+            }
         },
-        "state": "scan_location",
+        "next_state": "scan_location",
         "message": undefined
     },
     'validate' : {
         "data": undefined,
-        "state": "scan_pack",
+        "next_state": "start_scan_pack",
         "message": {
             'body': 'Pack validated',
             'message_type': 'info',
         }
     },
     'cancel' : {
-        "state": "start",
+        "next_state": "start",
         "message": CANCEL_MSG_DEFAULT
     }
 }
@@ -41,14 +43,14 @@ var DEMO_SINGLE_PUTAWAY_1 = {
 var DEMO_SINGLE_PUTAWAY_2 = {
     'fetch' : {
         "data": undefined,
-        "state": "scan_pack",
+        "next_state": "start_scan_pack",
         "message": {"message_type": "error", "body": "You cannot do that!"}
     },
 }
 var DEMO_SINGLE_PUTAWAY_3 = {
     'fetch' : {
         "data": undefined,
-        "state": "scan_pack",
+        "next_state": "start_scan_pack",
         "message": {"message_type": "error", "body": "No pkg found"}
     },
 }
@@ -68,12 +70,12 @@ var DEMO_SINGLE_PUTAWAY_4 = {
             "product": {"id": 1, "name": 'Product 4'},
             "picking": {"id": 1, "name": 'Picking 4'},
         },
-        "state": "confirm_start",
+        "next_state": "confirm_start",
         "message": {"message_type": "info", "body": "Benoit is at the toilette: do you take over?"}
     },
     'validate' : {
         "data": undefined,
-        "state": "scan_pack",
+        "next_state": "start_scan_pack",
         "message": {
             'body': 'Pack validated',
             'message_type': 'info',
@@ -96,16 +98,16 @@ var DEMO_SINGLE_PUTAWAY_5 = {
             "product": {"id": 1, "name": 'Product 5'},
             "picking": {"id": 1, "name": 'Picking 5'},
         },
-        "state": "scan_location",
+        "next_state": "scan_location",
         "message": undefined
     },
     'cancel' : {
-        "state": "start",
+        "next_state": "start",
         "message": CANCEL_MSG_DEFAULT
     },
     'validate' : {
         "data": undefined,
-        "state": "scan_pack",
+        "next_state": "start_scan_pack",
         "message": {
             'body': 'Pack validated',
             'message_type': 'info',
@@ -128,17 +130,17 @@ var DEMO_SINGLE_PUTAWAY_6 = {
             "product": {"id": 1, "name": 'Product 6'},
             "picking": {"id": 1, "name": 'Picking 6'},
         },
-        "state": "scan_location",
+        "next_state": "scan_location",
         "message": undefined
     },
     'validate' : {
         "data": undefined,
-        "state": "confirm_location",
+        "next_state": "confirm_location",
         "message": {"message_type": "warning", "body": "Are you sure of this location?"}
     },
     'LOC6' : {
         "data": undefined,
-        "state": "scan_pack",
+        "next_state": "start_scan_pack",
         "message": {
             'body': 'Pack validated',
             'message_type': 'info',
@@ -161,17 +163,17 @@ var DEMO_SINGLE_PUTAWAY_7 = {
             "product": {"id": 1, "name": 'Product 7'},
             "picking": {"id": 1, "name": 'Picking 7'},
         },
-        "state": "scan_location",
+        "next_state": "scan_location",
         "message": undefined
     },
     'validate' : {
         "data": undefined,
-        "state": "scan_location",
+        "next_state": "scan_location",
         "message": {"message_type": "error", "body": "You cannot move to this location"}
     },
     'LOC7' : {
         "data": undefined,
-        "state": "scan_pack",
+        "next_state": "start_scan_pack",
         "message": {
             'body': 'Pack validated',
             'message_type': 'info',
@@ -271,24 +273,24 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
             "product": [{"id": 1, "name": 'Product 1', "qty": 5}, {"id": 2, "name": 'Product 2', "qty": 2}],
             "picking": {"id": 1, "name": 'Picking 1'},
         },
-        "state": "scan_location",
+        "next_state": "scan_location",
         "message": undefined
     },
     'validate' : {
         "data": undefined,
-        "state": "start",
+        "next_state": "start",
         "message": {
             'body': 'Pack validated',
             'message_type': 'info',
         }
     },
     'cancel' : {
-        "state": "start",
+        "next_state": "start",
         "message": CANCEL_MSG_DEFAULT
     },
     'LOC1' : {
         "data": undefined,
-        "state": "start",
+        "next_state": "start",
         "message": {
             'body': 'Pack validated',
             'message_type': 'info',
@@ -299,12 +301,12 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
             'last_operation_name': 'Last operation XYZ',
             'next_operation_name': 'Next operation XYZ',
         },
-        "state": "last_operation",
+        "next_state": "last_operation",
         "message": {}
     },
     'LOC3' : {
         "data": undefined,
-        "state": "start",
+        "next_state": "start",
         "message": {
             'body': 'Pack validated',
             'message_type': 'info',

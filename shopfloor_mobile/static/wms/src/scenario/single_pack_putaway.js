@@ -5,11 +5,11 @@ export var SinglePackPutAway = Vue.component('single-pack-putaway', {
     template: `
         <Screen title="Single pack putaway">
             <!-- FOR DEBUG -->
-            <!-- {{ current_state_key }} -->
+            <!-- <v-alert type="warning">{{ current_state_key }}</v-alert> -->
             <searchbar v-on:found="on_scan" :input_placeholder="search_input_placeholder"></searchbar>
             <user-information v-if="!need_confirmation && user_notification.message" v-bind:info="user_notification"></user-information>
             <user-confirmation v-if="need_confirmation" v-on:user-confirmation="on_user_confirm" v-bind:question="user_notification.message"></user-confirmation>
-            <operation-detail :operation="erp_data.data"></operation-detail>
+            <operation-detail :operation="state.data"></operation-detail>
             <cancel-button v-on:cancel="on_cancel" v-if="show_cancel_button"></cancel-button>
         </Screen>
     `,
