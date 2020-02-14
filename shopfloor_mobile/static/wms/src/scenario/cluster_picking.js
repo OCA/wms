@@ -17,8 +17,8 @@ export var ClusterPicking = Vue.component('cluster-picking', {
             <!-- FOR DEBUG -->
             <!-- {{ current_state_key }} -->
             <get-work v-if="is_state(initial_state_key)"
-                      v-on:get_work="current_state.on_get_work"
-                      v-on:manual_selection="current_state.on_manual_selection"></get-work>
+                      v-on:get_work="state.on_get_work"
+                      v-on:manual_selection="state.on_manual_selection"></get-work>
             <div class="work-info">
             </div>
         </Screen>

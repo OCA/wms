@@ -11,7 +11,7 @@ export var SinglePackTransfer = Vue.component('single-pack-transfer', {
             <user-information v-if="!need_confirmation && user_notification.message" v-bind:info="user_notification"></user-information>
             <user-confirmation v-if="need_confirmation" v-on:user-confirmation="on_user_confirm" v-bind:question="user_notification.message"></user-confirmation>
             <operation-detail :operation="state.data"></operation-detail>
-            <last-operation v-if="is_state('show_completion_info')" v-on:confirm="current_state.on_confirm"></last-operation>
+            <last-operation v-if="is_state('show_completion_info')" v-on:confirm="state.on_confirm"></last-operation>
             <cancel-button v-on:cancel="on_cancel" v-if="show_cancel_button"></cancel-button>
         </Screen>
     `,
