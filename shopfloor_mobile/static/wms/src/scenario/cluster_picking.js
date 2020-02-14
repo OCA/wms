@@ -13,20 +13,24 @@ import {ScenarioBaseMixin, GenericStatesMixin} from "./mixins.js";
 export var ClusterPicking = Vue.component('cluster-picking', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
     template: `
-        <Screen title="Single pack transfer">
+        <Screen title="Cluster picking">
             <!-- FOR DEBUG -->
             <!-- {{ current_state_key }} -->
-            <get-work v-if="is_state(initial_state_key)"
-                      v-on:get_work="state.on_get_work"
-                      v-on:manual_selection="state.on_manual_selection"></get-work>
-            <div class="work-info">
-            </div>
+            <get-work
+                v-if="is_state(initial_state_key)"
+                v-on:get_work="state.on_get_work"
+                v-on:manual_selection="state.on_manual_selection"></get-work>
+            <batch-picking-detail
+                v-if="is_state('confirm_start')"
+                :info="state.data"
+                v-on:confirm="state.on_confirm"
+                v-on:cancel="state.on_cancel"
+                ></batch-picking-detail>
         </Screen>
     `,
     data: function () {
         return {
-            'usage': 'picking_loading_trip',
-            'show_reset_button': true,
+            'usage': 'cluster_picking',
             'initial_state_key': 'start',
             'current_state_key': 'start',
             'states': {
@@ -48,9 +52,6 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     },
                 },
                 'start_manual_selection': {
-                    enter: () => {
-                        this.reset_erp_data('data')
-                    },
                     on_submit_back: () => {
                         this.go_state('start')
                     },
@@ -62,25 +63,18 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     },
                 },
                 'confirm_start': {
-                    enter: () => {
-                        this.need_confirmation = true
+                    on_confirm: () => {
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.confirm_start(this.state.data)
+                        )
                     },
-                    exit: () => {
-                        this.need_confirmation = false
-                    },
-                    on_user_confirm: (answer) => {
-                        if (answer == 'yes'){
-                            this.go_state(
-                                'wait_call',
-                                this.odoo.confirm_start(this.state.data)
-                            )
-                        } else {
-                            this.go_state(
-                                'wait_call',
-                                this.odoo.unassign(this.state.data)
-                            )
-                        }
-                    },
+                    on_cancel: () => {
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.unassign(this.state.data)
+                        )
+                    } 
                 },
                 'start_line': {
                     // here we have to use some info sent back from `select`
