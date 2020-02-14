@@ -21,9 +21,11 @@ var moreInfo = Vue.component('detail-location', {
           <tr v-for="product in locationDetail.products" class="blue">
 
             <td colspan="2">
-                {{ product.name }}</br>Pack {{ product.pack }}</br>{{ product.lot }}
+                <router-link :to="{ name: 'scananything', params: { codebar: product.pack.barcode}, query: {childOf: locationDetail.codebar }}">
+                {{ product.name }}</br>Pack {{ product.pack.name }}</br>{{ product.lot }}
                 {{ product.qty }}
                 <div>In stock 234 / Reserved 92</div>
+    </router-link>
             </td>
 
         </tr>

@@ -189,6 +189,26 @@ var DEMO_SINGLE_PUTAWAY_7 = {
     },
 }
 
+var PACK_1 = {
+    "id": 192834,
+    "name": "PA92834",
+    "location_src": {
+        "id": 1923,
+        "barcode": "LOC1923",
+        "name":  'B1S08A34',
+    },
+    "location_dst": {
+        "id": 224,
+        "barcode": "LOC224",
+        "name": 'B1S00A01',
+    },
+    "product": [
+        {"id": 1, "name": 'Ski Thermo Sock', "qty": 36, "lot": "19102403"},
+        {"id": 123, "name": 'Hiking shoes', "qty": 32, "lot": "1910239"},
+    ],
+    "picking": {"id": 1, "name": 'Picking 7'},
+}
+
 var DEMO_SCAN_ANYTHING_PACK = {
     'fetch' : {
         "data": {
@@ -240,34 +260,39 @@ var DEMO_SCAN_ANYTHING_LOCATION = {
     'fetch' : {
         "data": {
             "show_detail_info": {
-                "type": "location",
-                "barcode": "283429834",
-                "detail_info": {
-                    "id": 3231,
-                    "name": "CCOROL-01",
-                    "parent_name": "SCH/Packing/CCOROL",
-                    "products": [
-                        {
-                            "id": 424,
-                            "name": "Sun Glasses Cat 4 High Altitude",
-                            "pack": "PID0000008",
-                            "lot": "AA8122F41",
-                            "qty_instock": 34,
-                            "qty_reserved": 12,
+            "type": "location",
+            "barcode": "283429834",
+            "detail_info": {
+                "id": 3231,
+                "codebar": "loc",
+                "name": "CCOROL-01",
+                "parent_name": "SCH/Packing/CCOROL",
+                "products": [
+                    {
+                        "id": 424,
+                        "barcode": "PROD424",
+                        "name": "Sun Glasses Cat 4 High Altitude",
+                        "pack": {
+                            "name": "PID0000008",
+                            "barcode": "pack",
                         },
-                        {
-                            "id": 421,
-                            "name": "Sun Glasses Pro Glazier",
-                            "pack": "PID0000421",
-                            "lot": "AA8122F41",
-                            "qty_instock": 4,
-                            "qty_reserved": 0,
-                        },
-                    ],
-                }
-            },
+                        "lot": "AA8122F41",
+                        "qty_instock": 34,
+                        "qty_reserved": 12,
+                    },
+                    {
+                        "id": 421,
+                        "name": "Sun Glasses Pro Glazier",
+                        "pack": {},
+                        "lot": "AA8122F41",
+                        "qty_instock": 4,
+                        "qty_reserved": 0,
+                    },
+                ],
+            }
         },
         "message": undefined
+    }
     },
 }
 var DEMO_SINGLE_PACK_TRANSFER_1 = {

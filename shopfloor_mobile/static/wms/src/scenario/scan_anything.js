@@ -11,6 +11,7 @@ export var ScanAnything = Vue.component('scan-anything', {
             <detail-location :locationDetail="this.state.data.detail_info" v-if="state.data.type=='location'"></detail-location>
             <detail-operation :operationDetail="this.state.data.detail_info" v-if="state.data.type=='operation'"></detail-operation>
             <reset-screen-button v-on:reset="on_reset" :show_reset_button="show_reset_button"></reset-screen-button>
+            <v-btn v-if="showBackButon" depressed x-large color="blue" v-on:click="$router.back()">Back</v-btn>
         </Screen>
     `,
     mounted () {
@@ -37,6 +38,11 @@ export var ScanAnything = Vue.component('scan-anything', {
             this.reset_erp_data('data')
             this.$router.push({ name: "scananything", params: {codebar: undefined}})
         },
+    },
+    computed: {
+        showBackButon: function () {
+            return ('childOf' in this.$route.query)
+        }
     },
     data: function () {
         return {
