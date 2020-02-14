@@ -3,10 +3,14 @@ import {ScanAnything} from "./scenario/scan_anything.js";
 import {LoginPage} from './loginpage.js'
 // const NotFound = { template: '<div>Lost in the scanner app.</div>' }
 
+
+// Fake item to play nice with the mixin because it does not exist on the backend
+let fakeItem = {process:{id: 99}, id: 99}
+
 const routes = [
   { path: '/', component: HomePage, name: 'home'},
   { path: '/login', component: LoginPage, name: 'login'},
-  { path: '/scananything/:codebar?', component: ScanAnything, name: 'scananything' },
+  { path: '/scananything/:codebar?', component: ScanAnything, name: 'scananything', props: {menuItem: fakeItem}},
   // TODO Fix this it needs to be the last route, but I think it is not anymore with the dynamic one added.
   // { path: '*', component: NotFound },
 ]

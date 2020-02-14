@@ -22,7 +22,7 @@ export var ScanAnything = Vue.component('scan-anything', {
         }
     },
     beforeRouteUpdate (to, from, next) {
-        this.current_state = this.initial_state
+        this.go_state(this.initial_state_key)
         if (to.params["codebar"]){
             this.go_state(
                 'wait_call',
