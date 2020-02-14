@@ -6,6 +6,14 @@ from odoo.addons.base_rest.controllers.main import _PseudoCollection
 from odoo.addons.component.core import AbstractComponent, WorkContext
 
 
+def to_float(val):
+    if isinstance(val, float):
+        return val
+    if val:
+        return float(val)
+    return None
+
+
 class BaseShopfloorService(AbstractComponent):
     """Base class for REST services"""
 
