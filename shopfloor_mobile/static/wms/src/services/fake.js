@@ -57,18 +57,20 @@ var DEMO_SINGLE_PUTAWAY_3 = {
 var DEMO_SINGLE_PUTAWAY_4 = {
     'fetch' : {
         "data": {
-            "id": 1,
-            "name": "A nice pack 4",
-            "location_src": {
+            "confirm_start": {
                 "id": 1,
-                "name":  'Location SRC 4',
+                "name": "A nice pack 4",
+                "location_src": {
+                    "id": 1,
+                    "name":  'Location SRC 4',
+                },
+                "location_dst": {
+                    "id": 2,
+                    "name": 'Location DST 4',
+                },
+                "product": {"id": 1, "name": 'Product 4'},
+                "picking": {"id": 1, "name": 'Picking 4'},
             },
-            "location_dst": {
-                "id": 2,
-                "name": 'Location DST 4',
-            },
-            "product": {"id": 1, "name": 'Product 4'},
-            "picking": {"id": 1, "name": 'Picking 4'},
         },
         "next_state": "confirm_start",
         "message": {"message_type": "info", "body": "Benoit is at the toilette: do you take over?"}
@@ -85,18 +87,20 @@ var DEMO_SINGLE_PUTAWAY_4 = {
 var DEMO_SINGLE_PUTAWAY_5 = {
     'fetch' : {
         "data": {
-            "id": 1,
-            "name": "A nice pack 5",
-            "location_src": {
+            "scan_location": {
                 "id": 1,
-                "name":  'Location SRC 5',
+                "name": "A nice pack 5",
+                "location_src": {
+                    "id": 1,
+                    "name":  'Location SRC 5',
+                },
+                "location_dst": {
+                    "id": 2,
+                    "name": 'Location DST 5',
+                },
+                "product": {"id": 1, "name": 'Product 5'},
+                "picking": {"id": 1, "name": 'Picking 5'},
             },
-            "location_dst": {
-                "id": 2,
-                "name": 'Location DST 5',
-            },
-            "product": {"id": 1, "name": 'Product 5'},
-            "picking": {"id": 1, "name": 'Picking 5'},
         },
         "next_state": "scan_location",
         "message": undefined
@@ -117,18 +121,20 @@ var DEMO_SINGLE_PUTAWAY_5 = {
 var DEMO_SINGLE_PUTAWAY_6 = {
     'fetch' : {
         "data": {
-            "id": 1,
-            "name": "A nice pack 6",
-            "location_src": {
+            "scan_location": {
                 "id": 1,
-                "name":  'Location SRC 6',
+                "name": "A nice pack 6",
+                "location_src": {
+                    "id": 1,
+                    "name":  'Location SRC 6',
+                },
+                "location_dst": {
+                    "id": 2,
+                    "name": 'Location DST 6',
+                },
+                "product": {"id": 1, "name": 'Product 6'},
+                "picking": {"id": 1, "name": 'Picking 6'},
             },
-            "location_dst": {
-                "id": 2,
-                "name": 'Location DST 6',
-            },
-            "product": {"id": 1, "name": 'Product 6'},
-            "picking": {"id": 1, "name": 'Picking 6'},
         },
         "next_state": "scan_location",
         "message": undefined
@@ -150,18 +156,20 @@ var DEMO_SINGLE_PUTAWAY_6 = {
 var DEMO_SINGLE_PUTAWAY_7 = {
     'fetch' : {
         "data": {
-            "id": 1,
-            "name": "A nice pack 7",
-            "location_src": {
+            "scan_location": {
                 "id": 1,
-                "name":  'Location SRC 7',
+                "name": "A nice pack 7",
+                "location_src": {
+                    "id": 1,
+                    "name":  'Location SRC 7',
+                },
+                "location_dst": {
+                    "id": 2,
+                    "name": 'Location DST 7',
+                },
+                "product": {"id": 1, "name": 'Product 7'},
+                "picking": {"id": 1, "name": 'Picking 7'},
             },
-            "location_dst": {
-                "id": 2,
-                "name": 'Location DST 7',
-            },
-            "product": {"id": 1, "name": 'Product 7'},
-            "picking": {"id": 1, "name": 'Picking 7'},
         },
         "next_state": "scan_location",
         "message": undefined
@@ -184,19 +192,21 @@ var DEMO_SINGLE_PUTAWAY_7 = {
 var DEMO_SCAN_ANYTHING_PACK = {
     'fetch' : {
         "data": {
-            "type": "pack",
-            "id": 192834,
-            "name": "PA92834",
-            "location_src": {
-                "id": 1923,
-                "name":  'B1S08A34',
+            "show_detail_info": {
+                "type": "pack",
+                "id": 192834,
+                "name": "PA92834",
+                "location_src": {
+                    "id": 1923,
+                    "name":  'B1S08A34',
+                },
+                "location_dst": {
+                    "id": 224,
+                    "name": 'B1S00A01',
+                },
+                "product": [{"id": 1, "name": 'Ski Thermo Sock', "qty": 36, "lot": "19102403"}, {"id": 123, "name": 'Hiking shoes', "qty": 32, "lot": "1910239"}],
+                "picking": {"id": 1, "name": 'Picking 7'},
             },
-            "location_dst": {
-                "id": 224,
-                "name": 'B1S00A01',
-            },
-            "product": [{"id": 1, "name": 'Ski Thermo Sock', "qty": 36, "lot": "19102403"}, {"id": 123, "name": 'Hiking shoes', "qty": 32, "lot": "1910239"}],
-            "picking": {"id": 1, "name": 'Picking 7'},
         },
         "message": undefined
     },
@@ -204,22 +214,24 @@ var DEMO_SCAN_ANYTHING_PACK = {
 var DEMO_SCAN_ANYTHING_PRODUCT = {
     'fetch' : {
         "data": {
-            "type": "product",
-            "barcode": "009932424",
-            "detail_info": {
-                "id": 424,
-                "name": "Sun Glasses Cat 4 High Alititude",
-                "image": "http://localhost/web/image?model=product.template&id=16&field=image_128&unique=04022020111236",
-                "lot": "AA8122F41",
-                "expiry_date": "2020-12-01",
-                "default_code": "266009083",
-                "supplier_code": "SUP28342",
-                "packaging": [
-                    {"id": 98234, "name": "Box", "qty": 8, "qty_unit": "Unit"},
-                    {"id": 98235, "name": "Big Box", "qty": 6, "qty_unit": "Box"},
-                    {"id": 98236, "name": "Palette", "qty": 27, "qty_unit": "Big Box"},
-                ],
-            },
+            "show_detail_info": {
+                "type": "product",
+                "barcode": "009932424",
+                "detail_info": {
+                    "id": 424,
+                    "name": "Sun Glasses Cat 4 High Alititude",
+                    "image": "http://localhost/web/image?model=product.template&id=16&field=image_128&unique=04022020111236",
+                    "lot": "AA8122F41",
+                    "expiry_date": "2020-12-01",
+                    "default_code": "266009083",
+                    "supplier_code": "SUP28342",
+                    "packaging": [
+                        {"id": 98234, "name": "Box", "qty": 8, "qty_unit": "Unit"},
+                        {"id": 98235, "name": "Big Box", "qty": 6, "qty_unit": "Box"},
+                        {"id": 98236, "name": "Palette", "qty": 27, "qty_unit": "Big Box"},
+                    ],
+                },
+            }
         }
     },
     "message": undefined
@@ -227,31 +239,33 @@ var DEMO_SCAN_ANYTHING_PRODUCT = {
 var DEMO_SCAN_ANYTHING_LOCATION = {
     'fetch' : {
         "data": {
-            "type": "location",
-            "barcode": "283429834",
-            "detail_info": {
-                "id": 3231,
-                "name": "CCOROL-01",
-                "parent_name": "SCH/Packing/CCOROL",
-                "products": [
-                    {
-                        "id": 424,
-                        "name": "Sun Glasses Cat 4 High Altitude",
-                        "pack": "PID0000008",
-                        "lot": "AA8122F41",
-                        "qty_instock": 34,
-                        "qty_reserved": 12,
-                    },
-                    {
-                        "id": 421,
-                        "name": "Sun Glasses Pro Glazier",
-                        "pack": "PID0000421",
-                        "lot": "AA8122F41",
-                        "qty_instock": 4,
-                        "qty_reserved": 0,
-                    },
-                ],
-            }
+            "show_detail_info": {
+                "type": "location",
+                "barcode": "283429834",
+                "detail_info": {
+                    "id": 3231,
+                    "name": "CCOROL-01",
+                    "parent_name": "SCH/Packing/CCOROL",
+                    "products": [
+                        {
+                            "id": 424,
+                            "name": "Sun Glasses Cat 4 High Altitude",
+                            "pack": "PID0000008",
+                            "lot": "AA8122F41",
+                            "qty_instock": 34,
+                            "qty_reserved": 12,
+                        },
+                        {
+                            "id": 421,
+                            "name": "Sun Glasses Pro Glazier",
+                            "pack": "PID0000421",
+                            "lot": "AA8122F41",
+                            "qty_instock": 4,
+                            "qty_reserved": 0,
+                        },
+                    ],
+                }
+            },
         },
         "message": undefined
     },
@@ -259,19 +273,21 @@ var DEMO_SCAN_ANYTHING_LOCATION = {
 var DEMO_SINGLE_PACK_TRANSFER_1 = {
     'fetch' : {
         "data": {
-            "type": "pack",
-            "id": 1,
-            "name": "A nice pack 1",
-            "location_src": {
+            "scan_location": {
+                "type": "pack",
                 "id": 1,
-                "name":  'Location SRC 1',
+                "name": "A nice pack 1",
+                "location_src": {
+                    "id": 1,
+                    "name":  'Location SRC 1',
+                },
+                "location_dst": {
+                    "id": 2,
+                    "name": 'Location SRC 2',
+                },
+                "product": [{"id": 1, "name": 'Product 1', "qty": 5}, {"id": 2, "name": 'Product 2', "qty": 2}],
+                "picking": {"id": 1, "name": 'Picking 1'},
             },
-            "location_dst": {
-                "id": 2,
-                "name": 'Location SRC 2',
-            },
-            "product": [{"id": 1, "name": 'Product 1', "qty": 5}, {"id": 2, "name": 'Product 2', "qty": 2}],
-            "picking": {"id": 1, "name": 'Picking 1'},
         },
         "next_state": "scan_location",
         "message": undefined
@@ -298,8 +314,10 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
     },
     'LOC2' : {
         "data": {
-            'last_operation_name': 'Last operation XYZ',
-            'next_operation_name': 'Next operation XYZ',
+            "last_operation": {
+                'last_operation_name': 'Last operation XYZ',
+                'next_operation_name': 'Next operation XYZ',
+            },
         },
         "next_state": "last_operation",
         "message": {}
@@ -317,37 +335,39 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
 var DEMO_SCAN_ANYTHING_OPERATION = {
     'fetch' : {
         "data": {
-            "type": "operation",
-            "barcode": "280009834",
-            "detail_info": {
-                "id": 321311,
-                "name": "SCH/OUT/00008",
-                "customer": "BestCooperation SA",
-                "schedule_date": "2020-09-12",
-                "operation_type": "Abroad Delivery Order",
-                "destination_location": "DBACK-03",
-                "source_document": "SO0321",
-                "carrier": "",
-                "priority": 3,
-                "note": "Oh so this could be a really long text, how should it be implemented ?",
-                "moves": [
-                    {
-                        "id": 424,
-                        "name": "Sun Glasses Cat 4 High Altitude",
-                        "pack": "PID0000008",
-                        "lot": "AA8122F41",
-                        "qty": 34,
-                    },
-                    {
-                        "id": 421,
-                        "name": "Sun Glasses Pro Glazier",
-                        "pack": "PID0000421",
-                        "lot": "AA8122F41",
-                        "qty_instock": 4,
-                        "qty_reserved": 0,
-                    },
-                ],
-            }
+            "show_detail_info": {
+                "type": "operation",
+                "barcode": "280009834",
+                "detail_info": {
+                    "id": 321311,
+                    "name": "SCH/OUT/00008",
+                    "customer": "BestCooperation SA",
+                    "schedule_date": "2020-09-12",
+                    "operation_type": "Abroad Delivery Order",
+                    "destination_location": "DBACK-03",
+                    "source_document": "SO0321",
+                    "carrier": "",
+                    "priority": 3,
+                    "note": "Oh so this could be a really long text, how should it be implemented ?",
+                    "moves": [
+                        {
+                            "id": 424,
+                            "name": "Sun Glasses Cat 4 High Altitude",
+                            "pack": "PID0000008",
+                            "lot": "AA8122F41",
+                            "qty": 34,
+                        },
+                        {
+                            "id": 421,
+                            "name": "Sun Glasses Pro Glazier",
+                            "pack": "PID0000421",
+                            "lot": "AA8122F41",
+                            "qty_instock": 4,
+                            "qty_reserved": 0,
+                        },
+                    ],
+                }
+            },
         },
         "message": undefined
     },

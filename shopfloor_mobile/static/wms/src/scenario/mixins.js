@@ -60,13 +60,13 @@ export var ScenarioBaseMixin = {
         // generic states methods
         go_state: function(state_key, promise) {
             console.log('GO TO STATE', state_key)
+            if (state_key == 'start')
+                // alias "start" to the initial state
+                state_key = this.initial_state_key
             if (!_.has(this.states, state_key)) {
                 alert('State `' + state_key + '` does not exists!')
             }
             this.on_exit()
-            if (state_key == 'start')
-                // alias "start" to the initial state
-                state_key = this.initial_state_key
             this.current_state_key = state_key
             if (promise) {
                 promise.then(
