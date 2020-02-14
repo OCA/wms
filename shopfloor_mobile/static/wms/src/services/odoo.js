@@ -125,6 +125,9 @@ export class OdooMocked extends OdooMixin{
     picking_batch () {
         throw 'NOT IMPLEMENTED!'
     }
+    confirm_start () {
+        throw 'NOT IMPLEMENTED!'
+    }
     unassign () {
         throw 'NOT IMPLEMENTED!'
     }

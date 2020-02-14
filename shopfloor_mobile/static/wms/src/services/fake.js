@@ -44,14 +44,14 @@ var DEMO_SINGLE_PUTAWAY_2 = {
     'fetch' : {
         "data": undefined,
         "next_state": "start_scan_pack",
-        "message": {"message_type": "error", "body": "You cannot do that!"}
+        "message": {"message_type": "error", "message": "You cannot do that!"}
     },
 }
 var DEMO_SINGLE_PUTAWAY_3 = {
     'fetch' : {
         "data": undefined,
         "next_state": "start_scan_pack",
-        "message": {"message_type": "error", "body": "No pkg found"}
+        "message": {"message_type": "error", "message": "No pkg found"}
     },
 }
 var DEMO_SINGLE_PUTAWAY_4 = {
@@ -73,7 +73,7 @@ var DEMO_SINGLE_PUTAWAY_4 = {
             },
         },
         "next_state": "confirm_start",
-        "message": {"message_type": "info", "body": "Benoit is at the toilette: do you take over?"}
+        "message": {"message_type": "info", "message": "Benoit is at the toilette: do you take over?"}
     },
     'validate' : {
         "data": undefined,
@@ -142,7 +142,7 @@ var DEMO_SINGLE_PUTAWAY_6 = {
     'validate' : {
         "data": undefined,
         "next_state": "confirm_location",
-        "message": {"message_type": "warning", "body": "Are you sure of this location?"}
+        "message": {"message_type": "warning", "message": "Are you sure of this location?"}
     },
     'LOC6' : {
         "data": undefined,
@@ -177,7 +177,7 @@ var DEMO_SINGLE_PUTAWAY_7 = {
     'validate' : {
         "data": undefined,
         "next_state": "scan_location",
-        "message": {"message_type": "error", "body": "You cannot move to this location"}
+        "message": {"message_type": "error", "message": "You cannot move to this location"}
     },
     'LOC7' : {
         "data": undefined,
@@ -295,6 +295,48 @@ var DEMO_SCAN_ANYTHING_LOCATION = {
     }
     },
 }
+
+var DEMO_SCAN_ANYTHING_OPERATION = {
+    'fetch' : {
+        "data": {
+            "show_detail_info": {
+                "type": "operation",
+                "barcode": "280009834",
+                "detail_info": {
+                    "id": 321311,
+                    "name": "SCH/OUT/00008",
+                    "customer": "BestCooperation SA",
+                    "schedule_date": "2020-09-12",
+                    "operation_type": "Abroad Delivery Order",
+                    "destination_location": "DBACK-03",
+                    "source_document": "SO0321",
+                    "carrier": "",
+                    "priority": 3,
+                    "note": "Oh so this could be a really long text, how should it be implemented ?",
+                    "moves": [
+                        {
+                            "id": 424,
+                            "name": "Sun Glasses Cat 4 High Altitude",
+                            "pack": "PID0000008",
+                            "lot": "AA8122F41",
+                            "qty": 34,
+                        },
+                        {
+                            "id": 421,
+                            "name": "Sun Glasses Pro Glazier",
+                            "pack": "PID0000421",
+                            "lot": "AA8122F41",
+                            "qty_instock": 4,
+                            "qty_reserved": 0,
+                        },
+                    ],
+                }
+            },
+        },
+        "message": undefined
+    },
+}
+
 var DEMO_SINGLE_PACK_TRANSFER_1 = {
     'fetch' : {
         "data": {
@@ -357,45 +399,63 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
     },
 }
 
-var DEMO_SCAN_ANYTHING_OPERATION = {
-    'fetch' : {
-        "data": {
-            "show_detail_info": {
-                "type": "operation",
-                "barcode": "280009834",
-                "detail_info": {
-                    "id": 321311,
-                    "name": "SCH/OUT/00008",
-                    "customer": "BestCooperation SA",
-                    "schedule_date": "2020-09-12",
-                    "operation_type": "Abroad Delivery Order",
-                    "destination_location": "DBACK-03",
-                    "source_document": "SO0321",
-                    "carrier": "",
-                    "priority": 3,
-                    "note": "Oh so this could be a really long text, how should it be implemented ?",
-                    "moves": [
-                        {
-                            "id": 424,
-                            "name": "Sun Glasses Cat 4 High Altitude",
-                            "pack": "PID0000008",
-                            "lot": "AA8122F41",
-                            "qty": 34,
+
+var DEMO_CLUSTER_PICKING_1 = {
+    'find_batch': {
+        'next_state': 'confirm_start',
+        'data': {
+            'confirm_start': {
+                'name': 'BATCH001',
+                'picking_count': 3,
+                'move_line_count': 6,
+                'records': [
+                    {
+                        'name': 'OP001',
+                        'customer': {
+                            'name': 'Customer 1',
                         },
-                        {
-                            "id": 421,
-                            "name": "Sun Glasses Pro Glazier",
-                            "pack": "PID0000421",
-                            "lot": "AA8122F41",
-                            "qty_instock": 4,
-                            "qty_reserved": 0,
+                        'ref': 'SO000CUST001',
+                        'move_line_count': 4,
+                    },
+                    {
+                        'name': 'OP002',
+                        'customer': {
+                            'name': 'Customer 2',
                         },
-                    ],
-                }
-            },
-        },
-        "message": undefined
+                        'ref': 'SO000CUST002',
+                        'move_line_count': 2,
+                    },
+                ]
+            }
+        }
     },
+    'picking_batch/search': {},
+    'select': {},
+    'confirm_start': {
+        'next_state': 'start_line',
+        'data': {
+            'start_line': {
+                'line_id': 6,
+            }
+        }
+    },
+    'unassign': {
+        'next_state': 'start',
+    },
+    'scan_line': {
+        'next_state': 'scan_destination',
+    },
+    'scan_destination_pack': {},
+    'is_zero': {},
+    'skip_line': {},
+    'stock_issue': {},
+    'check_pack_lot': {},
+    'prepare_unload': {},
+    'set_destination_all': {},
+    'unload_split': {},
+    'unload_scan_pack': {},
+    'unload_scan_destination': {},
+    'unload_router': {},
 }
 
 window.DEMO_SINGLE_PUTAWAY = {
@@ -417,10 +477,12 @@ window.DEMO_SCAN_ANYTHING = {
     "loc": DEMO_SCAN_ANYTHING_LOCATION,
     "op": DEMO_SCAN_ANYTHING_OPERATION,
 }
+window.DEMO_CLUSTER_PICKING = DEMO_CLUSTER_PICKING_1
 
 window.DEMO_CASES = {
     "single_pack_putaway": window.DEMO_SINGLE_PUTAWAY,
     "single_pack_transfer": window.DEMO_SINGLE_PACK_TRANSFER,
+    "cluster_picking": window.DEMO_CLUSTER_PICKING,
     "scan_anything": window.DEMO_SCAN_ANYTHING,
 }
 window.DEMO_CASE = {}
