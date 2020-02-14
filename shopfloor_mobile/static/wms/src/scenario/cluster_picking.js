@@ -5,7 +5,7 @@ import {ScenarioBaseMixin, GenericStatesMixin} from "./mixins.js";
 <searchbar v-if="current_state_key == 'scan_location'" v-on:found="on_scan" :input_placeholder="search_input_placeholder" :input_data_type="'location'"></searchbar>
 <user-information v-if="!need_confirmation && user_notification.message" v-bind:info="user_notification"></user-information>
 <user-confirmation v-if="need_confirmation" v-on:user-confirmation="on_user_confirm" v-bind:question="user_notification.message"></user-confirmation>
-<operation-detail :operation="erp_data.data"></operation-detail>
+<operation-detail :operation="state.data"></operation-detail>
 <last-operation v-if="current_state_key == 'show_completion_info'" v-on:confirm="state['show_completion_info'].on_confirm"></last-operation>
 <cancel-button v-on:cancel="on_cancel" v-if="show_cancel_button"></cancel-button>
 */
@@ -70,11 +70,14 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     },
                     on_user_confirm: (answer) => {
                         if (answer == 'yes'){
-                            this.go_state('start_line')
+                            this.go_state(
+                                'wait_call',
+                                this.odoo.confirm_start(this.state.data)
+                            )
                         } else {
                             this.go_state(
                                 'wait_call',
-                                this.odoo.unassign(this.erp_data.data)
+                                this.odoo.unassign(this.state.data)
                             )
                         }
                     },
@@ -85,7 +88,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.scan_line(this.erp_data.data.move_id, scanned.text)
+                            this.odoo.scan_line(this.state.data.move_id, scanned.text)
                         )
                     },
                     on_full_bin: () => {
@@ -100,7 +103,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.scan_line(this.erp_data.data.move_id, scanned.text)
+                            this.odoo.scan_line(this.state.data.move_id, scanned.text)
                         )
                     },
                     on_button_action: () => {

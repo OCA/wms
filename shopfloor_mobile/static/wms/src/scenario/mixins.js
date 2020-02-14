@@ -11,10 +11,12 @@ export var ScenarioBaseMixin = {
             'need_confirmation': false,
             'show_reset_button': false,
             'erp_data': {
-                'data': {}
+                'data': {
+                    // $next_state: {},
+                }
             },
-            'initial_state_key': 'scan_pack',
-            'current_state_key': 'scan_pack',
+            'initial_state_key': 'start_scan_pack',
+            'current_state_key': 'start_scan_pack',
             'states': {},
             'usage': '',  // match component usage on odoo
         }
@@ -32,14 +34,23 @@ export var ScenarioBaseMixin = {
             this.odoo = new Odoo(odoo_params)
     },
     computed: {
-        current_state: function () {
-            return this.states[this.current_state_key]
+        /*
+        Full object of current state
+        */
+        state: function () {
+            let state_data = _.result(this.erp_data.data, this.current_state_key, {})
+            let state = {
+                'key': this.current_state_key,
+                'data': state_data,
+            }
+            _.extend(state, this.states[this.current_state_key])
+            return state
         },
         search_input_placeholder: function () {
-            return this.current_state.scan_placeholder
+            return this.state.scan_placeholder
         },
         show_cancel_button: function () {
-            return this.current_state.show_cancel_button
+            return this.state.show_cancel_button
         }
     },
     methods: {
@@ -49,6 +60,9 @@ export var ScenarioBaseMixin = {
         // generic states methods
         go_state: function(state_key, promise) {
             console.log('GO TO STATE', state_key)
+            if (!_.has(this.states, state_key)) {
+                alert('State `' + state_key + '` does not exists!')
+            }
             this.on_exit()
             if (state_key == 'start')
                 // alias "start" to the initial state
@@ -64,12 +78,12 @@ export var ScenarioBaseMixin = {
             }
         },
         on_enter: function () {
-            if (this.current_state.enter)
-                this.current_state.enter()
+            if (this.state.enter)
+                this.state.enter()
         },
         on_exit: function () {
-            if (this.current_state.exit)
-                this.current_state.exit()
+            if (this.state.exit)
+                this.state.exit()
         },
         on_success: function (result) {
             if (result.message) {
@@ -77,12 +91,12 @@ export var ScenarioBaseMixin = {
             } else {
                 this.reset_notification()
             }
-            if (this.current_state.success)
-                this.current_state.success(result)
+            if (this.state.success)
+                this.state.success(result)
         },
         on_error: function (result) {
-            if (this.current_state.error)
-                this.current_state.error(result)
+            if (this.state.error)
+                this.state.error(result)
         },
         on_reset: function (e) {
             this.reset_erp_data()
@@ -91,15 +105,15 @@ export var ScenarioBaseMixin = {
         },
         // specific states methods
         on_scan: function(scanned) {
-            if (this.current_state.on_scan)
-                this.current_state.on_scan(scanned)
+            if (this.state.on_scan)
+                this.state.on_scan(scanned)
         },
         on_cancel: function() {
-            if (this.current_state.on_cancel)
-                this.current_state.on_cancel()
+            if (this.state.on_cancel)
+                this.state.on_cancel()
         },
         on_user_confirm: function(answer){
-            this.current_state.on_user_confirm(answer)
+            this.state.on_user_confirm(answer)
             this.need_confirmation = false
             this.reset_notification()
         },
@@ -160,7 +174,7 @@ export var GenericStatesMixin = {
                         if (!_.isUndefined(result.data))
                             this.set_erp_data('data', result.data)
                         if (!_.isUndefined(result) && !result.error) {
-                            this.go_state(result.state)
+                            this.go_state(result.next_state)
                         } else {
                             alert(result.status + ' ' + result.error)
                         }
@@ -169,23 +183,23 @@ export var GenericStatesMixin = {
                 },
                 'scan_location': {
                     enter: () => {
-                        this.erp_data.data.location_barcode = false
+                        this.state.data.location_barcode = false
                     },
                     on_scan: (scanned) => {
-                        this.erp_data.data.location_barcode = scanned.text
+                        this.state.data.location_barcode = scanned.text
                         this.go_state('wait_validation',
-                            this.odoo.validate(this.erp_data.data))
+                            this.odoo.validate(this.state.data))
                     },
                     on_cancel: () => {
                         this.go_state('wait_cancel',
-                            this.odoo.cancel(this.erp_data.data))
+                            this.odoo.cancel(this.state.data))
                     },
                     scan_placeholder: 'Scan location',
                     show_cancel_button: true
                 },
                 'wait_validation': {
                     success: (result) => {
-                        this.go_state(result.state)
+                        this.go_state(result.next_state)
                     },
                     error: (result) => {
                         this.go_state('scan_location')
@@ -203,8 +217,8 @@ export var GenericStatesMixin = {
                     on_user_confirm: (answer) => {
                         if (answer == 'yes'){
                             this.go_state(
-                                'wait_validation',
-                                this.odoo.validate(this.erp_data.data, true)
+                                'wait_call',
+                                this.odoo.confirm_start(this.state.data, true)
                             )
                         } else {
                             this.go_state('scan_location')
@@ -213,7 +227,7 @@ export var GenericStatesMixin = {
                     on_scan: (scanned) => {
                         this.on_exit()
                         this.current_state_key = 'scan_location'
-                        this.current_state.on_scan(scanned)
+                        this.state.on_scan(scanned)
                     }
                 },
                 'confirm_start': {
@@ -233,7 +247,7 @@ export var GenericStatesMixin = {
                     on_scan:(scanned) => {
                         this.on_exit()
                         this.current_state_key = 'scan_location'
-                        this.current_state.on_scan(scanned)
+                        this.state.on_scan(scanned)
                     }
                 },
             }
