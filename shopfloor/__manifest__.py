@@ -30,8 +30,8 @@
     ],
     "demo": [
         "demo/auth_api_key_demo.xml",
-        "demo/shopfloor_process_demo.xml",
         "demo/stock_picking_type_demo.xml",
+        "demo/shopfloor_process_demo.xml",
         "demo/shopfloor_menu_demo.xml",
         "demo/shopfloor_operation_group_demo.xml",
         "demo/shopfloor_profile_demo.xml",
