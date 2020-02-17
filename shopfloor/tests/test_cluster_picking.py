@@ -179,3 +179,107 @@ class ClusterPickingCase(CommonCase):
                 "message": "No more work to do, please create a new batch transfer",
             },
         )
+
+    def test_select_in_progress_assigned(self):
+        """Select an in-progress batch assigned to the current user"""
+        self._add_stock_and_assign_pickings_for_batches(self.batch1)
+        self.batch1.write({"state": "in_progress", "user_id": self.env.uid})
+        # Simulate the client selecting the batch in a list
+        response = self.service.dispatch(
+            "select", params={"picking_batch_id": self.batch1.id}
+        )
+        self.assert_response(
+            response,
+            next_state="confirm_start",
+            data={
+                "id": self.batch1.id,
+                "name": self.batch1.name,
+                # we don't care in these tests, the 'find_batch' tests already
+                # check this
+                "weight": self.ANY,
+                "pickings": self.ANY,
+            },
+        )
+
+    def test_select_draft_assigned(self):
+        """Select a draft batch assigned to the current user"""
+        self._add_stock_and_assign_pickings_for_batches(self.batch1)
+        self.batch1.write({"user_id": self.env.uid})
+        # Simulate the client selecting the batch in a list
+        response = self.service.dispatch(
+            "select", params={"picking_batch_id": self.batch1.id}
+        )
+        # The endpoint starts the batch and assign it to self
+        self.assertEqual(self.batch1.user_id, self.env.user)
+        self.assertEqual(self.batch1.state, "in_progress")
+        self.assert_response(
+            response,
+            next_state="confirm_start",
+            data={
+                "id": self.batch1.id,
+                "name": self.batch1.name,
+                # we don't care in these tests, the 'find_batch' tests already
+                # check this
+                "weight": self.ANY,
+                "pickings": self.ANY,
+            },
+        )
+
+    def test_select_draft_unassigned(self):
+        """Select a draft batch not assigned to a user"""
+        self._add_stock_and_assign_pickings_for_batches(self.batch1)
+        # Simulate the client selecting the batch in a list
+        response = self.service.dispatch(
+            "select", params={"picking_batch_id": self.batch1.id}
+        )
+        # The endpoint starts the batch and assign it to self
+        self.assertEqual(self.batch1.user_id, self.env.user)
+        self.assertEqual(self.batch1.state, "in_progress")
+        self.assert_response(
+            response,
+            next_state="confirm_start",
+            data={
+                "id": self.batch1.id,
+                "name": self.batch1.name,
+                # we don't care in these tests, the 'find_batch' tests already
+                # check this
+                "weight": self.ANY,
+                "pickings": self.ANY,
+            },
+        )
+
+    def test_select_not_exists(self):
+        """Select a draft that does not exist"""
+        batch_id = self.batch1.id
+        self.batch1.unlink()
+        # Simulate the client selecting the batch in a list
+        response = self.service.dispatch(
+            "select", params={"picking_batch_id": batch_id}
+        )
+        self.assert_response(
+            response,
+            next_state="manual_selection",
+            message={
+                "message_type": "warning",
+                "message": "This batch cannot be selected.",
+            },
+        )
+
+    def test_select_already_assigned(self):
+        """Select a draft that does not exist"""
+        self._add_stock_and_assign_pickings_for_batches(self.batch1)
+        self.batch1.write(
+            {"state": "in_progress", "user_id": self.env.ref("base.user_demo")}
+        )
+        # Simulate the client selecting the batch in a list
+        response = self.service.dispatch(
+            "select", params={"picking_batch_id": self.batch1.id}
+        )
+        self.assert_response(
+            response,
+            next_state="manual_selection",
+            message={
+                "message_type": "warning",
+                "message": "This batch cannot be selected.",
+            },
+        )

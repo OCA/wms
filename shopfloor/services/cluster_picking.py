@@ -87,25 +87,33 @@ class ClusterPicking(Component):
         """
         batch_service = self.component(usage="picking_batch")
         batches = batch_service._search()
+        selected = self._select_a_picking_batch(batches)
+        if selected:
+            return self._response_for_confirm_start(selected)
+        else:
+            return self._response_for_no_batch_found()
+
+    # TODO this may be used in other scenarios? if so, extract
+    def _select_a_picking_batch(self, batches):
         # look for in progress + assigned to self first
         candidates = batches.filtered(
             lambda batch: batch.state == "in_progress"
             and batch.user_id == self.env.user
         )
         if candidates:
-            return self._response_for_confirm_start(candidates[0])
+            return candidates[0]
         # then look for draft assigned to self
         candidates = batches.filtered(lambda batch: batch.user_id == self.env.user)
         if candidates:
             batch = candidates[0]
             batch.write({"state": "in_progress"})
-            return self._response_for_confirm_start(batch)
+            return batch
         # finally take any batch that search could return
         if batches:
             batch = batches[0]
             batch.write({"user_id": self.env.uid, "state": "in_progress"})
-            return self._response_for_confirm_start(batch)
-        return self._response_for_no_batch_found()
+            return batch
+        return self.env["stock.picking.batch"]
 
     def _response_for_no_batch_found(self):
         return self._response(
@@ -142,6 +150,15 @@ class ClusterPicking(Component):
             },
         )
 
+    def _response_for_batch_cannot_be_selected(self):
+        return self._response(
+            next_state="manual_selection",
+            message={
+                "message_type": "warning",
+                "message": _("This batch cannot be selected."),
+            },
+        )
+
     def select(self, picking_batch_id):
         """Manually select a picking batch
 
@@ -159,7 +176,13 @@ class ClusterPicking(Component):
           concurrently for instance)
         * confirm_start: after the batch has been assigned to the user
         """
-        return self._response()
+        batch_service = self.component(usage="picking_batch")
+        batch = batch_service._search(batch_ids=[picking_batch_id])
+        selected = self._select_a_picking_batch(batch)
+        if selected:
+            return self._response_for_confirm_start(selected)
+        else:
+            return self._response_for_batch_cannot_be_selected()
 
     def confirm_start(self, picking_batch_id):
         """User confirms they start a batch
