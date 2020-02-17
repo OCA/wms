@@ -283,3 +283,25 @@ class ClusterPickingCase(CommonCase):
                 "message": "This batch cannot be selected.",
             },
         )
+
+    def test_unassign_batch(self):
+        """User cancels after selecting a batch, unassign it"""
+        self._add_stock_and_assign_pickings_for_batches(self.batch1)
+        self.batch1.write({"state": "in_progress", "user_id": self.env.uid})
+        # Simulate the client selecting the batch in a list
+        response = self.service.dispatch(
+            "unassign", params={"picking_batch_id": self.batch1.id}
+        )
+        self.assertEqual(self.batch1.state, "draft")
+        self.assertFalse(self.batch1.user_id)
+        self.assert_response(response, next_state="start")
+
+    def test_unassign_batch_not_exists(self):
+        """User cancels after selecting a batch deleted meanwhile"""
+        batch_id = self.batch1.id
+        self.batch1.unlink()
+        # Simulate the client selecting the batch in a list
+        response = self.service.dispatch(
+            "unassign", params={"picking_batch_id": batch_id}
+        )
+        self.assert_response(response, next_state="start")
