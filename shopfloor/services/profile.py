@@ -30,13 +30,13 @@ class ShopfloorProfile(Component):
         if name_fragment:
             domain.append(("name", "ilike", name_fragment))
         records = self.env[self._expose_model].search(domain)
-        return self._to_json(records)
+        return records
 
     def search(self, name_fragment=None):
         """List available profiles for current user"""
-        json_records = self._search(name_fragment=name_fragment)
+        records = self._search(name_fragment=name_fragment)
         return self._response(
-            data={"size": len(json_records), "records": self._to_json(json_records)}
+            data={"size": len(records), "records": self._to_json(records)}
         )
 
     def _get_base_search_domain(self):
