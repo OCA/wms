@@ -25,7 +25,7 @@ class SinglePackTransferCase(CommonCase):
         cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
-        cls.picking_type = cls.process.picking_type_ids
+        cls.picking_type = cls.process.picking_type_id
         cls.picking = cls._create_initial_move()
 
         # disable the completion on the picking type, we'll have specific test(s)

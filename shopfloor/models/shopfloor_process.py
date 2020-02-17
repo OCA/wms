@@ -7,8 +7,8 @@ class ShopfloorProcess(models.Model):
 
     name = fields.Char(required=True)
     code = fields.Selection(selection="_selection_code", required=True)
-    picking_type_ids = fields.One2many(
-        "stock.picking.type", "process_id", string="Operation types"
+    picking_type_id = fields.Many2one(
+        comodel_name="stock.picking.type", string="Operation Type"
     )
     menu_ids = fields.One2many(comodel_name="shopfloor.menu", inverse_name="process_id")
 

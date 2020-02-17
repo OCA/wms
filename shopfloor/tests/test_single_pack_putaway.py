@@ -145,7 +145,7 @@ class SinglePackPutawayCase(CommonCase):
                 "message": "You cannot work on a package (%s) outside of location: %s"
                 % (
                     self.pack_a.name,
-                    self.process.picking_type_ids.default_location_src_id.name,
+                    self.process.picking_type_id.default_location_src_id.name,
                 ),
             },
         )
@@ -239,7 +239,7 @@ class SinglePackPutawayCase(CommonCase):
         Used to test the next endpoints (/validate and /cancel)
         """
         picking_form = Form(self.env["stock.picking"])
-        picking_form.picking_type_id = self.menu.process_id.picking_type_ids
+        picking_form.picking_type_id = self.menu.process_id.picking_type_id
         with picking_form.move_ids_without_package.new() as move:
             move.product_id = self.product_a
             move.product_uom_qty = 1
