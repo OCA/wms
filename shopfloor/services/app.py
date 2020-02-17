@@ -34,8 +34,8 @@ class ShopfloorAppValidatorResponse(Component):
     _usage = "app.validator.response"
 
     def user_config(self):
-        menu_service = self.component("menu")
-        profile_service = self.component("profile")
+        menu_return_validator = self.component("menu.validator.response")
+        profile_return_validator = self.component("profile.validator.response")
         return self._response_schema(
             {
                 "menus": {
@@ -43,7 +43,7 @@ class ShopfloorAppValidatorResponse(Component):
                     "required": True,
                     "schema": {
                         "type": "dict",
-                        "schema": menu_service._record_return_schema,
+                        "schema": menu_return_validator._record_schema,
                     },
                 },
                 "profiles": {
@@ -51,7 +51,7 @@ class ShopfloorAppValidatorResponse(Component):
                     "required": True,
                     "schema": {
                         "type": "dict",
-                        "schema": profile_service._record_return_schema,
+                        "schema": profile_return_validator._record_schema,
                     },
                 },
             }
