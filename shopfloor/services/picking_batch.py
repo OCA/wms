@@ -31,10 +31,12 @@ class PickingBatch(Component):
             ]
         )
 
-    def _search(self, name_fragment=None):
+    def _search(self, name_fragment=None, batch_ids=None):
         domain = self._get_base_search_domain()
         if name_fragment:
-            domain.append(("name", "ilike", name_fragment))
+            domain = expression.AND([domain, [("name", "ilike", name_fragment)]])
+        if batch_ids:
+            domain = expression.AND([domain, [("id", "in", batch_ids)]])
         records = self.env[self._expose_model].search(domain, order="id asc")
         records = records.filtered(
             # Include done/cancel because we want to be able to work on the
