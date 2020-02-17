@@ -41,7 +41,16 @@ class PickingBatch(Component):
             # batch even if some pickings are done/canceled. They'll should be
             # ignored later.
             lambda batch: all(
-                picking.state in ("assigned", "done", "cancel")
+                (
+                    # When the batch is already in progress, we do not care
+                    # about state of the pickings, because we want to be able
+                    # to recover it in any case, even if, for instance, a stock
+                    # error changed a picking to unavailable after the user
+                    # started to work on the batch.
+                    batch.state == "in_progress"
+                    or picking.state in ("assigned", "done", "cancel")
+                )
+                and picking.picking_type_id in self.picking_types
                 for picking in batch.picking_ids
             )
         )
@@ -50,7 +59,8 @@ class PickingBatch(Component):
     def search(self, name_fragment=None):
         """List available stock picking batches for current user
 
-        Show only picking batches where all the pickings are available.
+        Show only picking batches where all the pickings are available and
+        where all pickings are in the picking type of the current process.
         """
         records = self._search(name_fragment=name_fragment)
         return self._response(
