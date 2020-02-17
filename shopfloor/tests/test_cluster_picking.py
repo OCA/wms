@@ -17,7 +17,7 @@ class ClusterPickingCase(CommonCase):
         cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
-        cls.picking_type = cls.process.picking_type_ids
+        cls.picking_type = cls.process.picking_type_id
         cls.batch1 = cls._create_picking_batch(cls.product_a)
         cls.batch2 = cls._create_picking_batch(cls.product_a)
         cls.batch3 = cls._create_picking_batch(cls.product_a)
