@@ -45,16 +45,17 @@ class PickingBatch(Component):
                 for picking in batch.picking_ids
             )
         )
-        # TODO why already convert to json in the internal method?
-        return self._to_json(records)
+        return records
 
     def search(self, name_fragment=None):
         """List available stock picking batches for current user
 
         Show only picking batches where all the pickings are available.
         """
-        json_records = self._search(name_fragment=name_fragment)
-        return self._response(data={"size": len(json_records), "records": json_records})
+        records = self._search(name_fragment=name_fragment)
+        return self._response(
+            data={"size": len(records), "records": self._to_json(records)}
+        )
 
     def _convert_one_record(self, record):
         assigned_pickings = record.picking_ids.filtered(
