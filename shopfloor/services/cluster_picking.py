@@ -7,7 +7,8 @@ from .service import to_float
 
 
 class ClusterPicking(Component):
-    """Methods for the Cluster Picking Process
+    """
+    Methods for the Cluster Picking Process
 
     The goal of this process is to do the pickings for a Picking Batch, for
     several customers at once.
@@ -37,10 +38,11 @@ class ClusterPicking(Component):
 
     * If all the goods (move lines) in the roller-cage go to the same destination,
       a screen asking a single barcode for the destination is shown
-    * Otherwise, the user has to scan one destination per good.
+    * Otherwise, the user has to scan one destination per Bin (destination
+      package of the moves).
     * If all the goods are supposed to go to the same destination but user doesn't
       want or can't, a "split" allows to reach the screen to scan one destination
-      per good.
+      per Bin.
     * When everything has a destination set and the batch is not finished yet,
       the user goes to the first phase of pickings again for the rest.
 
@@ -350,15 +352,13 @@ class ClusterPicking(Component):
         return self._response()
 
     def set_destination_all(self, picking_batch_id, barcode, confirmation=False):
-        """Set the destination for all the lines with a dest. package of the batch
+        """Set the destination for all the lines of the batch with a dest. package
 
         This method must be used only if all the move lines which have a destination
         package and qty done have the same destination location.
 
         A scanned location outside of the source location of the operation type is
         invalid.
-
-        TODO: remove the destination package or not?
 
         Transitions:
         * start_line: the batch still have move lines without destination package
@@ -394,7 +394,7 @@ class ClusterPicking(Component):
         No side effect in Odoo.
 
         Transitions:
-        * unload_single: if the batch still has lines to unload
+        * unload_single: if the batch still has packs to unload
         * start_line: if the batch still has lines to pick
         * start: if the batch is done. In this case, this method *has*
           to handle the closing of the batch to create backorders. TODO find a
@@ -403,11 +403,11 @@ class ClusterPicking(Component):
         """
         return self._response()
 
-    def unload_scan_pack(self, move_line_id, barcode):
+    def unload_scan_pack(self, package_id, barcode):
         """Check that the operator scans the correct package (bin) on unload
 
-        If the package is different as the destination package of the move line,
-        ask to scan it again.
+        If the scanned barcode is not the one of the Bin (package), ask to scan
+        again.
 
         Transitions:
         * unload_single: if the barcode does not match
@@ -415,16 +415,19 @@ class ClusterPicking(Component):
         """
         return self._response()
 
-    def unload_scan_destination(self, move_line_id, barcode, confirmation=False):
-        """Scan the final destination of the move line
+    def unload_scan_destination(self, package_id, barcode, confirmation=False):
+        """Scan the final destination for all the move lines moved with the Bin
 
-        TODO not sure. We have to call action_done on the picking *only when we
-        have scanned all the move lines* of the picking, so maybe we have to
+        It updates all the assigned move lines with the package to the
+        destination.
+
+        TODO not sure: We have to call action_done on the picking *only when we
+        have scanned all the packages* of the picking, so maybe we have to
         keep track of this with a new flag on move lines?
 
         Transitions:
         * unload_single: invalid scanned location or error
-        * unload_single: line is processed and the next line can be unloaded
+        * unload_single: line is processed and the next bin can be unloaded
         * confirm_unload_set_destination: the destination is valid but not the
           expected, ask a confirmation. This state has to call again the
           endpoint with confirmation=True
@@ -521,7 +524,7 @@ class ShopfloorClusterPickingValidator(Component):
 
     def unload_scan_pack(self):
         return {
-            "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "package_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
         }
 
