@@ -61,6 +61,7 @@ class CommonCase(SavepointCase, ComponentMixin):
         cls.input_location = cls.env.ref("stock.stock_location_company")
         cls.shelf1 = cls.env.ref("stock.stock_location_components")
         cls.shelf2 = cls.env.ref("stock.stock_location_14")
+        cls.customer = cls.env["res.partner"].create({"name": "Customer"})
 
     def assert_response(self, response, next_state=None, message=None, data=None):
         """Assert a response from the webservice
@@ -133,7 +134,7 @@ class CommonCase(SavepointCase, ComponentMixin):
 
     def _fill_stock_for_pickings(self, pickings):
         product_locations = {}
-        for move in self.all_batches.mapped("picking_ids.move_lines"):
+        for move in pickings.mapped("move_lines"):
             key = (move.product_id, move.location_id)
             product_locations.setdefault(key, 0)
             product_locations[key] += move.product_qty
