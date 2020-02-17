@@ -1,3 +1,5 @@
+from odoo import _
+
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
 
@@ -72,7 +74,7 @@ class ClusterPicking(Component):
 
         Business rules to find a batch, try in order:
 
-        a. Find an batch in progress assigned to the current user
+        a. Find a batch in progress assigned to the current user
         b. Find a draft batch assigned to the current user:
           1. set it to 'in progress'
         c. Find an unassigned draft batch:
@@ -83,7 +85,62 @@ class ClusterPicking(Component):
         * confirm_start: when it could find a batch
         * start: when no batch is available
         """
-        return self._response()
+        batch_service = self.component(usage="picking_batch")
+        batches = batch_service._search()
+        # look for in progress + assigned to self first
+        candidates = batches.filtered(
+            lambda batch: batch.state == "in_progress"
+            and batch.user_id == self.env.user
+        )
+        if candidates:
+            return self._response_for_confirm_start(candidates[0])
+        # then look for draft assigned to self
+        candidates = batches.filtered(lambda batch: batch.user_id == self.env.user)
+        if candidates:
+            batch = candidates[0]
+            batch.write({"state": "in_progress"})
+            return self._response_for_confirm_start(batch)
+        # finally take any batch that search could return
+        if batches:
+            batch = batches[0]
+            batch.write({"user_id": self.env.uid, "state": "in_progress"})
+            return self._response_for_confirm_start(batch)
+        return self._response_for_no_batch_found()
+
+    def _response_for_no_batch_found(self):
+        return self._response(
+            next_state="start",
+            message={
+                "message_type": "info",
+                "message": _("No more work to do, please create a new batch transfer"),
+            },
+        )
+
+    def _response_for_confirm_start(self, batch):
+        pickings = []
+        for picking in batch.picking_ids:
+            p_values = {
+                "id": picking.id,
+                "name": picking.name,
+                "move_line_count": len(picking.move_line_ids),
+                "origin": picking.origin or "",
+            }
+            if picking.partner_id:
+                p_values["partner"] = {
+                    "id": picking.partner_id.id,
+                    "name": picking.partner_id.name,
+                }
+            pickings.append(p_values)
+        return self._response(
+            next_state="confirm_start",
+            data={
+                "id": batch.id,
+                "name": batch.name,
+                # TODO
+                "weight": 0,
+                "pickings": pickings,
+            },
+        )
 
     def select(self, picking_batch_id):
         """Manually select a picking batch
@@ -629,6 +686,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                         },
                         "partner": {
                             "type": "dict",
+                            "required": False,
                             "schema": {
                                 "id": {"required": True, "type": "integer"},
                                 "name": {
