@@ -1,4 +1,4 @@
-from odoo import _, fields
+from odoo import _, exceptions, fields
 from odoo.exceptions import MissingError
 from odoo.osv import expression
 
@@ -24,13 +24,19 @@ class BaseShopfloorService(AbstractComponent):
     _expose_model = None
 
     @property
-    def picking_types(self):
+    def picking_type(self):
         """
         Get the current picking type based on the menu and the warehouse of the profile.
         """
-        return self.work.menu.process_id.picking_type_ids.filtered(
-            lambda p: p.warehouse_id == self.work.profile.warehouse_id
-        )
+        picking_type = self.work.menu.process_id.picking_type_id
+        if picking_type.warehouse_id != self.work.profile.warehouse_id:
+            raise exceptions.UserError(
+                _("Process {} cannot be used on warehouse {}").format(
+                    picking_type.display_name,
+                    self.work.profile.warehouse_id.display_name,
+                )
+            )
+        return picking_type
 
     def _get(self, _id):
         domain = expression.normalize_domain(self._get_base_search_domain())

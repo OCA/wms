@@ -84,7 +84,7 @@ class SinglePackTransfer(Component):
     def start(self, barcode):
         search = self.actions_for("search")
 
-        picking_type = self.picking_types
+        picking_type = self.picking_type
         if len(picking_type) > 1:
             return self._response_for_several_picking_types()
 
@@ -113,7 +113,7 @@ class SinglePackTransfer(Component):
             [
                 ("package_id", "=", pack.id),
                 ("state", "!=", "done"),
-                ("picking_id.picking_type_id", "in", self.picking_types.ids),
+                ("picking_id.picking_type_id", "=", self.picking_type.id),
             ]
         )
         if not existing_operations:

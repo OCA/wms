@@ -13,7 +13,6 @@
         <field name="color" eval="5"/>
         <field name="code">internal</field>
         <field name="show_operations" eval="1"/>
-        <field name="process_id" ref="shopfloor_process_put_away_reach_truck"/>
         <field name="display_completion_info" eval="1"/>
     </record>
 
@@ -30,7 +29,6 @@
         <field name="color" eval="5"/>
         <field name="code">internal</field>
         <field name="show_operations" eval="1"/>
-        <field name="process_id" ref="shopfloor_process_single_pallet_transfer"/>
         <field name="display_completion_info" eval="1"/>
     </record>
 
@@ -47,7 +45,6 @@
         <field name="color" eval="5"/>
         <field name="code">internal</field>
         <field name="show_operations" eval="1"/>
-        <field name="process_id" ref="shopfloor_process_cluster_picking"/>
         <field name="display_completion_info" eval="1"/>
     </record>
 

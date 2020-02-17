@@ -86,7 +86,7 @@ class SinglePackPutaway(Component):
     def start(self, barcode):
         """Scan a pack barcode"""
 
-        picking_type = self.picking_types
+        picking_type = self.picking_type
         if len(picking_type) > 1:
             return self._response_for_several_picking_types()
         elif not picking_type:
