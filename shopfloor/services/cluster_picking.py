@@ -204,6 +204,9 @@ class ClusterPicking(Component):
         Transitions:
         * "start" to work on a new batch
         """
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if batch.exists():
+            batch.write({"state": "draft", "user_id": False})
         return self._response(next_state="start")
 
     def scan_line(self, move_line_id, barcode):
