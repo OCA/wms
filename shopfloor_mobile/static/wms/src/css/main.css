@@ -48,3 +48,14 @@ ul.packaging span:first-child {
     height: 70vh;
     margin-bottom: 2rem;
 }
+
+.detail .v-card {
+    margin-bottom: 0.5rem;
+}
+.detail .v-card.main {
+    margin-bottom: 1rem;
+    border-width: 4px;
+}
+.v-dialog--fullscreen .button-vertical-list .v-btn {
+    width: 90%;
+}

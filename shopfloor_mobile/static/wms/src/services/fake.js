@@ -410,6 +410,7 @@ var DEMO_CLUSTER_PICKING_1 = {
                 'move_line_count': 6,
                 'records': [
                     {
+                        'id': 1,
                         'name': 'OP001',
                         'customer': {
                             'name': 'Customer 1',
@@ -418,6 +419,7 @@ var DEMO_CLUSTER_PICKING_1 = {
                         'move_line_count': 4,
                     },
                     {
+                        'id': 2,
                         'name': 'OP002',
                         'customer': {
                             'name': 'Customer 2',
@@ -435,7 +437,29 @@ var DEMO_CLUSTER_PICKING_1 = {
         'next_state': 'start_line',
         'data': {
             'start_line': {
-                'line_id': 6,
+                'id': 1,
+                'name': 'OP001',
+                'customer': {
+                    'name': 'Customer 1',
+                },
+                'ref': 'SO000CUST001',
+                'move_line_count': 4,
+                'pack': {
+                    'qty_on_hand': 5,
+                    'qty': 5,
+                    'name': 'Karton',
+                    'lot': 'THELOT000131'
+                },
+                'destination_bin': 'Bin #1',
+                "location_src": {
+                    "id": 1,
+                    "name":  'Location SRC 1',
+                },
+                "location_dst": {
+                    "id": 2,
+                    "name": 'Location SRC 2',
+                },
+                "product": {"id": 1, "name": 'Product 4'},
             }
         }
     },
@@ -444,8 +468,43 @@ var DEMO_CLUSTER_PICKING_1 = {
     },
     'scan_line': {
         'next_state': 'scan_destination',
+        'data': {
+            'scan_destination': {
+
+            },
+        },
     },
-    'scan_destination_pack': {},
+    'scan_destination_pack': {
+        'next_state': 'start_line',
+        'data': {
+            // next line to process
+            'start_line': {
+                'id': 2,
+                'name': 'OP001',
+                'customer': {
+                    'name': 'Customer 1',
+                },
+                'ref': 'SO000CUST001',
+                'move_line_count': 4,
+                'pack': {
+                    'qty_on_hand': 10,
+                    'qty': 10,
+                    'name': 'Karton',
+                    'lot': 'THELOT000131'
+                },
+                'destination_bin': 'Bin #2',
+                "location_src": {
+                    "id": 1,
+                    "name":  'Location SRC 2',
+                },
+                "location_dst": {
+                    "id": 2,
+                    "name": 'Location DST 2',
+                },
+                "product": {"id": 1, "name": 'Product 5'},
+            },
+        },
+    },
     'is_zero': {},
     'skip_line': {},
     'stock_issue': {},

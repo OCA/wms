@@ -1,9 +1,8 @@
-
-var batch_picking_info = Vue.component('batch-picking-detail', {
+export var batch_picking_info = Vue.component('batch-picking-detail', {
   props:['info'],
   template: `
   <div class="detail batch-picking-detail" v-if="!_.isEmpty(info)">
-    <v-card class="mb-2">
+    <v-card outlined class="main">
       <v-card-title>Work package info</v-card-title>
       <v-card-text>
         <ul>
@@ -14,7 +13,7 @@ var batch_picking_info = Vue.component('batch-picking-detail', {
       </v-card-text>
     </v-card>
 
-    <v-card v-for="rec in info.records">
+    <v-card outlined v-for="rec in info.records" :key="rec.id">
       <v-card-title> {{ rec.name }} </v-card-title>
       <v-card-text>
         <ul>
@@ -26,8 +25,8 @@ var batch_picking_info = Vue.component('batch-picking-detail', {
       </v-card-text>
     </v-card>
 
-    <v-btn color="primary" @click="$emit('confirm')">Start</v-btn>
-    <v-btn color="error" @click="$emit('cancel')">Cancel</v-btn>
+    <v-btn depressed color="primary" @click="$emit('confirm')">Start</v-btn>
+    <v-btn depressed color="error" class="float-right" @click="$emit('cancel')">Cancel</v-btn>
 
 </div>
 `

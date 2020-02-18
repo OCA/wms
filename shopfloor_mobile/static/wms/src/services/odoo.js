@@ -118,27 +118,38 @@ export class OdooMocked extends OdooMixin{
     }
     // picking_load_trip
     find_batch () {
+        console.log('find_batch', this.usage);
         if (_.isEmpty(window.DEMO_CASE))
             window.DEMO_CASE = window.DEMO_CASES[this.usage]
         return Promise.resolve(window.DEMO_CASE['find_batch'])
     }
     picking_batch () {
-        throw 'NOT IMPLEMENTED!'
+        console.log('picking_batch', this.usage);
+        throw '.picking_batch NOT IMPLEMENTED!'
     }
     confirm_start () {
-        throw 'NOT IMPLEMENTED!'
+        console.log('confirm_start', this.usage);
+        return Promise.resolve(window.DEMO_CASE['confirm_start'])
     }
     unassign () {
-        throw 'NOT IMPLEMENTED!'
+        console.log('unassign', this.usage);
+        return Promise.resolve(window.DEMO_CASE['unassign'])
     }
     scan_line () {
-        throw 'NOT IMPLEMENTED!'
+        console.log('scan_line', this.usage);
+        return Promise.resolve(window.DEMO_CASE['scan_line'])
+    }
+    scan_destination_pack () {
+        console.log('scan_destination_pack', this.usage);
+        return Promise.resolve(window.DEMO_CASE['scan_destination_pack'])
     }
     prepare_unload () {
-        throw 'NOT IMPLEMENTED!'
+        console.log('prepare_unload', this.usage);
+        throw '.prepare_unload NOT IMPLEMENTED!'
     }
     select () {
-        throw 'NOT IMPLEMENTED!'
+        console.log('select', this.usage);
+        throw '.select NOT IMPLEMENTED!'
     }
 
 }
@@ -171,22 +182,25 @@ export class Odoo extends OdooMixin{
     }
     // picking_load_trip
     find_batch () {
-        throw 'NOT IMPLEMENTED!'
+        throw '.find_batch NOT IMPLEMENTED!'
     }
     picking_batch () {
-        throw 'NOT IMPLEMENTED!'
+        throw '.picking_batch NOT IMPLEMENTED!'
     }
     unassign () {
-        throw 'NOT IMPLEMENTED!'
+        throw '.unassign NOT IMPLEMENTED!'
     }
     scan_line () {
-        throw 'NOT IMPLEMENTED!'
+        throw '.scan_line NOT IMPLEMENTED!'
+    }
+    scan_destination_pack () {
+        throw '.scan_destination_pack NOT IMPLEMENTED!'
     }
     prepare_unload () {
-        throw 'NOT IMPLEMENTED!'
+        throw '.prepare_unload NOT IMPLEMENTED!'
     }
     select () {
-        throw 'NOT IMPLEMENTED!'
+        throw '.select NOT IMPLEMENTED!'
     }
 
 }
