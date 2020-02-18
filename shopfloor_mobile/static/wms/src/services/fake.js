@@ -405,6 +405,7 @@ var DEMO_CLUSTER_PICKING_1 = {
         'next_state': 'confirm_start',
         'data': {
             'confirm_start': {
+                'id': 100,
                 'name': 'BATCH001',
                 'picking_count': 3,
                 'move_line_count': 6,
@@ -559,7 +560,13 @@ var DEMO_CLUSTER_PICKING_1 = {
     'skip_line': {},
     'stock_issue': {},
     'check_pack_lot': {},
-    'prepare_unload': {},
+    'prepare_unload': {
+        'next_state': 'unload_all',
+        'data': {
+            // next line to process
+            'unload_all': {}
+        },
+    },
     'set_destination_all': {},
     'unload_split': {},
     'unload_scan_pack': {},

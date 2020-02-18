@@ -151,7 +151,8 @@ export class OdooMocked extends OdooMixin{
     }
     prepare_unload () {
         console.log('prepare_unload', this.usage);
-        throw '.prepare_unload NOT IMPLEMENTED!'
+        let result = window.DEMO_CASE['prepare_unload']
+        return Promise.resolve(result)
     }
     select () {
         console.log('select', this.usage);

@@ -43,7 +43,7 @@ export var batch_picking_line_actions = Vue.component('batch-picking-line-action
   },
   template: `
   <div class="batch-picking-line-actions">
-    <v-dialog v-model="dialog" fullscreen tile class="actions fullscreen">
+    <v-dialog v-model="dialog" fullscreen tile class="actions fullscreen text-center">
       <template v-slot:activator="{ on }">
         <v-btn depressed color="primary" dark v-on="on">Action</v-btn>
       </template>
