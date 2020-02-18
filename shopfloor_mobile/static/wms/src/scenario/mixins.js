@@ -57,6 +57,9 @@ export var ScenarioBaseMixin = {
         state_is: function(state_key) {
             return state_key == this.current_state_key
         },
+        state_in: function(state_keys) {
+            return _.filter(state_keys, this.state_is).length > 0;
+        },
         // generic states methods
         go_state: function(state_key, promise) {
             console.log('GO TO STATE', state_key)
@@ -93,6 +96,7 @@ export var ScenarioBaseMixin = {
             }
             if (this.state.success)
                 this.state.success(result)
+            this.on_enter()
         },
         on_error: function (result) {
             if (this.state.error)
@@ -128,7 +132,9 @@ export var ScenarioBaseMixin = {
             console.log('USER NOTIF RESET')
         },
         set_erp_data: function (key, data) {
-            this.$set(this.erp_data, key, data)
+            let new_data = this.erp_data[key]
+            _.merge(new_data, data)
+            this.$set(this.erp_data, key, new_data)
         },
         reset_erp_data: function (key) {
             // FIXME
