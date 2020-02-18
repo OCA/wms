@@ -7,32 +7,32 @@ export var ClusterPicking = Vue.component('cluster-picking', {
             <!-- FOR DEBUG -->
             <!-- {{ current_state_key }} -->
             <get-work
-                v-if="is_state(initial_state_key)"
+                v-if="state_is(initial_state_key)"
                 v-on:get_work="state.on_get_work"
                 v-on:manual_selection="state.on_manual_selection"></get-work>
             <batch-picking-detail
-                v-if="is_state('confirm_start')"
+                v-if="state_is('confirm_start')"
                 :info="state.data"
                 v-on:confirm="state.on_confirm"
                 v-on:cancel="state.on_cancel"
                 ></batch-picking-detail>
             <batch-picking-line-detail
-                v-if="is_state('start_line')"
+                v-if="state_is('start_line')"
                 :line="state.data"
                 v-on:action="state.on_action"
                 ></batch-picking-line-detail>
             <searchbar
-                v-if="is_state('start_line')"
+                v-if="state_is('start_line')"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
                 ></searchbar>
-            <batch-picking-line-actions v-if="is_state('start_line')" />
+            <batch-picking-line-actions v-if="state_is('start_line')" />
             <div class="qty"
-                 v-if="is_state('scan_destination')">
+                 v-if="state_is('scan_destination')">
                 <input v-model.number="dest_qty" type="number" />
             </div>
             <searchbar
-                v-if="is_state('scan_destination')"
+                v-if="state_is('scan_destination')"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
                 ></searchbar>

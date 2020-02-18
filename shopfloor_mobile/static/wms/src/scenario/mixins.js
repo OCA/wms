@@ -54,7 +54,7 @@ export var ScenarioBaseMixin = {
         }
     },
     methods: {
-        is_state: function(state_key) {
+        state_is: function(state_key) {
             return state_key == this.current_state_key
         },
         // generic states methods
