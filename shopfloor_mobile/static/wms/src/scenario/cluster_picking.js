@@ -16,6 +16,26 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 v-on:confirm="state.on_confirm"
                 v-on:cancel="state.on_cancel"
                 ></batch-picking-detail>
+            <batch-picking-line-detail
+                v-if="is_state('start_line')"
+                :line="state.data"
+                v-on:action="state.on_action"
+                ></batch-picking-line-detail>
+            <searchbar
+                v-if="is_state('start_line')"
+                v-on:found="on_scan"
+                :input_placeholder="search_input_placeholder"
+                ></searchbar>
+            <batch-picking-line-actions v-if="is_state('start_line')" />
+            <div class="qty"
+                 v-if="is_state('scan_destination')">
+                <input v-model.number="dest_qty" type="number" />
+            </div>
+            <searchbar
+                v-if="is_state('scan_destination')"
+                v-on:found="on_scan"
+                :input_placeholder="search_input_placeholder"
+                ></searchbar>
         </Screen>
     `,
     data: function () {
@@ -23,6 +43,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
             'usage': 'cluster_picking',
             'initial_state_key': 'start',
             'current_state_key': 'start',
+            'dest_qty': 1,
             'states': {
                 'start': {
                     enter: () => {
@@ -72,22 +93,36 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.scan_line(this.state.data.move_id, scanned.text)
-                        )
-                    },
-                    on_full_bin: () => {
-                        this.go_state(
-                            'wait_call',
-                            this.odoo.prepare_unload(scanned.text)
+                            this.odoo.scan_line(this.state.data, scanned.text)
                         )
                     },
                     scan_placeholder: 'Scan location / pack / product / lot',
+                    // additional actions
+                    on_action: (action) => {
+                        this.state['on_' + action].call(this)
+                    },
+                    on_action_full_bin: () => {
+                        console.log('full bin TODO')
+                        // this.go_state(
+                        //     'wait_call',
+                        //     this.odoo.prepare_unload(scanned.text)
+                        // )
+                    },
+                    on_action_skip_line: () => {
+                        console.log('skip line TODO')
+                    },
+                    on_action_stock_out: () => {
+                        console.log('stock out TODO')
+                    },
+                    on_action_change_pack_or_lot: () => {
+                        console.log('change pack or lot TODO')
+                    },
                 },
                 'scan_destination': {
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.scan_line(this.state.data.move_id, scanned.text)
+                            this.odoo.scan_destination_pack(this.state.data, scanned.text)
                         )
                     },
                     on_button_action: () => {

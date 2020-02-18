@@ -19,7 +19,6 @@ if ( Storage.apikey ) {
     AppConfig.load().then(() => {
         // Adding the routes dynamically when received from ther server
         AppConfig.get('menus').forEach(function(item){
-            console.dir(item)
             app.$router.addRoutes([{
                 path: "/" + item.process.code,
                 component: ScenarioTemplate[item.process.code],
