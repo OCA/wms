@@ -476,6 +476,10 @@ var DEMO_CLUSTER_PICKING_1 = {
     },
     'scan_destination_pack': {
         'next_state': 'start_line',
+        'message': {
+            'message_type': 'info',
+            'message': 'Product 5 put in bin #2',
+        },
         'data': {
             // next line to process
             'start_line': {

@@ -139,7 +139,7 @@ export class OdooMocked extends OdooMixin{
         console.log('scan_line', this.usage);
         return Promise.resolve(window.DEMO_CASE['scan_line'])
     }
-    scan_destination_pack () {
+    scan_destination_pack (data, scanned, qty) {
         console.log('scan_destination_pack', this.usage);
         return Promise.resolve(window.DEMO_CASE['scan_destination_pack'])
     }

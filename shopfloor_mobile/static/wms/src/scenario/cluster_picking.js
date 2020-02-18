@@ -6,6 +6,10 @@ export var ClusterPicking = Vue.component('cluster-picking', {
         <Screen :title="menuItem.name">
             <!-- FOR DEBUG -->
             <!-- {{ current_state_key }} -->
+            <user-information
+                v-if="!need_confirmation && user_notification.message"
+                v-bind:info="user_notification"
+                ></user-information>
             <get-work
                 v-if="state_is(initial_state_key)"
                 v-on:get_work="state.on_get_work"
@@ -17,19 +21,21 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 v-on:cancel="state.on_cancel"
                 ></batch-picking-detail>
             <batch-picking-line-detail
-                v-if="state_is('start_line')"
-                :line="state.data"
-                v-on:action="state.on_action"
+                v-if="state_in(['start_line', 'scan_destination'])"
+                :line="erp_data.data['start_line']"
                 ></batch-picking-line-detail>
             <searchbar
                 v-if="state_is('start_line')"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
                 ></searchbar>
-            <batch-picking-line-actions v-if="state_is('start_line')" />
+            <batch-picking-line-actions
+                v-if="state_is('start_line')"
+                v-on:action="state.on_action"
+                />
             <div class="qty"
                  v-if="state_is('scan_destination')">
-                <input v-model.number="dest_qty" type="number" />
+                <input-number-spinner :init_value="scan_destination_qty" class="mb-2"/>
             </div>
             <searchbar
                 v-if="state_is('scan_destination')"
@@ -43,7 +49,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
             'usage': 'cluster_picking',
             'initial_state_key': 'start',
             'current_state_key': 'start',
-            'dest_qty': 1,
+            'scan_destination_qty': 1,
             'states': {
                 'start': {
                     enter: () => {
@@ -119,10 +125,15 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     },
                 },
                 'scan_destination': {
+                    enter: () => {
+                        // TODO: shalle we hook v-model for qty input straight to the state data?
+                        this.scan_destination_qty = this.erp_data.data.start_line.pack.qty
+                    },
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.scan_destination_pack(this.state.data, scanned.text)
+                            this.odoo.scan_destination_pack(
+                                this.state.data, scanned.text, this.scan_destination_qty)
                         )
                     },
                     on_button_action: () => {

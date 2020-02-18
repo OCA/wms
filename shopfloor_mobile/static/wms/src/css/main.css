@@ -59,3 +59,21 @@ ul.packaging span:first-child {
 .v-dialog--fullscreen .button-vertical-list .v-btn {
     width: 90%;
 }
+
+.number-spinner {
+    font-size: 1.6rem;
+    text-align: center;
+}
+.number-spinner .spinner-btn{
+    font-size: 2rem;
+    border-radius: 2rem;
+    border: 1px solid #ccc;
+    width: 40%;
+    margin: 0 auto;
+    cursor: pointer;
+}
+.number-spinner input {
+    width: 100%;
+    text-align: center;
+    margin: 0.5rem 0;
+}
