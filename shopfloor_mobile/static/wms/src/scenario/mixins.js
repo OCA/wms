@@ -124,12 +124,10 @@ export var ScenarioBaseMixin = {
         set_notification: function(message) {
             this.user_notification.message = message.message
             this.user_notification.message_type = message.message_type
-            console.log('USER NOTIF SET', this.user_notification)
         },
         reset_notification: function() {
             this.user_notification.message = false
             this.user_notification.message_type = false
-            console.log('USER NOTIF RESET')
         },
         set_erp_data: function (key, data) {
             let new_data = this.erp_data[key]

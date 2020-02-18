@@ -139,9 +139,15 @@ export class OdooMocked extends OdooMixin{
         console.log('scan_line', this.usage);
         return Promise.resolve(window.DEMO_CASE['scan_line'])
     }
-    scan_destination_pack (data, scanned, qty) {
+    scan_destination_pack (data, barcode, qty) {
         console.log('scan_destination_pack', this.usage);
-        return Promise.resolve(window.DEMO_CASE['scan_destination_pack'])
+        let result = window.DEMO_CASE['scan_destination_pack']
+        if (_.has(result, barcode)) {
+            result = result[barcode]
+        } else {
+            result = result['ok']
+        }
+        return Promise.resolve(result)
     }
     prepare_unload () {
         console.log('prepare_unload', this.usage);
@@ -150,6 +156,15 @@ export class OdooMocked extends OdooMixin{
     select () {
         console.log('select', this.usage);
         throw '.select NOT IMPLEMENTED!'
+    }
+    stock_is_zero (status) {
+        console.log('stock_is_zero', this.usage);
+        let result = window.DEMO_CASE['stock_is_zero']
+        let key = status ? 'yes' : 'no'
+        if (_.has(result, key)) {
+            result = result[status]
+        }
+        return Promise.resolve(result)
     }
 
 }
@@ -201,6 +216,10 @@ export class Odoo extends OdooMixin{
     }
     select () {
         throw '.select NOT IMPLEMENTED!'
+    }
+    stock_is_zero (status) {
+        console.log('stock_is_zero', this.usage);
+        throw '.stock_is_zero NOT IMPLEMENTED!'
     }
 
 }

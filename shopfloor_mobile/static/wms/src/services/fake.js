@@ -475,10 +475,57 @@ var DEMO_CLUSTER_PICKING_1 = {
         },
     },
     'scan_destination_pack': {
+        'ok': {
+            'next_state': 'start_line',
+            'message': {
+                'message_type': 'info',
+                'message': 'Product 5 put in bin #2',
+            },
+            'data': {
+                // next line to process
+                'start_line': {
+                    'id': 2,
+                    'name': 'OP001',
+                    'customer': {
+                        'name': 'Customer 1',
+                    },
+                    'ref': 'SO000CUST001',
+                    'move_line_count': 4,
+                    'pack': {
+                        'qty_on_hand': 10,
+                        'qty': 10,
+                        'name': 'Karton',
+                        'lot': 'THELOT000131'
+                    },
+                    'destination_bin': 'Bin #2',
+                    "location_src": {
+                        "id": 1,
+                        "name":  'Location SRC 2',
+                    },
+                    "location_dst": {
+                        "id": 2,
+                        "name": 'Location DST 2',
+                    },
+                    "product": {"id": 1, "name": 'Product 5'},
+                },
+            },
+        },
+        'ko': {
+            'next_state': 'zero_check',
+            'message': {
+                'message_type': 'info',
+                'message': 'Stock check required',
+            },
+            'data': {
+                'zero_check': {}
+            },
+        },
+    },
+    'stock_is_zero': {
         'next_state': 'start_line',
         'message': {
             'message_type': 'info',
-            'message': 'Product 5 put in bin #2',
+            'message': 'Stock zero confirmed',
         },
         'data': {
             // next line to process
@@ -509,7 +556,6 @@ var DEMO_CLUSTER_PICKING_1 = {
             },
         },
     },
-    'is_zero': {},
     'skip_line': {},
     'stock_issue': {},
     'check_pack_lot': {},

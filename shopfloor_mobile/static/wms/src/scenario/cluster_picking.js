@@ -42,6 +42,10 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
                 ></searchbar>
+            <stock-zero-check
+                v-if="state_is('zero_check')"
+                v-on:action="state.on_action"
+                />
         </Screen>
     `,
     data: function () {
@@ -142,7 +146,24 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             this.odoo.prepare_unload(scanned.text)
                         )
                     },
-                    scan_placeholder: 'Scan location / pack / product / lot',
+                    scan_placeholder: 'Scan destination bin',
+                },
+                'zero_check': {
+                    on_action: (action) => {
+                        this.state['on_' + action].call(this)
+                    },
+                    on_action_confirm_zero: () => {
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.stock_is_zero(true)
+                        )
+                    },
+                    on_action_confirm_not_zero: () => {
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.stock_is_zero(false)
+                        )
+                    },
                 },
                 'show_completion_info': {
                     on_confirm: () => {
