@@ -58,3 +58,27 @@ Vue.component('get-work', {
     </div>
     `,
 })
+
+
+Vue.component('stock-zero-check', {
+    template: `
+    <div class="stock-zero-check">
+      <v-dialog fullscreen tile value=true class="actions fullscreen">
+        <v-card>
+          <div class="button-list button-vertical-list">
+            <v-row align="center">
+              <v-col class="text-center" cols="12">
+                <v-btn depressed x-large color="primary" @click="$emit('action', 'action_confirm_zero')">Confirm stock = 0</v-btn>
+              </v-col>
+            </v-row>
+            <v-row align="center">
+              <v-col class="text-center" cols="12">
+                <v-btn depressed x-large color="warning" @click="$emit('action', 'action_confirm_not_zero')">Confirm stock NOT empty</v-btn>
+              </v-col>
+            </v-row>
+          </div>
+        </v-card>
+      </v-dialog>
+    </div>
+  `
+  })
