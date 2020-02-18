@@ -10,8 +10,10 @@ class ShopfloorApp(Component):
     _description = __doc__
 
     def user_config(self):
-        menus = self.component("menu")._search()
-        profiles = self.component("profile")._search()
+        menu_comp = self.component("menu")
+        profiles_comp = self.component("profile")
+        menus = menu_comp._to_json(menu_comp._search())
+        profiles = profiles_comp._to_json(profiles_comp._search())
         return self._response(data={"menus": menus, "profiles": profiles})
 
 
