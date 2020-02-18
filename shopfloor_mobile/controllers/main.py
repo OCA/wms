@@ -18,6 +18,9 @@ class ShopfloorMobileAppController(http.Controller):
     )
     def load_app_and_assets(self, path_fragment=""):
         # TODO Should be authorized via api.key except for the login ?
+        if path_fragment.endswith('.js.map'):
+            # do not bother us w/ JS maps for now (avoid FileNotFoundError)
+            return http.request.not_found()
         if path_fragment.startswith("src/"):
             # Serving an asset
             payload = os.path.join(self.module_path, "static", "wms", path_fragment)
