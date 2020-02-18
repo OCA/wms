@@ -9,45 +9,64 @@ export var ClusterPicking = Vue.component('cluster-picking', {
             <user-information
                 v-if="!need_confirmation && user_notification.message"
                 v-bind:info="user_notification"
-                ></user-information>
+                />
             <get-work
                 v-if="state_is(initial_state_key)"
                 v-on:get_work="state.on_get_work"
-                v-on:manual_selection="state.on_manual_selection"></get-work>
+                v-on:manual_selection="state.on_manual_selection"
+                />
             <batch-picking-detail
                 v-if="state_is('confirm_start')"
                 :info="state.data"
                 v-on:confirm="state.on_confirm"
                 v-on:cancel="state.on_cancel"
-                ></batch-picking-detail>
+                />
             <batch-picking-line-detail
                 v-if="state_in(['start_line', 'scan_destination'])"
                 :line="erp_data.data['start_line']"
-                ></batch-picking-line-detail>
+                />
             <searchbar
-                v-if="state_is('start_line')"
+                v-if="state_in(['start_line', 'unload_all'])"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
-                ></searchbar>
+                />
             <batch-picking-line-actions
                 v-if="state_is('start_line')"
                 v-on:action="state.on_action"
                 />
-            <div class="qty"
-                 v-if="state_is('scan_destination')">
-                <input-number-spinner :init_value="scan_destination_qty" class="mb-2"/>
+            <div v-if="state_is('scan_destination')">
+                <div class="qty">
+                    <input-number-spinner :init_value="scan_destination_qty" class="mb-2"/>
+                </div>
+                <searchbar
+                    v-on:found="on_scan"
+                    :input_placeholder="search_input_placeholder"
+                    />
+                <div class="full-bin text-center">
+                    <v-btn depressed color="warning" @click="state.on_action_full_bin">
+                        Full bin
+                    </v-btn>
+                </div>
             </div>
-            <searchbar
-                v-if="state_is('scan_destination')"
-                v-on:found="on_scan"
-                :input_placeholder="search_input_placeholder"
-                ></searchbar>
             <stock-zero-check
                 v-if="state_is('zero_check')"
                 v-on:action="state.on_action"
                 />
         </Screen>
     `,
+    computed: {
+        batch_id: function () {
+            return this.erp_data.data.confirm_start.id
+        },
+    },
+    methods: {
+        action_full_bin: function () {
+            this.go_state(
+                'wait_call',
+                this.odoo.prepare_unload(this.batch_id)
+            )
+        },
+    },
     data: function () {
         return {
             'usage': 'cluster_picking',
@@ -112,11 +131,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                         this.state['on_' + action].call(this)
                     },
                     on_action_full_bin: () => {
-                        console.log('full bin TODO')
-                        // this.go_state(
-                        //     'wait_call',
-                        //     this.odoo.prepare_unload(scanned.text)
-                        // )
+                        this.action_full_bin()
                     },
                     on_action_skip_line: () => {
                         console.log('skip line TODO')
@@ -139,6 +154,9 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             this.odoo.scan_destination_pack(
                                 this.state.data, scanned.text, this.scan_destination_qty)
                         )
+                    },
+                    on_action_full_bin: () => {
+                        this.action_full_bin()
                     },
                     on_button_action: () => {
                         this.go_state(
@@ -164,6 +182,16 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             this.odoo.stock_is_zero(false)
                         )
                     },
+                },
+                'unload_all': {
+                    on_scan: (scanned) => {
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.set_destination_all(
+                                this.state.data, scanned.text)
+                        )
+                    },
+                    scan_placeholder: 'Scan location',
                 },
                 'show_completion_info': {
                     on_confirm: () => {
