@@ -39,10 +39,9 @@ export var ScenarioBaseMixin = {
         Full object of current state
         */
         state: function () {
-            let state_data = _.result(this.erp_data.data, this.current_state_key, {})
             let state = {
                 'key': this.current_state_key,
-                'data': state_data,
+                'data': this._state_get_data_raw(this.current_state_key),
             }
             _.extend(state, this.states[this.current_state_key])
             return state
@@ -60,6 +59,18 @@ export var ScenarioBaseMixin = {
         },
         state_in: function(state_keys) {
             return _.filter(state_keys, this.state_is).length > 0;
+        },
+        _state_get_data_raw: function(state_key) {
+            return _.result(this.erp_data.data, state_key, {})
+        },
+        state_get_data: function(state_key) {
+            state_key = _.isUndefined(state_key) ? this.current_state_key : state_key
+            return this._state_get_data_raw(state_key)
+        },
+        state_set_data: function(data, state_key) {
+            state_key = _.isUndefined(state_key) ? this.current_state_key : state_key
+            let new_data = _.merge(this._state_get_data_raw(state_key), data)
+            this.$set(this.erp_data.data, state_key, new_data)
         },
         // generic states methods
         go_state: function(state_key, promise) {
