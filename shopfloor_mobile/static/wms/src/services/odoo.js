@@ -5,13 +5,17 @@ export class OdooMixin {
 
     constructor(params) {
         this.params = params;
-        this.usage = params.usage;
-        this.process_id = this.params.process_id;
-        this.process_menu_id = this.params.process_menu_id;
+        this.usage = params.usage
+        this.process_id = this.params.process_id
+        this.process_menu_id = this.params.process_menu_id
+        this.debug = this.params.debug
     }
-
+    call(path, data, method='POST', fullpath=false) {
+        let endpoint = fullpath ? path : this.usage + '/' + path
+        return this._call(endpoint, data, method)
+    }
     _call(endpoint, method, data) {
-        console.log('CALL', endpoint);
+        if (this.debug) console.log('CALL', endpoint)
         let self = this;
         let params = {
             method: method,
@@ -77,32 +81,9 @@ export class OdooMixin {
 
 export class OdooMocked extends OdooMixin{
 
-    start (barcode) {
-        console.log('Fetch', barcode);
-        window.DEMO_CASE = window.DEMO_CASES[this.usage][barcode];
-        let res = window.DEMO_CASE['fetch'];
-        console.log(res);
-        return Promise.resolve(res)
-        // return this._call('start', 'POST', {'barcode': barcode})
-    }
-    validate (operation, confirmed) {
-        console.log('Validate', operation);
-        let res = window.DEMO_CASE['validate'];
-        if (operation.location_barcode in window.DEMO_CASE)
-            res = window.DEMO_CASE[operation.location_barcode]
-        console.log(res);
-        return Promise.resolve(res)
-    }
-    cancel(id) {
-        console.log('Cancelling', id);
-        let res = window.DEMO_CASE['cancel'];
-        console.log(res);
-        return Promise.resolve(res)
-    }
-    scan_location (barcode) {
-        if (_.isEmpty(window.DEMO_CASE))
-            window.DEMO_CASE = window.DEMO_CASES[this.usage][barcode]
-        return Promise.resolve(window.DEMO_CASE['scan_loc'])
+    start (data) {
+        window.DEMO_CASE = window.DEMO_CASES[this.usage][data.barcode]
+        return Promise.resolve(window.DEMO_CASE['start'])
     }
     scan_anything (barcode) {
         console.log('Scan anything', barcode, this.usage);
@@ -116,111 +97,54 @@ export class OdooMocked extends OdooMixin{
         // console.log(res);
         return Promise.resolve(res)
     }
-    // picking_load_trip
-    find_batch () {
-        console.log('find_batch', this.usage);
+    call(path, data, method='POST', fullpath=false) {
+        console.log('CALL:', path, this.usage);
+        if (!_.isUndefined(this[path])) {
+            // provide your own mock by enpoint
+            return this[path].call(this, data)
+        }
+        if (!_.isUndefined(this[this.usage + '_' + path])) {
+            // provide your own mock by enpoint and specific process
+            return this[this.usage + '_' + path].call(this, data)
+        }
         if (_.isEmpty(window.DEMO_CASE))
+            // no demo case picked yet, find by process
             window.DEMO_CASE = window.DEMO_CASES[this.usage]
-        return Promise.resolve(window.DEMO_CASE['find_batch'])
-    }
-    picking_batch () {
-        console.log('picking_batch', this.usage);
-        throw '.picking_batch NOT IMPLEMENTED!'
-    }
-    confirm_start () {
-        console.log('confirm_start', this.usage);
-        return Promise.resolve(window.DEMO_CASE['confirm_start'])
-    }
-    unassign () {
-        console.log('unassign', this.usage);
-        return Promise.resolve(window.DEMO_CASE['unassign'])
-    }
-    scan_line () {
-        console.log('scan_line', this.usage);
-        return Promise.resolve(window.DEMO_CASE['scan_line'])
-    }
-    scan_destination_pack (data, barcode, qty) {
-        console.log('scan_destination_pack', this.usage);
-        let result = window.DEMO_CASE['scan_destination_pack']
+        let result
+        let barcode = data.barcode || data.location_barcode
+        if (_.has(window.DEMO_CASE, barcode)) {
+            // pick a specific case for this barcode
+            result = window.DEMO_CASE[barcode]
+        }
+        if (_.has(window.DEMO_CASE, path)) {
+            // pick general case for this path
+            result = window.DEMO_CASE[path]
+        }
         if (_.has(result, barcode)) {
+            // pick specific barcode case inside path case
             result = result[barcode]
-        } else {
+        }
+        if (_.has(result, 'ok')) {
+            // pick the case were you have good or bad result
             result = result['ok']
         }
-        return Promise.resolve(result)
-    }
-    prepare_unload () {
-        console.log('prepare_unload', this.usage);
-        let result = window.DEMO_CASE['prepare_unload']
-        return Promise.resolve(result)
-    }
-    select () {
-        console.log('select', this.usage);
-        throw '.select NOT IMPLEMENTED!'
-    }
-    stock_is_zero (status) {
-        console.log('stock_is_zero', this.usage);
-        let result = window.DEMO_CASE['stock_is_zero']
-        let key = status ? 'yes' : 'no'
-        if (_.has(result, key)) {
-            result = result[status]
+        if (!result) {
+            throw 'NOT IMPLEMENTED: ' + path
         }
         return Promise.resolve(result)
     }
-
 }
 
 
 export class Odoo extends OdooMixin{
 
+    // TODO: review and drop very specific methods, move calls to specific components
     start (barcode) {
-        return this._call(this.usage + '/start', 'POST', {'barcode': barcode})
-    }
-    validate (operation, confirmed) {
-        console.log('Validate', operation);
-        let data = {
-            'package_level_id': operation.id, 'location_barcode': operation.location_barcode
-        }
-        if (!_.isUndefined(confirmed))
-            data['confirmation'] = true;
-        return this._call(this.usage + '/validate', 'POST', data)
-    }
-    cancel(id) {
-        console.log('Cancelling', id);
-        return this._call(this.usage + '/cancel', 'POST', {'barcode': barcode})
-    }
-    scan_location (barcode) {
-        return this._call(this.usage + '/scan_location', 'POST', {'barcode': barcode})
+        return this.call('start', 'POST', {'barcode': barcode})
     }
     scan_anything (barcode) {
         console.log('Scan anything', barcode, this.usage);
         throw 'NOT IMPLEMENTED!'
-    }
-    // picking_load_trip
-    find_batch () {
-        throw '.find_batch NOT IMPLEMENTED!'
-    }
-    picking_batch () {
-        throw '.picking_batch NOT IMPLEMENTED!'
-    }
-    unassign () {
-        throw '.unassign NOT IMPLEMENTED!'
-    }
-    scan_line () {
-        throw '.scan_line NOT IMPLEMENTED!'
-    }
-    scan_destination_pack () {
-        throw '.scan_destination_pack NOT IMPLEMENTED!'
-    }
-    prepare_unload () {
-        throw '.prepare_unload NOT IMPLEMENTED!'
-    }
-    select () {
-        throw '.select NOT IMPLEMENTED!'
-    }
-    stock_is_zero (status) {
-        console.log('stock_is_zero', this.usage);
-        throw '.stock_is_zero NOT IMPLEMENTED!'
     }
 
 }

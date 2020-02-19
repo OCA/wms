@@ -26,6 +26,7 @@ export var ScenarioBaseMixin = {
             "process_id": this.menuItem.process.id,
             "process_menu_id": this.menuItem.id,
             "usage": this.usage,
+            "debug": this.$root.demo_mode
         }
         if (this.$root.demo_mode)
             this.odoo = new OdooMocked(odoo_params)
@@ -155,7 +156,7 @@ export var GenericStatesMixin = {
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.start(scanned.text)
+                            this.odoo.call('start', {'barcode': scanned.text})
                         )
                     },
                     scan_placeholder: 'Scan pack',
@@ -168,7 +169,7 @@ export var GenericStatesMixin = {
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.start(scanned.text)
+                            this.odoo.call('start', {'barcode': scanned.text})
                         )
                     },
                     scan_placeholder: 'Scan pack or location',
@@ -186,17 +187,22 @@ export var GenericStatesMixin = {
                     }
                 },
                 'scan_location': {
-                    enter: () => {
-                        this.state.data.location_barcode = false
-                    },
                     on_scan: (scanned) => {
                         this.state.data.location_barcode = scanned.text
                         this.go_state('wait_validation',
-                            this.odoo.validate(this.state.data))
+                            this.odoo.call('validate', {
+                                'package_level_id': this.state.data.id,
+                                'location_barcode': scanned.text,
+                                'confirmation': false,
+                            })
+                        )
                     },
                     on_cancel: () => {
                         this.go_state('wait_cancel',
-                            this.odoo.cancel(this.state.data))
+                            this.odoo.call('cancel', {
+                                'package_level_id': this.state.data.id,
+                            })
+                        )
                     },
                     scan_placeholder: 'Scan location',
                     show_cancel_button: true
@@ -220,9 +226,14 @@ export var GenericStatesMixin = {
                 'confirm_location': {
                     on_user_confirm: (answer) => {
                         if (answer == 'yes'){
-                            this.go_state(
-                                'wait_call',
-                                this.odoo.confirm_start(this.state.data, true)
+                            this.go_state('wait_validation',
+                                this.odoo.call('validate', {
+                                    // TODO: here the pkg level comes from the scan_location state
+                                    // this could be improved
+                                    'package_level_id': this.erp_data.data.scan_location.id,
+                                    'location_barcode': scanned.text,
+                                    'confirmation': true,
+                                })
                             )
                         } else {
                             this.go_state('scan_location')
@@ -232,7 +243,8 @@ export var GenericStatesMixin = {
                         this.on_exit()
                         this.current_state_key = 'scan_location'
                         this.state.on_scan(scanned)
-                    }
+                    },
+                    scan_placeholder: 'Scan location',
                 },
                 'confirm_start': {
                     enter: () => {
@@ -252,7 +264,8 @@ export var GenericStatesMixin = {
                         this.on_exit()
                         this.current_state_key = 'scan_location'
                         this.state.on_scan(scanned)
-                    }
+                    },
+                    scan_placeholder: 'Scan location',
                 },
             }
         }
