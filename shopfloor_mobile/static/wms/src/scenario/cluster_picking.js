@@ -63,7 +63,9 @@ export var ClusterPicking = Vue.component('cluster-picking', {
         action_full_bin: function () {
             this.go_state(
                 'wait_call',
-                this.odoo.prepare_unload(this.batch_id)
+                this.odoo.call('prepare_unload', {
+                    'picking_batch_id': this.batch_id,
+                })
             )
         },
     },
@@ -81,13 +83,13 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_get_work: (evt) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.find_batch()
+                            this.odoo.call('find_batch', this.state.data)
                         )
                     },
                     on_manual_selection: (evt) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.picking_batch()
+                            this.odoo.call('picking_batch', this.state.data)
                         )
                     },
                 },
@@ -98,7 +100,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_select: (selected) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.select(selected)
+                            this.odoo.call('select', this.state.data)
                         )
                     },
                 },
@@ -106,13 +108,13 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_confirm: () => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.confirm_start(this.state.data)
+                            this.odoo.call('confirm_start', this.state.data)
                         )
                     },
                     on_cancel: () => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.unassign(this.state.data)
+                            this.odoo.call('unassign', this.state.data)
                         )
                     } 
                 },
@@ -122,7 +124,10 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.scan_line(this.state.data, scanned.text)
+                            this.odoo.call('scan_line', {
+                                'move_line_id': this.state.data.id,
+                                'barcode': scanned.text,
+                            })
                         )
                     },
                     scan_placeholder: 'Scan location / pack / product / lot',
@@ -140,7 +145,12 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                         console.log('stock out TODO')
                     },
                     on_action_change_pack_or_lot: () => {
-                        console.log('change pack or lot TODO')
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.call('change_pack_lot', {
+                                'move_line_id': this.state.data.id,
+                            })
+                        )
                     },
                 },
                 'scan_destination': {
@@ -151,18 +161,15 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.scan_destination_pack(
-                                this.state.data, scanned.text, this.scan_destination_qty)
+                            this.odoo.call('scan_destination_pack', {
+                                'move_line_id': this.state.data.id,
+                                'barcode': scanned.text,
+                                'qty': this.scan_destination_qty,
+                            })
                         )
                     },
                     on_action_full_bin: () => {
                         this.action_full_bin()
-                    },
-                    on_button_action: () => {
-                        this.go_state(
-                            'wait_call',
-                            this.odoo.prepare_unload(scanned.text)
-                        )
                     },
                     scan_placeholder: 'Scan destination bin',
                 },
@@ -173,13 +180,19 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_action_confirm_zero: () => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.stock_is_zero(true)
+                            this.odoo.call('is_zero', {
+                                'move_line_id': this.state.data.id,
+                                'zero': true
+                            })
                         )
                     },
                     on_action_confirm_not_zero: () => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.stock_is_zero(false)
+                            this.odoo.call('is_zero', {
+                                'move_line_id': this.state.data.id,
+                                'zero': false
+                            })
                         )
                     },
                 },
@@ -187,17 +200,81 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.set_destination_all(
-                                this.state.data, scanned.text)
+                            this.odoo.call('set_destination_all', {
+                                'picking_batch_id': this.batch_id,
+                                'barcode': scanned.text,
+                            })
+                        )
+                    },
+                    on_action_split: () => {
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.call('unload_split', {
+                                'picking_batch_id': this.batch_id,
+                                'barcode': scanned.text, // TODO: should get barcode -> which one? See py specs
+                            })
+                        )
+                    },
+                    scan_placeholder: 'Scan location',
+                },
+                'unload_single': {
+                    on_scan: (scanned) => {
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.call('unload_scan_pack', {
+                                'package_id': null, // FIXME: where does it come from? backend data?
+                                'barcode': scanned.text,
+                            })
+                        )
+                    },
+                    scan_placeholder: 'Scan location',
+                },
+                'unload_set_destination': {
+                    on_scan: (scanned) => {
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.call('unload_scan_destination', {
+                                'package_id': null, // FIXME: where does it come from? backend data?
+                                'barcode': scanned.text,
+                            })
+                        )
+                    },
+                    scan_placeholder: 'Scan location',
+                },
+                'confirm_unload_set_destination': {
+                    on_scan: (scanned) => {
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.call('unload_scan_destination', {
+                                'package_id': null, // FIXME: where does it come from? backend data?
+                                'barcode': scanned.text,
+                                'confirmation': true,
+                            })
                         )
                     },
                     scan_placeholder: 'Scan location',
                 },
                 'show_completion_info': {
                     on_confirm: () => {
-                        // TODO: turn the cone?
-                        this.go_state('start')
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.call('unload_router', {
+                                'picking_batch_id': this.batch_id,
+                            })
+                        )
                     },
+                },
+                'change_pack_lot': {
+                    on_scan: (scanned) => {
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.call('change_pack_lot', {
+                                'move_line_id': this.state.data.id,
+                                'barcode': scanned.text,
+                            })
+                        )
+                    },
+                    scan_placeholder: 'Scan pack or lot',
                 },
             }
         }
