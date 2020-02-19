@@ -26,7 +26,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 :line="erp_data.data['start_line']"
                 />
             <searchbar
-                v-if="state_in(['start_line', 'unload_all'])"
+                v-if="state_in(['start_line', 'unload_all', 'confirm_unload_all'])"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
                 />
@@ -52,6 +52,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 v-if="state_is('zero_check')"
                 v-on:action="state.on_action"
                 />
+
         </Screen>
     `,
     computed: {
@@ -116,7 +117,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             'wait_call',
                             this.odoo.call('unassign', this.state.data)
                         )
-                    } 
+                    }
                 },
                 'start_line': {
                     // here we have to use some info sent back from `select`
@@ -197,12 +198,14 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     },
                 },
                 'unload_all': {
-                    on_scan: (scanned) => {
+                    on_scan: (scanned, confirmation=false) => {
+                        this.state_set_data({'location_barcode': scanned.text})
                         this.go_state(
                             'wait_call',
                             this.odoo.call('set_destination_all', {
                                 'picking_batch_id': this.batch_id,
                                 'barcode': scanned.text,
+                                'confirmation': confirmation,
                             })
                         )
                     },
@@ -214,6 +217,26 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                                 'barcode': scanned.text, // TODO: should get barcode -> which one? See py specs
                             })
                         )
+                    },
+                    scan_placeholder: 'Scan location',
+                },
+                'confirm_unload_all': {
+                    on_user_confirm: (answer) => {
+                        // TODO: check if this used
+                        //-> no flag is set to enable the confirmation dialog,
+                        // we only display a message, unlike `confirm_start`
+                        if (answer == 'yes'){
+                            // reuse data from unload_all
+                            let scan_data = this.state_get_data('unload_all')
+                            this.state.on_scan(scan_data.location_barcode, true)
+                        } else {
+                            this.go_state('scan_location')
+                        }
+                    },
+                    on_scan: (scanned, confirmation=true) => {
+                        this.on_exit()
+                        this.current_state_key = 'unload_all'
+                        this.state.on_scan(scanned, confirmation)
                     },
                     scan_placeholder: 'Scan location',
                 },

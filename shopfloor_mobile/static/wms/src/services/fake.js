@@ -571,7 +571,54 @@ var DEMO_CLUSTER_PICKING_1 = {
             'unload_all': {}
         },
     },
-    'set_destination_all': {},
+    'set_destination_all': {
+        'OK': {
+            'next_state': 'start_line',
+            'message': {
+                'message_type': 'info',
+                'message': 'Destination set',
+            },
+            'data': {
+                // next line to process
+                'start_line': {
+                    'id': 3,
+                    'name': 'OP003',
+                    'customer': {
+                        'name': 'Customer 3',
+                    },
+                    'ref': 'SO000CUST001',
+                    'move_line_count': 4,
+                    'pack': {
+                        'qty_on_hand': 10,
+                        'qty': 10,
+                        'name': 'Karton',
+                        'lot': 'THELOT000131'
+                    },
+                    'destination_bin': 'Bin #2',
+                    "location_src": {
+                        "id": 1,
+                        "name":  'Location SRC 2',
+                    },
+                    "location_dst": {
+                        "id": 2,
+                        "name": 'Location DST 2',
+                    },
+                    "product": {"id": 1, "name": 'Product 5'},
+                },
+            },
+        },
+        'KO': {
+            'next_state': 'confirm_unload_all',
+            'data': {
+                // next line to process
+                'unload_all': {}
+            },
+            'message': {
+                'message_type': 'warning',
+                'message': 'Confirm you want to unload them all?',
+            },
+        },
+    },
     'unload_split': {},
     'unload_scan_pack': {},
     'unload_scan_destination': {},
