@@ -1,5 +1,11 @@
 export var batch_picking_line = Vue.component('batch-picking-line-detail', {
-  props:['line'],
+  props: {
+      'line': Object,
+      'showFullInfo': {
+          'type': Boolean,
+          'default': true,
+      },
+  },
   data () {
     return {
       dialog: false,
@@ -13,11 +19,11 @@ export var batch_picking_line = Vue.component('batch-picking-line-detail', {
         <span class="ref">{{ line.ref }}</span> - <span class="ref">{{ line.customer.name }}</span>
       </v-card-subtitle>
       <v-card-text>
-        <span class="source">{{ line.location_dst.name }}</span>
+        <span class="source">{{ line.location_src.name }}</span>
       </v-card-text>
     </v-card>
 
-    <v-card outlined>
+    <v-card outlined v-if="showFullInfo">
       <v-card-title>{{ line.product.name }}</v-card-title>
       <v-card-text>
         <ul>
@@ -36,6 +42,7 @@ export var batch_picking_line = Vue.component('batch-picking-line-detail', {
 
 
 export var batch_picking_line_actions = Vue.component('batch-picking-line-actions', {
+  props:['line'],
   data () {
     return {
       dialog: false,
@@ -45,10 +52,16 @@ export var batch_picking_line_actions = Vue.component('batch-picking-line-action
   <div class="batch-picking-line-actions">
     <v-dialog v-model="dialog" fullscreen tile class="actions fullscreen text-center">
       <template v-slot:activator="{ on }">
-        <v-btn depressed color="primary" dark v-on="on">Action</v-btn>
+        <div class="button-list button-vertical-list full">
+          <v-row align="center" :no-gutters=true>
+            <v-col class="text-center" cols="12">
+              <v-btn depressed color="primary" dark v-on="on">Action</v-btn>
+            </v-col>
+          </v-row>
+        </div>
       </template>
       <v-card>
-        <div class="button-list button-vertical-list">
+        <div class="button-list button-vertical-list full">
           <v-row align="center">
             <v-col class="text-center" cols="12">
               <v-btn depressed x-large color="primary" @click="$emit('action', 'action_full_bin')">Go to destination - full bin(s)</v-btn>
@@ -61,7 +74,8 @@ export var batch_picking_line_actions = Vue.component('batch-picking-line-action
           </v-row>
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <v-btn depressed x-large color="primary" @click="$emit('action', 'action_stock_out')">Declare stock out</v-btn>
+              <v-btn depressed x-large color="primary"
+                  @click="$emit('action', 'action_stock_out')">Declare stock out</v-btn>
             </v-col>
           </v-row>
           <v-row align="center">
@@ -82,3 +96,23 @@ export var batch_picking_line_actions = Vue.component('batch-picking-line-action
 })
 
 
+export var batch_picking_line_stock_out = Vue.component('batch-picking-line-stock-out', {
+  props:['line'],
+  template: `
+    <div class="batch-picking-line-stock-out">
+      <batch-picking-line-detail :line="line" :showFullInfo="false" />
+      <div class="button-list button-vertical-list full">
+        <v-row align="center">
+          <v-col class="text-center" cols="12">
+            <v-btn depressed x-large color="primary" @click="$emit('action', 'confirm_stock_issue')">Confirm stock = 0</v-btn>
+          </v-col>
+        </v-row>
+        <v-row align="center">
+          <v-col class="text-center" cols="12">
+            <v-btn depressed x-large color="default" @click="$emit('action', 'back')">back</v-btn>
+          </v-col>
+        </v-row>
+      </div>
+    </div>
+`
+})
