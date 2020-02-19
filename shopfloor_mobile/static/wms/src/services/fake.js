@@ -1,12 +1,12 @@
 /* eslint no-use-before-define: 0 */  // --> OFF
 var CANCEL_MSG_DEFAULT = {
-    'body': 'Operation cancelled',
+    'message': 'Operation cancelled',
     'message_type': 'info',
 }
 
 
 var DEMO_SINGLE_PUTAWAY_1 = {
-    'fetch' : {
+    'start' : {
         "data": {
             "scan_location": {
                 "id": 1,
@@ -30,7 +30,7 @@ var DEMO_SINGLE_PUTAWAY_1 = {
         "data": undefined,
         "next_state": "start_scan_pack",
         "message": {
-            'body': 'Pack validated',
+            'message': 'Pack validated',
             'message_type': 'info',
         }
     },
@@ -41,21 +41,21 @@ var DEMO_SINGLE_PUTAWAY_1 = {
 }
 
 var DEMO_SINGLE_PUTAWAY_2 = {
-    'fetch' : {
+    'start' : {
         "data": undefined,
         "next_state": "start_scan_pack",
         "message": {"message_type": "error", "message": "You cannot do that!"}
     },
 }
 var DEMO_SINGLE_PUTAWAY_3 = {
-    'fetch' : {
+    'start' : {
         "data": undefined,
         "next_state": "start_scan_pack",
         "message": {"message_type": "error", "message": "No pkg found"}
     },
 }
 var DEMO_SINGLE_PUTAWAY_4 = {
-    'fetch' : {
+    'start' : {
         "data": {
             "confirm_start": {
                 "id": 1,
@@ -79,13 +79,17 @@ var DEMO_SINGLE_PUTAWAY_4 = {
         "data": undefined,
         "next_state": "start_scan_pack",
         "message": {
-            'body': 'Pack validated',
+            'message': 'Pack validated',
             'message_type': 'info',
         }
     },
+    'cancel' : {
+        "next_state": "start",
+        "message": CANCEL_MSG_DEFAULT
+    }
 }
 var DEMO_SINGLE_PUTAWAY_5 = {
-    'fetch' : {
+    'start' : {
         "data": {
             "scan_location": {
                 "id": 1,
@@ -113,13 +117,13 @@ var DEMO_SINGLE_PUTAWAY_5 = {
         "data": undefined,
         "next_state": "start_scan_pack",
         "message": {
-            'body': 'Pack validated',
+            'message': 'Pack validated',
             'message_type': 'info',
         }
     },
 }
 var DEMO_SINGLE_PUTAWAY_6 = {
-    'fetch' : {
+    'start' : {
         "data": {
             "scan_location": {
                 "id": 1,
@@ -148,13 +152,13 @@ var DEMO_SINGLE_PUTAWAY_6 = {
         "data": undefined,
         "next_state": "start_scan_pack",
         "message": {
-            'body': 'Pack validated',
+            'message': 'Pack validated',
             'message_type': 'info',
         }
     },
 }
 var DEMO_SINGLE_PUTAWAY_7 = {
-    'fetch' : {
+    'start' : {
         "data": {
             "scan_location": {
                 "id": 1,
@@ -183,7 +187,7 @@ var DEMO_SINGLE_PUTAWAY_7 = {
         "data": undefined,
         "next_state": "start_scan_pack",
         "message": {
-            'body': 'Pack validated',
+            'message': 'Pack validated',
             'message_type': 'info',
         }
     },
@@ -210,7 +214,7 @@ var PACK_1 = {
 }
 
 var DEMO_SCAN_ANYTHING_PACK = {
-    'fetch' : {
+    'start' : {
         "data": {
             "show_detail_info": {
                 "type": "pack",
@@ -232,7 +236,7 @@ var DEMO_SCAN_ANYTHING_PACK = {
     },
 }
 var DEMO_SCAN_ANYTHING_PRODUCT = {
-    'fetch' : {
+    'start' : {
         "data": {
             "show_detail_info": {
                 "type": "product",
@@ -257,7 +261,7 @@ var DEMO_SCAN_ANYTHING_PRODUCT = {
     "message": undefined
 }
 var DEMO_SCAN_ANYTHING_LOCATION = {
-    'fetch' : {
+    'start' : {
         "data": {
             "show_detail_info": {
             "type": "location",
@@ -297,7 +301,7 @@ var DEMO_SCAN_ANYTHING_LOCATION = {
 }
 
 var DEMO_SCAN_ANYTHING_OPERATION = {
-    'fetch' : {
+    'start' : {
         "data": {
             "show_detail_info": {
                 "type": "operation",
@@ -338,7 +342,7 @@ var DEMO_SCAN_ANYTHING_OPERATION = {
 }
 
 var DEMO_SINGLE_PACK_TRANSFER_1 = {
-    'fetch' : {
+    'start' : {
         "data": {
             "scan_location": {
                 "type": "pack",
@@ -363,7 +367,7 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
         "data": undefined,
         "next_state": "start",
         "message": {
-            'body': 'Pack validated',
+            'message': 'Pack validated',
             'message_type': 'info',
         }
     },
@@ -375,25 +379,25 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
         "data": undefined,
         "next_state": "start",
         "message": {
-            'body': 'Pack validated',
+            'message': 'Pack validated',
             'message_type': 'info',
         }
     },
     'LOC2' : {
         "data": {
-            "last_operation": {
+            "show_completion_info": {
                 'last_operation_name': 'Last operation XYZ',
                 'next_operation_name': 'Next operation XYZ',
             },
         },
-        "next_state": "last_operation",
+        "next_state": "show_completion_info",
         "message": {}
     },
     'LOC3' : {
         "data": undefined,
         "next_state": "start",
         "message": {
-            'body': 'Pack validated',
+            'message': 'Pack validated',
             'message_type': 'info',
         }
     },
