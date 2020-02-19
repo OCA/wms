@@ -23,7 +23,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 />
             <batch-picking-line-detail
                 v-if="state_in(['start_line', 'scan_destination'])"
-                :line="erp_data.data['start_line']"
+                :line="state_get_data('start_line')"
                 />
             <searchbar
                 v-if="state_in(['start_line', 'unload_all', 'confirm_unload_all'])"
@@ -33,6 +33,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
             <batch-picking-line-actions
                 v-if="state_is('start_line')"
                 v-on:action="state.on_action"
+                :line="state_get_data('start_line')"
                 />
             <div v-if="state_is('scan_destination')">
                 <div class="qty">
@@ -52,7 +53,11 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 v-if="state_is('zero_check')"
                 v-on:action="state.on_action"
                 />
-
+            <batch-picking-line-stock-out
+                v-if="state_is('stock_issue')"
+                v-on:action="state.on_action"
+                :line="state.data"
+                />
         </Screen>
     `,
     computed: {
@@ -84,6 +89,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_get_work: (evt) => {
                         this.go_state(
                             'wait_call',
+                            // TODO: for all the calls do not pass state.data, pass what is required
                             this.odoo.call('find_batch', this.state.data)
                         )
                     },
@@ -148,7 +154,8 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                         )
                     },
                     on_action_stock_out: () => {
-                        console.log('stock out TODO')
+                        this.state_set_data(this.state.data, 'stock_issue')
+                        this.go_state('stock_issue')
                     },
                     on_action_change_pack_or_lot: () => {
                         this.go_state(
@@ -303,6 +310,27 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                         )
                     },
                     scan_placeholder: 'Scan pack or lot',
+                },
+                'stock_issue': {
+                    enter: () => {
+                        this.reset_notification()
+                    },
+                    on_action: (action) => {
+                        this.state['on_' + action].call(this)
+                    },
+                    on_confirm_stock_issue: () => {
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.call('stock_issue', {
+                                'move_line_id': this.state.data.id,
+                            })
+                        )
+                    },
+                    on_back: () => {
+                        this.state_set_data({})
+                        this.reset_notification()
+                        this.go_state('start_line')
+                    },
                 },
             }
         }
