@@ -81,24 +81,14 @@ export class OdooMixin {
 
 export class OdooMocked extends OdooMixin{
 
-    start (data) {
-        window.DEMO_CASE = window.DEMO_CASES[this.usage][data.barcode]
-        return Promise.resolve(window.DEMO_CASE['start'])
-    }
-    scan_anything (barcode) {
-        console.log('Scan anything', barcode, this.usage);
-        window.DEMO_CASE = window.DEMO_CASES[this.usage][barcode]
-        if (!window.DEMO_CASE) {
-            return Promise.resolve({
-                "message": {"message_type": "error", "message": "Unknown barcode"}
-            })
-        }
-        let res = window.DEMO_CASE['fetch'];
-        // console.log(res);
-        return Promise.resolve(res)
+    constructor(params) {
+        super(params)
+        this.demo_data = window.DEMO_CASES[this.usage]
+        window.DEMO_CASE = window.DEMO_CASES[this.usage]
     }
     call(path, data, method='POST', fullpath=false) {
         console.log('CALL:', path, this.usage);
+        console.dir('CALL data:', data);
         if (!_.isUndefined(this[path])) {
             // provide your own mock by enpoint
             return this[path].call(this, data)
@@ -107,9 +97,6 @@ export class OdooMocked extends OdooMixin{
             // provide your own mock by enpoint and specific process
             return this[this.usage + '_' + path].call(this, data)
         }
-        if (_.isEmpty(window.DEMO_CASE))
-            // no demo case picked yet, find by process
-            window.DEMO_CASE = window.DEMO_CASES[this.usage]
         let result
         let barcode = data.barcode || data.location_barcode
         if (_.has(window.DEMO_CASE, barcode)) {
@@ -130,6 +117,32 @@ export class OdooMocked extends OdooMixin{
         }
         if (!result) {
             throw 'NOT IMPLEMENTED: ' + path
+        }
+        console.dir('CALL RETURN data:', result);
+        return Promise.resolve(result)
+    }
+    start (data) {
+        window.DEMO_CASE = this.demo_data[data.barcode]
+        return Promise.resolve(window.DEMO_CASE['start'])
+    }
+    scan_anything (barcode) {
+        console.log('Scan anything', barcode, this.usage);
+        window.DEMO_CASE = this.demo_data[this.usage][barcode]
+        if (!window.DEMO_CASE) {
+            return Promise.resolve({
+                "message": {"message_type": "error", "message": "Unknown barcode"}
+            })
+        }
+        let res = window.DEMO_CASE['fetch'];
+        // console.log(res);
+        return Promise.resolve(res)
+    }
+    cluster_picking_set_destination_all (data) {
+        let result = this.demo_data['set_destination_all']
+        if (data.confirmation) {
+            result = result['OK']
+        } else {
+            result = result['KO']
         }
         return Promise.resolve(result)
     }
