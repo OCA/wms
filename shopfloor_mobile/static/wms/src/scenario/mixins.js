@@ -198,13 +198,13 @@ export var GenericStatesMixin = {
                     }
                 },
                 'scan_location': {
-                    on_scan: (scanned) => {
-                        this.state.data.location_barcode = scanned.text
+                    on_scan: (scanned, confirmation=false) => {
+                        this.state_set_data({'location_barcode': scanned.text})
                         this.go_state('wait_validation',
                             this.odoo.call('validate', {
                                 'package_level_id': this.state.data.id,
                                 'location_barcode': scanned.text,
-                                'confirmation': false,
+                                'confirmation': confirmation,
                             })
                         )
                     },
@@ -236,24 +236,21 @@ export var GenericStatesMixin = {
                 },
                 'confirm_location': {
                     on_user_confirm: (answer) => {
+                        // TODO: check if this used
+                        //-> no flag is set to enable the confirmation dialog,
+                        // we only display a message, unlike `confirm_start`
                         if (answer == 'yes'){
-                            this.go_state('wait_validation',
-                                this.odoo.call('validate', {
-                                    // TODO: here the pkg level comes from the scan_location state
-                                    // this could be improved
-                                    'package_level_id': this.erp_data.data.scan_location.id,
-                                    'location_barcode': scanned.text,
-                                    'confirmation': true,
-                                })
-                            )
+                            // reuse data from scan_location
+                            let scan_data = this.state_get_data('scan_location')
+                            this.state.on_scan(scan_data.location_barcode, true)
                         } else {
                             this.go_state('scan_location')
                         }
                     },
-                    on_scan: (scanned) => {
+                    on_scan: (scanned, confirmation=true) => {
                         this.on_exit()
                         this.current_state_key = 'scan_location'
-                        this.state.on_scan(scanned)
+                        this.state.on_scan(scanned, confirmation)
                     },
                     scan_placeholder: 'Scan location',
                 },
