@@ -140,7 +140,12 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                         this.action_full_bin()
                     },
                     on_action_skip_line: () => {
-                        console.log('skip line TODO')
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.call('skip_line', {
+                                'move_line_id': this.state.data.id,
+                            })
+                        )
                     },
                     on_action_stock_out: () => {
                         console.log('stock out TODO')
