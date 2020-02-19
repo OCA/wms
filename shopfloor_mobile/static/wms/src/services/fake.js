@@ -4,7 +4,6 @@ var CANCEL_MSG_DEFAULT = {
     'message_type': 'info',
 }
 
-
 var DEMO_SINGLE_PUTAWAY_1 = {
     'start' : {
         "data": {
@@ -561,7 +560,41 @@ var DEMO_CLUSTER_PICKING_1 = {
             },
         },
     },
-    'skip_line': {},
+    'skip_line': {
+        'next_state': 'start_line',
+        'message': {
+            'message_type': 'info',
+            'message': 'Line skipped',
+        },
+        'data': {
+            // next line to process
+            'start_line': {
+                'id': 5,
+                'name': 'OP005',
+                'customer': {
+                    'name': 'Customer 4',
+                },
+                'ref': 'SO000CUST001',
+                'move_line_count': 3,
+                'pack': {
+                    'qty_on_hand': 10,
+                    'qty': 10,
+                    'name': 'Karton',
+                    'lot': 'THELOT000131'
+                },
+                'destination_bin': 'Bin #2',
+                "location_src": {
+                    "id": 1,
+                    "name":  'Location SRC 2',
+                },
+                "location_dst": {
+                    "id": 2,
+                    "name": 'Location DST 2',
+                },
+                "product": {"id": 1, "name": 'Product 5'},
+            },
+        },
+    },
     'stock_issue': {},
     'check_pack_lot': {},
     'prepare_unload': {
