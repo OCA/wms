@@ -1,6 +1,5 @@
 from odoo.osv import expression
 
-from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
 
@@ -104,7 +103,7 @@ class ShopfloorPickingBatchValidatorResponse(Component):
     def search(self):
         return self._response_schema(
             {
-                "size": {"coerce": to_int, "required": True, "type": "integer"},
+                "size": {"required": True, "type": "integer"},
                 "records": {
                     "type": "list",
                     "required": True,
@@ -116,8 +115,8 @@ class ShopfloorPickingBatchValidatorResponse(Component):
     @property
     def _record_schema(self):
         return {
-            "id": {"coerce": to_int, "required": True, "type": "integer"},
+            "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
-            "picking_count": {"coerce": to_int, "required": True, "type": "integer"},
-            "move_line_count": {"coerce": to_int, "required": True, "type": "integer"},
+            "picking_count": {"required": True, "type": "integer"},
+            "move_line_count": {"required": True, "type": "integer"},
         }
