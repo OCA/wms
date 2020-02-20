@@ -18,9 +18,12 @@ class ClusterPickingCase(CommonCase):
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
         cls.picking_type = cls.process.picking_type_id
+        # drop base demo data and create our own batches to work with
+        cls.env["stock.picking.batch"].search([]).unlink()
         cls.batch1 = cls._create_picking_batch(cls.product_a)
         cls.batch2 = cls._create_picking_batch(cls.product_a)
         cls.batch3 = cls._create_picking_batch(cls.product_a)
+        cls.batch4 = cls._create_picking_batch(cls.product_a)
 
     def setUp(self):
         super().setUp()
@@ -177,6 +180,49 @@ class ClusterPickingCase(CommonCase):
             message={
                 "message_type": "info",
                 "message": "No more work to do, please create a new batch transfer",
+            },
+        )
+
+    def test_list_batch(self):
+        """List all available batches"""
+        # batches must have all their pickings available to be selected
+        self._add_stock_and_assign_pickings_for_batches(
+            self.batch1 | self.batch2 | self.batch3
+        )
+        self.batch1.write({"state": "in_progress", "user_id": self.env.uid})
+        self.batch2.write(
+            {"state": "in_progress", "user_id": self.env.ref("base.user_demo")}
+        )
+        self.batch3.write({"state": "draft", "user_id": False})
+
+        self.assertEqual(
+            self.env["stock.picking.batch"].search([]),
+            self.batch1 + self.batch2 + self.batch3 + self.batch4,
+        )
+        # Simulate the client asking the list of batches
+        response = self.service.dispatch("list_batch")
+        self.assert_response(
+            response,
+            next_state="manual_selection",
+            data={
+                "size": 2,
+                "records": [
+                    {
+                        "id": self.batch1.id,
+                        "name": self.batch1.name,
+                        "picking_count": 1,
+                        "move_line_count": 1,
+                    },
+                    # batch 2 is excluded because assigned to someone else
+                    {
+                        "id": self.batch3.id,
+                        "name": self.batch3.name,
+                        "picking_count": 1,
+                        "move_line_count": 1,
+                    },
+                    # batch 4 is excluded because not all of its pickings are
+                    # assigned
+                ],
             },
         )
 
