@@ -1,3 +1,4 @@
+from collections import namedtuple
 from contextlib import contextmanager
 from pprint import pformat
 
@@ -105,24 +106,42 @@ class CommonCase(SavepointCase, ComponentMixin):
 
 
 class PickingBatchMixin:
-    @classmethod
-    def _create_picking_batch(cls, product):
-        picking_form = Form(cls.env["stock.picking"])
-        picking_form.picking_type_id = cls.picking_type
-        picking_form.location_id = cls.stock_location
-        picking_form.location_dest_id = cls.packing_location
-        picking_form.origin = "test {}".format(product.name)
-        picking_form.partner_id = cls.customer
-        with picking_form.move_ids_without_package.new() as move:
-            move.product_id = product
-            move.product_uom_qty = 1
-        picking = picking_form.save()
-        picking.action_confirm()
-        picking.action_assign()
 
+    BatchProduct = namedtuple(
+        "BatchProduct",
+        # browse record of the product,
+        # quantity in float
+        "product quantity",
+    )
+
+    @classmethod
+    def _create_picking_batch(cls, products):
+        """Create a picking batch
+
+        :param products: list of list of BatchProduct. The outer list creates
+        pickings and the innerr list creates moves in these pickings
+        """
         batch_form = Form(cls.env["stock.picking.batch"])
-        batch_form.picking_ids.add(picking)
-        return batch_form.save()
+        for transfer in products:
+            picking_form = Form(cls.env["stock.picking"])
+            picking_form.picking_type_id = cls.picking_type
+            picking_form.location_id = cls.stock_location
+            picking_form.location_dest_id = cls.packing_location
+            picking_form.origin = "test"
+            picking_form.partner_id = cls.customer
+            for batch_product in transfer:
+                product = batch_product.product
+                quantity = batch_product.quantity
+                with picking_form.move_ids_without_package.new() as move:
+                    move.product_id = product
+                    move.product_uom_qty = quantity
+                picking = picking_form.save()
+            batch_form.picking_ids.add(picking)
+
+        batch = batch_form.save()
+        batch.picking_ids.action_confirm()
+        batch.picking_ids.action_assign()
+        return batch
 
     @classmethod
     def _add_stock_and_assign_pickings_for_batches(cls, batches):
