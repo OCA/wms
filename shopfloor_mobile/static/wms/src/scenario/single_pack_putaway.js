@@ -3,7 +3,7 @@ import {ScenarioBaseMixin, GenericStatesMixin} from "./mixins.js";
 export var SinglePackPutAway = Vue.component('single-pack-putaway', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
     template: `
-        <Screen :title="menuItem.name">
+        <Screen :title="menuItem.name" :klass="usage">
             <!-- FOR DEBUG -->
             <!-- <v-alert type="warning">{{ current_state_key }}</v-alert> -->
             <searchbar v-on:found="on_scan" :input_placeholder="search_input_placeholder"></searchbar>

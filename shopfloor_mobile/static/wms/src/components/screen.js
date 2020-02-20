@@ -13,6 +13,13 @@ Vue.component('Screen', {
     computed: {
         navigation () {
             return this.$root.config.get('menus')
+        },
+        screen_css_class () {
+            return [
+                'screen',
+                'screen-' + this.klass,
+                this.$slots.footer ? 'with-footer': '',
+            ].join(' ')
         }
     },
     data: () => ({
@@ -24,7 +31,6 @@ Vue.component('Screen', {
                 v-model="drawer"
                 app
                 >
-
             <v-list>
                 <v-list-item
                     v-for="item in navigation"
@@ -79,9 +85,12 @@ Vue.component('Screen', {
         </v-app-bar>
         <v-content>
             <v-container>
-                <div :class="'screen screen-' + klass">
-                    <div class="wrapper">
-                        <slot>Screen content</slot>
+                <div :class="screen_css_class">
+                    <div class="main-content">
+                        <slot>No content provided</slot>
+                    </div>
+                    <div class="footer" v-if="$slots.footer">
+                        <slot name="footer">Optional footer - no content</slot>
                     </div>
                 </div>
             </v-container>

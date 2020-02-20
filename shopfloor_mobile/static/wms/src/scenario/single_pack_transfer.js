@@ -3,7 +3,7 @@ import {ScenarioBaseMixin, GenericStatesMixin} from "./mixins.js";
 export var SinglePackTransfer = Vue.component('single-pack-transfer', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
     template: `
-        <Screen :title="menuItem.name">
+        <Screen :title="menuItem.name" :klass="usage">
             <!-- FOR DEBUG -->
             <!-- {{ current_state_key }} -->
             <searchbar v-if="state_is(initial_state_key)" v-on:found="on_scan" :input_placeholder="search_input_placeholder"></searchbar>

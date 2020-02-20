@@ -52,13 +52,11 @@ export var batch_picking_line_actions = Vue.component('batch-picking-line-action
   <div class="batch-picking-line-actions">
     <v-dialog v-model="dialog" fullscreen tile class="actions fullscreen text-center">
       <template v-slot:activator="{ on }">
-        <div class="button-list button-vertical-list full">
-          <v-row align="center" :no-gutters=true>
-            <v-col class="text-center" cols="12">
-              <v-btn depressed color="primary" dark v-on="on">Action</v-btn>
-            </v-col>
-          </v-row>
-        </div>
+        <v-row class="actions bottom-actions">
+          <v-col>
+            <v-btn color="primary" dark v-on="on">Action</v-btn>
+          </v-col>
+        </v-row>
       </template>
       <v-card>
         <div class="button-list button-vertical-list full">
