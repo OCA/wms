@@ -3,7 +3,7 @@ import {ScenarioBaseMixin} from "./mixins.js";
 export var ScanAnything = Vue.component('scan-anything', {
     mixins: [ScenarioBaseMixin],
     template: `
-        <Screen title="Scan Anything">
+        <Screen title="Scan Anything" :klass="'scan_anything'">
             <searchbar v-on:found="on_scan" :input_placeholder="search_input_placeholder"></searchbar>
             <user-information v-if="!need_confirmation && user_notification.message" v-bind:info="user_notification"></user-information>
             <detail-pack :packDetail="state.data" v-if="state.data.type=='pack'"></detail-pack>

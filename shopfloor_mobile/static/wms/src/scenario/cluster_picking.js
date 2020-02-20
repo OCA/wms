@@ -3,7 +3,7 @@ import {ScenarioBaseMixin, GenericStatesMixin} from "./mixins.js";
 export var ClusterPicking = Vue.component('cluster-picking', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
     template: `
-        <Screen :title="menuItem.name">
+        <Screen :title="menuItem.name" :klass="usage">
             <!-- FOR DEBUG -->
             <!-- {{ current_state_key }} -->
             <user-information

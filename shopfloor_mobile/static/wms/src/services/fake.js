@@ -404,7 +404,7 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
 
 
 var getRandomInt = function (max) {
-    return Math.floor(Math.random() * Math.floor(max));
+    return Math.floor(Math.random() * Math.floor(max)) + 1
 }
 
 var batchList = function (count=5) {
@@ -461,7 +461,7 @@ var DEMO_CLUSTER_PICKING_1 = {
         'data': {
             // next line to process
             'manual_selection': {
-                'records': batchList()
+                'records': batchList(15)
             }
         }
     },

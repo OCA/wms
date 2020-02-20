@@ -1,3 +1,9 @@
+div.v-application--wrap > .container {
+    padding: 0;
+}
+main.v-content > .v-content__wrap {
+}
+
 #app.demo_mode header {
     border-bottom: 5px dashed orange !important;
 }
@@ -39,14 +45,20 @@ ul.packaging span:first-child {
     margin-top: 2rem;
 }
 
-.get-work {
+.fullscreen-buttons {
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    height: 80vh;
 }
-#btn-get-work {
-    height: 70vh;
-    margin-bottom: 2rem;
+.fullscreen-buttons-50 button.v-btn {
+    flex-grow: 1;
+    font-size: 2rem !important;
+    white-space: normal;
+    display: inline-block;
+}
+.fullscreen-buttons button:not(:last-child) {
+    margin-bottom: 5vh;
 }
 
 .detail .v-card {
@@ -58,6 +70,9 @@ ul.packaging span:first-child {
 }
 .button-vertical-list.full .v-btn {
     width: 90%;
+    height: 5rem;
+    white-space: normal;
+    display: inline-block;
 }
 
 .number-spinner {
@@ -76,4 +91,26 @@ ul.packaging span:first-child {
     width: 100%;
     text-align: center;
     margin: 0.5rem 0;
+}
+
+.with-bottom-actions {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* align items in Main Axis */
+    align-items: stretch; /* align items in Cross Axis */
+    align-content: stretch; /* Extra space in Cross Axis */
+}
+.with-bottom-actions > div:first-child {
+    height: 74vh;
+    margin-bottom: 2vh;
+    overflow-y: scroll;
+}
+.actions.bottom-actions {
+    flex-grow: 1;
+}
+.actions.bottom-actions .v-btn {
+    font-size: 1.2rem;
+    height: 3.5rem;
+    width: 100%;
 }
