@@ -17,12 +17,24 @@ class BatchPickingCase(CommonCase, PickingBatchMixin):
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
         cls.picking_type = cls.process.picking_type_id
-        cls.batch1 = cls._create_picking_batch(cls.product_a)
-        cls.batch2 = cls._create_picking_batch(cls.product_a)
-        cls.batch3 = cls._create_picking_batch(cls.product_a)
-        cls.batch4 = cls._create_picking_batch(cls.product_b)
-        cls.batch5 = cls._create_picking_batch(cls.product_b)
-        cls.batch6 = cls._create_picking_batch(cls.product_b)
+        cls.batch1 = cls._create_picking_batch(
+            [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+        )
+        cls.batch2 = cls._create_picking_batch(
+            [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+        )
+        cls.batch3 = cls._create_picking_batch(
+            [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+        )
+        cls.batch4 = cls._create_picking_batch(
+            [[cls.BatchProduct(product=cls.product_b, quantity=1)]]
+        )
+        cls.batch5 = cls._create_picking_batch(
+            [[cls.BatchProduct(product=cls.product_b, quantity=1)]]
+        )
+        cls.batch6 = cls._create_picking_batch(
+            [[cls.BatchProduct(product=cls.product_b, quantity=1)]]
+        )
         cls.all_batches = (
             cls.batch1 + cls.batch2 + cls.batch3 + cls.batch4 + cls.batch5 + cls.batch6
         )
