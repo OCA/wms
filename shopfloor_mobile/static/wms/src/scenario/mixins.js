@@ -197,6 +197,8 @@ export var GenericStatesMixin = {
 
                     }
                 },
+                // TODO: these states should be splitted out to a specific mixin
+                // for putaway and pack transfer
                 'scan_location': {
                     on_scan: (scanned, confirmation=false) => {
                         this.state_set_data({'location_barcode': scanned.text})

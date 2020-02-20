@@ -58,6 +58,13 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 v-on:action="state.on_action"
                 :line="state.data"
                 />
+            <manual-select
+                v-if="state_is('manual_selection')"
+                v-on:select="state.on_select"
+                v-on:back="state.on_back"
+                :records="state.data.records"
+                :key_value="'id'"
+                />
         </Screen>
     `,
     computed: {
@@ -89,25 +96,29 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_get_work: (evt) => {
                         this.go_state(
                             'wait_call',
-                            // TODO: for all the calls do not pass state.data, pass what is required
-                            this.odoo.call('find_batch', this.state.data)
+                            this.odoo.call('find_batch')
                         )
                     },
                     on_manual_selection: (evt) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.call('picking_batch', this.state.data)
+                            this.odoo.call('list_batches')
                         )
                     },
                 },
-                'start_manual_selection': {
-                    on_submit_back: () => {
+                'manual_selection': {
+                    enter: () => {
+                        this.reset_notification()
+                    },
+                    on_back: () => {
                         this.go_state('start')
                     },
                     on_select: (selected) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.call('select', this.state.data)
+                            this.odoo.call('select', {
+                                'picking_batch_id': selected,
+                            })
                         )
                     },
                 },
