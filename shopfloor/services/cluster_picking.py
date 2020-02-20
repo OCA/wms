@@ -95,6 +95,19 @@ class ClusterPicking(Component):
         else:
             return self._response_for_no_batch_found()
 
+    def list_batch(self):
+        """List picking batch on which user can work
+
+        Returns a list of all the available records for the current picking
+        type.
+
+        Transitions:
+        * manual_selection: to the selection screen
+        """
+        batch_service = self.component(usage="picking_batch")
+        batches = batch_service.search()["data"]
+        return self._response(next_state="manual_selection", data=batches)
+
     # TODO this may be used in other scenarios? if so, extract
     def _select_a_picking_batch(self, batches):
         # look for in progress + assigned to self first
@@ -454,6 +467,9 @@ class ShopfloorClusterPickingValidator(Component):
     def find_batch(self):
         return {}
 
+    def list_batch(self):
+        return {}
+
     def select(self):
         return {
             "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"}
@@ -553,7 +569,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             "confirm_start": self._schema_for_batch_details,
             "start_line": self._schema_for_single_line_details,
             "start": {},
-            "manual_selection": {},
+            "manual_selection": self._schema_for_batch_selection,
             "scan_destination": self._schema_for_single_line_details,
             "zero_check": self._schema_for_zero_check,
             "unload_all": self._schema_for_unload_all,
@@ -566,6 +582,9 @@ class ShopfloorClusterPickingValidatorResponse(Component):
 
     def find_batch(self):
         return self._response_schema(next_states=["confirm_start", "start"])
+
+    def list_batch(self):
+        return self._response_schema(next_states=["manual_selection"])
 
     def select(self):
         return self._response_schema(next_states=["manual_selection", "confirm_start"])
@@ -849,3 +868,8 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             "picking_done": {"type": "string", "nullable": False, "required": True},
             "picking_next": {"type": "string", "nullable": False, "required": True},
         }
+
+    @property
+    def _schema_for_batch_selection(self):
+        batch_validator = self.component(usage="picking_batch.validator.response")
+        return batch_validator.search()["data"]["schema"]
