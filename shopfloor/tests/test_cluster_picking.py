@@ -58,10 +58,18 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         super().setUpClass(*args, **kwargs)
         # drop base demo data and create our own batches to work with
         cls.env["stock.picking.batch"].search([]).unlink()
-        cls.batch1 = cls._create_picking_batch(cls.product_a)
-        cls.batch2 = cls._create_picking_batch(cls.product_a)
-        cls.batch3 = cls._create_picking_batch(cls.product_a)
-        cls.batch4 = cls._create_picking_batch(cls.product_a)
+        cls.batch1 = cls._create_picking_batch(
+            [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+        )
+        cls.batch2 = cls._create_picking_batch(
+            [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+        )
+        cls.batch3 = cls._create_picking_batch(
+            [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+        )
+        cls.batch4 = cls._create_picking_batch(
+            [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+        )
 
     def test_find_batch_in_progress_current_user(self):
         """Find an in-progress batch assigned to the current user"""
@@ -370,20 +378,22 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
         # TODO add several lines / different products
-        cls.batch1 = cls._create_picking_batch(cls.product_a)
-        cls._simulate_batch_selected(cls.batch1)
+        cls.batch = cls._create_picking_batch(
+            [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+        )
+        cls._simulate_batch_selected(cls.batch)
 
     def test_confirm_start_ok(self):
         """User confirms she starts the selected picking batch (happy path)"""
         # batch1 was already selected, we only need to confirm the selection
-        batch = self.batch1
+        batch = self.batch
         self.assertEqual(batch.state, "in_progress")
         picking = batch.picking_ids[0]
         first_move_line = picking.move_line_ids[0]
         self.assertTrue(first_move_line)
 
         response = self.service.dispatch(
-            "confirm_start", params={"picking_batch_id": self.batch1.id}
+            "confirm_start", params={"picking_batch_id": self.batch.id}
         )
         self.assert_response(
             response,
@@ -420,8 +430,8 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
 
     def test_confirm_start_not_exists(self):
         """User confirms she starts but batch has been deleted meanwhile"""
-        batch_id = self.batch1.id
-        self.batch1.unlink()
+        batch_id = self.batch.id
+        self.batch.unlink()
         response = self.service.dispatch(
             "confirm_start", params={"picking_batch_id": batch_id}
         )
