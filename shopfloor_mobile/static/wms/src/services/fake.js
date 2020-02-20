@@ -403,6 +403,23 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
 }
 
 
+var getRandomInt = function (max) {
+    return Math.floor(Math.random() * Math.floor(max));
+}
+
+var batchList = function (count=5) {
+    let list = []
+    for (let i = 1; i < count + 1; i++) {
+        list.push({
+            "id": i,
+            "name": 'Batch #' + i,
+            "picking_count": getRandomInt(3),
+            "move_line_count": getRandomInt(15),
+        })
+    }
+    return list
+}
+
 var DEMO_CLUSTER_PICKING_1 = {
     'find_batch': {
         'next_state': 'confirm_start',
@@ -435,8 +452,50 @@ var DEMO_CLUSTER_PICKING_1 = {
             }
         }
     },
-    'picking_batch/search': {},
-    'select': {},
+    'list_batches': {
+        'next_state': 'manual_selection',
+        'message': {
+            'message_type': 'info',
+            'message': 'Previous line postponed',
+        },
+        'data': {
+            // next line to process
+            'manual_selection': {
+                'records': batchList()
+            }
+        }
+    },
+    'select': {
+        'next_state': 'confirm_start',
+        'data': {
+            'confirm_start': {
+                'id': 100,
+                'name': 'BATCHXXX',
+                'picking_count': 3,
+                'move_line_count': 6,
+                'records': [
+                    {
+                        'id': 1,
+                        'name': 'OP001',
+                        'customer': {
+                            'name': 'Customer 1',
+                        },
+                        'ref': 'SO000CUST001',
+                        'move_line_count': 4,
+                    },
+                    {
+                        'id': 2,
+                        'name': 'OP002',
+                        'customer': {
+                            'name': 'Customer 2',
+                        },
+                        'ref': 'SO000CUST002',
+                        'move_line_count': 2,
+                    },
+                ]
+            }
+        }
+    },
     'confirm_start': {
         'next_state': 'start_line',
         'data': {

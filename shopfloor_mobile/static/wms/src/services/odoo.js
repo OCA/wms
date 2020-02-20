@@ -21,7 +21,7 @@ export class OdooMixin {
             method: method,
             headers: this._get_headers()
         }
-        if (data !== undefined) {
+        if (!_.isUndefined(data)) {
             if (method == 'GET') {
                 endpoint += '?' + new URLSearchParams(data).toString();
             } else if (method == 'POST') {
@@ -98,7 +98,7 @@ export class OdooMocked extends OdooMixin{
             return this[this.usage + '_' + path].call(this, data)
         }
         let result
-        let barcode = data.barcode || data.location_barcode
+        let barcode = data ? data.barcode || data.location_barcode : null
         if (_.has(window.DEMO_CASE, barcode)) {
             // pick a specific case for this barcode
             result = window.DEMO_CASE[barcode]

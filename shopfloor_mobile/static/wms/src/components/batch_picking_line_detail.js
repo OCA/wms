@@ -80,7 +80,7 @@ export var batch_picking_line_actions = Vue.component('batch-picking-line-action
           </v-row>
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <v-btn depressed x-large color="primary" @click="$emit('action', 'action_change_pack_or_lot')">Change lot or pack</v-btn>
+              <v-btn depressed x-large color="primary" @click="$emit('action', 'action_change_pack_or_lot')">Change lot or pack [TODO]</v-btn>
             </v-col>
           </v-row>
           <v-row align="center">
