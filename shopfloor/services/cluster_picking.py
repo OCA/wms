@@ -167,7 +167,7 @@ class ClusterPicking(Component):
 
     def _response_for_batch_cannot_be_selected(self):
         return self._response(
-            next_state="manual_selection",
+            base_response=self.list_batch(),
             message={
                 "message_type": "warning",
                 "message": _("This batch cannot be selected."),
@@ -211,7 +211,61 @@ class ClusterPicking(Component):
           package
         * start: if the condition above is wrong (rare case of race condition...)
         """
-        return self._response()
+        picking_batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not picking_batch.exists():
+            return self._response_batch_does_not_exist()
+
+        remaining_lines = picking_batch.mapped("picking_ids.move_line_ids").filtered(
+            lambda l: l.state == "assigned"
+        )
+        if not remaining_lines:
+            # TODO
+            pass
+
+        return self._response(
+            next_state="start_line", data=self._data_for_next_move_line(remaining_lines)
+        )
+
+    def _response_batch_does_not_exist(self):
+        message = self.actions_for("message")
+        return self._response(next_state="start", message=message.record_not_found())
+
+    def _data_for_next_move_line(self, move_lines):
+        line = move_lines[0]
+        picking = line.picking_id
+        batch = picking.batch_id
+        product = line.product_id
+        lot = line.lot_id
+        package = line.package_id
+        return {
+            # TODO have common methods to return general info
+            # for each model
+            "id": line.id,
+            "quantity": line.product_uom_qty,
+            "picking": {
+                "id": picking.id,
+                "name": picking.name,
+                "origin": picking.origin or "",
+                "note": picking.note or "",
+            },
+            "batch": {"id": batch.id, "name": batch.name},
+            "product": {
+                "id": product.id,
+                "name": product.name,
+                "display_name": product.display_name,
+                "default_code": product.default_code or "",
+                "qty_available": product.qty_available,
+            },
+            "lot": {"id": lot.id, "name": lot.name, "ref": lot.ref or ""}
+            if lot
+            else None,
+            "location_src": {"id": line.location_id.id, "name": line.location_id.name},
+            "location_dst": {
+                "id": line.location_dest_id.id,
+                "name": line.location_dest_id.name,
+            },
+            "pack": {"id": package.id, "name": package.name} if package else None,
+        }
 
     def unassign(self, picking_batch_id):
         """Unassign and reset to draft a started picking batch
@@ -754,6 +808,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
         return {
             # id is a stock.move.line
             "id": {"required": True, "type": "integer"},
+            "quantity": {"type": "float", "required": True},
             "picking": {
                 "type": "dict",
                 "schema": {
@@ -770,13 +825,21 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                     "name": {"type": "string", "nullable": False, "required": True},
                 },
             },
-            "quantity": {"type": "float", "required": True},
             "product": {
                 "type": "dict",
                 "schema": {
                     "id": {"required": True, "type": "integer"},
                     "name": {"type": "string", "nullable": False, "required": True},
-                    "ref": {"type": "string", "nullable": False, "required": True},
+                    "display_name": {
+                        "type": "string",
+                        "nullable": False,
+                        "required": True,
+                    },
+                    "default_code": {
+                        "type": "string",
+                        "nullable": False,
+                        "required": True,
+                    },
                     "qty_available": {
                         "type": "float",
                         "nullable": False,
@@ -786,6 +849,8 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             },
             "lot": {
                 "type": "dict",
+                "required": False,
+                "nullable": True,
                 "schema": {
                     "id": {"required": True, "type": "integer"},
                     "name": {"type": "string", "nullable": False, "required": True},
@@ -809,6 +874,8 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             },
             "pack": {
                 "type": "dict",
+                "required": False,
+                "nullable": True,
                 "schema": {
                     "id": {"required": True, "type": "integer"},
                     "name": {"type": "string", "nullable": False, "required": True},

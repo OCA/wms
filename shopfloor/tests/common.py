@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from pprint import pformat
 
-from odoo.tests.common import SavepointCase
+from odoo.tests.common import Form, SavepointCase
 
 from odoo.addons.base_rest.controllers.main import _PseudoCollection
 from odoo.addons.component.core import WorkContext
@@ -89,14 +89,43 @@ class CommonCase(SavepointCase, ComponentMixin):
             "\n\nExpected:\n%s" % (pformat(response), pformat(expected)),
         )
 
-    def _update_qty_in_location(self, location, product, quantity):
-        self.env["stock.quant"]._update_available_quantity(product, location, quantity)
+    @classmethod
+    def _update_qty_in_location(cls, location, product, quantity):
+        cls.env["stock.quant"]._update_available_quantity(product, location, quantity)
 
-    def _fill_stock_for_pickings(self, pickings):
+    @classmethod
+    def _fill_stock_for_pickings(cls, pickings):
         product_locations = {}
         for move in pickings.mapped("move_lines"):
             key = (move.product_id, move.location_id)
             product_locations.setdefault(key, 0)
             product_locations[key] += move.product_qty
         for (product, location), qty in product_locations.items():
-            self._update_qty_in_location(location, product, qty)
+            cls._update_qty_in_location(location, product, qty)
+
+
+class PickingBatchMixin:
+    @classmethod
+    def _create_picking_batch(cls, product):
+        picking_form = Form(cls.env["stock.picking"])
+        picking_form.picking_type_id = cls.picking_type
+        picking_form.location_id = cls.stock_location
+        picking_form.location_dest_id = cls.packing_location
+        picking_form.origin = "test {}".format(product.name)
+        picking_form.partner_id = cls.customer
+        with picking_form.move_ids_without_package.new() as move:
+            move.product_id = product
+            move.product_uom_qty = 1
+        picking = picking_form.save()
+        picking.action_confirm()
+        picking.action_assign()
+
+        batch_form = Form(cls.env["stock.picking.batch"])
+        batch_form.picking_ids.add(picking)
+        return batch_form.save()
+
+    @classmethod
+    def _add_stock_and_assign_pickings_for_batches(cls, batches):
+        pickings = batches.mapped("picking_ids")
+        cls._fill_stock_for_pickings(pickings)
+        pickings.action_assign()
