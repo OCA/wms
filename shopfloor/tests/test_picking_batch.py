@@ -1,9 +1,7 @@
-from odoo.tests.common import Form
-
-from .common import CommonCase
+from .common import CommonCase, PickingBatchMixin
 
 
-class BatchPickingCase(CommonCase):
+class BatchPickingCase(CommonCase, PickingBatchMixin):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
@@ -33,23 +31,6 @@ class BatchPickingCase(CommonCase):
         super().setUp()
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="picking_batch")
-
-    @classmethod
-    def _create_picking_batch(cls, product):
-        picking_form = Form(cls.env["stock.picking"])
-        picking_form.picking_type_id = cls.picking_type
-        picking_form.location_id = cls.stock_location
-        picking_form.location_dest_id = cls.packing_location
-        with picking_form.move_ids_without_package.new() as move:
-            move.product_id = product
-            move.product_uom_qty = 1
-        picking = picking_form.save()
-        picking.action_confirm()
-        picking.action_assign()
-
-        batch_form = Form(cls.env["stock.picking.batch"])
-        batch_form.picking_ids.add(picking)
-        return batch_form.save()
 
     def test_to_openapi(self):
         # will raise if it fails to generate the openapi specs

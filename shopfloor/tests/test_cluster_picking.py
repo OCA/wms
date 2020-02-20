@@ -1,29 +1,23 @@
-from odoo.tests.common import Form
+import unittest
 
-from .common import CommonCase
+from .common import CommonCase, PickingBatchMixin
 
 
-class ClusterPickingCase(CommonCase):
+class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
         cls.product_a = cls.env["product.product"].create(
-            {"name": "Product A", "type": "product"}
+            {"name": "Product A", "type": "product", "default_code": "A"}
         )
         cls.product_b = cls.env["product.product"].create(
-            {"name": "Product B", "type": "product"}
+            {"name": "Product B", "type": "product", "default_code": "B"}
         )
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
         cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
         cls.picking_type = cls.process.picking_type_id
-        # drop base demo data and create our own batches to work with
-        cls.env["stock.picking.batch"].search([]).unlink()
-        cls.batch1 = cls._create_picking_batch(cls.product_a)
-        cls.batch2 = cls._create_picking_batch(cls.product_a)
-        cls.batch3 = cls._create_picking_batch(cls.product_a)
-        cls.batch4 = cls._create_picking_batch(cls.product_a)
 
     def setUp(self):
         super().setUp()
@@ -31,32 +25,43 @@ class ClusterPickingCase(CommonCase):
             self.service = work.component(usage="cluster_picking")
 
     @classmethod
-    def _create_picking_batch(cls, product):
-        picking_form = Form(cls.env["stock.picking"])
-        picking_form.picking_type_id = cls.picking_type
-        picking_form.location_id = cls.stock_location
-        picking_form.location_dest_id = cls.packing_location
-        picking_form.origin = "test {}".format(product.name)
-        picking_form.partner_id = cls.customer
-        with picking_form.move_ids_without_package.new() as move:
-            move.product_id = product
-            move.product_uom_qty = 1
-        picking = picking_form.save()
-        picking.action_confirm()
-        picking.action_assign()
+    def _simulate_batch_selected(cls, batches):
+        cls._add_stock_and_assign_pickings_for_batches(batches)
+        batches.write({"state": "in_progress", "user_id": cls.env.uid})
 
-        batch_form = Form(cls.env["stock.picking.batch"])
-        batch_form.picking_ids.add(picking)
-        return batch_form.save()
+
+class ClusterPickingAPICase(ClusterPickingCommonCase):
+    """Base tests for the cluster picking API"""
 
     def test_to_openapi(self):
         # will raise if it fails to generate the openapi specs
         self.service.to_openapi()
 
-    def _add_stock_and_assign_pickings_for_batches(self, batches):
-        pickings = batches.mapped("picking_ids")
-        self._fill_stock_for_pickings(pickings)
-        pickings.action_assign()
+
+class ClusterPickingSelectionCase(ClusterPickingCommonCase):
+    """Tests covering the selection of picking batches
+
+    Endpoints:
+
+    * /cluster_picking/find_batch
+    * /cluster_picking/list_batch
+    * /cluster_picking/select
+    * /cluster_picking/unassign
+
+    These endpoints interact with a list of picking batches.
+    The other endpoints that interact with a single batch (after selection)
+    are handled in ``ClusterPickingSelectedCase``.
+    """
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super().setUpClass(*args, **kwargs)
+        # drop base demo data and create our own batches to work with
+        cls.env["stock.picking.batch"].search([]).unlink()
+        cls.batch1 = cls._create_picking_batch(cls.product_a)
+        cls.batch2 = cls._create_picking_batch(cls.product_a)
+        cls.batch3 = cls._create_picking_batch(cls.product_a)
+        cls.batch4 = cls._create_picking_batch(cls.product_a)
 
     def test_find_batch_in_progress_current_user(self):
         """Find an in-progress batch assigned to the current user"""
@@ -309,6 +314,7 @@ class ClusterPickingCase(CommonCase):
                 "message_type": "warning",
                 "message": "This batch cannot be selected.",
             },
+            data={"size": 0, "records": []},
         )
 
     def test_select_already_assigned(self):
@@ -328,12 +334,12 @@ class ClusterPickingCase(CommonCase):
                 "message_type": "warning",
                 "message": "This batch cannot be selected.",
             },
+            data={"size": 0, "records": []},
         )
 
     def test_unassign_batch(self):
         """User cancels after selecting a batch, unassign it"""
-        self._add_stock_and_assign_pickings_for_batches(self.batch1)
-        self.batch1.write({"state": "in_progress", "user_id": self.env.uid})
+        self._simulate_batch_selected(self.batch1)
         # Simulate the client selecting the batch in a list
         response = self.service.dispatch(
             "unassign", params={"picking_batch_id": self.batch1.id}
@@ -351,3 +357,88 @@ class ClusterPickingCase(CommonCase):
             "unassign", params={"picking_batch_id": batch_id}
         )
         self.assert_response(response, next_state="start")
+
+
+class ClusterPickingSelectedCase(ClusterPickingCommonCase):
+    """Tests covering endpoints working on a single picking batch
+
+    After a batch has been selected, by the tests covered in
+    ``ClusterPickingSelectionCase``.
+    """
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super().setUpClass(*args, **kwargs)
+        # TODO add several lines / different products
+        cls.batch1 = cls._create_picking_batch(cls.product_a)
+        cls._simulate_batch_selected(cls.batch1)
+
+    def test_confirm_start_ok(self):
+        """User confirms she starts the selected picking batch (happy path)"""
+        # batch1 was already selected, we only need to confirm the selection
+        batch = self.batch1
+        self.assertEqual(batch.state, "in_progress")
+        picking = batch.picking_ids[0]
+        first_move_line = picking.move_line_ids[0]
+        self.assertTrue(first_move_line)
+
+        response = self.service.dispatch(
+            "confirm_start", params={"picking_batch_id": self.batch1.id}
+        )
+        self.assert_response(
+            response,
+            data={
+                "id": first_move_line.id,
+                "quantity": 1.0,
+                "location_dst": {
+                    "id": first_move_line.location_dest_id.id,
+                    "name": first_move_line.location_dest_id.name,
+                },
+                "location_src": {
+                    "id": first_move_line.location_id.id,
+                    "name": first_move_line.location_id.name,
+                },
+                "picking": {
+                    "id": picking.id,
+                    "name": picking.name,
+                    "note": "",
+                    "origin": picking.origin,
+                },
+                "batch": {"id": batch.id, "name": batch.name},
+                "product": {
+                    "default_code": first_move_line.product_id.default_code,
+                    "display_name": first_move_line.product_id.display_name,
+                    "id": first_move_line.product_id.id,
+                    "name": first_move_line.product_id.name,
+                    "qty_available": first_move_line.product_id.qty_available,
+                },
+                "lot": None,
+                "pack": None,
+            },
+            next_state="start_line",
+        )
+
+    def test_confirm_start_not_exists(self):
+        """User confirms she starts but batch has been deleted meanwhile"""
+        batch_id = self.batch1.id
+        self.batch1.unlink()
+        response = self.service.dispatch(
+            "confirm_start", params={"picking_batch_id": batch_id}
+        )
+        self.assert_response(
+            response,
+            message={
+                "message_type": "error",
+                "message": "This record you were working on does not exist anymore.",
+            },
+            next_state="start",
+        )
+
+    # TODO
+    @unittest.skip("not sure yet what we have to do, keep for later")
+    def test_confirm_start_all_is_done(self):
+        """User confirms start but all lines are already done"""
+        # we want to jump to the start because there are no lines
+        # to process anymore, but we want to set pickings and
+        # picking batch to done if not done yet (because the process
+        # was interrupted for instance)
