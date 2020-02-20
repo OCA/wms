@@ -59,6 +59,12 @@ class MessageAction(Component):
             "message": _("This operation does not exist anymore."),
         }
 
+    def record_not_found(self):
+        return {
+            "message_type": "error",
+            "message": _("This record you were working on does not exist anymore."),
+        }
+
     def operation_has_been_canceled_elsewhere(self):
         return {
             "message_type": "warning",

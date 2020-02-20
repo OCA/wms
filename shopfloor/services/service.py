@@ -76,11 +76,13 @@ class BaseShopfloorService(AbstractComponent):
         )
         return validator_component._get_validator(method_name)
 
-    def _response(self, data=None, next_state=None, message=None):
+    def _response(self, base_response=None, data=None, next_state=None, message=None):
         """Base "envelope" for the responses
 
         All the keys are optional.
 
+        :param base_response: optional dictionary of values to extend
+        (typically already created by a call to _response())
         :param data: dictionary of values, when a next_state is provided,
         the data is enclosed in a key of the same name (to support polymorphism
         in the schema)
@@ -89,7 +91,10 @@ class BaseShopfloorService(AbstractComponent):
         :param message: dictionary for the message to show in the client
         application (see ``_response_schema`` for the keys)
         """
-        response = {}
+        if base_response:
+            response = base_response.copy()
+        else:
+            response = {}
         if next_state:
             # data for a state is always enclosed in a key with the name
             # of the state, so an endpoint can return to different states
