@@ -1,7 +1,7 @@
 var moreInfo = Vue.component('detail-pack', {
     data: function () {
         return {
-        }
+        };
     },
     props:['packDetail'],
     methods: {
@@ -41,5 +41,5 @@ var moreInfo = Vue.component('detail-pack', {
         </template>
       </v-simple-table>
     </div>
-    `
-})
+    `,
+});

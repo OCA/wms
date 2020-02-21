@@ -1,7 +1,7 @@
 Vue.component('detail-product', {
     data: function () {
         return {
-        }
+        };
     },
     props:['productDetail'],
     methods: {
@@ -61,4 +61,4 @@ Vue.component('detail-product', {
         </template>
       </v-simple-table>
     `,
-})
+});

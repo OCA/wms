@@ -34,5 +34,5 @@ var moreInfo = Vue.component('detail-location', {
         </template>
       </v-simple-table>
     </div>
-    `
-})
+    `,
+});

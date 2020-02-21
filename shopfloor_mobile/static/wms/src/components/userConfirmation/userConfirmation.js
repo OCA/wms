@@ -1,7 +1,7 @@
 var userConfirmation = Vue.component('user-confirmation', {
-  props: ['title', 'question'],
-  methods: {},
-  template: `
+    props: ['title', 'question'],
+    methods: {},
+    template: `
 
     <div class="confirm mt-4">
         <v-alert type="warning" prominent>
@@ -24,4 +24,4 @@ var userConfirmation = Vue.component('user-confirmation', {
     </div>
 
 `,
-})
+});

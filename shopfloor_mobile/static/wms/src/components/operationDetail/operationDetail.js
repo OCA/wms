@@ -1,17 +1,17 @@
 
 var operationDetail = Vue.component('operation-detail', {
-  data: function () {
-    return {
-        show_detail_dialog: false,
-    }
-  },
-  props:['operation'],
+    data: function () {
+        return {
+            show_detail_dialog: false,
+        };
+    },
+    props:['operation'],
     methods: {
-        show_details: function() {
+        show_details: function () {
             this.show_detail_dialog = true;
         },
     },
-  template: `
+    template: `
   <div class="detail operation-detail" v-if="!_.isEmpty(operation)">
     <v-simple-table>
     <template v-slot:default>
@@ -51,5 +51,5 @@ var operationDetail = Vue.component('operation-detail', {
     </template>
   </v-simple-table>
 </div>
-`
-})
+`,
+});

@@ -2,8 +2,8 @@ Vue.component('reset-screen-button', {
     props: ['show_reset_button'],
     methods: {
         reset: function () {
-		    this.$emit('reset')
-        }
+		    this.$emit('reset');
+        },
     },
     template: `
         <div class="action reset">
@@ -12,7 +12,7 @@ Vue.component('reset-screen-button', {
             </v-form>
         </div>
     `,
-})
+});
 
 Vue.component('cancel-button', {
     template: `
@@ -20,13 +20,13 @@ Vue.component('cancel-button', {
             <v-btn depressed x-large color="error" v-on:click="$emit('cancel')">Cancel</v-btn>
         </div>
     `,
-})
+});
 
 // TODO: could be merged w/ userConfirmation
 Vue.component('last-operation', {
-    // props: ['info'],
+    // Props: ['info'],
     data: function () {
-        return {'info': {}}
+        return {'info': {}};
     },
     template: `
     <div class="last-operation">
@@ -43,7 +43,7 @@ Vue.component('last-operation', {
         </v-dialog>
     </div>
     `,
-})
+});
 
 
 Vue.component('get-work', {
@@ -57,7 +57,7 @@ Vue.component('get-work', {
       </v-btn>
     </div>
     `,
-})
+});
 
 
 Vue.component('stock-zero-check', {
@@ -80,33 +80,32 @@ Vue.component('stock-zero-check', {
         </v-card>
       </v-dialog>
     </div>
-  `
-})
-
+  `,
+});
 
 
 Vue.component('manual-select', {
     props: {
-      'records': Array,
-      'key_value': {
-        'type': String,
-      },
-      'key_title': {
-        'type': String,
-        'default': 'name'
-      },
+        'records': Array,
+        'key_value': {
+            'type': String,
+        },
+        'key_title': {
+            'type': String,
+            'default': 'name',
+        },
     },
     data: function () {
-        return {'selected': null}
+        return {'selected': null};
     },
     methods: {
-      // NOTE: v-list-item-group should be able to work w/ `v-model`.
-      // For some reason, it does not work here.
-      // At the same time is preferable to have a place to hook to
-      // in case you want to customize its behavior.
-      updateSelected (selectedItem) {
-        this.selected = selectedItem
-      }
+        // NOTE: v-list-item-group should be able to work w/ `v-model`.
+        // For some reason, it does not work here.
+        // At the same time is preferable to have a place to hook to
+        // in case you want to customize its behavior.
+        updateSelected (selectedItem) {
+            this.selected = selectedItem;
+        },
     },
     template: `
     <div class="manual-select with-bottom-actions">
@@ -140,5 +139,5 @@ Vue.component('manual-select', {
         </v-col>
       </v-row>
     </div>
-  `
-})
+  `,
+});

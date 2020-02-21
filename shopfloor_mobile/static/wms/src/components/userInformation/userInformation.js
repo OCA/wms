@@ -7,7 +7,7 @@ Vue.component('user-information', {
     `,
     computed: {
         alert_type: function () {
-            return this.info.message_type
-        }
+            return this.info.message_type;
+        },
     },
-})
+});

@@ -31,5 +31,5 @@ var moreInfo = Vue.component('detail-operation', {
         </template>
       </v-simple-table>
     </div>
-    `
-})
+    `,
+});

@@ -1,22 +1,22 @@
-/* eslint no-use-before-define: 0 */  // --> OFF
+/* eslint no-use-before-define: 0 */ // --> OFF
 
 var getRandomInt = function (max) {
-    max = max ? max : 10000
-    return Math.floor(Math.random() * Math.floor(max)) + 1
-}
+    max = max ? max : 10000;
+    return Math.floor(Math.random() * Math.floor(max)) + 1;
+};
 
 var batchList = function (count=5) {
-    let list = []
+    const list = [];
     for (let i = 1; i < count + 1; i++) {
         list.push({
             "id": i,
             "name": "Batch #" + i,
             "picking_count": getRandomInt(3),
             "move_line_count": getRandomInt(15),
-        })
+        });
     }
-    return list
-}
+    return list;
+};
 
 
 var makeBatchPickingLine = function () {
@@ -55,9 +55,9 @@ var makeBatchPickingLine = function () {
             "id": getRandomInt(),
             "name": "LOC-DST-" + _.padStart(getRandomInt(), 10, 0),
         },
-    }
-}
+    };
+};
 
 
-window.DEMO_CASES = {} // collection
-/* eslint no-use-before-define: 2 */  // --> ON
+window.DEMO_CASES = {}; // Collection
+/* eslint no-use-before-define: 2 */ // --> ON
