@@ -1,8 +1,8 @@
-/* eslint no-use-before-define: 0 */  // --> OFF
+/* eslint no-use-before-define: 0 */ // --> OFF
 var CANCEL_MSG_DEFAULT = {
     'message': 'Operation cancelled',
     'message_type': 'info',
-}
+};
 
 var DEMO_SINGLE_PUTAWAY_1 = {
     'start' : {
@@ -20,10 +20,10 @@ var DEMO_SINGLE_PUTAWAY_1 = {
                 },
                 "product": [{"id": 1, "name": 'Product 1', "qty": 5}, {"id": 2, "name": 'Product 2', "qty": 2}],
                 "picking": {"id": 1, "name": 'Picking 1'},
-            }
+            },
         },
         "next_state": "scan_location",
-        "message": undefined
+        "message": undefined,
     },
     'validate' : {
         "data": undefined,
@@ -31,28 +31,28 @@ var DEMO_SINGLE_PUTAWAY_1 = {
         "message": {
             'message': 'Pack validated',
             'message_type': 'info',
-        }
+        },
     },
     'cancel' : {
         "next_state": "start",
-        "message": CANCEL_MSG_DEFAULT
-    }
-}
+        "message": CANCEL_MSG_DEFAULT,
+    },
+};
 
 var DEMO_SINGLE_PUTAWAY_2 = {
     'start' : {
         "data": undefined,
         "next_state": "start_scan_pack",
-        "message": {"message_type": "error", "message": "You cannot do that!"}
+        "message": {"message_type": "error", "message": "You cannot do that!"},
     },
-}
+};
 var DEMO_SINGLE_PUTAWAY_3 = {
     'start' : {
         "data": undefined,
         "next_state": "start_scan_pack",
-        "message": {"message_type": "error", "message": "No pkg found"}
+        "message": {"message_type": "error", "message": "No pkg found"},
     },
-}
+};
 var DEMO_SINGLE_PUTAWAY_4 = {
     'start' : {
         "data": {
@@ -72,7 +72,7 @@ var DEMO_SINGLE_PUTAWAY_4 = {
             },
         },
         "next_state": "confirm_start",
-        "message": {"message_type": "info", "message": "Benoit is at the toilette: do you take over?"}
+        "message": {"message_type": "info", "message": "Benoit is at the toilette: do you take over?"},
     },
     'validate' : {
         "data": undefined,
@@ -80,13 +80,13 @@ var DEMO_SINGLE_PUTAWAY_4 = {
         "message": {
             'message': 'Pack validated',
             'message_type': 'info',
-        }
+        },
     },
     'cancel' : {
         "next_state": "start",
-        "message": CANCEL_MSG_DEFAULT
-    }
-}
+        "message": CANCEL_MSG_DEFAULT,
+    },
+};
 var DEMO_SINGLE_PUTAWAY_5 = {
     'start' : {
         "data": {
@@ -106,11 +106,11 @@ var DEMO_SINGLE_PUTAWAY_5 = {
             },
         },
         "next_state": "scan_location",
-        "message": undefined
+        "message": undefined,
     },
     'cancel' : {
         "next_state": "start",
-        "message": CANCEL_MSG_DEFAULT
+        "message": CANCEL_MSG_DEFAULT,
     },
     'validate' : {
         "data": undefined,
@@ -118,9 +118,9 @@ var DEMO_SINGLE_PUTAWAY_5 = {
         "message": {
             'message': 'Pack validated',
             'message_type': 'info',
-        }
+        },
     },
-}
+};
 var DEMO_SINGLE_PUTAWAY_6 = {
     'start' : {
         "data": {
@@ -140,12 +140,12 @@ var DEMO_SINGLE_PUTAWAY_6 = {
             },
         },
         "next_state": "scan_location",
-        "message": undefined
+        "message": undefined,
     },
     'validate' : {
         "data": undefined,
         "next_state": "confirm_location",
-        "message": {"message_type": "warning", "message": "Are you sure of this location?"}
+        "message": {"message_type": "warning", "message": "Are you sure of this location?"},
     },
     'LOC6' : {
         "data": undefined,
@@ -153,9 +153,9 @@ var DEMO_SINGLE_PUTAWAY_6 = {
         "message": {
             'message': 'Pack validated',
             'message_type': 'info',
-        }
+        },
     },
-}
+};
 var DEMO_SINGLE_PUTAWAY_7 = {
     'start' : {
         "data": {
@@ -175,12 +175,12 @@ var DEMO_SINGLE_PUTAWAY_7 = {
             },
         },
         "next_state": "scan_location",
-        "message": undefined
+        "message": undefined,
     },
     'validate' : {
         "data": undefined,
         "next_state": "scan_location",
-        "message": {"message_type": "error", "message": "You cannot move to this location"}
+        "message": {"message_type": "error", "message": "You cannot move to this location"},
     },
     'LOC7' : {
         "data": undefined,
@@ -188,12 +188,12 @@ var DEMO_SINGLE_PUTAWAY_7 = {
         "message": {
             'message': 'Pack validated',
             'message_type': 'info',
-        }
+        },
     },
-}
+};
 
 
-window.DEMO_CASES["single_pack_putaway"] = {
+window.DEMO_CASES.single_pack_putaway = {
     "1": DEMO_SINGLE_PUTAWAY_1,
     "2": DEMO_SINGLE_PUTAWAY_2,
     "3": DEMO_SINGLE_PUTAWAY_3,
@@ -201,6 +201,6 @@ window.DEMO_CASES["single_pack_putaway"] = {
     "5": DEMO_SINGLE_PUTAWAY_5,
     "6": DEMO_SINGLE_PUTAWAY_6,
     "7": DEMO_SINGLE_PUTAWAY_7,
-}
+};
 
-/* eslint no-use-before-define: 2 */  // --> ON
+/* eslint no-use-before-define: 2 */ // --> ON

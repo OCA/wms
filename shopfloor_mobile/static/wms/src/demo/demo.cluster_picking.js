@@ -1,4 +1,4 @@
-/* eslint no-use-before-define: 0 */  // --> OFF
+/* eslint no-use-before-define: 0 */ // --> OFF
 
 var DEMO_CLUSTER_PICKING_1 = {
     "find_batch": {
@@ -28,9 +28,9 @@ var DEMO_CLUSTER_PICKING_1 = {
                         "origin": "SO000CUST002",
                         "move_line_count": 2,
                     },
-                ]
-            }
-        }
+                ],
+            },
+        },
     },
     "list_batch": {
         "next_state": "manual_selection",
@@ -39,11 +39,11 @@ var DEMO_CLUSTER_PICKING_1 = {
             "message": "Previous line postponed",
         },
         "data": {
-            // next line to process
+            // Next line to process
             "manual_selection": {
-                "records": batchList(15)
-            }
-        }
+                "records": batchList(15),
+            },
+        },
     },
     "select": {
         "next_state": "confirm_start",
@@ -72,15 +72,15 @@ var DEMO_CLUSTER_PICKING_1 = {
                         "origin": "SO000CUST002",
                         "move_line_count": 2,
                     },
-                ]
-            }
-        }
+                ],
+            },
+        },
     },
     "confirm_start": {
         "next_state": "start_line",
         "data": {
-            "start_line": makeBatchPickingLine()
-        }
+            "start_line": makeBatchPickingLine(),
+        },
     },
     "unassign": {
         "next_state": "start",
@@ -101,7 +101,7 @@ var DEMO_CLUSTER_PICKING_1 = {
                 "message": "Product 5 put in bin #2",
             },
             "data": {
-                "start_line": makeBatchPickingLine()
+                "start_line": makeBatchPickingLine(),
             },
         },
         "ko": {
@@ -111,7 +111,7 @@ var DEMO_CLUSTER_PICKING_1 = {
                 "message": "Stock check required",
             },
             "data": {
-                "zero_check": {}
+                "zero_check": {},
             },
         },
     },
@@ -122,8 +122,8 @@ var DEMO_CLUSTER_PICKING_1 = {
             "message": "Stock zero confirmed",
         },
         "data": {
-            // next line to process
-            "start_line": makeBatchPickingLine()
+            // Next line to process
+            "start_line": makeBatchPickingLine(),
         },
     },
     "skip_line": {
@@ -133,8 +133,8 @@ var DEMO_CLUSTER_PICKING_1 = {
             "message": "Previous line postponed",
         },
         "data": {
-            // next line to process
-            "start_line": makeBatchPickingLine()
+            // Next line to process
+            "start_line": makeBatchPickingLine(),
         },
     },
     "stock_issue": {
@@ -144,16 +144,16 @@ var DEMO_CLUSTER_PICKING_1 = {
             "message": "Stock out confirmed",
         },
         "data": {
-            // next line to process
-            "start_line": makeBatchPickingLine()
+            // Next line to process
+            "start_line": makeBatchPickingLine(),
         },
     },
     "check_pack_lot": {},
     "prepare_unload": {
         "next_state": "unload_all",
         "data": {
-            // next line to process
-            "unload_all": {}
+            // Next line to process
+            "unload_all": {},
         },
     },
     "set_destination_all": {
@@ -164,15 +164,15 @@ var DEMO_CLUSTER_PICKING_1 = {
                 "message": "Destination set",
             },
             "data": {
-                // next line to process
-                "start_line": makeBatchPickingLine()
+                // Next line to process
+                "start_line": makeBatchPickingLine(),
             },
         },
         "KO": {
             "next_state": "confirm_unload_all",
             "data": {
-                // next line to process
-                "unload_all": {}
+                // Next line to process
+                "unload_all": {},
             },
             "message": {
                 "message_type": "warning",
@@ -184,8 +184,8 @@ var DEMO_CLUSTER_PICKING_1 = {
     "unload_scan_pack": {},
     "unload_scan_destination": {},
     "unload_router": {},
-}
+};
 
-window.DEMO_CASES["cluster_picking"] = DEMO_CLUSTER_PICKING_1
+window.DEMO_CASES.cluster_picking = DEMO_CLUSTER_PICKING_1;
 
-/* eslint no-use-before-define: 2 */  // --> ON
+/* eslint no-use-before-define: 2 */ // --> ON

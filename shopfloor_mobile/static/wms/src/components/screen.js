@@ -12,15 +12,15 @@ Vue.component('Screen', {
     },
     computed: {
         navigation () {
-            return this.$root.config.get('menus')
+            return this.$root.config.get('menus');
         },
         screen_css_class () {
             return [
                 'screen',
                 'screen-' + this.klass,
                 this.$slots.footer ? 'with-footer': '',
-            ].join(' ')
-        }
+            ].join(' ');
+        },
     },
     data: () => ({
         drawer: null,
@@ -97,4 +97,4 @@ Vue.component('Screen', {
         </v-content>
     </v-app>
     `,
-})
+});

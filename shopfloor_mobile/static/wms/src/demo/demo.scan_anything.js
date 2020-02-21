@@ -1,4 +1,4 @@
-/* eslint no-use-before-define: 0 */  // --> OFF
+/* eslint no-use-before-define: 0 */ // --> OFF
 var DEMO_SCAN_ANYTHING_PACK = {
     'start' : {
         "data": {
@@ -18,9 +18,9 @@ var DEMO_SCAN_ANYTHING_PACK = {
                 "picking": {"id": 1, "name": 'Picking 7'},
             },
         },
-        "message": undefined
+        "message": undefined,
     },
-}
+};
 var DEMO_SCAN_ANYTHING_PRODUCT = {
     'start' : {
         "data": {
@@ -41,50 +41,50 @@ var DEMO_SCAN_ANYTHING_PRODUCT = {
                         {"id": 98236, "name": "Palette", "qty": 27, "qty_unit": "Big Box"},
                     ],
                 },
-            }
-        }
+            },
+        },
     },
-    "message": undefined
-}
+    "message": undefined,
+};
 var DEMO_SCAN_ANYTHING_LOCATION = {
     'start' : {
         "data": {
             "show_detail_info": {
-            "type": "location",
-            "barcode": "283429834",
-            "detail_info": {
-                "id": 3231,
-                "codebar": "loc",
-                "name": "CCOROL-01",
-                "parent_name": "SCH/Packing/CCOROL",
-                "products": [
-                    {
-                        "id": 424,
-                        "barcode": "PROD424",
-                        "name": "Sun Glasses Cat 4 High Altitude",
-                        "pack": {
-                            "name": "PID0000008",
-                            "barcode": "pack",
+                "type": "location",
+                "barcode": "283429834",
+                "detail_info": {
+                    "id": 3231,
+                    "codebar": "loc",
+                    "name": "CCOROL-01",
+                    "parent_name": "SCH/Packing/CCOROL",
+                    "products": [
+                        {
+                            "id": 424,
+                            "barcode": "PROD424",
+                            "name": "Sun Glasses Cat 4 High Altitude",
+                            "pack": {
+                                "name": "PID0000008",
+                                "barcode": "pack",
+                            },
+                            "lot": "AA8122F41",
+                            "qty_instock": 34,
+                            "qty_reserved": 12,
                         },
-                        "lot": "AA8122F41",
-                        "qty_instock": 34,
-                        "qty_reserved": 12,
-                    },
-                    {
-                        "id": 421,
-                        "name": "Sun Glasses Pro Glazier",
-                        "pack": {},
-                        "lot": "AA8122F41",
-                        "qty_instock": 4,
-                        "qty_reserved": 0,
-                    },
-                ],
-            }
+                        {
+                            "id": 421,
+                            "name": "Sun Glasses Pro Glazier",
+                            "pack": {},
+                            "lot": "AA8122F41",
+                            "qty_instock": 4,
+                            "qty_reserved": 0,
+                        },
+                    ],
+                },
+            },
+            "message": undefined,
         },
-        "message": undefined
-    }
     },
-}
+};
 
 var DEMO_SCAN_ANYTHING_OPERATION = {
     'start' : {
@@ -120,18 +120,18 @@ var DEMO_SCAN_ANYTHING_OPERATION = {
                             "qty_reserved": 0,
                         },
                     ],
-                }
+                },
             },
         },
-        "message": undefined
+        "message": undefined,
     },
-}
+};
 
-window.DEMO_CASES['scan_anything'] = {
+window.DEMO_CASES.scan_anything = {
     "pack": DEMO_SCAN_ANYTHING_PACK,
     "prod": DEMO_SCAN_ANYTHING_PRODUCT,
     "loc": DEMO_SCAN_ANYTHING_LOCATION,
     "op": DEMO_SCAN_ANYTHING_OPERATION,
-}
+};
 
-/* eslint no-use-before-define: 2 */  // --> ON
+/* eslint no-use-before-define: 2 */ // --> ON

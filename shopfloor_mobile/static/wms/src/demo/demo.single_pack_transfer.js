@@ -1,9 +1,9 @@
-/* eslint no-use-before-define: 0 */  // --> OFF
-/* eslint no-use-before-define: 0 */  // --> OFF
+/* eslint no-use-before-define: 0 */ // --> OFF
+/* eslint no-use-before-define: 0 */ // --> OFF
 var CANCEL_MSG_DEFAULT = {
     'message': 'Operation cancelled',
     'message_type': 'info',
-}
+};
 
 
 var DEMO_SINGLE_PACK_TRANSFER_1 = {
@@ -26,7 +26,7 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
             },
         },
         "next_state": "scan_location",
-        "message": undefined
+        "message": undefined,
     },
     'validate' : {
         "data": undefined,
@@ -34,11 +34,11 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
         "message": {
             'message': 'Pack validated',
             'message_type': 'info',
-        }
+        },
     },
     'cancel' : {
         "next_state": "start",
-        "message": CANCEL_MSG_DEFAULT
+        "message": CANCEL_MSG_DEFAULT,
     },
     'LOC1' : {
         "data": undefined,
@@ -46,7 +46,7 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
         "message": {
             'message': 'Pack validated',
             'message_type': 'info',
-        }
+        },
     },
     'LOC2' : {
         "data": {
@@ -56,7 +56,7 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
             },
         },
         "next_state": "show_completion_info",
-        "message": {}
+        "message": {},
     },
     'LOC3' : {
         "data": undefined,
@@ -64,9 +64,9 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
         "message": {
             'message': 'Pack validated',
             'message_type': 'info',
-        }
+        },
     },
-}
+};
 
-window.DEMO_CASES['single_pack_transfer'] = DEMO_SINGLE_PACK_TRANSFER_1
-/* eslint no-use-before-define: 2 */  // --> ON
+window.DEMO_CASES.single_pack_transfer = DEMO_SINGLE_PACK_TRANSFER_1;
+/* eslint no-use-before-define: 2 */ // --> ON
