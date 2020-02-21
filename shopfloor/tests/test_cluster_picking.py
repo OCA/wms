@@ -746,4 +746,59 @@ class ClusterPickingScanLineCase(ClusterPickingCommonCase):
         )
 
 
+class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
+    """Tests covering the /scan_destination_pack endpoint
+
+    After a batch has been selected and the user confirmed they are
+    working on it, user picked the good, now they scan the location
+    destination.
+    """
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super().setUpClass(*args, **kwargs)
+        cls.batch = cls._create_picking_batch(
+            [
+                [
+                    cls.BatchProduct(product=cls.product_a, quantity=10),
+                    cls.BatchProduct(product=cls.product_b, quantity=10),
+                ],
+                [cls.BatchProduct(product=cls.product_a, quantity=10)],
+            ]
+        )
+        cls.bin1 = cls.env["stock.quant.package"].create({})
+
+    def test_scan_destination_pack_ok(self):
+        """Happy path for scan destination package
+
+        It sets the line in the pack for the full qty
+        """
+        self._simulate_batch_selected(self.batch)
+        line = self.batch.picking_ids.move_line_ids[0]
+        next_line = self.batch.picking_ids.move_line_ids[1]
+        qty_done = line.product_uom_qty
+        response = self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "move_line_id": line.id,
+                "barcode": self.bin1.name,
+                "quantity": qty_done,
+            },
+        )
+        self.assertRecordValues(
+            line, [{"qty_done": qty_done, "result_package_id": self.bin1.id}]
+        )
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=self._line_data(next_line),
+            message={
+                "message_type": "info",
+                "message": "{} {} put in {}".format(
+                    line.qty_done, line.product_id.display_name, self.bin1.name
+                ),
+            },
+        )
+
+
 # TODO tests for transitions to next line / no next lines, ...

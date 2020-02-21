@@ -413,7 +413,51 @@ class ClusterPicking(Component):
         have the same destination.
         * start_line: to pick the next line if any.
         """
-        return self._response()
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        if not move_line.exists():
+            # TODO go to next line? (but then handle if it's the last one)
+            return self._response(next_state="start")
+        # TODO if another line of the picking has a destination package, handle
+        # it (note: should be added to the 'single line' schema /data as well,
+        # maybe use a computed field).
+
+        # TODO handle partial pick
+        if quantity > move_line.product_uom_qty:
+            # TODO (+ use float_tools)
+            return self._response()
+        # TODO handle destination bin not empty
+        search = self.actions_for("search")
+        bin_package = search.package_from_scan(barcode)
+        if not bin_package:
+            # TODO
+            return self._response()
+        move_line.write({"qty_done": quantity, "result_package_id": bin_package.id})
+        # TODO zero check
+        # TODO handle next line and no next line (in a shared way with other
+        # endpoints)
+        batch = move_line.picking_id.batch_id
+        remaining_lines = batch.mapped("picking_ids.move_line_ids").filtered(
+            lambda line: not line.result_package_id
+        )
+        if not remaining_lines:
+            return self._response(
+                next_state="start",
+                message={"message_type": "info", "message": "Not implemented"},
+            )
+        next_line = remaining_lines[0]
+        return self._response(
+            next_state="start_line",
+            data=self._data_for_next_move_line(next_line),
+            message={
+                "message_type": "info",
+                # TODO different message for products/packs?
+                "message": _("{} {} put in {}").format(
+                    move_line.qty_done,
+                    move_line.product_id.display_name,
+                    bin_package.name,
+                ),
+            },
+        )
 
     def prepare_unload(self, picking_batch_id):
         """Initiate the unloading phase of the process
@@ -962,6 +1006,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                     "name": {"type": "string", "nullable": False, "required": True},
                 },
             },
+            # TODO add destination pack
             "pack": {
                 "type": "dict",
                 "required": False,
