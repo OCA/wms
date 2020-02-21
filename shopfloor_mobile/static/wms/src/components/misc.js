@@ -95,16 +95,25 @@ Vue.component('manual-select', {
         'type': String,
         'default': 'name'
       },
-  },
+    },
     data: function () {
         return {'selected': null}
+    },
+    methods: {
+      // NOTE: v-list-item-group should be able to work w/ `v-model`.
+      // For some reason, it does not work here.
+      // At the same time is preferable to have a place to hook to
+      // in case you want to customize its behavior.
+      updateSelected (selectedItem) {
+        this.selected = selectedItem
+      }
     },
     template: `
     <div class="manual-select with-bottom-actions">
       <v-card outlined>
         <v-list shaped>
-          <v-list-item-group v-model="selected" mandatory color="success">
-            <v-list-item v-for="rec in records" :key="rec[key_value]">
+          <v-list-item-group mandatory color="success">
+            <v-list-item v-for="rec in records" :key="rec[key_value]" @click="updateSelected(rec[key_value])">
               <v-list-item-content>
                 <v-list-item-title v-text="rec[key_title]"></v-list-item-title>
                 <!-- TODO: this part is harcoded and works only for picking batch selection

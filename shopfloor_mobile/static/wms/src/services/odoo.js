@@ -12,7 +12,7 @@ export class OdooMixin {
     }
     call(path, data, method='POST', fullpath=false) {
         let endpoint = fullpath ? path : this.usage + '/' + path
-        return this._call(endpoint, data, method)
+        return this._call(endpoint, method, data)
     }
     _call(endpoint, method, data) {
         if (this.debug) console.log('CALL', endpoint)
@@ -21,12 +21,11 @@ export class OdooMixin {
             method: method,
             headers: this._get_headers()
         }
-        if (!_.isUndefined(data)) {
-            if (method == 'GET') {
-                endpoint += '?' + new URLSearchParams(data).toString();
-            } else if (method == 'POST') {
-                params['body'] = JSON.stringify(data);
-            }
+        data = _.isUndefined(data) ? {} : data
+        if (method == 'GET' && data.length) {
+            endpoint += '?' + new URLSearchParams(data).toString();
+        } else if (method == 'POST') {
+            params['body'] = JSON.stringify(data);
         }
         return fetch(
             this._get_url(endpoint), params
