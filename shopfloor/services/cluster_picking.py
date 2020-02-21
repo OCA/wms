@@ -301,7 +301,97 @@ class ClusterPicking(Component):
           pack meanwhile (race condition).
         * scan_destination: if the barcode matches.
         """
-        return self._response()
+        message = self.actions_for("message")
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        if not move_line.exists():
+            # TODO go to next line? (but then handle if it's the last one)
+            return self._response(next_state="start")
+        # TODO check again the state of the move line, if already processed
+        # move to the next state or next line
+        if move_line.package_id.name == barcode:
+            return self._response_for_scan_line_ok(move_line)
+        elif move_line.product_id.barcode == barcode:
+            if move_line.product_id.tracking in ("lot", "serial"):
+                return self._response_for_scan_line_product_need_lot(move_line)
+            return self._response_for_scan_line_ok(move_line)
+        elif move_line.lot_id.name == barcode:
+            return self._response_for_scan_line_ok(move_line)
+        elif move_line.location_id.barcode == barcode:
+            # When a user scan a location, we accept only when we knows that
+            # they scanned the good thing, so if in the location we have
+            # several lots (on a package or a product), several packages,
+            # several products or a mix of several products and packages, we
+            # ask to scan a more precise barcode.
+            location = move_line.location_id
+            packages = set()
+            products = set()
+            lots = set()
+            for quant in location.quant_ids:
+                if quant.quantity <= 0:
+                    continue
+                if quant.package_id:
+                    packages.add(quant.package_id)
+                else:
+                    products.add(quant.product_id)
+                if quant.lot_id:
+                    lots.add(quant.lot_id)
+
+            if len(lots) > 1:
+                return self._response_for_scan_line_several_lots_in_loc(move_line)
+            if len(packages | products) > 1:
+                if move_line.package_id:
+                    return self._response_for_scan_line_several_packages_in_loc(
+                        move_line
+                    )
+                else:
+                    return self._response_for_scan_line_several_products_in_loc(
+                        move_line
+                    )
+
+            return self._response_for_scan_line_ok(move_line)
+
+        return self._response(
+            next_state="start_line",
+            data=self._data_for_next_move_line(move_line),
+            message=message.barcode_not_found(),
+        )
+
+    def _response_for_scan_line_several_lots_in_loc(self, move_line):
+        message = self.actions_for("message")
+        return self._response(
+            next_state="start_line",
+            data=self._data_for_next_move_line(move_line),
+            message=message.several_lots_in_location(move_line.location_id),
+        )
+
+    def _response_for_scan_line_several_products_in_loc(self, move_line):
+        message = self.actions_for("message")
+        return self._response(
+            next_state="start_line",
+            data=self._data_for_next_move_line(move_line),
+            message=message.several_products_in_location(move_line.location_id),
+        )
+
+    def _response_for_scan_line_several_packages_in_loc(self, move_line):
+        message = self.actions_for("message")
+        return self._response(
+            next_state="start_line",
+            data=self._data_for_next_move_line(move_line),
+            message=message.several_packs_in_location(move_line.location_id),
+        )
+
+    def _response_for_scan_line_product_need_lot(self, move_line):
+        message = self.actions_for("message")
+        return self._response(
+            next_state="start_line",
+            data=self._data_for_next_move_line(move_line),
+            message=message.scan_lot_on_product_tracked_by_lot(),
+        )
+
+    def _response_for_scan_line_ok(self, move_line):
+        return self._response(
+            next_state="scan_destination", data=self._data_for_next_move_line(move_line)
+        )
 
     def scan_destination_pack(self, move_line_id, barcode, quantity):
         """Scan the destination package (bin) for a move line

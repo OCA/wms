@@ -58,7 +58,7 @@ class BatchPickingCase(CommonCase, PickingBatchMixin):
     def test_search(self):
         """Return only draft batches with assigned pickings """
         pickings = self.all_batches.mapped("picking_ids")
-        self._fill_stock_for_pickings(pickings)
+        self._fill_stock_for_moves(pickings.mapped("move_lines"))
         pickings.action_assign()
         self.assertTrue(all(p.state == "assigned" for p in pickings))
         # we should not have done batches in list
