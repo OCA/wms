@@ -102,16 +102,14 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_manual_selection: (evt) => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.call('list_batches')
+                            this.odoo.call('list_batch')
                         )
                     },
                 },
                 'manual_selection': {
-                    enter: () => {
-                        this.reset_notification()
-                    },
                     on_back: () => {
                         this.go_state('start')
+                        this.reset_notification()
                     },
                     on_select: (selected) => {
                         this.go_state(
@@ -126,13 +124,17 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_confirm: () => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.call('confirm_start', this.state.data)
+                            this.odoo.call('confirm_start', {
+                                'picking_batch_id': this.batch_id,
+                            })
                         )
                     },
                     on_cancel: () => {
                         this.go_state(
                             'wait_call',
-                            this.odoo.call('unassign', this.state.data)
+                            this.odoo.call('unassign', {
+                                'picking_batch_id': this.batch_id,
+                            })
                         )
                     }
                 },
@@ -180,7 +182,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 'scan_destination': {
                     enter: () => {
                         // TODO: shalle we hook v-model for qty input straight to the state data?
-                        this.scan_destination_qty = this.erp_data.data.start_line.pack.qty
+                        this.scan_destination_qty = this.erp_data.data.start_line.product.qty_available
                     },
                     on_scan: (scanned) => {
                         this.go_state(
@@ -188,7 +190,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             this.odoo.call('scan_destination_pack', {
                                 'move_line_id': this.state.data.id,
                                 'barcode': scanned.text,
-                                'qty': this.scan_destination_qty,
+                                'quantity': this.scan_destination_qty,
                             })
                         )
                     },
