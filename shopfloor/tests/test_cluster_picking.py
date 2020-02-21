@@ -8,10 +8,20 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
         cls.product_a = cls.env["product.product"].create(
-            {"name": "Product A", "type": "product", "default_code": "A"}
+            {
+                "name": "Product A",
+                "type": "product",
+                "default_code": "A",
+                "barcode": "A",
+            }
         )
         cls.product_b = cls.env["product.product"].create(
-            {"name": "Product B", "type": "product", "default_code": "B"}
+            {
+                "name": "Product B",
+                "type": "product",
+                "default_code": "B",
+                "barcode": "B",
+            }
         )
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
         cls.process = cls.menu.process_id
@@ -25,8 +35,21 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
             self.service = work.component(usage="cluster_picking")
 
     @classmethod
-    def _simulate_batch_selected(cls, batches):
-        cls._add_stock_and_assign_pickings_for_batches(batches)
+    def _simulate_batch_selected(cls, batches, in_package=False, in_lot=False):
+        """Create a state as if a batch was selected by the user
+
+        * The picking batch is in progress
+        * It is assigned to the current user
+        * All the move lines are available
+
+        Note: currently, this method create a source package that contains
+        all the products of the batch. It is enough for the current tests.
+        """
+        pickings = batches.mapped("picking_ids")
+        cls._fill_stock_for_moves(
+            pickings.mapped("move_lines"), in_package=in_package, in_lot=in_lot
+        )
+        pickings.action_assign()
         batches.write({"state": "in_progress", "user_id": cls.env.uid})
 
 
@@ -50,7 +73,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
 
     These endpoints interact with a list of picking batches.
     The other endpoints that interact with a single batch (after selection)
-    are handled in ``ClusterPickingSelectedCase``.
+    are handled in other classes.
     """
 
     @classmethod
@@ -70,6 +93,11 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         cls.batch4 = cls._create_picking_batch(
             [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
         )
+
+    def _add_stock_and_assign_pickings_for_batches(self, batches):
+        pickings = batches.mapped("picking_ids")
+        self._fill_stock_for_moves(pickings.mapped("move_lines"))
+        pickings.action_assign()
 
     def test_find_batch_in_progress_current_user(self):
         """Find an in-progress batch assigned to the current user"""
@@ -377,11 +405,10 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
-        # TODO add several lines / different products
         cls.batch = cls._create_picking_batch(
             [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
         )
-        cls._simulate_batch_selected(cls.batch)
+        cls._simulate_batch_selected(cls.batch, in_package=True)
 
     def test_confirm_start_ok(self):
         """User confirms she starts the selected picking batch (happy path)"""
@@ -391,6 +418,10 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         picking = batch.picking_ids[0]
         first_move_line = picking.move_line_ids[0]
         self.assertTrue(first_move_line)
+        # A package exists on the move line, because the quant created
+        # by ``_simulate_batch_selected`` has a package.
+        package = first_move_line.package_id
+        self.assertTrue(package)
 
         response = self.service.dispatch(
             "confirm_start", params={"picking_batch_id": self.batch.id}
@@ -423,7 +454,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
                     "qty_available": first_move_line.product_id.qty_available,
                 },
                 "lot": None,
-                "pack": None,
+                "pack": {"id": package.id, "name": package.name},
             },
             next_state="start_line",
         )
@@ -452,3 +483,273 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         # to process anymore, but we want to set pickings and
         # picking batch to done if not done yet (because the process
         # was interrupted for instance)
+
+
+class ClusterPickingScanLineCase(ClusterPickingCommonCase):
+    """Tests covering the /scan_line endpoint
+
+    After a batch has been selected and the user confirmed they are
+    working on it.
+
+    User scans something and the scan_line endpoints validates they
+    scanned the proper thing to pick.
+    """
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super().setUpClass(*args, **kwargs)
+        # quants already existing are from demo data
+        cls.env["stock.quant"].search(
+            [("location_id", "=", cls.stock_location.id)]
+        ).unlink()
+        cls.batch = cls._create_picking_batch(
+            [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+        )
+
+    def _line_data(self, move_line):
+        picking = move_line.picking_id
+        batch = picking.batch_id
+        # A package exists on the move line, because the quant created
+        # by ``_simulate_batch_selected`` has a package.
+        package = move_line.package_id
+        lot = move_line.lot_id
+        return {
+            "id": move_line.id,
+            "quantity": 1.0,
+            "location_dst": {
+                "id": move_line.location_dest_id.id,
+                "name": move_line.location_dest_id.name,
+            },
+            "location_src": {
+                "id": move_line.location_id.id,
+                "name": move_line.location_id.name,
+            },
+            "picking": {
+                "id": picking.id,
+                "name": picking.name,
+                "note": "",
+                "origin": picking.origin,
+            },
+            "batch": {"id": batch.id, "name": batch.name},
+            "product": {
+                "default_code": move_line.product_id.default_code,
+                "display_name": move_line.product_id.display_name,
+                "id": move_line.product_id.id,
+                "name": move_line.product_id.name,
+                "qty_available": move_line.product_id.qty_available,
+            },
+            "lot": {"id": lot.id, "name": lot.name, "ref": lot.ref or ""}
+            if lot
+            else None,
+            "pack": {"id": package.id, "name": package.name} if package else None,
+        }
+
+    def test_scan_line_pack_ok(self):
+        """Scan to check if user picks the correct pack for current line"""
+        self._simulate_batch_selected(self.batch, in_package=True)
+        # we only have one line in this test case
+        selected_line = self.batch.picking_ids.move_line_ids
+        package = selected_line.package_id
+        response = self.service.dispatch(
+            "scan_line",
+            params={"move_line_id": selected_line.id, "barcode": package.name},
+        )
+        self.assert_response(
+            response, next_state="scan_destination", data=self._line_data(selected_line)
+        )
+
+    def test_scan_line_product_ok(self):
+        """Scan to check if user picks the correct product for current line"""
+        self._simulate_batch_selected(self.batch)
+        # we only have one line in this test case
+        selected_line = self.batch.picking_ids.move_line_ids
+        product = selected_line.product_id
+        response = self.service.dispatch(
+            "scan_line",
+            params={"move_line_id": selected_line.id, "barcode": product.barcode},
+        )
+        self.assert_response(
+            response, next_state="scan_destination", data=self._line_data(selected_line)
+        )
+
+    def _scan_line_serial_or_lot_ok(self, tracking):
+        self.product_a.tracking = tracking
+        self._simulate_batch_selected(self.batch, in_lot=True)
+        # we only have one line in this test case
+        selected_line = self.batch.picking_ids.move_line_ids
+        lot = selected_line.lot_id
+        response = self.service.dispatch(
+            "scan_line", params={"move_line_id": selected_line.id, "barcode": lot.name}
+        )
+        self.assert_response(
+            response, next_state="scan_destination", data=self._line_data(selected_line)
+        )
+
+    def test_scan_line_lot_ok(self):
+        """Scan to check if user picks the correct lot for current line"""
+        self._scan_line_serial_or_lot_ok("lot")
+
+    def test_scan_line_serial_ok(self):
+        """Scan to check if user picks the correct serial for current line"""
+        self._scan_line_serial_or_lot_ok("serial")
+
+    def test_scan_line_error_product_tracked(self):
+        """Scan a product tracked by lot, must scan the lot"""
+        self.product_a.tracking = "lot"
+        self._simulate_batch_selected(self.batch, in_lot=True)
+        # we only have one line in this test case
+        selected_line = self.batch.picking_ids.move_line_ids
+        product = selected_line.product_id
+        response = self.service.dispatch(
+            "scan_line",
+            params={"move_line_id": selected_line.id, "barcode": product.barcode},
+        )
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=self._line_data(selected_line),
+            message={
+                "message_type": "warning",
+                "message": "Product tracked by lot, please scan one.",
+            },
+        )
+
+    def _scan_line_location_ok(self):
+        # we only have one line in this test case
+        selected_line = self.batch.picking_ids.move_line_ids
+        location = selected_line.location_id
+        response = self.service.dispatch(
+            "scan_line",
+            params={"move_line_id": selected_line.id, "barcode": location.barcode},
+        )
+        self.assert_response(
+            response, next_state="scan_destination", data=self._line_data(selected_line)
+        )
+
+    def test_scan_line_location_ok_single_package(self):
+        """Scan to check if user scans a correct location for current line
+
+        If there is only one single package in the location, there is no
+        ambiguity so we can use it.
+        """
+        self._simulate_batch_selected(self.batch, in_package=True)
+        self._scan_line_location_ok()
+
+    def test_scan_line_location_ok_single_product(self):
+        """Scan to check if user scans a correct location for current line
+
+        If there is only one single product in the location, there is no
+        ambiguity so we can use it.
+        """
+        self._simulate_batch_selected(self.batch)
+        self._scan_line_location_ok()
+
+    def test_scan_line_location_ok_single_lot(self):
+        """Scan to check if user scans a correct location for current line
+
+        If there is only one single lot in the location, there is no
+        ambiguity so we can use it.
+        """
+        self._simulate_batch_selected(self.batch, in_lot=True)
+        self._scan_line_location_ok()
+
+    def test_scan_line_location_error_several_package(self):
+        """Scan to check if user scans a correct location for current line
+
+        If there are several packages in the location, user has to scan one.
+        """
+        self._simulate_batch_selected(self.batch, in_package=True)
+        # we only have one line in this test case
+        selected_line = self.batch.picking_ids.move_line_ids
+        location = selected_line.location_id
+
+        # add a second package in the location
+        self._update_qty_in_location(
+            location,
+            self.product_b,
+            10,
+            package=self.env["stock.quant.package"].create({}),
+        )
+        response = self.service.dispatch(
+            "scan_line",
+            params={"move_line_id": selected_line.id, "barcode": location.barcode},
+        )
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=self._line_data(selected_line),
+            message={
+                "message_type": "warning",
+                "message": "Several packages found in Stock, please scan a package.",
+            },
+        )
+
+    def test_scan_line_location_error_several_products(self):
+        """Scan to check if user scans a correct location for current line
+
+        If there are several products in the location, user has to scan one.
+        """
+        self._simulate_batch_selected(self.batch)
+        # we only have one line in this test case
+        selected_line = self.batch.picking_ids.move_line_ids
+        location = selected_line.location_id
+
+        # add a second product in the location
+        self._update_qty_in_location(location, self.product_b, 10)
+        response = self.service.dispatch(
+            "scan_line",
+            params={"move_line_id": selected_line.id, "barcode": location.barcode},
+        )
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=self._line_data(selected_line),
+            message={
+                "message_type": "warning",
+                "message": "Several products found in Stock, please scan a product.",
+            },
+        )
+
+    def test_scan_line_location_error_several_lots(self):
+        """Scan to check if user scans a correct location for current line
+
+        If there are several lots in the location, user has to scan one.
+        """
+        self._simulate_batch_selected(self.batch, in_lot=True)
+        # we only have one line in this test case
+        selected_line = self.batch.picking_ids.move_line_ids
+        location = selected_line.location_id
+        lot = self.env["stock.production.lot"].create(
+            {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        # add a second lot in the location
+        self._update_qty_in_location(location, self.product_a, 10, lot=lot)
+        response = self.service.dispatch(
+            "scan_line",
+            params={"move_line_id": selected_line.id, "barcode": location.barcode},
+        )
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=self._line_data(selected_line),
+            message={
+                "message_type": "warning",
+                "message": "Several lots found in Stock, please scan a lot.",
+            },
+        )
+
+    def test_scan_line_error_not_found(self):
+        """Nothing found for the barcode"""
+        self._simulate_batch_selected(self.batch, in_package=True)
+        # we only have one line in this test case
+        selected_line = self.batch.picking_ids.move_line_ids
+        response = self.service.dispatch(
+            "scan_line",
+            params={"move_line_id": selected_line.id, "barcode": "NO_EXISTING_BARCODE"},
+        )
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=self._line_data(selected_line),
+            message={"message_type": "error", "message": "Barcode not found"},
+        )
