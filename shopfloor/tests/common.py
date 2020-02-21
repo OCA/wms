@@ -91,18 +91,32 @@ class CommonCase(SavepointCase, ComponentMixin):
         )
 
     @classmethod
-    def _update_qty_in_location(cls, location, product, quantity):
-        cls.env["stock.quant"]._update_available_quantity(product, location, quantity)
+    def _update_qty_in_location(
+        cls, location, product, quantity, package=None, lot=None
+    ):
+        cls.env["stock.quant"]._update_available_quantity(
+            product, location, quantity, package_id=package, lot_id=lot
+        )
 
     @classmethod
-    def _fill_stock_for_pickings(cls, pickings):
+    def _fill_stock_for_moves(cls, moves, in_package=False, in_lot=False):
         product_locations = {}
-        for move in pickings.mapped("move_lines"):
+        package = None
+        if in_package:
+            package = cls.env["stock.quant.package"].create({})
+        for move in moves:
             key = (move.product_id, move.location_id)
             product_locations.setdefault(key, 0)
             product_locations[key] += move.product_qty
         for (product, location), qty in product_locations.items():
-            cls._update_qty_in_location(location, product, qty)
+            lot = None
+            if in_lot:
+                lot = cls.env["stock.production.lot"].create(
+                    {"product_id": product.id, "company_id": cls.env.company.id}
+                )
+            cls._update_qty_in_location(
+                location, product, qty, package=package, lot=lot
+            )
 
 
 class PickingBatchMixin:
@@ -142,9 +156,3 @@ class PickingBatchMixin:
         batch.picking_ids.action_confirm()
         batch.picking_ids.action_assign()
         return batch
-
-    @classmethod
-    def _add_stock_and_assign_pickings_for_batches(cls, batches):
-        pickings = batches.mapped("picking_ids")
-        cls._fill_stock_for_pickings(pickings)
-        pickings.action_assign()
