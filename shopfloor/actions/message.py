@@ -53,6 +53,12 @@ class MessageAction(Component):
     def scan_destination(self):
         return {"message_type": "info", "message": _("Scan the destination location")}
 
+    def scan_lot_on_product_tracked_by_lot(self):
+        return {
+            "message_type": "warning",
+            "message": _("Product tracked by lot, please scan one."),
+        }
+
     def operation_not_found(self):
         return {
             "message_type": "error",
@@ -64,6 +70,9 @@ class MessageAction(Component):
             "message_type": "error",
             "message": _("This record you were working on does not exist anymore."),
         }
+
+    def barcode_not_found(self):
+        return {"message_type": "error", "message": _("Barcode not found")}
 
     def operation_has_been_canceled_elsewhere(self):
         return {
@@ -106,9 +115,25 @@ class MessageAction(Component):
 
     def several_packs_in_location(self, location):
         return {
-            "message_type": "error",
+            "message_type": "warning",
             "message": _(
                 "Several packages found in %s, please scan a package." % location.name
+            ),
+        }
+
+    def several_lots_in_location(self, location):
+        return {
+            "message_type": "warning",
+            "message": _(
+                "Several lots found in %s, please scan a lot." % location.name
+            ),
+        }
+
+    def several_products_in_location(self, location):
+        return {
+            "message_type": "warning",
+            "message": _(
+                "Several products found in %s, please scan a product." % location.name
             ),
         }
 

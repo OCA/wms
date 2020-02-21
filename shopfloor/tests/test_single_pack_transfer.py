@@ -256,7 +256,7 @@ class SinglePackTransferCase(CommonCase):
             response,
             next_state="start",
             message={
-                "message_type": "error",
+                "message_type": "warning",
                 "message": "Several packages found in %s, please scan a package."
                 % (self.shelf1.name,),
             },
