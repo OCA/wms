@@ -1,5 +1,7 @@
 import {Odoo, OdooMocked} from "../services/odoo.js";
 
+
+
 export var ScenarioBaseMixin = {
     props: ['menuItem'],
     data: function () {
@@ -19,6 +21,11 @@ export var ScenarioBaseMixin = {
             'current_state_key': 'start_scan_pack',
             'states': {},
             'usage': '',  // match component usage on odoo
+        }
+    },
+    beforeMount: function () {
+        if (this.$root.demo_mode) {
+            this.$root.loadJS('src/demo/demo.' + this.usage + '.js', this.usage)
         }
     },
     mounted: function () {

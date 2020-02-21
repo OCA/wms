@@ -81,12 +81,11 @@ export class OdooMixin {
 
 export class OdooMocked extends OdooMixin{
 
-    constructor(params) {
-        super(params)
+    _set_demo_data() {
         this.demo_data = window.DEMO_CASES[this.usage]
-        window.DEMO_CASE = window.DEMO_CASES[this.usage]
     }
     call(path, data, method='POST', fullpath=false) {
+        this._set_demo_data()
         console.log('CALL:', path, this.usage);
         console.dir('CALL data:', data);
         if (!_.isUndefined(this[path])) {
@@ -99,13 +98,13 @@ export class OdooMocked extends OdooMixin{
         }
         let result
         let barcode = data ? data.barcode || data.location_barcode : null
-        if (_.has(window.DEMO_CASE, barcode)) {
+        if (_.has(this.demo_data, barcode)) {
             // pick a specific case for this barcode
-            result = window.DEMO_CASE[barcode]
+            result = this.demo_data[barcode]
         }
-        if (_.has(window.DEMO_CASE, path)) {
+        if (_.has(this.demo_data, path)) {
             // pick general case for this path
-            result = window.DEMO_CASE[path]
+            result = this.demo_data[path]
         }
         if (_.has(result, barcode)) {
             // pick specific barcode case inside path case
@@ -121,14 +120,10 @@ export class OdooMocked extends OdooMixin{
         console.dir('CALL RETURN data:', result);
         return Promise.resolve(result)
     }
-    start (data) {
-        window.DEMO_CASE = this.demo_data[data.barcode]
-        return Promise.resolve(window.DEMO_CASE['start'])
-    }
     scan_anything (barcode) {
         console.log('Scan anything', barcode, this.usage);
-        window.DEMO_CASE = this.demo_data[this.usage][barcode]
-        if (!window.DEMO_CASE) {
+        demo_case = this.demo_data[this.usage][barcode]
+        if (!demo_case) {
             return Promise.resolve({
                 "message": {"message_type": "error", "message": "Unknown barcode"}
             })
