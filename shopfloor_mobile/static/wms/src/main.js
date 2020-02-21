@@ -40,6 +40,7 @@ const vuetify_themes = {
     }
 }
 
+
 const app = new Vue({
     router: router,
     vuetify: new Vuetify({
@@ -54,6 +55,20 @@ const app = new Vue({
     },
     created: function () {
         this.demo_mode = window.location.pathname.includes('demo')
+        if (this.demo_mode)
+            this.loadJS('src/demo/demo.core.js', 'demo_core')
     },
+    methods: {
+        loadJS: function (url, script_id) {
+            if (script_id && !document.getElementById(script_id)) {
+                console.log('Load JS', url)
+                var script = document.createElement('script')
+                script.setAttribute('src', url)
+                script.setAttribute('type', 'text/javascript')
+                script.setAttribute('id', script_id)
+                document.getElementsByTagName("head")[0].appendChild(script)
+            }
+        }
+    }
 
 }).$mount('#app');
