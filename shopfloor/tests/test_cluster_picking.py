@@ -523,15 +523,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         # was interrupted for instance)
 
 
-class ClusterPickingScanLineCase(ClusterPickingCommonCase):
-    """Tests covering the /scan_line endpoint
-
-    After a batch has been selected and the user confirmed they are
-    working on it.
-
-    User scans something and the scan_line endpoints validates they
-    scanned the proper thing to pick.
-    """
+class ClusterPickingLineCommonCase(ClusterPickingCommonCase):
 
     @classmethod
     def setUpClass(cls, *args, **kwargs):
@@ -581,6 +573,17 @@ class ClusterPickingScanLineCase(ClusterPickingCommonCase):
             else None,
             "pack": {"id": package.id, "name": package.name} if package else None,
         }
+
+
+class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
+    """Tests covering the /scan_line endpoint
+
+    After a batch has been selected and the user confirmed they are
+    working on it.
+
+    User scans something and the scan_line endpoints validates they
+    scanned the proper thing to pick.
+    """
 
     def _scan_line_ok(self, line, scanned):
         response = self.service.dispatch(
@@ -763,7 +766,9 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                     cls.BatchProduct(product=cls.product_a, quantity=10),
                     cls.BatchProduct(product=cls.product_b, quantity=10),
                 ],
-                [cls.BatchProduct(product=cls.product_a, quantity=10)],
+                [
+                    cls.BatchProduct(product=cls.product_a, quantity=10)
+                ],
             ]
         )
         cls.bin1 = cls.env["stock.quant.package"].create({})
