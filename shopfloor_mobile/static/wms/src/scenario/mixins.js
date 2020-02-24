@@ -272,6 +272,10 @@ export var GenericStatesMixin = {
                     },
                     on_user_confirm: (answer) => {
                         if (answer == 'yes'){
+                            // Keep the data received from previous state but not the question answered
+                            let state_data = this.state_get_data(this.current_state_key)
+                            state_data.message = {}
+                            this.state_set_data(state_data, 'scan_location')
                             this.go_state('scan_location')
                         } else {
                             this.go_state('start')
