@@ -65,8 +65,9 @@ export var ScanAnything = Vue.component('scan-anything', {
                 },
                 'wait_call': {
                     success: (result) => {
-                        if (result.data != undefined)
-                            this.set_erp_data('data', result.data)
+                        // This start key is not needed in this scenario
+                        if (!_.isUndefined(result.start.data))
+                            this.set_erp_data('data', result.start.data)
                         this.go_state('show_detail_info')
                     },
                     error: (result) => {
