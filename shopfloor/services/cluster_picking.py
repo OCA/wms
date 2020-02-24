@@ -215,15 +215,26 @@ class ClusterPicking(Component):
         if not picking_batch.exists():
             return self._response_batch_does_not_exist()
 
-        remaining_lines = picking_batch.mapped("picking_ids.move_line_ids").filtered(
-            lambda l: l.state == "assigned"
-        )
+        remaining_lines = self._assigned_lines_for_picking_batch(picking_batch)
         if not remaining_lines:
             # TODO
             pass
-
         return self._response(
             next_state="start_line", data=self._data_for_next_move_line(remaining_lines)
+        )
+
+    def _lines_for_picking_batch(self, picking_batch, filter_func=lambda x: x):
+        lines = picking_batch.mapped("picking_ids.move_line_ids").filtered(filter_func)
+        return lines
+
+    def _assigned_lines_for_picking_batch(self, picking_batch):
+        return self._lines_for_picking_batch(
+            picking_batch, filter_func=lambda l: l.state == 'assigned'
+        )
+
+    def _unpackaged_lines_for_picking_batch(self, picking_batch):
+        return self._lines_for_picking_batch(
+            picking_batch, filter_func=lambda l: not l.result_package_id
         )
 
     def _response_batch_does_not_exist(self):
@@ -436,9 +447,7 @@ class ClusterPicking(Component):
         # TODO handle next line and no next line (in a shared way with other
         # endpoints)
         batch = move_line.picking_id.batch_id
-        remaining_lines = batch.mapped("picking_ids.move_line_ids").filtered(
-            lambda line: not line.result_package_id
-        )
+        remaining_lines = self._unpackaged_lines_for_picking_batch(batch)
         if not remaining_lines:
             return self._response(
                 next_state="start",
