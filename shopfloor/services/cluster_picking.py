@@ -229,7 +229,7 @@ class ClusterPicking(Component):
 
     def _assigned_lines_for_picking_batch(self, picking_batch):
         return self._lines_for_picking_batch(
-            picking_batch, filter_func=lambda l: l.state == 'assigned'
+            picking_batch, filter_func=lambda l: l.state == "assigned"
         )
 
     def _unpackaged_lines_for_picking_batch(self, picking_batch):
@@ -481,7 +481,51 @@ class ClusterPicking(Component):
         * unload_all: when ``cluster_picking_unload_all`` is True
         * unload_single: when ``cluster_picking_unload_all`` is False
         """
-        return self._response()
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
+        if len(batch.mapped("picking_ids.move_line_ids.location_dest_id")) == 1:
+            batch.cluster_picking_unload_all = True
+            return self._response_for_unload_all(batch)
+        else:
+            # the lines have different destinations
+            batch.cluster_picking_unload_all = False
+            return self._response_for_unload_single(batch)
+
+    def _data_for_unload(self, move_line):
+        batch = move_line.picking_id.batch_id
+        return {
+            "id": batch.id,
+            "name": batch.name,
+            "location_dst": {
+                "id": move_line.location_dest_id.id,
+                "name": move_line.location_dest_id.name,
+            },
+        }
+
+    def _response_for_unload_all(self, batch):
+        # all the lines destinations are the same here
+        first_line = batch.mapped("picking_ids.move_line_ids")[0]
+        return self._response(
+            next_state="unload_all", data=self._data_for_unload(first_line)
+        )
+
+    def _next_line_for_unload_single(self, batch):
+        lines = batch.mapped("picking_ids.move_line_ids")
+        for line in lines:
+            if line.shopfloor_unloaded:
+                continue
+            return line
+        return self.env["stock.move.line"].browse()
+
+    def _response_for_unload_single(self, batch):
+        next_line = self._next_line_for_unload_single(batch)
+        if not next_line:
+            # TODO ensure batch is 'done' and go to start?
+            return self._response()
+        return self._response(
+            next_state="unload_single", data=self._data_for_unload(next_line)
+        )
 
     def is_zero(self, move_line_id, zero):
         """Confirm or not if the source location of a move has zero qty
