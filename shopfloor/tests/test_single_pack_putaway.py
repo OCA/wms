@@ -403,6 +403,7 @@ class SinglePackPutawayCase(CommonCase):
         # was already started by the first step (start operation)
         package_level = self._simulate_started()
 
+        move = package_level.move_line_ids.move_id
         # expected destination is 'shelf1', we'll scan shelf2 which must
         # ask a confirmation to the user (it's still in the same picking type)
         response = self.service.dispatch(
@@ -412,11 +413,25 @@ class SinglePackPutawayCase(CommonCase):
                 "location_barcode": self.shelf2.barcode,
             },
         )
+        message = self.service.actions_for("message").confirm_location_changed(
+            self.shelf1, self.shelf2
+        )
 
         self.assert_response(
             response,
             next_state="confirm_location",
-            message={"message_type": "warning", "message": "Are you sure?"},
+            message=message,
+            data={
+                "id": self.ANY,
+                "location_src": {
+                    "id": self.dispatch_location.id,
+                    "name": self.dispatch_location.name,
+                },
+                "location_dst": {"id": self.shelf1.id, "name": self.shelf1.name},
+                "name": package_level.package_id.name,
+                "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
+                "product": {"id": move.product_id.id, "name": move.product_id.name},
+            },
         )
 
     def test_validate_location_with_confirm(self):
