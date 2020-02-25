@@ -8,20 +8,10 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
         cls.product_a = cls.env["product.product"].create(
-            {
-                "name": "Product A",
-                "type": "product",
-                "default_code": "A",
-                "barcode": "A",
-            }
+            {"name": "Product A", "type": "product", "default_code": "A", "barcode": "A"}
         )
         cls.product_b = cls.env["product.product"].create(
-            {
-                "name": "Product B",
-                "type": "product",
-                "default_code": "B",
-                "barcode": "B",
-            }
+            {"name": "Product B", "type": "product", "default_code": "B", "barcode": "B"}
         )
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
         cls.process = cls.menu.process_id
@@ -379,9 +369,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         batch_id = self.batch1.id
         self.batch1.unlink()
         # Simulate the client selecting the batch in a list
-        response = self.service.dispatch(
-            "select", params={"picking_batch_id": batch_id}
-        )
+        response = self.service.dispatch("select", params={"picking_batch_id": batch_id})
         self.assert_response(
             response,
             next_state="manual_selection",
@@ -771,102 +759,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         )
 
 
-class ClusterPickingPrepareUnloadPackCase(ClusterPickingCommonCase):
-    """Tests covering the /prepare_unload endpoint
-
-    Destination packages have been set on all the move lines of the batch.
-    The unload operation will start, but we have 2 paths for this:
-
-    1. unload all the destination packages at the same place
-    2. unload the destination packages one by one at different places
-
-    By default, if all the move lines have the same destination, the
-    first path is used. A flag on the batch picking keeps track of which
-    path is used.
-    """
-
-    @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
-        cls.batch = cls._create_picking_batch(
-            [
-                [
-                    cls.BatchProduct(product=cls.product_a, quantity=10),
-                    cls.BatchProduct(product=cls.product_b, quantity=10),
-                ],
-                [cls.BatchProduct(product=cls.product_a, quantity=10)],
-            ]
-        )
-        cls._simulate_batch_selected(cls.batch)
-        cls.bin1 = cls.env["stock.quant.package"].create({})
-        cls.bin2 = cls.env["stock.quant.package"].create({})
-        cls.packing_a_location = cls.env["stock.location"].create(
-            {
-                "name": "Packing A",
-                "barcode": "Packing-A",
-                "location_id": cls.packing_location.id,
-            }
-        )
-        cls.packing_b_location = cls.env["stock.location"].create(
-            {
-                "name": "Packing B",
-                "barcode": "Packing-B",
-                "location_id": cls.packing_location.id,
-            }
-        )
-
-    def _set_dest_package_and_done(self, move_lines, dest_package):
-        """Simulate what would have been done in the previous steps"""
-        for line in move_lines:
-            line.write({"qty_done": line.qty_done, "package_id": dest_package.id})
-
-    def test_prepare_unload_all_same_dest(self):
-        """All move lines have the same destination location"""
-        move_lines = self.batch.mapped("picking_ids.move_line_ids")
-        self._set_dest_package_and_done(move_lines[:1], self.bin1)
-        self._set_dest_package_and_done(move_lines[1:], self.bin2)
-        move_lines.write({"location_dest_id": self.packing_location.id})
-        response = self.service.dispatch(
-            "prepare_unload", params={"picking_batch_id": self.batch.id}
-        )
-        self.assertRecordValues(self.batch, [{"cluster_picking_unload_all": True}])
-        self.assert_response(
-            response,
-            next_state="unload_all",
-            data={
-                "id": self.batch.id,
-                "name": self.batch.name,
-                "location_dst": {
-                    "id": self.packing_location.id,
-                    "name": self.packing_location.name,
-                },
-            },
-        )
-
-    def test_prepare_unload_different_dest(self):
-        """All move lines have different destination locations"""
-        move_lines = self.batch.mapped("picking_ids.move_line_ids")
-        self._set_dest_package_and_done(move_lines[:1], self.bin1)
-        self._set_dest_package_and_done(move_lines[1:], self.bin2)
-        move_lines[:1].write({"location_dest_id": self.packing_a_location.id})
-        move_lines[:1].write({"location_dest_id": self.packing_b_location.id})
-        response = self.service.dispatch(
-            "prepare_unload", params={"picking_batch_id": self.batch.id}
-        )
-        self.assertRecordValues(self.batch, [{"cluster_picking_unload_all": False}])
-        first_line = move_lines[0]
-        self.assert_response(
-            response,
-            next_state="unload_single",
-            data={
-                "id": self.batch.id,
-                "name": self.batch.name,
-                "location_dst": {
-                    "id": first_line.location_dest_id.id,
-                    "name": first_line.location_dest_id.name,
-                },
-            },
-        )
+# TODO tests for transitions to next line / no next lines, ...
 
 
 class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
@@ -924,4 +817,234 @@ class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
         self.assertTrue(lines[3].shopfloor_postponed)
 
 
-# TODO tests for transitions to next line / no next lines, ...
+class ClusterPickingUnloadingCommonCase(ClusterPickingCommonCase):
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super().setUpClass(*args, **kwargs)
+        cls.batch = cls._create_picking_batch(
+            [
+                [
+                    cls.BatchProduct(product=cls.product_a, quantity=10),
+                    cls.BatchProduct(product=cls.product_b, quantity=10),
+                ],
+                [cls.BatchProduct(product=cls.product_a, quantity=10)],
+            ]
+        )
+        cls._simulate_batch_selected(cls.batch)
+        cls.bin1 = cls.env["stock.quant.package"].create({})
+        cls.bin2 = cls.env["stock.quant.package"].create({})
+        cls.packing_a_location = cls.env["stock.location"].create(
+            {
+                "name": "Packing A",
+                "barcode": "Packing-A",
+                "location_id": cls.packing_location.id,
+            }
+        )
+        cls.packing_b_location = cls.env["stock.location"].create(
+            {
+                "name": "Packing B",
+                "barcode": "Packing-B",
+                "location_id": cls.packing_location.id,
+            }
+        )
+
+    def _set_dest_package_and_done(self, move_lines, dest_package):
+        """Simulate what would have been done in the previous steps"""
+        for line in move_lines:
+            line.write(
+                {"qty_done": line.product_uom_qty, "result_package_id": dest_package.id}
+            )
+
+
+class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
+    """Tests covering the /prepare_unload endpoint
+
+    Destination packages have been set on all the move lines of the batch.
+    The unload operation will start, but we have 2 paths for this:
+
+    1. unload all the destination packages at the same place
+    2. unload the destination packages one by one at different places
+
+    By default, if all the move lines have the same destination, the
+    first path is used. A flag on the batch picking keeps track of which
+    path is used.
+    """
+
+    def test_prepare_unload_all_same_dest(self):
+        """All move lines have the same destination location"""
+        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        self._set_dest_package_and_done(move_lines[:2], self.bin1)
+        self._set_dest_package_and_done(move_lines[2:], self.bin2)
+        move_lines.write({"location_dest_id": self.packing_location.id})
+        response = self.service.dispatch(
+            "prepare_unload", params={"picking_batch_id": self.batch.id}
+        )
+        self.assertRecordValues(self.batch, [{"cluster_picking_unload_all": True}])
+        self.assert_response(
+            response,
+            next_state="unload_all",
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "location_dst": {
+                    "id": self.packing_location.id,
+                    "name": self.packing_location.name,
+                },
+            },
+        )
+
+    def test_prepare_unload_different_dest(self):
+        """All move lines have different destination locations"""
+        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        self._set_dest_package_and_done(move_lines[:2], self.bin1)
+        self._set_dest_package_and_done(move_lines[2:], self.bin2)
+        move_lines[:1].write({"location_dest_id": self.packing_a_location.id})
+        move_lines[:1].write({"location_dest_id": self.packing_b_location.id})
+        response = self.service.dispatch(
+            "prepare_unload", params={"picking_batch_id": self.batch.id}
+        )
+        self.assertRecordValues(self.batch, [{"cluster_picking_unload_all": False}])
+        first_line = move_lines[0]
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "location_dst": {
+                    "id": first_line.location_dest_id.id,
+                    "name": first_line.location_dest_id.name,
+                },
+            },
+        )
+
+
+class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
+    """Tests covering the /set_destination_all endpoint
+
+    All the picked lines go to the same destination, a single call to this
+    endpoint set them as "unloaded" and set the destination. When the last
+    available line of a picking is unloaded, the picking is set to 'done'.
+    """
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super().setUpClass(*args, **kwargs)
+        # this is what the /prepare_endpoint method would have set as all the
+        # destinations are the same:
+        cls.batch.cluster_picking_unload_all = True
+
+    def test_set_destination_all_ok(self):
+        """Set destination on all lines for the full batch and end the process"""
+        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        # put destination packages, the whole quantity on lines and a similar
+        # destination (when /set_destination_all is called, all the lines to
+        # unload must have the same destination)
+        self._set_dest_package_and_done(move_lines[:2], self.bin1)
+        self._set_dest_package_and_done(move_lines[2:], self.bin2)
+        move_lines.write({"location_dest_id": self.packing_location.id})
+
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "picking_batch_id": self.batch.id,
+                "barcode": self.packing_location.barcode,
+            },
+        )
+        # since the whole batch is complete, we expect the batch and all
+        # pickings to be 'done'
+        self.assertRecordValues(
+            move_lines.mapped("picking_id"), [{"state": "done"}, {"state": "done"}]
+        )
+        self.assertRecordValues(
+            move_lines,
+            [
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_done": 10,
+                    "state": "done",
+                    "location_dest_id": self.packing_location.id,
+                },
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_done": 10,
+                    "state": "done",
+                    "location_dest_id": self.packing_location.id,
+                },
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_done": 10,
+                    "state": "done",
+                    "location_dest_id": self.packing_location.id,
+                },
+            ],
+        )
+        self.assertRecordValues(self.batch, [{"state": "done"}])
+        self.assert_response(
+            response,
+            next_state="start",
+            message={"message_type": "info", "message": "Batch Transfer complete"},
+        )
+
+    def test_set_destination_all_remaining_lines(self):
+        """Set destination on all lines for a part of the batch"""
+        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        # Put destination packages, the whole quantity on lines and a similar
+        # destination (when /set_destination_all is called, all the lines to
+        # unload must have the same destination).
+        # However, we keep a line without qty_done and destination package,
+        # so when the dest location is set, the endpoint should route back
+        # to the 'start_line' state to work on the remaining line.
+        lines_to_unload = move_lines[:2]
+        self._set_dest_package_and_done(lines_to_unload, self.bin1)
+        lines_to_unload.write({"location_dest_id": self.packing_location.id})
+
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "picking_batch_id": self.batch.id,
+                "barcode": self.packing_location.barcode,
+            },
+        )
+        # Since the whole batch is not complete, state should not be done.
+        # The picking with one line should be "done" because we unloaded its line.
+        # The second one still has a line to pick.
+        one_line_picking = self.batch.picking_ids[0]
+        two_lines_picking = self.batch.picking_ids[1]
+        self.assertRecordValues(one_line_picking, [{"state": "done"}])
+        self.assertRecordValues(two_lines_picking, [{"state": "assigned"}])
+        self.assertRecordValues(
+            move_lines,
+            [
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_done": 10,
+                    "state": "done",
+                    "picking_id": one_line_picking.id,
+                    "location_dest_id": self.packing_location.id,
+                },
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_done": 10,
+                    # will be done when the second line of the picking is unloaded
+                    "state": "assigned",
+                    "picking_id": two_lines_picking.id,
+                    "location_dest_id": self.packing_location.id,
+                },
+                {
+                    "shopfloor_unloaded": False,
+                    "qty_done": 0,
+                    "state": "assigned",
+                    "picking_id": two_lines_picking.id,
+                    "location_dest_id": self.packing_location.id,
+                },
+            ],
+        )
+        self.assertRecordValues(self.batch, [{"state": "in_progress"}])
+
+        self.assert_response(
+            response, next_state="start_line", data=self._line_data(move_lines[2])
+        )
+
+        # TODO add test when /set_destination_all is called but not all lines
+        # have the same destination
