@@ -61,8 +61,8 @@ repos:
   - id: isort
     name: isort except __init__.py
     exclude: /__init__\.py$
-- repo: https://github.com/pre-commit/mirrors-eslint
-  rev: v6.5.1
-  hooks:
-  - id: eslint
-    verbose: true
+#- repo: https://github.com/pre-commit/mirrors-eslint
+#  rev: v6.5.1
+#  hooks:
+#  - id: eslint
+#    verbose: true
