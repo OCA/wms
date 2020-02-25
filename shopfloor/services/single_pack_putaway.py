@@ -286,7 +286,9 @@ class SinglePackPutaway(Component):
                 if not scanned_location.is_sublocation_of(move.location_dest_id):
                     move.location_dest_id = scanned_location.id
             else:
-                return self._response_for_location_need_confirm()
+                return self._response_for_location_need_confirm(
+                    move_line, package.package_id, scanned_location
+                )
 
         pack_transfer.set_destination_and_done(move, scanned_location)
         return self._response_for_validate_success()
@@ -367,7 +369,7 @@ class SinglePackPutawayValidatorResponse(Component):
             "start": {},
             "confirm_start": self._schema_for_location,
             "scan_location": self._schema_for_location,
-            "confirm_location": {},
+            "confirm_location": self._schema_for_location,
         }
 
     def cancel(self):
