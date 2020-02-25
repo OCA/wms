@@ -78,6 +78,7 @@ ul.packaging span:first-child {
 .number-spinner {
     font-size: 1.6rem;
     text-align: center;
+    overflow: hidden;
 }
 .number-spinner .spinner-btn{
     font-size: 2rem;
@@ -91,6 +92,19 @@ ul.packaging span:first-child {
     width: 100%;
     text-align: center;
     margin: 0.5rem 0;
+}
+.number-spinner.spinner-position-right .spinner-btn{
+    float: right;
+    margin: 0.5rem 0;
+}
+.number-spinner.spinner-position-right .input-wrapper{
+    float: left;
+    width: 50%;
+    margin: 0.5rem 0;
+}
+.number-spinner.spinner-position-right input.init-value{
+    font-weight: bold;
+    color: #999;
 }
 
 .with-bottom-actions {
