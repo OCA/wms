@@ -22,6 +22,7 @@ var batchList = function (count=5) {
 var makeBatchPickingLine = function () {
     return {
         "id": getRandomInt(),
+        "postponed": true,
         "picking": {
             "id": getRandomInt(),
             "name": "PICK" + _.padStart(getRandomInt(), 8, 0),
