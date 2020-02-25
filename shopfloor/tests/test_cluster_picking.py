@@ -861,7 +861,8 @@ class ClusterPickingUnloadingCommonCase(ClusterPickingCommonCase):
             }
         )
 
-    def _set_dest_package_and_done(self, move_lines, dest_package):
+    @classmethod
+    def _set_dest_package_and_done(cls, move_lines, dest_package):
         """Simulate what would have been done in the previous steps"""
         for line in move_lines:
             line.write(
@@ -922,8 +923,9 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="unload_single",
             data={
-                "id": self.bin1.id,
-                "name": self.bin1.name,
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "package": {"id": self.bin1.id, "name": self.bin1.name},
                 "location_dst": {
                     "id": first_line.location_dest_id.id,
                     "name": first_line.location_dest_id.name,
@@ -1081,8 +1083,9 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="unload_single",
             data={
-                "id": self.bin1.id,
-                "name": self.bin1.name,
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "package": {"id": self.bin1.id, "name": self.bin1.name},
                 "location_dst": {
                     "id": move_lines[0].location_dest_id.id,
                     "name": move_lines[0].location_dest_id.name,
@@ -1237,11 +1240,81 @@ class ClusterPickingUnloadSplitCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="unload_single",
             data={
-                "id": self.bin1.id,
-                "name": self.bin1.name,
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "package": {"id": self.bin1.id, "name": self.bin1.name},
                 "location_dst": {
                     "id": move_lines[0].location_dest_id.id,
                     "name": move_lines[0].location_dest_id.name,
                 },
             },
+        )
+
+
+class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
+    """Tests covering the /unload_scan_pack endpoint
+
+    Goods have been put in the package bins, they have different destinations
+    or /unload_split has been called, now user has to unload package per
+    package. For this, they'll first scan the bin package, which will call the
+    endpoint /unload_scan_pack. (second step will be to set the destination
+    with /unload_scan_destination, in a different test case)
+    """
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super().setUpClass(*args, **kwargs)
+        cls.batch.cluster_picking_unload_all = False
+        cls.move_lines = cls.batch.mapped("picking_ids.move_line_ids")
+        cls._set_dest_package_and_done(cls.move_lines, cls.bin1)
+        cls.move_lines[:2].write({"location_dest_id": cls.packing_a_location.id})
+        cls.move_lines[2:].write({"location_dest_id": cls.packing_b_location.id})
+
+    def test_unload_scan_pack_ok(self):
+        """Endpoint /unload_scan_pack is called, result ok"""
+        response = self.service.dispatch(
+            "unload_scan_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": self.bin1.name,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="unload_set_destination",
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "package": {"id": self.bin1.id, "name": self.bin1.name},
+                "location_dst": {
+                    "id": self.move_lines[0].location_dest_id.id,
+                    "name": self.move_lines[0].location_dest_id.name,
+                },
+            },
+        )
+
+    def test_unload_scan_pack_wrong_barcode(self):
+        """Endpoint /unload_scan_pack is called, wrong barcode scanned"""
+        response = self.service.dispatch(
+            "unload_scan_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": self.bin2.name,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "package": {"id": self.bin1.id, "name": self.bin1.name},
+                "location_dst": {
+                    "id": self.move_lines[0].location_dest_id.id,
+                    "name": self.move_lines[0].location_dest_id.name,
+                },
+            },
+            message={"message_type": "error", "message": "Wrong bin"},
         )
