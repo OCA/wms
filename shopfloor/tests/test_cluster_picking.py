@@ -52,7 +52,7 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
         pickings.action_assign()
         batches.write({"state": "in_progress", "user_id": cls.env.uid})
 
-    def _line_data(self, move_line):
+    def _line_data(self, move_line, qty=None):
         picking = move_line.picking_id
         batch = picking.batch_id
         # A package exists on the move line, because the quant created
@@ -61,7 +61,8 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
         lot = move_line.lot_id
         return {
             "id": move_line.id,
-            "quantity": move_line.product_uom_qty,
+            "quantity": qty or move_line.product_uom_qty,
+            "postponed": move_line.shopfloor_postponed,
             "location_dst": {
                 "id": move_line.location_dest_id.id,
                 "name": move_line.location_dest_id.name,
@@ -469,6 +470,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
             data={
                 "id": first_move_line.id,
                 "quantity": 1.0,
+                "postponed": False,
                 "location_dst": {
                     "id": first_move_line.location_dest_id.id,
                     "name": first_move_line.location_dest_id.name,
@@ -535,43 +537,9 @@ class ClusterPickingLineCommonCase(ClusterPickingCommonCase):
             [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
         )
 
-    def _line_data(self, move_line):
-        picking = move_line.picking_id
-        batch = picking.batch_id
-        # A package exists on the move line, because the quant created
-        # by ``_simulate_batch_selected`` has a package.
-        package = move_line.package_id
-        lot = move_line.lot_id
-        return {
-            "id": move_line.id,
-            "quantity": 1.0,
-            "location_dst": {
-                "id": move_line.location_dest_id.id,
-                "name": move_line.location_dest_id.name,
-            },
-            "location_src": {
-                "id": move_line.location_id.id,
-                "name": move_line.location_id.name,
-            },
-            "picking": {
-                "id": picking.id,
-                "name": picking.name,
-                "note": "",
-                "origin": picking.origin,
-            },
-            "batch": {"id": batch.id, "name": batch.name},
-            "product": {
-                "default_code": move_line.product_id.default_code,
-                "display_name": move_line.product_id.display_name,
-                "id": move_line.product_id.id,
-                "name": move_line.product_id.name,
-                "qty_available": move_line.product_id.qty_available,
-            },
-            "lot": {"id": lot.id, "name": lot.name, "ref": lot.ref or ""}
-            if lot
-            else None,
-            "pack": {"id": package.id, "name": package.name} if package else None,
-        }
+    def _line_data(self, move_line, qty=1.0):
+        # just force qty to 1.0
+        return super()._line_data(move_line, qty=qty)
 
 
 class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
@@ -899,6 +867,29 @@ class ClusterPickingPrepareUnloadPackCase(ClusterPickingCommonCase):
                 },
             },
         )
+# TODO
+# class ClusterPickingSkipLineCase(ClusterPickingLineCommonCase):
+#     """Tests covering the /skip_line endpoint
+#     """
+
+#     def _skip_line(self, line, scanned):
+#         response = self.service.dispatch(
+#             "scan_line", params={"move_line_id": line.id, "barcode": scanned}
+#         )
+#         self.assert_response(
+#             response, next_state="scan_destination", data=self._line_data(line)
+#         )
+
+#     @classmethod
+#     def setUpClass(cls, *args, **kwargs):
+#         super().setUpClass(*args, **kwargs)
+#         # quants already existing are from demo data
+#         cls.env["stock.quant"].search(
+#             [("location_id", "=", cls.stock_location.id)]
+#         ).unlink()
+#         cls.batch = cls._create_picking_batch(
+#             [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+#         )
 
 
 # TODO tests for transitions to next line / no next lines, ...
