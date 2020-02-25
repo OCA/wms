@@ -37,7 +37,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 />
             <div v-if="state_is('scan_destination')">
                 <div class="qty">
-                    <input-number-spinner :init_value="scan_destination_qty" class="mb-2"/>
+                    <input-number-spinner v-on:input="state.on_qty_update" :init_value="scan_destination_qty" class="mb-2"/>
                 </div>
                 <searchbar
                     v-on:found="on_scan"
@@ -183,6 +183,9 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     enter: () => {
                         // TODO: shalle we hook v-model for qty input straight to the state data?
                         this.scan_destination_qty = this.erp_data.data.start_line.product.qty_available
+                    },
+                    on_qty_update: (qty) => {
+                        this.scan_destination_qty = parseInt(qty)
                     },
                     on_scan: (scanned) => {
                         this.go_state(
