@@ -244,6 +244,9 @@ export var GenericStatesMixin = {
                 },
                 'wait_validation': {
                     success: (result) => {
+                        if (!_.isUndefined(result.data)){
+                            this.set_erp_data('data', result.data)
+                        }
                         this.go_state(result.next_state)
                     },
                     error: (result) => {
@@ -262,14 +265,20 @@ export var GenericStatesMixin = {
                     display_info: {
                         'scan_placeholder': 'Scan location',
                     },
+                    enter: () => {
+                        this.need_confirmation = true
+                    },
+                    exit: () => {
+                        this.need_confirmation = false
+                    },
                     on_user_confirm: (answer) => {
-                        // TODO: check if this used
-                        //-> no flag is set to enable the confirmation dialog,
-                        // we only display a message, unlike `confirm_start`
                         if (answer == 'yes'){
-                            // reuse data from scan_location
+                            // Reuse data from scan_location and
+                            // simulate the event that on_scan expects
                             let scan_data = this.state_get_data('scan_location')
-                            this.state.on_scan(scan_data.location_barcode, true)
+                            this.state.on_scan({
+                                'text': scan_data.location_barcode
+                            }, true)
                         } else {
                             this.go_state('scan_location')
                         }
@@ -279,7 +288,6 @@ export var GenericStatesMixin = {
                         this.current_state_key = 'scan_location'
                         this.state.on_scan(scanned, confirmation)
                     },
-                    scan_placeholder: 'Scan location',
                 },
                 'confirm_start': {
                     display_info: {
