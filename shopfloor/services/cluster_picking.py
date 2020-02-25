@@ -778,7 +778,7 @@ class ClusterPicking(Component):
             message={"message_type": "info", "message": _("Batch Transfer complete")},
         )
 
-    def unload_split(self, picking_batch_id, barcode, confirmation=False):
+    def unload_split(self, picking_batch_id):
         """Indicates that now the batch must be treated line per line
 
         Even if the move lines to unload all have the same destination.
@@ -792,7 +792,13 @@ class ClusterPicking(Component):
         Transitions:
         * unload_single: always goes here since we now want to unload line per line
         """
-        return self._response()
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
+
+        batch.cluster_picking_unload_all = False
+
+        return self._response_for_unload_single(batch)
 
     def unload_router(self, picking_batch_id):
         """Called after the info screen, route to the next state

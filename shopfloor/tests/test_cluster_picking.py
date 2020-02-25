@@ -1201,3 +1201,47 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             next_state="start",
             message={"message_type": "info", "message": "Batch Transfer complete"},
         )
+
+
+class ClusterPickingUnloadSplitCase(ClusterPickingUnloadingCommonCase):
+    """Tests covering the /unload_split endpoint
+
+    All the destinations of the bins were the same so the "unload all" screen
+    was presented to the user, but they want different destination, so they hit
+    the "split" button. From now on, the workflow should use the "unload single"
+    screen even if the destinations are the same.
+    """
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super().setUpClass(*args, **kwargs)
+        # this is what the /prepare_endpoint method would have set as all the
+        # destinations are the same:
+        cls.batch.cluster_picking_unload_all = True
+
+    def test_unload_split_ok(self):
+        """Call /unload_split and continue to unload single"""
+        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        # put destination packages, the whole quantity on lines and a similar
+        # destination (when /set_destination_all is called, all the lines to
+        # unload must have the same destination)
+        self._set_dest_package_and_done(move_lines, self.bin1)
+        move_lines.write({"location_dest_id": self.packing_location.id})
+
+        response = self.service.dispatch(
+            "unload_split", params={"picking_batch_id": self.batch.id}
+        )
+        self.assertRecordValues(self.batch, [{"cluster_picking_unload_all": False}])
+        self.assert_response(
+            # the remaining move line still needs to be picked
+            response,
+            next_state="unload_single",
+            data={
+                "id": self.bin1.id,
+                "name": self.bin1.name,
+                "location_dst": {
+                    "id": move_lines[0].location_dest_id.id,
+                    "name": move_lines[0].location_dest_id.name,
+                },
+            },
+        )
