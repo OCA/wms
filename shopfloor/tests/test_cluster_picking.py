@@ -8,15 +8,26 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
         cls.product_a = cls.env["product.product"].create(
-            {"name": "Product A", "type": "product", "default_code": "A", "barcode": "A"}
+            {
+                "name": "Product A",
+                "type": "product",
+                "default_code": "A",
+                "barcode": "A",
+            }
         )
         cls.product_b = cls.env["product.product"].create(
-            {"name": "Product B", "type": "product", "default_code": "B", "barcode": "B"}
+            {
+                "name": "Product B",
+                "type": "product",
+                "default_code": "B",
+                "barcode": "B",
+            }
         )
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
         cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
+        cls.wh.delivery_steps = "pick_pack_ship"
         cls.picking_type = cls.process.picking_type_id
 
     def setUp(self):
@@ -369,7 +380,9 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         batch_id = self.batch1.id
         self.batch1.unlink()
         # Simulate the client selecting the batch in a list
-        response = self.service.dispatch("select", params={"picking_batch_id": batch_id})
+        response = self.service.dispatch(
+            "select", params={"picking_batch_id": batch_id}
+        )
         self.assert_response(
             response,
             next_state="manual_selection",
@@ -909,8 +922,8 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="unload_single",
             data={
-                "id": self.batch.id,
-                "name": self.batch.name,
+                "id": self.bin1.id,
+                "name": self.bin1.name,
                 "location_dst": {
                     "id": first_line.location_dest_id.id,
                     "name": first_line.location_dest_id.name,
@@ -1043,8 +1056,148 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         self.assertRecordValues(self.batch, [{"state": "in_progress"}])
 
         self.assert_response(
-            response, next_state="start_line", data=self._line_data(move_lines[2])
+            # the remaining move line still needs to be picked
+            response,
+            next_state="start_line",
+            data=self._line_data(move_lines[2]),
         )
 
-        # TODO add test when /set_destination_all is called but not all lines
-        # have the same destination
+    def test_set_destination_all_but_different_dest(self):
+        """Endpoint was called but destinations are different"""
+        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        self._set_dest_package_and_done(move_lines, self.bin1)
+        move_lines[:2].write({"location_dest_id": self.packing_a_location.id})
+        move_lines[2:].write({"location_dest_id": self.packing_b_location.id})
+
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "picking_batch_id": self.batch.id,
+                "barcode": self.packing_location.barcode,
+            },
+        )
+        self.assertRecordValues(self.batch, [{"cluster_picking_unload_all": False}])
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data={
+                "id": self.bin1.id,
+                "name": self.bin1.name,
+                "location_dst": {
+                    "id": move_lines[0].location_dest_id.id,
+                    "name": move_lines[0].location_dest_id.name,
+                },
+            },
+        )
+
+    def test_set_destination_all_error_location_not_found(self):
+        """Endpoint called with a barcode not existing for a location"""
+        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        self._set_dest_package_and_done(move_lines, self.bin1)
+        move_lines.write({"location_dest_id": self.packing_a_location.id})
+
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={"picking_batch_id": self.batch.id, "barcode": "NOTFOUND"},
+        )
+        self.assert_response(
+            response,
+            next_state="unload_all",
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "location_dst": {
+                    "id": move_lines[0].location_dest_id.id,
+                    "name": move_lines[0].location_dest_id.name,
+                },
+            },
+            message={
+                "message_type": "error",
+                "message": "No location found for this barcode.",
+            },
+        )
+
+    def test_set_destination_all_error_location_invalid(self):
+        """Endpoint called with a barcode for an invalid location
+
+        It is invalid when the location is not the destination location or
+        sublocation of the picking type.
+        """
+        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        self._set_dest_package_and_done(move_lines, self.bin1)
+        move_lines.write({"location_dest_id": self.packing_a_location.id})
+
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "picking_batch_id": self.batch.id,
+                "barcode": self.dispatch_location.barcode,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="unload_all",
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "location_dst": {
+                    "id": move_lines[0].location_dest_id.id,
+                    "name": move_lines[0].location_dest_id.name,
+                },
+            },
+            message={"message_type": "error", "message": "You cannot place it here"},
+        )
+
+    def test_set_destination_all_need_confirmation(self):
+        """Endpoint called with a barcode for another (valid) location"""
+        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        self._set_dest_package_and_done(move_lines, self.bin1)
+        move_lines.write({"location_dest_id": self.packing_a_location.id})
+
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "picking_batch_id": self.batch.id,
+                "barcode": self.packing_b_location.barcode,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="confirm_unload_all",
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "location_dst": {
+                    "id": move_lines[0].location_dest_id.id,
+                    "name": move_lines[0].location_dest_id.name,
+                },
+            },
+        )
+
+    def test_set_destination_all_with_confirmation(self):
+        """Endpoint called with a barcode for another (valid) location, confirm"""
+        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        self._set_dest_package_and_done(move_lines, self.bin1)
+        move_lines.write({"location_dest_id": self.packing_a_location.id})
+
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "picking_batch_id": self.batch.id,
+                "barcode": self.packing_b_location.barcode,
+                "confirmation": True,
+            },
+        )
+        self.assertRecordValues(
+            move_lines,
+            [
+                {"location_dest_id": self.packing_b_location.id},
+                {"location_dest_id": self.packing_b_location.id},
+                {"location_dest_id": self.packing_b_location.id},
+            ],
+        )
+        self.assert_response(
+            response,
+            next_state="start",
+            message={"message_type": "info", "message": "Batch Transfer complete"},
+        )
