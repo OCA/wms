@@ -9,5 +9,5 @@ class StockMoveLine(models.Model):
         default=False,
         copy=False,
         help="Technical field. "
-             "Indicates if a the move has been postponed in a process.",
+        "Indicates if a the move has been postponed in a process.",
     )
