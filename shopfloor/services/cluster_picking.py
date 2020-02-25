@@ -538,9 +538,10 @@ class ClusterPicking(Component):
             package.dest_move_line_ids.filtered(self._filter_for_unload)
         )
         return {
-            # TODO disambiguate "id" everywhere? (id -> package_id)
-            "id": package.id,
-            "name": package.name,
+            # TODO disambiguate "id" everywhere? (id -> picking_batch_id)
+            "id": batch.id,
+            "name": batch.name,
+            "package": {"id": package.id, "name": package.name},
             "location_dst": {
                 "id": line.location_dest_id.id,
                 "name": line.location_dest_id.name,
@@ -815,7 +816,7 @@ class ClusterPicking(Component):
         """
         return self._response()
 
-    def unload_scan_pack(self, package_id, barcode):
+    def unload_scan_pack(self, picking_batch_id, package_id, barcode):
         """Check that the operator scans the correct package (bin) on unload
 
         If the scanned barcode is not the one of the Bin (package), ask to scan
@@ -825,9 +826,27 @@ class ClusterPicking(Component):
         * unload_single: if the barcode does not match
         * unload_set_destination: barcode is correct
         """
-        return self._response()
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
+        package = self.env["stock.quant.package"].browse(package_id)
+        if not package.exists():
+            # TODO: next package? if no next package, close and go to start?
+            return self._response()
+        if package.name != barcode:
+            return self._response(
+                next_state="unload_single",
+                data=self._data_for_unload_single(batch, package),
+                message={"message_type": "error", "message": _("Wrong bin")},
+            )
+        return self._response(
+            next_state="unload_set_destination",
+            data=self._data_for_unload_single(batch, package),
+        )
 
-    def unload_scan_destination(self, package_id, barcode, confirmation=False):
+    def unload_scan_destination(
+        self, picking_batch_id, package_id, barcode, confirmation=False
+    ):
         """Scan the final destination for all the move lines moved with the Bin
 
         It updates all the assigned move lines with the package to the
@@ -939,13 +958,15 @@ class ShopfloorClusterPickingValidator(Component):
 
     def unload_scan_pack(self):
         return {
+            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
             "package_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
         }
 
     def unload_scan_destination(self):
         return {
-            "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "package_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
             "confirmation": {"type": "boolean", "nullable": True, "required": False},
         }
@@ -1251,9 +1272,16 @@ class ShopfloorClusterPickingValidatorResponse(Component):
     @property
     def _schema_for_unload_single(self):
         return {
-            # stock.quant.package
+            # stock.batch.picking
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
+            "package": {
+                "type": "dict",
+                "schema": {
+                    "id": {"required": True, "type": "integer"},
+                    "name": {"type": "string", "nullable": False, "required": True},
+                },
+            },
             "location_dst": {
                 "type": "dict",
                 "schema": {
