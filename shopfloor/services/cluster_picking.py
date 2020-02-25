@@ -1,4 +1,4 @@
-from odoo import fields, _
+from odoo import _, fields
 
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
@@ -238,7 +238,12 @@ class ClusterPicking(Component):
         )
 
     def _first_line_for_picking_batch(self, picking_batch, filter_func=lambda x: x):
-        return fields.first(self._lines_for_picking_batch(picking_batch, filter_func=filter_func))
+        return fields.first(
+            self._lines_for_picking_batch(picking_batch, filter_func=filter_func)
+        )
+
+    def _next_line_for_picking_batch(self, picking_batch):
+        return fields.first(self._unpackaged_lines_for_picking_batch(picking_batch))
 
     def _response_batch_does_not_exist(self):
         message = self.actions_for("message")
@@ -451,13 +456,12 @@ class ClusterPicking(Component):
         # TODO handle next line and no next line (in a shared way with other
         # endpoints)
         batch = move_line.picking_id.batch_id
-        remaining_lines = self._unpackaged_lines_for_picking_batch(batch)
-        if not remaining_lines:
+        next_line = self._next_line_for_picking_batch(batch)
+        if not next_line:
             return self._response(
                 next_state="start",
                 message={"message_type": "info", "message": "Not implemented"},
             )
-        next_line = remaining_lines[0]
         return self._response(
             next_state="start_line",
             data=self._data_for_next_move_line(next_line),
@@ -560,7 +564,22 @@ class ClusterPicking(Component):
         * start_line: with data for the next line (or itself if it's the last one,
         in such case, a helpful message is returned)
         """
-        return self._response()
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        if not move_line.exists():
+            # TODO go to next line? (but then handle if it's the last one)
+            return self._response(next_state="start")
+        # flag as postponed
+        move_line.shopfloor_postponed = True
+        return self._response_for_skip_line(move_line)
+
+    def _response_for_skip_line(self, move_line):
+        next_line = self._next_line_for_picking_batch(move_line.picking_id.batch_id)
+        if not next_line:
+            # TODO ensure batch is 'done' and go to start?
+            return self._response()
+        return self._response(
+            next_state="start_line", data=self._data_for_next_move_line(next_line)
+        )
 
     def stock_issue(self, move_line_id):
         """Declare a stock issue for a line
