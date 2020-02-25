@@ -112,7 +112,8 @@ class ClusterPicking(Component):
     def _select_a_picking_batch(self, batches):
         # look for in progress + assigned to self first
         candidates = batches.filtered(
-            lambda batch: batch.state == "in_progress" and batch.user_id == self.env.user
+            lambda batch: batch.state == "in_progress"
+            and batch.user_id == self.env.user
         )
         if candidates:
             return candidates[0]
@@ -490,6 +491,10 @@ class ClusterPicking(Component):
             },
         )
 
+    def _are_all_dest_location_same(self, batch):
+        lines_to_unload = self._lines_to_unload(batch)
+        return len(lines_to_unload.mapped("location_dest_id")) == 1
+
     def prepare_unload(self, picking_batch_id):
         """Initiate the unloading phase of the process
 
@@ -506,7 +511,7 @@ class ClusterPicking(Component):
         batch = self.env["stock.picking.batch"].browse(picking_batch_id)
         if not batch.exists():
             return self._response_batch_does_not_exist()
-        if len(batch.mapped("picking_ids.move_line_ids.location_dest_id")) == 1:
+        if self._are_all_dest_location_same(batch):
             batch.cluster_picking_unload_all = True
             return self._response_for_unload_all(batch)
         else:
@@ -514,48 +519,73 @@ class ClusterPicking(Component):
             batch.cluster_picking_unload_all = False
             return self._response_for_unload_single(batch)
 
-    def _data_for_unload(self, move_line):
-        batch = move_line.picking_id.batch_id
+    def _data_for_unload_all(self, batch):
+        lines = self._lines_to_unload(batch)
+        # all the lines destinations are the same here, it looks
+        # only for the first one
+        first_line = fields.first(lines)
         return {
             "id": batch.id,
             "name": batch.name,
             "location_dst": {
-                "id": move_line.location_dest_id.id,
-                "name": move_line.location_dest_id.name,
+                "id": first_line.location_dest_id.id,
+                "name": first_line.location_dest_id.name,
             },
         }
 
-    def _response_for_unload_all(self, batch):
-        # all the lines destinations are the same here, it looks
-        # only for the first one
-        first_line = self._next_line_for_unload_single(batch)
+    def _data_for_unload_single(self, batch, package):
+        line = fields.first(
+            package.dest_move_line_ids.filtered(self._filter_for_unload)
+        )
+        return {
+            # TODO disambiguate "id" everywhere? (id -> package_id)
+            "id": package.id,
+            "name": package.name,
+            "location_dst": {
+                "id": line.location_dest_id.id,
+                "name": line.location_dest_id.name,
+            },
+        }
+
+    def _response_for_unload_all(self, batch, message=None):
         return self._response(
-            next_state="unload_all", data=self._data_for_unload(first_line)
+            next_state="unload_all",
+            data=self._data_for_unload_all(batch),
+            message=message,
+        )
+
+    def _response_for_unload_all_need_confirm(self, batch, message=None):
+        return self._response(
+            next_state="confirm_unload_all",
+            data=self._data_for_unload_all(batch),
+            message=message,
+        )
+
+    def _filter_for_unload(self, line):
+        return (
+            line.qty_done > 0 and line.result_package_id and not line.shopfloor_unloaded
         )
 
     def _lines_to_unload(self, batch):
-        return self._lines_for_picking_batch(
-            batch,
-            filter_func=lambda l: l.qty_done > 0
-            and l.result_package_id
-            and not l.shopfloor_unloaded,
-        )
+        return self._lines_for_picking_batch(batch, filter_func=self._filter_for_unload)
 
-    def _next_line_for_unload_single(self, batch):
+    def _bin_packages_to_unload(self, batch):
         lines = self._lines_to_unload(batch)
-        for line in lines:
-            if line.shopfloor_unloaded:
-                continue
-            return line
-        return self.env["stock.move.line"].browse()
+        packages = lines.mapped("result_package_id")
+        return packages
+
+    def _next_bin_package_for_unload_single(self, batch):
+        packages = self._bin_packages_to_unload(batch)
+        return fields.first(packages)
 
     def _response_for_unload_single(self, batch):
-        next_line = self._next_line_for_unload_single(batch)
-        if not next_line:
+        next_package = self._next_bin_package_for_unload_single(batch)
+        if not next_package:
             # TODO ensure batch is 'done' and go to start?
             return self._response()
         return self._response(
-            next_state="unload_single", data=self._data_for_unload(next_line)
+            next_state="unload_single",
+            data=self._data_for_unload_single(batch, next_package),
         )
 
     def is_zero(self, move_line_id, zero):
@@ -680,12 +710,39 @@ class ClusterPicking(Component):
         if not batch.exists():
             return self._response_batch_does_not_exist()
 
+        message = self.actions_for("message")
+
+        # In case /set_destination_all was called and the destinations were
+        # in fact no the same... restart the unloading step over
+        if not self._are_all_dest_location_same(batch):
+            return self.prepare_unload(batch.id)
+
         lines = self._lines_to_unload(batch)
         if not lines:
             # TODO a bit unexpected here but deal with it
             return self._response()
 
-        lines.shopfloor_unloaded = True
+        first_line = fields.first(lines)
+        picking_type = fields.first(batch.picking_ids).picking_type_id
+        scanned_location = self.actions_for("search").location_from_scan(barcode)
+        if not scanned_location:
+            return self._response_for_unload_all(
+                batch, message=message.no_location_found()
+            )
+        if not scanned_location.is_sublocation_of(
+            picking_type.default_location_dest_id
+        ):
+            return self._response_for_unload_all(
+                batch, message=message.dest_location_not_allowed()
+            )
+
+        if not scanned_location.is_sublocation_of(first_line.location_dest_id):
+            if not confirmation:
+                return self._response_for_unload_all_need_confirm(batch)
+
+        lines.write(
+            {"shopfloor_unloaded": True, "location_dest_id": scanned_location.id}
+        )
         for line in lines:
             # We set the picking to done only when the last line is
             # unloaded to avoid backorders.
@@ -702,13 +759,15 @@ class ClusterPicking(Component):
             batch.state = "done"
             return self._response_batch_complete()
 
-        # TODO add tests for this
         next_line = self._next_line_for_pick(batch)
         if next_line:
             return self._response(
                 next_state="start_line", data=self._data_move_line(next_line)
             )
         else:
+            # TODO add tests for this (for instance a picking is not 'done'
+            # because a move was unassigned, we want to validate the batch to
+            # produce backorders)
             batch.mapped("picking_ids").action_done()
             batch.state = "done"
             return self._response_batch_complete()
@@ -1012,6 +1071,9 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                 "start_line",
                 # invalid destination, have to scan a valid one
                 "unload_all",
+                # this endpoint was called but after checking, lines
+                # have different destination locations
+                "unload_single",
                 # different destination to confirm
                 "confirm_unload_all",
                 # batch finished
@@ -1183,7 +1245,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
     @property
     def _schema_for_unload_single(self):
         return {
-            # stock.move.line
+            # stock.quant.package
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
             "location_dst": {
