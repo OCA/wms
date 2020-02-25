@@ -253,6 +253,7 @@ class ClusterPicking(Component):
             # for each model
             "id": line.id,
             "quantity": line.product_uom_qty,
+            "postponed": line.shopfloor_postponed,
             "picking": {
                 "id": picking.id,
                 "name": picking.name,
@@ -996,6 +997,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             # id is a stock.move.line
             "id": {"required": True, "type": "integer"},
             "quantity": {"type": "float", "required": True},
+            "postponed": {"type": "boolean", "required": False},
             "picking": {
                 "type": "dict",
                 "schema": {
