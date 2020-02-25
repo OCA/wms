@@ -12,7 +12,7 @@ export var batch_picking_line = Vue.component('batch-picking-line-detail', {
     }
   },
   template: `
-  <div class="detail batch-picking-line-detail" v-if="!_.isEmpty(line)">
+  <div v-if="!_.isEmpty(line)" :class="'detail batch-picking-line-detail ' + (line.postponed ? 'line-postponed' : '')">
     <v-card outlined class="main">
       <v-card-title>{{ line.picking.name }}</v-card-title>
       <v-card-subtitle>
