@@ -92,6 +92,13 @@ class MessageAction(Component):
     def need_confirmation(self):
         return {"message_type": "warning", "message": _("Are you sure?")}
 
+    def confirm_location_changed(self, from_location, to_location):
+        return {
+            "message_type": "warning",
+            "message": _("Confirm location change from %s to %s?")
+            % (from_location.name, to_location.name),
+        }
+
     def confirm_pack_moved(self):
         return {
             "message_type": "success",
