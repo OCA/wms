@@ -112,8 +112,7 @@ class ClusterPicking(Component):
     def _select_a_picking_batch(self, batches):
         # look for in progress + assigned to self first
         candidates = batches.filtered(
-            lambda batch: batch.state == "in_progress"
-            and batch.user_id == self.env.user
+            lambda batch: batch.state == "in_progress" and batch.user_id == self.env.user
         )
         if candidates:
             return candidates[0]
@@ -215,42 +214,53 @@ class ClusterPicking(Component):
         if not picking_batch.exists():
             return self._response_batch_does_not_exist()
 
-        remaining_lines = self._assigned_lines_for_picking_batch(picking_batch)
-        if not remaining_lines:
+        next_line = self._next_line_for_pick(picking_batch)
+        if not next_line:
             # TODO
-            pass
+            return self._response(
+                next_state="start",
+                message={
+                    "message_type": "error",
+                    "message": "no lines remaining, not implemented",
+                },
+            )
+
         return self._response(
-            next_state="start_line", data=self._data_for_next_move_line(remaining_lines)
+            next_state="start_line", data=self._data_move_line(next_line)
         )
 
     def _lines_for_picking_batch(self, picking_batch, filter_func=lambda x: x):
         lines = picking_batch.mapped("picking_ids.move_line_ids").filtered(filter_func)
+        # TODO we probably don't care about the postponed order in the 'set
+        # destination location' step, reset it on 'scan_destination_pack'?
         return lines.sorted(key=lambda x: x.shopfloor_postponed)
 
-    def _assigned_lines_for_picking_batch(self, picking_batch):
+    def _lines_to_pick(self, picking_batch):
         return self._lines_for_picking_batch(
-            picking_batch, filter_func=lambda l: l.state == "assigned"
+            picking_batch,
+            filter_func=lambda l: (
+                l.state == "assigned"
+                # On 'StockPicking.action_assign()', result_package_id is set to
+                # the same package as 'package_id'. Here, we need to exclude lines
+                # that were already put into a bin, i.e. the destination package
+                # is different.
+                and (not l.result_package_id or l.result_package_id == l.package_id)
+            ),
         )
 
-    def _unpackaged_lines_for_picking_batch(self, picking_batch):
-        return self._lines_for_picking_batch(
-            picking_batch, filter_func=lambda l: not l.result_package_id
-        )
-
-    def _first_line_for_picking_batch(self, picking_batch, filter_func=lambda x: x):
-        return fields.first(
-            self._lines_for_picking_batch(picking_batch, filter_func=filter_func)
-        )
-
-    def _next_line_for_picking_batch(self, picking_batch):
-        return fields.first(self._unpackaged_lines_for_picking_batch(picking_batch))
+    def _next_line_for_pick(self, picking_batch):
+        remaining_lines = self._lines_to_pick(picking_batch)
+        return fields.first(remaining_lines)
 
     def _response_batch_does_not_exist(self):
         message = self.actions_for("message")
         return self._response(next_state="start", message=message.record_not_found())
 
-    def _data_for_next_move_line(self, move_lines):
-        line = move_lines[0]
+    def _data_for_next_move_line(self, picking_batch):
+        remaining_lines = self._lines_to_pick(picking_batch)
+        return self._data_move_line(remaining_lines[0])
+
+    def _data_move_line(self, line):
         picking = line.picking_id
         batch = picking.batch_id
         product = line.product_id
@@ -372,7 +382,7 @@ class ClusterPicking(Component):
 
         return self._response(
             next_state="start_line",
-            data=self._data_for_next_move_line(move_line),
+            data=self._data_move_line(move_line),
             message=message.barcode_not_found(),
         )
 
@@ -380,7 +390,7 @@ class ClusterPicking(Component):
         message = self.actions_for("message")
         return self._response(
             next_state="start_line",
-            data=self._data_for_next_move_line(move_line),
+            data=self._data_move_line(move_line),
             message=message.several_lots_in_location(move_line.location_id),
         )
 
@@ -388,7 +398,7 @@ class ClusterPicking(Component):
         message = self.actions_for("message")
         return self._response(
             next_state="start_line",
-            data=self._data_for_next_move_line(move_line),
+            data=self._data_move_line(move_line),
             message=message.several_products_in_location(move_line.location_id),
         )
 
@@ -396,7 +406,7 @@ class ClusterPicking(Component):
         message = self.actions_for("message")
         return self._response(
             next_state="start_line",
-            data=self._data_for_next_move_line(move_line),
+            data=self._data_move_line(move_line),
             message=message.several_packs_in_location(move_line.location_id),
         )
 
@@ -404,13 +414,13 @@ class ClusterPicking(Component):
         message = self.actions_for("message")
         return self._response(
             next_state="start_line",
-            data=self._data_for_next_move_line(move_line),
+            data=self._data_move_line(move_line),
             message=message.scan_lot_on_product_tracked_by_lot(),
         )
 
     def _response_for_scan_line_ok(self, move_line):
         return self._response(
-            next_state="scan_destination", data=self._data_for_next_move_line(move_line)
+            next_state="scan_destination", data=self._data_move_line(move_line)
         )
 
     def scan_destination_pack(self, move_line_id, barcode, quantity):
@@ -456,15 +466,19 @@ class ClusterPicking(Component):
         # TODO handle next line and no next line (in a shared way with other
         # endpoints)
         batch = move_line.picking_id.batch_id
-        next_line = self._next_line_for_picking_batch(batch)
+        next_line = self._next_line_for_pick(batch)
         if not next_line:
+            # TODO
             return self._response(
                 next_state="start",
-                message={"message_type": "info", "message": "Not implemented"},
+                message={
+                    "message_type": "error",
+                    "message": "no lines remaining, not implemented",
+                },
             )
         return self._response(
             next_state="start_line",
-            data=self._data_for_next_move_line(next_line),
+            data=self._data_move_line(next_line),
             message={
                 "message_type": "info",
                 # TODO different message for products/packs?
@@ -512,15 +526,23 @@ class ClusterPicking(Component):
         }
 
     def _response_for_unload_all(self, batch):
-        # all the lines destinations are the same here
-        first_line = self._first_line_for_picking_batch(batch)
+        # all the lines destinations are the same here, it looks
+        # only for the first one
+        first_line = self._next_line_for_unload_single(batch)
         return self._response(
             next_state="unload_all", data=self._data_for_unload(first_line)
         )
 
+    def _lines_to_unload(self, batch):
+        return self._lines_for_picking_batch(
+            batch,
+            filter_func=lambda l: l.qty_done > 0
+            and l.result_package_id
+            and not l.shopfloor_unloaded,
+        )
+
     def _next_line_for_unload_single(self, batch):
-        # TODO: shall we use `_first_line_for_picking_batch` + lambda filter?
-        lines = batch.mapped("picking_ids.move_line_ids")
+        lines = self._lines_to_unload(batch)
         for line in lines:
             if line.shopfloor_unloaded:
                 continue
@@ -573,12 +595,18 @@ class ClusterPicking(Component):
         return self._response_for_skip_line(move_line)
 
     def _response_for_skip_line(self, move_line):
-        next_line = self._next_line_for_picking_batch(move_line.picking_id.batch_id)
+        next_line = self._next_line_for_pick(move_line.picking_id.batch_id)
         if not next_line:
             # TODO ensure batch is 'done' and go to start?
-            return self._response()
+            return self._response(
+                next_state="start",
+                message={
+                    "message_type": "error",
+                    "message": "no lines remaining, not implemented",
+                },
+            )
         return self._response(
-            next_state="start_line", data=self._data_for_next_move_line(next_line)
+            next_state="start_line", data=self._data_move_line(next_line)
         )
 
     def stock_issue(self, move_line_id):
@@ -648,7 +676,48 @@ class ClusterPicking(Component):
           generic way to share actions happening on transitions such as "close
           the batch"
         """
-        return self._response()
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
+
+        lines = self._lines_to_unload(batch)
+        if not lines:
+            # TODO a bit unexpected here but deal with it
+            return self._response()
+
+        lines.shopfloor_unloaded = True
+        for line in lines:
+            # We set the picking to done only when the last line is
+            # unloaded to avoid backorders.
+            picking = line.picking_id
+            if picking.state == "done":
+                continue
+            picking_lines = picking.mapped("move_line_ids")
+            if all(l.shopfloor_unloaded for l in picking_lines):
+                picking.action_done()
+
+        if all(picking.state == "done" for picking in batch.picking_ids):
+            # do not use the 'done()' method because it does many things we
+            # don't care about
+            batch.state = "done"
+            return self._response_batch_complete()
+
+        # TODO add tests for this
+        next_line = self._next_line_for_pick(batch)
+        if next_line:
+            return self._response(
+                next_state="start_line", data=self._data_move_line(next_line)
+            )
+        else:
+            batch.mapped("picking_ids").action_done()
+            batch.state = "done"
+            return self._response_batch_complete()
+
+    def _response_batch_complete(self):
+        return self._response(
+            next_state="start",
+            message={"message_type": "info", "message": _("Batch Transfer complete")},
+        )
 
     def unload_split(self, picking_batch_id, barcode, confirmation=False):
         """Indicates that now the batch must be treated line per line
@@ -788,7 +857,7 @@ class ShopfloorClusterPickingValidator(Component):
 
     def set_destination_all(self):
         return {
-            "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
             "confirmation": {"type": "boolean", "nullable": True, "required": False},
         }
