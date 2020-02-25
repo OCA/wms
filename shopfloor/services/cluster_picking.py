@@ -1,4 +1,4 @@
-from odoo import _
+from odoo import fields, _
 
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
@@ -225,7 +225,7 @@ class ClusterPicking(Component):
 
     def _lines_for_picking_batch(self, picking_batch, filter_func=lambda x: x):
         lines = picking_batch.mapped("picking_ids.move_line_ids").filtered(filter_func)
-        return lines
+        return lines.sorted(key=lambda x: x.shopfloor_postponed)
 
     def _assigned_lines_for_picking_batch(self, picking_batch):
         return self._lines_for_picking_batch(
@@ -236,6 +236,9 @@ class ClusterPicking(Component):
         return self._lines_for_picking_batch(
             picking_batch, filter_func=lambda l: not l.result_package_id
         )
+
+    def _first_line_for_picking_batch(self, picking_batch, filter_func=lambda x: x):
+        return fields.first(self._lines_for_picking_batch(picking_batch, filter_func=filter_func))
 
     def _response_batch_does_not_exist(self):
         message = self.actions_for("message")
@@ -506,12 +509,13 @@ class ClusterPicking(Component):
 
     def _response_for_unload_all(self, batch):
         # all the lines destinations are the same here
-        first_line = batch.mapped("picking_ids.move_line_ids")[0]
+        first_line = self._first_line_for_picking_batch(batch)
         return self._response(
             next_state="unload_all", data=self._data_for_unload(first_line)
         )
 
     def _next_line_for_unload_single(self, batch):
+        # TODO: shall we use `_first_line_for_picking_batch` + lambda filter?
         lines = batch.mapped("picking_ids.move_line_ids")
         for line in lines:
             if line.shopfloor_unloaded:
