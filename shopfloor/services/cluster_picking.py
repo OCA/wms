@@ -755,14 +755,19 @@ class ClusterPicking(Component):
         """Declare a stock issue for a line
 
         After errors in the stock, the user cannot take all the products
-        because there is physically not enough goods. The move line is
-        unassigned, and an inventory is created to reduce the quantity in the
+        because there is physically not enough goods. The move line is deleted
+        (unreserve), and an inventory is created to reduce the quantity in the
         source location to prevent future errors until a correction. Beware:
         the quantity already reserved by other lines should remain reserved so
         the inventory's quantity must be set to the quantity of lines reserved
         by other move lines (but not the current one).
 
-        A second inventory is created in draft to have someone do an inventory.
+        The other lines not yet picked in the batch for the same product, lot,
+        package are unreserved as well (moves lines deleted, which unreserve
+        their quantity on the move).
+
+        A second inventory is created in draft to have someone do an inventory
+        check.
 
         Transitions:
         * start_line: when the batch still contains lines without destination
@@ -775,7 +780,61 @@ class ClusterPicking(Component):
           and the last line has a stock issue). In this case, this method *has*
           to handle the closing of the batch to create backorders (_unload_end)
         """
-        return self._response()
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        if not move_line.exists():
+            return self._response(
+                next_state="start", message=self.msg_store.unrecoverable_error()
+            )
+        batch = move_line.picking_id.batch_id
+
+        inventory = self.actions_for("inventory")
+        # create a draft inventory for a user to check
+        inventory.create_control_stock(
+            move_line.location_id,
+            move_line.product_id,
+            move_line.package_id,
+            move_line.lot_id,
+        )
+        move = move_line.move_id
+        lot = move_line.lot_id
+        package = move_line.package_id
+        location = move_line.location_id
+
+        # unreserve every lines for the same product/lot in the same batch and
+        # not done yet, so the same user doesn't have to declare 2 times the
+        # stock issue for the same thing!
+        domain = self._domain_stock_issue_unlink_lines(move_line)
+        unreserve_move_lines = move_line | self.env["stock.move.line"].search(domain)
+        unreserve_move_lines.unlink()
+
+        # Then, create an inventory with just enough qty so the other assigned
+        # move lines for the same product in other batches and the other move lines
+        # already picked stay assigned.
+        inventory.create_stock_issue(move, location, package, lot)
+        return self._pick_next_line(batch)
+
+    def _domain_stock_issue_unlink_lines(self, move_line):
+        # Since we have not enough stock, delete the move lines, which will
+        # in turn unreserve the moves. The moves lines we delete are those
+        # in the same batch (we don't want to interfere with other operators
+        # work, they'll have to declare a stock issue), and not yet started.
+        # The goal is to prevent the same operator to declare twice the same
+        # stock issue for the same product/lot/package.
+        batch = move_line.picking_id.batch_id
+        move = move_line.move_id
+        lot = move_line.lot_id
+        package = move_line.package_id
+        location = move_line.location_id
+        domain = [
+            ("location_id", "=", location.id),
+            ("product_id", "=", move.product_id.id),
+            ("package_id", "=", package.id),
+            ("lot_id", "=", lot.id),
+            ("state", "not in", ("cancel", "done")),
+            ("qty_done", "=", 0),
+            ("picking_id.batch_id", "=", batch.id),
+        ]
+        return domain
 
     def change_pack_lot(self, move_line_id, barcode):
         """Change the expected pack or the lot for a line
