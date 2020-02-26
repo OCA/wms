@@ -2,7 +2,7 @@ Vue.component('reset-screen-button', {
     props: ['show_reset_button'],
     methods: {
         reset: function () {
-		    this.$emit('reset');
+            this.$emit('reset');
         },
     },
     template: `
