@@ -151,10 +151,14 @@ class SinglePackTransfer(Component):
             data=self._data_after_package_scanned(move_line, pack),
         )
 
-    def _response_for_location_need_confirm(self):
+    def _response_for_location_need_confirm(self, move_line, pack, to_location):
         message = self.actions_for("message")
         return self._response(
-            next_state="confirm_location", message=message.need_confirmation()
+            next_state="confirm_location",
+            message=message.confirm_location_changed(
+                move_line.location_dest_id, to_location
+            ),
+            data=self._data_after_package_scanned(move_line, pack),
         )
 
     def _response_for_validate_success(self, last=False):
@@ -194,7 +198,9 @@ class SinglePackTransfer(Component):
                 if not scanned_location.is_sublocation_of(move.location_dest_id):
                     move.location_dest_id = scanned_location.id
             else:
-                return self._response_for_location_need_confirm()
+                return self._response_for_location_need_confirm(
+                    move_line, package.package_id, scanned_location
+                )
 
         pack_transfer.set_destination_and_done(move, scanned_location)
         last = move.picking_id.completion_info == "next_picking_ready"
@@ -263,7 +269,7 @@ class SinglePackTransferValidatorResponse(Component):
             "start": {},
             "confirm_start": self._schema_for_location,
             "scan_location": self._schema_for_location,
-            "confirm_location": {},
+            "confirm_location": self._schema_for_location,
             "show_completion_info": {},
         }
 

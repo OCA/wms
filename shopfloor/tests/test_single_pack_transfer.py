@@ -542,10 +542,21 @@ class SinglePackTransferCase(CommonCase):
             },
         )
 
+        message = self.service.actions_for("message").confirm_location_changed(
+            self.shelf2, self.shelf1
+        )
         self.assert_response(
             response,
             next_state="confirm_location",
-            message={"message_type": "warning", "message": "Are you sure?"},
+            message=message,
+            data={
+                "id": self.ANY,
+                "name": package_level.package_id.name,
+                "location_src": {"id": self.shelf1.id, "name": self.shelf1.name},
+                "location_dst": {"id": self.shelf2.id, "name": self.shelf2.name},
+                "picking": {"id": self.picking.id, "name": self.picking.name},
+                "product": {"id": self.product_a.id, "name": self.product_a.name},
+            },
         )
 
     def test_validate_location_with_confirm(self):
