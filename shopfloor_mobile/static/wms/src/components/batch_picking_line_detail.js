@@ -16,24 +16,21 @@ export var batch_picking_line = Vue.component('batch-picking-line-detail', {
     <v-card outlined class="main">
       <v-card-title>{{ line.picking.name }}</v-card-title>
       <v-card-subtitle>
-        From batch <strong>{{ line.batch.name }}</strong>
-      </v-card-subtitle>
-      <v-card-text>
+        <div class="batch"><span class="label">From batch:</span> {{ line.batch.name }}</div>
         <div v-if="line.picking.origin"><span class="ref">{{ line.picking.origin }}</span> - <span class="ref">[CUSTOMER TODO]</span></div>
-        <div><span class="source">{{ line.location_src.name }}</span></div>
-      </v-card-text>
+        <div class="source"><span class="label">Location:</span> {{ line.location_src.name }}</div>
+      </v-card-subtitle>
     </v-card>
 
     <v-card outlined v-if="showFullInfo">
-      <v-card-title>{{ line.product.display_name }}</v-card-title>
+      <v-card-title>{{ line.product.default_code }}</v-card-title>
+      <v-card-subtitle>{{ line.product.name }}</v-card-subtitle>
       <v-card-text>
-        <ul>
-          <li><span class="pack">{{ line.pack.name }}</span></li>
-          <li v-if="line.lot"><span class="lot">Lot: {{ line.lot.name }}</span></li>
-          <li><span class="qty-on-hand">On-hand qty {{ line.product.qty_available }}</span></li>
-          <li><span class="qty">Pkg qty [TODO]</span></li>
-          <li><span class="bin">Destination bin {{ line.location_dst.name }}</span></li>
-        </ul>
+        <div class="pack"><span class="label">Pack:</span> {{ line.pack.name }}</div>
+        <div v-if="line.lot" class="lot"><span class="label">Lot:</span> {{ line.lot.name }}</div>
+        <div class="qty-on-hand"><span class="label">On hand qty:</span> {{ line.product.qty_available }}</div>
+        <div class="qty-pkg"><span class="label">Package qty:</span> {{ line.quantity }}</div>
+        <div class="destination"><span class="label">Destination:</span> {{ line.location_dst.name }}</div>
       </v-card-text>
     </v-card>
 
