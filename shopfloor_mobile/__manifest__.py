@@ -11,4 +11,7 @@
     "category": "Warehouse Management",
     "license": "AGPL-3",
     "installable": True,
+    "data": [
+        "menus.xml",
+    ]
 }
