@@ -142,10 +142,16 @@ class ClusterPicking(Component):
     def _response_for_confirm_start(self, batch):
         pickings = []
         for picking in batch.picking_ids:
+            # TODO: is this correct?
+            p_weight = sum(
+                picking.mapped('move_line_ids.product_id.weight')
+            )
             p_values = {
                 "id": picking.id,
                 "name": picking.name,
+                "partner": None,
                 "move_line_count": len(picking.move_line_ids),
+                "weight": p_weight,
                 "origin": picking.origin or "",
             }
             if picking.partner_id:
@@ -159,8 +165,6 @@ class ClusterPicking(Component):
             data={
                 "id": batch.id,
                 "name": batch.name,
-                # TODO
-                "weight": 0,
                 "pickings": pickings,
             },
         )
@@ -1140,7 +1144,6 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             # id is a stock.picking.batch
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
-            "weight": {"type": "float", "nullable": False, "required": True},
             "pickings": {
                 "type": "list",
                 "required": True,
@@ -1150,6 +1153,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                         "id": {"required": True, "type": "integer"},
                         "name": {"type": "string", "nullable": False, "required": True},
                         "move_line_count": {"required": True, "type": "integer"},
+                        "weight": {"type": "float", "nullable": False, "required": True},
                         "origin": {
                             "type": "string",
                             "nullable": False,
@@ -1158,6 +1162,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                         "partner": {
                             "type": "dict",
                             "required": False,
+                            "nullable": True,
                             "schema": {
                                 "id": {"required": True, "type": "integer"},
                                 "name": {
