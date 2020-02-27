@@ -20,12 +20,10 @@ var moreInfo = Vue.component('detail-location', {
           </tr>
           <tr v-for="product in locationDetail.products" class="blue">
 
-            <td colspan="2">
-                <router-link :to="{ name: 'scananything', params: { codebar: product.pack.barcode}, query: {childOf: locationDetail.codebar }}">
+            <td colspan="2" @click="$emit('url-change', product.pack.barcode)">
                 {{ product.name }}</br>Pack {{ product.pack.name }}</br>{{ product.lot }}
                 {{ product.qty }}
                 <div>In stock 234 / Reserved 92</div>
-    </router-link>
             </td>
 
         </tr>

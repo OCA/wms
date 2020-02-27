@@ -8,7 +8,7 @@ export var ScanAnything = Vue.component('scan-anything', {
             <user-information v-if="!need_confirmation && user_notification.message" v-bind:info="user_notification"></user-information>
             <detail-pack :packDetail="state.data" v-if="state.data.type=='pack'"></detail-pack>
             <detail-product :productDetail="this.state.data.detail_info" v-if="state.data.type=='product'"></detail-product>
-            <detail-location :locationDetail="this.state.data.detail_info" v-if="state.data.type=='location'"></detail-location>
+            <detail-location :locationDetail="this.state.data.detail_info" v-if="state.data.type=='location'" v-on:url-change="urlChanged"></detail-location>
             <detail-operation :operationDetail="this.state.data.detail_info" v-if="state.data.type=='operation'"></detail-operation>
             <reset-screen-button v-on:reset="on_reset" :show_reset_button="show_reset_button"></reset-screen-button>
             <v-btn v-if="showBackButon" depressed x-large color="blue" v-on:click="$router.back()">Back</v-btn>
@@ -37,6 +37,14 @@ export var ScanAnything = Vue.component('scan-anything', {
             this.reset_notification()
             this.reset_erp_data('data')
             this.$router.push({ name: "scananything", params: {codebar: undefined}})
+        },
+        urlChanged: function(codebar) {
+            // Change the route on when more info clicked in children
+            let query = {}
+            if ('codebar' in this.$route.params) {
+                query.childOf = this.$route.params.codebar
+            }
+            this.$router.push({ name: "scananything", params: {codebar: codebar}, query: query})
         },
     },
     computed: {
