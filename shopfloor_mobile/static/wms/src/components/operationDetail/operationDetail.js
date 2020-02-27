@@ -2,13 +2,15 @@
 var operationDetail = Vue.component('operation-detail', {
     data: function () {
         return {
-            show_detail_dialog: false,
+            show_popup_dialog: false,
+            barcodeOpen: '',
         };
     },
     props:['operation'],
     methods: {
-        show_details: function () {
-            this.show_detail_dialog = true;
+        show_popup: function (barcode) {
+            this.barcodeOpen = barcode || "loc1"
+            this.show_popup_dialog = true;
         },
     },
     template: `
@@ -20,7 +22,7 @@ var operationDetail = Vue.component('operation-detail', {
         <th>Name</th>
         <td>
             {{ operation.name }}
-            <v-btn @click="show_details" icon text class="float-right">
+            <v-btn @click="show_popup('pack')" icon text class="float-right">
                 <v-icon large dark>mdi-help-circle</v-icon>
             </v-btn>
         </td>
@@ -31,19 +33,27 @@ var operationDetail = Vue.component('operation-detail', {
       </tr>
       <tr class="teal lighten-2">
         <th>Source</th>
-        <td>{{ operation.location_src.name }}</td>
+        <td>{{ operation.location_src.name }}
+            <v-btn @click="show_popup('loc1')" icon text class="float-right">
+                <v-icon large dark>mdi-help-circle</v-icon>
+            </v-btn>
+        </td>
       </tr>
       <tr class="amber">
         <th>Destination</th>
-        <td>{{ operation.location_dst.name }}</td>
+        <td>{{ operation.location_dst.name }}
+            <v-btn @click="show_popup(loc2)" icon text class="float-right">
+                <v-icon large dark>mdi-help-circle</v-icon>
+            </v-btn>
+        </td>
       </tr>
       </tbody>
 
-    <v-dialog v-model="show_detail_dialog">
+    <v-dialog v-model="show_popup_dialog">
         <v-card>
-            <detail-pack :packDetail="operation"></detail-pack>
+            <detail-popup :barcode="barcodeOpen"></detail-popup>
             <v-card-actions>
-                <v-btn color="primary" @click="show_detail_dialog = false">Close</v-btn>
+                <v-btn color="primary" @click="show_popup_dialog = false">Close</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

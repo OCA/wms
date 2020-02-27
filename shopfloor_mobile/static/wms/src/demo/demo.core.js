@@ -60,5 +60,5 @@ var makeBatchPickingLine = function () {
 };
 
 
-window.DEMO_CASES = {}; // Collection
+window.DEMO_CASES = window.DEMO_CASES || {}; // Collection
 /* eslint no-use-before-define: 2 */ // --> ON

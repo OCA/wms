@@ -4,23 +4,27 @@ var DEMO_SCAN_ANYTHING_PACK = {
         "data": {
             "show_detail_info": {
                 "type": "pack",
-                "id": 192834,
-                "name": "PA92834",
-                "location_src": {
-                    "id": 1923,
-                    "name":  'B1S08A34',
+                "barcode": "akdlsjf",
+                "detail_info": {
+                    "id": 192834,
+                    "name": "PA92834",
+                    "location_src": {
+                        "id": 1923,
+                        "name":  'B1S08A34',
+                    },
+                    "location_dst": {
+                        "id": 224,
+                        "name": 'B1S00A01',
+                    },
+                    "product": [{"id": 1, "name": 'Ski Thermo Sock', "qty": 36, "lot": "19102403"}, {"id": 123, "name": 'Hiking shoes', "qty": 32, "lot": "1910239"}],
+                    "picking": {"id": 1, "name": 'Picking 7'},
                 },
-                "location_dst": {
-                    "id": 224,
-                    "name": 'B1S00A01',
-                },
-                "product": [{"id": 1, "name": 'Ski Thermo Sock', "qty": 36, "lot": "19102403"}, {"id": 123, "name": 'Hiking shoes', "qty": 32, "lot": "1910239"}],
-                "picking": {"id": 1, "name": 'Picking 7'},
             },
         },
         "message": undefined,
     },
 };
+
 var DEMO_SCAN_ANYTHING_PRODUCT = {
     'start' : {
         "data": {
@@ -46,7 +50,7 @@ var DEMO_SCAN_ANYTHING_PRODUCT = {
     },
     "message": undefined,
 };
-var DEMO_SCAN_ANYTHING_LOCATION = {
+var DEMO_SCAN_ANYTHING_LOCATION_1 = {
     'start' : {
         "data": {
             "show_detail_info": {
@@ -64,7 +68,7 @@ var DEMO_SCAN_ANYTHING_LOCATION = {
                             "name": "Sun Glasses Cat 4 High Altitude",
                             "pack": {
                                 "name": "PID0000008",
-                                "barcode": "pack",
+                                "barcode": "prod",
                             },
                             "lot": "AA8122F41",
                             "qty_instock": 34,
@@ -77,6 +81,38 @@ var DEMO_SCAN_ANYTHING_LOCATION = {
                             "lot": "AA8122F41",
                             "qty_instock": 4,
                             "qty_reserved": 0,
+                        },
+                    ],
+                },
+            },
+            "message": undefined,
+        },
+    },
+};
+
+var DEMO_SCAN_ANYTHING_LOCATION_2 = {
+    'start' : {
+        "data": {
+            "show_detail_info": {
+                "type": "location",
+                "barcode": "283429834",
+                "detail_info": {
+                    "id": 3231,
+                    "codebar": "loc",
+                    "name": "CCOROL-02",
+                    "parent_name": "SCH/Packing/CCOROL",
+                    "products": [
+                        {
+                            "id": 424,
+                            "barcode": "PROD111",
+                            "name": "Truc",
+                            "pack": {
+                                "name": "PID0000008",
+                                "barcode": "pack",
+                            },
+                            "lot": "AA8122F41",
+                            "qty_instock": 34,
+                            "qty_reserved": 12,
                         },
                     ],
                 },
@@ -127,10 +163,12 @@ var DEMO_SCAN_ANYTHING_OPERATION = {
     },
 };
 
+window.DEMO_CASES = window.DEMO_CASES || {}
 window.DEMO_CASES.scan_anything = {
     "pack": DEMO_SCAN_ANYTHING_PACK,
     "prod": DEMO_SCAN_ANYTHING_PRODUCT,
-    "loc": DEMO_SCAN_ANYTHING_LOCATION,
+    "loc1": DEMO_SCAN_ANYTHING_LOCATION_1,
+    "loc2": DEMO_SCAN_ANYTHING_LOCATION_2,
     "op": DEMO_SCAN_ANYTHING_OPERATION,
 };
 
