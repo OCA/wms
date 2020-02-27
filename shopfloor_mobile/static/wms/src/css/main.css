@@ -128,3 +128,7 @@ ul.packaging span:first-child {
     height: 3.5rem;
     width: 100%;
 }
+
+.label {
+    font-weight: 600;
+}
