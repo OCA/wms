@@ -15,11 +15,13 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
                 "name": "A nice pack 1",
                 "location_src": {
                     "id": 1,
-                    "name":  "Location SRC 1",
+                    "name":  'Location SRC 1',
+                    "barcode": "loc1",
                 },
                 "location_dst": {
                     "id": 2,
-                    "name": "Location SRC 2",
+                    "name": 'Location DST 2',
+                    "barcode": "loc2",
                 },
                 "product": [{"id": 1, "name": "Product 1", "qty": 5}, {"id": 2, "name": "Product 2", "qty": 2}],
                 "picking": {"id": 1, "name": "Picking 1"},

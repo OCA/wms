@@ -18,7 +18,7 @@ export var detailPopup = Vue.component('detail-popup', {
     },
     methods: {
         getData: function (codebar) {
-            this.odoo.scan_anything(codebar).then((result) => {this.currentData = result.start.data.show_detail_info})
+            this.odoo.scan_anything(codebar).then((result) => {this.currentData = result.data})
         },
         urlChanged: function(barcode) {
             // Raises a warning from Vue, but it is the way it should work
