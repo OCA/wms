@@ -7,9 +7,9 @@ export var batch_picking_info = Vue.component('batch-picking-detail', {
         <v-card-title>{{ info.name }}</v-card-title>
         <v-card-text>
           <ul>
-            <li>Operations: {{ info.picking_count }}</li>
-            <li>Lines: {{ info.move_line_count }}</li>
-            <li>Total weight: [TODO]</li>
+            <li>Operations: {{ info.pickings.length }}</li>
+            <li>Lines: {{ _.sumBy(info.pickings, function(p) { return p.move_line_count; }) }}</li>
+            <li>Total weight: {{ _.sumBy(info.pickings, function(p) { return p.weight; }) }}</li>
           </ul>
         </v-card-text>
       </v-card>
@@ -18,10 +18,10 @@ export var batch_picking_info = Vue.component('batch-picking-detail', {
         <v-card-title> {{ rec.name }} </v-card-title>
         <v-card-text>
           <ul>
-            <!--li>Customer: {{ rec.customer.name }}</li-->
+            <li v-if="rec.partner">{{ rec.partner.name }}</li>
             <li>Lines: {{ rec.move_line_count }}</li>
-            <li>Weight: [TODO]</li>
-            <li>REF: {{ rec.origin }}</li>
+            <li>Weight: {{ rec.weight }}</li>
+            <li v-if="rec.origin">REF: {{ rec.origin }}</li>
           </ul>
         </v-card-text>
       </v-card>
