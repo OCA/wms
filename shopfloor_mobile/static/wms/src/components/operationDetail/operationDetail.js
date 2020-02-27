@@ -9,7 +9,7 @@ var operationDetail = Vue.component('operation-detail', {
     props:['operation'],
     methods: {
         show_popup: function (barcode) {
-            this.barcodeOpen = barcode || "loc1"
+            this.barcodeOpen = barcode
             this.show_popup_dialog = true;
         },
     },
@@ -22,9 +22,6 @@ var operationDetail = Vue.component('operation-detail', {
         <th>Name</th>
         <td>
             {{ operation.name }}
-            <v-btn @click="show_popup('pack')" icon text class="float-right">
-                <v-icon large dark>mdi-help-circle</v-icon>
-            </v-btn>
         </td>
       </tr>
       <tr class="teal lighten-2" v-if="operation.barcode">
@@ -34,7 +31,7 @@ var operationDetail = Vue.component('operation-detail', {
       <tr class="teal lighten-2">
         <th>Source</th>
         <td>{{ operation.location_src.name }}
-            <v-btn @click="show_popup('loc1')" icon text class="float-right">
+            <v-btn @click="show_popup(operation.location_src.barcode)" icon text class="float-right">
                 <v-icon large dark>mdi-help-circle</v-icon>
             </v-btn>
         </td>
@@ -42,7 +39,7 @@ var operationDetail = Vue.component('operation-detail', {
       <tr class="amber">
         <th>Destination</th>
         <td>{{ operation.location_dst.name }}
-            <v-btn @click="show_popup(loc2)" icon text class="float-right">
+            <v-btn @click="show_popup(operation.location_dst.barcode)" icon text class="float-right">
                 <v-icon large dark>mdi-help-circle</v-icon>
             </v-btn>
         </td>

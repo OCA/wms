@@ -61,7 +61,7 @@ Vue.component('Screen', {
 
             <v-toolbar-title>{{ title }}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon @click="$router.push('scananything')">
+            <v-btn icon @click="$router.push({'name': 'scananything'})" :disabled="this.$route.name=='scananything'">
                 <v-icon >mdi-magnify</v-icon>
             </v-btn>
         </v-app-bar>

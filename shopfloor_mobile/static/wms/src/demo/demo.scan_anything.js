@@ -1,8 +1,6 @@
 /* eslint no-use-before-define: 0 */ // --> OFF
 var DEMO_SCAN_ANYTHING_PACK = {
-    'start' : {
         "data": {
-            "show_detail_info": {
                 "type": "pack",
                 "barcode": "akdlsjf",
                 "detail_info": {
@@ -20,15 +18,11 @@ var DEMO_SCAN_ANYTHING_PACK = {
                     "picking": {"id": 1, "name": 'Picking 7'},
                 },
             },
-        },
-        "message": undefined,
-    },
+    "message": undefined,
 };
 
 var DEMO_SCAN_ANYTHING_PRODUCT = {
-    'start' : {
         "data": {
-            "show_detail_info": {
                 "type": "product",
                 "barcode": "009932424",
                 "detail_info": {
@@ -46,14 +40,31 @@ var DEMO_SCAN_ANYTHING_PRODUCT = {
                     ],
                 },
             },
-        },
-    },
+    "message": undefined,
+};
+var DEMO_SCAN_ANYTHING_PRODUCT_PACK = {
+        "data": {
+                "type": "product",
+                "barcode": "009932424",
+                "detail_info": {
+                    "id": 424,
+                    "name": "Sun Glasses Cat 4 High Alititude",
+                    "image": "http://localhost/web/image?model=product.template&id=16&field=image_128&unique=04022020111236",
+                    "lot": "AA8122F41",
+                    "expiry_date": "2020-12-01",
+                    "default_code": "266009083",
+                    "supplier_code": "SUP28342",
+                    "packaging": [
+                        {"id": 98234, "name": "Box", "qty": 8, "qty_unit": "Unit"},
+                        {"id": 98235, "name": "Big Box", "qty": 6, "qty_unit": "Box"},
+                        {"id": 98236, "name": "Palette", "qty": 27, "qty_unit": "Big Box"},
+                    ],
+                },
+            },
     "message": undefined,
 };
 var DEMO_SCAN_ANYTHING_LOCATION_1 = {
-    'start' : {
         "data": {
-            "show_detail_info": {
                 "type": "location",
                 "barcode": "283429834",
                 "detail_info": {
@@ -86,14 +97,10 @@ var DEMO_SCAN_ANYTHING_LOCATION_1 = {
                 },
             },
             "message": undefined,
-        },
-    },
 };
 
 var DEMO_SCAN_ANYTHING_LOCATION_2 = {
-    'start' : {
         "data": {
-            "show_detail_info": {
                 "type": "location",
                 "barcode": "283429834",
                 "detail_info": {
@@ -118,14 +125,10 @@ var DEMO_SCAN_ANYTHING_LOCATION_2 = {
                 },
             },
             "message": undefined,
-        },
-    },
 };
 
 var DEMO_SCAN_ANYTHING_OPERATION = {
-    'start' : {
         "data": {
-            "show_detail_info": {
                 "type": "operation",
                 "barcode": "280009834",
                 "detail_info": {
@@ -158,9 +161,7 @@ var DEMO_SCAN_ANYTHING_OPERATION = {
                     ],
                 },
             },
-        },
         "message": undefined,
-    },
 };
 
 window.DEMO_CASES = window.DEMO_CASES || {}
