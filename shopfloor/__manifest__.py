@@ -25,6 +25,7 @@
         "views/shopfloor_menu.xml",
         "views/shopfloor_process.xml",
         "views/stock_picking_type.xml",
+        "views/stock_location.xml",
         "views/shopfloor_profile_views.xml",
         "views/menus.xml",
     ],
