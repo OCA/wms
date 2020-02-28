@@ -177,14 +177,13 @@ class StockLocation(models.Model):
         return not (max_weight and pack_weight and pack_weight > max_weight)
 
     def _existing_quants(self, products=None, lot=None):
-
-        base_domain = [("location_id", "=", self.id)]
+        base_domain = [("location_id", "child_of", self.id)]
         domain = self._prepare_existing_domain(base_domain, products=products, lot=lot)
         return self.env["stock.quant"].search(domain, limit=1)
 
     def _existing_planned_moves(self, products=None, lot=None):
         base_domain = [
-            ("location_dest_id", "=", self.id),
+            ("location_dest_id", "child_of", self.id),
             ("move_id.state", "not in", ("draft", "cancel", "done")),
         ]
         domain = self._prepare_existing_domain(base_domain, products=products, lot=lot)
