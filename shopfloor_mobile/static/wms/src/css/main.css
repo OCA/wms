@@ -132,7 +132,7 @@ ul.packaging span:first-child {
     align-content: stretch; /* Extra space in Cross Axis */
 }
 .with-bottom-actions > div:first-child {
-    height: 74vh;
+    height: 68vh;
     margin-bottom: 2vh;
     overflow-y: scroll;
 }

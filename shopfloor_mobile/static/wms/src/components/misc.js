@@ -110,7 +110,7 @@ Vue.component('manual-select', {
     template: `
     <div class="manual-select with-bottom-actions">
       <v-card outlined>
-        <v-list shaped>
+        <v-list shaped v-if="records.length">
           <v-list-item-group mandatory color="success">
             <v-list-item v-for="rec in records" :key="rec[key_value]" @click="updateSelected(rec[key_value])">
               <v-list-item-content>
@@ -125,8 +125,11 @@ Vue.component('manual-select', {
             </v-list-item>
           </v-list-item-group>
         </v-list>
+        <v-alert type="error" v-if="!records.length">
+          No record found.
+        </v-alert>
       </v-card>
-      <v-row class="actions bottom-actions">
+      <v-row class="actions bottom-actions" v-if="records.length">
         <v-col>
           <v-btn color="success" @click="$emit('select', selected)">
             Start

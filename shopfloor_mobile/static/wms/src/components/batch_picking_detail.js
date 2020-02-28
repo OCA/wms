@@ -4,25 +4,37 @@ export var batch_picking_info = Vue.component('batch-picking-detail', {
   <div class="detail batch-picking-detail with-bottom-actions" v-if="!_.isEmpty(info)">
     <div>
       <v-card outlined class="main">
-        <v-card-title>{{ info.name }}</v-card-title>
+        <v-card-title>Operations: {{ info.pickings.length }}</v-card-title>
+        <v-card-subtitle>{{ info.name }}</v-card-subtitle>
         <v-card-text>
-          <ul>
-            <li>Operations: {{ info.pickings.length }}</li>
-            <li>Lines: {{ _.sumBy(info.pickings, function(p) { return p.move_line_count; }) }}</li>
-            <li>Total weight: {{ _.sumBy(info.pickings, function(p) { return p.weight; }) }}</li>
-          </ul>
+          <div class="lines-nr">
+            <span class="label">Lines:</span>
+            {{ _.sumBy(info.pickings, function(p) { return p.move_line_count; }) }}
+          </div>
+          <div class="weight">
+            <span class="label">Weight:</span>
+            {{ _.sumBy(info.pickings, function(p) { return p.weight; }) }}
+          </div>
         </v-card-text>
       </v-card>
 
       <v-card outlined v-for="rec in info.pickings" :key="rec.id">
         <v-card-title> {{ rec.name }} </v-card-title>
         <v-card-text>
-          <ul>
-            <li v-if="rec.partner">{{ rec.partner.name }}</li>
-            <li>Lines: {{ rec.move_line_count }}</li>
-            <li>Weight: {{ rec.weight }}</li>
-            <li v-if="rec.origin">REF: {{ rec.origin }}</li>
-          </ul>
+          <div class="lines-nr">
+            <span class="label">Lines:</span>
+            {{ _.sumBy(info.pickings, function(p) { return p.move_line_count; }) }}
+          </div>
+          <div class="weight">
+            <span class="label">Weight:</span>
+            {{ _.sumBy(info.pickings, function(p) { return p.weight; }) }}
+          </div>
+          <div class="partner" v-if="rec.partner">
+            <span class="label">Customer:</span> {{ rec.partner.name }}
+          </div>
+          <div class="origin" v-if="rec.origin">
+            <span class="label">REF:</span> {{ rec.origin }}
+          </div>
         </v-card-text>
       </v-card>
 
