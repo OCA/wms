@@ -143,9 +143,7 @@ class ClusterPicking(Component):
         pickings = []
         for picking in batch.picking_ids:
             # TODO: is this correct?
-            p_weight = sum(
-                picking.mapped('move_line_ids.product_id.weight')
-            )
+            p_weight = sum(picking.mapped("move_line_ids.product_id.weight"))
             p_values = {
                 "id": picking.id,
                 "name": picking.name,
@@ -162,11 +160,7 @@ class ClusterPicking(Component):
             pickings.append(p_values)
         return self._response(
             next_state="confirm_start",
-            data={
-                "id": batch.id,
-                "name": batch.name,
-                "pickings": pickings,
-            },
+            data={"id": batch.id, "name": batch.name, "pickings": pickings},
         )
 
     def _response_for_batch_cannot_be_selected(self):
@@ -1182,7 +1176,11 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                         "id": {"required": True, "type": "integer"},
                         "name": {"type": "string", "nullable": False, "required": True},
                         "move_line_count": {"required": True, "type": "integer"},
-                        "weight": {"type": "float", "nullable": False, "required": True},
+                        "weight": {
+                            "type": "float",
+                            "nullable": False,
+                            "required": True,
+                        },
                         "origin": {
                             "type": "string",
                             "nullable": False,
