@@ -13,22 +13,22 @@ var moreInfo = Vue.component('detail-pack', {
 
           <tbody>
           <tr class="teal lighten-2">
-            <th>Name</th>
+            <th>Pack</th>
             <td>
                 {{ packDetail.name }}
             </td>
           </tr>
-          <tr class="blue lighten-2">
-            <th>Operation</th>
-            <td>Operation Name</td>
-          </tr>
-          <tr class="blue lighten-2">
+          <tr class="teal lighten-2">
             <th>Location</th>
             <td>
                 {{ packDetail.location_src.name }}<br/>
                 Weight : ?<br/>
                 Packaging : ?
             </td>
+          </tr>
+          <tr class="blue lighten-2">
+            <th>Operation</th>
+            <td>Operation Name</td>
           </tr>
           <tr v-for="product in packDetail.product" class="blue">
             <th> {{ product.name }}</br> Lot: {{ product.lot }}</th>
