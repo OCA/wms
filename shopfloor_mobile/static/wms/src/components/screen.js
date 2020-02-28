@@ -65,18 +65,16 @@ Vue.component('Screen', {
                 <v-icon >mdi-magnify</v-icon>
             </v-btn>
         </v-app-bar>
-        <v-content>
+        <v-content :class="screen_css_class">
             <div class="header" v-if="$slots.header">
                 <slot name="header">Optional header - no content</slot>
             </div>
             <v-container>
-                <div :class="screen_css_class">
-                    <div class="main-content">
-                        <slot>No content provided</slot>
-                    </div>
-                    <div class="footer" v-if="$slots.footer">
-                        <slot name="footer">Optional footer - no content</slot>
-                    </div>
+                <div class="main-content">
+                    <slot>No content provided</slot>
+                </div>
+                <div class="footer" v-if="$slots.footer">
+                    <slot name="footer">Optional footer - no content</slot>
                 </div>
             </v-container>
         </v-content>

@@ -3,17 +3,16 @@ import {ScenarioBaseMixin, GenericStatesMixin} from "./mixins.js";
 export var ClusterPicking = Vue.component('cluster-picking', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
     template: `
-        <Screen :title="menuItem.name" :klass="usage">
+        <Screen :title="menuItem.name" :klass="usage + ' ' + 'state-' + state.key">
             <!-- FOR DEBUG -->
             <!-- {{ current_state_key }} -->
-            <template v-slot:header v-if="state.display_info">
-                <state-display-info :info="state.display_info" />
+            <template v-slot:header>
+                <user-information
+                    v-if="!need_confirmation && user_notification.message"
+                    v-bind:info="user_notification"
+                    />
+                <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
-            <!-- TODO: move it above everything -->
-            <user-information
-                v-if="!need_confirmation && user_notification.message"
-                v-bind:info="user_notification"
-                />
             <searchbar
                 v-if="state_in(['start_line', 'unload_all', 'confirm_unload_all', 'scan_destination'])"
                 v-on:found="on_scan"
