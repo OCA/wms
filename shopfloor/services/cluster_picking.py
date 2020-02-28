@@ -496,14 +496,7 @@ class ClusterPicking(Component):
         batch = move_line.picking_id.batch_id
         next_line = self._next_line_for_pick(batch)
         if not next_line:
-            # TODO
-            return self._response(
-                next_state="start",
-                message={
-                    "message_type": "error",
-                    "message": "no lines remaining, not implemented",
-                },
-            )
+            return self.prepare_unload(batch.id)
         return self._response(
             next_state="start_line",
             data=self._data_move_line(next_line),
