@@ -485,7 +485,7 @@ class ClusterPicking(Component):
             next_state="start_line",
             data=self._data_move_line(next_line),
             message={
-                "message_type": "info",
+                "message_type": "success",
                 # TODO different message for products/packs?
                 "message": _("{} {} put in {}").format(
                     move_line.qty_done,
@@ -780,7 +780,7 @@ class ClusterPicking(Component):
     def _response_batch_complete(self):
         return self._response(
             next_state="start",
-            message={"message_type": "info", "message": _("Batch Transfer complete")},
+            message={"message_type": "success", "message": _("Batch Transfer complete")},
         )
 
     def unload_split(self, picking_batch_id):
