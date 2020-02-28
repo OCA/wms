@@ -1,7 +1,8 @@
 div.v-application--wrap > .container {
     padding: 0;
 }
-main.v-content > .v-content__wrap {
+main.v-content > .v-content__wrap > .header .container {
+    padding-bottom: 0;
 }
 
 #app.demo_mode header {

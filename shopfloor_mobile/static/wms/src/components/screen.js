@@ -73,10 +73,11 @@ Vue.component('Screen', {
                 <div class="main-content">
                     <slot>No content provided</slot>
                 </div>
-                <div class="footer" v-if="$slots.footer">
-                    <slot name="footer">Optional footer - no content</slot>
-                </div>
             </v-container>
+            <!-- TODO: use flexbox to put it always at the bottom -->
+            <div class="footer" v-if="$slots.footer">
+                <slot name="footer">Optional footer - no content</slot>
+            </div>
         </v-content>
     </v-app>
     `,
