@@ -197,6 +197,7 @@ export var GenericStatesMixin = {
                         if (!_.isUndefined(result.data))
                             this.set_erp_data('data', result.data)
                         if (!_.isUndefined(result) && !result.error) {
+                            // TODO: consider not changing the state if it is the same to no refresh
                             this.go_state(result.next_state)
                         } else {
                             alert(result.status + ' ' + result.error)
