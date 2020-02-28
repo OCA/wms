@@ -74,10 +74,8 @@ class SinglePackTransfer(Component):
         )
 
     def _response_for_start_success(self, move_line, pack):
-        message = self.actions_for("message")
         return self._response(
             next_state="scan_location",
-            message=message.scan_destination(),
             data=self._data_after_package_scanned(move_line, pack),
         )
 
