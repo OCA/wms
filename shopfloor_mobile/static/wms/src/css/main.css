@@ -102,8 +102,24 @@ ul.packaging span:first-child {
     width: 50%;
     margin: 0.5rem 0;
 }
-.number-spinner.spinner-position-right input.init-value{
+.number-spinner.spinner-position-left .spinner-btn{
+    float: left;
+    margin: 0.5rem 0;
+}
+.number-spinner.spinner-position-left .input-wrapper{
+    float: right;
+    width: 50%;
+    margin: 0.5rem 0;
+}
+.number-spinner .v-text-field__details {
+    display: none;
+}
+.number-spinner .v-input.current-value{
+    font-size: 1.5rem;
+}
+.number-spinner .init-value{
     font-weight: bold;
+    font-size: 1.2rem;
     color: #999;
 }
 
