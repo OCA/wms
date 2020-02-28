@@ -35,7 +35,7 @@ var DEMO_CLUSTER_PICKING_1 = {
     "list_batch": {
         "next_state": "manual_selection",
         "message": {
-            "message_type": "info",
+            "message_type": "success",
             "message": "Previous line postponed",
         },
         "data": {
@@ -97,7 +97,7 @@ var DEMO_CLUSTER_PICKING_1 = {
         "ok": {
             "next_state": "start_line",
             "message": {
-                "message_type": "info",
+                "message_type": "success",
                 "message": "Product 5 put in bin #2",
             },
             "data": {
@@ -118,7 +118,7 @@ var DEMO_CLUSTER_PICKING_1 = {
     "stock_is_zero": {
         "next_state": "start_line",
         "message": {
-            "message_type": "info",
+            "message_type": "success",
             "message": "Stock zero confirmed",
         },
         "data": {
@@ -129,7 +129,7 @@ var DEMO_CLUSTER_PICKING_1 = {
     "skip_line": {
         "next_state": "start_line",
         "message": {
-            "message_type": "info",
+            "message_type": "success",
             "message": "Previous line postponed",
         },
         "data": {
@@ -140,7 +140,7 @@ var DEMO_CLUSTER_PICKING_1 = {
     "stock_issue": {
         "next_state": "start_line",
         "message": {
-            "message_type": "info",
+            "message_type": "success",
             "message": "Stock out confirmed",
         },
         "data": {
@@ -152,15 +152,16 @@ var DEMO_CLUSTER_PICKING_1 = {
     "prepare_unload": {
         "next_state": "unload_all",
         "data": {
-            // Next line to process
-            "unload_all": {},
+            "unload_all": {
+
+            },
         },
     },
     "set_destination_all": {
         "OK": {
             "next_state": "start_line",
             "message": {
-                "message_type": "info",
+                "message_type": "success",
                 "message": "Destination set",
             },
             "data": {

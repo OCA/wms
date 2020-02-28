@@ -19,7 +19,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 :input_placeholder="search_input_placeholder"
                 />
             <get-work
-                v-if="state_is(initial_state_key)"
+                v-if="state_is('start')"
                 v-on:get_work="state.on_get_work"
                 v-on:manual_selection="state.on_manual_selection"
                 />
@@ -83,6 +83,21 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     </v-card-title>
                 </v-card>
             </div>
+            <template v-slot:footer v-if="state_is('unload_all')">
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn depressed color="primary" @click="$emit('action', 'action_split')">Split [TODO]</v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn depressed @click="$emit('action', 'action_back')">Back [TODO]</v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
+            </template>
+
         </Screen>
     `,
     computed: {
