@@ -42,6 +42,27 @@ var DEMO_SCAN_ANYTHING_PRODUCT = {
             },
     "message": undefined,
 };
+var DEMO_SCAN_ANYTHING_PRODUCT_2 = {
+        "data": {
+                "type": "product",
+                "barcode": "prod2",
+                "detail_info": {
+                    "id": 421,
+                    "name": "Sun Glasses Pro Glazier",
+                    "image": "",
+                    "lot": "ZA3222G01",
+                    "expiry_date": "2020-12-01",
+                    "default_code": "266009083",
+                    "supplier_code": "SUP28342",
+                    "packaging": [
+                        {"id": 98234, "name": "Box", "qty": 8, "qty_unit": "Unit"},
+                        {"id": 98235, "name": "Big Box", "qty": 6, "qty_unit": "Box"},
+                        {"id": 98236, "name": "Palette", "qty": 27, "qty_unit": "Big Box"},
+                    ],
+                },
+            },
+    "message": undefined,
+};
 var DEMO_SCAN_ANYTHING_PRODUCT_PACK = {
         "data": {
                 "type": "product",
@@ -66,7 +87,7 @@ var DEMO_SCAN_ANYTHING_PRODUCT_PACK = {
 var DEMO_SCAN_ANYTHING_LOCATION_1 = {
         "data": {
                 "type": "location",
-                "barcode": "283429834",
+                "barcode": "loc1",
                 "detail_info": {
                     "id": 3231,
                     "codebar": "loc",
@@ -75,11 +96,11 @@ var DEMO_SCAN_ANYTHING_LOCATION_1 = {
                     "products": [
                         {
                             "id": 424,
-                            "barcode": "PROD424",
+                            "barcode": "PROD1",
                             "name": "Sun Glasses Cat 4 High Altitude",
                             "pack": {
-                                "name": "PID0000008",
-                                "barcode": "prod",
+                                "name": "PACK0000008",
+                                "barcode": "pack",
                             },
                             "lot": "AA8122F41",
                             "qty_instock": 34,
@@ -87,9 +108,10 @@ var DEMO_SCAN_ANYTHING_LOCATION_1 = {
                         },
                         {
                             "id": 421,
+                            "barcode": "prod2",
                             "name": "Sun Glasses Pro Glazier",
                             "pack": {},
-                            "lot": "AA8122F41",
+                            "lot": "ZA3222G01",
                             "qty_instock": 4,
                             "qty_reserved": 0,
                         },
@@ -113,10 +135,7 @@ var DEMO_SCAN_ANYTHING_LOCATION_2 = {
                             "id": 424,
                             "barcode": "PROD111",
                             "name": "Truc",
-                            "pack": {
-                                "name": "PID0000008",
-                                "barcode": "pack",
-                            },
+                            "pack": {},
                             "lot": "AA8122F41",
                             "qty_instock": 34,
                             "qty_reserved": 12,
@@ -168,6 +187,7 @@ window.DEMO_CASES = window.DEMO_CASES || {}
 window.DEMO_CASES.scan_anything = {
     "pack": DEMO_SCAN_ANYTHING_PACK,
     "prod": DEMO_SCAN_ANYTHING_PRODUCT,
+    "prod2": DEMO_SCAN_ANYTHING_PRODUCT_2,
     "loc1": DEMO_SCAN_ANYTHING_LOCATION_1,
     "loc2": DEMO_SCAN_ANYTHING_LOCATION_2,
     "op": DEMO_SCAN_ANYTHING_OPERATION,

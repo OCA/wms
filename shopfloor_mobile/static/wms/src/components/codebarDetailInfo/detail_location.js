@@ -20,7 +20,7 @@ var moreInfo = Vue.component('detail-location', {
           </tr>
           <tr v-for="product in locationDetail.products" class="blue">
 
-            <td colspan="2" @click="$emit('url-change', product.pack.barcode)">
+            <td colspan="2" @click="$emit('url-change', product.pack.barcode || product.barcode)">
                 {{ product.name }}</br>Pack {{ product.pack.name }}</br>{{ product.lot }}
                 {{ product.qty }}
                 <div>In stock 234 / Reserved 92</div>
