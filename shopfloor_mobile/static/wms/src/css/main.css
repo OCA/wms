@@ -148,3 +148,9 @@ ul.packaging span:first-child {
 .label {
     font-weight: 600;
 }
+
+.state-display-info .v-alert{
+    margin-bottom: 0;
+}
+.state-title {
+}
