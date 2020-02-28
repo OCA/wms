@@ -259,6 +259,14 @@ class ClusterPicking(Component):
             ),
         )
 
+    def _last_picked_line(self, picking):
+        """Get the last line packed for this picking."""
+        return fields.first(
+            picking.move_line_ids.filtered(
+                lambda l: l.qty_done > 0 and l.result_package_id
+            )
+        )
+
     def _next_line_for_pick(self, picking_batch):
         remaining_lines = self._lines_to_pick(picking_batch)
         return fields.first(remaining_lines)
@@ -430,9 +438,15 @@ class ClusterPicking(Component):
         )
 
     def _response_for_scan_line_ok(self, move_line):
-        return self._response(
-            next_state="scan_destination", data=self._data_move_line(move_line)
-        )
+        data = self._data_move_line(move_line)
+        last_picked_line = self._last_picked_line(move_line.picking_id)
+        if last_picked_line:
+            # suggest pack to be used for the next line
+            data["destination_pack"] = {
+                "id": last_picked_line.result_package_id.id,
+                "name": last_picked_line.result_package_id.name,
+            }
+        return self._response(next_state="scan_destination", data=data)
 
     def scan_destination_pack(self, move_line_id, barcode, quantity):
         """Scan the destination package (bin) for a move line
@@ -1255,6 +1269,15 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             },
             # TODO add destination pack
             "pack": {
+                "type": "dict",
+                "required": False,
+                "nullable": True,
+                "schema": {
+                    "id": {"required": True, "type": "integer"},
+                    "name": {"type": "string", "nullable": False, "required": True},
+                },
+            },
+            "destination_pack": {
                 "type": "dict",
                 "required": False,
                 "nullable": True,
