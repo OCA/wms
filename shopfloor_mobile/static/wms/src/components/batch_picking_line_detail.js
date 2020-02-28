@@ -12,27 +12,40 @@ export var batch_picking_line = Vue.component('batch-picking-line-detail', {
     }
   },
   template: `
-  <div v-if="!_.isEmpty(line)" :class="'detail batch-picking-line-detail ' + (line.postponed ? 'line-postponed' : '')">
-    <v-card outlined class="main">
-      <v-card-title>{{ line.picking.name }}</v-card-title>
-      <v-card-subtitle>
-        <div class="batch"><span class="label">From batch:</span> {{ line.batch.name }}</div>
-        <div v-if="line.picking.origin"><span class="ref">{{ line.picking.origin }}</span> - <span class="ref">[CUSTOMER TODO]</span></div>
+<div v-if="!_.isEmpty(line)" :class="'detail batch-picking-line-detail ' + (line.postponed ? 'line-postponed' : '')">
+  <v-card outlined class="main">
+    <!-- use card-title just to get some big styles for prominent information for free -->
+    <v-card-title>
+      <div class="main-info">
         <div class="source"><span class="label">Location:</span> {{ line.location_src.name }}</div>
-      </v-card-subtitle>
-    </v-card>
-
-    <v-card outlined v-if="showFullInfo">
-      <v-card-title>{{ line.product.default_code }}</v-card-title>
-      <v-card-subtitle>{{ line.product.name }}</v-card-subtitle>
-      <v-card-text>
-        <div class="pack"><span class="label">Pack:</span> {{ line.pack.name }}</div>
+        <div v-if="line.destination_pack" class="destination-bin"><span class="label">Destination bin:</span> {{ line.destination_pack.name }}</div>
         <div v-if="line.lot" class="lot"><span class="label">Lot:</span> {{ line.lot.name }}</div>
-        <div class="qty-on-hand"><span class="label">On hand qty:</span> {{ line.product.qty_available }}</div>
-        <div class="qty-pkg"><span class="label">Package qty:</span> {{ line.quantity }}</div>
-        <div class="destination"><span class="label">Destination:</span> {{ line.location_dst.name }}</div>
-      </v-card-text>
-    </v-card>
+        <div class="pack"><span class="label">Pack:</span> {{ line.pack.name }}</div>
+        <div class="qty-pkg"><span class="label">Qty:</span> {{ line.quantity }}</div>
+      </div>
+    </v-card-title>
+  </v-card>
+
+
+  <v-card outlined v-if="showFullInfo">
+    <v-card-title>{{ line.product.default_code }}</v-card-title>
+    <v-card-subtitle>{{ line.product.name }}</v-card-subtitle>
+
+    <v-card-title>{{ line.picking.name }}</v-card-title>
+    <v-card-subtitle>
+      <div class="batch"><span class="label">From batch:</span> {{ line.batch.name }}</div>
+    </v-card-subtitle>
+    <v-card-text>
+      <div class="ref" v-if="line.picking.origin">
+        <span>{{ line.picking.origin }}</span>
+      </div>
+      <div class="customer" v-if="line.picking.partner">
+        <span>{{ line.picking.partner.name }}</span>
+      </div>
+      <div class="qty-on-hand"><span class="label">On hand qty:</span> {{ line.product.qty_available }}</div>
+      <div class="destination"><span class="label">Destination:</span> {{ line.location_dst.name }}</div>
+    </v-card-text>
+  </v-card>
 
 </div>
 `

@@ -10,6 +10,11 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 v-if="!need_confirmation && user_notification.message"
                 v-bind:info="user_notification"
                 />
+            <searchbar
+                v-if="state_in(['start_line', 'unload_all', 'confirm_unload_all', 'scan_destination'])"
+                v-on:found="on_scan"
+                :input_placeholder="search_input_placeholder"
+                />
             <get-work
                 v-if="state_is(initial_state_key)"
                 v-on:get_work="state.on_get_work"
@@ -23,12 +28,8 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 />
             <batch-picking-line-detail
                 v-if="state_in(['start_line', 'scan_destination'])"
-                :line="state_get_data('start_line')"
-                />
-            <searchbar
-                v-if="state_in(['start_line', 'unload_all', 'confirm_unload_all'])"
-                v-on:found="on_scan"
-                :input_placeholder="search_input_placeholder"
+                :line="state.data"
+                :show-full-info="!state_is('scan_destination')"
                 />
             <batch-picking-line-actions
                 v-if="state_is('start_line')"
@@ -39,14 +40,14 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 <div class="qty">
                     <input-number-spinner v-on:input="state.on_qty_update" :init_value="scan_destination_qty" class="mb-2"/>
                 </div>
-                <searchbar
-                    v-on:found="on_scan"
-                    :input_placeholder="search_input_placeholder"
-                    />
-                <div class="full-bin text-center">
-                    <v-btn depressed color="warning" @click="state.on_action_full_bin">
-                        Full bin
-                    </v-btn>
+                <div class="button-list button-vertical-list full mt-10">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn depressed color="warning" @click="state.on_action_full_bin">
+                                Full bin
+                            </v-btn>
+                        </v-col>
+                    </v-row>
                 </div>
             </div>
             <stock-zero-check
@@ -182,7 +183,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 'scan_destination': {
                     enter: () => {
                         // TODO: shalle we hook v-model for qty input straight to the state data?
-                        this.scan_destination_qty = this.erp_data.data.start_line.product.qty_available
+                        this.scan_destination_qty = this.erp_data.data.start_line.quantity
                     },
                     on_qty_update: (qty) => {
                         this.scan_destination_qty = parseInt(qty)
