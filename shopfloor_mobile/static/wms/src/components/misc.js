@@ -160,7 +160,7 @@ Vue.component('state-display-info', {
       'info': Object,
   },
   template: `
-  <div class="state-display-info" v-if="info">
+  <div class="state-display-info" v-if="info.title">
     <div class="container">
       <v-alert tile dense outlined type="info">
         <div class="state-title text--secondary">{{ info.title }}</div>

@@ -162,9 +162,9 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 },
                 'start_line': {
                     display_info: {
-                        'title': 'Pick the product by scanning something'
+                        'title': 'Pick the product by scanning something',
+                        'scan_placeholder': 'Scan location / pack / product / lot',
                     },
-                    scan_placeholder: 'Scan location / pack / product / lot',
                     // here we have to use some info sent back from `select`
                     // or from `find_batch` that we pass to scan line
                     on_scan: (scanned) => {
@@ -206,9 +206,9 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 },
                 'scan_destination': {
                     display_info: {
-                        'title': 'Check quantity and scan a destination bin'
+                        'title': 'Check quantity and scan a destination bin',
+                        'scan_placeholder': 'Scan destination bin',
                     },
-                    scan_placeholder: 'Scan destination bin',
                     enter: () => {
                         // TODO: shalle we hook v-model for qty input straight to the state data?
                         this.scan_destination_qty = this.erp_data.data.start_line.quantity
@@ -254,6 +254,10 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     },
                 },
                 'unload_all': {
+                    display_info: {
+                        'title': 'Unload all bins',
+                        'scan_placeholder': 'Scan location',
+                    },
                     on_scan: (scanned, confirmation=false) => {
                         this.state_set_data({'location_barcode': scanned.text})
                         this.go_state(
@@ -274,12 +278,12 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             })
                         )
                     },
-                    scan_placeholder: 'Scan location',
-                    display_info: {
-                        'title': 'Unload all bins',
-                    }
                 },
                 'confirm_unload_all': {
+                    display_info: {
+                        'title': 'Unload all bins confirm',
+                        'scan_placeholder': 'Scan location',
+                    },
                     on_user_confirm: (answer) => {
                         // TODO: check if this used
                         //-> no flag is set to enable the confirmation dialog,
@@ -297,9 +301,12 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                         this.current_state_key = 'unload_all'
                         this.state.on_scan(scanned, confirmation)
                     },
-                    scan_placeholder: 'Unload all: scan location',
                 },
                 'unload_single': {
+                    display_info: {
+                        'title': 'Unload single bin',
+                        'scan_placeholder': 'Scan location',
+                    },
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
@@ -309,9 +316,12 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             })
                         )
                     },
-                    scan_placeholder: 'Unload single: scan location',
                 },
                 'unload_set_destination': {
+                    display_info: {
+                        'title': 'Set destination',
+                        'scan_placeholder': 'Scan location',
+                    },
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
@@ -321,9 +331,12 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             })
                         )
                     },
-                    scan_placeholder: 'Scan location',
                 },
                 'confirm_unload_set_destination': {
+                    display_info: {
+                        'title': 'Set destination confirm',
+                        'scan_placeholder': 'Scan location',
+                    },
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
@@ -334,7 +347,6 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             })
                         )
                     },
-                    scan_placeholder: 'Scan location',
                 },
                 'show_completion_info': {
                     on_confirm: () => {
@@ -347,6 +359,10 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     },
                 },
                 'change_pack_lot': {
+                    display_info: {
+                        'title': 'Change pack or lot',
+                        'scan_placeholder': 'Scan pack or lot',
+                    },
                     on_scan: (scanned) => {
                         this.go_state(
                             'wait_call',
@@ -356,7 +372,6 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             })
                         )
                     },
-                    scan_placeholder: 'Scan pack or lot',
                 },
                 'stock_issue': {
                     enter: () => {
