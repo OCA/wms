@@ -94,7 +94,7 @@ class MessageAction(Component):
 
     def confirm_pack_moved(self):
         return {
-            "message_type": "info",
+            "message_type": "success",
             "message": _("The pack has been moved, you can scan a new pack."),
         }
 
