@@ -31,7 +31,7 @@ Vue.component('last-operation', {
     template: `
     <div class="last-operation">
         <v-dialog persistent fullscreen tile value=true>
-            <v-alert type="info" prominent transition="scale-transition">
+            <v-alert tile type="info" prominent transition="scale-transition">
                 <v-card outlined color="blue lighten-1" class="message mt-10">
                     <v-card-title>This was the last operation of the document.</v-card-title>
                     <v-card-text>The next operation is ready to be processed.</v-card-text>
@@ -130,7 +130,7 @@ Vue.component('manual-select', {
             </v-list-item>
           </v-list-item-group>
         </v-list>
-        <v-alert type="error" v-if="!records.length">
+        <v-alert tile type="error" v-if="!records.length">
           No record found.
         </v-alert>
       </v-card>
@@ -159,7 +159,7 @@ Vue.component('state-display-info', {
   template: `
   <div class="state-display-info" v-if="info">
     <div class="container">
-      <v-alert dense outlined type="info">
+      <v-alert tile dense outlined type="info">
         <div class="state-title text--secondary">{{ info.title }}</div>
       </v-alert>
     </div>

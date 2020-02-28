@@ -1,7 +1,7 @@
 Vue.component('user-information', {
     props: ['info'],
     template: `
-    <v-alert :type="alert_type">
+    <v-alert :type="alert_type" tile>
     {{ info.message }}
     </v-alert>
     `,
