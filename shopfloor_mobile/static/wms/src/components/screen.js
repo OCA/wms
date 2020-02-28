@@ -18,6 +18,7 @@ Vue.component('Screen', {
             return [
                 'screen',
                 'screen-' + this.klass,
+                this.$slots.header ? 'with-header': '',
                 this.$slots.footer ? 'with-footer': '',
             ].join(' ');
         },
@@ -54,6 +55,7 @@ Vue.component('Screen', {
                 dark
                 flat
                 app
+                dense
                 >
             <v-app-bar-nav-icon @click.stop="drawer = !drawer" v-if="showMenu" />
 
@@ -84,6 +86,9 @@ Vue.component('Screen', {
             </v-menu>
         </v-app-bar>
         <v-content>
+            <div class="header" v-if="$slots.header">
+                <slot name="header">Optional header - no content</slot>
+            </div>
             <v-container>
                 <div :class="screen_css_class">
                     <div class="main-content">

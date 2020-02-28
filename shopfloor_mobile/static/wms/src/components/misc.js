@@ -144,3 +144,20 @@ Vue.component('manual-select', {
     </div>
   `,
 });
+
+
+
+Vue.component('state-display-info', {
+  props: {
+      'info': Object,
+  },
+  template: `
+  <div class="state-display-info" v-if="info">
+    <div class="container">
+      <v-alert dense outlined type="info">
+        <div class="state-title text--secondary">{{ info.title }}</div>
+      </v-alert>
+    </div>
+  </div>
+`,
+});

@@ -6,6 +6,10 @@ export var ClusterPicking = Vue.component('cluster-picking', {
         <Screen :title="menuItem.name" :klass="usage">
             <!-- FOR DEBUG -->
             <!-- {{ current_state_key }} -->
+            <template v-slot:header v-if="state.display_info">
+                <state-display-info :info="state.display_info" />
+            </template>
+            <!-- TODO: move it above everything -->
             <user-information
                 v-if="!need_confirmation && user_notification.message"
                 v-bind:info="user_notification"
@@ -84,6 +88,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
         },
     },
     data: function () {
+        // TODO: add a title to each screen
         return {
             'usage': 'cluster_picking',
             'initial_state_key': 'start',
@@ -120,6 +125,9 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             })
                         )
                     },
+                    display_info: {
+                        'title': 'Select a batch and start'
+                    },
                 },
                 'confirm_start': {
                     on_confirm: () => {
@@ -140,6 +148,10 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     }
                 },
                 'start_line': {
+                    display_info: {
+                        'title': 'Pick the product by scanning something'
+                    },
+                    scan_placeholder: 'Scan location / pack / product / lot',
                     // here we have to use some info sent back from `select`
                     // or from `find_batch` that we pass to scan line
                     on_scan: (scanned) => {
@@ -151,7 +163,6 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             })
                         )
                     },
-                    scan_placeholder: 'Scan location / pack / product / lot',
                     // additional actions
                     on_action: (action) => {
                         this.state['on_' + action].call(this)
@@ -181,6 +192,10 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     },
                 },
                 'scan_destination': {
+                    display_info: {
+                        'title': 'Check quantity and scan a destination bin'
+                    },
+                    scan_placeholder: 'Scan destination bin',
                     enter: () => {
                         // TODO: shalle we hook v-model for qty input straight to the state data?
                         this.scan_destination_qty = this.erp_data.data.start_line.quantity
@@ -201,7 +216,6 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                     on_action_full_bin: () => {
                         this.action_full_bin()
                     },
-                    scan_placeholder: 'Scan destination bin',
                 },
                 'zero_check': {
                     on_action: (action) => {
@@ -248,6 +262,9 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                         )
                     },
                     scan_placeholder: 'Scan location',
+                    display_info: {
+                        'title': 'Unload all bins',
+                    }
                 },
                 'confirm_unload_all': {
                     on_user_confirm: (answer) => {
@@ -267,7 +284,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                         this.current_state_key = 'unload_all'
                         this.state.on_scan(scanned, confirmation)
                     },
-                    scan_placeholder: 'Scan location',
+                    scan_placeholder: 'Unload all: scan location',
                 },
                 'unload_single': {
                     on_scan: (scanned) => {
@@ -279,7 +296,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             })
                         )
                     },
-                    scan_placeholder: 'Scan location',
+                    scan_placeholder: 'Unload single: scan location',
                 },
                 'unload_set_destination': {
                     on_scan: (scanned) => {
