@@ -796,7 +796,10 @@ class ClusterPicking(Component):
     def _response_batch_complete(self):
         return self._response(
             next_state="start",
-            message={"message_type": "success", "message": _("Batch Transfer complete")},
+            message={
+                "message_type": "success",
+                "message": _("Batch Transfer complete"),
+            },
         )
 
     def unload_split(self, picking_batch_id):
