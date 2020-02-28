@@ -109,6 +109,10 @@ export class OdooMocked extends OdooMixin{
             // pick specific barcode case inside path case
             result = result[barcode]
         }
+        if (_.has(result, path)) {
+            // pick the case were the 1st step is decide by the barcode
+            result = result[path]
+        }
         if (_.has(result, 'ok')) {
             // pick the case were you have good or bad result
             result = result['ok']
