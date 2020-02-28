@@ -70,6 +70,20 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 :records="state.data.records"
                 :key_value="'id'"
                 />
+
+            <!-- TODO: do we need a component for this? -->
+            <div class="unload-all" v-if="state_is('unload_all')">
+                <v-card outlined class="main">
+                    <v-card-title>
+                        <div class="main-info">
+                            <div class="destination">
+                                <span class="label">Destination:</span>
+                                {{ state.data.location_dst.name }}
+                            </div>
+                        </div>
+                    </v-card-title>
+                </v-card>
+            </div>
         </Screen>
     `,
     computed: {
