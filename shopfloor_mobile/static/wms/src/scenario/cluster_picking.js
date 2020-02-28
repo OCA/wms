@@ -47,7 +47,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 <div class="button-list button-vertical-list full mt-10">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="warning" @click="state.on_action_full_bin">
+                            <v-btn depressed @click="state.on_action_full_bin">
                                 Full bin
                             </v-btn>
                         </v-col>
