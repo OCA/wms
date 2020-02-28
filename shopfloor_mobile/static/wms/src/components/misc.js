@@ -86,7 +86,10 @@ Vue.component('stock-zero-check', {
 
 Vue.component('manual-select', {
     props: {
-        'records': Array,
+        'records': {
+          'type': Array,
+          'default': [],
+        },
         'key_value': {
             'type': String,
         },
@@ -108,7 +111,7 @@ Vue.component('manual-select', {
         },
     },
     mounted: function () {
-      if (this.records && !this.selected) {
+      if (this.records.length && !this.selected) {
         this.updateSelected(this.records[0][this.key_value])
       }
     },
