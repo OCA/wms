@@ -4,7 +4,7 @@ var userConfirmation = Vue.component('user-confirmation', {
     template: `
 
     <div class="confirm mt-4">
-        <v-alert type="warning" prominent>
+        <v-alert type="warning" prominent tile>
             {{ question }}
             <v-form class="mt-4">
                 <v-btn

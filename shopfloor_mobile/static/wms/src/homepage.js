@@ -24,7 +24,7 @@ export var HomePage = Vue.component('home-page', {
                 </v-list-item>
             </v-list>
 
-            <v-alert class="mt10" color="warning" v-if="$root.demo_mode">DEMO MODE ON</v-alert>
+            <v-alert tile class="mt10" color="warning" v-if="$root.demo_mode">DEMO MODE ON</v-alert>
         </Screen>
     `
 });
