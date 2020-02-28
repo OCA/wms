@@ -7,8 +7,9 @@ export var NumberSpinner = Vue.component('input-number-spinner', {
     </div>
     <div class="input-wrapper">
         <v-text-field class="current-value" :type="input_type" v-model="value" :disabled="!editable" />
-        <span class="separator"></span>
-        <v-text-field class="init-value" type="text"  v-model="original_value" disabled />
+        <div v-if="show_init_value" class="init-value">
+            <span>{{ original_value }}</span>
+        </div>
     </div>
     <div class="spinner-btn minus" v-on:click="decrease()">
         <slot name="minus"><span>-</span></slot>
@@ -43,6 +44,10 @@ export var NumberSpinner = Vue.component('input-number-spinner', {
         spinner_position: {
             type: String,
             default: 'right',
+        },
+        show_init_value: {
+            type: Boolean,
+            default: true,
         },
 
     },
