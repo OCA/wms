@@ -285,7 +285,7 @@ class ClusterPicking(Component):
         product = line.product_id
         lot = line.lot_id
         package = line.package_id
-        return {
+        data = {
             # TODO have common methods to return general info
             # for each model
             "id": line.id,
@@ -296,6 +296,7 @@ class ClusterPicking(Component):
                 "name": picking.name,
                 "origin": picking.origin or "",
                 "note": picking.note or "",
+                "partner": None,
             },
             "batch": {"id": batch.id, "name": batch.name},
             "product": {
@@ -315,6 +316,14 @@ class ClusterPicking(Component):
             },
             "pack": {"id": package.id, "name": package.name} if package else None,
         }
+        if picking.partner_id:
+            # TODO retrieve info always in the same way
+            # maybe using base_jsonify
+            data["picking"]["partner"] = {
+                "id": picking.partner_id.id,
+                "name": picking.partner_id.name,
+            }
+        return data
 
     def unassign(self, picking_batch_id):
         """Unassign and reset to draft a started picking batch
@@ -1211,6 +1220,19 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                     "name": {"type": "string", "nullable": False, "required": True},
                     "origin": {"type": "string", "nullable": False, "required": True},
                     "note": {"type": "string", "nullable": False, "required": True},
+                    "partner": {
+                        "type": "dict",
+                        "required": False,
+                        "nullable": True,
+                        "schema": {
+                            "id": {"required": True, "type": "integer"},
+                            "name": {
+                                "type": "string",
+                                "nullable": False,
+                                "required": True,
+                            },
+                        },
+                    },
                 },
             },
             "batch": {
@@ -1267,7 +1289,6 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                     "name": {"type": "string", "nullable": False, "required": True},
                 },
             },
-            # TODO add destination pack
             "pack": {
                 "type": "dict",
                 "required": False,
