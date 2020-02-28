@@ -104,15 +104,20 @@ Vue.component('manual-select', {
         // At the same time is preferable to have a place to hook to
         // in case you want to customize its behavior.
         updateSelected (selectedItem) {
-            this.selected = selectedItem;
+          this.selected = selectedItem;
         },
+    },
+    mounted: function () {
+      if (this.records && !this.selected) {
+        this.updateSelected(this.records[0][this.key_value])
+      }
     },
     template: `
     <div class="manual-select with-bottom-actions">
       <v-card outlined>
         <v-list shaped v-if="records.length">
           <v-list-item-group mandatory color="success">
-            <v-list-item v-for="rec in records" :key="rec[key_value]" @click="updateSelected(rec[key_value])">
+            <v-list-item v-for="rec in records" :key="rec[key_value]" @click="updateSelected(rec[key_value])" :data-id="rec[key_value]">
               <v-list-item-content>
                 <v-list-item-title v-text="rec[key_title]"></v-list-item-title>
                 <!-- TODO: this part is harcoded and works only for picking batch selection
