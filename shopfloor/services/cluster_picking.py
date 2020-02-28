@@ -238,7 +238,13 @@ class ClusterPicking(Component):
         lines = picking_batch.mapped("picking_ids.move_line_ids").filtered(filter_func)
         # TODO we probably don't care about the postponed order in the 'set
         # destination location' step, reset it on 'scan_destination_pack'?
-        return lines.sorted(key=lambda x: x.shopfloor_postponed)
+        # TODO test line sorting and all these methods to retrieve lines
+
+        # Sort line by source location,
+        # so that the picker start w/ products in the same location.
+        # Postponed lines must come always
+        # after ALL the other lines in the batch are processed.
+        return lines.sorted(key=lambda x: (x.location_id, x.shopfloor_postponed))
 
     def _lines_to_pick(self, picking_batch):
         return self._lines_for_picking_batch(
