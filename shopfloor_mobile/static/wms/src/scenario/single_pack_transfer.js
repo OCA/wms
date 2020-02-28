@@ -4,11 +4,15 @@ export var SinglePackTransfer = Vue.component('single-pack-transfer', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
     template: `
         <Screen :title="menuItem.name" :klass="usage">
-            <!-- FOR DEBUG -->
-            <!-- {{ current_state_key }} -->
+            <template v-slot:header>
+                <user-information
+                    v-if="!need_confirmation && user_notification.message"
+                    v-bind:info="user_notification"
+                    />
+                <state-display-info :info="state.display_info" v-if="state.display_info"/>
+            </template>
             <searchbar v-if="state_is(initial_state_key)" v-on:found="on_scan" :input_placeholder="search_input_placeholder"></searchbar>
             <searchbar v-if="state_is('scan_location')" v-on:found="on_scan" :input_placeholder="search_input_placeholder" :input_data_type="'location'"></searchbar>
-            <user-information v-if="!need_confirmation && user_notification.message" v-bind:info="user_notification"></user-information>
             <user-confirmation v-if="need_confirmation" v-on:user-confirmation="on_user_confirm" v-bind:question="user_notification.message"></user-confirmation>
             <operation-detail :operation="state.data"></operation-detail>
             <last-operation v-if="state_is('show_completion_info')" v-on:confirm="state.on_confirm"></last-operation>

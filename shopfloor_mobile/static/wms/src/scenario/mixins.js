@@ -51,13 +51,18 @@ export var ScenarioBaseMixin = {
                 'data': this._state_get_data_raw(this.current_state_key),
             }
             _.extend(state, this.states[this.current_state_key])
+            _.defaults(state, {'display_info': {}})
             return state
         },
         search_input_placeholder: function () {
-            return this.state.scan_placeholder
+            if (this.state.scan_placeholder) {
+                // TMP backward compat
+                return this.state.scan_placeholder
+            }
+            return this.state.display_info.scan_placeholder
         },
         show_cancel_button: function () {
-            return this.state.show_cancel_button
+            return this.state.display_info.show_cancel_button
         }
     },
     methods: {
@@ -168,6 +173,10 @@ export var GenericStatesMixin = {
             'states': {
                 // generic state for when to start w/ scanning a pack
                 'start_scan_pack': {
+                    display_info: {
+                        'title': 'Start by scanning a pack',
+                        'scan_placeholder': 'Scan pack',
+                    },
                     enter: () => {
                         this.reset_erp_data('data')
                     },
@@ -177,10 +186,13 @@ export var GenericStatesMixin = {
                             this.odoo.call('start', {'barcode': scanned.text})
                         )
                     },
-                    scan_placeholder: 'Scan pack',
                 },
                 // generic state for when to start w/ scanning a pack or loc
                 'start_scan_pack_or_location': {
+                    display_info: {
+                        'title': 'Start by scanning a pack or a location',
+                        'scan_placeholder': 'Scan pack',
+                    },
                     enter: () => {
                         this.reset_erp_data('data')
                     },
@@ -190,7 +202,6 @@ export var GenericStatesMixin = {
                             this.odoo.call('start', {'barcode': scanned.text})
                         )
                     },
-                    scan_placeholder: 'Scan pack or location',
                 },
                 'wait_call': {
                     success: (result) => {
@@ -208,6 +219,11 @@ export var GenericStatesMixin = {
                 // TODO: these states should be splitted out to a specific mixin
                 // for putaway and pack transfer
                 'scan_location': {
+                    display_info: {
+                        'title': 'Set a location',
+                        'scan_placeholder': 'Scan location',
+                        'show_cancel_button': true,
+                    },
                     on_scan: (scanned, confirmation=false) => {
                         this.state_set_data({'location_barcode': scanned.text})
                         this.go_state('wait_validation',
@@ -225,8 +241,6 @@ export var GenericStatesMixin = {
                             })
                         )
                     },
-                    scan_placeholder: 'Scan location',
-                    show_cancel_button: true
                 },
                 'wait_validation': {
                     success: (result) => {
@@ -245,6 +259,9 @@ export var GenericStatesMixin = {
                     },
                 },
                 'confirm_location': {
+                    display_info: {
+                        'scan_placeholder': 'Scan location',
+                    },
                     on_user_confirm: (answer) => {
                         // TODO: check if this used
                         //-> no flag is set to enable the confirmation dialog,
@@ -265,6 +282,10 @@ export var GenericStatesMixin = {
                     scan_placeholder: 'Scan location',
                 },
                 'confirm_start': {
+                    display_info: {
+                        'title': 'Confirm start and select a location',
+                        'scan_placeholder': 'Scan location',
+                    },
                     enter: () => {
                         this.need_confirmation = true
                     },
@@ -287,7 +308,6 @@ export var GenericStatesMixin = {
                         this.current_state_key = 'scan_location'
                         this.state.on_scan(scanned)
                     },
-                    scan_placeholder: 'Scan location',
                 },
             }
         }
