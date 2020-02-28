@@ -220,7 +220,7 @@ class ClusterPicking(Component):
                 next_state="start",
                 message={
                     "message_type": "error",
-                    "message": "no lines remaining, not implemented",
+                    "message": "No lines remaining, should go to 'Prepare unload' but is not implemented yet",
                 },
             )
 
