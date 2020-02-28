@@ -82,7 +82,7 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
                     "message_type": {
                         "type": "string",
                         "required": True,
-                        "allowed": ["info", "warning", "error"],
+                        "allowed": ["info", "warning", "error", "success"],
                     },
                     "message": {"type": "string", "required": True},
                 },
