@@ -11,7 +11,11 @@
     "license": "AGPL-3",
     "application": False,
     "installable": True,
-    "depends": ["stock_storage_type", "stock_quant_package_dimension"],
+    "depends": [
+        "stock_location_children",
+        "stock_quant_package_dimension",
+        "stock_storage_type",
+    ],
     "data": [
         "security/ir.model.access.csv",
         "views/stock_location.xml",

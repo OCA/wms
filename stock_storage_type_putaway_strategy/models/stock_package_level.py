@@ -17,6 +17,8 @@ class StockPackageLevel(models.Model):
         'package_id.package_storage_type_id.location_storage_type_ids',
         'package_id.package_storage_type_id.storage_location_sequence_ids',
         'package_id.package_storage_type_id.storage_location_sequence_ids.location_id',
+        'package_id.package_storage_type_id.storage_location_sequence_ids.location_id.children_ids',
+        # Dependency on quant_ids managed by cache invalidation on create/write
         'picking_id', 'picking_id.location_dest_id',
         'picking_id.package_level_ids.location_dest_id'
     )

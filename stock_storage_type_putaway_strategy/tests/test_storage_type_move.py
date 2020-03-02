@@ -76,14 +76,31 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             [
                 ('allowed_location_storage_type_ids', 'in', int_picking.package_level_ids.mapped('package_id.package_storage_type_id.location_storage_type_ids').ids),
                 ('location_id', 'child_of',  int_picking.location_dest_id.id),
-                ('location_id', 'child_of', package_type_locations.ids),
-                ('child_ids', '=', False),  # Removes areas
-                # TODO check change on _existing domain
+                ('id', 'in', package_type_locations.mapped('children_ids').ids),
             ]
         )
+        only_empty_possible_locations = possible_locations.filtered(lambda l: not l.quant_ids)
         self.assertEqual(
             int_picking.package_level_ids.mapped("allowed_location_dest_ids"),
-            possible_locations - int_picking.package_level_ids.mapped("location_dest_id"),
+            only_empty_possible_locations - int_picking.package_level_ids.mapped("location_dest_id"),
+        )
+        # Update qty in a bin to ensure it's not in possible locations anymore
+        self.env["stock.quant"]._update_available_quantity(self.product, self.pallets_bin_3_location, 1.0)
+        only_empty_possible_locations_2 = possible_locations.filtered(
+            lambda l: not l.quant_ids)
+        self.assertEqual(only_empty_possible_locations, only_empty_possible_locations_2 | self.pallets_bin_3_location)
+        self.assertEqual(
+            int_picking.package_level_ids.mapped("allowed_location_dest_ids"),
+            only_empty_possible_locations_2 - int_picking.package_level_ids.mapped("location_dest_id"),
+        )
+        # Creating a new possible location must be reflected in domain
+        pallets_bin_4_location = self.env['stock.location'].create({
+            'name': 'Pallets bin 4',
+            'location_id': self.pallets_location.id
+        })
+        self.assertEqual(
+            int_picking.package_level_ids.mapped("allowed_location_dest_ids"),
+            (only_empty_possible_locations_2 | pallets_bin_4_location) - int_picking.package_level_ids.mapped("location_dest_id"),
         )
 
     def test_unallowed_move(self):

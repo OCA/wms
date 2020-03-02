@@ -114,7 +114,7 @@ class StockLocation(models.Model):
         return self.browse(allowed_ids)
 
     def _get_ordered_children_locations(self):
-        return self.search([("id", "child_of", self.ids), ("id", "!=", self.id)])
+        return self.children_ids
 
     def _package_storage_type_allowed(self, package_storage_type, quants, products):
         self.ensure_one()
