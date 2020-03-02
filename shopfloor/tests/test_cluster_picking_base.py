@@ -75,6 +75,7 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
                 "name": picking.name,
                 "note": "",
                 "origin": picking.origin,
+                "partner": {"id": self.customer.id, "name": self.customer.name},
             },
             "batch": {"id": batch.id, "name": batch.name},
             "product": {

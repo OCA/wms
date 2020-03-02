@@ -169,7 +169,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         self.assert_response(
             response,
             next_state="start",
-            message={"message_type": "info", "message": "Batch Transfer complete"},
+            message={"message_type": "success", "message": "Batch Transfer complete"},
         )
 
     def test_set_destination_all_remaining_lines(self):
@@ -373,7 +373,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         self.assert_response(
             response,
             next_state="start",
-            message={"message_type": "info", "message": "Batch Transfer complete"},
+            message={"message_type": "success", "message": "Batch Transfer complete"},
         )
 
 

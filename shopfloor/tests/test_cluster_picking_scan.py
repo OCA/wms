@@ -225,7 +225,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             next_state="start_line",
             data=self._line_data(next_line),
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "message": "{} {} put in {}".format(
                     line.qty_done, line.product_id.display_name, self.bin1.name
                 ),

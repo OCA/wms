@@ -463,7 +463,7 @@ class SinglePackPutawayCase(CommonCase):
             response,
             next_state="start",
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "message": "The pack has been moved, you can scan a new pack.",
             },
         )
