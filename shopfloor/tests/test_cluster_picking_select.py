@@ -59,14 +59,14 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
             data={
                 "id": self.batch3.id,
                 "name": self.batch3.name,
-                # TODO
-                "weight": 0,
                 "pickings": [
                     {
                         "id": self.batch3.picking_ids.id,
                         "name": self.batch3.picking_ids.name,
                         "move_line_count": len(self.batch3.picking_ids.move_line_ids),
                         "origin": self.batch3.picking_ids.origin,
+                        # TODO check weight
+                        "weight": 0,
                         "partner": {
                             "id": self.batch3.picking_ids.partner_id.id,
                             "name": self.batch3.picking_ids.partner_id.name,
@@ -97,14 +97,14 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
             data={
                 "id": self.batch2.id,
                 "name": self.batch2.name,
-                # TODO
-                "weight": 0,
                 "pickings": [
                     {
                         "id": self.batch2.picking_ids.id,
                         "name": self.batch2.picking_ids.name,
                         "move_line_count": len(self.batch2.picking_ids.move_line_ids),
                         "origin": self.batch2.picking_ids.origin,
+                        # TODO check weight
+                        "weight": 0,
                         "partner": {
                             "id": self.batch2.picking_ids.partner_id.id,
                             "name": self.batch2.picking_ids.partner_id.name,
@@ -134,14 +134,14 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
             data={
                 "id": self.batch2.id,
                 "name": self.batch2.name,
-                # TODO
-                "weight": 0,
                 "pickings": [
                     {
                         "id": self.batch2.picking_ids.id,
                         "name": self.batch2.picking_ids.name,
                         "move_line_count": len(self.batch2.picking_ids.move_line_ids),
                         "origin": self.batch2.picking_ids.origin,
+                        # TODO check weight
+                        "weight": 0,
                         "partner": {
                             "id": self.batch2.picking_ids.partner_id.id,
                             "name": self.batch2.picking_ids.partner_id.name,
@@ -225,7 +225,6 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
                 "name": self.batch1.name,
                 # we don't care in these tests, the 'find_batch' tests already
                 # check this
-                "weight": self.ANY,
                 "pickings": self.ANY,
             },
         )
@@ -249,7 +248,6 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
                 "name": self.batch1.name,
                 # we don't care in these tests, the 'find_batch' tests already
                 # check this
-                "weight": self.ANY,
                 "pickings": self.ANY,
             },
         )
@@ -272,7 +270,6 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
                 "name": self.batch1.name,
                 # we don't care in these tests, the 'find_batch' tests already
                 # check this
-                "weight": self.ANY,
                 "pickings": self.ANY,
             },
         )
@@ -387,6 +384,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
                     "name": picking.name,
                     "note": "",
                     "origin": picking.origin,
+                    "partner": {"id": self.customer.id, "name": self.customer.name},
                 },
                 "batch": {"id": batch.id, "name": batch.name},
                 "product": {

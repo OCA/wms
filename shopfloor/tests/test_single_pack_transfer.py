@@ -97,10 +97,6 @@ class SinglePackTransferCase(CommonCase):
         self.assert_response(
             response,
             next_state="scan_location",
-            message={
-                "message_type": "info",
-                "message": "Scan the destination location",
-            },
             data={
                 "id": self.ANY,
                 "name": package_level.package_id.name,
@@ -193,7 +189,6 @@ class SinglePackTransferCase(CommonCase):
             # checked in the test_start test.
             response,
             next_state="scan_location",
-            message=self.ANY,
             data=self.ANY,
         )
 
@@ -365,7 +360,7 @@ class SinglePackTransferCase(CommonCase):
             response,
             next_state="start",
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "message": "The pack has been moved, you can scan a new pack.",
             },
         )
@@ -420,7 +415,7 @@ class SinglePackTransferCase(CommonCase):
             response,
             next_state="show_completion_info",
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "message": "The pack has been moved, you can scan a new pack.",
             },
         )
@@ -598,7 +593,7 @@ class SinglePackTransferCase(CommonCase):
             response,
             next_state="start",
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "message": "The pack has been moved, you can scan a new pack.",
             },
         )
