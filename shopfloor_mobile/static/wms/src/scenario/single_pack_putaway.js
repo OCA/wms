@@ -1,7 +1,7 @@
-import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
+import {GenericStatesMixin, ScenarioBaseMixin, SinglePackStatesMixin} from "./mixins.js";
 
 export var SinglePackPutAway = Vue.component('single-pack-putaway', {
-    mixins: [ScenarioBaseMixin, GenericStatesMixin],
+    mixins: [ScenarioBaseMixin, GenericStatesMixin, SinglePackStatesMixin],
     template: `
         <Screen :title="menuItem.name" :klass="usage">
             <template v-slot:header>

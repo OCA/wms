@@ -308,7 +308,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                             const scan_data = this.state_get_data('unload_all');
                             this.state.on_scan(scan_data.location_barcode, true);
                         } else {
-                            this.go_state('scan_location');
+                            this.go_state('scan_destination');
                         }
                     },
                     on_scan: (scanned, confirmation=true) => {
