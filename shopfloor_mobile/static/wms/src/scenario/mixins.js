@@ -66,6 +66,12 @@ export var ScenarioBaseMixin = {
         show_cancel_button: function () {
             return this.state.display_info.show_cancel_button;
         },
+        screen_info: function () {
+            return {
+                'title': this.menuItem.name,
+                'klass': this.usage + ' ' + 'state-' + this.state.key,
+            };
+        },
     },
     methods: {
         state_is: function (state_key) {

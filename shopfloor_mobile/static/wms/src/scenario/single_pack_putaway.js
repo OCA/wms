@@ -3,7 +3,7 @@ import {GenericStatesMixin, ScenarioBaseMixin, SinglePackStatesMixin} from "./mi
 export var SinglePackPutAway = Vue.component('single-pack-putaway', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin, SinglePackStatesMixin],
     template: `
-        <Screen :title="menuItem.name" :klass="usage">
+        <Screen :title="screen_info.title" :klass="screen_info.klass">
             <template v-slot:header>
                 <user-information
                     v-if="!need_confirmation && user_notification.message"
