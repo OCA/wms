@@ -120,9 +120,7 @@ class BaseShopfloorService(AbstractComponent):
 
     def _get_openapi_default_parameters(self):
         defaults = super()._get_openapi_default_parameters()
-        demo_api_key = self.env.ref(
-            "shopfloor.api_key_demo", raise_if_not_found=False
-        ).key
+        demo_api_key = self.env.ref("shopfloor.api_key_demo", raise_if_not_found=False)
 
         # Try to first the first menu that implements the current service.
         # Not all usages have a process, in that case, well set the first
@@ -142,7 +140,7 @@ class BaseShopfloorService(AbstractComponent):
                     "required": True,
                     "schema": {"type": "string"},
                     "style": "simple",
-                    "value": demo_api_key,
+                    "value": demo_api_key.key if demo_api_key else "",
                 },
                 {
                     "name": "SERVICE_CTX_MENU_ID",
