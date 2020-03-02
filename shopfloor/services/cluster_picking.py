@@ -142,7 +142,7 @@ class ClusterPicking(Component):
     def _response_for_confirm_start(self, batch):
         pickings = []
         for picking in batch.picking_ids:
-            # TODO: is this correct?
+            # FIXME weight must be multiplied by quantity
             p_weight = sum(picking.mapped("move_line_ids.product_id.weight"))
             p_values = {
                 "id": picking.id,
