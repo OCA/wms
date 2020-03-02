@@ -20,13 +20,13 @@ const router = new VueRouter({
 })
 router.beforeEach(async (to, from, next) => {
     await Vue.nextTick()
-    next()
+    // next()
     // FIXME: temporarily disabled for devs and for customer demo
-    // if (!router.app.config.authenticated && to.name!='login' && !router.app.demo_mode){
-    //     next('login')
-    // } else {
-    //     next()
-    // }
+    if (!router.app.config.authenticated && to.name!='login' && !router.app.demo_mode){
+        next('login')
+    } else {
+        next()
+    }
 })
 
 export {router};
