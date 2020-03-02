@@ -24,16 +24,16 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         # drop base demo data and create our own batches to work with
         cls.env["stock.picking.batch"].search([]).unlink()
         cls.batch1 = cls._create_picking_batch(
-            [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+            [[cls.BatchProduct(product=cls.product_a, quantity=3)]]
         )
         cls.batch2 = cls._create_picking_batch(
-            [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+            [[cls.BatchProduct(product=cls.product_a, quantity=3)]]
         )
         cls.batch3 = cls._create_picking_batch(
-            [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+            [[cls.BatchProduct(product=cls.product_a, quantity=3)]]
         )
         cls.batch4 = cls._create_picking_batch(
-            [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
+            [[cls.BatchProduct(product=cls.product_a, quantity=3)]]
         )
 
     def _add_stock_and_assign_pickings_for_batches(self, batches):
@@ -65,8 +65,8 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
                         "name": self.batch3.picking_ids.name,
                         "move_line_count": len(self.batch3.picking_ids.move_line_ids),
                         "origin": self.batch3.picking_ids.origin,
-                        # TODO check weight
-                        "weight": 0,
+                        # quantity of products (3) * weight of product (2)
+                        "weight": 6.0,
                         "partner": {
                             "id": self.batch3.picking_ids.partner_id.id,
                             "name": self.batch3.picking_ids.partner_id.name,
@@ -103,8 +103,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
                         "name": self.batch2.picking_ids.name,
                         "move_line_count": len(self.batch2.picking_ids.move_line_ids),
                         "origin": self.batch2.picking_ids.origin,
-                        # TODO check weight
-                        "weight": 0,
+                        "weight": 6.0,
                         "partner": {
                             "id": self.batch2.picking_ids.partner_id.id,
                             "name": self.batch2.picking_ids.partner_id.name,
@@ -140,8 +139,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
                         "name": self.batch2.picking_ids.name,
                         "move_line_count": len(self.batch2.picking_ids.move_line_ids),
                         "origin": self.batch2.picking_ids.origin,
-                        # TODO check weight
-                        "weight": 0,
+                        "weight": 6.0,
                         "partner": {
                             "id": self.batch2.picking_ids.partner_id.id,
                             "name": self.batch2.picking_ids.partner_id.name,

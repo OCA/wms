@@ -11,6 +11,7 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
                 "type": "product",
                 "default_code": "A",
                 "barcode": "A",
+                "weight": 2,
             }
         )
         cls.product_b = cls.env["product.product"].create(
@@ -19,6 +20,7 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
                 "type": "product",
                 "default_code": "B",
                 "barcode": "B",
+                "weight": 3,
             }
         )
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
