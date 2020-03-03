@@ -286,6 +286,8 @@
     "yoda": "warn"
   },
   "parserOptions": {
-      "ecmaVersion": 2017
+      "ecmaVersion": 2017,
+      // TODO: check if this compatible w/ OCA default config
+      "sourceType": "module"
   }
 }
