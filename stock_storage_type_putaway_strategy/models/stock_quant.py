@@ -55,6 +55,7 @@ class StockQuant(models.Model):
                 if (
                     loc_storage_type.do_not_mix_products and (
                         len(package_products) > 1 or
+                        len(products_in_location) >= 1 and
                         package_products != products_in_location
                     )
                 ):
@@ -62,6 +63,7 @@ class StockQuant(models.Model):
                 if (
                     loc_storage_type.do_not_mix_lots and (
                         len(package_lots) > 1 or
+                        len(lots_in_location) >= 1 and
                         package_lots != lots_in_location
                     )
                 ):
