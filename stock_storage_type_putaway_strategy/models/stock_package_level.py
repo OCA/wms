@@ -38,6 +38,9 @@ class StockPackageLevel(models.Model):
                 # TODO check if intersect is needed as we use picking dest loc
                 #  in _get_allowed_location_dest_ids
                 intersect_locations = allowed_locations & picking_child_location_dest_ids
+                # Add the pack_level actual location_dest since it is actually
+                # excluded by the check on incoming stock moves
+                intersect_locations |= pack_level.location_dest_id
                 pack_level.allowed_location_dest_ids = intersect_locations.ids
             else:
                 pack_level.allowed_location_dest_ids = picking_child_location_dest_ids.ids

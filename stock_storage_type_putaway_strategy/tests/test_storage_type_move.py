@@ -84,7 +84,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         only_empty_possible_locations = possible_locations.filtered(lambda l: not l.quant_ids)
         self.assertEqual(
             int_picking.package_level_ids.mapped("allowed_location_dest_ids"),
-            only_empty_possible_locations - int_picking.package_level_ids.mapped("location_dest_id"),
+            only_empty_possible_locations,
         )
         # Update qty in a bin to ensure it's not in possible locations anymore
         self.env["stock.quant"]._update_available_quantity(self.product, self.pallets_bin_3_location, 1.0)
@@ -93,7 +93,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         self.assertEqual(only_empty_possible_locations, only_empty_possible_locations_2 | self.pallets_bin_3_location)
         self.assertEqual(
             int_picking.package_level_ids.mapped("allowed_location_dest_ids"),
-            only_empty_possible_locations_2 - int_picking.package_level_ids.mapped("location_dest_id"),
+            only_empty_possible_locations_2,
         )
         # Creating a new possible location must be reflected in domain
         pallets_bin_4_location = self.env['stock.location'].create({
