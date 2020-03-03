@@ -1,25 +1,27 @@
-import {Storage} from './services/storage.js'
+import {Storage} from './services/storage.js';
 
 export var LoginPage = Vue.component('login-page', {
-    data: function(){ return {
-        'apikey': '72B044F7AC780DAC',
-        'error': '',
-    }},
+    data: function () {
+        return {
+            'apikey': '72B044F7AC780DAC',
+            'error': '',
+        };
+    },
     methods: {
-        login: function(evt) {
+        login: function (evt) {
             evt.preventDefault();
-            // call odoo application load => set the result in the local storage in json
-            Storage.apikey = this.apikey
-            this.error = ""
+            // Call odoo application load => set the result in the local storage in json
+            Storage.apikey = this.apikey;
+            this.error = "";
             this.$root.config.load().catch((error) => {
-                this.error = "Invalid API KEY"
+                this.error = "Invalid API KEY";
             }).then(() => {
                 if (this.$root.config.authenticated) {
-                    this.$router.push({'name': 'home'})
+                    this.$router.push({'name': 'home'});
                 }
-          });
+            });
 
-        }
+        },
     },
     template: `
     <Screen title="Login"
@@ -35,5 +37,5 @@ export var LoginPage = Vue.component('login-page', {
         <v-btn type="submit"></v-btn>
       </v-form>
     </Screen>
-    `
+    `,
 });

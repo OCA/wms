@@ -1,4 +1,4 @@
-import {ScenarioBaseMixin, GenericStatesMixin} from "./mixins.js";
+import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
 
 export var SinglePackPutAway = Vue.component('single-pack-putaway', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
@@ -24,6 +24,6 @@ export var SinglePackPutAway = Vue.component('single-pack-putaway', {
             // FIXME: scenario has changed -> we should use `start_scan_pack_or_location` as on pack transfer
             'initial_state_key': 'start_scan_pack',
             'current_state_key': 'start_scan_pack',
-        }
+        };
     },
-})
+});

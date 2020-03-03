@@ -87,8 +87,8 @@ Vue.component('stock-zero-check', {
 Vue.component('manual-select', {
     props: {
         'records': {
-          'type': Array,
-          'default': [],
+            'type': Array,
+            'default': [],
         },
         'key_value': {
             'type': String,
@@ -107,13 +107,13 @@ Vue.component('manual-select', {
         // At the same time is preferable to have a place to hook to
         // in case you want to customize its behavior.
         updateSelected (selectedItem) {
-          this.selected = selectedItem;
+            this.selected = selectedItem;
         },
     },
     mounted: function () {
-      if (this.records.length && !this.selected) {
-        this.updateSelected(this.records[0][this.key_value])
-      }
+        if (this.records.length && !this.selected) {
+            this.updateSelected(this.records[0][this.key_value]);
+        }
     },
     template: `
     <div class="manual-select with-bottom-actions">
@@ -154,12 +154,11 @@ Vue.component('manual-select', {
 });
 
 
-
 Vue.component('state-display-info', {
-  props: {
-      'info': Object,
-  },
-  template: `
+    props: {
+        'info': Object,
+    },
+    template: `
   <div class="state-display-info" v-if="info.title">
     <div class="container">
       <v-alert tile dense outlined type="info">

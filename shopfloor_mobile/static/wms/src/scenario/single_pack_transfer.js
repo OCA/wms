@@ -1,4 +1,4 @@
-import {ScenarioBaseMixin, GenericStatesMixin} from "./mixins.js";
+import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
 
 export var SinglePackTransfer = Vue.component('single-pack-transfer', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
@@ -29,10 +29,10 @@ export var SinglePackTransfer = Vue.component('single-pack-transfer', {
                 'show_completion_info': {
                     on_confirm: () => {
                         // TODO: turn the cone?
-                        this.go_state('start')
+                        this.go_state('start');
                     },
                 },
-            }
-        }
+            },
+        };
     },
-})
+});
