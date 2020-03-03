@@ -9,7 +9,7 @@ var operationDetail = Vue.component('operation-detail', {
     props:['operation'],
     methods: {
         show_popup: function (barcode) {
-            this.barcodeOpen = barcode
+            this.barcodeOpen = barcode;
             this.show_popup_dialog = true;
         },
     },

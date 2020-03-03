@@ -1,6 +1,6 @@
 export var batch_picking_info = Vue.component('batch-picking-detail', {
-  props:['info'],
-  template: `
+    props:['info'],
+    template: `
   <div class="detail batch-picking-detail with-bottom-actions" v-if="!_.isEmpty(info)">
     <div>
       <v-card outlined class="main">
@@ -49,5 +49,5 @@ export var batch_picking_info = Vue.component('batch-picking-detail', {
     </v-row>
 
 </div>
-`
-})
+`,
+});

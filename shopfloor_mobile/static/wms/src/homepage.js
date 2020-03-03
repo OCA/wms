@@ -1,9 +1,9 @@
 export var HomePage = Vue.component('home-page', {
     computed: {
         navigation () {
-            return this.$root.config.get('menus')
-            }
+            return this.$root.config.get('menus');
         },
+    },
     props:['routes'],
     template: `
         <Screen
@@ -26,5 +26,5 @@ export var HomePage = Vue.component('home-page', {
 
             <v-alert tile class="mt10" color="warning" v-if="$root.demo_mode">DEMO MODE ON</v-alert>
         </Screen>
-    `
+    `,
 });
