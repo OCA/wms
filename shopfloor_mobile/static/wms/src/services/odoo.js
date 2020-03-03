@@ -65,11 +65,14 @@ export class OdooMixin {
         return this._error_info(response)
     }
     _get_headers() {
+        // /!\ IMPORTANT /!\ Always use headers w/out underscores.
+        // https://www.nginx.com/resources/wiki/start/
+        // topics/tutorials/config_pitfalls/#missing-disappearing-http-headers
         return {
             'Content-Type': 'application/json',
-            'SERVICE_CTX_MENU_ID': this.process_menu_id,
-            'SERVICE_CTX_PROFILE_ID': 1, // FIXME
-            'API_KEY': Storage.apikey,
+            'SERVICE-CTX-MENU-ID': this.process_menu_id,
+            'SERVICE-CTX-PROFILE-ID': 1, // FIXME
+            'API-KEY': Storage.apikey,
         }
     }
     _get_url (endpoint) {
