@@ -489,3 +489,320 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
             },
             message={"message_type": "error", "message": "Wrong bin"},
         )
+
+
+class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase):
+    """Tests covering the /unload_scan_destination endpoint
+
+    Goods have been put in the package bins, they have different destinations
+    or /unload_split has been called, now user has to unload package per
+    package. For this, they'll first scanned the bin package already (endpoint
+    /unload_scan_pack), now they have to set the destination with
+    /unload_scan_destination for the scanned pack.
+    """
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super().setUpClass(*args, **kwargs)
+        cls.batch.cluster_picking_unload_all = False
+        cls.move_lines = cls.batch.mapped("picking_ids.move_line_ids")
+        cls.bin1_lines = cls.move_lines[:1]
+        cls.bin2_lines = cls.move_lines[1:]
+        cls._set_dest_package_and_done(cls.bin1_lines, cls.bin1)
+        cls._set_dest_package_and_done(cls.bin2_lines, cls.bin2)
+        cls.bin1_lines.write({"location_dest_id": cls.packing_a_location.id})
+        cls.bin2_lines.write({"location_dest_id": cls.packing_b_location.id})
+        cls.one_line_picking = cls.batch.picking_ids[0]
+        cls.two_lines_picking = cls.batch.picking_ids[1]
+
+    def test_unload_scan_destination_ok(self):
+        """Endpoint /unload_scan_destination is called, result ok"""
+        dest_location = self.bin1_lines[0].location_dest_id
+
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": dest_location.barcode,
+            },
+        )
+
+        # The scan of destination set 'unloaded' to True to track the fact
+        # that we set the destination for the line. In this case, the line
+        # and the stock.picking are 'done' because all the lines of the picking
+        # have been unloaded
+        self.assertRecordValues(self.one_line_picking, [{"state": "done"}])
+        self.assertRecordValues(self.two_lines_picking, [{"state": "assigned"}])
+        self.assertRecordValues(
+            self.bin1_lines,
+            [
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_done": 10,
+                    "state": "done",
+                    "picking_id": self.one_line_picking.id,
+                    "location_dest_id": self.packing_a_location.id,
+                }
+            ],
+        )
+        self.assertRecordValues(
+            self.bin2_lines,
+            [
+                {
+                    "shopfloor_unloaded": False,
+                    "qty_done": 10,
+                    "state": "assigned",
+                    "picking_id": self.two_lines_picking.id,
+                    "location_dest_id": self.packing_b_location.id,
+                },
+                {
+                    "shopfloor_unloaded": False,
+                    "qty_done": 10,
+                    "state": "assigned",
+                    "picking_id": self.two_lines_picking.id,
+                    "location_dest_id": self.packing_b_location.id,
+                },
+            ],
+        )
+        self.assertRecordValues(self.batch, [{"state": "in_progress"}])
+
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                # the line of bin1 is unloaded, next one will be bin2
+                "package": {"id": self.bin2.id, "name": self.bin2.name},
+                "location_dst": {
+                    "id": self.bin2_lines[0].location_dest_id.id,
+                    "name": self.bin2_lines[0].location_dest_id.name,
+                },
+            },
+        )
+
+    def test_unload_scan_destination_one_line_of_picking_only(self):
+        """Endpoint /unload_scan_destination is called, only one line of picking"""
+        # For this test, we assume the move in bin1 is already done.
+        self.one_line_picking.action_done()
+        # And for the second picking, we put one line bin2 and one line in bin3
+        # so the user would have to go through 2 screens for each pack.
+        # After scanning and setting the destination for bin2, the picking will
+        # still be "assigned" and they'll have to scan bin3 (but this test stops
+        # at bin2)
+        bin3 = self.env["stock.quant.package"].create({})
+        bin2_line = self.bin2_lines[0]
+        bin3_line = self.bin2_lines[1]
+        self._set_dest_package_and_done(bin3_line, bin3)
+
+        dest_location = bin2_line.location_dest_id
+
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin2.id,
+                "barcode": dest_location.barcode,
+            },
+        )
+
+        # The scan of destination set 'unloaded' to True to track the fact
+        # that we set the destination for the line. The picking is still
+        # assigned because the second line still has to be unloaded.
+        self.assertRecordValues(self.two_lines_picking, [{"state": "assigned"}])
+        self.assertRecordValues(
+            bin2_line,
+            [
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_done": 10,
+                    "state": "assigned",
+                    "picking_id": self.two_lines_picking.id,
+                    "location_dest_id": self.packing_b_location.id,
+                }
+            ],
+        )
+        self.assertRecordValues(
+            bin3_line,
+            [
+                {
+                    "shopfloor_unloaded": False,
+                    "qty_done": 10,
+                    "state": "assigned",
+                    "picking_id": self.two_lines_picking.id,
+                    "location_dest_id": self.packing_b_location.id,
+                }
+            ],
+        )
+        self.assertRecordValues(self.batch, [{"state": "in_progress"}])
+
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                # the line of bin2 is unloaded, next one will be bin3
+                "package": {"id": bin3.id, "name": bin3.name},
+                "location_dst": {
+                    "id": bin3_line.location_dest_id.id,
+                    "name": bin3_line.location_dest_id.name,
+                },
+            },
+        )
+
+    def test_unload_scan_destination_last_line(self):
+        """Endpoint /unload_scan_destination is called on last line"""
+        # For this test, we assume the move in bin1 is already done.
+        self.one_line_picking.action_done()
+        # And for the second picking, bin2 was already unloaded,
+        # remains bin3 to unload.
+        bin3 = self.env["stock.quant.package"].create({})
+        bin2_line = self.bin2_lines[0]
+        bin3_line = self.bin2_lines[1]
+        self._set_dest_package_and_done(bin3_line, bin3)
+        bin2_line.shopfloor_unloaded = True
+
+        dest_location = bin3_line.location_dest_id
+
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": bin3.id,
+                "barcode": dest_location.barcode,
+            },
+        )
+
+        # The scan of destination set 'unloaded' to True to track the fact
+        # that we set the destination for the line. The picking is done
+        # because all the lines have been unloaded
+        self.assertRecordValues(self.two_lines_picking, [{"state": "done"}])
+        self.assertRecordValues(
+            bin3_line,
+            [
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_done": 10,
+                    "state": "done",
+                    "picking_id": self.two_lines_picking.id,
+                    "location_dest_id": self.packing_b_location.id,
+                }
+            ],
+        )
+        self.assertRecordValues(self.batch, [{"state": "done"}])
+
+        self.assert_response(
+            response,
+            next_state="start",
+            message={"message": "Batch Transfer complete", "message_type": "success"},
+        )
+
+    def test_unload_scan_destination_error_location_not_found(self):
+        """Endpoint called with a barcode not existing for a location"""
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": "¤",
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="unload_set_destination",
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "package": {"id": self.bin1.id, "name": self.bin1.name},
+                "location_dst": {
+                    "id": self.bin1_lines[0].location_dest_id.id,
+                    "name": self.bin1_lines[0].location_dest_id.name,
+                },
+            },
+            message={
+                "message_type": "error",
+                "message": "No location found for this barcode.",
+            },
+        )
+
+    def test_unload_scan_destination_error_location_invalid(self):
+        """Endpoint called with a barcode for an invalid location
+
+        It is invalid when the location is not the destination location or
+        sublocation of the picking type.
+        """
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": self.dispatch_location.barcode,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="unload_set_destination",
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "package": {"id": self.bin1.id, "name": self.bin1.name},
+                "location_dst": {
+                    "id": self.bin1_lines[0].location_dest_id.id,
+                    "name": self.bin1_lines[0].location_dest_id.name,
+                },
+            },
+            message={"message_type": "error", "message": "You cannot place it here"},
+        )
+
+    def test_unload_scan_destination_need_confirmation(self):
+        """Endpoint called with a barcode for another (valid) location"""
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": self.packing_b_location.barcode,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="confirm_unload_set_destination",
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "package": {"id": self.bin1.id, "name": self.bin1.name},
+                "location_dst": {
+                    "id": self.bin1_lines[0].location_dest_id.id,
+                    "name": self.bin1_lines[0].location_dest_id.name,
+                },
+            },
+        )
+
+    def test_unload_scan_destination_with_confirmation(self):
+        """Endpoint called with a barcode for another (valid) location, confirm"""
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin2.id,
+                "barcode": self.packing_a_location.barcode,
+                "confirmation": True,
+            },
+        )
+        self.assertRecordValues(
+            self.bin2.quant_ids,
+            [
+                {"location_id": self.packing_a_location.id},
+                {"location_id": self.packing_a_location.id},
+            ],
+        )
+        self.assertRecordValues(
+            self.two_lines_picking.move_line_ids,
+            [
+                {"location_dest_id": self.packing_a_location.id},
+                {"location_dest_id": self.packing_a_location.id},
+            ],
+        )
+        self.assert_response(response, next_state="unload_single", data=self.ANY)
