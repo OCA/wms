@@ -7,6 +7,7 @@ import {LoginPage} from './loginpage.js';
 // Fake item to play nice with the mixin because it does not exist on the backend
 const fakeItem = {process:{id: 99}, id: 99};
 
+// TODO: handle routes via registry
 const routes = [
     {path: '/', component: HomePage, name: 'home'},
     {path: '/login', component: LoginPage, name: 'login'},

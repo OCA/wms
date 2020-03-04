@@ -1,17 +1,8 @@
 import {router} from './router.js';
 import {Config} from './services/config.js';
 import {Storage} from './services/storage.js';
+import {process_registry} from './services/process_registry.js';
 
-import {SinglePackPutAway} from './scenario/single_pack_putaway.js';
-import {SinglePackTransfer} from './scenario/single_pack_transfer.js';
-import {ClusterPicking} from './scenario/cluster_picking.js';
-
-// TODO: we should have a registry to be able to plug new scenario from outside
-const ScenarioTemplate = {
-    single_pack_putaway: SinglePackPutAway,
-    single_pack_transfer: SinglePackTransfer,
-    cluster_picking: ClusterPicking,
-};
 
 var AppConfig = new Config();
 
@@ -19,14 +10,21 @@ if ( Storage.apikey ) {
     AppConfig.load().then(() => {
         // Adding the routes dynamically when received from ther server
         AppConfig.get('menus').forEach(function (item) {
-            app.$router.addRoutes([{
-                path: "/" + item.process.code,
-                component: ScenarioTemplate[item.process.code],
-                props: {menuItem: item},
-            }]);
+            const registered = process_registry.get(item.process.code);
+            if (registered) {
+                app.$router.addRoutes([{
+                    path: "/" + item.process.code,
+                    component: process_registry.get(item.process.code),
+                    props: {menuItem: item},
+                }]);
+            } else {
+                // TODO: use NotFound component
+                console.error("Cannot find process component for", item.process.code, item);
+            }
         });
     });
 }
+
 
 const vuetify_themes = {
     light: {

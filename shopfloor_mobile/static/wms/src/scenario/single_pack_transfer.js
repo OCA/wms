@@ -1,4 +1,5 @@
 import {GenericStatesMixin, ScenarioBaseMixin, SinglePackStatesMixin} from "./mixins.js";
+import {process_registry} from '../services/process_registry.js';
 
 export var SinglePackTransfer = Vue.component('single-pack-transfer', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin, SinglePackStatesMixin],
@@ -36,3 +37,4 @@ export var SinglePackTransfer = Vue.component('single-pack-transfer', {
         };
     },
 });
+process_registry.add('single_pack_transfer', SinglePackTransfer);
