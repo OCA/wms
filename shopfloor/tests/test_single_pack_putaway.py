@@ -76,7 +76,7 @@ class SinglePackPutawayCase(CommonCase):
             move_line, [{"qty_done": 1.0, "location_dest_id": self.shelf1.id}]
         )
         self.assertRecordValues(
-            move, [{"state": "assigned", "location_dest_id": self.stock_location.id}]
+            move, [{"state": "assigned", "location_dest_id": self.shelf1.id}]
         )
         self.assert_response(
             response,
