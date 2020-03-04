@@ -18,6 +18,53 @@ var batchList = function (count=5) {
     return list;
 };
 
+var randomFromArray = function (an_array) {
+    return an_array[Math.floor(Math.random() * an_array.length)];
+};
+
+var locations = [{
+    "id": getRandomInt(),
+    "name": "LOC-" + _.padStart(getRandomInt(), 6, 0),
+}, {
+    "id": getRandomInt(),
+    "name": "LOC-" + _.padStart(getRandomInt(), 6, 0),
+}, {
+    "id": getRandomInt(),
+    "name": "LOC-" + _.padStart(getRandomInt(), 6, 0),
+},
+];
+
+
+var makePicking = function (with_lines=0) {
+    const picking = {
+        "id": getRandomInt(),
+        "name": "PICK" + _.padStart(getRandomInt(), 8, 0),
+        "origin": "SO" + _.padStart(getRandomInt(), 6, 0),
+        "move_line_count": getRandomInt(10),
+        "weight": getRandomInt(1000),
+    };
+    if (with_lines) {
+        const lines = [];
+        for (let i = 1; i < with_lines + 1; i++) {
+            lines.push({
+                "id": i,
+                "product": {
+                    "id": i,
+                    "name": "Prod #" + i,
+                    "display_name": "[" + _.padStart(getRandomInt(), 8, 0) + "] Prod #" + i,
+                },
+                "pack": {
+                    "id": i,
+                    "name": "PACK" + _.padStart(getRandomInt(), 10, 0),
+                },
+                "location_src": randomFromArray(locations),
+            });
+        }
+        picking.lines = lines;
+    }
+    return picking;
+};
+
 
 var makeBatchPickingLine = function () {
     return {
