@@ -24,7 +24,6 @@ export var SinglePackPutAway = Vue.component('single-pack-putaway', {
             'show_reset_button': true,
             // FIXME: scenario has changed -> we should use `start_scan_pack_or_location` as on pack transfer
             'initial_state_key': 'start_scan_pack',
-            'current_state_key': 'start_scan_pack',
         };
     },
 });

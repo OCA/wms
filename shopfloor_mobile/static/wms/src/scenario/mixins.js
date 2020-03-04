@@ -16,8 +16,8 @@ export var ScenarioBaseMixin = {
                     // $next_state: {},
                 },
             },
-            'initial_state_key': 'start_scan_pack',
-            'current_state_key': 'start_scan_pack',
+            'initial_state_key': 'start',
+            'current_state_key': '',
             'states': {},
             'usage': '', // Match component usage on odoo
         };
@@ -40,6 +40,10 @@ export var ScenarioBaseMixin = {
         // FIXME: init data should come from specific scenario
         {
             this.odoo = new Odoo(odoo_params);
+        }
+        if (!this.current_state_key) {
+            // Default to initial state
+            this.current_state_key = this.initial_state_key;
         }
     },
     computed: {

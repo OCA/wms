@@ -25,7 +25,6 @@ export var SinglePackTransfer = Vue.component('single-pack-transfer', {
             'usage': 'single_pack_transfer',
             'show_reset_button': true,
             'initial_state_key': 'start_scan_pack_or_location',
-            'current_state_key': 'start_scan_pack_or_location',
             'states': {
                 'show_completion_info': {
                     on_confirm: () => {
