@@ -1,4 +1,5 @@
 import {GenericStatesMixin, ScenarioBaseMixin, SinglePackStatesMixin} from "./mixins.js";
+import {process_registry} from '../services/process_registry.js';
 
 export var SinglePackPutAway = Vue.component('single-pack-putaway', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin, SinglePackStatesMixin],
@@ -27,3 +28,4 @@ export var SinglePackPutAway = Vue.component('single-pack-putaway', {
         };
     },
 });
+process_registry.add('single_pack_putaway', SinglePackPutAway);

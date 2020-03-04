@@ -1,4 +1,5 @@
 import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
+import {process_registry} from '../services/process_registry.js';
 
 export var ClusterPicking = Vue.component('cluster-picking', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
@@ -413,3 +414,4 @@ export var ClusterPicking = Vue.component('cluster-picking', {
         };
     },
 });
+process_registry.add('cluster_picking', ClusterPicking);
