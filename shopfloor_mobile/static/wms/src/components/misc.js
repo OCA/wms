@@ -83,76 +83,20 @@ Vue.component('stock-zero-check', {
   `,
 });
 
-
-Vue.component('manual-select', {
+// TODO: split out
+Vue.component('picking-batch-select-content', {
     props: {
-        'records': {
-            'type': Array,
-            'default': [],
-        },
-        'key_value': {
-            'type': String,
-        },
-        'key_title': {
-            'type': String,
-            'default': 'name',
-        },
-    },
-    data: function () {
-        return {'selected': null};
-    },
-    methods: {
-        // NOTE: v-list-item-group should be able to work w/ `v-model`.
-        // For some reason, it does not work here.
-        // At the same time is preferable to have a place to hook to
-        // in case you want to customize its behavior.
-        updateSelected (selectedItem) {
-            this.selected = selectedItem;
-        },
-    },
-    mounted: function () {
-        if (this.records.length && !this.selected) {
-            this.updateSelected(this.records[0][this.key_value]);
-        }
+        'record': Object,
+        'options': Object,
     },
     template: `
-    <div class="manual-select with-bottom-actions">
-      <v-card outlined>
-        <v-list shaped v-if="records.length">
-          <v-list-item-group mandatory color="success">
-            <v-list-item v-for="rec in records" :key="rec[key_value]" @click="updateSelected(rec[key_value])" :data-id="rec[key_value]">
-              <v-list-item-content>
-                <v-list-item-title v-text="rec[key_title]"></v-list-item-title>
-                <!-- TODO: this part is harcoded and works only for picking batch selection
-                We should find a way to pass this content dynamically.
-                We don't have labels so we cannot just loop on them.
-                -->
-                <v-list-item-action-text>Operations: {{ rec.picking_count }}</v-list-item-action-text>
-                <v-list-item-action-text>Lines: {{ rec.move_line_count }}</v-list-item-action-text>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list-item-group>
-        </v-list>
-        <v-alert tile type="error" v-if="!records.length">
-          No record found.
-        </v-alert>
-      </v-card>
-      <v-row class="actions bottom-actions" v-if="records.length">
-        <v-col>
-          <v-btn color="success" @click="$emit('select', selected)">
-            Start
-          </v-btn>
-        </v-col>
-        <v-col>
-          <v-btn color="default" @click="$emit('back')" class="float-right">
-            Back
-          </v-btn>
-        </v-col>
-      </v-row>
+    <div>
+        <v-list-item-title v-text="record[options.key_title]"></v-list-item-title>
+        <v-list-item-action-text>Operations: {{ record.picking_count }}</v-list-item-action-text>
+        <v-list-item-action-text>Lines: {{ record.move_line_count }}</v-list-item-action-text>
     </div>
   `,
 });
-
 
 Vue.component('state-display-info', {
     props: {

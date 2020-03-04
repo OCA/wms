@@ -69,6 +69,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 v-on:back="state.on_back"
                 :records="state.data.records"
                 :key_value="'id'"
+                :list_item_content_component="'picking-batch-select-content'"
                 />
 
             <!-- TODO: do we need a component for this? -->
