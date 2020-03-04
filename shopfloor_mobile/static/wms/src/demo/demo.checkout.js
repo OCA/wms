@@ -1,34 +1,20 @@
 /* eslint no-use-before-define: 0 */ // --> OFF
 
-var DEMO_CLUSTER_PICKING_1 = {
-    "find_batch": {
-        "next_state": "confirm_start",
-        "data": {
-            "confirm_start": {
-                "id": 100,
-                "name": "BATCH001",
-                "picking_count": 3,
-                "move_line_count": 6,
-                "pickings": [
-                    {
-                        "id": 1,
-                        "name": "OP001",
-                        "partner": {
-                            "name": "Customer 1",
-                        },
-                        "origin": "SO000CUST001",
-                        "move_line_count": 4,
-                    },
-                    {
-                        "id": 2,
-                        "name": "OP002",
-                        "partner": {
-                            "name": "Customer 2",
-                        },
-                        "origin": "SO000CUST002",
-                        "move_line_count": 2,
-                    },
-                ],
+var DEMO_CHECKOUT = {
+    "scan_document": {
+        "PACK1" : {
+            // No picking
+            "next_state": "select_document",
+            "message": {
+                "message_type": "error",
+                "message": "No picking found for PACK1",
+            },
+        },
+        "PACK2" : {
+            // All line have a destination pack
+            "next_state": "select_line",
+            "data": {
+                "select_line": makePicking(5),
             },
         },
     },
@@ -45,16 +31,11 @@ var DEMO_CLUSTER_PICKING_1 = {
             },
         },
     },
-    "select": {
-        "next_state": "confirm_start",
+    // TODO
+    "select_line": {
+        "next_state": "select_pack",
         "data": {
-            "confirm_start": {
-                "id": 100,
-                "name": "BATCHXXX",
-                "picking_count": 3,
-                "move_line_count": 6,
-                "pickings": [makePicking(), makePicking()],
-            },
+            "select_pack": makePicking({"with_lines": 5, "random_pack": true}),
         },
     },
     "confirm_start": {
@@ -168,6 +149,6 @@ var DEMO_CLUSTER_PICKING_1 = {
     "unload_router": {},
 };
 
-window.DEMO_CASES.cluster_picking = DEMO_CLUSTER_PICKING_1;
+window.DEMO_CASES.checkout = DEMO_CHECKOUT;
 
 /* eslint no-use-before-define: 2 */ // --> ON

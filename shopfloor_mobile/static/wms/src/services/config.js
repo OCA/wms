@@ -18,9 +18,9 @@ export class Config {
                 if (!_.isUndefined(result.data)) {
                     this.data = result.data;
                     // TMP DEV add menu item for XXX process to draft
-                    // this.data['menus'].push({
-                    //   'id': 3, 'name': 'Cluster picking', 'process': {'id': 5, 'code': 'cluster_picking'}
-                    // })
+                    this.data.menus.push({
+                        'id': 99, 'name': 'Checkout', 'process': {'id': 99, 'code': 'checkout'},
+                    });
                     this.authenticated = true;
                 } else {
                     console.log(result);
