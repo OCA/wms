@@ -146,6 +146,14 @@ ul.packaging span:first-child {
     width: 100%;
 }
 
+.with-bottom-actions.with-groups .v-list-item__title {
+    padding: 0.5rem 1rem 1rem 1rem;
+}
+.with-bottom-actions.with-groups .select-group:not(:last-child){
+    border-bottom: 1px dashed;
+    margin-bottom: 0.5rem;
+}
+
 .label {
     font-weight: 600;
 }

@@ -48,6 +48,7 @@ var makePicking = function (with_lines=0) {
         for (let i = 1; i < with_lines + 1; i++) {
             lines.push({
                 "id": i,
+                "picking_id": picking.id,
                 "product": {
                     "id": i,
                     "name": "Prod #" + i,
@@ -70,11 +71,7 @@ var makeBatchPickingLine = function () {
     return {
         "id": getRandomInt(),
         "postponed": true,
-        "picking": {
-            "id": getRandomInt(),
-            "name": "PICK" + _.padStart(getRandomInt(), 8, 0),
-            "origin": "SO" + _.padStart(getRandomInt(), 6, 0),
-        },
+        "picking": makePicking(),
         "batch": {
             "id": getRandomInt(),
             "name": "BATCH" + _.padStart(getRandomInt(), 8, 0),
