@@ -216,15 +216,7 @@ class ClusterPicking(Component):
 
         next_line = self._next_line_for_pick(picking_batch)
         if not next_line:
-            # TODO
-            return self._response(
-                next_state="start",
-                message={
-                    "message_type": "error",
-                    "message": "No lines remaining. "
-                    "Should go to 'Prepare unload' but is not implemented yet",
-                },
-            )
+            return self.prepare_unload(picking_batch)
 
         return self._response(
             next_state="start_line", data=self._data_move_line(next_line)
@@ -586,7 +578,10 @@ class ClusterPicking(Component):
 
     def _filter_for_unload(self, line):
         return (
-            line.qty_done > 0 and line.result_package_id and not line.shopfloor_unloaded
+            line.state == "assigned"
+            and line.qty_done > 0
+            and line.result_package_id
+            and not line.shopfloor_unloaded
         )
 
     def _lines_to_unload(self, batch):
@@ -604,8 +599,7 @@ class ClusterPicking(Component):
     def _response_for_unload_single(self, batch):
         next_package = self._next_bin_package_for_unload_single(batch)
         if not next_package:
-            # TODO ensure batch is 'done' and go to start?
-            return self._response()
+            return self._unload_end(batch)
         return self._response(
             next_state="unload_single",
             data=self._data_for_unload_single(batch, next_package),
@@ -641,23 +635,19 @@ class ClusterPicking(Component):
         """
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
-            # TODO go to next line? (but then handle if it's the last one)
-            return self._response(next_state="start")
+            message = self.actions_for("message")
+            return self._response(
+                next_state="start", message=message.unrecoverable_error()
+            )
         # flag as postponed
         move_line.shopfloor_postponed = True
         return self._response_for_skip_line(move_line)
 
     def _response_for_skip_line(self, move_line):
-        next_line = self._next_line_for_pick(move_line.picking_id.batch_id)
+        batch = move_line.picking_id.batch_id
+        next_line = self._next_line_for_pick(batch)
         if not next_line:
-            # TODO ensure batch is 'done' and go to start?
-            return self._response(
-                next_state="start",
-                message={
-                    "message_type": "error",
-                    "message": "no lines remaining, not implemented",
-                },
-            )
+            return self.prepare_unload(batch.id)
         return self._response(
             next_state="start_line", data=self._data_move_line(next_line)
         )
@@ -684,9 +674,7 @@ class ClusterPicking(Component):
           destination
         * start: all lines are done/confirmed (because all lines were unloaded
           and the last line has a stock issue). In this case, this method *has*
-          to handle the closing of the batch to create backorders. TODO find a
-          generic way to share actions happening on transitions such as "close
-          the batch"
+          to handle the closing of the batch to create backorders (_unload_end)
         """
         return self._response()
 
@@ -725,9 +713,7 @@ class ClusterPicking(Component):
         * confirm_unload_all: the scanned location is not the expected one (but
           still a valid one)
         * start: batch is totally done. In this case, this method *has*
-          to handle the closing of the batch to create backorders. TODO find a
-          generic way to share actions happening on transitions such as "close
-          the batch"
+          to handle the closing of the batch to create backorders.
         """
         batch = self.env["stock.picking.batch"].browse(picking_batch_id)
         if not batch.exists():
@@ -742,8 +728,7 @@ class ClusterPicking(Component):
 
         lines = self._lines_to_unload(batch)
         if not lines:
-            # TODO a bit unexpected here but deal with it
-            return self._response()
+            return self._unload_end(batch)
 
         first_line = fields.first(lines)
         picking_type = fields.first(batch.picking_ids).picking_type_id
@@ -763,9 +748,11 @@ class ClusterPicking(Component):
             if not confirmation:
                 return self._response_for_unload_all_need_confirm(batch)
 
-        lines.write(
-            {"shopfloor_unloaded": True, "location_dest_id": scanned_location.id}
-        )
+        self._unload_set_destination_on_lines(lines, scanned_location)
+        return self._unload_end(batch)
+
+    def _unload_set_destination_on_lines(self, lines, location):
+        lines.write({"shopfloor_unloaded": True, "location_dest_id": location.id})
         for line in lines:
             # We set the picking to done only when the last line is
             # unloaded to avoid backorders.
@@ -776,6 +763,7 @@ class ClusterPicking(Component):
             if all(l.shopfloor_unloaded for l in picking_lines):
                 picking.action_done()
 
+    def _unload_end(self, batch):
         if all(picking.state == "done" for picking in batch.picking_ids):
             # do not use the 'done()' method because it does many things we
             # don't care about
@@ -826,6 +814,8 @@ class ClusterPicking(Component):
 
         return self._response_for_unload_single(batch)
 
+    # TODO we shouldn't need this endpoint if we implement the "completion
+    # info" screen as a kind of generic info box instead of a state
     def unload_router(self, picking_batch_id):
         """Called after the info screen, route to the next state
 
@@ -835,9 +825,7 @@ class ClusterPicking(Component):
         * unload_single: if the batch still has packs to unload
         * start_line: if the batch still has lines to pick
         * start: if the batch is done. In this case, this method *has*
-          to handle the closing of the batch to create backorders. TODO find a
-          generic way to share actions happening on transitions such as "close
-          the batch"
+          to handle the closing of the batch to create backorders.
         """
         return self._response()
 
@@ -856,16 +844,25 @@ class ClusterPicking(Component):
             return self._response_batch_does_not_exist()
         package = self.env["stock.quant.package"].browse(package_id)
         if not package.exists():
-            # TODO: next package? if no next package, close and go to start?
-            return self._response()
+            return self._unload_next_package(batch)
         if package.name != barcode:
             return self._response(
                 next_state="unload_single",
                 data=self._data_for_unload_single(batch, package),
                 message={"message_type": "error", "message": _("Wrong bin")},
             )
+        return self._response_for_unload_set_destination(batch, package)
+
+    def _response_for_unload_set_destination(self, batch, package, message=None):
         return self._response(
             next_state="unload_set_destination",
+            data=self._data_for_unload_single(batch, package),
+            message=message,
+        )
+
+    def _response_for_confirm_unload_set_destination(self, batch, package):
+        return self._response(
+            next_state="confirm_unload_set_destination",
             data=self._data_for_unload_single(batch, package),
         )
 
@@ -876,10 +873,6 @@ class ClusterPicking(Component):
 
         It updates all the assigned move lines with the package to the
         destination.
-
-        TODO not sure: We have to call action_done on the picking *only when we
-        have scanned all the packages* of the picking, so maybe we have to
-        keep track of this with a new flag on move lines?
 
         Transitions:
         * unload_single: invalid scanned location or error
@@ -892,12 +885,56 @@ class ClusterPicking(Component):
           client should then call /unload_router to know the next state
         * start_line: if the batch still has lines to pick
         * start: if the batch is done. In this case, this method *has*
-          to handle the closing of the batch to create backorders. TODO find a
-          generic way to share actions happening on transitions such as "close
-          the batch"
+          to handle the closing of the batch to create backorders.
 
         """
-        return self._response()
+        message = self.actions_for("message")
+
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
+
+        package = self.env["stock.quant.package"].browse(package_id)
+        if not package.exists():
+            return self._unload_next_package(batch)
+
+        # we work only on the lines of the scanned package
+        lines = self._lines_to_unload(batch).filtered(
+            lambda l: l.result_package_id == package
+        )
+        if not lines:
+            return self._unload_end(batch)
+
+        first_line = fields.first(lines)
+        picking_type = fields.first(batch.picking_ids).picking_type_id
+        scanned_location = self.actions_for("search").location_from_scan(barcode)
+        if not scanned_location:
+            return self._response_for_unload_set_destination(
+                batch, package, message=message.no_location_found()
+            )
+        if not scanned_location.is_sublocation_of(
+            picking_type.default_location_dest_id
+        ):
+            return self._response_for_unload_set_destination(
+                batch, package, message=message.dest_location_not_allowed()
+            )
+
+        if not scanned_location.is_sublocation_of(first_line.location_dest_id):
+            if not confirmation:
+                return self._response_for_confirm_unload_set_destination(batch, package)
+
+        self._unload_set_destination_on_lines(lines, scanned_location)
+
+        return self._unload_next_package(batch)
+
+    def _unload_next_package(self, batch):
+        next_package = self._next_bin_package_for_unload_single(batch)
+        if next_package:
+            return self._response(
+                next_state="unload_single",
+                data=self._data_for_unload_single(batch, next_package),
+            )
+        return self._unload_end(batch)
 
 
 class ShopfloorClusterPickingValidator(Component):
@@ -1044,6 +1081,14 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                 # unrecoverable error, maybe we should add an attribute
                 # `_start_state = "start"` and implicitly add it in states
                 "start",
+                # we reopen a batch already started where all the lines were
+                # already picked and have to be unloaded to the same
+                # destination
+                "unload_all",
+                # we reopen a batch already started where all the lines were
+                # already picked and have to be unloaded to the different
+                # destinations
+                "unload_single",
             ]
         )
 
@@ -1143,13 +1188,24 @@ class ShopfloorClusterPickingValidatorResponse(Component):
 
     def unload_scan_pack(self):
         return self._response_schema(
-            next_states=["unload_single", "unload_set_destination"]
+            next_states=[
+                # go back to the same state if barcode issue
+                "unload_single",
+                # if the package to scan was deleted, was the last to unload
+                # and we still have lines to pick
+                "start_line",
+                # next "logical" state, when the scan is ok
+                "unload_set_destination",
+                # the package was deleted and was the last one of the batch
+                "start",
+            ]
         )
 
     def unload_scan_destination(self):
         return self._response_schema(
             next_states=[
                 "unload_single",
+                "unload_set_destination",
                 "confirm_unload_set_destination",
                 "show_completion_info",
                 "start",

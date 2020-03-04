@@ -149,3 +149,9 @@ class MessageAction(Component):
             "message_type": "error",
             "message": _("No pending operation for package %s." % pack.name),
         }
+
+    def unrecoverable_error(self):
+        return {
+            "message_type": "error",
+            "message": _("Unrecoverable error, please restart."),
+        }
