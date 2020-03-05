@@ -405,5 +405,118 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             },
         )
 
+    def test_scan_destination_pack_zero_check(self):
+        """Location will be emptied, have to go to zero check"""
+        line = self.one_line_picking.move_line_ids
+        # Update the quantity in the location to be equal to the line's
+        # so when scan_destination_pack sets the qty_done, the planned
+        # qty should be zero and trigger a zero check
+        self._update_qty_in_location(
+            line.location_id, line.product_id, line.product_uom_qty
+        )
+        response = self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "move_line_id": line.id,
+                "barcode": self.bin1.name,
+                "quantity": line.product_uom_qty,
+            },
+        )
 
-# TODO tests for transitions to next line / no next lines, ...
+        self.assert_response(
+            response,
+            next_state="zero_check",
+            data={
+                "id": line.id,
+                "location_src": {
+                    "id": line.location_id.id,
+                    "name": line.location_id.name,
+                },
+            },
+        )
+
+
+class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
+    """Tests covering the /is_zero endpoint
+
+    After a line has been scanned, if the location is empty, the
+    client application is redirected to the "zero_check" state,
+    where the user has to confirm or not that the location is empty.
+    When the location is empty, there is nothing to do, but when it
+    in fact not empty, a draft inventory must be created for the
+    product so someone can verify.
+    """
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super().setUpClass(*args, **kwargs)
+        cls.batch = cls._create_picking_batch(
+            [
+                [
+                    cls.BatchProduct(product=cls.product_a, quantity=10),
+                    cls.BatchProduct(product=cls.product_b, quantity=10),
+                ]
+            ]
+        )
+        cls.picking = cls.batch.picking_ids
+        cls._simulate_batch_selected(cls.batch)
+
+        cls.line = cls.picking.move_line_ids[0]
+        cls.next_line = cls.picking.move_line_ids[1]
+        cls.bin1 = cls.env["stock.quant.package"].create({})
+        cls._update_qty_in_location(
+            cls.line.location_id, cls.line.product_id, cls.line.product_uom_qty
+        )
+        # we already scan and put the first line in bin1, at this point the
+        # system see the location is empty and reach "zero_check"
+        cls._set_dest_package_and_done(cls.line, cls.bin1)
+
+    def test_is_zero_is_empty(self):
+        """call /is_zero confirming it's empty"""
+        response = self.service.dispatch(
+            "is_zero", params={"move_line_id": self.line.id, "zero": True}
+        )
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=self._line_data(self.next_line),
+            message={
+                "message_type": "success",
+                "message": "{} {} put in {}".format(
+                    self.line.qty_done,
+                    self.line.product_id.display_name,
+                    self.bin1.name,
+                ),
+            },
+        )
+
+    def test_is_zero_is_not_empty(self):
+        """call /is_zero not confirming it's empty"""
+        response = self.service.dispatch(
+            "is_zero", params={"move_line_id": self.line.id, "zero": False}
+        )
+        inventory = self.env["stock.inventory"].search(
+            [
+                ("location_ids", "in", self.line.location_id.id),
+                ("product_ids", "in", self.line.product_id.id),
+                ("state", "=", "draft"),
+            ]
+        )
+        self.assertTrue(inventory)
+        self.assertEqual(
+            inventory.name,
+            "Zero check issue on location Stock ({})".format(self.picking.name),
+        )
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=self._line_data(self.next_line),
+            message={
+                "message_type": "success",
+                "message": "{} {} put in {}".format(
+                    self.line.qty_done,
+                    self.line.product_id.display_name,
+                    self.bin1.name,
+                ),
+            },
+        )

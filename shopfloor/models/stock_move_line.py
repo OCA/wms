@@ -11,3 +11,5 @@ class StockMoveLine(models.Model):
         help="Technical field. "
         "Indicates if a the move has been postponed in a process.",
     )
+    # we search lines based on their location in some workflows
+    location_id = fields.Many2one(index=True)
