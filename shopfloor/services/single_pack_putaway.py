@@ -306,17 +306,15 @@ class SinglePackPutawayValidatorResponse(Component):
         }
 
     def cancel(self):
-        return self._response_schema(next_states=["start"])
+        return self._response_schema(next_states={"start"})
 
     def validate(self):
         return self._response_schema(
-            next_states=["scan_location", "start", "confirm_location"]
+            next_states={"scan_location", "start", "confirm_location"}
         )
 
     def start(self):
-        return self._response_schema(
-            next_states=["confirm_start", "start", "scan_location"]
-        )
+        return self._response_schema(next_states={"confirm_start", "scan_location"})
 
     @property
     def _schema_for_location(self):

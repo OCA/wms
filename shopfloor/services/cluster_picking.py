@@ -1143,24 +1143,18 @@ class ShopfloorClusterPickingValidatorResponse(Component):
         }
 
     def find_batch(self):
-        return self._response_schema(next_states=["confirm_start", "start"])
+        return self._response_schema(next_states={"confirm_start"})
 
     def list_batch(self):
-        return self._response_schema(next_states=["manual_selection"])
+        return self._response_schema(next_states={"manual_selection"})
 
     def select(self):
-        return self._response_schema(next_states=["manual_selection", "confirm_start"])
+        return self._response_schema(next_states={"manual_selection", "confirm_start"})
 
     def confirm_start(self):
         return self._response_schema(
-            next_states=[
+            next_states={
                 "start_line",
-                # "start" should be pretty rare, only if the batch has been
-                # canceled, deleted meanwhile...
-                # TODO every state could bring back to 'start' in case of
-                # unrecoverable error, maybe we should add an attribute
-                # `_start_state = "start"` and implicitly add it in states
-                "start",
                 # we reopen a batch already started where all the lines were
                 # already picked and have to be unloaded to the same
                 # destination
@@ -1169,21 +1163,18 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                 # already picked and have to be unloaded to the different
                 # destinations
                 "unload_single",
-            ]
+            }
         )
 
     def unassign(self):
-        return self._response_schema(next_states=["start"])
+        return self._response_schema(next_states={"start"})
 
     def scan_line(self):
-        return self._response_schema(
-            next_states=["start_line", "scan_destination", "start"]
-        )
+        return self._response_schema(next_states={"start_line", "scan_destination"})
 
     def scan_destination_pack(self):
         return self._response_schema(
-            next_states=[
-                "start",
+            next_states={
                 # error during scan of pack (wrong barcode, ...)
                 "scan_destination",
                 # when we still have lines to process
@@ -1196,24 +1187,24 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                 # when all lines have been processed and have different
                 # destinations
                 "unload_single",
-            ]
+            }
         )
 
     def prepare_unload(self):
         return self._response_schema(
-            next_states=[
+            next_states={
                 # when all lines have been processed and have same
                 # destination
                 "unload_all",
                 # when all lines have been processed and have different
                 # destinations
                 "unload_single",
-            ]
+            }
         )
 
     def is_zero(self):
         return self._response_schema(
-            next_states=[
+            next_states={
                 # when we still have lines to process
                 "start_line",
                 # when all lines have been processed and have same
@@ -1222,15 +1213,15 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                 # when all lines have been processed and have different
                 # destinations
                 "unload_single",
-            ]
+            }
         )
 
     def skip_line(self):
-        return self._response_schema(next_states=["start_line"])
+        return self._response_schema(next_states={"start_line"})
 
     def stock_issue(self):
         return self._response_schema(
-            next_states=[
+            next_states={
                 # when we still have lines to process
                 "start_line",
                 # when all lines have been processed and have same
@@ -1239,16 +1230,15 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                 # when all lines have been processed and have different
                 # destinations
                 "unload_single",
-                "start",
-            ]
+            }
         )
 
     def change_pack_lot(self):
-        return self._response_schema(next_states=["scan_destination", "start_line"])
+        return self._response_schema(next_states={"scan_destination", "start_line"})
 
     def set_destination_all(self):
         return self._response_schema(
-            next_states=[
+            next_states={
                 # if the batch still contain lines
                 "start_line",
                 # invalid destination, have to scan a valid one
@@ -1260,20 +1250,18 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                 "confirm_unload_all",
                 # batch finished
                 "start",
-            ]
+            }
         )
 
     def unload_split(self):
-        return self._response_schema(next_states=["unload_single"])
+        return self._response_schema(next_states={"unload_single"})
 
     def unload_router(self):
-        return self._response_schema(
-            next_states=["unload_single", "start_line", "start"]
-        )
+        return self._response_schema(next_states={"unload_single", "start_line"})
 
     def unload_scan_pack(self):
         return self._response_schema(
-            next_states=[
+            next_states={
                 # go back to the same state if barcode issue
                 "unload_single",
                 # if the package to scan was deleted, was the last to unload
@@ -1281,21 +1269,19 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                 "start_line",
                 # next "logical" state, when the scan is ok
                 "unload_set_destination",
-                # the package was deleted and was the last one of the batch
-                "start",
-            ]
+            }
         )
 
     def unload_scan_destination(self):
         return self._response_schema(
-            next_states=[
+            next_states={
                 "unload_single",
                 "unload_set_destination",
                 "confirm_unload_set_destination",
                 "show_completion_info",
                 "start",
                 "start_line",
-            ]
+            }
         )
 
     # TODO single class for sharing schemas between services
