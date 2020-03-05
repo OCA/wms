@@ -124,7 +124,7 @@ ul.packaging span:first-child {
     color: #999;
 }
 
-.with-bottom-actions {
+.manual-select.with-bottom-actions {
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -132,25 +132,25 @@ ul.packaging span:first-child {
     align-items: stretch; /* align items in Cross Axis */
     align-content: stretch; /* Extra space in Cross Axis */
 }
-.with-bottom-actions > div:first-child {
+.manual-select.with-bottom-actions > div:first-child {
     height: 68vh;
     margin-bottom: 2vh;
     overflow-y: scroll;
 }
-.actions.bottom-actions {
+.manual-select .actions.bottom-actions {
     flex-grow: 1;
 }
-.actions.bottom-actions .v-btn {
+.manual-select .actions.bottom-actions .v-btn {
     font-size: 1.2rem;
     height: 3.5rem;
     width: 100%;
 }
 
-.with-bottom-actions.with-groups .v-list-item__title {
+.manual-select.with-groups .v-card__title {
     padding: 0.5rem 1rem 1rem 1rem;
 }
-.with-bottom-actions.with-groups .select-group:not(:last-child){
-    border-bottom: 1px dashed;
+.manual-select.with-groups .select-group:not(:last-child){
+    border-bottom: 2px;
     margin-bottom: 0.5rem;
 }
 

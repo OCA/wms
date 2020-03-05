@@ -12,7 +12,7 @@ export var checkout_picking_info = Vue.component('checkout-picking-detail', {
                 const location = _.first(_.filter(locations, {'id': parseInt(loc_id)}));
                 res.push({
                     'key': loc_id,
-                    'title': location.name,
+                    'title': 'Location: ' + location.name,
                     'records': value,
                 });
             });
@@ -40,6 +40,7 @@ export var checkout_picking_info = Vue.component('checkout-picking-detail', {
         :key_value="'id'"
         :list_item_content_component="'checkout-select-content'"
         :bubbleUpAction="true"
+        :showActions="false"
         />
 </div>
 `,
@@ -57,8 +58,11 @@ Vue.component('checkout-select-content', {
         </div>
         <div class="no_pack" v-if="!record.pack">
             <span>{{ record.product.display_name }}</span>
-            <div class="lot" v-if="record.picking.origin">
-                <span>{{ record.picking.origin }}</span>
+            <div class="lot" v-if="record.lot">
+                <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
+            </div>
+            <div class="qty">
+                <span class="label">Qty:</span> <span>{{ record.product.qty }}</span>
             </div>
         </div>
     </div>
