@@ -270,6 +270,8 @@ class ShopfloorCheckoutValidatorResponse(Component):
     _name = "shopfloor.checkout.validator.response"
     _usage = "checkout.validator.response"
 
+    _start_state = "select_document"
+
     def _states(self):
         """List of possible next states
 
@@ -290,35 +292,35 @@ class ShopfloorCheckoutValidatorResponse(Component):
         }
 
     def scan_document(self):
-        return self._response_schema(next_states=["select_document", "select_line"])
+        return self._response_schema(next_states={"select_document", "select_line"})
 
     def list_stock_picking(self):
-        return self._response_schema(next_states=["manual_selection"])
+        return self._response_schema(next_states={"manual_selection"})
 
     def select(self):
         return self._response_schema(
-            next_states=["manual_selection", "summary", "select_line"]
+            next_states={"manual_selection", "summary", "select_line"}
         )
 
     def scan_line(self):
-        return self._response_schema(next_states=["select_line", "select_pack"])
+        return self._response_schema(next_states={"select_line", "select_pack"})
 
     def select_line(self):
         return self.scan_line()
 
     def reset_line_qty(self):
-        return self._response_schema(next_states=["select_pack"])
+        return self._response_schema(next_states={"select_pack"})
 
     def set_line_qty(self):
-        return self._response_schema(next_states=["select_pack"])
+        return self._response_schema(next_states={"select_pack"})
 
     def scan_pack_action(self):
         return self._response_schema(
-            next_states=["select_pack", "select_line", "summary"]
+            next_states={"select_pack", "select_line", "summary"}
         )
 
     def set_custom_qty(self):
-        return self._response_schema(next_states=["select_pack"])
+        return self._response_schema(next_states={"select_pack"})
 
     def new_package(self):
-        return self._response_schema(next_states=["select_line"])
+        return self._response_schema(next_states={"select_line"})
