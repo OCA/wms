@@ -1,4 +1,5 @@
 from odoo import _, fields
+from odoo.tools.float_utils import float_compare  # , float_is_zero
 
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
@@ -214,18 +215,20 @@ class ClusterPicking(Component):
         if not picking_batch.exists():
             return self._response_batch_does_not_exist()
 
-        next_line = self._next_line_for_pick(picking_batch)
-        if not next_line:
-            return self.prepare_unload(picking_batch)
+        return self._pick_next_line(picking_batch)
 
+    def _pick_next_line(self, batch, message=None):
+        next_line = self._next_line_for_pick(batch)
+        if not next_line:
+            return self.prepare_unload(batch.id)
         return self._response(
-            next_state="start_line", data=self._data_move_line(next_line)
+            next_state="start_line",
+            data=self._data_move_line(next_line),
+            message=message,
         )
 
     def _lines_for_picking_batch(self, picking_batch, filter_func=lambda x: x):
         lines = picking_batch.mapped("picking_ids.move_line_ids").filtered(filter_func)
-        # TODO we probably don't care about the postponed order in the 'set
-        # destination location' step, reset it on 'scan_destination_pack'?
         # TODO test line sorting and all these methods to retrieve lines
 
         # Sort line by source location,
@@ -248,11 +251,11 @@ class ClusterPicking(Component):
         )
 
     def _last_picked_line(self, picking):
-        """Get the last line packed for this picking."""
+        """Get the last line picked and put in a pack for this picking"""
         return fields.first(
             picking.move_line_ids.filtered(
                 lambda l: l.qty_done > 0 and l.result_package_id
-            )
+            ).sorted(key="write_date", reverse=True)
         )
 
     def _next_line_for_pick(self, picking_batch):
@@ -350,18 +353,18 @@ class ClusterPicking(Component):
         message = self.actions_for("message")
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
-            # TODO go to next line? (but then handle if it's the last one)
-            return self._response(next_state="start")
-        # TODO check again the state of the move line, if already processed
-        # move to the next state or next line
+            return self._response(
+                next_state="start", message=message.unrecoverable_error()
+            )
         if move_line.package_id.name == barcode:
-            return self._response_for_scan_line_ok(move_line)
+            return self._response_for_scan_destination(move_line)
+        # TODO should search for product packaging too
         elif move_line.product_id.barcode == barcode:
             if move_line.product_id.tracking in ("lot", "serial"):
                 return self._response_for_scan_line_product_need_lot(move_line)
-            return self._response_for_scan_line_ok(move_line)
+            return self._response_for_scan_destination(move_line)
         elif move_line.lot_id.name == barcode:
-            return self._response_for_scan_line_ok(move_line)
+            return self._response_for_scan_destination(move_line)
         elif move_line.location_id.barcode == barcode:
             # When a user scan a location, we accept only when we knows that
             # they scanned the good thing, so if in the location we have
@@ -394,7 +397,7 @@ class ClusterPicking(Component):
                         move_line
                     )
 
-            return self._response_for_scan_line_ok(move_line)
+            return self._response_for_scan_destination(move_line)
 
         return self._response(
             next_state="start_line",
@@ -434,7 +437,7 @@ class ClusterPicking(Component):
             message=message.scan_lot_on_product_tracked_by_lot(),
         )
 
-    def _response_for_scan_line_ok(self, move_line):
+    def _response_for_scan_destination(self, move_line, message=None):
         data = self._data_move_line(move_line)
         last_picked_line = self._last_picked_line(move_line.picking_id)
         if last_picked_line:
@@ -443,7 +446,7 @@ class ClusterPicking(Component):
                 "id": last_picked_line.result_package_id.id,
                 "name": last_picked_line.result_package_id.name,
             }
-        return self._response(next_state="scan_destination", data=data)
+        return self._response(next_state="scan_destination", data=data, message=message)
 
     def scan_destination_pack(self, move_line_id, barcode, quantity):
         """Scan the destination package (bin) for a move line
@@ -465,35 +468,65 @@ class ClusterPicking(Component):
         have the same destination.
         * start_line: to pick the next line if any.
         """
+        message = self.actions_for("message")
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
-            # TODO go to next line? (but then handle if it's the last one)
-            return self._response(next_state="start")
-        # TODO if another line of the picking has a destination package, handle
-        # it (note: should be added to the 'single line' schema /data as well,
-        # maybe use a computed field).
+            return self._response(
+                next_state="start", message=message.unrecoverable_error()
+            )
+        rounding = move_line.product_uom_id.rounding
+        compare = float_compare(
+            quantity, move_line.product_uom_qty, precision_rounding=rounding
+        )
+        qty_lesser = compare == -1
+        qty_greater = compare == 1
+        if qty_greater:
+            return self._response_for_scan_destination(
+                move_line,
+                message={
+                    "message_type": "error",
+                    "message": _("You must not pick more than {} units.").format(
+                        move_line.product_uom_qty
+                    ),
+                },
+            )
+        elif qty_lesser:
+            # split the move line which will be processed later (maybe the user
+            # has to pick some goods from another place because the location
+            # contained less items than expected)
+            remaining = move_line.product_uom_qty - quantity
+            # TODO it must be the next line to process
+            move_line.copy({"product_uom_qty": remaining, "qty_done": 0})
+            move_line.product_uom_qty = quantity
 
-        # TODO handle partial pick
-        if quantity > move_line.product_uom_qty:
-            # TODO (+ use float_tools)
-            return self._response()
-        # TODO handle destination bin not empty
         search = self.actions_for("search")
+        message = self.actions_for("message")
         bin_package = search.package_from_scan(barcode)
         if not bin_package:
-            # TODO
-            return self._response()
+            return self._response_for_scan_destination(
+                move_line, message=message.bin_not_found_for_barcode(barcode)
+            )
+
+        # the scanned package can contain only move lines of the same picking
+        if any(
+            ml.picking_id != move_line.picking_id
+            for ml in bin_package.planned_move_line_ids
+        ):
+            return self._response_for_scan_destination(
+                move_line,
+                message={
+                    "message_type": "error",
+                    "message": _(
+                        "The destination bin {} is not empty, please take another."
+                    ).format(bin_package.name),
+                },
+            )
+
         move_line.write({"qty_done": quantity, "result_package_id": bin_package.id})
         # TODO zero check
-        # TODO handle next line and no next line (in a shared way with other
-        # endpoints)
         batch = move_line.picking_id.batch_id
-        next_line = self._next_line_for_pick(batch)
-        if not next_line:
-            return self.prepare_unload(batch.id)
-        return self._response(
-            next_state="start_line",
-            data=self._data_move_line(next_line),
+        return self._pick_next_line(
+            batch,
             message={
                 "message_type": "success",
                 # TODO different message for products/packs?
@@ -549,7 +582,7 @@ class ClusterPicking(Component):
 
     def _data_for_unload_single(self, batch, package):
         line = fields.first(
-            package.dest_move_line_ids.filtered(self._filter_for_unload)
+            package.planned_move_line_ids.filtered(self._filter_for_unload)
         )
         return {
             # TODO disambiguate "id" everywhere? (id -> picking_batch_id)
@@ -645,12 +678,7 @@ class ClusterPicking(Component):
 
     def _response_for_skip_line(self, move_line):
         batch = move_line.picking_id.batch_id
-        next_line = self._next_line_for_pick(batch)
-        if not next_line:
-            return self.prepare_unload(batch.id)
-        return self._response(
-            next_state="start_line", data=self._data_move_line(next_line)
-        )
+        return self._pick_next_line(batch)
 
     def stock_issue(self, move_line_id):
         """Declare a stock issue for a line
@@ -1096,11 +1124,16 @@ class ShopfloorClusterPickingValidatorResponse(Component):
         return self._response_schema(next_states=["start"])
 
     def scan_line(self):
-        return self._response_schema(next_states=["start_line", "scan_destination"])
+        return self._response_schema(
+            next_states=["start_line", "scan_destination", "start"]
+        )
 
     def scan_destination_pack(self):
         return self._response_schema(
             next_states=[
+                "start",
+                # error during scan of pack (wrong barcode, ...)
+                "scan_destination",
                 # when we still have lines to process
                 "start_line",
                 # when the source location is empty
