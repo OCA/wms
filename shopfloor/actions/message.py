@@ -158,3 +158,11 @@ class MessageAction(Component):
             "message_type": "error",
             "message": _("Unrecoverable error, please restart."),
         }
+
+    def x_units_put_in_package(self, qty, product, package):
+        return {
+            "message_type": "success",
+            "message": _("{} {} put in {}").format(
+                qty, product.display_name, package.name
+            ),
+        }

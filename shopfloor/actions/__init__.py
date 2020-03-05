@@ -20,3 +20,4 @@ from . import base_action
 from . import message
 from . import pack_transfer_validate
 from . import search
+from . import inventory
