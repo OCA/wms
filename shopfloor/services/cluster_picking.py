@@ -1,5 +1,5 @@
 from odoo import _, fields
-from odoo.tools.float_utils import float_compare  # , float_is_zero
+from odoo.tools.float_utils import float_compare
 
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
@@ -214,7 +214,6 @@ class ClusterPicking(Component):
         picking_batch = self.env["stock.picking.batch"].browse(picking_batch_id)
         if not picking_batch.exists():
             return self._response_batch_does_not_exist()
-
         return self._pick_next_line(picking_batch)
 
     def _pick_next_line(self, batch, message=None):
@@ -521,20 +520,52 @@ class ClusterPicking(Component):
                     ).format(bin_package.name),
                 },
             )
-
         move_line.write({"qty_done": quantity, "result_package_id": bin_package.id})
-        # TODO zero check
+
         batch = move_line.picking_id.batch_id
+
+        if self._planned_qty_in_location_is_empty(
+            move_line.product_id, move_line.location_id
+        ):
+            return self._response_for_zero_check(move_line)
+
         return self._pick_next_line(
             batch,
-            message={
-                "message_type": "success",
-                # TODO different message for products/packs?
-                "message": _("{} {} put in {}").format(
-                    move_line.qty_done,
-                    move_line.product_id.display_name,
-                    bin_package.name,
-                ),
+            message=message.x_units_put_in_package(
+                move_line.qty_done, move_line.product_id, move_line.result_package_id
+            ),
+        )
+
+    def _planned_qty_in_location_is_empty(self, product, location):
+        """Return if a location will be empty when move lines will be confirmed
+
+        Used for the "zero check". We need to know if a location is empty, but since
+        we set the move lines to "done" only at the end of the unload workflow, we
+        have to look at the qty_done of the move lines from this location.
+        """
+        remaining = product.with_context(location=location.id).qty_available
+        lines_in_loc = self.env["stock.move.line"].search(
+            # TODO do we care about lots here?
+            [
+                ("state", "!=", "done"),
+                ("location_id", "=", location.id),
+                ("product_id", "=", product.id),
+            ]
+        )
+        planned = remaining - sum(lines_in_loc.mapped("qty_done"))
+        rounding = product.uom_id.rounding
+        compare = float_compare(planned, 0, precision_rounding=rounding)
+        return compare <= 0
+
+    def _response_for_zero_check(self, move_line):
+        return self._response(
+            next_state="zero_check",
+            data={
+                "id": move_line.id,
+                "location_src": {
+                    "id": move_line.location_id.id,
+                    "name": move_line.location_id.name,
+                },
             },
         )
 
@@ -652,7 +683,28 @@ class ClusterPicking(Component):
         * unload_single: if all lines have a destination package and different
           destination
         """
-        return self._response()
+        message = self.actions_for("message")
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        if not move_line.exists():
+            return self._response(
+                next_state="start", message=message.unrecoverable_error()
+            )
+
+        if not zero:
+            inventory = self.actions_for("inventory")
+            inventory.create_draft_check_empty(
+                move_line.location_id,
+                move_line.product_id,
+                ref=move_line.picking_id.name,
+            )
+
+        batch = move_line.picking_id.batch_id
+        return self._pick_next_line(
+            batch,
+            message=message.x_units_put_in_package(
+                move_line.qty_done, move_line.product_id, move_line.result_package_id
+            ),
+        )
 
     def skip_line(self, move_line_id):
         """Skip a line. The line will be processed at the end.
