@@ -272,21 +272,19 @@ class SinglePackTransferValidatorResponse(Component):
         }
 
     def start(self):
-        return self._response_schema(
-            next_states=["confirm_start", "start", "scan_location"]
-        )
+        return self._response_schema(next_states={"confirm_start", "scan_location"})
 
     def cancel(self):
-        return self._response_schema(next_states=["start"])
+        return self._response_schema(next_states={"start"})
 
     def validate(self):
         return self._response_schema(
-            next_states=[
+            next_states={
                 "scan_location",
                 "start",
                 "confirm_location",
                 "show_completion_info",
-            ]
+            }
         )
 
     @property
