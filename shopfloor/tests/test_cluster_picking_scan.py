@@ -198,14 +198,19 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 [cls.BatchProduct(product=cls.product_a, quantity=10)],
             ]
         )
+        cls.one_line_picking = cls.batch.picking_ids[0]
+        cls.two_lines_picking = cls.batch.picking_ids[1]
+
         cls.bin1 = cls.env["stock.quant.package"].create({})
+        cls.bin2 = cls.env["stock.quant.package"].create({})
+
+        cls._simulate_batch_selected(cls.batch)
 
     def test_scan_destination_pack_ok(self):
         """Happy path for scan destination package
 
         It sets the line in the pack for the full qty
         """
-        self._simulate_batch_selected(self.batch)
         line = self.batch.picking_ids.move_line_ids[0]
         next_line = self.batch.picking_ids.move_line_ids[1]
         qty_done = line.product_uom_qty
@@ -224,6 +229,174 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             response,
             next_state="start_line",
             data=self._line_data(next_line),
+            message={
+                "message_type": "success",
+                "message": "{} {} put in {}".format(
+                    line.qty_done, line.product_id.display_name, self.bin1.name
+                ),
+            },
+        )
+
+    def test_scan_destination_pack_ok_last_line(self):
+        """Happy path for scan destination package
+
+        It sets the line in the pack for the full qty
+        """
+        self._set_dest_package_and_done(self.one_line_picking.move_line_ids, self.bin1)
+        self._set_dest_package_and_done(
+            self.two_lines_picking.move_line_ids[0], self.bin2
+        )
+        # this is the only remaining line to pick
+        line = self.two_lines_picking.move_line_ids[1]
+        qty_done = line.product_uom_qty
+        response = self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "move_line_id": line.id,
+                "barcode": self.bin2.name,
+                "quantity": qty_done,
+            },
+        )
+        self.assertRecordValues(
+            line, [{"qty_done": qty_done, "result_package_id": self.bin2.id}]
+        )
+        self.assert_response(
+            response,
+            # they reach the same destination so next state unload_all
+            next_state="unload_all",
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                "location_dst": {
+                    "id": self.packing_location.id,
+                    "name": self.packing_location.name,
+                },
+            },
+        )
+
+    def test_scan_destination_pack_not_empty_same_picking(self):
+        """Scan a destination package with move lines of same picking"""
+        line1 = self.two_lines_picking.move_line_ids[0]
+        line2 = self.two_lines_picking.move_line_ids[1]
+        # we already scan and put the first line in bin1
+        self._set_dest_package_and_done(line1, self.bin1)
+        response = self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "move_line_id": line2.id,
+                # this bin is used for the same picking, should be allowed
+                "barcode": self.bin1.name,
+                "quantity": line2.product_uom_qty,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="start_line",
+            # we did not pick this line, so it should go there
+            data=self._line_data(self.one_line_picking.move_line_ids),
+            message=self.ANY,
+        )
+
+    def test_scan_destination_pack_not_empty_different_picking(self):
+        """Scan a destination package with move lines of other picking"""
+        # do as if the user already picked the first good (for another picking)
+        # and put it in bin1
+        self._set_dest_package_and_done(self.one_line_picking.move_line_ids, self.bin1)
+        line = self.two_lines_picking.move_line_ids[0]
+        response = self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "move_line_id": line.id,
+                # this bin is used for the other picking
+                "barcode": self.bin1.name,
+                "quantity": line.product_uom_qty,
+            },
+        )
+        self.assertRecordValues(line, [{"qty_done": 0, "result_package_id": False}])
+        self.assert_response(
+            response,
+            next_state="scan_destination",
+            data=self._line_data(line),
+            message={
+                "message_type": "error",
+                "message": "The destination bin {} is not empty,"
+                " please take another.".format(self.bin1.name),
+            },
+        )
+
+    def test_scan_destination_pack_bin_not_found(self):
+        """Scan a destination package that do not exist"""
+        line = self.one_line_picking.move_line_ids
+        response = self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "move_line_id": line.id,
+                # this bin is used for the other picking
+                "barcode": "⌿",
+                "quantity": line.product_uom_qty,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="scan_destination",
+            data=self._line_data(line),
+            message={
+                "message_type": "error",
+                "message": "Bin {} doesn't exist".format("⌿"),
+            },
+        )
+
+    def test_scan_destination_pack_quantity_more(self):
+        """Pick more units than expected"""
+        line = self.one_line_picking.move_line_ids
+        response = self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "move_line_id": line.id,
+                "barcode": self.bin1.name,
+                "quantity": line.product_uom_qty + 1,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="scan_destination",
+            data=self._line_data(line),
+            message={
+                "message_type": "error",
+                "message": "You must not pick more than {} units.".format(
+                    line.product_uom_qty
+                ),
+            },
+        )
+
+    def test_scan_destination_pack_quantity_less(self):
+        """Pick less units than expected"""
+        line = self.one_line_picking.move_line_ids
+        response = self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "move_line_id": line.id,
+                "barcode": self.bin1.name,
+                "quantity": line.product_uom_qty - 3,
+            },
+        )
+
+        self.assertRecordValues(
+            line,
+            [{"qty_done": 7, "result_package_id": self.bin1.id, "product_uom_qty": 7}],
+        )
+        new_line = self.one_line_picking.move_line_ids - line
+        self.assertRecordValues(
+            new_line,
+            [{"qty_done": 0, "result_package_id": False, "product_uom_qty": 3}],
+        )
+
+        self.assert_response(
+            response,
+            next_state="start_line",
+            # TODO ensure the duplicated line is the next line, it works now but
+            # maybe only by chance
+            data=self._line_data(new_line),
             message={
                 "message_type": "success",
                 "message": "{} {} put in {}".format(
