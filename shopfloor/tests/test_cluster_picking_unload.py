@@ -32,14 +32,6 @@ class ClusterPickingUnloadingCommonCase(ClusterPickingCommonCase):
             }
         )
 
-    @classmethod
-    def _set_dest_package_and_done(cls, move_lines, dest_package):
-        """Simulate what would have been done in the previous steps"""
-        for line in move_lines:
-            line.write(
-                {"qty_done": line.product_uom_qty, "result_package_id": dest_package.id}
-            )
-
 
 class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
     """Tests covering the /prepare_unload endpoint

@@ -35,6 +35,9 @@ class MessageAction(Component):
             "message": _("The package %s doesn't exist") % barcode,
         }
 
+    def bin_not_found_for_barcode(self, barcode):
+        return {"message_type": "error", "message": _("Bin %s doesn't exist") % barcode}
+
     def package_not_allowed_in_src_location(self, barcode, picking_type):
         return {
             "message_type": "error",
