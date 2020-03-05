@@ -94,6 +94,11 @@ class CommonCase(SavepointCase, ComponentMixin):
     def _update_qty_in_location(
         cls, location, product, quantity, package=None, lot=None
     ):
+        quants = cls.env["stock.quant"]._gather(
+            product, location, lot_id=lot, package_id=package, strict=True
+        )
+        # this method adds the quantity to the current quantity, so remove it
+        quantity -= sum(quants.mapped("quantity"))
         cls.env["stock.quant"]._update_available_quantity(
             product, location, quantity, package_id=package, lot_id=lot
         )
@@ -114,6 +119,11 @@ class CommonCase(SavepointCase, ComponentMixin):
                 lot = cls.env["stock.production.lot"].create(
                     {"product_id": product.id, "company_id": cls.env.company.id}
                 )
+            else:
+                # always add more quantity in stock to avoid to trigger the
+                # "zero checks" in tests, not for lots which must have a qty
+                # of 1
+                qty *= 2
             cls._update_qty_in_location(
                 location, product, qty, package=package, lot=lot
             )
