@@ -373,7 +373,7 @@ class SinglePackPutawayValidatorResponse(Component):
         }
 
     def cancel(self):
-        return self._response_schema(next_states=["start"])
+        return self._response_schema(next_states={"start"})
 
     def _validator_scan_pack(self):
         return {"barcode": {"type": "string", "nullable": False, "required": True}}

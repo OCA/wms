@@ -55,6 +55,9 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
     _collection = "shopfloor.service"
     _is_rest_service_component = False
 
+    # Initial state of a workflow
+    _start_state = "start"
+
     def _states(self):
         """List of possible next states
 
@@ -73,6 +76,10 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
         next_states is a list of allowed states to which the client
         can transition. The schema of the data needed for every state
         of the list must be defined in the ``_states`` method.
+
+        The initial state does not need to be included in the list, it
+        is implicit as we assume that any state can go back to the initial
+        state in case of unrecoverable error.
         """
         response_schema = {
             "message": {
@@ -92,7 +99,16 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
             data_schema = {}
 
         if next_states:
+            next_states = set(next_states)
+            next_states.add(self._start_state)
             states_schemas = self._states()
+            if self._start_state not in states_schemas:
+                raise ValueError(
+                    "the _start_state is {} but this state does not exist"
+                    ", you may want to change the property's value".format(
+                        self._start_state
+                    )
+                )
             unknown_states = set(next_states) - states_schemas.keys()
             if unknown_states:
                 raise ValueError(
