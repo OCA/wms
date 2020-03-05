@@ -22,42 +22,68 @@ var randomFromArray = function (an_array) {
     return an_array[Math.floor(Math.random() * an_array.length)];
 };
 
-var locations = [{
-    "id": getRandomInt(),
-    "name": "LOC-" + _.padStart(getRandomInt(), 6, 0),
-}, {
-    "id": getRandomInt(),
-    "name": "LOC-" + _.padStart(getRandomInt(), 6, 0),
-}, {
-    "id": getRandomInt(),
-    "name": "LOC-" + _.padStart(getRandomInt(), 6, 0),
-},
-];
 
-
-var makePicking = function (with_lines=0) {
-    const picking = {
+var makeSimpleRecord = function (options) {
+    const opts = _.defaults(options, {
+        'name_prefix': '',
+        'padding': 6,
+    });
+    const name = opts.name_prefix ? opts.name_prefix + '-' : '';
+    return {
         "id": getRandomInt(),
-        "name": "PICK" + _.padStart(getRandomInt(), 8, 0),
+        "name": name + _.padStart(getRandomInt(), opts.padding, 0),
+    };
+};
+
+
+var makeLocation = function (prefix) {
+    return makeSimpleRecord({name_prefix: prefix || 'LOC'});
+};
+
+var makeLot = function () {
+    return makeSimpleRecord({name_prefix: 'LOT'});
+};
+
+var makePack = function () {
+    return makeSimpleRecord({name_prefix: 'PACK', padding: 10});
+};
+
+var locations = [makeLocation(), makeLocation(), makeLocation()];
+
+
+var makeProduct = function (i) {
+    const prod = makeSimpleRecord({name_prefix: 'Prod ' + i, padding: 0});
+    const default_code = _.padStart(getRandomInt(), 8, 0);
+    _.extend(prod, {
+        "default_code": default_code,
+        "display_name": "[" + default_code + "] " + prod.name,
+        "qty": getRandomInt(200),
+        "qty_available": getRandomInt(200),
+    });
+    return prod;
+};
+
+
+var makePicking = function (options={}) {
+    const picking = makeSimpleRecord({name_prefix: 'PICK', padding: 8});
+    _.extend(picking, {
         "origin": "SO" + _.padStart(getRandomInt(), 6, 0),
         "move_line_count": getRandomInt(10),
         "weight": getRandomInt(1000),
-    };
-    if (with_lines) {
+    });
+    if (options.with_lines) {
         const lines = [];
-        for (let i = 1; i < with_lines + 1; i++) {
+        for (let i = 1; i < options.with_lines + 1; i++) {
+            let pack = makePack();
+            if (options.random_pack && i % 3 == 0) {
+                // No pack every 3 items
+                pack = null;
+            }
             lines.push({
                 "id": i,
                 "picking_id": picking.id,
-                "product": {
-                    "id": i,
-                    "name": "Prod #" + i,
-                    "display_name": "[" + _.padStart(getRandomInt(), 8, 0) + "] Prod #" + i,
-                },
-                "pack": {
-                    "id": i,
-                    "name": "PACK" + _.padStart(getRandomInt(), 10, 0),
-                },
+                "product": makeProduct(i),
+                "pack": pack,
                 "location_src": randomFromArray(locations),
             });
         }
@@ -72,34 +98,14 @@ var makeBatchPickingLine = function () {
         "id": getRandomInt(),
         "postponed": true,
         "picking": makePicking(),
-        "batch": {
-            "id": getRandomInt(),
-            "name": "BATCH" + _.padStart(getRandomInt(), 8, 0),
-        },
-        "lot": {
-            "id": getRandomInt(),
-            "name": "LOT" + _.padStart(getRandomInt(), 10, 0),
-        },
-        "pack": {
-            "id": getRandomInt(),
-            "name": "PACK" + _.padStart(getRandomInt(), 10, 0),
-        },
+        "batch": makeSimpleRecord({name_prefix: 'BATCH'}),
+        "lot": makeLot(),
+        "pack": makePack(),
         "origin": "S0" + getRandomInt(),
         "move_line_count": getRandomInt(20),
-        "product": {
-            "qty_available": getRandomInt(200),
-            "qty": getRandomInt(200),
-            "name": "Product " + getRandomInt(),
-        },
-        "destination_bin": "BIN" + _.padStart(getRandomInt(), 5, 0),
-        "location_src": {
-            "id": getRandomInt(),
-            "name": "LOC-SRC-" + _.padStart(getRandomInt(), 10, 0),
-        },
-        "location_dst": {
-            "id": getRandomInt(),
-            "name": "LOC-DST-" + _.padStart(getRandomInt(), 10, 0),
-        },
+        "product": makeProduct(),
+        "location_src": makeLocation('LOC-SRC'),
+        "location_dst": makeLocation('LOC-DST'),
     };
 };
 
