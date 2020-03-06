@@ -14,7 +14,7 @@ var DEMO_CHECKOUT = {
             // All line have a destination pack
             "next_state": "select_line",
             "data": {
-                "select_line": makePicking({"with_lines": 5, "random_pack": true}),
+                "select_line": makePicking({"lines_count": 5, "line_random_pack": true}),
             },
         },
     },
@@ -22,7 +22,14 @@ var DEMO_CHECKOUT = {
     "select_line": {
         "next_state": "select_pack",
         "data": {
-            "select_pack": makePicking({"with_lines": 5, "random_pack": true}),
+            "select_pack": makePicking({"lines_count": 5, "line_random_pack": true, "line_random_dst": true}),
+        },
+    },
+    // TODO
+    "summary": {
+        "next_state": "summary",
+        "data": {
+            "summary": makePicking({"lines_count": 5, "line_random_pack": true}),
         },
     },
 };

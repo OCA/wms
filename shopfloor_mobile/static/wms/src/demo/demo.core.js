@@ -49,6 +49,8 @@ var makePack = function () {
 };
 
 var locations = [makeLocation(), makeLocation(), makeLocation()];
+var locations_src = [makeLocation('LOC-SRC'), makeLocation('LOC-SRC'), makeLocation('LOC-SRC')];
+var locations_dst = [makeLocation('LOC-DST'), makeLocation('LOC-DST'), makeLocation('LOC-DST')];
 
 
 var makeProduct = function (i) {
@@ -64,6 +66,32 @@ var makeProduct = function (i) {
 };
 
 
+var makePickingLines = function (options={}) {
+    const lines = [];
+    for (let i = 1; i < options.lines_count + 1; i++) {
+        let pack = makePack();
+        if (options.line_random_pack && i % 3 == 0) {
+            // No pack every 3 items
+            pack = null;
+        }
+        let loc_dst = randomFromArray(locations_dst);
+        if (options.line_random_dst && i % 3 == 0) {
+            // No pack every 3 items
+            loc_dst = null;
+        }
+        lines.push({
+            "id": i,
+            "picking_id": options.picking ? options.picking.id : null,
+            "product": makeProduct(i),
+            "pack": pack,
+            "location_src": randomFromArray(locations_src),
+            "location_dst": loc_dst,
+        });
+    }
+    return lines;
+};
+
+
 var makePicking = function (options={}) {
     const picking = makeSimpleRecord({name_prefix: 'PICK', padding: 8});
     _.extend(picking, {
@@ -71,23 +99,9 @@ var makePicking = function (options={}) {
         "move_line_count": getRandomInt(10),
         "weight": getRandomInt(1000),
     });
-    if (options.with_lines) {
-        const lines = [];
-        for (let i = 1; i < options.with_lines + 1; i++) {
-            let pack = makePack();
-            if (options.random_pack && i % 3 == 0) {
-                // No pack every 3 items
-                pack = null;
-            }
-            lines.push({
-                "id": i,
-                "picking_id": picking.id,
-                "product": makeProduct(i),
-                "pack": pack,
-                "location_src": randomFromArray(locations),
-            });
-        }
-        picking.lines = lines;
+    if (options.lines_count) {
+        options.picking = picking;
+        picking.lines = makePickingLines(options);
     }
     return picking;
 };
