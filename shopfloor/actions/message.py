@@ -141,6 +141,18 @@ class MessageAction(Component):
             ),
         }
 
+    def no_lot_for_barcode(self, barcode):
+        return {
+            "message_type": "error",
+            "body": _("No lot found for {}".format(barcode)),
+        }
+
+    def lot_on_wrong_product(self, barcode):
+        return {
+            "message_type": "error",
+            "body": _("Lot {} is for another product.").format(barcode),
+        }
+
     def several_lots_in_location(self, location):
         return {
             "message_type": "warning",
@@ -165,6 +177,12 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Unrecoverable error, please restart."),
+        }
+
+    def package_different_content(self, package):
+        return {
+            "message_type": "error",
+            "body": _("Package {} has a different content.").format(package.name),
         }
 
     def x_units_put_in_package(self, qty, product, package):
