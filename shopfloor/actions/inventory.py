@@ -46,7 +46,38 @@ class InventoryAction(Component):
             }
         )
 
-    def create_control_stock(self, location, product, package, lot):
+    def move_package_quants_to_location(self, package, dest_location):
+        """Create inventories to move a package to a different location
+
+        It should be called when the package is - in real life - already in
+        the destination. It creates an inventory to remove the package from
+        the source location and a second inventory to place the package
+        in the destination (to reflect the reality).
+
+        The source location is the current location of the package.
+        """
+        quant_values = []
+        # sudo and the key in context activate is_inventory_mode on quants
+        quants = package.quant_ids.sudo().with_context(inventory_mode=True)
+        for quant in quants:
+            quantity = quant.quantity
+            quant.inventory_quantity = 0
+            quant_values.append(self._quant_move_values(quant, dest_location, quantity))
+
+        quant_model = self.env["stock.quant"].sudo().with_context(inventory_mode=True)
+        quant_model.create(quant_values)
+
+    def _quant_move_values(self, quant, location, quantity):
+        return {
+            "product_id": quant.product_id.id,
+            "inventory_quantity": quantity,
+            "location_id": location.id,
+            "lot_id": quant.lot_id.id,
+            "package_id": quant.package_id.id,
+            "owner_id": quant.owner_id.id,
+        }
+
+    def create_control_stock(self, location, product, package, lot, name=None):
         """Create a draft inventory so a user has to check a location
 
         If a draft or in progress inventory already exists for the same
@@ -55,9 +86,10 @@ class InventoryAction(Component):
         if not self._inventory_exists(location, product):
             product_name = self._stock_issue_product_description(product, package, lot)
 
-            name = _("Control stock issue in location {} for {}").format(
-                location.name, product_name
-            )
+            if not name:
+                name = _("Control stock issue in location {} for {}").format(
+                    location.name, product_name
+                )
             self._create_draft_inventory(location, product, name)
 
     def create_stock_issue(self, move, location, package, lot):
