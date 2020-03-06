@@ -1,22 +1,13 @@
-export var checkout_picking_info = Vue.component('checkout-picking-detail', {
-    props: ['info'],
-    methods: {
-        group_lines_by_location: function (lines) {
-            // {'key': 'no-group', 'title': '', 'records': []}
-            const res = [];
-            const locations = _.uniqBy(_.map(lines, function (x) {
-                return x.location_src;
-            }), 'id');
-            const grouped = _.groupBy(lines, 'location_src.id');
-            _.forEach(grouped, function (value, loc_id) {
-                const location = _.first(_.filter(locations, {'id': parseInt(loc_id)}));
-                res.push({
-                    'key': loc_id,
-                    'title': 'Location: ' + location.name,
-                    'records': value,
-                });
-            });
-            return res;
+export var checkout_picking_detail = Vue.component('checkout-picking-detail', {
+    props: {
+        'info': Object,
+        'grouped_lines': Array,
+        // TODO: maybe this should be provided by manual select component
+        'select_options': {
+            'type': Object,
+            'default': function () {
+                return {};
+            },
         },
     },
     template: `
@@ -35,12 +26,14 @@ export var checkout_picking_info = Vue.component('checkout-picking-detail', {
     </v-card>
 
     <manual-select
-        :records="group_lines_by_location(info.lines)"
-        :grouped="true"
+        :records="info.lines"
+        :grouped_records="grouped_lines"
         :key_value="'id'"
         :list_item_content_component="'checkout-select-content'"
         :bubbleUpAction="true"
         :showActions="false"
+        :multiple="select_options.multiple"
+        :initSelectAll="select_options.initSelectAll"
         />
 </div>
 `,

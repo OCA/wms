@@ -31,15 +31,32 @@ export var Checkout = Vue.component('checkout', {
 
             <div v-if="state_is('select_line')">
                 <checkout-picking-detail
-                    v-if="state_is('select_line')"
                     :info="state.data"
+                    :grouped_lines="group_lines_by_location(state.data.lines)"
                     v-on:select="state.on_select"
                     v-on:back="state.on_back"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="$emit('action', 'summary')">Summary</v-btn>
+                            <v-btn depressed color="primary" @click="state.on_summary">Summary</v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
+            </div>
+
+            <div v-if="state_is('summary')">
+                <checkout-picking-detail
+                    :info="state.data"
+                    :grouped_lines="group_lines_by_location(state.data.lines, {'group_key': 'location_dst'})"
+                    :select_options="{multiple: true, initSelectAll: true}"
+                    v-on:select="state.on_select"
+                    v-on:back="state.on_back"
+                    />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn depressed color="primary" @click="$emit('action', 'TODO')">TODO</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -64,6 +81,28 @@ export var Checkout = Vue.component('checkout', {
     methods: {
         record_by_id: function (records, _id) {
             return _.first(_.filter(records, {'id': _id}));
+        },
+        group_lines_by_location: function (lines, options) {
+            // {'key': 'no-group', 'title': '', 'records': []}
+            options =_.defaults(options || {}, {
+                'group_key': 'location_src',
+                'name_prefix': 'Location',
+            });
+            const res = [];
+            const locations = _.uniqBy(_.map(lines, function (x) {
+                return x[options.group_key];
+            }), 'id');
+            const grouped = _.groupBy(lines, options.group_key + '.id');
+            _.forEach(grouped, function (value, loc_id) {
+                const location = _.first(_.filter(locations, {'id': parseInt(loc_id)}));
+                const title = options.name_prefix ? options.name_prefix + ': ' + location.name : location.name;
+                res.push({
+                    'key': loc_id,
+                    'title': title,
+                    'records': value,
+                });
+            });
+            return res;
         },
     },
     data: function () {
@@ -128,21 +167,29 @@ export var Checkout = Vue.component('checkout', {
                             return;
                         }
                         const line = this.record_by_id(this.state.data.lines, selected);
-                        this.go_state(
-                            'wait_call',
-                            this.odoo.call('select_line', {
-                                'picking_id': this.picking_id,
-                                'move_line_id': line.id,
-                                'package_id': line.pack ? line.pack.id : null,
-                            }),
-                        );
+                        console.log('SELECTED', line, 'TODO');
+                        if (false) {
+                            this.go_state(
+                                'wait_call',
+                                this.odoo.call('select_line', {
+                                    'picking_id': this.picking_id,
+                                    'move_line_id': line.id,
+                                    'package_id': line.pack ? line.pack.id : null,
+                                }),
+                            );
+                        }
                     },
                     on_back: () => {
                         this.go_state('start');
                         this.reset_notification();
                     },
                     on_summary: () => {
-                        throw 'NOT IMPLEMENTED';
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.call('summary', {
+                                'picking_id': this.picking_id,
+                            }),
+                        );
                     },
                 },
                 'select_pack': {
@@ -234,6 +281,16 @@ export var Checkout = Vue.component('checkout', {
                 'summary': {
                     display_info: {
                         'title': 'Summary',
+                    },
+                    on_select: (selected) => {
+                        if (!selected) {
+                            return;
+                        }
+                        console.log('ON SELECT - TODO');
+                    },
+                    on_back: () => {
+                        this.go_state('start');
+                        this.reset_notification();
                     },
                     on_action: (action) => {
                         this.state['on_' + action].call(this);
