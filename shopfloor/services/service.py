@@ -78,7 +78,9 @@ class BaseShopfloorService(AbstractComponent):
         )
         return validator_component._get_validator(method_name)
 
-    def _response(self, base_response=None, data=None, next_state=None, message=None):
+    def _response(
+        self, base_response=None, data=None, next_state=None, message=None, popup=None
+    ):
         """Base "envelope" for the responses
 
         All the keys are optional.
@@ -92,6 +94,9 @@ class BaseShopfloorService(AbstractComponent):
         application must reach
         :param message: dictionary for the message to show in the client
         application (see ``_response_schema`` for the keys)
+        :param popup: dictionary for a popup to show in the client application
+        (see ``_response_schema`` for the keys). The popup is displayed before
+        reaching the next state.
         """
         if base_response:
             response = base_response.copy()
@@ -117,6 +122,9 @@ class BaseShopfloorService(AbstractComponent):
 
         if message:
             response["message"] = message
+
+        if popup:
+            response["popup"] = popup
 
         return response
 

@@ -5,6 +5,11 @@ class ClusterPickingUnloadingCommonCase(ClusterPickingCommonCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
+
+        # activate the computation of this field, so we have a chance to
+        # transition to the 'show completion info' popup.
+        cls.picking_type.display_completion_info = True
+
         cls.batch = cls._create_picking_batch(
             [
                 [
@@ -56,7 +61,6 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
         response = self.service.dispatch(
             "prepare_unload", params={"picking_batch_id": self.batch.id}
         )
-        self.assertRecordValues(self.batch, [{"cluster_picking_unload_all": True}])
         self.assert_response(
             response,
             next_state="unload_all",
@@ -80,7 +84,6 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
         response = self.service.dispatch(
             "prepare_unload", params={"picking_batch_id": self.batch.id}
         )
-        self.assertRecordValues(self.batch, [{"cluster_picking_unload_all": False}])
         first_line = move_lines[0]
         self.assert_response(
             response,
@@ -104,13 +107,6 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
     endpoint set them as "unloaded" and set the destination. When the last
     available line of a picking is unloaded, the picking is set to 'done'.
     """
-
-    @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
-        # this is what the /prepare_endpoint method would have set as all the
-        # destinations are the same:
-        cls.batch.cluster_picking_unload_all = True
 
     def test_set_destination_all_ok(self):
         """Set destination on all lines for the full batch and end the process"""
@@ -241,7 +237,6 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
                 "barcode": self.packing_location.barcode,
             },
         )
-        self.assertRecordValues(self.batch, [{"cluster_picking_unload_all": False}])
         self.assert_response(
             response,
             next_state="unload_single",
@@ -383,7 +378,6 @@ class ClusterPickingUnloadSplitCase(ClusterPickingUnloadingCommonCase):
         super().setUpClass(*args, **kwargs)
         # this is what the /prepare_endpoint method would have set as all the
         # destinations are the same:
-        cls.batch.cluster_picking_unload_all = True
 
     def test_unload_split_ok(self):
         """Call /unload_split and continue to unload single"""
@@ -397,7 +391,6 @@ class ClusterPickingUnloadSplitCase(ClusterPickingUnloadingCommonCase):
         response = self.service.dispatch(
             "unload_split", params={"picking_batch_id": self.batch.id}
         )
-        self.assertRecordValues(self.batch, [{"cluster_picking_unload_all": False}])
         self.assert_response(
             # the remaining move line still needs to be picked
             response,
@@ -427,7 +420,6 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
-        cls.batch.cluster_picking_unload_all = False
         cls.move_lines = cls.batch.mapped("picking_ids.move_line_ids")
         cls._set_dest_package_and_done(cls.move_lines, cls.bin1)
         cls.move_lines[:2].write({"location_dest_id": cls.packing_a_location.id})
@@ -496,7 +488,6 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
-        cls.batch.cluster_picking_unload_all = False
         cls.move_lines = cls.batch.mapped("picking_ids.move_line_ids")
         cls.bin1_lines = cls.move_lines[:1]
         cls.bin2_lines = cls.move_lines[1:]
@@ -798,3 +789,50 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             ],
         )
         self.assert_response(response, next_state="unload_single", data=self.ANY)
+
+    def test_unload_scan_destination_completion_info(self):
+        """/unload_scan_destination that make chained picking ready"""
+        picking = self.one_line_picking
+        dest_location = picking.move_line_ids.location_dest_id
+        self.picking_type.display_completion_info = True
+
+        # create a chained picking after the current one
+        next_picking = picking.copy(
+            {
+                "picking_type_id": self.wh.out_type_id.id,
+                "location_id": picking.location_dest_id.id,
+                "location_dest_id": self.customer_location.id,
+            }
+        )
+        next_picking.move_lines.write(
+            {"move_orig_ids": [(6, 0, picking.move_lines.ids)]}
+        )
+        next_picking.action_confirm()
+
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": dest_location.barcode,
+            },
+        )
+
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            popup={
+                "body": "Last operation of transfer {}. Next operation "
+                "({}) is ready to proceed.".format(picking.name, next_picking.name)
+            },
+            data={
+                "id": self.batch.id,
+                "name": self.batch.name,
+                # the line of bin1 is unloaded, next one will be bin2
+                "package": {"id": self.bin2.id, "name": self.bin2.name},
+                "location_dest": {
+                    "id": self.bin2_lines[0].location_dest_id.id,
+                    "name": self.bin2_lines[0].location_dest_id.name,
+                },
+            },
+        )
