@@ -96,7 +96,12 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
                     },
                     "message": {"type": "string", "required": True},
                 },
-            }
+            },
+            "popup": {
+                "type": "dict",
+                "required": False,
+                "schema": {"body": {"type": "string", "required": True}},
+            },
         }
         if not data_schema:
             data_schema = {}
