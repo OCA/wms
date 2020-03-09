@@ -98,11 +98,10 @@ var makePicking = function (options={}) {
         "origin": "SO" + _.padStart(getRandomInt(), 6, 0),
         "move_line_count": getRandomInt(10),
         "weight": getRandomInt(1000),
+        "lines_count": 0,
     });
-    if (options.lines_count) {
-        options.picking = picking;
-        picking.lines = makePickingLines(options);
-    }
+    options.picking = picking;
+    picking.lines = makePickingLines(options);
     return picking;
 };
 
