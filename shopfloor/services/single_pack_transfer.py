@@ -1,8 +1,6 @@
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
-# TODO add completion info screen
-
 
 class SinglePackTransfer(Component):
     """Methods for the Single Pack Transfer Process"""
@@ -151,13 +149,12 @@ class SinglePackTransfer(Component):
             data=self._data_after_package_scanned(move_line, pack),
         )
 
-    def _response_for_validate_success(self, last=False):
+    def _response_for_validate_success(self, completion_info_popup=None):
         message = self.actions_for("message")
-        next_state = "start"
-        if last:
-            next_state = "show_completion_info"
         return self._response(
-            next_state=next_state, message=message.confirm_pack_moved()
+            next_state="start",
+            message=message.confirm_pack_moved(),
+            popup=completion_info_popup,
         )
 
     def validate(self, package_level_id, location_barcode, confirmation=False):
@@ -193,8 +190,13 @@ class SinglePackTransfer(Component):
                 )
 
         pack_transfer.set_destination_and_done(move, scanned_location)
-        last = move.picking_id.completion_info == "next_picking_ready"
-        return self._response_for_validate_success(last=last)
+
+        completion_info = self.actions_for("completion.info")
+        completion_info_popup = completion_info.popup(package.move_line_ids)
+
+        return self._response_for_validate_success(
+            completion_info_popup=completion_info_popup
+        )
 
     def cancel(self, package_level_id):
         package = self.env["stock.package_level"].browse(package_level_id)
@@ -260,7 +262,6 @@ class SinglePackTransferValidatorResponse(Component):
             "confirm_start": self._schema_for_location,
             "scan_location": self._schema_for_location,
             "confirm_location": self._schema_for_location,
-            "show_completion_info": {},
         }
 
     def start(self):
@@ -271,12 +272,7 @@ class SinglePackTransferValidatorResponse(Component):
 
     def validate(self):
         return self._response_schema(
-            next_states={
-                "scan_location",
-                "start",
-                "confirm_location",
-                "show_completion_info",
-            }
+            next_states={"scan_location", "start", "confirm_location"}
         )
 
     @property

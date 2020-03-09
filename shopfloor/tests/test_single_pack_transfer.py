@@ -396,6 +396,19 @@ class SinglePackTransferCase(CommonCase):
         # transition to the 'show completion info' screen.
         self.picking_type.display_completion_info = True
 
+        # create a chained picking after the current one
+        next_picking = self.picking.copy(
+            {
+                "picking_type_id": self.wh.out_type_id.id,
+                "location_id": self.picking.location_dest_id.id,
+                "location_dest_id": self.customer_location.id,
+            }
+        )
+        next_picking.move_lines.write(
+            {"move_orig_ids": [(6, 0, self.picking.move_lines.ids)]}
+        )
+        next_picking.action_confirm()
+
         # now, call the service to proceed with validation of the
         # movement
         response = self.service.dispatch(
@@ -408,7 +421,11 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            next_state="show_completion_info",
+            next_state="start",
+            popup={
+                "body": "Last operation of transfer {}. Next operation "
+                "({}) is ready to proceed.".format(self.picking.name, next_picking.name)
+            },
             message={
                 "message_type": "success",
                 "message": "The pack has been moved, you can scan a new pack.",
