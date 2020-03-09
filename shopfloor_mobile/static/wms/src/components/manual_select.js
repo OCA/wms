@@ -18,39 +18,33 @@ Vue.component('manual-select', {
         list_item_content_component: {
             'type': String,
         },
-        bubbleUpAction: {
-            'type': Boolean,
-            'default': false,
-        },
-        showActions: {
-            'type': Boolean,
-            'default': true,
-        },
-        initSelectAll: {
-            'type': Boolean,
-            'default': false,
-        },
-        initValue: {
-            'type': [Number, Array],
-            'default': null,
-        },
-        multiple: {
-            'type': Boolean,
-            'default': false,
+        options: {
+            'type': Object,
+            'default': function () {
+                return {
+                    bubbleUpAction: false,
+                    showActions: true,
+                    initSelectAll: false,
+                    initValue: null,
+                    multiple: false,
+                    showCounters: false,
+                };
+            },
         },
     },
     data: function () {
         const self = this;
+        const initValue = this.options.initValue;
         let selected;
-        if (this.multiple) {
-            selected = self.initValue ? [self.initValue] : [];
-            if (this.initSelectAll) {
+        if (this.options.multiple) {
+            selected = initValue ? [initValue] : [];
+            if (this.options.initSelectAll) {
                 selected = _.map(this.records, function (x) {
                     return x[self.key_value];
                 });
             }
         } else {
-            selected = self.initValue ? self.initValue : null;
+            selected = initValue ? initValue : null;
         }
         return {
             selected: selected,
@@ -63,7 +57,7 @@ Vue.component('manual-select', {
             // on grand-parent components as well.
             // Maybe we can emit the event on the $root
             // and add a namespace to the event (eg: usage:event_name)
-            if (this.bubbleUpAction) {
+            if (this.options.bubbleUpAction) {
                 this.$parent.$emit(event_name, data);
             } else {
                 this.$emit(event_name, data);
@@ -80,10 +74,11 @@ Vue.component('manual-select', {
         has_records () {
             return this.records.length > 0;
         },
-        options () {
+        list_item_options () {
             return {
                 'key_value': this.key_value,
                 'key_title': this.key_title,
+                'showCounters': this.options.showCounters,
             };
         },
         selectable () {
@@ -98,12 +93,11 @@ Vue.component('manual-select', {
         },
         klass () {
             const bits = ["manual-select"];
-            if (this.showActions) {
-                bits.push('with-bottom-actions');
-            }
-            if (this.grouped_records.length) {
-                bits.push('with-groups');
-            }
+            _.forEach(this.$props.options, function (v, k) {
+                if (v) {
+                    bits.push('with-' + k);
+                }
+            });
             return bits.join(' ');
         },
     },
@@ -116,17 +110,23 @@ Vue.component('manual-select', {
     <div :class="klass">
         <v-card outlined>
             <v-list shaped v-if="has_records">
-                <v-list-item-group :multiple="multiple || null" color="success" v-model="selected">
+                <v-list-item-group :multiple="options.multiple" color="success" v-model="selected">
                     <div class="select-group" v-for="group in selectable" :key="group.key">
                         <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
                         <v-list-item
-                                v-for="rec in group.records"
+                                v-for="(rec, index) in group.records"
                                 :key="rec[key_value]"
                                 :value="rec[key_value]"
                                 :data-id="rec[key_value]"
                                 >
                             <v-list-item-content>
-                                <component :is="list_item_content_component" :options="options" :record="rec"></component>
+                                <component
+                                    :is="list_item_content_component"
+                                    :options="list_item_options"
+                                    :record="rec"
+                                    :index="index"
+                                    :count="group.records.length"
+                                    ></component>
                             </v-list-item-content>
                         </v-list-item>
                     </div>
@@ -136,7 +136,7 @@ Vue.component('manual-select', {
                 No record found.
             </v-alert>
         </v-card>
-        <v-row class="actions bottom-actions" v-if="has_records && showActions">
+        <v-row class="actions bottom-actions" v-if="has_records && options.showActions">
             <v-col>
                 <v-btn color="success" @click="handleAction('select', selected)">
                     Start

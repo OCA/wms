@@ -48,8 +48,8 @@ export var Checkout = Vue.component('checkout', {
             <div v-if="state_is('summary')">
                 <checkout-picking-detail
                     :info="state.data"
-                    :grouped_lines="group_lines_by_location(state.data.lines, {'group_key': 'location_dst'})"
-                    :select_options="{multiple: true, initSelectAll: true}"
+                    :grouped_lines="group_lines_by_location(state.data.lines, {'group_key': 'location_dst', 'prepare_records': group_by_pack})"
+                    :select_options="{multiple: true, initSelectAll: true, showCounters: true}"
                     v-on:select="state.on_select"
                     v-on:back="state.on_back"
                     />
@@ -87,6 +87,9 @@ export var Checkout = Vue.component('checkout', {
             options =_.defaults(options || {}, {
                 'group_key': 'location_src',
                 'name_prefix': 'Location',
+                'prepare_records': function (recs) {
+                    return recs;
+                },
             });
             const res = [];
             const locations = _.uniqBy(_.map(lines, function (x) {
@@ -99,6 +102,28 @@ export var Checkout = Vue.component('checkout', {
                 res.push({
                     'key': loc_id,
                     'title': title,
+                    'records': options.prepare_records(value),
+                });
+            });
+            return res;
+        },
+        group_by_pack: function (lines) {
+            const res = [];
+            const packs = _.uniqBy(_.map(lines, function (x) {
+                return x.pack;
+            }), 'id');
+            const grouped = _.groupBy(lines, 'pack.id');
+            _.forEach(grouped, function (value, pack_id) {
+                let pack = _.first(_.filter(packs, {'id': parseInt(pack_id)}));
+                if (!pack) {
+                    pack = {
+                        'key': 'no-pack',
+                        'title': '',
+                    };
+                }
+                res.push({
+                    'key': pack_id,
+                    'title': pack.name,
                     'records': value,
                 });
             });

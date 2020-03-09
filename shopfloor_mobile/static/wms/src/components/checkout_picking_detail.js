@@ -6,7 +6,9 @@ export var checkout_picking_detail = Vue.component('checkout-picking-detail', {
         'select_options': {
             'type': Object,
             'default': function () {
-                return {};
+                return {
+                    'showActions': false,
+                };
             },
         },
     },
@@ -30,10 +32,7 @@ export var checkout_picking_detail = Vue.component('checkout-picking-detail', {
         :grouped_records="grouped_lines"
         :key_value="'id'"
         :list_item_content_component="'checkout-select-content'"
-        :bubbleUpAction="true"
-        :showActions="false"
-        :multiple="select_options.multiple"
-        :initSelectAll="select_options.initSelectAll"
+        :options="select_options"
         />
 </div>
 `,
@@ -43,13 +42,52 @@ Vue.component('checkout-select-content', {
     props: {
         'record': Object,
         'options': Object,
+        'index': Number,
+        'count': Number,
     },
     template: `
     <div>
         <div class="has_pack" v-if="record.pack">
+            <div class="item-counter">
+                <span>{{ index + 1 }} / {{ count }}</span>
+            </div>
             <span>{{ record.pack.name }}</span>
         </div>
         <div class="no_pack" v-if="!record.pack">
+            <div class="item-counter">
+                <span>{{ index + 1 }} / {{ count }}</span>
+            </div>
+            <span>{{ record.product.display_name }}</span>
+            <div class="lot" v-if="record.lot">
+                <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
+            </div>
+            <div class="qty">
+                <span class="label">Qty:</span> <span>{{ record.product.qty }}</span>
+            </div>
+        </div>
+    </div>
+  `,
+});
+
+Vue.component('checkout-summary-content', {
+    props: {
+        'record': Object,
+        'options': Object,
+        'index': Number,
+        'count': Number,
+    },
+    template: `
+    <div>
+        <div class="has_pack" v-if="record.pack">
+            <div class="item-counter">
+                <span>{{ index + 1 }} / {{ count }}</span>
+            </div>
+            <span>{{ record.pack.name }}</span>
+        </div>
+        <div class="no_pack" v-if="!record.pack">
+            <div class="item-counter">
+                <span>{{ index + 1 }} / {{ count }}</span>
+            </div>
             <span>{{ record.product.display_name }}</span>
             <div class="lot" v-if="record.lot">
                 <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>

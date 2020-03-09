@@ -153,6 +153,15 @@ ul.packaging span:first-child {
     border-bottom: 2px;
     margin-bottom: 0.5rem;
 }
+.manual-select .item-counter {
+    float: right;
+    font-size: 0.8rem;
+    display: none;
+}
+.manual-select.with-showCounters .item-counter {
+    display: block;
+}
+
 
 .label {
     font-weight: 600;
