@@ -79,8 +79,8 @@ class ClusterPicking(Component):
     def msg_store(self):
         return self.actions_for("message")
 
-    def _response_for_start(self, message=None):
-        return self._response(next_state="start", message=message,)
+    def _response_for_start(self, message=None, popup=None):
+        return self._response(next_state="start", message=message, popup=popup)
 
     def _response_for_confirm_start(self, batch):
         return self._response(
@@ -95,11 +95,12 @@ class ClusterPicking(Component):
         }
         return self._response(next_state="manual_selection", data=data, message=message)
 
-    def _response_for_start_line(self, move_line, message=None):
+    def _response_for_start_line(self, move_line, message=None, popup=None):
         return self._response(
             next_state="start_line",
             data=self._data_move_line(move_line),
             message=message,
+            popup=popup,
         )
 
     def _response_for_scan_destination(self, move_line, message=None):
@@ -133,11 +134,12 @@ class ClusterPicking(Component):
             message=message,
         )
 
-    def _response_for_unload_single(self, batch, package, message=None):
+    def _response_for_unload_single(self, batch, package, message=None, popup=None):
         return self._response(
             next_state="unload_single",
             data=self._data_for_unload_single(batch, package),
             message=message,
+            popup=popup,
         )
 
     def _response_for_unload_set_destination(self, batch, package, message=None):
@@ -631,24 +633,20 @@ class ClusterPicking(Component):
         """Initiate the unloading phase of the scenario
 
         If the destination of all the move lines still to unload is the same,
-        it sets the flag ``cluster_picking_unload_all`` to True on
-        ``stock.batch.picking``.
         Everytime this method is called, it resets the flag according to the
         condition above.
 
         Transitions:
-        * unload_all: when ``cluster_picking_unload_all`` is True
-        * unload_single: when ``cluster_picking_unload_all`` is False
+        * unload_all: when all lines go to the same destination
+        * unload_single: when lines have different destinations
         """
         batch = self.env["stock.picking.batch"].browse(picking_batch_id)
         if not batch.exists():
             return self._response_batch_does_not_exist()
         if self._are_all_dest_location_same(batch):
-            batch.cluster_picking_unload_all = True
             return self._response_for_unload_all(batch)
         else:
             # the lines have different destinations
-            batch.cluster_picking_unload_all = False
             return self._unload_next_package(batch)
 
     def _data_for_unload_all(self, batch):
@@ -852,7 +850,9 @@ class ClusterPicking(Component):
                 return self._response_for_confirm_unload_all(batch)
 
         self._unload_set_destination_on_lines(lines, scanned_location)
-        return self._unload_end(batch)
+        completion_info = self.actions_for("completion.info")
+        completion_info_popup = completion_info.popup(lines)
+        return self._unload_end(batch, completion_info_popup=completion_info_popup)
 
     def _unload_set_destination_on_lines(self, lines, location):
         lines.write({"shopfloor_unloaded": True, "location_dest_id": location.id})
@@ -866,18 +866,19 @@ class ClusterPicking(Component):
             if all(l.shopfloor_unloaded for l in picking_lines):
                 picking.action_done()
 
-    def _unload_end(self, batch):
+    def _unload_end(self, batch, completion_info_popup=None):
         if all(picking.state == "done" for picking in batch.picking_ids):
             # do not use the 'done()' method because it does many things we
             # don't care about
             batch.state = "done"
             return self._response_for_start(
-                message=self.msg_store.batch_transfer_complete()
+                message=self.msg_store.batch_transfer_complete(),
+                popup=completion_info_popup,
             )
 
         next_line = self._next_line_for_pick(batch)
         if next_line:
-            return self._response_for_start_line(next_line)
+            return self._response_for_start_line(next_line, popup=completion_info_popup)
         else:
             # TODO add tests for this (for instance a picking is not 'done'
             # because a move was unassigned, we want to validate the batch to
@@ -885,16 +886,14 @@ class ClusterPicking(Component):
             batch.mapped("picking_ids").action_done()
             batch.state = "done"
             return self._response_for_start(
-                message=self.msg_store.batch_transfer_complete()
+                message=self.msg_store.batch_transfer_complete(),
+                popup=completion_info_popup,
             )
 
     def unload_split(self, picking_batch_id):
         """Indicates that now the batch must be treated line per line
 
         Even if the move lines to unload all have the same destination.
-
-        It sets the flag ``stock_picking_batch.cluster_picking_unload_all`` to
-        False.
 
         Note: if we go back to the first phase of picking and start a new
         phase of unloading, the flag is reevaluated to the initial condition.
@@ -906,24 +905,7 @@ class ClusterPicking(Component):
         if not batch.exists():
             return self._response_batch_does_not_exist()
 
-        batch.cluster_picking_unload_all = False
-
         return self._unload_next_package(batch)
-
-    # TODO we shouldn't need this endpoint if we implement the "completion
-    # info" screen as a kind of generic info box instead of a state
-    def unload_router(self, picking_batch_id):
-        """Called after the info screen, route to the next state
-
-        No side effect in Odoo.
-
-        Transitions:
-        * unload_single: if the batch still has packs to unload
-        * start_line: if the batch still has lines to pick
-        * start: if the batch is done. In this case, this method *has*
-          to handle the closing of the batch to create backorders.
-        """
-        return self._response()
 
     def unload_scan_pack(self, picking_batch_id, package_id, barcode):
         """Check that the operator scans the correct package (bin) on unload
@@ -963,9 +945,6 @@ class ClusterPicking(Component):
         * confirm_unload_set_destination: the destination is valid but not the
           expected, ask a confirmation. This state has to call again the
           endpoint with confirmation=True
-        * show_completion_info: the completion info of the picking is
-          "next_picking_ready", it will show an info box to the user, the js
-          client should then call /unload_router to know the next state
         * start_line: if the batch still has lines to pick
         * start: if the batch is done. In this case, this method *has*
           to handle the closing of the batch to create backorders.
@@ -1006,13 +985,20 @@ class ClusterPicking(Component):
 
         self._unload_set_destination_on_lines(lines, scanned_location)
 
-        return self._unload_next_package(batch)
+        completion_info = self.actions_for("completion.info")
+        completion_info_popup = completion_info.popup(lines)
 
-    def _unload_next_package(self, batch):
+        return self._unload_next_package(
+            batch, completion_info_popup=completion_info_popup
+        )
+
+    def _unload_next_package(self, batch, completion_info_popup=None):
         next_package = self._next_bin_package_for_unload_single(batch)
         if next_package:
-            return self._response_for_unload_single(batch, next_package)
-        return self._unload_end(batch)
+            return self._response_for_unload_single(
+                batch, next_package, popup=completion_info_popup
+            )
+        return self._unload_end(batch, completion_info_popup=completion_info_popup)
 
 
 class ShopfloorClusterPickingValidator(Component):
@@ -1137,7 +1123,6 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             "unload_single": self._schema_for_unload_single,
             "unload_set_destination": self._schema_for_unload_single,
             "confirm_unload_set_destination": self._schema_for_unload_single,
-            "show_completion_info": self._schema_for_completion_info,
         }
 
     def find_batch(self):
@@ -1276,7 +1261,6 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                 "unload_single",
                 "unload_set_destination",
                 "confirm_unload_set_destination",
-                "show_completion_info",
                 "start",
                 "start_line",
             }
