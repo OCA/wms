@@ -49,10 +49,14 @@ export class DemoTools {
             'name_prefix': '',
             'padding': 6,
         });
-        const name = opts.name_prefix ? opts.name_prefix + '-' : '';
+        let name = options.name;
+        if (!name) {
+            name = opts.name_prefix ? opts.name_prefix + '-' : '';
+            name += _.padStart(this.getRandomInt(), opts.padding, 0);
+        }
         return {
             "id": this.getRandomInt(),
-            "name": name + _.padStart(this.getRandomInt(), opts.padding, 0),
+            "name": name,
         };
     }
 
@@ -119,6 +123,9 @@ export class DemoTools {
             "move_line_count": this.getRandomInt(10),
             "weight": this.getRandomInt(1000),
             "lines_count": 0,
+            "partner": this.makeSimpleRecord({
+                'name': this.randomFromArray(this.customerNames()),
+            }),
         });
         options.picking = picking;
         picking.lines = this.makePickingLines(options);
@@ -139,6 +146,50 @@ export class DemoTools {
             "location_src": this.makeLocation('LOC-SRC'),
             "location_dst": this.makeLocation('LOC-DST'),
         };
+    }
+
+    customerNames () {
+        return [
+            "Edith Sanchez",
+            "Brandon Freeman",
+            "Nicole Ford",
+            "Willie Burke",
+            "Ron Gibson",
+            "Toni Rhodes",
+            "Gemini Furniture",
+            "Ready Mat",
+            "The Jackson Group",
+            "Azure Interior",
+            "Joel Willis",
+            "Julie Richards",
+            "Travis Mendoza",
+            "Billy Fox",
+            "Jesse Brown",
+            "Kim Snyder",
+            "Douglas Fletcher",
+            "Floyd Steward",
+            "Edwin Hansen",
+            "Soham Palmer",
+            "Default User Template",
+            "Gordon Owens",
+            "Oscar Morgan",
+            "Lorraine Douglas",
+            "Addison Olson",
+            "Sandra Neal",
+            "Colleen Diaz",
+            "Tom Ruiz",
+            "Theodore Gardner",
+            "Wood Corner",
+            "Deco Addict",
+            "My Company (Chicago)",
+            "Dwayne Newman",
+            "My Company (San Francisco)",
+            "Chester Reed",
+            "Lumber Inc",
+            "Jeff Lawson",
+            "Mitchell Admin",
+            "Marc Demo",
+        ];
     }
 
 }

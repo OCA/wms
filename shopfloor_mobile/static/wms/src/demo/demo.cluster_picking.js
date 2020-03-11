@@ -9,26 +9,7 @@ var DEMO_CLUSTER_PICKING_1 = {
                 "name": "BATCH001",
                 "picking_count": 3,
                 "move_line_count": 6,
-                "pickings": [
-                    {
-                        "id": 1,
-                        "name": "OP001",
-                        "partner": {
-                            "name": "Customer 1",
-                        },
-                        "origin": "SO000CUST001",
-                        "move_line_count": 4,
-                    },
-                    {
-                        "id": 2,
-                        "name": "OP002",
-                        "partner": {
-                            "name": "Customer 2",
-                        },
-                        "origin": "SO000CUST002",
-                        "move_line_count": 2,
-                    },
-                ],
+                "pickings": [demotools.makePicking(), demotools.makePicking()],
             },
         },
     },
