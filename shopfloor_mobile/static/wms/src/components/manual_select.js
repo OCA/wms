@@ -6,7 +6,9 @@ Vue.component('manual-select', {
         },
         grouped_records: {
             'type': Array,
-            'default': [],
+            'default':  function () {
+                return [];
+            },
         },
         key_title: {
             'type': String,
