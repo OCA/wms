@@ -68,7 +68,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 v-on:select="state.on_select"
                 v-on:back="state.on_back"
                 :records="state.data.records"
-                :options="{list_item_component: 'picking-batch-select-content'}"
+                :list_item_fields="manual_select_picking_fields"
                 />
 
             <!-- TODO: do we need a component for this? -->
@@ -104,6 +104,12 @@ export var ClusterPicking = Vue.component('cluster-picking', {
     computed: {
         batch_id: function () {
             return this.erp_data.data.confirm_start.id;
+        },
+        manual_select_picking_fields: function () {
+            return [
+                {'path': 'picking_count', 'label': 'Operations'},
+                {'path': 'move_line_count', 'label': 'Lines'},
+            ];
         },
     },
     methods: {

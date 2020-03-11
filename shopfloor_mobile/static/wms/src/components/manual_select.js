@@ -172,7 +172,7 @@ Vue.component('manual-select', {
   `,
 });
 
-
+// TODO: this could be use for display detail as well
 Vue.component('manual-select-item', {
     props: {
         record: Object,

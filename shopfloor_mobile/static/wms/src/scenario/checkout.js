@@ -66,6 +66,7 @@ export var Checkout = Vue.component('checkout', {
                     v-on:select="state.on_select"
                     v-on:back="state.on_back"
                     :records="state.data.records"
+                    :list_item_fields="manual_select_picking_fields"
                     />
             </div>
         </Screen>
@@ -73,6 +74,13 @@ export var Checkout = Vue.component('checkout', {
     computed: {
         picking_id: function () {
             return this.erp_data.data.select_line.id;
+        },
+        manual_select_picking_fields: function () {
+            return [
+                {'path': 'partner.name'},
+                {'path': 'origin'},
+                {'path': 'move_line_count', 'label': 'Lines'},
+            ];
         },
     },
     // Mounted: function () {
