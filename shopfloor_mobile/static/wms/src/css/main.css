@@ -154,12 +154,11 @@ ul.packaging span:first-child {
     margin-bottom: 0.5rem;
 }
 .manual-select .item-counter {
-    float: right;
-    font-size: 0.8rem;
     display: none;
+    padding-right: 0.5rem;
 }
 .manual-select.with-showCounters .item-counter {
-    display: block;
+    display: inline;
 }
 
 
