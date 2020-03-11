@@ -1,4 +1,5 @@
 import {Storage} from './storage.js';
+import {demotools} from '../demo/demo.core.js';
 
 
 export class OdooMixin {
@@ -87,7 +88,7 @@ export class OdooMixin {
 export class OdooMocked extends OdooMixin {
 
     _set_demo_data () {
-        this.demo_data = window.DEMO_CASES[this.usage];
+        this.demo_data = demotools.get_case(this.usage);
     }
     call (path, data, method='POST', fullpath=false) {
         this._set_demo_data();
