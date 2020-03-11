@@ -24,7 +24,7 @@ export var Checkout = Vue.component('checkout', {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="$emit('action', 'manual_selection')">Manual selection</v-btn>
+                            <v-btn depressed color="primary" @click="state.on_manual_selection">Manual selection</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -65,7 +65,7 @@ export var Checkout = Vue.component('checkout', {
                 <manual-select
                     v-on:select="state.on_select"
                     v-on:back="state.on_back"
-                    :records="state.data.lines"
+                    :records="state.data.records"
                     />
             </div>
         </Screen>
