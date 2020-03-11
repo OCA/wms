@@ -32,7 +32,7 @@ class StockQuant(models.Model):
                     _(
                         "Package storage type %s is not allowed into "
                         "Location %s"
-                    ) % (pack_storage_type, location)
+                    ) % (pack_storage_type.name, location.name)
                 )
             allowed = False
             package_quants = quant.package_id.mapped('quant_ids')
@@ -90,7 +90,7 @@ class StockQuant(models.Model):
                         "there isn't any location storage type that allows "
                         "package storage type %s into it."
                     ) % (
-                        quant.package_id, location, pack_storage_type
+                        quant.package_id.name, location.name, pack_storage_type.name
                     )
                 )
 
