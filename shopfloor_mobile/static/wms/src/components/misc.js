@@ -83,21 +83,6 @@ Vue.component('stock-zero-check', {
   `,
 });
 
-// TODO: split out
-Vue.component('picking-batch-select-content', {
-    props: {
-        'record': Object,
-        'options': Object,
-    },
-    template: `
-    <div>
-        <v-list-item-title v-text="record[options.key_title]"></v-list-item-title>
-        <v-list-item-action-text>Operations: {{ record.picking_count }}</v-list-item-action-text>
-        <v-list-item-action-text>Lines: {{ record.move_line_count }}</v-list-item-action-text>
-    </div>
-  `,
-});
-
 
 Vue.component('state-display-info', {
     props: {
