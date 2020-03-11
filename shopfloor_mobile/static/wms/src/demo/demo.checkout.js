@@ -19,6 +19,25 @@ var DEMO_CHECKOUT = {
             },
         },
     },
+    "list_stock_picking": {
+        "next_state": "manual_selection",
+        "message": null,
+        "data": {
+            "manual_selection": {
+                "records": _.sampleSize([
+                    demotools.makePicking(),
+                    demotools.makePicking(),
+                    demotools.makePicking(),
+                    demotools.makePicking(),
+                    demotools.makePicking(),
+                    demotools.makePicking(),
+                    demotools.makePicking(),
+                    demotools.makePicking(),
+                ], _.random(8)),
+            },
+        },
+    },
+
     // TODO
     "select_line": {
         "next_state": "select_pack",
