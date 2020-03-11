@@ -63,7 +63,7 @@ const app = new Vue({
                 console.log('Load JS', url);
                 var script = document.createElement('script');
                 script.setAttribute('src', url);
-                script.setAttribute('type', 'text/javascript');
+                script.setAttribute('type', 'module');
                 script.setAttribute('id', script_id);
                 document.getElementsByTagName("head")[0].appendChild(script);
             }
