@@ -75,7 +75,6 @@ Vue.component('checkout-select-content', {
 var checkout_summary_detail = Vue.component('checkout-summary-detail', {
     mixins: [CheckoutPickingDetailMixin],
     props: {
-        // TODO: maybe this should be provided by manual select component
         'select_options': {
             'type': Object,
             'default': function () {
@@ -99,11 +98,6 @@ Vue.component('checkout-summary-content', {
         'index': Number,
         'count': Number,
     },
-    methods: {
-        debug_it: function (record) {
-            console.dir(record);
-        },
-    },
     template: `
     <div class="summary-content">
         <div class="has-pack" v-if="record.key != 'no-pack'">
@@ -116,7 +110,7 @@ Vue.component('checkout-summary-content', {
         </div>
         <div class="no-pack" v-else>
             <div v-for="(subrec, i) in record.records">
-                <checkout-summary-product-detail :record="subrec" />
+                <checkout-summary-product-detail :record="subrec" :index="index" :count="count" />
             </div>
         </div>
     </div>
@@ -127,10 +121,17 @@ Vue.component('checkout-summary-content', {
 Vue.component('checkout-summary-product-detail', {
     props: {
         'record': Object,
+        'index': Number,
+        'count': Number,
     },
     template: `
         <div class="summary-content-item">
-            <v-list-item-title v-text="record.product.display_name"></v-list-item-title>
+            <v-list-item-title>
+                <span class="item-counter">
+                    <span>{{ index + 1 }} / {{ count }}</span>
+                </span>
+                {{ record.product.display_name }}
+            </v-list-item-title>
             <v-list-item-subtitle>
                 <div class="lot" v-if="record.lot">
                     <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
@@ -148,15 +149,7 @@ Vue.component('checkout-summary-extra-content', {
     props: {
         'record': Object,
     },
-    methods: {
-        debug_it: function (record) {
-            console.dir(record);
-            debugger;
-        },
-    },
     template: `
-    <div>
-    <!--{{ debug_it(record) }} -->
     <v-expansion-panels flat v-if="record.key != 'no-pack' && record.records_by_pkg_type">
         <v-expansion-panel v-for="pkg_type in record.records_by_pkg_type" :key="pkg_type.key">
             <v-expansion-panel-header>
@@ -169,6 +162,5 @@ Vue.component('checkout-summary-extra-content', {
             </v-expansion-panel-content>
         </v-expansion-panel>
     </v-expansion-panels>
-    </div>
     `,
 });
