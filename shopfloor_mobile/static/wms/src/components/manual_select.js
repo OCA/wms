@@ -8,15 +8,9 @@ Vue.component('manual-select', {
             'type': Array,
             'default': [],
         },
-        key_value: {
-            'type': String,
-        },
         key_title: {
             'type': String,
             'default': 'name',
-        },
-        list_item_content_component: {
-            'type': String,
         },
         options: {
             'type': Object,
@@ -28,6 +22,8 @@ Vue.component('manual-select', {
                     initValue: null,
                     multiple: false,
                     showCounters: false,
+                    list_item_component: 'manual-select-item',
+                    list_item_extra_component: '',
                 };
             },
         },
@@ -40,7 +36,7 @@ Vue.component('manual-select', {
             selected = initValue ? [initValue] : [];
             if (this.options.initSelectAll) {
                 selected = _.map(this.records, function (x) {
-                    return x[self.key_value];
+                    return self.records.indexOf(x);
                 });
             }
         } else {
@@ -67,7 +63,12 @@ Vue.component('manual-select', {
     watch: {
         selected: function (val, oldVal) {
             // Bubble up select action (handy when no action used)
-            this.handleAction('select', this.selected);
+            const selected_records = _.pickBy(
+                this.records, function (x) {
+                    return _.has(val, x.id);
+                },
+            );
+            this.handleAction('select', selected_records);
         },
     },
     computed: {
@@ -76,7 +77,6 @@ Vue.component('manual-select', {
         },
         list_item_options () {
             return {
-                'key_value': this.key_value,
                 'key_title': this.key_title,
                 'showCounters': this.options.showCounters,
             };
@@ -101,34 +101,45 @@ Vue.component('manual-select', {
             return bits.join(' ');
         },
     },
-    // Mounted: function () {
-    //     if (this.records.length && !this.selected) {
-    //         this.updateSelected(this.records[0][this.key_value]);
-    //     }
-    // },
     template: `
     <div :class="klass">
         <v-card outlined>
-            <v-list shaped v-if="has_records">
+            <v-list v-if="has_records">
                 <v-list-item-group :multiple="options.multiple" color="success" v-model="selected">
                     <div class="select-group" v-for="group in selectable" :key="group.key">
                         <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
-                        <v-list-item
-                                v-for="(rec, index) in group.records"
-                                :key="rec[key_value]"
-                                :value="rec[key_value]"
-                                :data-id="rec[key_value]"
-                                >
-                            <v-list-item-content>
+                        <div class="list-item-wrapper" v-for="(rec, index) in group.records"">
+                            <v-list-item :key="index">
+                                <template v-slot:default="{ active, toggle }">
+                                    <v-list-item-content>
+                                        <component
+                                            :is="options.list_item_component"
+                                            :options="list_item_options"
+                                            :record="rec"
+                                            :index="index"
+                                            :count="group.records.length"
+                                            ></component>
+                                    </v-list-item-content>
+                                    <v-list-item-action>
+                                        <v-checkbox
+                                            :input-value="active"
+                                            :true-value="index"
+                                            color="accent-4"
+                                            @click="toggle"
+                                        ></v-checkbox>
+                                    </v-list-item-action>
+                                </template>
+                            </v-list-item>
+                            <div class="extra" v-if="options.list_item_extra_component">
                                 <component
-                                    :is="list_item_content_component"
+                                    :is="options.list_item_extra_component"
                                     :options="list_item_options"
                                     :record="rec"
                                     :index="index"
                                     :count="group.records.length"
                                     ></component>
-                            </v-list-item-content>
-                        </v-list-item>
+                            </div>
+                        </div>
                     </div>
                 </v-list-item-group>
             </v-list>
@@ -148,6 +159,19 @@ Vue.component('manual-select', {
                 </v-btn>
             </v-col>
         </v-row>
+    </div>
+  `,
+});
+
+
+Vue.component('manual-select-item', {
+    props: {
+        'record': Object,
+        'options': Object,
+    },
+    template: `
+    <div>
+        <v-list-item-title v-text="record[options.key_title]"></v-list-item-title>
     </div>
   `,
 });
