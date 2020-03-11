@@ -66,6 +66,9 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
         """
         return {}
 
+    def schemas(self):
+        return self.component(usage="schema")
+
     def _response_schema(self, data_schema=None, next_states=None):
         """Schema for the return validator
 
