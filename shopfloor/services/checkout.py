@@ -98,7 +98,7 @@ class Checkout(Component):
 
         Transitions:
         * select_line: nothing could be found for the barcode
-        * select_pack: lines are selected, user is redirected to this
+        * select_package: lines are selected, user is redirected to this
         screen to change the qty done and destination pack if needed
         """
         return self._response()
@@ -110,41 +110,41 @@ class Checkout(Component):
         move_line_id is given by the client (user clicked on a list).
 
         It returns a list of move line ids that will be displayed by the
-        screen ``select_pack``. This screen will have to send this list to
+        screen ``select_package``. This screen will have to send this list to
         the endpoints it calls, so we can select/deselect lines but still
         show them in the list of the client application.
 
         Transitions:
         * select_line: nothing could be found for the barcode
-        * select_pack: lines are selected, user is redirected to this
-        screen to change the qty done and destination pack if needed
+        * select_package: lines are selected, user is redirected to this
+        screen to change the qty done and destination package if needed
         """
         assert package_id or move_line_id
         return self._response()
 
-    def reset_line_qty(self, move_line_id):
+    def reset_line_qty(self, picking_id, move_line_id):
         """Reset qty_done of a move line to zero
 
-        Used to deselect a line in the "select_pack" screen.
+        Used to deselect a line in the "select_package" screen.
 
         Transitions:
-        * select_pack: goes back to the same state, the line will appear
+        * select_package: goes back to the same state, the line will appear
         as deselected
         """
         return self._response()
 
-    def set_line_qty(self, move_line_id):
+    def set_line_qty(self, picking_id, move_line_id):
         """Set qty_done of a move line to its reserved quantity
 
-        Used to deselect a line in the "select_pack" screen.
+        Used to deselect a line in the "select_package" screen.
 
         Transitions:
-        * select_pack: goes back to the same state, the line will appear
+        * select_package: goes back to the same state, the line will appear
         as selected
         """
         return self._response()
 
-    def scan_pack_action(self, move_line_ids, barcode):
+    def scan_package_action(self, picking_id, move_line_ids, barcode):
         """Scan a package, a lot, a product or a package to handle a line
 
         When a package is scanned, if the package is known as the destination
@@ -166,7 +166,7 @@ class Checkout(Component):
         ``qty_done`` > 0 and have no destination package.
 
         Transitions:
-        * select_pack: when a product or lot is scanned to select/deselect,
+        * select_package: when a product or lot is scanned to select/deselect,
         the client app has to show the same screen with the updated selection
         * select_line: when a package or packaging type is scanned, move lines
         have been put in package and we can return back to this state to handle
@@ -176,16 +176,16 @@ class Checkout(Component):
         """
         return self._response()
 
-    def set_custom_qty(self, move_line_id, qty_done):
+    def set_custom_qty(self, picking_id, move_line_id, qty_done):
         """Change qty_done of a move line with a custom value
 
         Transitions:
-        * select_pack: goes back to this screen showing all the lines after
+        * select_package: goes back to this screen showing all the lines after
           we changed the qty
         """
         return self._response()
 
-    def new_package(self, move_line_ids):
+    def new_package(self, picking_id, move_line_ids):
         """Add all selected lines in a new package
 
         It creates a new package and set it as the destination package of all
@@ -199,7 +199,102 @@ class Checkout(Component):
         """
         return self._response()
 
-    # TODO add the rest of the methods
+    def list_dest_package(self, picking_id, move_line_ids):
+        """Return a list of packages the user can select for the lines
+
+        Only valid packages must be proposed. Look at ``scan_dest_package``
+        for the conditions to be valid.
+
+        Transitions:
+        * select_dest_package: selection screen
+        """
+        return self._response()
+
+    def scan_dest_package(self, picking_id, move_line_ids, barcode):
+        """Scan destination package for lines
+
+        Set the destination package on the selected lines with a `qty_done` if
+        the package is valid. It is valid when one of:
+
+        * it is already the destination package of another line of the stock.picking
+        * it is the source package of the selected lines
+
+        Note: by default, Odoo puts the same destination package as the source
+        package on lines.
+
+        Transitions:
+        * select_package: error when scanning package
+        * select_line: lines to package remain
+        * summary: all lines are put in packages
+        """
+        return self._response()
+
+    def set_dest_package(self, picking_id, move_line_ids, package_id):
+        """Set destination package for lines from a package id
+
+        Used by the list obtained from ``list_dest_package``.
+
+        The validity is the same as ``scan_dest_package``.
+
+        Transitions:
+        * select_dest_package: error when scanning package
+        * select_line: lines to package remain
+        * summary: all lines are put in packages
+        """
+        return self._response()
+
+    def summary(self, picking_id):
+        """Return information for the summary screen
+
+        Transitions:
+        * summary
+        """
+        return self._response()
+
+    def list_package_type(self, picking_id, package_id):
+        """List the available package types for a package
+
+        For a package, we can change the package type. The available
+        package types are the ones with no product.
+
+        Transitions:
+        * change_package_type
+        """
+        return self._response()
+
+    def set_package_type(self, picking_id, package_id, package_type_id):
+        """Set a package type on a package
+
+        Transitions:
+        * change_package_type: in case of error
+        * summary
+        """
+        return self._response()
+
+    def remove_package(self, picking_id, package_id):
+        """Remove destination package from move lines and set qty done to 0
+
+        All the move lines with the package as ``result_package_id`` have their
+        ``result_package_id`` reset to the source package (default odoo behavior)
+        and their ``qty_done`` set to 0.
+
+        Transitions:
+        * summary
+        """
+        return self._response()
+
+    def done(self, picking_id, confirmation=False):
+        """Set the moves as done
+
+        If some lines have not the full ``qty_done`` or no destination package set,
+        a confirmation is asked to the user.
+
+        Transitions:
+        * summary: in case of error
+        * select_document: after done, goes back to start
+        * confirm_done: confirm a partial
+        """
+        return self._response()
 
 
 class ShopfloorCheckoutValidator(Component):
@@ -232,13 +327,20 @@ class ShopfloorCheckoutValidator(Component):
         }
 
     def reset_line_qty(self):
-        return {"move_line_id": {"coerce": to_int, "required": True, "type": "integer"}}
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
 
     def set_line_qty(self):
-        return {"move_line_id": {"coerce": to_int, "required": True, "type": "integer"}}
-
-    def scan_pack_action(self):
         return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
+
+    def scan_package_action(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "move_line_ids": {
                 "type": "list",
                 "required": True,
@@ -249,17 +351,79 @@ class ShopfloorCheckoutValidator(Component):
 
     def set_custom_qty(self):
         return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
             "qty_done": {"coerce": to_float, "required": True, "type": "float"},
         }
 
     def new_package(self):
         return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "move_line_ids": {
                 "type": "list",
                 "required": True,
                 "schema": {"coerce": to_int, "required": True, "type": "integer"},
-            }
+            },
+        }
+
+    def list_dest_package(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "move_line_ids": {
+                "type": "list",
+                "required": True,
+                "schema": {"coerce": to_int, "required": True, "type": "integer"},
+            },
+        }
+
+    def scan_dest_package(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "move_line_ids": {
+                "type": "list",
+                "required": True,
+                "schema": {"coerce": to_int, "required": True, "type": "integer"},
+            },
+            "barcode": {"required": True, "type": "string"},
+        }
+
+    def set_dest_package(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "move_line_ids": {
+                "type": "list",
+                "required": True,
+                "schema": {"coerce": to_int, "required": True, "type": "integer"},
+            },
+            "package_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
+
+    def summary(self):
+        return {"picking_id": {"coerce": to_int, "required": True, "type": "integer"}}
+
+    def list_package_type(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "package_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
+
+    def set_package_type(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "package_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "package_type_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
+
+    def remove_package(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "package_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
+
+    def done(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "confirmation": {"type": "boolean", "nullable": True, "required": False},
         }
 
 
@@ -278,17 +442,99 @@ class ShopfloorCheckoutValidatorResponse(Component):
         With the schema of the data send to the client to transition
         to the next state.
         """
-        # TODO schemas
         return {
             "select_document": {},
             "manual_selection": {},
-            "select_line": {},
-            "select_pack": {},
-            "change_quantity": {},
-            "select_dest_package": {},
-            "summary": {},
-            "change_package_type": {},
-            "confirm_done": {},
+            "select_line": self._schema_picking_details,
+            "select_package": self._schema_selected_lines,
+            "change_quantity": self._schema_selected_lines,
+            "select_dest_package": self._schema_select_package,
+            "summary": self._schema_picking_details,
+            "change_package_type": self._schema_select_package_type,
+            "confirm_done": self._schema_picking_details,
+        }
+
+    @property
+    def _schema_picking_details(self):
+        return {
+            "picking": {
+                "type": "dict",
+                "schema": {
+                    "id": {"required": True, "type": "integer"},
+                    "name": {"type": "string", "nullable": False, "required": True},
+                    "origin": {"type": "string", "nullable": True, "required": True},
+                    "note": {"type": "string", "nullable": True, "required": True},
+                    "move_lines": {
+                        "type": "list",
+                        "schema": {
+                            "type": "dict",
+                            "schema": self.schemas().move_line(),
+                        },
+                    },
+                },
+            }
+        }
+
+    @property
+    def _schema_select_package(self):
+        return {
+            "selected_move_lines": {
+                "type": "list",
+                "schema": {"type": "dict", "schema": self.schemas().move_line()},
+            },
+            "packages": {
+                "type": "list",
+                "schema": {"type": "dict", "schema": self.schemas().package()},
+            },
+            "picking": {
+                "type": "dict",
+                "schema": {
+                    "id": {"required": True, "type": "integer"},
+                    "name": {"type": "string", "nullable": False, "required": True},
+                    "origin": {"type": "string", "nullable": True, "required": True},
+                    "note": {"type": "string", "nullable": True, "required": True},
+                },
+            },
+        }
+
+    @property
+    def _schema_select_package_type(self):
+        return {
+            "selected_move_lines": {
+                "type": "list",
+                "schema": {"type": "dict", "schema": self.schemas().move_line()},
+            },
+            "package_types": {
+                "type": "list",
+                "schema": {"type": "dict", "schema": self.schemas().package_type()},
+            },
+            "picking": {
+                "type": "dict",
+                "schema": {
+                    "id": {"required": True, "type": "integer"},
+                    "name": {"type": "string", "nullable": False, "required": True},
+                    "origin": {"type": "string", "nullable": True, "required": True},
+                    "note": {"type": "string", "nullable": True, "required": True},
+                },
+            },
+        }
+
+    @property
+    def _schema_selected_lines(self):
+        return {
+            "selected_move_lines": {
+                "type": "list",
+                "schema": {"type": "dict", "schema": self.schemas().move_line()},
+            },
+            "picking": {
+                "type": "dict",
+                "schema": {
+                    "id": {"required": True, "type": "integer"},
+                    "name": {"type": "string", "nullable": False, "required": True},
+                    "origin": {"type": "string", "nullable": True, "required": True},
+                    "note": {"type": "string", "nullable": True, "required": True},
+                },
+            },
         }
 
     def scan_document(self):
@@ -303,24 +549,52 @@ class ShopfloorCheckoutValidatorResponse(Component):
         )
 
     def scan_line(self):
-        return self._response_schema(next_states={"select_line", "select_pack"})
+        return self._response_schema(next_states={"select_line", "select_package"})
 
     def select_line(self):
         return self.scan_line()
 
     def reset_line_qty(self):
-        return self._response_schema(next_states={"select_pack"})
+        return self._response_schema(next_states={"select_package"})
 
     def set_line_qty(self):
-        return self._response_schema(next_states={"select_pack"})
+        return self._response_schema(next_states={"select_package"})
 
-    def scan_pack_action(self):
+    def scan_package_action(self):
         return self._response_schema(
-            next_states={"select_pack", "select_line", "summary"}
+            next_states={"select_package", "select_line", "summary"}
         )
 
     def set_custom_qty(self):
-        return self._response_schema(next_states={"select_pack"})
+        return self._response_schema(next_states={"select_package"})
 
     def new_package(self):
         return self._response_schema(next_states={"select_line"})
+
+    def list_dest_package(self):
+        return self._response_schema(next_states={"select_dest_package"})
+
+    def scan_dest_package(self):
+        return self._response_schema(
+            next_states={"select_package", "select_line", "summary"}
+        )
+
+    def set_dest_package(self):
+        return self._response_schema(
+            next_states={"select_dest_package", "select_line", "summary"}
+        )
+
+    def summary(self):
+        return self._response_schema(next_states={"summary"})
+
+    def list_package_type(self):
+        return self._response_schema(next_states={"change_package_type"})
+
+    def set_package_type(self):
+        return self._response_schema(next_states={"change_package_type", "summary"})
+
+    def remove_package(self):
+        return self._response_schema(next_states={"summary"})
+
+    def done(self):
+        return self._response_schema(next_states={"summary", "confirm_done"})
