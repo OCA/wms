@@ -1,5 +1,6 @@
 import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from '../services/process_registry.js';
+import {demotools} from '../demo/demo.core.js';
 
 export var Checkout = Vue.component('checkout', {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
@@ -46,10 +47,9 @@ export var Checkout = Vue.component('checkout', {
             </div>
 
             <div v-if="state_is('summary')">
-                <checkout-picking-detail
+                <checkout-summary-detail
                     :info="state.data"
                     :grouped_lines="group_lines_by_location(state.data.lines, {'group_key': 'location_dst', 'prepare_records': group_by_pack})"
-                    :select_options="{multiple: true, initSelectAll: true, showCounters: true}"
                     v-on:select="state.on_select"
                     v-on:back="state.on_back"
                     />
@@ -70,14 +70,18 @@ export var Checkout = Vue.component('checkout', {
         v-on:select="state.on_select"
         v-on:back="state.on_back"
         :records="state.data.lines"
-        :key_value="'id'"
-        :list_item_content_component="'TODO'"
         /> */
     computed: {
         picking_id: function () {
             return this.erp_data.data.select_line.id;
         },
     },
+    // Mounted: function () {
+    //     // FIXME: just for dev
+    //     this.set_erp_data('data', {
+    //         'summary': demotools.makePicking({"lines_count": 5, "line_random_pack": true}),
+    //     });
+    // },
     methods: {
         record_by_id: function (records, _id) {
             return _.first(_.filter(records, {'id': _id}));
@@ -108,23 +112,37 @@ export var Checkout = Vue.component('checkout', {
             return res;
         },
         group_by_pack: function (lines) {
+            const self = this;
             const res = [];
             const packs = _.uniqBy(_.map(lines, function (x) {
                 return x.pack;
             }), 'id');
             const grouped = _.groupBy(lines, 'pack.id');
-            _.forEach(grouped, function (value, pack_id) {
-                let pack = _.first(_.filter(packs, {'id': parseInt(pack_id)}));
-                if (!pack) {
-                    pack = {
-                        'key': 'no-pack',
-                        'title': '',
-                    };
-                }
+            _.forEach(grouped, function (products, pack_id) {
+                const pack = _.first(_.filter(packs, {'id': parseInt(pack_id)}));
                 res.push({
-                    'key': pack_id,
-                    'title': pack.name,
-                    'records': value,
+                    'key': pack ? pack.name : 'no-pack',
+                    // No pack, just display the product name
+                    'title': pack ? pack.name : products[0].display_name,
+                    'records': products,
+                    'records_by_pkg_type': pack ? self.group_by_package_type(products) : null,
+                });
+            });
+            return res;
+        },
+        group_by_package_type: function (lines) {
+            const res = [];
+            const pkgs = _.uniqBy(_.map(lines, function (x) {
+                return x.pack ? x.pack.package_type : null;
+            }), 'id');
+            const grouped = _.groupBy(lines, 'pack.package_type.id');
+            _.forEach(grouped, function (products, pkg_type_id) {
+                const pkg = _.first(_.filter(pkgs, {'id': parseInt(pkg_type_id)}));
+                res.push({
+                    'key': pkg ? pkg.name : 'no-pkg',
+                    // No pack, just display the product name
+                    'title': pkg ? pkg.name : 'NO-PKG',
+                    'records': products,
                 });
             });
             return res;
@@ -133,6 +151,7 @@ export var Checkout = Vue.component('checkout', {
     data: function () {
         return {
             'usage': 'checkout',
+            // 'initial_state_key': 'summary',
             'initial_state_key': 'select_document',
             'states': {
                 'select_document': {
