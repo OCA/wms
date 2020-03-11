@@ -29,6 +29,12 @@ Vue.component('manual-select', {
                 };
             },
         },
+        list_item_fields: {
+            'type': Array,
+            'default':  function () {
+                return [];
+            },
+        },
     },
     data: function () {
         const self = this;
@@ -81,6 +87,7 @@ Vue.component('manual-select', {
             return {
                 'key_title': this.key_title,
                 'showCounters': this.options.showCounters,
+                'fields': this.list_item_fields,
             };
         },
         selectable () {
@@ -120,7 +127,7 @@ Vue.component('manual-select', {
                                             :record="rec"
                                             :index="index"
                                             :count="group.records.length"
-                                            ></component>
+                                            />
                                     </v-list-item-content>
                                     <v-list-item-action>
                                         <v-checkbox
@@ -139,7 +146,7 @@ Vue.component('manual-select', {
                                     :record="rec"
                                     :index="index"
                                     :count="group.records.length"
-                                    ></component>
+                                    />
                             </div>
                         </div>
                     </div>
@@ -168,12 +175,26 @@ Vue.component('manual-select', {
 
 Vue.component('manual-select-item', {
     props: {
-        'record': Object,
-        'options': Object,
+        record: Object,
+        options: Object,
+    },
+    methods: {
+        render_field_value (record, field) {
+            console.log(field);
+            if (field.renderer) {
+                return field.renderer(record);
+            }
+            return _.result(record, field.path);
+        },
     },
     template: `
     <div>
         <v-list-item-title v-text="record[options.key_title]"></v-list-item-title>
+        <div class="details">
+            <div class="field-detail" v-for="(field, index) in options.fields">
+                <span v-if="field.label" class="label">{{ field.label }}:</span> {{ render_field_value(record, field) }}
+            </div>
+        </div>
     </div>
   `,
 });

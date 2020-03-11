@@ -98,6 +98,7 @@ Vue.component('picking-batch-select-content', {
   `,
 });
 
+
 Vue.component('state-display-info', {
     props: {
         'info': Object,
