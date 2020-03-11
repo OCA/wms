@@ -61,16 +61,15 @@ export var Checkout = Vue.component('checkout', {
                     </v-row>
                 </div>
             </div>
-
+            <div v-if="state_is('manual_selection')">
+                <manual-select
+                    v-on:select="state.on_select"
+                    v-on:back="state.on_back"
+                    :records="state.data.lines"
+                    />
+            </div>
         </Screen>
         `,
-
-    /* <manual-select
-        v-if="state_is('manual_selection')"
-        v-on:select="state.on_select"
-        v-on:back="state.on_back"
-        :records="state.data.lines"
-        /> */
     computed: {
         picking_id: function () {
             return this.erp_data.data.select_line.id;
@@ -78,6 +77,7 @@ export var Checkout = Vue.component('checkout', {
     },
     // Mounted: function () {
     //     // FIXME: just for dev
+    //     this.initial_state_key = 'summary'
     //     this.set_erp_data('data', {
     //         'summary': demotools.makePicking({"lines_count": 5, "line_random_pack": true}),
     //     });
