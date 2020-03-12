@@ -20,11 +20,22 @@ class BaseShopfloorSchemaResponse(Component):
             "qty_done": {"type": "float", "required": True},
             "quantity": {"type": "float", "required": True},
             "product": {"type": "dict", "required": True, "schema": self.product()},
-            "lot": {"type": "dict", "required": True, "schema": self.lot()},
-            "package_src": {"type": "dict", "required": True, "schema": self.package()},
+            "lot": {
+                "type": "dict",
+                "required": False,
+                "nullable": True,
+                "schema": self.lot(),
+            },
+            "package_src": {
+                "type": "dict",
+                "required": True,
+                "nullable": True,
+                "schema": self.package(),
+            },
             "package_dest": {
                 "type": "dict",
                 "required": True,
+                "nullable": True,
                 "schema": self.package(),
             },
             "location_src": {

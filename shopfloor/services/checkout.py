@@ -1,3 +1,5 @@
+from odoo import _
+
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
@@ -55,7 +57,90 @@ class Checkout(Component):
         * summary: stock.picking is selected and all its lines have a
           destination pack set
         """
-        return self._response()
+        search = self.actions_for("search")
+        picking = search.stock_picking_from_scan(barcode)
+        # TODO find from location, etc
+        # TODO better error message when not available
+        if picking and picking.state == "assigned":
+            return self._response_for_selected_stock_picking(picking)
+        else:
+            return self._response_for_no_stock_picking_found(barcode)
+
+    def _response_for_selected_stock_picking(self, picking):
+        # TODO if all lines have a dest package set, go to summary
+        return self._response(
+            next_state="select_line", data=self._data_for_stock_picking(picking)
+        )
+
+    def _response_for_no_stock_picking_found(self, barcode):
+        return self._response(
+            next_state="select_document",
+            message={
+                "message_type": "error",
+                "message": _("No transfer found for barcode {}").format(barcode),
+            },
+        )
+
+    def _data_for_stock_picking(self, picking):
+        return {
+            "picking": {
+                "id": picking.id,
+                "name": picking.name,
+                "origin": picking.origin or "",
+                "note": picking.note or "",
+                "move_lines": [
+                    {
+                        "id": ml.id,
+                        "qty_done": ml.qty_done,
+                        "quantity": ml.product_uom_qty,
+                        "product": {
+                            "id": ml.product_id.id,
+                            "name": ml.product_id.name,
+                            "display_name": ml.product_id.display_name,
+                            "default_code": ml.product_id.default_code or "",
+                        },
+                        "lot": {"id": ml.lot_id.id, "name": ml.lot_id.name}
+                        if ml.lot_id
+                        else None,
+                        "package_src": {
+                            "id": ml.package_id.id,
+                            "name": ml.package_id.name,
+                            # TODO
+                            "weight": 0,
+                            # TODO
+                            "line_count": 0,
+                            "package_type_name": (
+                                ml.package_id.package_storage_type_id.name or ""
+                            ),
+                        }
+                        if ml.package_id
+                        else None,
+                        "package_dest": {
+                            "id": ml.result_package_id.id,
+                            "name": ml.result_package_id.name,
+                            # TODO
+                            "weight": 0,
+                            # TODO
+                            "line_count": 0,
+                            "package_type_name": (
+                                ml.result_package_id.package_storage_type_id.name or ""
+                            ),
+                        }
+                        if ml.result_package_id
+                        else None,
+                        "location_src": {
+                            "id": ml.location_id.id,
+                            "name": ml.location_id.name,
+                        },
+                        "location_dest": {
+                            "id": ml.location_dest_id.id,
+                            "name": ml.location_dest_id.name,
+                        },
+                    }
+                    for ml in picking.move_line_ids
+                ],
+            }
+        }
 
     def list_stock_picking(self):
         """List stock.picking records available
