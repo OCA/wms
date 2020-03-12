@@ -18,4 +18,5 @@ class ShopfloorProcess(models.Model):
             ("single_pack_putaway", "Single Pack Put-away"),
             ("single_pack_transfer", "Single Pack Transfer"),
             ("cluster_picking", "Cluster Picking"),
+            ("checkout", "Checkout"),
         ]
