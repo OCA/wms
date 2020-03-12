@@ -18,4 +18,10 @@
         <field name="picking_type_id" ref="picking_type_cluster_picking_demo"/>
     </record>
 
+    <record id="shopfloor_process_checkout" model="shopfloor.process">
+        <field name="name">Checkout</field>
+        <field name="code">checkout</field>
+        <field name="picking_type_id" ref="picking_type_checkout_demo"/>
+    </record>
+
 </odoo>

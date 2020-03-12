@@ -18,4 +18,10 @@
         <field name="process_id" ref="shopfloor_process_cluster_picking"/>
     </record>
 
+    <record id="shopfloor_menu_checkout" model="shopfloor.menu">
+        <field name="name">Checkout</field>
+        <field name="sequence">30</field>
+        <field name="process_id" ref="shopfloor_process_checkout"/>
+    </record>
+
 </odoo>

@@ -53,7 +53,7 @@ class BaseShopfloorSchemaResponse(Component):
             "name": {"type": "string", "nullable": False, "required": True},
             "weight": {"required": True, "nullable": True, "type": "float"},
             "line_count": {"required": True, "nullable": True, "type": "integer"},
-            "package_type": {"required": True, "nullable": True, "type": "string"},
+            "package_type_name": {"required": True, "nullable": True, "type": "string"},
         }
 
     def lot(self):
