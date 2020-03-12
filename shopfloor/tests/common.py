@@ -119,10 +119,11 @@ class CommonCase(SavepointCase, ComponentMixin):
                 lot = cls.env["stock.production.lot"].create(
                     {"product_id": product.id, "company_id": cls.env.company.id}
                 )
-            else:
+            if not (in_lot or in_package):
                 # always add more quantity in stock to avoid to trigger the
                 # "zero checks" in tests, not for lots which must have a qty
-                # of 1
+                # of 1 and not for packages because we need the strict number
+                # of units to pick a package
                 qty *= 2
             cls._update_qty_in_location(
                 location, product, qty, package=package, lot=lot
