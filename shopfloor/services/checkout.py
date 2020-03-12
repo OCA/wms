@@ -3,6 +3,10 @@ from odoo.addons.component.core import Component
 
 from .service import to_float
 
+# NOTE: we need to know if the destination package is set, but sometimes
+# the dest. package is kept, so we should have an additional field on
+# move lines to keep track of lines set
+
 
 class Checkout(Component):
     """
@@ -48,6 +52,8 @@ class Checkout(Component):
         Transitions:
         * select_document: when no stock.picking could be found
         * select_line: a stock.picking is selected
+        * summary: stock.picking is selected and all its lines have a
+          destination pack set
         """
         return self._response()
 
@@ -445,17 +451,17 @@ class ShopfloorCheckoutValidatorResponse(Component):
         return {
             "select_document": {},
             "manual_selection": {},
-            "select_line": self._schema_picking_details,
+            "select_line": self._schema_stock_picking_details,
             "select_package": self._schema_selected_lines,
             "change_quantity": self._schema_selected_lines,
             "select_dest_package": self._schema_select_package,
-            "summary": self._schema_picking_details,
+            "summary": self._schema_stock_picking_details,
             "change_package_type": self._schema_select_package_type,
-            "confirm_done": self._schema_picking_details,
+            "confirm_done": self._schema_stock_picking_details,
         }
 
     @property
-    def _schema_picking_details(self):
+    def _schema_stock_picking_details(self):
         return {
             "picking": {
                 "type": "dict",
@@ -538,7 +544,9 @@ class ShopfloorCheckoutValidatorResponse(Component):
         }
 
     def scan_document(self):
-        return self._response_schema(next_states={"select_document", "select_line"})
+        return self._response_schema(
+            next_states={"select_document", "select_line", "summary"}
+        )
 
     def list_stock_picking(self):
         return self._response_schema(next_states={"manual_selection"})
