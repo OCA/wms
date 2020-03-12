@@ -17,3 +17,6 @@ class SearchAction(Component):
 
     def package_from_scan(self, barcode):
         return self.env["stock.quant.package"].search([("name", "=", barcode)])
+
+    def stock_picking_from_scan(self, barcode):
+        return self.env["stock.picking"].search([("name", "=", barcode)])

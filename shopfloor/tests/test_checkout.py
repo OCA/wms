@@ -17,6 +17,7 @@ class CheckoutCase(CommonCase):
         cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
+        cls.wh.delivery_steps = "pick_pack_ship"
         cls.picking_type = cls.process.picking_type_id
 
     def setUp(self):
@@ -40,61 +41,14 @@ class CheckoutCase(CommonCase):
         return picking
 
     def _stock_picking_data(self, picking):
-        return {
-            "id": picking.id,
-            "name": picking.name,
-            "origin": picking.origin,
-            "note": picking.note,
-            "move_lines": [
-                {
-                    "id": ml.id,
-                    "qty_done": ml.qty_done,
-                    "quantity": ml.product_uom_qty,
-                    "product": {
-                        "id": ml.product_id.id,
-                        "name": ml.product_id.name,
-                        "display_name": ml.product_id.display_name,
-                        "default_code": ml.product_id.default_code,
-                    },
-                    "lot": {"id": ml.lot_id.id, "name": ml.lot_id.name},
-                    "package_src": {
-                        "id": ml.package_id.id,
-                        "name": ml.package_id.name,
-                        "weight": ml.package_id.weight,
-                        # TODO
-                        "line_count": 0,
-                        "package_type_name": ml.package_id.package_type_id.name,
-                    },
-                    "package_dest": {
-                        "id": ml.result_package_id.id,
-                        "name": ml.result_package_id.name,
-                        "weight": ml.result_package_id.weight,
-                        # TODO
-                        "line_count": 0,
-                        "package_type_name": ml.result_package_id.package_type_id.name,
-                    },
-                    "location_src": {
-                        "id": ml.location_id.id,
-                        "name": ml.location_id.name,
-                    },
-                    "location_dest": {
-                        "id": ml.location_dest_id.id,
-                        "name": ml.location_dest_id.name,
-                    },
-                }
-                for ml in picking.move_line_ids
-            ],
-        }
+        return self.service._data_for_stock_picking(picking)
 
-    def test_scan_document_location_ok(self):
+    def test_scan_document_stock_picking_ok(self):
         picking = self._create_picking()
         self._fill_stock_for_moves(picking.move_lines, in_package=True)
         picking.action_assign()
-
-        location = picking.location_id
-        # TODO set qty in loc for each move line
         response = self.service.dispatch(
-            "scan_document", params={"barcode": location.barcode}
+            "scan_document", params={"barcode": picking.name}
         )
         self.assert_response(
             response, next_state="select_line", data=self._stock_picking_data(picking)
