@@ -16,17 +16,17 @@ class CheckoutLisStockPickingCase(CheckoutCommonCase):
         expected = {
             "pickings": [
                 {
-                    "id": picking2.id,
-                    "line_count": len(picking2.move_line_ids),
-                    "name": picking2.name,
+                    "id": picking1.id,
+                    "line_count": len(picking1.move_line_ids),
+                    "name": picking1.name,
                     "note": "",
                     "origin": "",
                     "partner": {"id": self.customer.id, "name": self.customer.name},
                 },
                 {
-                    "id": picking1.id,
-                    "line_count": len(picking1.move_line_ids),
-                    "name": picking1.name,
+                    "id": picking2.id,
+                    "line_count": len(picking2.move_line_ids),
+                    "name": picking2.name,
                     "note": "",
                     "origin": "",
                     "partner": {"id": self.customer.id, "name": self.customer.name},
@@ -35,3 +35,16 @@ class CheckoutLisStockPickingCase(CheckoutCommonCase):
         }
 
         self.assert_response(response, next_state="manual_selection", data=expected)
+
+
+class CheckoutSelectCase(CheckoutCommonCase):
+    def test_select_ok(self):
+        picking = self._create_picking()
+        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        picking.action_assign()
+        response = self.service.dispatch("select", params={"picking_id": picking.id})
+        self.assert_response(
+            response, next_state="select_line", data=self._stock_picking_data(picking)
+        )
+
+        # TODO error cases and go to summary
