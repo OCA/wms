@@ -59,12 +59,34 @@ class Checkout(Component):
         """
         search = self.actions_for("search")
         picking = search.stock_picking_from_scan(barcode)
-        # TODO find from location, etc
-        # TODO better error message when not available
-        if picking and picking.state == "assigned":
+        if not picking:
+            location = search.location_from_scan(barcode)
+            if location:
+                if not location.is_sublocation_of(
+                    self.picking_type.default_location_src_id
+                ):
+                    return self._response_for_scan_location_not_allowed()
+                lines = location.source_move_line_ids
+                pickings = lines.mapped("picking_id")
+                if len(pickings) == 1:
+                    picking = pickings
+                else:
+                    return self._response_for_several_stock_picking_found()
+        if not picking:
+            package = search.package_from_scan(barcode)
+            if package:
+                lines = package.planned_move_line_ids
+                pickings = lines.mapped("picking_id")
+                if len(pickings) == 1:
+                    picking = pickings
+        if not picking:
+            return self._response_for_no_stock_picking_found()
+        if picking:
+            if picking.picking_type_id != self.picking_type:
+                return self._response_for_scan_picking_type_not_allowed()
+            if picking.state != "assigned":
+                return self._response_for_picking_not_assigned(picking)
             return self._response_for_selected_stock_picking(picking)
-        else:
-            return self._response_for_no_stock_picking_found(barcode)
 
     def _response_for_selected_stock_picking(self, picking):
         # TODO if all lines have a dest package set, go to summary
@@ -72,13 +94,46 @@ class Checkout(Component):
             next_state="select_line", data=self._data_for_stock_picking(picking)
         )
 
-    def _response_for_no_stock_picking_found(self, barcode):
+    def _response_for_picking_not_assigned(self, picking):
         return self._response(
             next_state="select_document",
             message={
                 "message_type": "error",
-                "message": _("No transfer found for barcode {}").format(barcode),
+                "message": _("Transfer {} is not entirely available.").format(
+                    picking.name
+                ),
             },
+        )
+
+    def _response_for_several_stock_picking_found(self):
+        return self._response(
+            next_state="select_document",
+            message={
+                "message_type": "error",
+                "message": _(
+                    "Several transfers found, please scan a package"
+                    " or select a transfer manually."
+                ),
+            },
+        )
+
+    def _response_for_scan_picking_type_not_allowed(self):
+        message = self.actions_for("message")
+        return self._response(
+            next_state="select_document",
+            message=message.cannot_move_something_in_picking_type(),
+        )
+
+    def _response_for_scan_location_not_allowed(self):
+        message = self.actions_for("message")
+        return self._response(
+            next_state="select_document", message=message.location_not_allowed()
+        )
+
+    def _response_for_no_stock_picking_found(self):
+        message = self.actions_for("message")
+        return self._response(
+            next_state="select_document", message=message.barcode_not_found()
         )
 
     def _data_for_stock_picking(self, picking):
