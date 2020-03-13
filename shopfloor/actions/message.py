@@ -89,6 +89,9 @@ class MessageAction(Component):
             "message": _("No location found for this barcode."),
         }
 
+    def location_not_allowed(self):
+        return {"message_type": "error", "message": _("Location not allowed here.")}
+
     def dest_location_not_allowed(self):
         return {"message_type": "error", "message": _("You cannot place it here")}
 
@@ -165,4 +168,10 @@ class MessageAction(Component):
             "message": _("{} {} put in {}").format(
                 qty, product.display_name, package.name
             ),
+        }
+
+    def cannot_move_something_in_picking_type(self):
+        return {
+            "message_type": "error",
+            "message": _("You cannot move this using this menu."),
         }
