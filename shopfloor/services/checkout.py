@@ -205,7 +205,7 @@ class Checkout(Component):
         ]
 
     def _order_for_list_stock_picking(self):
-        return "scheduled_date desc, id asc"
+        return "scheduled_date asc, id asc"
 
     def list_stock_picking(self):
         """List stock.picking records available
