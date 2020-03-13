@@ -79,24 +79,26 @@ class Checkout(Component):
                 pickings = lines.mapped("picking_id")
                 if len(pickings) == 1:
                     picking = pickings
+        return self._select_picking(picking, "select_document")
+
+    def _select_picking(self, picking, state_for_error):
         if not picking:
-            return self._response_for_no_stock_picking_found()
-        if picking:
-            if picking.picking_type_id != self.picking_type:
-                return self._response_for_scan_picking_type_not_allowed()
-            if picking.state != "assigned":
-                return self._response_for_picking_not_assigned(picking)
-            return self._response_for_selected_stock_picking(picking)
+            return self._response_for_no_stock_picking_found(state_for_error)
+        if picking.picking_type_id != self.picking_type:
+            return self._response_for_scan_picking_type_not_allowed(state_for_error)
+        if picking.state != "assigned":
+            return self._response_for_picking_not_assigned(picking, state_for_error)
+        # TODO if all lines have a dest package set, go to summary
+        return self._response_for_selected_stock_picking(picking)
 
     def _response_for_selected_stock_picking(self, picking):
-        # TODO if all lines have a dest package set, go to summary
         return self._response(
             next_state="select_line", data=self._data_for_stock_picking(picking)
         )
 
-    def _response_for_picking_not_assigned(self, picking):
+    def _response_for_picking_not_assigned(self, picking, next_state):
         return self._response(
-            next_state="select_document",
+            next_state=next_state,
             message={
                 "message_type": "error",
                 "message": _("Transfer {} is not entirely available.").format(
@@ -117,10 +119,10 @@ class Checkout(Component):
             },
         )
 
-    def _response_for_scan_picking_type_not_allowed(self):
+    def _response_for_scan_picking_type_not_allowed(self, next_state):
         message = self.actions_for("message")
         return self._response(
-            next_state="select_document",
+            next_state=next_state,
             message=message.cannot_move_something_in_picking_type(),
         )
 
@@ -130,10 +132,10 @@ class Checkout(Component):
             next_state="select_document", message=message.location_not_allowed()
         )
 
-    def _response_for_no_stock_picking_found(self):
+    def _response_for_no_stock_picking_found(self, next_state):
         message = self.actions_for("message")
         return self._response(
-            next_state="select_document", message=message.barcode_not_found()
+            next_state=next_state, message=message.barcode_not_found()
         )
 
     def _data_for_stock_picking(self, picking):
@@ -255,7 +257,8 @@ class Checkout(Component):
         * select_line: the "normal" case, when the user has to put in pack/move
           lines
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id)
+        return self._select_picking(picking, "manual_selection")
 
     def scan_line(self, picking_id, barcode):
         """Scan move lines of the stock picking
