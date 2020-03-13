@@ -143,6 +143,7 @@ class Checkout(Component):
                 "name": picking.name,
                 "origin": picking.origin or "",
                 "note": picking.note or "",
+                # TODO add partner
                 "move_lines": [
                     {
                         "id": ml.id,
@@ -197,6 +198,15 @@ class Checkout(Component):
             }
         }
 
+    def _domain_for_list_stock_picking(self):
+        return [
+            ("state", "=", "assigned"),
+            ("picking_type_id", "=", self.picking_type.id),
+        ]
+
+    def _order_for_list_stock_picking(self):
+        return "scheduled_date desc, id asc"
+
     def list_stock_picking(self):
         """List stock.picking records available
 
@@ -206,7 +216,26 @@ class Checkout(Component):
         Transitions:
         * manual_selection: to the selection screen
         """
-        return self._response()
+        pickings = self.env["stock.picking"].search(
+            self._domain_for_list_stock_picking(),
+            order=self._order_for_list_stock_picking(),
+        )
+        data = {
+            "pickings": [self._data_picking_for_list(picking) for picking in pickings]
+        }
+        return self._response(next_state="manual_selection", data=data)
+
+    def _data_picking_for_list(self, picking):
+        return {
+            "id": picking.id,
+            "name": picking.name,
+            "origin": picking.origin or "",
+            "note": picking.note or "",
+            "line_count": len(picking.move_line_ids),
+            "partner": {"id": picking.partner_id.id, "name": picking.partner_id.name}
+            if picking.partner_id
+            else None,
+        }
 
     def select(self, picking_id):
         """Select a stock picking for the process
@@ -590,7 +619,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
         """
         return {
             "select_document": {},
-            "manual_selection": {},
+            "manual_selection": self._schema_selection_list,
             "select_line": self._schema_stock_picking_details,
             "select_package": self._schema_selected_lines,
             "change_quantity": self._schema_selected_lines,
@@ -615,6 +644,41 @@ class ShopfloorCheckoutValidatorResponse(Component):
                         "schema": {
                             "type": "dict",
                             "schema": self.schemas().move_line(),
+                        },
+                    },
+                },
+            }
+        }
+
+    @property
+    def _schema_selection_list(self):
+        return {
+            "pickings": {
+                "type": "list",
+                "schema": {
+                    "type": "dict",
+                    "schema": {
+                        "id": {"required": True, "type": "integer"},
+                        "name": {"type": "string", "nullable": False, "required": True},
+                        "origin": {
+                            "type": "string",
+                            "nullable": True,
+                            "required": True,
+                        },
+                        "note": {"type": "string", "nullable": True, "required": True},
+                        "line_count": {"type": "integer", "required": True},
+                        "partner": {
+                            "type": "dict",
+                            "nullable": True,
+                            "required": True,
+                            "schema": {
+                                "id": {"required": True, "type": "integer"},
+                                "name": {
+                                    "type": "string",
+                                    "nullable": False,
+                                    "required": True,
+                                },
+                            },
                         },
                     },
                 },
