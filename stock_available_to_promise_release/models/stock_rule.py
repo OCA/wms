@@ -21,7 +21,7 @@ class StockRule(models.Model):
                 and not rule.picking_type_id.code == "outgoing"
             ):
                 moves = procurement.values.get("move_dest_ids")
-                # Track the moves that needs to have their pull rule
+                # Track the moves that need to have their pull rule
                 # done. Before the 'pull' is done, we don't know the
                 # which route is chosen. We update the destination
                 # move (ie. the outgoing) when the current route
