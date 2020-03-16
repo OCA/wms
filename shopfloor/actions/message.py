@@ -175,3 +175,9 @@ class MessageAction(Component):
             "message_type": "error",
             "message": _("You cannot move this using this menu."),
         }
+
+    def stock_picking_not_available(self, picking):
+        return {
+            "message_type": "error",
+            "message": _("Transfer {} is not available.").format(picking.name),
+        }

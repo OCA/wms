@@ -82,12 +82,25 @@ class Checkout(Component):
         return self._select_picking(picking, "select_document")
 
     def _select_picking(self, picking, state_for_error):
+        message = self.actions_for("message")
         if not picking:
-            return self._response_for_no_stock_picking_found(state_for_error)
+            if state_for_error == "manual_selection":
+                return self._response_for_manual_selection(
+                    message=message.operation_not_found()
+                )
+            return self._response_for_barcode_no_stock_picking_found()
         if picking.picking_type_id != self.picking_type:
-            return self._response_for_scan_picking_type_not_allowed(state_for_error)
+            if state_for_error == "manual_selection":
+                return self._response_for_manual_selection(
+                    message=message.cannot_move_something_in_picking_type()
+                )
+            return self._response_for_scan_picking_type_not_allowed()
         if picking.state != "assigned":
-            return self._response_for_picking_not_assigned(picking, state_for_error)
+            if state_for_error == "manual_selection":
+                return self._response_for_manual_selection(
+                    message=message.stock_picking_not_available(picking)
+                )
+            return self._response_for_picking_not_assigned(picking)
         # TODO if all lines have a dest package set, go to summary
         return self._response_for_selected_stock_picking(picking)
 
@@ -96,15 +109,11 @@ class Checkout(Component):
             next_state="select_line", data=self._data_for_stock_picking(picking)
         )
 
-    def _response_for_picking_not_assigned(self, picking, next_state):
+    def _response_for_picking_not_assigned(self, picking):
+        message = self.actions_for("message")
         return self._response(
-            next_state=next_state,
-            message={
-                "message_type": "error",
-                "message": _("Transfer {} is not entirely available.").format(
-                    picking.name
-                ),
-            },
+            next_state="select_document",
+            message=message.stock_picking_not_available(picking),
         )
 
     def _response_for_several_stock_picking_found(self):
@@ -119,10 +128,10 @@ class Checkout(Component):
             },
         )
 
-    def _response_for_scan_picking_type_not_allowed(self, next_state):
+    def _response_for_scan_picking_type_not_allowed(self):
         message = self.actions_for("message")
         return self._response(
-            next_state=next_state,
+            next_state="select_document",
             message=message.cannot_move_something_in_picking_type(),
         )
 
@@ -132,10 +141,10 @@ class Checkout(Component):
             next_state="select_document", message=message.location_not_allowed()
         )
 
-    def _response_for_no_stock_picking_found(self, next_state):
+    def _response_for_barcode_no_stock_picking_found(self):
         message = self.actions_for("message")
         return self._response(
-            next_state=next_state, message=message.barcode_not_found()
+            next_state="select_document", message=message.barcode_not_found()
         )
 
     def _data_for_stock_picking(self, picking):
@@ -218,6 +227,9 @@ class Checkout(Component):
         Transitions:
         * manual_selection: to the selection screen
         """
+        return self._response_for_manual_selection()
+
+    def _response_for_manual_selection(self, message=None):
         pickings = self.env["stock.picking"].search(
             self._domain_for_list_stock_picking(),
             order=self._order_for_list_stock_picking(),
@@ -225,7 +237,7 @@ class Checkout(Component):
         data = {
             "pickings": [self._data_picking_for_list(picking) for picking in pickings]
         }
-        return self._response(next_state="manual_selection", data=data)
+        return self._response(next_state="manual_selection", data=data, message=message)
 
     def _data_picking_for_list(self, picking):
         return {
@@ -257,7 +269,7 @@ class Checkout(Component):
         * select_line: the "normal" case, when the user has to put in pack/move
           lines
         """
-        picking = self.env["stock.picking"].browse(picking_id)
+        picking = self.env["stock.picking"].browse(picking_id).exists()
         return self._select_picking(picking, "manual_selection")
 
     def scan_line(self, picking_id, barcode):

@@ -47,9 +47,7 @@ class CheckoutScanCase(CheckoutCommonCase):
             next_state="select_document",
             message={
                 "message_type": "error",
-                "message": "Transfer {} is not entirely available.".format(
-                    picking.name
-                ),
+                "message": "Transfer {} is not available.".format(picking.name),
             },
         )
 
