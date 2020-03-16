@@ -12,3 +12,4 @@ from . import test_cluster_picking_unload
 from . import test_checkout_base
 from . import test_checkout_scan
 from . import test_checkout_select
+from . import test_checkout_scan_line
