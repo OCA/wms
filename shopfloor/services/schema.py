@@ -14,6 +14,24 @@ class BaseShopfloorSchemaResponse(Component):
     _usage = "schema"
     _is_rest_service_component = False
 
+    def picking(self):
+        return {
+            "id": {"required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+            "origin": {"type": "string", "nullable": True, "required": True},
+            "note": {"type": "string", "nullable": True, "required": True},
+            "line_count": {"type": "integer", "nullable": True, "required": True},
+            "partner": {
+                "type": "dict",
+                "nullable": True,
+                "required": True,
+                "schema": {
+                    "id": {"required": True, "type": "integer"},
+                    "name": {"type": "string", "nullable": False, "required": True},
+                },
+            },
+        }
+
     def move_line(self):
         return {
             "id": {"type": "integer", "required": True},

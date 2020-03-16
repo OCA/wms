@@ -86,7 +86,7 @@ class Checkout(Component):
         if not picking:
             if state_for_error == "manual_selection":
                 return self._response_for_manual_selection(
-                    message=message.operation_not_found()
+                    message=message.stock_picking_not_found()
                 )
             return self._response_for_barcode_no_stock_picking_found()
         if picking.picking_type_id != self.picking_type:
@@ -106,7 +106,8 @@ class Checkout(Component):
 
     def _response_for_selected_stock_picking(self, picking):
         return self._response(
-            next_state="select_line", data=self._data_for_stock_picking(picking)
+            next_state="select_line",
+            data={"picking": self._data_for_stock_picking(picking)},
         )
 
     def _response_for_picking_not_assigned(self, picking):
@@ -147,67 +148,72 @@ class Checkout(Component):
             next_state="select_document", message=message.barcode_not_found()
         )
 
-    def _data_for_stock_picking(self, picking):
+    def _response_for_stock_picking_has_been_deleted(self):
+        message = self.actions_for("message")
+        return self._response(
+            next_state="select_document", message=message.stock_picking_not_found()
+        )
+
+    def _data_for_move_line(self, move_line):
         return {
-            "picking": {
-                "id": picking.id,
-                "name": picking.name,
-                "origin": picking.origin or "",
-                "note": picking.note or "",
-                # TODO add partner
-                "move_lines": [
-                    {
-                        "id": ml.id,
-                        "qty_done": ml.qty_done,
-                        "quantity": ml.product_uom_qty,
-                        "product": {
-                            "id": ml.product_id.id,
-                            "name": ml.product_id.name,
-                            "display_name": ml.product_id.display_name,
-                            "default_code": ml.product_id.default_code or "",
-                        },
-                        "lot": {"id": ml.lot_id.id, "name": ml.lot_id.name}
-                        if ml.lot_id
-                        else None,
-                        "package_src": {
-                            "id": ml.package_id.id,
-                            "name": ml.package_id.name,
-                            # TODO
-                            "weight": 0,
-                            # TODO
-                            "line_count": 0,
-                            "package_type_name": (
-                                ml.package_id.package_storage_type_id.name or ""
-                            ),
-                        }
-                        if ml.package_id
-                        else None,
-                        "package_dest": {
-                            "id": ml.result_package_id.id,
-                            "name": ml.result_package_id.name,
-                            # TODO
-                            "weight": 0,
-                            # TODO
-                            "line_count": 0,
-                            "package_type_name": (
-                                ml.result_package_id.package_storage_type_id.name or ""
-                            ),
-                        }
-                        if ml.result_package_id
-                        else None,
-                        "location_src": {
-                            "id": ml.location_id.id,
-                            "name": ml.location_id.name,
-                        },
-                        "location_dest": {
-                            "id": ml.location_dest_id.id,
-                            "name": ml.location_dest_id.name,
-                        },
-                    }
-                    for ml in picking.move_line_ids
-                ],
+            "id": move_line.id,
+            "qty_done": move_line.qty_done,
+            "quantity": move_line.product_uom_qty,
+            "product": {
+                "id": move_line.product_id.id,
+                "name": move_line.product_id.name,
+                "display_name": move_line.product_id.display_name,
+                "default_code": move_line.product_id.default_code or "",
+            },
+            "lot": {"id": move_line.lot_id.id, "name": move_line.lot_id.name}
+            if move_line.lot_id
+            else None,
+            "package_src": {
+                "id": move_line.package_id.id,
+                "name": move_line.package_id.name,
+                # TODO
+                "weight": 0,
+                # TODO
+                "line_count": 0,
+                "package_type_name": (
+                    move_line.package_id.package_storage_type_id.name or ""
+                ),
             }
+            if move_line.package_id
+            else None,
+            "package_dest": {
+                "id": move_line.result_package_id.id,
+                "name": move_line.result_package_id.name,
+                # TODO
+                "weight": 0,
+                # TODO
+                "line_count": 0,
+                "package_type_name": (
+                    move_line.result_package_id.package_storage_type_id.name or ""
+                ),
+            }
+            if move_line.result_package_id
+            else None,
+            "location_src": {
+                "id": move_line.location_id.id,
+                "name": move_line.location_id.name,
+            },
+            "location_dest": {
+                "id": move_line.location_dest_id.id,
+                "name": move_line.location_dest_id.name,
+            },
         }
+
+    def _data_for_stock_picking(self, picking):
+        data = self._data_picking_base(picking)
+        data.update(
+            {
+                "move_lines": [
+                    self._data_for_move_line(ml) for ml in picking.move_line_ids
+                ]
+            }
+        )
+        return data
 
     def _domain_for_list_stock_picking(self):
         return [
@@ -234,12 +240,10 @@ class Checkout(Component):
             self._domain_for_list_stock_picking(),
             order=self._order_for_list_stock_picking(),
         )
-        data = {
-            "pickings": [self._data_picking_for_list(picking) for picking in pickings]
-        }
+        data = {"pickings": [self._data_picking_base(picking) for picking in pickings]}
         return self._response(next_state="manual_selection", data=data, message=message)
 
-    def _data_picking_for_list(self, picking):
+    def _data_picking_base(self, picking):
         return {
             "id": picking.id,
             "name": picking.name,
@@ -272,6 +276,23 @@ class Checkout(Component):
         picking = self.env["stock.picking"].browse(picking_id).exists()
         return self._select_picking(picking, "manual_selection")
 
+    def _response_for_select_package(self, lines):
+        picking = lines.mapped("picking_id")
+        return self._response(
+            next_state="select_package",
+            data={
+                "selected_move_lines": [
+                    self._data_for_move_line(line) for line in lines
+                ],
+                "picking": self._data_picking_base(picking),
+            },
+        )
+
+    def _select_scanned_lines(self, lines):
+        for line in lines:
+            line.qty_done = line.product_uom_qty
+        return self._response_for_select_package(lines)
+
     def scan_line(self, picking_id, barcode):
         """Scan move lines of the stock picking
 
@@ -291,6 +312,37 @@ class Checkout(Component):
         * select_package: lines are selected, user is redirected to this
         screen to change the qty done and destination pack if needed
         """
+        picking = self.env["stock.picking"].browse(picking_id)
+        if not picking.exists():
+            return self._response_stock_picking_does_not_exist()
+
+        search = self.actions_for("search")
+
+        package = search.package_from_scan(barcode)
+        if package:
+            lines = picking.move_line_ids.filtered(lambda l: l.package_id == package)
+            if not lines:
+                # TODO error package not in picking
+                pass
+            return self._select_scanned_lines(lines)
+
+        product = search.product_from_scan(barcode)
+        if product:
+            # TODO product tracked by lot: must scan lot
+            lines = picking.move_line_ids.filtered(lambda l: l.product_id == product)
+            # TODO: if no lines: error
+            if len(lines.mapped("package_id")) > 1:
+                # TODO must scan package
+                pass
+            return self._select_scanned_lines(lines)
+
+        lot = search.lot_from_scan(barcode)
+        if lot:
+            lines = picking.move_line_ids.filtered(lambda l: l.lot_id == lot)
+            # TODO: if no lines: error
+            return self._select_scanned_lines(lines)
+
+        # TODO barcode not found
         return self._response()
 
     def select_line(self, picking_id, package_id=None, move_line_id=None):
@@ -646,57 +698,23 @@ class ShopfloorCheckoutValidatorResponse(Component):
 
     @property
     def _schema_stock_picking_details(self):
-        return {
-            "picking": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                    "origin": {"type": "string", "nullable": True, "required": True},
-                    "note": {"type": "string", "nullable": True, "required": True},
-                    "move_lines": {
-                        "type": "list",
-                        "schema": {
-                            "type": "dict",
-                            "schema": self.schemas().move_line(),
-                        },
-                    },
-                },
+        schema = self.schemas().picking()
+        schema.update(
+            {
+                "move_lines": {
+                    "type": "list",
+                    "schema": {"type": "dict", "schema": self.schemas().move_line()},
+                }
             }
-        }
+        )
+        return {"picking": {"type": "dict", "schema": schema}}
 
     @property
     def _schema_selection_list(self):
         return {
             "pickings": {
                 "type": "list",
-                "schema": {
-                    "type": "dict",
-                    "schema": {
-                        "id": {"required": True, "type": "integer"},
-                        "name": {"type": "string", "nullable": False, "required": True},
-                        "origin": {
-                            "type": "string",
-                            "nullable": True,
-                            "required": True,
-                        },
-                        "note": {"type": "string", "nullable": True, "required": True},
-                        "line_count": {"type": "integer", "required": True},
-                        "partner": {
-                            "type": "dict",
-                            "nullable": True,
-                            "required": True,
-                            "schema": {
-                                "id": {"required": True, "type": "integer"},
-                                "name": {
-                                    "type": "string",
-                                    "nullable": False,
-                                    "required": True,
-                                },
-                            },
-                        },
-                    },
-                },
+                "schema": {"type": "dict", "schema": self.schemas().picking()},
             }
         }
 
@@ -711,15 +729,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
                 "type": "list",
                 "schema": {"type": "dict", "schema": self.schemas().package()},
             },
-            "picking": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                    "origin": {"type": "string", "nullable": True, "required": True},
-                    "note": {"type": "string", "nullable": True, "required": True},
-                },
-            },
+            "picking": {"type": "dict", "schema": self.schemas().picking()},
         }
 
     @property
@@ -733,15 +743,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
                 "type": "list",
                 "schema": {"type": "dict", "schema": self.schemas().package_type()},
             },
-            "picking": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                    "origin": {"type": "string", "nullable": True, "required": True},
-                    "note": {"type": "string", "nullable": True, "required": True},
-                },
-            },
+            "picking": {"type": "dict", "schema": self.schemas().picking()},
         }
 
     @property
@@ -751,15 +753,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
                 "type": "list",
                 "schema": {"type": "dict", "schema": self.schemas().move_line()},
             },
-            "picking": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                    "origin": {"type": "string", "nullable": True, "required": True},
-                    "note": {"type": "string", "nullable": True, "required": True},
-                },
-            },
+            "picking": {"type": "dict", "schema": self.schemas().picking()},
         }
 
     def scan_document(self):

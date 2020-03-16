@@ -68,6 +68,12 @@ class MessageAction(Component):
             "message": _("This operation does not exist anymore."),
         }
 
+    def stock_picking_not_found(self):
+        return {
+            "message_type": "error",
+            "message": _("This transfer does not exist anymore."),
+        }
+
     def record_not_found(self):
         return {
             "message_type": "error",
