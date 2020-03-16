@@ -25,15 +25,16 @@ class CheckoutCommonCase(CommonCase):
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="checkout")
 
-    def _create_picking(self, picking_type=None):
-        picking_form = Form(self.env["stock.picking"])
-        picking_form.picking_type_id = picking_type or self.picking_type
-        picking_form.partner_id = self.customer
+    @classmethod
+    def _create_picking(cls, picking_type=None):
+        picking_form = Form(cls.env["stock.picking"])
+        picking_form.picking_type_id = picking_type or cls.picking_type
+        picking_form.partner_id = cls.customer
         with picking_form.move_ids_without_package.new() as move:
-            move.product_id = self.product_a
+            move.product_id = cls.product_a
             move.product_uom_qty = 10
         with picking_form.move_ids_without_package.new() as move:
-            move.product_id = self.product_b
+            move.product_id = cls.product_b
             move.product_uom_qty = 10
         picking = picking_form.save()
         picking.action_confirm()
