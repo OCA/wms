@@ -9,7 +9,9 @@ class CheckoutScanCase(CheckoutCommonCase):
         barcode = barcode_func(picking)
         response = self.service.dispatch("scan_document", params={"barcode": barcode})
         self.assert_response(
-            response, next_state="select_line", data=self._stock_picking_data(picking)
+            response,
+            next_state="select_line",
+            data={"picking": self._stock_picking_data(picking)},
         )
 
     def test_scan_document_stock_picking_ok(self):
