@@ -15,26 +15,21 @@ class MenuCase(CommonCase):
         """Request /menu/search"""
         # Simulate the client searching menus
         response = self.service.dispatch("search")
+        menus = self.env["shopfloor.menu"].search([])
         self.assert_response(
             response,
             data={
-                "size": 3,
+                "size": len(menus),
                 "records": [
                     {
-                        "id": self.ANY,
-                        "name": "Put-Away Reach Truck",
-                        "process": {"id": self.ANY, "code": "single_pack_putaway"},
-                    },
-                    {
-                        "id": self.ANY,
-                        "name": "Single Pallet Transfer",
-                        "process": {"id": self.ANY, "code": "single_pack_transfer"},
-                    },
-                    {
-                        "id": self.ANY,
-                        "name": "Cluster Picking",
-                        "process": {"id": self.ANY, "code": "cluster_picking"},
-                    },
+                        "id": menu.id,
+                        "name": menu.name,
+                        "process": {
+                            "id": menu.process_id.id,
+                            "code": menu.process_id.code,
+                        },
+                    }
+                    for menu in menus
                 ],
             },
         )

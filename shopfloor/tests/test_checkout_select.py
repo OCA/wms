@@ -1,7 +1,7 @@
 from .test_checkout_base import CheckoutCommonCase
 
 
-class CheckoutLisStockPickingCase(CheckoutCommonCase):
+class CheckoutListStockPickingCase(CheckoutCommonCase):
     def test_list_stock_picking(self):
         picking1 = self._create_picking()
         picking2 = self._create_picking()
@@ -52,7 +52,7 @@ class CheckoutSelectCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_line",
-            data=self._stock_picking_data(self.picking),
+            data={"picking": self._stock_picking_data(self.picking)},
         )
 
     def _test_error(self, picking, msg):
@@ -78,7 +78,7 @@ class CheckoutSelectCase(CheckoutCommonCase):
     def test_select_error_not_found(self):
         picking = self._create_picking()
         picking.unlink()
-        self._test_error(picking, "This operation does not exist anymore.")
+        self._test_error(picking, "This transfer does not exist anymore.")
 
     def test_select_error_not_available(self):
         picking = self._create_picking()
