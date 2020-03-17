@@ -59,7 +59,7 @@ class StockMove(models.Model):
         domain = [
             ("need_release", "=", True),
             ("product_id", "=", self.product_id.id),
-            ("date_priority", "<=", self.date_priority),
+            ("date_priority", "<", self.date_priority),
             ("warehouse_id", "=", self.warehouse_id.id),
         ]
         return domain
