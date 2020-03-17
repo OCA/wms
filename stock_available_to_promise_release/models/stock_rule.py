@@ -22,7 +22,7 @@ class StockRule(models.Model):
             ):
                 moves = procurement.values.get("move_dest_ids")
                 # Track the moves that need to have their pull rule
-                # done. Before the 'pull' is done, we don't know the
+                # done. Before the 'pull' is done, we don't know
                 # which route is chosen. We update the destination
                 # move (ie. the outgoing) when the current route
                 # defers the pull rules and return so we don't create

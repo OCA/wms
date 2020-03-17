@@ -7,9 +7,6 @@ from odoo import api, fields, models
 class StockPicking(models.Model):
     _inherit = "stock.picking"
 
-    # Add store on the field, as it is quite used in the searches,
-    # and this is an easy-win to reduce the number of SQL queries.
-    picking_type_code = fields.Selection(store=True)
     need_release = fields.Boolean(compute="_compute_need_release")
 
     @api.depends("move_lines.need_release")
