@@ -3,6 +3,11 @@ from .test_checkout_base import CheckoutCommonCase
 
 class CheckoutScanLineCase(CheckoutCommonCase):
     def _test_scan_line_ok(self, barcode, selected_lines):
+        """Test /scan_line with a valid return
+
+        :param barcode: the barcode we scan
+        :selected_lines: expected move lines returned by the endpoint
+        """
         picking = selected_lines.mapped("picking_id")
         response = self.service.dispatch(
             "scan_line", params={"picking_id": picking.id, "barcode": barcode}
@@ -59,7 +64,8 @@ class CheckoutScanLineCase(CheckoutCommonCase):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_b, 10)]
         )
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        # do not put them in a package, we'll pack units here
+        self._fill_stock_for_moves(picking.move_lines)
         picking.action_assign()
         line_a = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
@@ -72,7 +78,7 @@ class CheckoutScanLineCase(CheckoutCommonCase):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_a, 10), (self.product_b, 10)]
         )
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_lines)
         picking.action_assign()
         lines_a = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
@@ -85,7 +91,7 @@ class CheckoutScanLineCase(CheckoutCommonCase):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_a, 10), (self.product_b, 10)]
         )
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_lines)
         picking.action_assign()
         lines_a = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
@@ -105,5 +111,186 @@ class CheckoutScanLineCase(CheckoutCommonCase):
         lot = first_line.lot_id
         self._test_scan_line_ok(lot.name, first_line)
 
-    # TODO test 2 lines with product in different packages
-    # TODO test 2 lines with lots in different packages
+    def test_scan_line_product_in_one_package_all_package_lines_ok(self):
+        picking = self._create_picking(
+            lines=[(self.product_a, 10), (self.product_b, 10)]
+        )
+        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        picking.action_assign()
+        # Product_a and product_b are in the same package, when we scan product_a,
+        # we expect to work on all the lines of the package. If product_a was in
+        # more than one package, it would be an error.
+        self._test_scan_line_ok(self.product_a.barcode, picking.move_line_ids)
+
+    def _test_scan_line_error(self, picking, barcode, message):
+        """Test errors for /scan_line
+
+        :param picking: the picking we are currently working with (selected)
+        :param barcode: the barcode we scan
+        """
+        response = self.service.dispatch(
+            "scan_line", params={"picking_id": picking.id, "barcode": barcode}
+        )
+        self.assert_response(
+            response,
+            next_state="select_line",
+            data={"picking": self._stock_picking_data(picking)},
+            message=message,
+        )
+
+    def test_scan_line_error_barcode_not_found(self):
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        picking.action_assign()
+        self._test_scan_line_error(
+            picking,
+            "NOT A BARCODE",
+            {"message_type": "error", "message": "Barcode not found"},
+        )
+
+    def test_scan_line_error_package_not_in_picking(self):
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        picking2 = self._create_picking(lines=[(self.product_a, 10)])
+        self._fill_stock_for_moves(picking2.move_lines, in_package=True)
+        (picking | picking2).action_assign()
+        package = picking2.move_line_ids.package_id
+        # we work with picking, but we scan the package of picking2
+        self._test_scan_line_error(
+            picking,
+            package.name,
+            {
+                "message_type": "error",
+                "message": "Package {} is not in the current transfer.".format(
+                    package.name
+                ),
+            },
+        )
+
+    def test_scan_line_error_product_tracked_by_lot(self):
+        self.product_a.tracking = "lot"
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        picking.action_assign()
+        # product tracked by lot, but we scan the product barcode, user
+        # has to scan the lot
+        self._test_scan_line_error(
+            picking,
+            self.product_a.barcode,
+            {
+                "message_type": "warning",
+                "message": "Product tracked by lot, please scan one.",
+            },
+        )
+
+    def test_scan_line_error_product_in_two_packages(self):
+        picking = self._create_picking(
+            lines=[(self.product_a, 10), (self.product_a, 10)],
+            # when action_confirm is called, it would merge the moves
+            confirm=False,
+        )
+        self._fill_stock_for_moves(picking.move_lines[0], in_package=True)
+        self._fill_stock_for_moves(picking.move_lines[1], in_package=True)
+        picking.action_assign()
+        self._test_scan_line_error(
+            picking,
+            self.product_a.barcode,
+            {
+                "message_type": "warning",
+                "message": "This product is part of multiple"
+                " packages, please scan a package.",
+            },
+        )
+
+    def test_scan_line_error_product_in_one_package_and_unit(self):
+        picking = self._create_picking(
+            lines=[(self.product_a, 10), (self.product_a, 10)],
+            # when action_confirm is called, it would merge the moves
+            # we want to keep them separated to put a part in a package
+            confirm=False,
+        )
+        # put the product in one package and the other as unit
+        self._fill_stock_for_moves(picking.move_lines[0], in_package=True)
+        self._fill_stock_for_moves(picking.move_lines[1])
+        picking.action_assign()
+        self._test_scan_line_error(
+            picking,
+            self.product_a.barcode,
+            {
+                "message_type": "warning",
+                "message": "This product is part of multiple"
+                " packages, please scan a package.",
+            },
+        )
+
+    def test_scan_line_error_product_not_in_picking(self):
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        picking.action_assign()
+        self._test_scan_line_error(
+            picking,
+            self.product_b.barcode,
+            {
+                "message_type": "error",
+                "message": "Product is not in the current transfer.",
+            },
+        )
+
+    def test_scan_line_error_lot_not_in_picking(self):
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        self._fill_stock_for_moves(picking.move_lines, in_lot=True)
+        picking.action_assign()
+        lot = self.env["stock.production.lot"].create(
+            {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        self._test_scan_line_error(
+            picking,
+            lot.name,
+            {"message_type": "error", "message": "Lot is not in the current transfer."},
+        )
+
+    def test_scan_line_error_lot_in_two_packages(self):
+        picking = self._create_picking(
+            lines=[(self.product_a, 10), (self.product_a, 10)],
+            # when action_confirm is called, it would merge the moves
+            confirm=False,
+        )
+        # we want the same lot to be used in 2 lines with different packages
+        lot = self.env["stock.production.lot"].create(
+            {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        self._fill_stock_for_moves(picking.move_lines[0], in_package=True, in_lot=lot)
+        self._fill_stock_for_moves(picking.move_lines[1], in_package=True, in_lot=lot)
+        picking.action_assign()
+        self._test_scan_line_error(
+            picking,
+            lot.name,
+            {
+                "message_type": "warning",
+                "message": "This lot is part of multiple"
+                " packages, please scan a package.",
+            },
+        )
+
+    def test_scan_line_error_lot_in_one_package_and_unit(self):
+        picking = self._create_picking(
+            lines=[(self.product_a, 10), (self.product_a, 10)],
+            # when action_confirm is called, it would merge the moves
+            confirm=False,
+        )
+        # we want the same lot to be used in 2 lines with different packages
+        lot = self.env["stock.production.lot"].create(
+            {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        self._fill_stock_for_moves(picking.move_lines[0], in_package=True, in_lot=lot)
+        self._fill_stock_for_moves(picking.move_lines[1], in_lot=lot)
+        picking.action_assign()
+        self._test_scan_line_error(
+            picking,
+            lot.name,
+            {
+                "message_type": "warning",
+                "message": "This lot is part of multiple"
+                " packages, please scan a package.",
+            },
+        )
