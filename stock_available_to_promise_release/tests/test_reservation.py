@@ -11,6 +11,7 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
         cls.wh = cls.env["stock.warehouse"].create(
             {
                 "name": "Test Warehouse",
