@@ -187,3 +187,19 @@ class MessageAction(Component):
             "message_type": "error",
             "message": _("Transfer {} is not available.").format(picking.name),
         }
+
+    def product_multiple_packages_scan_package(self):
+        return {
+            "message_type": "warning",
+            "message": _(
+                "This product is part of multiple packages, please scan a package."
+            ),
+        }
+
+    def lot_multiple_packages_scan_package(self):
+        return {
+            "message_type": "warning",
+            "message": _(
+                "This lot is part of multiple packages, please scan a package."
+            ),
+        }
