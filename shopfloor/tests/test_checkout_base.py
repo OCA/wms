@@ -32,7 +32,7 @@ class CheckoutCommonCase(CommonCase):
             self.service = work.component(usage="checkout")
 
     @classmethod
-    def _create_picking(cls, picking_type=None, lines=None):
+    def _create_picking(cls, picking_type=None, lines=None, confirm=True):
         picking_form = Form(cls.env["stock.picking"])
         picking_form.picking_type_id = picking_type or cls.picking_type
         picking_form.partner_id = cls.customer
@@ -43,7 +43,8 @@ class CheckoutCommonCase(CommonCase):
                 move.product_id = product
                 move.product_uom_qty = qty
         picking = picking_form.save()
-        picking.action_confirm()
+        if confirm:
+            picking.action_confirm()
         return picking
 
     def _stock_picking_data(self, picking):

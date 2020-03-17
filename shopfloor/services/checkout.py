@@ -6,8 +6,8 @@ from odoo.addons.component.core import Component
 from .service import to_float
 
 # NOTE: we need to know if the destination package is set, but sometimes
-# the dest. package is kept, so we should have an additional field on
-# move lines to keep track of lines set
+# the dest. package is kept, so we will use field shopfloor_checkout_packed
+# on the move line
 
 
 class Checkout(Component):
@@ -104,10 +104,11 @@ class Checkout(Component):
         # TODO if all lines have a dest package set, go to summary
         return self._response_for_selected_stock_picking(picking)
 
-    def _response_for_selected_stock_picking(self, picking):
+    def _response_for_selected_stock_picking(self, picking, message=None):
         return self._response(
             next_state="select_line",
             data={"picking": self._data_for_stock_picking(picking)},
+            message=message,
         )
 
     def _response_for_picking_not_assigned(self, picking):
@@ -209,11 +210,17 @@ class Checkout(Component):
         data.update(
             {
                 "move_lines": [
-                    self._data_for_move_line(ml) for ml in picking.move_line_ids
+                    self._data_for_move_line(ml)
+                    for ml in self._lines_for_selection(picking)
                 ]
             }
         )
         return data
+
+    def _lines_for_selection(self, picking):
+        return picking.move_line_ids.filtered(
+            lambda l: l.qty_done == 0 and not l.shopfloor_checkout_packed
+        )
 
     def _domain_for_list_stock_picking(self):
         return [
@@ -317,33 +324,108 @@ class Checkout(Component):
             return self._response_stock_picking_does_not_exist()
 
         search = self.actions_for("search")
+        message = self.actions_for("message")
+
+        selection_lines = self._lines_for_selection(picking)
+        # TODO handle no lines in selection go to summary
 
         package = search.package_from_scan(barcode)
         if package:
-            lines = picking.move_line_ids.filtered(lambda l: l.package_id == package)
-            if not lines:
-                # TODO error package not in picking
-                pass
-            return self._select_scanned_lines(lines)
+            return self._select_lines_from_package(picking, selection_lines, package)
 
         product = search.product_from_scan(barcode)
         if product:
-            # TODO product tracked by lot: must scan lot
-            lines = picking.move_line_ids.filtered(lambda l: l.product_id == product)
-            # TODO: if no lines: error
-            if len(lines.mapped("package_id")) > 1:
-                # TODO must scan package
-                pass
-            return self._select_scanned_lines(lines)
+            return self._select_lines_from_product(picking, selection_lines, product)
 
         lot = search.lot_from_scan(barcode)
         if lot:
-            lines = picking.move_line_ids.filtered(lambda l: l.lot_id == lot)
-            # TODO: if no lines: error
-            return self._select_scanned_lines(lines)
+            return self._select_lines_from_lot(picking, selection_lines, lot)
 
-        # TODO barcode not found
-        return self._response()
+        return self._response_for_selected_stock_picking(
+            picking, message=message.barcode_not_found()
+        )
+
+    def _select_lines_from_package(self, picking, selection_lines, package):
+        lines = selection_lines.filtered(lambda l: l.package_id == package)
+        if not lines:
+            return self._response_for_selected_stock_picking(
+                picking,
+                message={
+                    "message_type": "error",
+                    "message": _("Package {} is not in the current transfer.").format(
+                        package.name
+                    ),
+                },
+            )
+        return self._select_scanned_lines(lines)
+
+    def _select_lines_from_product(self, picking, selection_lines, product):
+        message = self.actions_for("message")
+        if product.tracking in ("lot", "serial"):
+            return self._response_for_selected_stock_picking(
+                picking, message=message.scan_lot_on_product_tracked_by_lot()
+            )
+
+        lines = selection_lines.filtered(lambda l: l.product_id == product)
+        if not lines:
+            return self._response_for_selected_stock_picking(
+                picking,
+                message={
+                    "message_type": "error",
+                    "message": _("Product is not in the current transfer."),
+                },
+            )
+
+        # When products are as units outside of packages, we can select them for
+        # packing, but if they are in a package, we want the user to scan the packages.
+        # If the product is only in one package though, scanning the product selects
+        # the package.
+        packages = lines.mapped("package_id")
+        # Do not use mapped here: we want to see if we have more than one package,
+        # but also if we have one product as a package and the same product as
+        # a unit in another line. In both cases, we want the user to scan the
+        # package.
+        if packages and len({l.package_id for l in lines}) > 1:
+            return self._response_for_selected_stock_picking(
+                picking, message=message.product_multiple_packages_scan_package()
+            )
+        elif packages:
+            # Select all the lines of the package when we scan a product in a
+            # package and we have only one.
+            return self._select_lines_from_package(picking, selection_lines, packages)
+
+        return self._select_scanned_lines(lines)
+
+    def _select_lines_from_lot(self, picking, selection_lines, lot):
+        lines = selection_lines.filtered(lambda l: l.lot_id == lot)
+        if not lines:
+            return self._response_for_selected_stock_picking(
+                picking,
+                message={
+                    "message_type": "error",
+                    "message": _("Lot is not in the current transfer."),
+                },
+            )
+
+        message = self.actions_for("message")
+        # When lots are as units outside of packages, we can select them for
+        # packing, but if they are in a package, we want the user to scan the packages.
+        # If the product is only in one package though, scanning the lot selects
+        # the package.
+        packages = lines.mapped("package_id")
+        # Do not use mapped here: we want to see if we have more than one
+        # package, but also if we have one lot as a package and the same lot as
+        # a unit in another line. In both cases, we want the user to scan the
+        # package.
+        if packages and len({l.package_id for l in lines}) > 1:
+            return self._response_for_selected_stock_picking(
+                picking, message=message.lot_multiple_packages_scan_package()
+            )
+        elif packages:
+            # Select all the lines of the package when we scan a lot in a
+            # package and we have only one.
+            return self._select_lines_from_package(picking, selection_lines, packages)
+        return self._select_scanned_lines(lines)
 
     def select_line(self, picking_id, package_id=None, move_line_id=None):
         """Select move lines of the stock picking

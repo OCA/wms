@@ -2,6 +2,7 @@ from collections import namedtuple
 from contextlib import contextmanager
 from pprint import pformat
 
+from odoo import models
 from odoo.tests.common import Form, SavepointCase
 
 from odoo.addons.base_rest.controllers.main import _PseudoCollection
@@ -116,9 +117,12 @@ class CommonCase(SavepointCase, ComponentMixin):
         for (product, location), qty in product_locations.items():
             lot = None
             if in_lot:
-                lot = cls.env["stock.production.lot"].create(
-                    {"product_id": product.id, "company_id": cls.env.company.id}
-                )
+                if isinstance(in_lot, models.BaseModel):
+                    lot = in_lot
+                else:
+                    lot = cls.env["stock.production.lot"].create(
+                        {"product_id": product.id, "company_id": cls.env.company.id}
+                    )
             if not (in_lot or in_package):
                 # always add more quantity in stock to avoid to trigger the
                 # "zero checks" in tests, not for lots which must have a qty
