@@ -1,23 +1,18 @@
 from .test_checkout_base import CheckoutCommonCase
 
 
-class CheckoutScanLineCase(CheckoutCommonCase):
-    def _test_scan_line_ok(self, barcode, selected_lines):
-        """Test /scan_line with a valid return
-
-        :param barcode: the barcode we scan
-        :selected_lines: expected move lines returned by the endpoint
-        """
+class CheckoutSelectLineCommonCase(CheckoutCommonCase):
+    def _assert_selected(self, response, selected_lines):
         picking = selected_lines.mapped("picking_id")
-        response = self.service.dispatch(
-            "scan_line", params={"picking_id": picking.id, "barcode": barcode}
-        )
+        unselected_lines = picking.move_line_ids - selected_lines
         for line in selected_lines:
             self.assertEqual(
                 line.qty_done,
                 line.product_uom_qty,
                 "Scanned lines must have their qty done set to the reserved quantity",
             )
+        for line in unselected_lines:
+            self.assertEqual(line.qty_done, 0)
         self.assert_response(
             response,
             next_state="select_package",
@@ -30,11 +25,25 @@ class CheckoutScanLineCase(CheckoutCommonCase):
                     "name": picking.name,
                     "note": "",
                     "origin": "",
-                    "line_count": 2,
+                    "line_count": len(picking.move_line_ids),
                     "partner": {"id": self.customer.id, "name": self.customer.name},
                 },
             },
         )
+
+
+class CheckoutScanLineCase(CheckoutSelectLineCommonCase):
+    def _test_scan_line_ok(self, barcode, selected_lines):
+        """Test /scan_line with a valid return
+
+        :param barcode: the barcode we scan
+        :selected_lines: expected move lines returned by the endpoint
+        """
+        picking = selected_lines.mapped("picking_id")
+        response = self.service.dispatch(
+            "scan_line", params={"picking_id": picking.id, "barcode": barcode}
+        )
+        self._assert_selected(response, selected_lines)
 
     def test_scan_line_package_ok(self):
         picking = self._create_picking(
@@ -127,6 +136,7 @@ class CheckoutScanLineCase(CheckoutCommonCase):
 
         :param picking: the picking we are currently working with (selected)
         :param barcode: the barcode we scan
+        :param message: the dict of expected error message
         """
         response = self.service.dispatch(
             "scan_line", params={"picking_id": picking.id, "barcode": barcode}
