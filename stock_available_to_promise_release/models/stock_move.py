@@ -50,7 +50,7 @@ class StockMove(models.Model):
             return 0.0
         available = self.product_id.with_context(
             location=self.warehouse_id.lot_stock_id.id
-        ).virtual_available
+        ).qty_available
         return max(
             min(available - self._previous_promised_qty(), self.product_qty), 0.0
         )
