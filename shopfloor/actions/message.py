@@ -77,7 +77,7 @@ class MessageAction(Component):
     def record_not_found(self):
         return {
             "message_type": "error",
-            "message": _("This record you were working on does not exist anymore."),
+            "message": _("The record you were working on does not exist anymore."),
         }
 
     def barcode_not_found(self):

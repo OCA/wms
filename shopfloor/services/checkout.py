@@ -444,6 +444,36 @@ class Checkout(Component):
         screen to change the qty done and destination package if needed
         """
         assert package_id or move_line_id
+
+        picking = self.env["stock.picking"].browse(picking_id)
+        if not picking.exists():
+            return self._response_stock_picking_does_not_exist()
+
+        message = self.actions_for("message")
+        selection_lines = self._lines_for_selection(picking)
+        # TODO if no remaining lines, go to summary
+
+        if package_id:
+            package = self.env["stock.quant.package"].browse(package_id).exists()
+            if not package:
+                return self._response_for_selected_stock_picking(
+                    picking, message=message.record_not_found()
+                )
+            return self._select_lines_from_package(picking, selection_lines, package)
+        if move_line_id:
+            move_line = self.env["stock.move.line"].browse(move_line_id).exists()
+            if not move_line:
+                return self._response_for_selected_stock_picking(
+                    picking, message=message.record_not_found()
+                )
+            # normally, the client should sent only move lines out of packages, but
+            # in case there is a package, handle it as a package
+            if move_line.package_id:
+                return self._select_lines_from_package(
+                    picking, selection_lines, move_line.package_id
+                )
+            return self._select_scanned_lines(move_line)
+
         return self._response()
 
     def reset_line_qty(self, picking_id, move_line_id):

@@ -407,7 +407,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
             response,
             message={
                 "message_type": "error",
-                "message": "This record you were working on does not exist anymore.",
+                "message": "The record you were working on does not exist anymore.",
             },
             next_state="start",
         )
