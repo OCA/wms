@@ -210,14 +210,13 @@ class Checkout(Component):
         data.update(
             {
                 "move_lines": [
-                    self._data_for_move_line(ml)
-                    for ml in self._lines_for_selection(picking)
+                    self._data_for_move_line(ml) for ml in self._lines_to_pack(picking)
                 ]
             }
         )
         return data
 
-    def _lines_for_selection(self, picking):
+    def _lines_to_pack(self, picking):
         return picking.move_line_ids.filtered(
             lambda l: l.qty_done == 0 and not l.shopfloor_checkout_packed
         )
@@ -283,7 +282,7 @@ class Checkout(Component):
         picking = self.env["stock.picking"].browse(picking_id).exists()
         return self._select_picking(picking, "manual_selection")
 
-    def _response_for_select_package(self, lines):
+    def _response_for_select_package(self, lines, message=None):
         picking = lines.mapped("picking_id")
         return self._response(
             next_state="select_package",
@@ -293,12 +292,21 @@ class Checkout(Component):
                 ],
                 "picking": self._data_picking_base(picking),
             },
+            message=message,
         )
 
-    def _select_scanned_lines(self, lines):
+    def _select_lines(self, lines):
         for line in lines:
+            if line.shopfloor_checkout_packed:
+                continue
             line.qty_done = line.product_uom_qty
-        return self._response_for_select_package(lines)
+
+        picking = lines.mapped("picking_id")
+        other_lines = picking.move_line_ids - lines
+        self._deselect_lines(other_lines)
+
+    def _deselect_lines(self, lines):
+        lines.filtered(lambda l: not l.shopfloor_checkout_packed).qty_done = 0
 
     def scan_line(self, picking_id, barcode):
         """Scan move lines of the stock picking
@@ -326,7 +334,7 @@ class Checkout(Component):
         search = self.actions_for("search")
         message = self.actions_for("message")
 
-        selection_lines = self._lines_for_selection(picking)
+        selection_lines = self._lines_to_pack(picking)
         # TODO handle no lines in selection go to summary
 
         package = search.package_from_scan(barcode)
@@ -357,7 +365,8 @@ class Checkout(Component):
                     ),
                 },
             )
-        return self._select_scanned_lines(lines)
+        self._select_lines(lines)
+        return self._response_for_select_package(lines)
 
     def _select_lines_from_product(self, picking, selection_lines, product):
         message = self.actions_for("message")
@@ -394,7 +403,8 @@ class Checkout(Component):
             # package and we have only one.
             return self._select_lines_from_package(picking, selection_lines, packages)
 
-        return self._select_scanned_lines(lines)
+        self._select_lines(lines)
+        return self._response_for_select_package(lines)
 
     def _select_lines_from_lot(self, picking, selection_lines, lot):
         lines = selection_lines.filtered(lambda l: l.lot_id == lot)
@@ -425,7 +435,9 @@ class Checkout(Component):
             # Select all the lines of the package when we scan a lot in a
             # package and we have only one.
             return self._select_lines_from_package(picking, selection_lines, packages)
-        return self._select_scanned_lines(lines)
+
+        self._select_lines(lines)
+        return self._response_for_select_package(lines)
 
     def select_line(self, picking_id, package_id=None, move_line_id=None):
         """Select move lines of the stock picking
@@ -450,7 +462,7 @@ class Checkout(Component):
             return self._response_stock_picking_does_not_exist()
 
         message = self.actions_for("message")
-        selection_lines = self._lines_for_selection(picking)
+        selection_lines = self._lines_to_pack(picking)
         # TODO if no remaining lines, go to summary
 
         if package_id:
@@ -472,31 +484,91 @@ class Checkout(Component):
                 return self._select_lines_from_package(
                     picking, selection_lines, move_line.package_id
                 )
-            return self._select_scanned_lines(move_line)
+            self._select_lines(move_line)
+            return self._response_for_select_package(move_line)
 
         return self._response()
 
-    def reset_line_qty(self, picking_id, move_line_id):
+    def _change_line_qty(
+        self, picking_id, selected_line_ids, move_line_id, quantity_func
+    ):
+        picking = self.env["stock.picking"].browse(picking_id)
+        if not picking.exists():
+            return self._response_stock_picking_does_not_exist()
+
+        message_directory = self.actions_for("message")
+
+        move_line = self.env["stock.move.line"].browse(move_line_id).exists()
+
+        message = None
+        if not move_line:
+            message = message_directory.record_not_found()
+        else:
+            qty_done = quantity_func(move_line)
+            if qty_done > move_line.product_uom_qty:
+                qty_done = move_line.product_uom_qty
+                message = {
+                    "message": _(
+                        "Not allowed to pack more than the quantity, "
+                        "the value has been changed to the maximum."
+                    ),
+                    "message_type": "warning",
+                }
+            if qty_done < 0:
+                message = {
+                    "message": _("Negative quantity not allowed."),
+                    "message_type": "error",
+                }
+            else:
+                move_line.qty_done = qty_done
+        return self._response_for_select_package(
+            self.env["stock.move.line"].browse(selected_line_ids).exists(),
+            message=message,
+        )
+
+    def reset_line_qty(self, picking_id, selected_line_ids, move_line_id):
         """Reset qty_done of a move line to zero
 
         Used to deselect a line in the "select_package" screen.
+        The selected_line_ids parameter is used to keep the selection of lines
+        stateless.
 
         Transitions:
         * select_package: goes back to the same state, the line will appear
         as deselected
         """
-        return self._response()
+        return self._change_line_qty(
+            picking_id, selected_line_ids, move_line_id, lambda __: 0
+        )
 
-    def set_line_qty(self, picking_id, move_line_id):
+    def set_line_qty(self, picking_id, selected_line_ids, move_line_id):
         """Set qty_done of a move line to its reserved quantity
 
-        Used to deselect a line in the "select_package" screen.
+        Used to select a line in the "select_package" screen.
+        The selected_line_ids parameter is used to keep the selection of lines
+        stateless.
 
         Transitions:
         * select_package: goes back to the same state, the line will appear
         as selected
         """
-        return self._response()
+        return self._change_line_qty(
+            picking_id, selected_line_ids, move_line_id, lambda l: l.product_uom_qty
+        )
+
+    def set_custom_qty(self, picking_id, selected_line_ids, move_line_id, qty_done):
+        """Change qty_done of a move line with a custom value
+
+        The selected_line_ids parameter is used to keep the selection of lines
+        stateless.
+
+        Transitions:
+        * select_package: goes back to this screen showing all the lines after
+          we changed the qty
+        """
+        return self._change_line_qty(
+            picking_id, selected_line_ids, move_line_id, lambda __: qty_done
+        )
 
     def scan_package_action(self, picking_id, move_line_ids, barcode):
         """Scan a package, a lot, a product or a package to handle a line
@@ -527,15 +599,6 @@ class Checkout(Component):
         the other lines
         * summary: if there is no other lines, go to the summary screen to be able
         to close the stock picking
-        """
-        return self._response()
-
-    def set_custom_qty(self, picking_id, move_line_id, qty_done):
-        """Change qty_done of a move line with a custom value
-
-        Transitions:
-        * select_package: goes back to this screen showing all the lines after
-          we changed the qty
         """
         return self._response()
 
@@ -683,19 +746,41 @@ class ShopfloorCheckoutValidator(Component):
     def reset_line_qty(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "selected_line_ids": {
+                "type": "list",
+                "required": True,
+                "schema": {"coerce": to_int, "required": True, "type": "integer"},
+            },
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
         }
 
     def set_line_qty(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "selected_line_ids": {
+                "type": "list",
+                "required": True,
+                "schema": {"coerce": to_int, "required": True, "type": "integer"},
+            },
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
+
+    def set_custom_qty(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "selected_line_ids": {
+                "type": "list",
+                "required": True,
+                "schema": {"coerce": to_int, "required": True, "type": "integer"},
+            },
+            "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "qty_done": {"coerce": to_float, "required": True, "type": "float"},
         }
 
     def scan_package_action(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "move_line_ids": {
+            "selected_line_ids": {
                 "type": "list",
                 "required": True,
                 "schema": {"coerce": to_int, "required": True, "type": "integer"},
@@ -703,17 +788,10 @@ class ShopfloorCheckoutValidator(Component):
             "barcode": {"required": True, "type": "string"},
         }
 
-    def set_custom_qty(self):
-        return {
-            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "qty_done": {"coerce": to_float, "required": True, "type": "float"},
-        }
-
     def new_package(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "move_line_ids": {
+            "selected_line_ids": {
                 "type": "list",
                 "required": True,
                 "schema": {"coerce": to_int, "required": True, "type": "integer"},
@@ -723,7 +801,7 @@ class ShopfloorCheckoutValidator(Component):
     def list_dest_package(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "move_line_ids": {
+            "selected_line_ids": {
                 "type": "list",
                 "required": True,
                 "schema": {"coerce": to_int, "required": True, "type": "integer"},
@@ -733,7 +811,7 @@ class ShopfloorCheckoutValidator(Component):
     def scan_dest_package(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "move_line_ids": {
+            "selected_line_ids": {
                 "type": "list",
                 "required": True,
                 "schema": {"coerce": to_int, "required": True, "type": "integer"},
@@ -744,7 +822,7 @@ class ShopfloorCheckoutValidator(Component):
     def set_dest_package(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "move_line_ids": {
+            "selected_line_ids": {
                 "type": "list",
                 "required": True,
                 "schema": {"coerce": to_int, "required": True, "type": "integer"},
@@ -893,13 +971,13 @@ class ShopfloorCheckoutValidatorResponse(Component):
     def set_line_qty(self):
         return self._response_schema(next_states={"select_package"})
 
+    def set_custom_qty(self):
+        return self._response_schema(next_states={"select_package"})
+
     def scan_package_action(self):
         return self._response_schema(
             next_states={"select_package", "select_line", "summary"}
         )
-
-    def set_custom_qty(self):
-        return self._response_schema(next_states={"select_package"})
 
     def new_package(self):
         return self._response_schema(next_states={"select_line"})
