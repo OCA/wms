@@ -3,6 +3,9 @@
 
 from datetime import datetime
 
+from dateutil.relativedelta import relativedelta
+from freezegun import freeze_time
+
 from odoo import fields
 from odoo.tests import common
 
@@ -28,6 +31,7 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
         cls.product2 = cls.env["product.product"].create(
             {"name": "Product 2", "type": "product"}
         )
+        cls.uom_unit = cls.env.ref("uom.product_uom_unit")
         cls.partner_delta = cls.env.ref("base.res_partner_4")
         cls.loc_bin1 = cls.env["stock.location"].create(
             {"name": "Bin1", "location_id": cls.loc_stock.id}
@@ -119,6 +123,53 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
             line.qty_done = line.product_qty
         picking.action_done()
 
+    def test_qty_ctx(self):
+        move = self.env["stock.move"].create(
+            {
+                "name": "testing ctx",
+                "product_id": self.product1.id,
+                "product_uom_qty": 1,
+                "product_uom": self.uom_unit.id,
+                "warehouse_id": self.wh.id,
+                "location_id": self.loc_stock.id,
+                "location_dest_id": self.loc_customer.id,
+            }
+        )
+        ctx = move._order_available_to_promise_qty_ctx()
+        self.assertEqual(ctx["location"], self.wh.lot_stock_id.id)
+
+    def test_horizon_date(self):
+        move = self.env["stock.move"].create(
+            {
+                "name": "testing ctx",
+                "product_id": self.product1.id,
+                "product_uom_qty": 1,
+                "product_uom": self.uom_unit.id,
+                "warehouse_id": self.wh.id,
+                "location_id": self.loc_stock.id,
+                "location_dest_id": self.loc_customer.id,
+            }
+        )
+        self.env.company.stock_reservation_horizon = 0
+        self.assertEqual(move._promise_reservation_horizon_date(), None)
+        # set 15 days
+        self.env.company.stock_reservation_horizon = 15
+        from_date = datetime.now().replace(hour=23, minute=59, second=59)
+        to_date = from_date + relativedelta(days=15)
+        self.assertEqual(
+            # skip millisec
+            move._promise_reservation_horizon_date().timetuple()[:6],
+            to_date.timetuple()[:6],
+        )
+        # lower to 5
+        self.env.company.stock_reservation_horizon = 5
+        to_date = from_date + relativedelta(days=5)
+        self.assertEqual(
+            # skip millisec
+            move._promise_reservation_horizon_date().timetuple()[:6],
+            to_date.timetuple()[:6],
+        )
+
     def test_ordered_available_to_promise_value(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         picking = self._out_picking(
@@ -128,20 +179,20 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
         )
         picking2 = self._out_picking(
             self._create_picking_chain(
-                self.wh, [(self.product1, 3)], date=datetime(2019, 9, 2, 16, 1)
+                self.wh, [(self.product1, 3)], date=datetime(2019, 9, 3, 16, 1)
             )
         )
         # we'll assign this one in the test, should deduct pick 1 and 2
         picking3 = self._out_picking(
             self._create_picking_chain(
-                self.wh, [(self.product1, 20)], date=datetime(2019, 9, 3, 16, 0)
+                self.wh, [(self.product1, 20)], date=datetime(2019, 9, 4, 16, 0)
             )
         )
         # this one should be ignored when we'll assign pick 3 as it has
         # a later date
         picking4 = self._out_picking(
             self._create_picking_chain(
-                self.wh, [(self.product1, 20)], date=datetime(2019, 9, 4, 16, 1)
+                self.wh, [(self.product1, 20)], date=datetime(2019, 9, 5, 16, 1)
             )
         )
 
@@ -155,6 +206,28 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
         self.assertEqual(picking2.move_lines._ordered_available_to_promise(), 3)
         self.assertEqual(picking3.move_lines._ordered_available_to_promise(), 12)
         self.assertEqual(picking4.move_lines._ordered_available_to_promise(), 0)
+
+        self.env.company.stock_reservation_horizon = 1
+        with freeze_time("2019-09-03"):
+            # set expected date for picking moves far in the future
+            picking.move_lines.write({"date_expected": "2019-09-10"})
+            # its quantity won't be counted ib previously reserved
+            # and we get 3 more on the next one
+            self.assertEqual(picking3.move_lines._ordered_available_to_promise(), 17)
+            # do the same for picking 2
+            picking2.move_lines.write({"date_expected": "2019-09-10"})
+            # its quantity won't be counted ib previously reserved
+            # and we get 3 more on the next one
+            self.assertEqual(picking3.move_lines._ordered_available_to_promise(), 20)
+            self.assertEqual(picking4.move_lines._ordered_available_to_promise(), 0)
+            picking3.move_lines.write({"date_expected": "2019-09-10"})
+            self.assertEqual(picking4.move_lines._ordered_available_to_promise(), 20)
+
+        # move the horizon fwd
+        self.env.company.stock_reservation_horizon = 10
+        with freeze_time("2019-09-03"):
+            # last picking won't have available qty again
+            self.assertEqual(picking4.move_lines._ordered_available_to_promise(), 0)
 
     def test_normal_chain(self):
         # usual scenario, without using the option to defer the pull
