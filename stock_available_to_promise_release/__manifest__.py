@@ -3,7 +3,7 @@
 
 {
     "name": "Stock Available to Promise Release",
-    "version": "13.0.1.0.0",
+    "version": "13.0.1.1.0",
     "summary": "Release Operations based on available to promise",
     "author": "Camptocamp,Odoo Community Association (OCA)",
     "category": "Stock Management",
@@ -12,6 +12,7 @@
         "views/stock_move_views.xml",
         "views/stock_picking_views.xml",
         "views/stock_location_route_views.xml",
+        "views/res_config_settings.xml",
         "wizards/stock_move_release_views.xml",
     ],
     "installable": True,
