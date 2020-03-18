@@ -3,7 +3,7 @@
 
 from odoo import api, fields, models
 from odoo.osv import expression
-from odoo.tools import float_compare
+from odoo.tools import date_utils, float_compare
 
 from odoo.addons import decimal_precision as dp
 
@@ -19,7 +19,7 @@ class StockMove(models.Model):
         "Used to calculate the ordered available to promise.",
     )
     ordered_available_to_promise = fields.Float(
-        "Ordered Available to Promise",
+        string="Ordered Available to Promise",
         compute="_compute_ordered_available_to_promise",
         digits=dp.get_precision("Product Unit of Measure"),
         help="Available to Promise quantity minus quantities promised "
@@ -49,11 +49,30 @@ class StockMove(models.Model):
         if not self._should_compute_ordered_available_to_promise():
             return 0.0
         available = self.product_id.with_context(
-            location=self.warehouse_id.lot_stock_id.id
+            **self._order_available_to_promise_qty_ctx()
         ).qty_available
         return max(
             min(available - self._previous_promised_qty(), self.product_qty), 0.0
         )
+
+    def _order_available_to_promise_qty_ctx(self):
+        return {
+            # used by product qty calculation in stock module
+            # (all the way down to `_get_domain_locations`).
+            "location": self.warehouse_id.lot_stock_id.id,
+        }
+
+    def _promise_reservation_horizon(self):
+        return self.env.company.sudo().stock_reservation_horizon
+
+    def _promise_reservation_horizon_date(self):
+        horizon = self._promise_reservation_horizon()
+        if horizon:
+            # start from end of today and add horizon days
+            return date_utils.add(
+                date_utils.end_of(fields.Datetime.today(), "day"), days=horizon
+            )
+        return None
 
     def _previous_promised_quantity_domain(self):
         domain = [
@@ -62,13 +81,17 @@ class StockMove(models.Model):
             ("date_priority", "<", self.date_priority),
             ("warehouse_id", "=", self.warehouse_id.id),
         ]
+        horizon_date = self._promise_reservation_horizon_date()
+        if horizon_date:
+            # exclude moves planned beyond the horizon
+            domain.append(("date_expected", "<", horizon_date))
         return domain
 
     def _previous_promised_qty(self):
         previous_moves = self.search(
             expression.AND(
                 [self._previous_promised_quantity_domain(), [("id", "!=", self.id)]]
-            )
+            ),
         )
         promised_qty = sum(
             previous_moves.mapped(
