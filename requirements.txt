@@ -1,0 +1,3 @@
+# tests
+# TODO: check https://github.com/OCA/maintainer-quality-tools/pull/646
+freezegun
