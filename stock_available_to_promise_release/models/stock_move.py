@@ -144,7 +144,13 @@ class StockMove(models.Model):
                     # we don't want to deliver unless we can deliver all at
                     # once
                     continue
-                move.with_context(release_available_to_promise=True)._split(remaining)
+                move.with_context(release_available_to_promise=True)._release_split(
+                    remaining
+                )
+
+            if not move.picking_id.printed:
+                # Make sure the flag is set even if no split happens.
+                move.picking_id.printed = True
 
             values = move._prepare_procurement_values()
             procurement_requests.append(
@@ -168,3 +174,22 @@ class StockMove(models.Model):
             pulled_moves = pulled_moves.mapped("move_orig_ids")
 
         return True
+
+    def _release_split(self, remaining_qty):
+        """Split move and create a new picking for it.
+
+        Instead of splitting the move and leave remaining qty into the same picking
+        we move it to a new one so that we can release it later as soon as
+        the qty is available.
+        """
+        # Rely on `printed` flag to make _assign_picking create a new picking.
+        # See `stock.move._assign_picking` and
+        # `stock.move._search_picking_for_assignation`.
+        if not self.picking_id.printed:
+            self.picking_id.printed = True
+        new_move = self.browse(self._split(remaining_qty))
+        # Picking assignment is needed here because `_split` copies the move
+        # thus the `_should_be_assigned` condition is not satisfied
+        # and the move is not assigned.
+        new_move._assign_picking()
+        return new_move
