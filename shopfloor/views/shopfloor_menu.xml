@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="shopfloor_menu_tree_view" model="ir.ui.view">
+        <field name="name">shopfloor menu tree</field>
+        <field name="model">shopfloor.menu</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="operation_group_ids" widget="many2many_tags"/>
+                <field name="process_id" required="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="shopfloor_menu_search_view" model="ir.ui.view">
+        <field name="name">shopfloor menu search</field>
+        <field name="model">shopfloor.menu</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_shopfloor_menu" model="ir.actions.act_window">
+        <field name="name">Menus</field>
+        <field name="res_model">shopfloor.menu</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree</field>
+    </record>
+</odoo>

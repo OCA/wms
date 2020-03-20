@@ -1,0 +1,157 @@
+div.v-application--wrap > .container {
+    padding: 0;
+}
+main.v-content > .v-content__wrap > .header .container {
+    padding-bottom: 0;
+}
+
+#app.demo_mode header {
+    border-bottom: 5px dashed orange !important;
+}
+
+.v-data-table th,
+.v-data-table td
+{
+    font-size: 1.2rem;
+}
+.v-data-table tbody tr:not(:last-child) td:last-child,
+.v-data-table tbody tr:not(:last-child) th:last-child,
+.v-data-table tbody tr:not(:last-child) th:not(.v-data-table__mobile-row),
+.v-data-table tbody tr:not(:last-child) td:not(.v-data-table__mobile-row) {
+    border-bottom: 2px solid white !important;
+}
+
+.screen-home .v-list-item:not(:last-child) {
+    margin-bottom: 0.5rem;
+    border-bottom: 2px dotted !important;
+}
+
+ul.packaging {
+    list-style: none;
+}
+ul.packaging span:first-child {
+    width:33%;
+    float:left;
+}
+.v-dialog.v-dialog--active.v-dialog--fullscreen .v-alert__wrapper {
+    display: block;
+    height: 100vh;
+    margin: 0;
+}
+.v-dialog.v-dialog--active.v-dialog--fullscreen .v-alert__wrapper .message {
+}
+
+
+.action {
+    margin-top: 2rem;
+}
+
+.fullscreen-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    height: 80vh;
+}
+.fullscreen-buttons-50 button.v-btn {
+    flex-grow: 1;
+    font-size: 2rem !important;
+    white-space: normal;
+    display: inline-block;
+}
+.fullscreen-buttons button:not(:last-child) {
+    margin-bottom: 5vh;
+}
+
+.detail .v-card {
+    margin-bottom: 0.5rem;
+}
+.detail .v-card.main {
+    margin-bottom: 1rem;
+    border-width: 4px;
+}
+.button-vertical-list.full .v-btn {
+    width: 90%;
+    height: 5rem;
+    white-space: normal;
+    display: inline-block;
+}
+
+.number-spinner {
+    font-size: 1.6rem;
+    text-align: center;
+    overflow: hidden;
+}
+.number-spinner .spinner-btn{
+    font-size: 2rem;
+    border-radius: 2rem;
+    border: 1px solid #ccc;
+    width: 40%;
+    margin: 0 auto;
+    cursor: pointer;
+}
+.number-spinner input {
+    width: 100%;
+    text-align: center;
+    margin: 0.5rem 0;
+}
+.number-spinner.spinner-position-right .spinner-btn{
+    float: right;
+    margin: 0.5rem 0;
+}
+.number-spinner.spinner-position-right .input-wrapper{
+    float: left;
+    width: 50%;
+    margin: 0.5rem 0;
+}
+.number-spinner.spinner-position-left .spinner-btn{
+    float: left;
+    margin: 0.5rem 0;
+}
+.number-spinner.spinner-position-left .input-wrapper{
+    float: right;
+    width: 50%;
+    margin: 0.5rem 0;
+}
+.number-spinner .v-text-field__details {
+    display: none;
+}
+.number-spinner .v-input.current-value{
+    font-size: 1.5rem;
+}
+.number-spinner .init-value{
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #999;
+}
+
+.with-bottom-actions {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* align items in Main Axis */
+    align-items: stretch; /* align items in Cross Axis */
+    align-content: stretch; /* Extra space in Cross Axis */
+}
+.with-bottom-actions > div:first-child {
+    height: 68vh;
+    margin-bottom: 2vh;
+    overflow-y: scroll;
+}
+.actions.bottom-actions {
+    flex-grow: 1;
+}
+.actions.bottom-actions .v-btn {
+    font-size: 1.2rem;
+    height: 3.5rem;
+    width: 100%;
+}
+
+.label {
+    font-weight: 600;
+}
+
+.state-display-info .v-alert{
+    margin-bottom: 0;
+}
+.state-title {
+}

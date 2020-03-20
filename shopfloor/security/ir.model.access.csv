@@ -1,0 +1,9 @@
+"id","name","model_id/id","group_id/id","perm_read","perm_write","perm_create","perm_unlink"
+"access_shopfloor_menu_users","shopfloor menu","model_shopfloor_menu",,1,0,0,0
+"access_shopfloor_menu_stock_manager","shopfloor menu inventory manager","model_shopfloor_menu","stock.group_stock_manager",1,1,1,1
+"access_shopfloor_operation_group_users","shopfloor operation group","model_shopfloor_operation_group",,1,0,0,0
+"access_shopfloor_operation_group_stock_manager","shopfloor operation group inventory manager","model_shopfloor_operation_group","stock.group_stock_manager",1,1,1,1
+"access_shopfloor_profile_users","shopfloor profile","model_shopfloor_profile",,1,0,0,0
+"access_shopfloor_profile_stock_manager","shopfloor profile inventory manager","model_shopfloor_profile","stock.group_stock_manager",1,1,1,1
+"access_shopfloor_process_users","shopfloor process","model_shopfloor_process",,1,0,0,0
+"access_shopfloor_process_stock_manager","shopfloor process inventory manager","model_shopfloor_process","stock.group_stock_manager",1,1,1,1

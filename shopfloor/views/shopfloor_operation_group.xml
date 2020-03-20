@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="shopfloor_operation_group_tree_view" model="ir.ui.view">
+        <field name="name">shopfloor operation group tree</field>
+        <field name="model">shopfloor.operation.group</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="name"/>
+                <field name="user_ids" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="shopfloor_operation_group_form_view" model="ir.ui.view">
+        <field name="name">shopfloor operation group form</field>
+        <field name="model">shopfloor.operation.group</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="user_ids" widget="many2many_tags"/>
+                            <field name="menu_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="shopfloor_operation_group_search_view" model="ir.ui.view">
+        <field name="name">shopfloor operation group search</field>
+        <field name="model">shopfloor.operation.group</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_shopfloor_operation_group" model="ir.actions.act_window">
+        <field name="name">Operation Groups</field>
+        <field name="res_model">shopfloor.operation.group</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

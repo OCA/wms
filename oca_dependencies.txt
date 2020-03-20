@@ -1,0 +1,3 @@
+rest-framework
+server-auth
+stock-logistics-warehouse https://github.com/guewen/stock-logistics-warehouse 13.0-mig-stock_picking_completion_info
