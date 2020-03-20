@@ -1,38 +1,8 @@
 from .test_checkout_base import CheckoutCommonCase
+from .test_checkout_select_package_base import CheckoutSelectPackageMixin
 
 
-class CheckoutSelectLineCommonCase(CheckoutCommonCase):
-    def _assert_selected(self, response, selected_lines):
-        picking = selected_lines.mapped("picking_id")
-        unselected_lines = picking.move_line_ids - selected_lines
-        for line in selected_lines:
-            self.assertEqual(
-                line.qty_done,
-                line.product_uom_qty,
-                "Scanned lines must have their qty done set to the reserved quantity",
-            )
-        for line in unselected_lines:
-            self.assertEqual(line.qty_done, 0)
-        self.assert_response(
-            response,
-            next_state="select_package",
-            data={
-                "selected_move_lines": [
-                    self._move_line_data(ml) for ml in selected_lines
-                ],
-                "picking": {
-                    "id": picking.id,
-                    "name": picking.name,
-                    "note": "",
-                    "origin": "",
-                    "line_count": len(picking.move_line_ids),
-                    "partner": {"id": self.customer.id, "name": self.customer.name},
-                },
-            },
-        )
-
-
-class CheckoutScanLineCase(CheckoutSelectLineCommonCase):
+class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
     def _test_scan_line_ok(self, barcode, selected_lines):
         """Test /scan_line with a valid return
 
