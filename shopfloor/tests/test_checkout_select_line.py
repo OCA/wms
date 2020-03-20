@@ -1,7 +1,8 @@
-from .test_checkout_scan_line import CheckoutSelectLineCommonCase
+from .test_checkout_base import CheckoutCommonCase
+from .test_checkout_select_package_base import CheckoutSelectPackageMixin
 
 
-class CheckoutSelectLineCase(CheckoutSelectLineCommonCase):
+class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -70,7 +71,7 @@ class CheckoutSelectLineCase(CheckoutSelectLineCommonCase):
 
     def test_select_line_package_error_not_found(self):
         selected_lines = self.move_single.move_line_ids
-        self.picking.do_unreserve()
+        selected_lines.unlink()
         self._test_select_line_error(
             {"picking_id": self.picking.id, "package_id": selected_lines[0].id},
             {
@@ -81,7 +82,7 @@ class CheckoutSelectLineCase(CheckoutSelectLineCommonCase):
 
     def test_select_line_move_line_error_not_found(self):
         selected_lines = self.move_single.move_line_ids
-        self.picking.do_unreserve()
+        selected_lines.unlink()
         self._test_select_line_error(
             {"picking_id": self.picking.id, "move_line_id": selected_lines[0].id},
             {
