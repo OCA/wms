@@ -342,9 +342,17 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
         )
 
         cust_picking.release_available_to_promise()
+        out_pickings = sorted(
+            self._pickings_in_group(pickings.group_id) - cust_picking,
+            key=lambda x: x.move_lines.product_qty,
+        )
+        # 2 pickings instead of just one because remaining qty to process
+        # is split into a new one.
+        self.assertEqual(len(out_pickings), 2)
+        out_picking = out_pickings[0]
+        split_out_picking = out_pickings[1]
 
-        out_picking = self._pickings_in_group(pickings.group_id) - cust_picking
-
+        # the complete one is assigned and placed into stock output
         self.assertRecordValues(
             out_picking,
             [
@@ -355,9 +363,22 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
                 }
             ],
         )
+        # the split once stays in the original location
+        self.assertRecordValues(
+            split_out_picking,
+            [
+                {
+                    "state": "waiting",
+                    "location_id": self.wh.wh_output_stock_loc_id.id,
+                    "location_dest_id": self.loc_customer.id,
+                }
+            ],
+        )
 
         self.assertRecordValues(out_picking.move_lines, [{"product_qty": 7.0}])
+        self.assertRecordValues(split_out_picking.move_lines, [{"product_qty": 13.0}])
 
+        # let's deliver what we can
         self._deliver(out_picking)
         self.assertRecordValues(out_picking, [{"state": "done"}])
 
@@ -371,6 +392,12 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
                     "reserved_availability": 7.0,
                     "procure_method": "make_to_order",
                 },
+            ],
+        )
+        self.assertRecordValues(split_out_picking, [{"state": "waiting"}])
+        self.assertRecordValues(
+            split_out_picking.move_lines,
+            [
                 {
                     "state": "waiting",
                     "product_qty": 13.0,
@@ -494,8 +521,15 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
         )
 
         cust_picking.move_lines.release_available_to_promise()
-        out_picking = self._pickings_in_group(pickings.group_id) - cust_picking
-
+        out_pickings = sorted(
+            self._pickings_in_group(pickings.group_id) - cust_picking,
+            key=lambda x: x.move_lines.product_qty,
+        )
+        # 2 pickings instead of just one because remaining qty to process
+        # is split into a new one.
+        self.assertEqual(len(out_pickings), 2)
+        out_picking = out_pickings[0]
+        split_out_picking = out_pickings[1]
         self.assertRecordValues(
             out_picking.move_lines,
             [
@@ -503,6 +537,17 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
                     "state": "assigned",
                     "product_qty": 12.0,
                     "reserved_availability": 1.0,
+                    "product_uom_qty": 1.0,
+                }
+            ],
+        )
+        self.assertRecordValues(
+            split_out_picking.move_lines,
+            [
+                {
+                    "state": "waiting",
+                    "product_qty": 12.0,
+                    "reserved_availability": 0.0,
                     "product_uom_qty": 1.0,
                 }
             ],
