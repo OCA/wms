@@ -758,6 +758,8 @@ class Checkout(Component):
         Transitions:
         * select_dest_package: selection screen
         """
+        # TODO get list of all result_package_id | package_id of picking's move
+        # lines, return to 'select_dest_package' with the list
         return self._response()
 
     def scan_dest_package(self, picking_id, move_line_ids, barcode):
@@ -777,6 +779,8 @@ class Checkout(Component):
         * select_line: lines to package remain
         * summary: all lines are put in packages
         """
+        # TODO search for stock.quant.package with barcode, if found, call
+        # _put_lines_in_package
         return self._response()
 
     def set_dest_package(self, picking_id, move_line_ids, package_id):
@@ -791,6 +795,7 @@ class Checkout(Component):
         * select_line: lines to package remain
         * summary: all lines are put in packages
         """
+        # TODO check if package still exists, call _put_lines_in_package
         return self._response()
 
     def summary(self, picking_id):
@@ -813,6 +818,7 @@ class Checkout(Component):
         Transitions:
         * change_package_type
         """
+        # TODO list product.packaging where product_id is False
         return self._response()
 
     def set_package_type(self, picking_id, package_id, package_type_id):
