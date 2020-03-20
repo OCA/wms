@@ -1,10 +1,9 @@
 import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
-import {process_registry} from '../services/process_registry.js';
 
-export var ClusterPicking = Vue.component('cluster-picking', {
+export var ClusterPicking = Vue.component("cluster-picking", {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
     template: `
-        <Screen :title="screen_info.title" :klass="screen_info.klass">
+        <Screen :title="menuItem.name" :klass="usage + ' ' + 'state-' + state.key">
             <!-- FOR DEBUG -->
             <!-- {{ current_state_key }} -->
             <template v-slot:header>
@@ -68,7 +67,7 @@ export var ClusterPicking = Vue.component('cluster-picking', {
                 v-on:select="state.on_select"
                 v-on:back="state.on_back"
                 :records="state.data.records"
-                :list_item_fields="manual_select_picking_fields"
+                :key_value="'id'"
                 />
 
             <!-- TODO: do we need a component for this? -->
@@ -102,322 +101,309 @@ export var ClusterPicking = Vue.component('cluster-picking', {
         </Screen>
     `,
     computed: {
-        batch_id: function () {
+        batch_id: function() {
             return this.erp_data.data.confirm_start.id;
-        },
-        manual_select_picking_fields: function () {
-            return [
-                {'path': 'picking_count', 'label': 'Operations'},
-                {'path': 'move_line_count', 'label': 'Lines'},
-            ];
         },
     },
     methods: {
-        action_full_bin: function () {
+        action_full_bin: function() {
             this.go_state(
-                'wait_call',
-                this.odoo.call('prepare_unload', {
-                    'picking_batch_id': this.batch_id,
-                }),
+                "wait_call",
+                this.odoo.call("prepare_unload", {
+                    picking_batch_id: this.batch_id,
+                })
             );
         },
     },
-    data: function () {
+    data: function() {
         // TODO: add a title to each screen
         return {
-            'usage': 'cluster_picking',
-            'initial_state_key': 'start',
-            'current_state_key': 'start',
-            'scan_destination_qty': 1,
-            'states': {
-                'start': {
+            usage: "cluster_picking",
+            initial_state_key: "start",
+            current_state_key: "start",
+            scan_destination_qty: 1,
+            states: {
+                start: {
                     enter: () => {
-                        this.reset_erp_data('data');
+                        this.reset_erp_data("data");
                     },
-                    on_get_work: (evt) => {
-                        this.go_state(
-                            'wait_call',
-                            this.odoo.call('find_batch'),
-                        );
+                    on_get_work: evt => {
+                        this.go_state("wait_call", this.odoo.call("find_batch"));
                     },
-                    on_manual_selection: (evt) => {
-                        this.go_state(
-                            'wait_call',
-                            this.odoo.call('list_batch'),
-                        );
+                    on_manual_selection: evt => {
+                        this.go_state("wait_call", this.odoo.call("list_batch"));
                     },
                 },
-                'manual_selection': {
+                manual_selection: {
                     on_back: () => {
-                        this.go_state('start');
+                        this.go_state("start");
                         this.reset_notification();
                     },
-                    on_select: (selected) => {
+                    on_select: selected => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('select', {
-                                'picking_batch_id': selected,
-                            }),
+                            "wait_call",
+                            this.odoo.call("select", {
+                                picking_batch_id: selected,
+                            })
                         );
                     },
                     display_info: {
-                        'title': 'Select a batch and start',
+                        title: "Select a batch and start",
                     },
                 },
-                'confirm_start': {
+                confirm_start: {
                     on_confirm: () => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('confirm_start', {
-                                'picking_batch_id': this.batch_id,
-                            }),
+                            "wait_call",
+                            this.odoo.call("confirm_start", {
+                                picking_batch_id: this.batch_id,
+                            })
                         );
                     },
                     on_cancel: () => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('unassign', {
-                                'picking_batch_id': this.batch_id,
-                            }),
+                            "wait_call",
+                            this.odoo.call("unassign", {
+                                picking_batch_id: this.batch_id,
+                            })
                         );
                     },
                 },
-                'start_line': {
+                start_line: {
                     display_info: {
-                        'title': 'Pick the product by scanning something',
-                        'scan_placeholder': 'Scan location / pack / product / lot',
+                        title: "Pick the product by scanning something",
+                        scan_placeholder: "Scan location / pack / product / lot",
                     },
                     // Here we have to use some info sent back from `select`
                     // or from `find_batch` that we pass to scan line
-                    on_scan: (scanned) => {
+                    on_scan: scanned => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('scan_line', {
-                                'move_line_id': this.state.data.id,
-                                'barcode': scanned.text,
-                            }),
+                            "wait_call",
+                            this.odoo.call("scan_line", {
+                                move_line_id: this.state.data.id,
+                                barcode: scanned.text,
+                            })
                         );
                     },
                     // Additional actions
-                    on_action: (action) => {
-                        this.state['on_' + action].call(this);
+                    on_action: action => {
+                        this.state["on_" + action].call(this);
                     },
                     on_action_full_bin: () => {
                         this.action_full_bin();
                     },
                     on_action_skip_line: () => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('skip_line', {
-                                'move_line_id': this.state.data.id,
-                            }),
+                            "wait_call",
+                            this.odoo.call("skip_line", {
+                                move_line_id: this.state.data.id,
+                            })
                         );
                     },
                     on_action_stock_out: () => {
-                        this.state_set_data(this.state.data, 'stock_issue');
-                        this.go_state('stock_issue');
+                        this.state_set_data(this.state.data, "stock_issue");
+                        this.go_state("stock_issue");
                     },
                     on_action_change_pack_or_lot: () => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('change_pack_lot', {
-                                'move_line_id': this.state.data.id,
-                            }),
+                            "wait_call",
+                            this.odoo.call("change_pack_lot", {
+                                move_line_id: this.state.data.id,
+                            })
                         );
                     },
                 },
-                'scan_destination': {
+                scan_destination: {
                     display_info: {
-                        'title': 'Check quantity and scan a destination bin',
-                        'scan_placeholder': 'Scan destination bin',
+                        title: "Check quantity and scan a destination bin",
+                        scan_placeholder: "Scan destination bin",
                     },
                     enter: () => {
                         // TODO: shalle we hook v-model for qty input straight to the state data?
                         this.scan_destination_qty = this.erp_data.data.start_line.quantity;
                     },
-                    on_qty_update: (qty) => {
+                    on_qty_update: qty => {
                         this.scan_destination_qty = parseInt(qty);
                     },
-                    on_scan: (scanned) => {
+                    on_scan: scanned => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('scan_destination_pack', {
-                                'move_line_id': this.state.data.id,
-                                'barcode': scanned.text,
-                                'quantity': this.scan_destination_qty,
-                            }),
+                            "wait_call",
+                            this.odoo.call("scan_destination_pack", {
+                                move_line_id: this.state.data.id,
+                                barcode: scanned.text,
+                                quantity: this.scan_destination_qty,
+                            })
                         );
                     },
                     on_action_full_bin: () => {
                         this.action_full_bin();
                     },
                 },
-                'zero_check': {
-                    on_action: (action) => {
-                        this.state['on_' + action].call(this);
+                zero_check: {
+                    on_action: action => {
+                        this.state["on_" + action].call(this);
                     },
                     on_action_confirm_zero: () => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('is_zero', {
-                                'move_line_id': this.state.data.id,
-                                'zero': true,
-                            }),
+                            "wait_call",
+                            this.odoo.call("is_zero", {
+                                move_line_id: this.state.data.id,
+                                zero: true,
+                            })
                         );
                     },
                     on_action_confirm_not_zero: () => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('is_zero', {
-                                'move_line_id': this.state.data.id,
-                                'zero': false,
-                            }),
+                            "wait_call",
+                            this.odoo.call("is_zero", {
+                                move_line_id: this.state.data.id,
+                                zero: false,
+                            })
                         );
                     },
                 },
-                'unload_all': {
+                unload_all: {
                     display_info: {
-                        'title': 'Unload all bins',
-                        'scan_placeholder': 'Scan location',
+                        title: "Unload all bins",
+                        scan_placeholder: "Scan location",
                     },
-                    on_scan: (scanned, confirmation=false) => {
-                        this.state_set_data({'location_barcode': scanned.text});
+                    on_scan: (scanned, confirmation = false) => {
+                        this.state_set_data({location_barcode: scanned.text});
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('set_destination_all', {
-                                'picking_batch_id': this.batch_id,
-                                'barcode': scanned.text,
-                                'confirmation': confirmation,
-                            }),
+                            "wait_call",
+                            this.odoo.call("set_destination_all", {
+                                picking_batch_id: this.batch_id,
+                                barcode: scanned.text,
+                                confirmation: confirmation,
+                            })
                         );
                     },
                     on_action_split: () => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('unload_split', {
-                                'picking_batch_id': this.batch_id,
-                                'barcode': scanned.text, // TODO: should get barcode -> which one? See py specs
-                            }),
+                            "wait_call",
+                            this.odoo.call("unload_split", {
+                                picking_batch_id: this.batch_id,
+                                barcode: scanned.text, // TODO: should get barcode -> which one? See py specs
+                            })
                         );
                     },
                 },
-                'confirm_unload_all': {
+                confirm_unload_all: {
                     display_info: {
-                        'title': 'Unload all bins confirm',
-                        'scan_placeholder': 'Scan location',
+                        title: "Unload all bins confirm",
+                        scan_placeholder: "Scan location",
                     },
-                    on_user_confirm: (answer) => {
+                    on_user_confirm: answer => {
                         // TODO: check if this used
                         // -> no flag is set to enable the confirmation dialog,
                         // we only display a message, unlike `confirm_start`
-                        if (answer == 'yes') {
+                        if (answer == "yes") {
                             // Reuse data from unload_all
-                            const scan_data = this.state_get_data('unload_all');
+                            const scan_data = this.state_get_data("unload_all");
                             this.state.on_scan(scan_data.location_barcode, true);
                         } else {
-                            this.go_state('scan_destination');
+                            this.go_state("scan_location");
                         }
                     },
-                    on_scan: (scanned, confirmation=true) => {
+                    on_scan: (scanned, confirmation = true) => {
                         this.on_exit();
-                        this.current_state_key = 'unload_all';
+                        this.current_state_key = "unload_all";
                         this.state.on_scan(scanned, confirmation);
                     },
                 },
-                'unload_single': {
+                unload_single: {
                     display_info: {
-                        'title': 'Unload single bin',
-                        'scan_placeholder': 'Scan location',
+                        title: "Unload single bin",
+                        scan_placeholder: "Scan location",
                     },
-                    on_scan: (scanned) => {
+                    on_scan: scanned => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('unload_scan_pack', {
-                                'package_id': null, // FIXME: where does it come from? backend data?
-                                'barcode': scanned.text,
-                            }),
+                            "wait_call",
+                            this.odoo.call("unload_scan_pack", {
+                                package_id: null, // FIXME: where does it come from? backend data?
+                                barcode: scanned.text,
+                            })
                         );
                     },
                 },
-                'unload_set_destination': {
+                unload_set_destination: {
                     display_info: {
-                        'title': 'Set destination',
-                        'scan_placeholder': 'Scan location',
+                        title: "Set destination",
+                        scan_placeholder: "Scan location",
                     },
-                    on_scan: (scanned) => {
+                    on_scan: scanned => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('unload_scan_destination', {
-                                'package_id': null, // FIXME: where does it come from? backend data?
-                                'barcode': scanned.text,
-                            }),
+                            "wait_call",
+                            this.odoo.call("unload_scan_destination", {
+                                package_id: null, // FIXME: where does it come from? backend data?
+                                barcode: scanned.text,
+                            })
                         );
                     },
                 },
-                'confirm_unload_set_destination': {
+                confirm_unload_set_destination: {
                     display_info: {
-                        'title': 'Set destination confirm',
-                        'scan_placeholder': 'Scan location',
+                        title: "Set destination confirm",
+                        scan_placeholder: "Scan location",
                     },
-                    on_scan: (scanned) => {
+                    on_scan: scanned => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('unload_scan_destination', {
-                                'package_id': null, // FIXME: where does it come from? backend data?
-                                'barcode': scanned.text,
-                                'confirmation': true,
-                            }),
+                            "wait_call",
+                            this.odoo.call("unload_scan_destination", {
+                                package_id: null, // FIXME: where does it come from? backend data?
+                                barcode: scanned.text,
+                                confirmation: true,
+                            })
                         );
                     },
                 },
-                'show_completion_info': {
+                show_completion_info: {
                     on_confirm: () => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('unload_router', {
-                                'picking_batch_id': this.batch_id,
-                            }),
+                            "wait_call",
+                            this.odoo.call("unload_router", {
+                                picking_batch_id: this.batch_id,
+                            })
                         );
                     },
                 },
-                'change_pack_lot': {
+                change_pack_lot: {
                     display_info: {
-                        'title': 'Change pack or lot',
-                        'scan_placeholder': 'Scan pack or lot',
+                        title: "Change pack or lot",
+                        scan_placeholder: "Scan pack or lot",
                     },
-                    on_scan: (scanned) => {
+                    on_scan: scanned => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('change_pack_lot', {
-                                'move_line_id': this.state.data.id,
-                                'barcode': scanned.text,
-                            }),
+                            "wait_call",
+                            this.odoo.call("change_pack_lot", {
+                                move_line_id: this.state.data.id,
+                                barcode: scanned.text,
+                            })
                         );
                     },
                 },
-                'stock_issue': {
+                stock_issue: {
                     enter: () => {
                         this.reset_notification();
                     },
-                    on_action: (action) => {
-                        this.state['on_' + action].call(this);
+                    on_action: action => {
+                        this.state["on_" + action].call(this);
                     },
                     on_confirm_stock_issue: () => {
                         this.go_state(
-                            'wait_call',
-                            this.odoo.call('stock_issue', {
-                                'move_line_id': this.state.data.id,
-                            }),
+                            "wait_call",
+                            this.odoo.call("stock_issue", {
+                                move_line_id: this.state.data.id,
+                            })
                         );
                     },
                     on_back: () => {
                         this.state_set_data({});
                         this.reset_notification();
-                        this.go_state('start_line');
+                        this.go_state("start_line");
                     },
                 },
             },
         };
     },
 });
-process_registry.add('cluster_picking', ClusterPicking);

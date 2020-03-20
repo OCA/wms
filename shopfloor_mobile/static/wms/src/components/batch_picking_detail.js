@@ -1,5 +1,5 @@
-export var batch_picking_info = Vue.component('batch-picking-detail', {
-    props:['info'],
+export var batch_picking_info = Vue.component("batch-picking-detail", {
+    props: ["info"],
     template: `
   <div class="detail batch-picking-detail with-bottom-actions" v-if="!_.isEmpty(info)">
     <div>

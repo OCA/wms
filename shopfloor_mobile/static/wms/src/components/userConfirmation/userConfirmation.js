@@ -1,5 +1,5 @@
-var userConfirmation = Vue.component('user-confirmation', {
-    props: ['title', 'question'],
+var userConfirmation = Vue.component("user-confirmation", {
+    props: ["title", "question"],
     methods: {},
     template: `
 

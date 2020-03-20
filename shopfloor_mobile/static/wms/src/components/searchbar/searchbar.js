@@ -1,25 +1,25 @@
-Vue.component('searchbar', {
-    data: function () {
+Vue.component("searchbar", {
+    data: function() {
         return {
-            entered: '',
+            entered: "",
             autofocus: {
-                'type': Boolean,
-                'default': true,
+                type: Boolean,
+                default: true,
             },
         };
     },
-    props: ['input_placeholder', 'input_data_type'],
+    props: ["input_placeholder", "input_data_type"],
     methods: {
-        search: function (e ) {
+        search: function(e) {
             e.preventDefault();
-            this.$emit('found', {
+            this.$emit("found", {
                 text: this.entered,
                 type: e.target.dataset.type,
             }); // Talk to parent
             this.reset();
         },
-        reset: function () {
-            this.entered = '';
+        reset: function() {
+            this.entered = "";
         },
     },
 

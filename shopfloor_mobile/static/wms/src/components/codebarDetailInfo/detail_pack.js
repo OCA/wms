@@ -1,11 +1,9 @@
-var moreInfo = Vue.component('detail-pack', {
-    data: function () {
-        return {
-        };
+var moreInfo = Vue.component("detail-pack", {
+    data: function() {
+        return {};
     },
-    props:['packDetail'],
-    methods: {
-    },
+    props: ["packDetail"],
+    methods: {},
     template: `
       <div class="" v-if="">
         <v-simple-table>

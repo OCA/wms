@@ -1,6 +1,6 @@
 import {Odoo, OdooMocked} from "../services/odoo.js";
 
-export var ScanAnything = Vue.component('scan-anything', {
+export var ScanAnything = Vue.component("scan-anything", {
     template: `
         <Screen title="Scan Anything" :klass="'scan_anything'">
             <searchbar v-on:found="on_scan" :input_placeholder="search_input_placeholder"></searchbar>
@@ -12,15 +12,15 @@ export var ScanAnything = Vue.component('scan-anything', {
             <v-btn v-if="showBackButon" depressed x-large color="blue" v-on:click="$router.back()">Back</v-btn>
         </Screen>
     `,
-    mounted () {
+    mounted() {
         const odoo_params = {
-            "process_id": 99,
-            "process_menu_id": 99,
-            "usage": this.usage,
-            "debug": this.$root.demo_mode,
+            process_id: 99,
+            process_menu_id: 99,
+            usage: this.usage,
+            debug: this.$root.demo_mode,
         };
         if (this.$root.demo_mode) {
-            this.$root.loadJS('src/demo/demo.' + this.usage + '.js', this.usage);
+            this.$root.loadJS("src/demo/demo." + this.usage + ".js", this.usage);
             this.odoo = new OdooMocked(odoo_params);
         } else {
             this.odoo = new Odoo(odoo_params);
@@ -29,7 +29,7 @@ export var ScanAnything = Vue.component('scan-anything', {
             this.getData(this.$route.params.codebar);
         }
     },
-    beforeRouteUpdate (to, from, next) {
+    beforeRouteUpdate(to, from, next) {
         if (to.params.codebar) {
             this.getData(to.params.codebar);
         } else {
@@ -38,43 +38,47 @@ export var ScanAnything = Vue.component('scan-anything', {
         next();
     },
     methods: {
-        on_reset: function (e) {
+        on_reset: function(e) {
             this.dataReceived = {};
             this.$router.push({name: "scananything", params: {codebar: undefined}});
         },
-        urlChanged: function (codebar) {
+        urlChanged: function(codebar) {
             // Change the route on when more info clicked in children
             const query = {};
-            if ('codebar' in this.$route.params) {
+            if ("codebar" in this.$route.params) {
                 query.childOf = this.$route.params.codebar;
             }
-            this.$router.push({name: "scananything", params: {codebar: codebar}, query: query});
+            this.$router.push({
+                name: "scananything",
+                params: {codebar: codebar},
+                query: query,
+            });
         },
-        getData: function (codebar) {
-            this.odoo.scan_anything(codebar).then((result) => {
+        getData: function(codebar) {
+            this.odoo.scan_anything(codebar).then(result => {
                 this.dataReceived = result.data || {};
             });
         },
-        on_scan: function (scanned) {
+        on_scan: function(scanned) {
             this.$router.push({
-                "name": "scananything",
-                params: {"codebar": scanned.text},
+                name: "scananything",
+                params: {codebar: scanned.text},
             });
         },
     },
     computed: {
-        showBackButon: function () {
-            return 'childOf' in this.$route.query;
+        showBackButon: function() {
+            return "childOf" in this.$route.query;
         },
-        show_reset_button: function () {
+        show_reset_button: function() {
             return !_.isEmpty(this.dataReceived);
         },
     },
-    data: function () {
+    data: function() {
         return {
-            'usage': 'scan_anything',
-            'dataReceived': {},
-            'search_input_placeholder': 'Scan anything',
+            usage: "scan_anything",
+            dataReceived: {},
+            search_input_placeholder: "Scan anything",
         };
     },
 });

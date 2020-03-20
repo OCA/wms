@@ -1,23 +1,20 @@
-import {Storage} from './storage.js';
-import {demotools} from '../demo/demo.core.js';
-
+import {Storage} from "./storage.js";
 
 export class OdooMixin {
-
-    constructor (params) {
+    constructor(params) {
         this.params = params;
         this.usage = params.usage;
         this.process_id = this.params.process_id;
         this.process_menu_id = this.params.process_menu_id;
         this.debug = this.params.debug;
     }
-    call (path, data, method='POST', fullpath=false) {
-        const endpoint = fullpath ? path : this.usage + '/' + path;
+    call(path, data, method = "POST", fullpath = false) {
+        const endpoint = fullpath ? path : this.usage + "/" + path;
         return this._call(endpoint, method, data);
     }
-    _call (endpoint, method, data) {
+    _call(endpoint, method, data) {
         if (this.debug) {
-            console.log('CALL', endpoint);
+            console.log("CALL", endpoint);
         }
         const self = this;
         const params = {
@@ -25,82 +22,79 @@ export class OdooMixin {
             headers: this._get_headers(),
         };
         data = _.isUndefined(data) ? {} : data;
-        if (method == 'GET' && data.length) {
-            endpoint += '?' + new URLSearchParams(data).toString();
-        } else if (method == 'POST') {
+        if (method == "GET" && data.length) {
+            endpoint += "?" + new URLSearchParams(data).toString();
+        } else if (method == "POST") {
             params.body = JSON.stringify(data);
         }
-        return fetch(
-            this._get_url(endpoint), params,
-        )
-            .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                }
+        return fetch(this._get_url(endpoint), params).then(response => {
+            if (response.ok) {
+                return response.json();
+            }
 
-                let handler = self['_handle_' + response.status.toString()];
-                if (_.isUndefined(handler)) {
-                    handler = this._handle_error;
-                }
-                return handler.call(this, response);
-
-            });
+            let handler = self["_handle_" + response.status.toString()];
+            if (_.isUndefined(handler)) {
+                handler = this._handle_error;
+            }
+            return handler.call(this, response);
+        });
     }
-    _error_info (response) {
+    _error_info(response) {
         return {
-            'error': response.statusText,
-            'status': response.status,
-            'response': response,
+            error: response.statusText,
+            status: response.status,
+            response: response,
         };
     }
-    _handle_403 (response) {
+    _handle_403(response) {
         Storage.apikey = "";
         return this._error_info(response);
     }
-    _handle_404 (response) {
-        console.log('Endpoint not found, please check your odoo configuration. URL: ', response.url);
+    _handle_404(response) {
+        console.log(
+            "Endpoint not found, please check your odoo configuration. URL: ",
+            response.url
+        );
         return this._error_info(response);
     }
-    _handle_500 (response) {
+    _handle_500(response) {
         return this._error_info(response);
     }
-    _handle_error (response) {
+    _handle_error(response) {
         console.log(response.status, response.statusText, response.url);
         return this._error_info(response);
     }
-    _get_headers () {
+    _get_headers() {
         // /!\ IMPORTANT /!\ Always use headers w/out underscores.
         // https://www.nginx.com/resources/wiki/start/
         // topics/tutorials/config_pitfalls/#missing-disappearing-http-headers
         return {
-            'Content-Type': 'application/json',
-            'SERVICE-CTX-MENU-ID': this.process_menu_id,
-            'SERVICE-CTX-PROFILE-ID': 1, // FIXME
-            'API-KEY': Storage.apikey,
+            "Content-Type": "application/json",
+            "SERVICE-CTX-MENU-ID": this.process_menu_id,
+            "SERVICE-CTX-PROFILE-ID": 1, // FIXME
+            "API-KEY": Storage.apikey,
         };
     }
-    _get_url (endpoint) {
-        return '/shopfloor/' + endpoint;
+    _get_url(endpoint) {
+        return "/shopfloor/" + endpoint;
     }
 }
 
-
 export class OdooMocked extends OdooMixin {
-
-    _set_demo_data () {
-        this.demo_data = demotools.get_case(this.usage);
+    _set_demo_data() {
+        this.demo_data = window.DEMO_CASES[this.usage];
     }
-    call (path, data, method='POST', fullpath=false) {
+    call(path, data, method = "POST", fullpath = false) {
         this._set_demo_data();
-        console.log('CALL:', path, this.usage);
-        console.dir('CALL data:', data);
+        console.log("CALL:", path, this.usage);
+        console.dir("CALL data:", data);
         if (!_.isUndefined(this[path])) {
             // Provide your own mock by enpoint
             return this[path].call(this, data);
         }
-        if (!_.isUndefined(this[this.usage + '_' + path])) {
+        if (!_.isUndefined(this[this.usage + "_" + path])) {
             // Provide your own mock by enpoint and specific process
-            return this[this.usage + '_' + path].call(this, data);
+            return this[this.usage + "_" + path].call(this, data);
         }
         let result;
         const barcode = data ? data.barcode || data.location_barcode : null;
@@ -120,29 +114,29 @@ export class OdooMocked extends OdooMixin {
             // Pick the case were the 1st step is decide by the barcode
             result = result[path];
         }
-        if (_.has(result, 'ok')) {
+        if (_.has(result, "ok")) {
             // Pick the case were you have good or bad result
             result = result.ok;
         }
         if (!result) {
-            throw 'NOT IMPLEMENTED: ' + path;
+            throw "NOT IMPLEMENTED: " + path;
         }
-        console.dir('CALL RETURN data:', result);
+        console.dir("CALL RETURN data:", result);
         return Promise.resolve(result);
     }
-    scan_anything (barcode) {
-        console.log('Scan anything', barcode, this.usage);
+    scan_anything(barcode) {
+        console.log("Scan anything", barcode, this.usage);
         this._set_demo_data();
         var demo_case = this.demo_data[barcode];
         if (!demo_case) {
             return Promise.resolve({
-                "message": {"message_type": "error", "message": "Unknown barcode"},
+                message: {message_type: "error", message: "Unknown barcode"},
             });
         }
         console.dir(demo_case);
         return Promise.resolve(demo_case);
     }
-    cluster_picking_set_destination_all (data) {
+    cluster_picking_set_destination_all(data) {
         let result = this.demo_data.set_destination_all;
         if (data.confirmation) {
             result = result.OK;
@@ -153,16 +147,13 @@ export class OdooMocked extends OdooMixin {
     }
 }
 
-
 export class Odoo extends OdooMixin {
-
     // TODO: review and drop very specific methods, move calls to specific components
-    start (barcode) {
-        return this.call('start', 'POST', {'barcode': barcode});
+    start(barcode) {
+        return this.call("start", "POST", {barcode: barcode});
     }
-    scan_anything (barcode) {
-        console.log('Scan anything', barcode, this.usage);
-        throw 'NOT IMPLEMENTED!';
+    scan_anything(barcode) {
+        console.log("Scan anything", barcode, this.usage);
+        throw "NOT IMPLEMENTED!";
     }
-
 }

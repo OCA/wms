@@ -1,15 +1,15 @@
 import {Odoo, OdooMocked} from "../../services/odoo.js";
 
-export var detailPopup = Vue.component('detail-popup', {
-    mounted: function () {
+export var detailPopup = Vue.component("detail-popup", {
+    mounted: function() {
         const odoo_params = {
-            "process_id": 99,
-            "process_menu_id": 99,
-            "usage": 'scan_anything',
-            "debug": this.$root.demo_mode,
+            process_id: 99,
+            process_menu_id: 99,
+            usage: "scan_anything",
+            debug: this.$root.demo_mode,
         };
         if (this.$root.demo_mode) {
-            this.$root.loadJS('src/demo/demo.' + this.usage + '.js', this.usage);
+            this.$root.loadJS("src/demo/demo." + this.usage + ".js", this.usage);
             this.odoo = new OdooMocked(odoo_params);
         } else {
             this.odoo = new Odoo(odoo_params);
@@ -17,28 +17,28 @@ export var detailPopup = Vue.component('detail-popup', {
         this.getData(this.barcode);
     },
     methods: {
-        getData: function (codebar) {
-            this.odoo.scan_anything(codebar).then((result) => {
+        getData: function(codebar) {
+            this.odoo.scan_anything(codebar).then(result => {
                 this.currentData = result.data;
             });
         },
-        urlChanged: function (barcode) {
+        urlChanged: function(barcode) {
             // Raises a warning from Vue, but it is the way it should work
             this.barcode = barcode;
         },
     },
-    data: function () {
+    data: function() {
         return {
-            'usage': 'scan_anything',
-            'currentData': {},
+            usage: "scan_anything",
+            currentData: {},
         };
     },
     watch: {
-        barcode: function (val) {
+        barcode: function(val) {
             this.getData(val);
         },
     },
-    props:['barcode'],
+    props: ["barcode"],
     template: `
     <div>
         <h3>Info {{ currentData.type}} : {{ currentData.barcode }}</h3>

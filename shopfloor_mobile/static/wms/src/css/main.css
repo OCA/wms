@@ -10,8 +10,7 @@ main.v-content > .v-content__wrap > .header .container {
 }
 
 .v-data-table th,
-.v-data-table td
-{
+.v-data-table td {
     font-size: 1.2rem;
 }
 .v-data-table tbody tr:not(:last-child) td:last-child,
@@ -30,8 +29,8 @@ ul.packaging {
     list-style: none;
 }
 ul.packaging span:first-child {
-    width:33%;
-    float:left;
+    width: 33%;
+    float: left;
 }
 .v-dialog.v-dialog--active.v-dialog--fullscreen .v-alert__wrapper {
     display: block;
@@ -40,7 +39,6 @@ ul.packaging span:first-child {
 }
 .v-dialog.v-dialog--active.v-dialog--fullscreen .v-alert__wrapper .message {
 }
-
 
 .action {
     margin-top: 2rem;
@@ -81,7 +79,7 @@ ul.packaging span:first-child {
     text-align: center;
     overflow: hidden;
 }
-.number-spinner .spinner-btn{
+.number-spinner .spinner-btn {
     font-size: 2rem;
     border-radius: 2rem;
     border: 1px solid #ccc;
@@ -94,20 +92,20 @@ ul.packaging span:first-child {
     text-align: center;
     margin: 0.5rem 0;
 }
-.number-spinner.spinner-position-right .spinner-btn{
+.number-spinner.spinner-position-right .spinner-btn {
     float: right;
     margin: 0.5rem 0;
 }
-.number-spinner.spinner-position-right .input-wrapper{
+.number-spinner.spinner-position-right .input-wrapper {
     float: left;
     width: 50%;
     margin: 0.5rem 0;
 }
-.number-spinner.spinner-position-left .spinner-btn{
+.number-spinner.spinner-position-left .spinner-btn {
     float: left;
     margin: 0.5rem 0;
 }
-.number-spinner.spinner-position-left .input-wrapper{
+.number-spinner.spinner-position-left .input-wrapper {
     float: right;
     width: 50%;
     margin: 0.5rem 0;
@@ -115,10 +113,10 @@ ul.packaging span:first-child {
 .number-spinner .v-text-field__details {
     display: none;
 }
-.number-spinner .v-input.current-value{
+.number-spinner .v-input.current-value {
     font-size: 1.5rem;
 }
-.number-spinner .init-value{
+.number-spinner .init-value {
     font-weight: bold;
     font-size: 1.2rem;
     color: #999;
@@ -166,7 +164,7 @@ ul.packaging span:first-child {
     font-weight: 600;
 }
 
-.state-display-info .v-alert{
+.state-display-info .v-alert {
     margin-bottom: 0;
 }
 .state-title {

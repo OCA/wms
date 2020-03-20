@@ -1,5 +1,5 @@
-var moreInfo = Vue.component('detail-location', {
-    props:['locationDetail'],
+var moreInfo = Vue.component("detail-location", {
+    props: ["locationDetail"],
     template: `
       <div>
         <v-simple-table>

@@ -1,5 +1,5 @@
-var moreInfo = Vue.component('detail-operation', {
-    props:['operationDetail'],
+var moreInfo = Vue.component("detail-operation", {
+    props: ["operationDetail"],
     template: `
       <div>
         <v-simple-table>
