@@ -40,6 +40,10 @@ repos:
         args:
           - --color
           - --fix
+        # SPECIAL CASE: barcode scanner app use Vue.js +
+        # advanced JS (modules, classes, etc)
+        # which are not supported by OCA rules yet.
+        exclude: shopfloor_mobile/*
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.4.0
     hooks:
