@@ -26,6 +26,30 @@ msgid "Cancel"
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#: model:ir.model,name:stock_available_to_promise_release.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
+msgid ""
+"Compute product quantity to be delivered based on given days of horizon."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_res_company__stock_reservation_horizon
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_res_config_settings__stock_reservation_horizon
+msgid ""
+"Compute promised quantities for order planned to be shipped until this "
+"number of days from today."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model,name:stock_available_to_promise_release.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model_terms:ir.actions.act_window,help:stock_available_to_promise_release.stock_move_release_action
 msgid "Create a new stock movement"
 msgstr ""
@@ -143,8 +167,19 @@ msgid "Stock Moves To Release"
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_res_company__stock_reservation_horizon
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_res_config_settings__stock_reservation_horizon
+msgid "Stock Reservation Horizon"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_rule
 msgid "Stock Rule"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
+msgid "Stock reservation"
 msgstr ""
 
 #. module: stock_available_to_promise_release
