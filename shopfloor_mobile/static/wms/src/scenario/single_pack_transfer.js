@@ -1,6 +1,6 @@
 import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
 
-export var SinglePackTransfer = Vue.component('single-pack-transfer', {
+export var SinglePackTransfer = Vue.component("single-pack-transfer", {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
     template: `
         <Screen :title="menuItem.name" :klass="usage">
@@ -19,17 +19,17 @@ export var SinglePackTransfer = Vue.component('single-pack-transfer', {
             <cancel-button v-on:cancel="on_cancel" v-if="show_cancel_button"></cancel-button>
         </Screen>
     `,
-    data: function () {
+    data: function() {
         return {
-            'usage': 'single_pack_transfer',
-            'show_reset_button': true,
-            'initial_state_key': 'start_scan_pack_or_location',
-            'current_state_key': 'start_scan_pack_or_location',
-            'states': {
-                'show_completion_info': {
+            usage: "single_pack_transfer",
+            show_reset_button: true,
+            initial_state_key: "start_scan_pack_or_location",
+            current_state_key: "start_scan_pack_or_location",
+            states: {
+                show_completion_info: {
                     on_confirm: () => {
                         // TODO: turn the cone?
-                        this.go_state('start');
+                        this.go_state("start");
                     },
                 },
             },

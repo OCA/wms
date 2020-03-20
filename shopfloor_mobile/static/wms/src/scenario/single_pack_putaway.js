@@ -1,6 +1,6 @@
 import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
 
-export var SinglePackPutAway = Vue.component('single-pack-putaway', {
+export var SinglePackPutAway = Vue.component("single-pack-putaway", {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
     template: `
         <Screen :title="menuItem.name" :klass="usage">
@@ -17,13 +17,13 @@ export var SinglePackPutAway = Vue.component('single-pack-putaway', {
             <cancel-button v-on:cancel="on_cancel" v-if="show_cancel_button"></cancel-button>
         </Screen>
     `,
-    data: function () {
+    data: function() {
         return {
-            'usage': 'single_pack_putaway',
-            'show_reset_button': true,
+            usage: "single_pack_putaway",
+            show_reset_button: true,
             // FIXME: scenario has changed -> we should use `start_scan_pack_or_location` as on pack transfer
-            'initial_state_key': 'start_scan_pack',
-            'current_state_key': 'start_scan_pack',
+            initial_state_key: "start_scan_pack",
+            current_state_key: "start_scan_pack",
         };
     },
 });

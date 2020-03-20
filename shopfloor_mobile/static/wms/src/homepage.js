@@ -1,10 +1,10 @@
-export var HomePage = Vue.component('home-page', {
+export var HomePage = Vue.component("home-page", {
     computed: {
-        navigation () {
-            return this.$root.config.get('menus');
+        navigation() {
+            return this.$root.config.get("menus");
         },
     },
-    props:['routes'],
+    props: ["routes"],
     template: `
         <Screen
             title="Barcode scanner"
