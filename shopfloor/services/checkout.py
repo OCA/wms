@@ -652,10 +652,15 @@ class Checkout(Component):
             "height": packaging.height,
         }
 
-    def _create_and_assign_new_packaging(self, picking, selected_lines, packaging):
-        package = self.env["stock.quant.package"].create(
-            self._prepare_vals_package_from_packaging(packaging)
-        )
+    def _prepare_vals_package_without_packaging(self):
+        return {}
+
+    def _create_and_assign_new_packaging(self, picking, selected_lines, packaging=None):
+        if packaging:
+            vals = self._prepare_vals_package_from_packaging(packaging)
+        else:
+            vals = self._prepare_vals_package_without_packaging()
+        package = self.env["stock.quant.package"].create(vals)
         return self._put_lines_in_allowed_package(picking, selected_lines, package)
 
     def scan_package_action(self, picking_id, selected_line_ids, barcode):
@@ -732,12 +737,17 @@ class Checkout(Component):
         the selected lines.
 
         Selected lines are move lines in the list of ``move_line_ids`` where
-        ``qty_done`` > 0 and have no destination package.
+        ``qty_done`` > 0 and have no destination package
+        (shopfloor_checkout_packed is False).
 
         Transitions:
         * select_line: goes back to selection of lines to work on next lines
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id)
+        if not picking.exists():
+            return self._response_stock_picking_does_not_exist()
+        selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
+        return self._create_and_assign_new_packaging(picking, selected_lines)
 
     def list_dest_package(self, picking_id, move_line_ids):
         """Return a list of packages the user can select for the lines
