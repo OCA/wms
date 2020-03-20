@@ -1,27 +1,22 @@
 <odoo noupdate="1">
-
     <record id="shopfloor_menu_put_away_reach_truck" model="shopfloor.menu">
         <field name="name">Put-Away Reach Truck</field>
         <field name="sequence">10</field>
-        <field name="process_id" ref="shopfloor_process_put_away_reach_truck"/>
+        <field name="process_id" ref="shopfloor_process_put_away_reach_truck" />
     </record>
-
     <record id="shopfloor_menu_single_pallet_transfer" model="shopfloor.menu">
         <field name="name">Single Pallet Transfer</field>
         <field name="sequence">20</field>
-        <field name="process_id" ref="shopfloor_process_single_pallet_transfer"/>
+        <field name="process_id" ref="shopfloor_process_single_pallet_transfer" />
     </record>
-
     <record id="shopfloor_menu_cluster_picking" model="shopfloor.menu">
         <field name="name">Cluster Picking</field>
         <field name="sequence">30</field>
-        <field name="process_id" ref="shopfloor_process_cluster_picking"/>
+        <field name="process_id" ref="shopfloor_process_cluster_picking" />
     </record>
-
     <record id="shopfloor_menu_checkout" model="shopfloor.menu">
         <field name="name">Checkout</field>
         <field name="sequence">30</field>
-        <field name="process_id" ref="shopfloor_process_checkout"/>
+        <field name="process_id" ref="shopfloor_process_checkout" />
     </record>
-
 </odoo>
