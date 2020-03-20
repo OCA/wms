@@ -15,3 +15,5 @@ from . import test_checkout_select
 from . import test_checkout_scan_line
 from . import test_checkout_select_line
 from . import test_checkout_set_qty
+from . import test_checkout_scan_package_action
+from . import test_checkout_summary

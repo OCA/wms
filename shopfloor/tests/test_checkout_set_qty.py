@@ -1,7 +1,8 @@
 from .test_checkout_base import CheckoutCommonCase
+from .test_checkout_select_package_base import CheckoutSelectPackageMixin
 
 
-class CheckoutSetQtyCommonCase(CheckoutCommonCase):
+class CheckoutSetQtyCommonCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -27,35 +28,6 @@ class CheckoutSetQtyCommonCase(CheckoutCommonCase):
             all(l.qty_done == l.product_uom_qty for l in self.selected_lines)
         )
         self.assertTrue(all(l.qty_done == 0 for l in self.deselected_lines))
-
-    def _assert_selected_qties(
-        self, response, selected_lines, lines_quantities, message=None
-    ):
-        picking = selected_lines.mapped("picking_id")
-        deselected_lines = picking.move_line_ids - selected_lines
-        self.assertEqual(selected_lines.ids, [l.id for l in lines_quantities])
-        for line, quantity in lines_quantities.items():
-            self.assertEqual(line.qty_done, quantity)
-        for line in deselected_lines:
-            self.assertEqual(line.qty_done, 0, "Lines deselected must have no qty done")
-        self.assert_response(
-            response,
-            next_state="select_package",
-            data={
-                "selected_move_lines": [
-                    self._move_line_data(ml) for ml in selected_lines
-                ],
-                "picking": {
-                    "id": picking.id,
-                    "name": picking.name,
-                    "note": "",
-                    "origin": "",
-                    "line_count": len(picking.move_line_ids),
-                    "partner": {"id": self.customer.id, "name": self.customer.name},
-                },
-            },
-            message=message,
-        )
 
 
 class CheckoutResetLineQtyCase(CheckoutSetQtyCommonCase):

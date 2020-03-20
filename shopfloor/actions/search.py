@@ -32,3 +32,8 @@ class SearchAction(Component):
 
     def lot_from_scan(self, barcode):
         return self.env["stock.production.lot"].search([("name", "=", barcode)])
+
+    def generic_packaging_from_scan(self, barcode):
+        return self.env["product.packaging"].search(
+            [("barcode", "=", barcode), ("product_id", "=", False)]
+        )
