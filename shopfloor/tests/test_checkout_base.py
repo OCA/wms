@@ -25,6 +25,12 @@ class CheckoutCommonCase(CommonCase):
         cls.product_c_packaging = cls.env["product.packaging"].create(
             {"name": "Box", "product_id": cls.product_b.id, "barcode": "ProductCBox"}
         )
+        cls.product_d = cls.env["product.product"].create(
+            {"name": "Product D", "type": "product", "barcode": "product_d"}
+        )
+        cls.product_d_packaging = cls.env["product.packaging"].create(
+            {"name": "Box", "product_id": cls.product_d.id, "barcode": "ProductDBox"}
+        )
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_checkout")
         cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
