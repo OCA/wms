@@ -556,3 +556,5 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
     def test_mto_picking(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         # TODO a MTO picking should work normally
+
+    # TODO: test w/ multiple orders by priority
