@@ -25,7 +25,7 @@ class StockMove(models.Model):
         help="Available to Promise quantity minus quantities promised "
         " to older promised operations.",
     )
-    need_release = fields.Boolean()
+    need_release = fields.Boolean(index=True,)
 
     @api.depends()
     def _compute_ordered_available_to_promise(self):
@@ -75,24 +75,50 @@ class StockMove(models.Model):
         return None
 
     def _previous_promised_quantity_domain(self):
-        domain = [
-            ("need_release", "=", True),
+        """Lookup for product promised qty in the same warehouse.
+
+        Moves to consider are either already released or still be to released
+        but not done yet. Each of them should fit the reservation horizon.
+        """
+        base_domain = [
             ("product_id", "=", self.product_id.id),
-            ("date_priority", "<", self.date_priority),
             ("warehouse_id", "=", self.warehouse_id.id),
         ]
         horizon_date = self._promise_reservation_horizon_date()
         if horizon_date:
             # exclude moves planned beyond the horizon
-            domain.append(("date_expected", "<", horizon_date))
-        return domain
+            base_domain.append(("date_expected", "<=", horizon_date))
+
+        # either the move has to be released
+        # and priority is higher than the current one
+        domain_not_released = [
+            ("need_release", "=", True),
+            ("date_priority", "<", self.date_priority),
+        ]
+        # or it has been released already
+        # and is not canceled or done
+        domain_released = [
+            ("need_release", "=", False),
+            (
+                "state",
+                "in",
+                ("waiting", "confirmed", "partially_available", "assigned"),
+            ),
+        ]
+        # NOTE: this domain might be suboptimal as we may lookup too many moves.
+        # If we face performance issues, this is a good candidate to debug.
+        return expression.AND(
+            [base_domain, expression.OR([domain_not_released, domain_released])]
+        )
 
     def _previous_promised_qty(self):
         previous_moves = self.search(
             expression.AND(
+                # TODO: `!=` could be suboptimal, consider filter out on recordset
                 [self._previous_promised_quantity_domain(), [("id", "!=", self.id)]]
             ),
         )
+        # TODO: consider sum via SQL
         promised_qty = sum(
             previous_moves.mapped(
                 lambda move: max(move.product_qty - move.reserved_availability, 0.0)
