@@ -54,6 +54,12 @@ then based on the quantity that was promised to the customer (available to promi
 * Allow to perform reservations jointly with your delivery rounds planning.
   Reserve only the quants you planned to deliver.
 
+When move qty is not completely satisfied on release,
+the remaining qty is split and attached to a new picking that can be released later.
+
+Important: if the "Stock reservation horizon" is set, the qty is calculated
+on moves which have an expected date not beyond $today + $horizon (in days).
+
 .. IMPORTANT::
    This is an alpha version, the data model and design can change at any time without warning.
    Only for development or testing purpose, do not use in production.
@@ -69,6 +75,8 @@ Configuration
 
 In Inventory > Configuration > Warehouses, activate the option "Release based on Available to Promise"
 when you want to use the feature.
+
+To modify the horizon go to "Inventory > Settings" and change "Stock reservation horizon".
 
 Usage
 =====
