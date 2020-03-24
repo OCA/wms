@@ -2,12 +2,6 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo import api, fields, models
 
-SHIPPING_POLICY_SELECTION = [
-    ("procurement_group", "Take from procurement group"),
-    ("force_as_soon_as_possible", "Force to as soon as possible"),
-    ("force_all_products_ready", "Force to when all products are ready"),
-]
-
 
 class StockPickingType(models.Model):
 
@@ -17,8 +11,16 @@ class StockPickingType(models.Model):
     def _default_shipping_policy(self):
         return "procurement_group"
 
+    @api.model
+    def _selection_shipping_policy(self):
+        return [
+            ("procurement_group", "Take from procurement group"),
+            ("force_as_soon_as_possible", "Force to as soon as possible"),
+            ("force_all_products_ready", "Force to when all products are ready"),
+        ]
+
     shipping_policy = fields.Selection(
-        SHIPPING_POLICY_SELECTION,
+        selection="_selection_shipping_policy",
         default=lambda r: r._default_shipping_policy(),
         help="Allows to force the shipping policy on pickings according to the"
         " picking type.",
