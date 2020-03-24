@@ -16,7 +16,12 @@
     </record>
     <record id="shopfloor_menu_checkout" model="shopfloor.menu">
         <field name="name">Checkout</field>
-        <field name="sequence">30</field>
+        <field name="sequence">40</field>
         <field name="process_id" ref="shopfloor_process_checkout" />
+    </record>
+    <record id="shopfloor_menu_delivery" model="shopfloor.menu">
+        <field name="name">Delivery</field>
+        <field name="sequence">50</field>
+        <field name="process_id" ref="shopfloor_process_delivery" />
     </record>
 </odoo>
