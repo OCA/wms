@@ -44,10 +44,6 @@ class BatchPickingCase(CommonCase, PickingBatchMixin):
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="picking_batch")
 
-    def test_to_openapi(self):
-        # will raise if it fails to generate the openapi specs
-        self.service.to_openapi()
-
     def test_search_empty(self):
         """No batch is available"""
         # Simulate the client asking the list of picking batch
