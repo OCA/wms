@@ -199,3 +199,8 @@ msgstr ""
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_picking
 msgid "Transfer"
 msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
+msgid "days"
+msgstr ""
