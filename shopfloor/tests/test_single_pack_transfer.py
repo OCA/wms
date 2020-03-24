@@ -61,10 +61,6 @@ class SinglePackTransferCase(CommonCase):
         package_level.is_done = True
         return package_level
 
-    def test_to_openapi(self):
-        # will raise if it fails to generate the openapi specs
-        self.service.to_openapi()
-
     def test_start(self):
         """Test the happy path for single pack transfer /start endpoint
 

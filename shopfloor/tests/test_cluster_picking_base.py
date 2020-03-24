@@ -102,14 +102,6 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
             )
 
 
-class ClusterPickingAPICase(ClusterPickingCommonCase):
-    """Base tests for the cluster picking API"""
-
-    def test_to_openapi(self):
-        # will raise if it fails to generate the openapi specs
-        self.service.to_openapi()
-
-
 class ClusterPickingLineCommonCase(ClusterPickingCommonCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):

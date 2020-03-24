@@ -7,10 +7,6 @@ class MenuCase(CommonCase):
         with self.work_on_services() as work:
             self.service = work.component(usage="menu")
 
-    def test_to_openapi(self):
-        # will raise if it fails to generate the openapi specs
-        self.service.to_openapi()
-
     def test_menu_search(self):
         """Request /menu/search"""
         # Simulate the client searching menus

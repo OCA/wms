@@ -38,10 +38,6 @@ class SinglePackPutawayCase(CommonCase):
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="single_pack_putaway")
 
-    def test_to_openapi(self):
-        # will raise if it fails to generate the openapi specs
-        self.service.to_openapi()
-
     def test_start(self):
         """Test the happy path for single pack putaway /start endpoint
 

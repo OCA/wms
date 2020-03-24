@@ -7,10 +7,6 @@ class AppCase(CommonCase):
         with self.work_on_services() as work:
             self.service = work.component(usage="app")
 
-    def test_to_openapi(self):
-        # will raise if it fails to generate the openapi specs
-        self.service.to_openapi()
-
     def test_user_config(self):
         """Request /app/user_config"""
         # Simulate the client asking the configuration
