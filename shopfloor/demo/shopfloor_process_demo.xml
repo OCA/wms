@@ -19,4 +19,9 @@
         <field name="code">checkout</field>
         <field name="picking_type_id" ref="picking_type_checkout_demo" />
     </record>
+    <record id="shopfloor_process_delivery" model="shopfloor.process">
+        <field name="name">Delivery</field>
+        <field name="code">delivery</field>
+        <field name="picking_type_id" ref="picking_type_delivery_demo" />
+    </record>
 </odoo>
