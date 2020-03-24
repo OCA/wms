@@ -26,3 +26,9 @@ then based on the quantity that was promised to the customer (available to promi
   virtually reserved
 * Allow to perform reservations jointly with your delivery rounds planning.
   Reserve only the quants you planned to deliver.
+
+When move qty is not completely satisfied on release,
+the remaining qty is split and attached to a new picking that can be released later.
+
+Important: if the "Stock reservation horizon" is set, the qty is calculated
+on moves which have an expected date not beyond $today + $horizon (in days).
