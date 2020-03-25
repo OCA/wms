@@ -296,7 +296,7 @@ class Checkout(Component):
             next_state="select_package",
             data={
                 "selected_move_lines": [
-                    self._data_for_move_line(line) for line in lines
+                    self._data_for_move_line(line) for line in lines.sorted()
                 ],
                 "picking": self._data_picking_base(picking),
             },
