@@ -73,6 +73,89 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             },
         )
 
+    def test_scan_line_product_error_several_packages(self):
+        """When we scan a product which is in more than one package, error"""
+        self._simulate_batch_selected(self.batch, in_package=True)
+        line = self.batch.picking_ids.move_line_ids
+        # create a second move line for the same product in a different
+        # package
+        move = line.move_id.copy()
+        self._fill_stock_for_moves(move, in_package=True)
+        move._action_confirm(merge=False)
+        move._action_assign()
+
+        self._scan_line_error(
+            line,
+            move.product_id.barcode,
+            {
+                "message_type": "warning",
+                "message": "This product is part of multiple"
+                " packages, please scan a package.",
+            },
+        )
+
+    def test_scan_line_product_error_in_one_package_and_unit(self):
+        """When we scan a product which is in a package and as raw, error"""
+        self._simulate_batch_selected(self.batch, in_package=True)
+        line = self.batch.picking_ids.move_line_ids
+        # create a second move line for the same product in a different
+        # package
+        move = line.move_id.copy()
+        self._fill_stock_for_moves(move)
+        move._action_confirm(merge=False)
+        move._action_assign()
+
+        self._scan_line_error(
+            line,
+            move.product_id.barcode,
+            {
+                "message_type": "warning",
+                "message": "This product is part of multiple"
+                " packages, please scan a package.",
+            },
+        )
+
+    def test_scan_line_lot_error_several_packages(self):
+        """When we scan a lot which is in more than one package, error"""
+        self._simulate_batch_selected(self.batch, in_package=True, in_lot=True)
+        line = self.batch.picking_ids.move_line_ids
+        # create a second move line for the same product in a different
+        # package
+        move = line.move_id.copy()
+        self._fill_stock_for_moves(move, in_lot=line.lot_id)
+        move._action_confirm(merge=False)
+        move._action_assign()
+
+        self._scan_line_error(
+            line,
+            line.lot_id.name,
+            {
+                "message_type": "warning",
+                "message": "This lot is part of multiple"
+                " packages, please scan a package.",
+            },
+        )
+
+    def test_scan_line_lot_error_in_one_package_and_unit(self):
+        """When we scan a lot which is in a package and as raw, error"""
+        self._simulate_batch_selected(self.batch, in_package=True, in_lot=True)
+        line = self.batch.picking_ids.move_line_ids
+        # create a second move line for the same product in a different
+        # package
+        move = line.move_id.copy()
+        self._fill_stock_for_moves(move, in_lot=line.lot_id)
+        move._action_confirm(merge=False)
+        move._action_assign()
+        self._scan_line_error(
+            line,
+            line.lot_id.name,
+            {
+                "message_type": "warning",
+                "message": "This lot is part of multiple"
+                " packages, please scan a package.",
+            },
+        )
+
     def test_scan_line_location_ok_single_package(self):
         """Scan to check if user scans a correct location for current line
 
