@@ -147,7 +147,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             {line_to_change: new_qty, line_keep_qty: line_keep_qty.product_uom_qty},
         )
 
-    def test_set_custem_qty_not_found(self):
+    def test_set_custom_qty_not_found(self):
         selected_lines = self.moves_pack1.move_line_ids
         response = self.service.dispatch(
             "set_custom_qty",
