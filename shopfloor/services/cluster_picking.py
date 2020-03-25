@@ -113,7 +113,8 @@ class ClusterPicking(Component):
     def _select_a_picking_batch(self, batches):
         # look for in progress + assigned to self first
         candidates = batches.filtered(
-            lambda batch: batch.state == "in_progress" and batch.user_id == self.env.user
+            lambda batch: batch.state == "in_progress"
+            and batch.user_id == self.env.user
         )
         if candidates:
             return candidates[0]
@@ -385,9 +386,37 @@ class ClusterPicking(Component):
             return self._response_for_start_line(
                 move_line, message=message.scan_lot_on_product_tracked_by_lot()
             )
+
+        # if we scanned a product and it's part of several packages, we can't be
+        # sure the user scanned the correct one, in such case, ask to scan a package
+        other_product_lines = picking.move_line_ids.filtered(
+            lambda l: l.product_id == product
+        )
+        packages = other_product_lines.mapped("package_id")
+        # Do not use mapped here: we want to see if we have more than one package,
+        # but also if we have one product as a package and the same product as
+        # a unit in another line. In both cases, we want the user to scan the
+        # package.
+        if packages and len({l.package_id for l in other_product_lines}) > 1:
+            return self._response_for_start_line(
+                move_line, message=message.product_multiple_packages_scan_package()
+            )
         return self._response_for_scan_destination(move_line)
 
     def _scan_line_by_lot(self, picking, move_line, lot):
+        message = self.actions_for("message")
+        # if we scanned a lot and it's part of several packages, we can't be
+        # sure the user scanned the correct one, in such case, ask to scan a package
+        other_lot_lines = picking.move_line_ids.filtered(lambda l: l.lot_id == lot)
+        packages = other_lot_lines.mapped("package_id")
+        # Do not use mapped here: we want to see if we have more than one
+        # package, but also if we have one lot as a package and the same lot as
+        # a unit in another line. In both cases, we want the user to scan the
+        # package.
+        if packages and len({l.package_id for l in other_lot_lines}) > 1:
+            return self._response_for_start_line(
+                move_line, message=message.lot_multiple_packages_scan_package()
+            )
         return self._response_for_scan_destination(move_line)
 
     def _scan_line_by_location(self, picking, move_line, location):
@@ -819,7 +848,9 @@ class ClusterPicking(Component):
             return self._response_for_unload_all(
                 batch, message=message.no_location_found()
             )
-        if not scanned_location.is_sublocation_of(picking_type.default_location_dest_id):
+        if not scanned_location.is_sublocation_of(
+            picking_type.default_location_dest_id
+        ):
             return self._response_for_unload_all(
                 batch, message=message.dest_location_not_allowed()
             )
@@ -864,7 +895,10 @@ class ClusterPicking(Component):
     def _response_batch_complete(self):
         return self._response(
             next_state="start",
-            message={"message_type": "success", "message": _("Batch Transfer complete")},
+            message={
+                "message_type": "success",
+                "message": _("Batch Transfer complete"),
+            },
         )
 
     def unload_split(self, picking_batch_id):
@@ -987,7 +1021,9 @@ class ClusterPicking(Component):
             return self._response_for_unload_set_destination(
                 batch, package, message=message.no_location_found()
             )
-        if not scanned_location.is_sublocation_of(picking_type.default_location_dest_id):
+        if not scanned_location.is_sublocation_of(
+            picking_type.default_location_dest_id
+        ):
             return self._response_for_unload_set_destination(
                 batch, package, message=message.dest_location_not_allowed()
             )
@@ -1294,7 +1330,11 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                         "id": {"required": True, "type": "integer"},
                         "name": {"type": "string", "nullable": False, "required": True},
                         "move_line_count": {"required": True, "type": "integer"},
-                        "weight": {"type": "float", "nullable": False, "required": True},
+                        "weight": {
+                            "type": "float",
+                            "nullable": False,
+                            "required": True,
+                        },
                         "origin": {
                             "type": "string",
                             "nullable": False,
