@@ -18,5 +18,6 @@ from . import test_checkout_select_line
 from . import test_checkout_set_qty
 from . import test_checkout_scan_package_action
 from . import test_checkout_new_package
+from . import test_checkout_list_package
 from . import test_checkout_summary
 from . import test_delivery_base
