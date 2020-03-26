@@ -606,6 +606,10 @@ class Checkout(Component):
     def _filter_lines_to_pack(move_line):
         return move_line.qty_done > 0 and not move_line.shopfloor_checkout_packed
 
+    def _is_package_allowed(self, picking, package):
+        existing_packages = picking.mapped("move_line_ids.result_package_id")
+        return package in existing_packages
+
     def _put_lines_in_package(self, picking, selected_lines, package):
         """Put the current selected lines with a qty_done in a package
 
@@ -615,8 +619,7 @@ class Checkout(Component):
         since Odoo set the value of the result package to the source package by
         default, it works by default.
         """
-        existing_packages = picking.mapped("move_line_ids.result_package_id")
-        if package not in existing_packages:
+        if not self._is_package_allowed(picking, package):
             return self._response_for_select_package(
                 selected_lines,
                 message={
@@ -778,13 +781,15 @@ class Checkout(Component):
             return self._response_stock_picking_does_not_exist()
 
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
+        return self._response_for_select_dest_package(picking, lines)
 
+    def _response_for_select_dest_package(self, picking, move_lines, message=None):
         packages = picking.mapped("move_line_ids.package_id") | picking.mapped(
             "move_line_ids.result_package_id"
         )
         if not packages:
             return self._response_for_select_package(
-                lines,
+                move_lines,
                 message={
                     "message_type": "warning",
                     "message": _("No valid package to select."),
@@ -794,19 +799,33 @@ class Checkout(Component):
         packages_data = [
             self._data_package(picking, package) for package in packages.sorted()
         ]
-
         return self._response(
             next_state="select_dest_package",
             data={
                 "picking": picking_data,
                 "packages": packages_data,
                 "selected_move_lines": [
-                    # TODO factorize
-                    self._data_for_move_line(line)
-                    for line in lines.sorted()
+                    self._data_for_move_line(line) for line in move_lines.sorted()
                 ],
             },
+            message=message,
         )
+
+    def _set_dest_package_from_selection(self, picking, selected_lines, package):
+        if not package:
+            return self._response_for_select_dest_package(picking, selected_lines)
+        if not self._is_package_allowed(picking, package):
+            return self._response_for_select_dest_package(
+                picking,
+                selected_lines,
+                message={
+                    "message_type": "error",
+                    "message": _("Not a valid destination package").format(
+                        package.name
+                    ),
+                },
+            )
+        return self._put_lines_in_allowed_package(picking, selected_lines, package)
 
     def scan_dest_package(self, picking_id, selected_line_ids, barcode):
         """Scan destination package for lines
@@ -821,13 +840,17 @@ class Checkout(Component):
         package on lines.
 
         Transitions:
-        * select_package: error when scanning package
+        * select_dest_package: error when scanning package
         * select_line: lines to package remain
         * summary: all lines are put in packages
         """
-        # TODO search for stock.quant.package with barcode, if found, call
-        # _put_lines_in_package
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id)
+        if not picking.exists():
+            return self._response_stock_picking_does_not_exist()
+        lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
+        search = self.actions_for("search")
+        package = search.package_from_scan(barcode)
+        return self._set_dest_package_from_selection(picking, lines, package)
 
     def set_dest_package(self, picking_id, selected_line_ids, package_id):
         """Set destination package for lines from a package id
@@ -837,12 +860,16 @@ class Checkout(Component):
         The validity is the same as ``scan_dest_package``.
 
         Transitions:
-        * select_dest_package: error when scanning package
+        * select_dest_package: error when selecting package
         * select_line: lines to package remain
         * summary: all lines are put in packages
         """
-        # TODO check if package still exists, call _put_lines_in_package
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id)
+        if not picking.exists():
+            return self._response_stock_picking_does_not_exist()
+        lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
+        package = self.env["stock.quant.package"].browse(package_id).exists()
+        return self._set_dest_package_from_selection(picking, lines, package)
 
     def summary(self, picking_id):
         """Return information for the summary screen
@@ -1177,7 +1204,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
 
     def scan_dest_package(self):
         return self._response_schema(
-            next_states={"select_package", "select_line", "summary"}
+            next_states={"select_dest_package", "select_line", "summary"}
         )
 
     def set_dest_package(self):
