@@ -749,7 +749,21 @@ class Checkout(Component):
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         return self._create_and_assign_new_packaging(picking, selected_lines)
 
-    def list_dest_package(self, picking_id, move_line_ids):
+    def _data_package(self, picking, package):
+        line_count = len(
+            picking.move_line_ids.filtered(lambda l: l.package_id == package)
+        )
+        return {
+            "id": package.id,
+            "name": package.name,
+            # TODO
+            "weight": 0,
+            "line_count": line_count,
+            # TODO
+            "package_type_name": "",
+        }
+
+    def list_dest_package(self, picking_id, selected_line_ids):
         """Return a list of packages the user can select for the lines
 
         Only valid packages must be proposed. Look at ``scan_dest_package``
@@ -757,12 +771,44 @@ class Checkout(Component):
 
         Transitions:
         * select_dest_package: selection screen
+        * select_package: when no package is available
         """
-        # TODO get list of all result_package_id | package_id of picking's move
-        # lines, return to 'select_dest_package' with the list
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id)
+        if not picking.exists():
+            return self._response_stock_picking_does_not_exist()
 
-    def scan_dest_package(self, picking_id, move_line_ids, barcode):
+        lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
+
+        packages = picking.mapped("move_line_ids.package_id") | picking.mapped(
+            "move_line_ids.result_package_id"
+        )
+        if not packages:
+            return self._response_for_select_package(
+                lines,
+                message={
+                    "message_type": "warning",
+                    "message": _("No valid package to select."),
+                },
+            )
+        picking_data = self._data_picking_base(picking)
+        packages_data = [
+            self._data_package(picking, package) for package in packages.sorted()
+        ]
+
+        return self._response(
+            next_state="select_dest_package",
+            data={
+                "picking": picking_data,
+                "packages": packages_data,
+                "selected_move_lines": [
+                    # TODO factorize
+                    self._data_for_move_line(line)
+                    for line in lines.sorted()
+                ],
+            },
+        )
+
+    def scan_dest_package(self, picking_id, selected_line_ids, barcode):
         """Scan destination package for lines
 
         Set the destination package on the selected lines with a `qty_done` if
@@ -783,7 +829,7 @@ class Checkout(Component):
         # _put_lines_in_package
         return self._response()
 
-    def set_dest_package(self, picking_id, move_line_ids, package_id):
+    def set_dest_package(self, picking_id, selected_line_ids, package_id):
         """Set destination package for lines from a package id
 
         Used by the list obtained from ``list_dest_package``.
@@ -1125,7 +1171,9 @@ class ShopfloorCheckoutValidatorResponse(Component):
         return self._response_schema(next_states={"select_line"})
 
     def list_dest_package(self):
-        return self._response_schema(next_states={"select_dest_package"})
+        return self._response_schema(
+            next_states={"select_dest_package", "select_package"}
+        )
 
     def scan_dest_package(self):
         return self._response_schema(
