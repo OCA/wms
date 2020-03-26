@@ -64,3 +64,6 @@ class CheckoutCommonCase(CommonCase):
 
     def _move_line_data(self, move_line):
         return self.service._data_for_move_line(move_line)
+
+    def _package_data(self, picking, package):
+        return self.service._data_package(picking, package)
