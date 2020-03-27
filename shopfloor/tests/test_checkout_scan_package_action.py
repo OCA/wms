@@ -291,9 +291,6 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         move_line2.qty_done = move_line2.product_uom_qty
         move_line3.qty_done = 0
 
-        packaging_type = self.env["stock.package.storage.type"].create(
-            {"name": "Pallet"}
-        )
         packaging = self.env["product.packaging"].create(
             {
                 "name": "Pallet",
@@ -301,7 +298,6 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 "height": 12,
                 "width": 13,
                 "lngth": 14,
-                "package_storage_type_id": packaging_type.id,
             }
         )
 
@@ -322,8 +318,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             new_package,
             [
                 {
-                    "package_storage_type_id": packaging_type.id,
-                    "packaging_id": packaging.id,
+                    "product_packaging_id": packaging.id,
                     "lngth": packaging.lngth,
                     "width": packaging.width,
                     "height": packaging.height,

@@ -105,14 +105,14 @@ class Checkout(Component):
 
     def _response_for_selected_stock_picking(self, picking, message=None):
         if all(line.shopfloor_checkout_packed for line in picking.move_line_ids):
-            return self._response_for_all_lines_packed(picking, message=message)
+            return self._response_for_summary(picking, message=message)
         return self._response(
             next_state="select_line",
             data={"picking": self._data_for_stock_picking(picking)},
             message=message,
         )
 
-    def _response_for_all_lines_packed(self, picking, message=None):
+    def _response_for_summary(self, picking, message=None):
         return self._response(
             next_state="summary",
             data={"picking": self._data_for_stock_picking(picking)},
@@ -184,8 +184,8 @@ class Checkout(Component):
                 "weight": 0,
                 # TODO
                 "line_count": 0,
-                "package_type_name": (
-                    move_line.package_id.package_storage_type_id.name or ""
+                "packaging_name": (
+                    move_line.package_id.product_packaging_id.name or ""
                 ),
             }
             if move_line.package_id
@@ -197,8 +197,8 @@ class Checkout(Component):
                 "weight": 0,
                 # TODO
                 "line_count": 0,
-                "package_type_name": (
-                    move_line.result_package_id.package_storage_type_id.name or ""
+                "packaging_name": (
+                    move_line.result_package_id.product_packaging_id.name or ""
                 ),
             }
             if move_line.result_package_id
@@ -646,10 +646,8 @@ class Checkout(Component):
         )
 
     def _prepare_vals_package_from_packaging(self, packaging):
-        package_type = packaging.package_storage_type_id
         return {
-            "package_storage_type_id": package_type.id,
-            "packaging_id": packaging.id,
+            "product_packaging_id": packaging.id,
             "lngth": packaging.lngth,
             "width": packaging.width,
             "height": packaging.height,
@@ -762,8 +760,7 @@ class Checkout(Component):
             # TODO
             "weight": 0,
             "line_count": line_count,
-            # TODO
-            "package_type_name": "",
+            "packaging_name": package.product_packaging_id.name or "",
         }
 
     def list_dest_package(self, picking_id, selected_line_ids):
@@ -880,25 +877,55 @@ class Checkout(Component):
         picking = self.env["stock.picking"].browse(picking_id)
         if not picking.exists():
             return self._response_stock_picking_does_not_exist()
-        return self._response_for_all_lines_packed(picking)
+        return self._response_for_summary(picking)
 
-    def list_package_type(self, picking_id, package_id):
+    def _data_packaging(self, packaging):
+        return {"id": packaging.id, "name": packaging.name}
+
+    def _get_allowed_packaging(self):
+        return self.env["product.packaging"].search([("product_id", "=", False)])
+
+    def list_packaging(self, picking_id, package_id):
         """List the available package types for a package
 
-        For a package, we can change the package type. The available
-        package types are the ones with no product.
+        For a package, we can change the packaging. The available
+        packaging are the ones with no product.
 
         Transitions:
-        * change_package_type
+        * change_packaging
+        * summary: if the package_id no longer exists
         """
-        # TODO list product.packaging where product_id is False
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id)
+        if not picking.exists():
+            return self._response_stock_picking_does_not_exist()
 
-    def set_package_type(self, picking_id, package_id, package_type_id):
+        package = self.env["stock.quant.package"].browse(package_id).exists()
+        packaging_list = self._get_allowed_packaging()
+        return self._response_for_change_packaging(picking, package, packaging_list)
+
+    def _response_for_change_packaging(self, picking, package, packaging_list):
+        message = self.actions_for("message")
+        if not package:
+            return self._response_for_summary(
+                picking, message=message.record_not_found()
+            )
+        return self._response(
+            next_state="change_packaging",
+            data={
+                "picking": self._data_picking_base(picking),
+                "package": self._data_package(picking, package),
+                "packagings": [
+                    self._data_packaging(packaging)
+                    for packaging in packaging_list.sorted()
+                ],
+            },
+        )
+
+    def set_packaging(self, picking_id, package_id, packaging_id):
         """Set a package type on a package
 
         Transitions:
-        * change_package_type: in case of error
+        * change_packaging: in case of error
         * summary
         """
         return self._response()
@@ -1048,17 +1075,17 @@ class ShopfloorCheckoutValidator(Component):
     def summary(self):
         return {"picking_id": {"coerce": to_int, "required": True, "type": "integer"}}
 
-    def list_package_type(self):
+    def list_packaging(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "package_id": {"coerce": to_int, "required": True, "type": "integer"},
         }
 
-    def set_package_type(self):
+    def set_packaging(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "package_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "package_type_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "packaging_id": {"coerce": to_int, "required": True, "type": "integer"},
         }
 
     def remove_package(self):
@@ -1097,7 +1124,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
             "change_quantity": self._schema_selected_lines,
             "select_dest_package": self._schema_select_package,
             "summary": self._schema_stock_picking_details,
-            "change_package_type": self._schema_select_package_type,
+            "change_packaging": self._schema_select_packaging,
             "confirm_done": self._schema_stock_picking_details,
         }
 
@@ -1138,17 +1165,14 @@ class ShopfloorCheckoutValidatorResponse(Component):
         }
 
     @property
-    def _schema_select_package_type(self):
+    def _schema_select_packaging(self):
         return {
-            "selected_move_lines": {
-                "type": "list",
-                "schema": {"type": "dict", "schema": self.schemas().move_line()},
-            },
-            "package_types": {
-                "type": "list",
-                "schema": {"type": "dict", "schema": self.schemas().package_type()},
-            },
             "picking": {"type": "dict", "schema": self.schemas().picking()},
+            "package": {"type": "dict", "schema": self.schemas().package()},
+            "packagings": {
+                "type": "list",
+                "schema": {"type": "dict", "schema": self.schemas().packaging()},
+            },
         }
 
     @property
@@ -1215,11 +1239,11 @@ class ShopfloorCheckoutValidatorResponse(Component):
     def summary(self):
         return self._response_schema(next_states={"summary"})
 
-    def list_package_type(self):
-        return self._response_schema(next_states={"change_package_type"})
+    def list_packaging(self):
+        return self._response_schema(next_states={"change_packaging", "summary"})
 
-    def set_package_type(self):
-        return self._response_schema(next_states={"change_package_type", "summary"})
+    def set_packaging(self):
+        return self._response_schema(next_states={"change_packaging", "summary"})
 
     def remove_package(self):
         return self._response_schema(next_states={"summary"})
