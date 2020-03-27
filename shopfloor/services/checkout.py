@@ -928,7 +928,26 @@ class Checkout(Component):
         * change_packaging: in case of error
         * summary
         """
-        return self._response()
+        message = self.actions_for("message")
+
+        picking = self.env["stock.picking"].browse(picking_id)
+        if not picking.exists():
+            return self._response_stock_picking_does_not_exist()
+
+        package = self.env["stock.quant.package"].browse(package_id).exists()
+        packaging = self.env["product.packaging"].browse(packaging_id).exists()
+        if not (package and packaging):
+            return self._response_for_summary(
+                picking, message=message.record_not_found()
+            )
+        package.product_packaging_id = packaging
+        return self._response_for_summary(
+            picking,
+            message={
+                "message_type": "success",
+                "message": _("Packaging changed on package {}").format(package.name),
+            },
+        )
 
     def remove_package(self, picking_id, package_id):
         """Remove destination package from move lines and set qty done to 0
