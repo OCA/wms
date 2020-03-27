@@ -1,7 +1,7 @@
 from .test_checkout_base import CheckoutCommonCase
 
 
-class CheckoutListPackagingCase(CheckoutCommonCase):
+class CheckoutListSetPackagingCase(CheckoutCommonCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -35,15 +35,16 @@ class CheckoutListPackagingCase(CheckoutCommonCase):
                 "lngth": 10,
             }
         )
+        cls.picking = cls._create_picking(lines=[(cls.product_a, 10)])
+        cls._fill_stock_for_moves(cls.picking.move_lines, in_package=True)
+        cls.picking.action_assign()
+        cls.package = cls.picking.move_line_ids.result_package_id
+        cls.package.product_packaging_id = cls.packaging_pallet
 
     def test_list_packaging_ok(self):
-        picking = self._create_picking(lines=[(self.product_a, 10)])
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
-        picking.action_assign()
-        package = picking.move_line_ids.result_package_id
         response = self.service.dispatch(
             "list_packaging",
-            params={"picking_id": picking.id, "package_id": package.id},
+            params={"picking_id": self.picking.id, "package_id": self.package.id},
         )
 
         self.assert_response(
@@ -51,20 +52,20 @@ class CheckoutListPackagingCase(CheckoutCommonCase):
             next_state="change_packaging",
             data={
                 "picking": {
-                    "id": picking.id,
-                    "name": picking.name,
+                    "id": self.picking.id,
+                    "name": self.picking.name,
                     "note": "",
                     "origin": "",
-                    "line_count": len(picking.move_line_ids),
+                    "line_count": len(self.picking.move_line_ids),
                     "partner": {"id": self.customer.id, "name": self.customer.name},
                 },
                 "package": {
-                    "id": package.id,
-                    "name": package.name,
+                    "id": self.package.id,
+                    "name": self.package.name,
                     # TODO
                     "weight": 0,
                     "line_count": 1,
-                    "packaging_name": package.product_packaging_id.name or "",
+                    "packaging_name": self.package.product_packaging_id.name or "",
                 },
                 "packagings": [
                     {
@@ -81,14 +82,73 @@ class CheckoutListPackagingCase(CheckoutCommonCase):
         )
 
     def test_list_packaging_error_package_not_found(self):
-        picking = self._create_picking(lines=[(self.product_a, 10)])
         response = self.service.dispatch(
-            "list_packaging", params={"picking_id": picking.id, "package_id": 0}
+            "list_packaging", params={"picking_id": self.picking.id, "package_id": 0}
         )
         self.assert_response(
             response,
             next_state="summary",
-            data={"picking": self._stock_picking_data(picking)},
+            data={"picking": self._stock_picking_data(self.picking)},
+            message={
+                "message_type": "error",
+                "message": "The record you were working on does not exist anymore.",
+            },
+        )
+
+    def test_set_packaging_ok(self):
+        response = self.service.dispatch(
+            "set_packaging",
+            params={
+                "picking_id": self.picking.id,
+                "package_id": self.package.id,
+                "packaging_id": self.packaging_inner_box.id,
+            },
+        )
+        self.assertRecordValues(
+            self.package, [{"product_packaging_id": self.packaging_inner_box.id}]
+        )
+        self.assert_response(
+            response,
+            next_state="summary",
+            data={"picking": self._stock_picking_data(self.picking)},
+            message={
+                "message_type": "success",
+                "message": "Packaging changed on package {}".format(self.package.name),
+            },
+        )
+
+    def test_set_packaging_error_package_not_found(self):
+        response = self.service.dispatch(
+            "set_packaging",
+            params={
+                "picking_id": self.picking.id,
+                "package_id": 0,
+                "packaging_id": self.packaging_inner_box.id,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="summary",
+            data={"picking": self._stock_picking_data(self.picking)},
+            message={
+                "message_type": "error",
+                "message": "The record you were working on does not exist anymore.",
+            },
+        )
+
+    def test_set_packaging_error_packaging_not_found(self):
+        response = self.service.dispatch(
+            "set_packaging",
+            params={
+                "picking_id": self.picking.id,
+                "package_id": self.package.id,
+                "packaging_id": 0,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="summary",
+            data={"picking": self._stock_picking_data(self.picking)},
             message={
                 "message_type": "error",
                 "message": "The record you were working on does not exist anymore.",
