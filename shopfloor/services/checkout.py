@@ -111,9 +111,9 @@ class Checkout(Component):
             message=message,
         )
 
-    def _response_for_summary(self, picking, message=None):
+    def _response_for_summary(self, picking, need_confirm=False, message=None):
         return self._response(
-            next_state="summary",
+            next_state="summary" if not need_confirm else "confirm_done",
             data={"picking": self._data_for_stock_picking(picking)},
             message=message,
         )
@@ -988,6 +988,13 @@ class Checkout(Component):
             )
         return self._response_for_summary(picking)
 
+    @staticmethod
+    def _filter_lines_(move_line):
+        return (
+            move_line.qty_done == move_line.product_uom_qty
+            and move_line.shopfloor_checkout_packed
+        )
+
     def done(self, picking_id, confirmation=False):
         """Set the moves as done
 
@@ -999,7 +1006,42 @@ class Checkout(Component):
         * select_document: after done, goes back to start
         * confirm_done: confirm a partial
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id)
+        if not picking.exists():
+            return self._response_stock_picking_does_not_exist()
+        lines = picking.move_line_ids
+        if not confirmation:
+            if not all(line.qty_done == line.product_uom_qty for line in lines):
+                return self._response_for_summary(
+                    picking,
+                    need_confirm=True,
+                    message={
+                        "message_type": "warning",
+                        "message": _(
+                            "Not all lines have been processed, do you"
+                            " want to confirm partial operation?"
+                        ),
+                    },
+                )
+            elif not all(line.shopfloor_checkout_packed for line in lines):
+                return self._response_for_summary(
+                    picking,
+                    need_confirm=True,
+                    message={
+                        "message_type": "warning",
+                        "message": _(
+                            "Remaining raw product not packed, proceed anyway?"
+                        ),
+                    },
+                )
+        picking.action_done()
+        return self._response(
+            next_state="select_document",
+            message={
+                "message_type": "success",
+                "message": _("Transfer {} done").format(picking.name),
+            },
+        )
 
 
 class ShopfloorCheckoutValidator(Component):
