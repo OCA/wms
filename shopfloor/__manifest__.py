@@ -18,12 +18,6 @@
         "auth_api_key",
         # https://github.com/OCA/stock-logistics-warehouse/pull/808
         "stock_picking_completion_info",
-        # https://github.com/OCA/wms/pull/12
-        "stock_storage_type",
-        # https://github.com/OCA/wms/pull/13
-        "stock_storage_type_putaway_strategy",
-        # https://github.com/OCA/stock-logistics-warehouse/pull/855
-        "stock_location_children",
         # https://github.com/OCA/stock-logistics-workflow/pull/608
         "stock_quant_package_dimension",
         # https://github.com/OCA/stock-logistics-workflow/pull/607
