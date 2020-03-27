@@ -5,10 +5,6 @@ from odoo.addons.component.core import Component
 
 from .service import to_float
 
-# NOTE: we need to know if the destination package is set, but sometimes
-# the dest. package is kept, so we will use field shopfloor_checkout_packed
-# on the move line
-
 
 class Checkout(Component):
     """
@@ -26,6 +22,9 @@ class Checkout(Component):
     4) Products are packed (e.g. too high pallet) and we split it on several
     5) Products are not packed (e.g. raw products) and we create new packages
     6) Products are not packed (e.g. raw products) and we do not create packages
+
+    A new flag ``shopfloor_checkout_packed`` on move lines allows to track which
+    lines have been put in a package.
 
     Flow Diagram: https://www.draw.io/#G1qRenBcezk50ggIazDuu2qOfkTsoIAxXP
     """
@@ -225,9 +224,7 @@ class Checkout(Component):
         return data
 
     def _lines_to_pack(self, picking):
-        return picking.move_line_ids.filtered(
-            lambda l: l.qty_done == 0 and not l.shopfloor_checkout_packed
-        )
+        return picking.move_line_ids.filtered(self._filter_lines_unpacked)
 
     def _domain_for_list_stock_picking(self):
         return [
@@ -603,8 +600,16 @@ class Checkout(Component):
             )
 
     @staticmethod
+    def _filter_lines_unpacked(move_line):
+        return move_line.qty_done == 0 and not move_line.shopfloor_checkout_packed
+
+    @staticmethod
     def _filter_lines_to_pack(move_line):
         return move_line.qty_done > 0 and not move_line.shopfloor_checkout_packed
+
+    @staticmethod
+    def _filter_lines_packed(move_line):
+        return move_line.qty_done > 0 and move_line.shopfloor_checkout_packed
 
     def _is_package_allowed(self, picking, package):
         existing_packages = picking.mapped("move_line_ids.result_package_id")
@@ -955,11 +960,33 @@ class Checkout(Component):
         All the move lines with the package as ``result_package_id`` have their
         ``result_package_id`` reset to the source package (default odoo behavior)
         and their ``qty_done`` set to 0.
+        It flags ``shopfloor_checkout_packed`` to False so they have to be packed again.
 
         Transitions:
         * summary
         """
-        return self._response()
+        message = self.actions_for("message")
+        picking = self.env["stock.picking"].browse(picking_id)
+        if not picking.exists():
+            return self._response_stock_picking_does_not_exist()
+
+        package = self.env["stock.quant.package"].browse(package_id).exists()
+        if not package:
+            return self._response_for_summary(
+                picking, message=message.record_not_found()
+            )
+        move_lines = picking.move_line_ids.filtered(
+            lambda l: self._filter_lines_packed(l) and l.result_package_id == package
+        )
+        for move_line in move_lines:
+            move_line.write(
+                {
+                    "qty_done": 0,
+                    "result_package_id": move_line.package_id,
+                    "shopfloor_checkout_packed": False,
+                }
+            )
+        return self._response_for_summary(picking)
 
     def done(self, picking_id, confirmation=False):
         """Set the moves as done
