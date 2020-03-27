@@ -82,7 +82,7 @@ class BaseShopfloorSchemaResponse(Component):
             "name": {"type": "string", "nullable": False, "required": True},
             "weight": {"required": True, "nullable": True, "type": "float"},
             "line_count": {"required": True, "nullable": True, "type": "integer"},
-            "package_type_name": {"required": True, "nullable": True, "type": "string"},
+            "packaging_name": {"required": True, "nullable": True, "type": "string"},
         }
 
     def lot(self):
@@ -97,7 +97,7 @@ class BaseShopfloorSchemaResponse(Component):
             "name": {"type": "string", "nullable": False, "required": True},
         }
 
-    def package_type(self):
+    def packaging(self):
         return {
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
