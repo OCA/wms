@@ -39,6 +39,14 @@ class CommonCase(SavepointCase, ComponentMixin):
             model_name="rest.service.registration", collection=collection, **params
         )
 
+    @contextmanager
+    def work_on_actions(self, **params):
+        params = params or {}
+        collection = _PseudoCollection("shopfloor.action", self.env)
+        yield WorkContext(
+            model_name="rest.service.registration", collection=collection, **params
+        )
+
     # pylint: disable=method-required-super
     # super is called "the old-style way" to call both super classes in the
     # order we want
@@ -56,6 +64,7 @@ class CommonCase(SavepointCase, ComponentMixin):
         )
         cls.setUpComponent()
         cls.setUpClassVars()
+        cls.setUpClassBaseData()
 
     @classmethod
     def setUpClassVars(cls):
@@ -68,6 +77,57 @@ class CommonCase(SavepointCase, ComponentMixin):
         cls.shelf1 = cls.env.ref("stock.stock_location_components")
         cls.shelf2 = cls.env.ref("stock.stock_location_14")
         cls.customer = cls.env["res.partner"].create({"name": "Customer"})
+
+    @classmethod
+    def setUpClassBaseData(cls):
+        cls.product_a = cls.env["product.product"].create(
+            {
+                "name": "Product A",
+                "type": "product",
+                "default_code": "A",
+                "barcode": "A",
+                "weight": 2,
+            }
+        )
+        cls.product_a_packaging = cls.env["product.packaging"].create(
+            {"name": "Box", "product_id": cls.product_a.id, "barcode": "ProductABox"}
+        )
+        cls.product_b = cls.env["product.product"].create(
+            {
+                "name": "Product B",
+                "type": "product",
+                "default_code": "B",
+                "barcode": "B",
+                "weight": 3,
+            }
+        )
+        cls.product_b_packaging = cls.env["product.packaging"].create(
+            {"name": "Box", "product_id": cls.product_b.id, "barcode": "ProductBBox"}
+        )
+        cls.product_c = cls.env["product.product"].create(
+            {
+                "name": "Product C",
+                "type": "product",
+                "default_code": "C",
+                "barcode": "C",
+                "weight": 3,
+            }
+        )
+        cls.product_c_packaging = cls.env["product.packaging"].create(
+            {"name": "Box", "product_id": cls.product_b.id, "barcode": "ProductCBox"}
+        )
+        cls.product_d = cls.env["product.product"].create(
+            {
+                "name": "Product D",
+                "type": "product",
+                "default_code": "D",
+                "barcode": "D",
+                "weight": 3,
+            }
+        )
+        cls.product_d_packaging = cls.env["product.packaging"].create(
+            {"name": "Box", "product_id": cls.product_d.id, "barcode": "ProductDBox"}
+        )
 
     def assert_response(self, response, next_state=None, message=None, data=None):
         """Assert a response from the webservice
@@ -90,6 +150,22 @@ class CommonCase(SavepointCase, ComponentMixin):
             "\n\nActual:\n%s"
             "\n\nExpected:\n%s" % (pformat(response), pformat(expected)),
         )
+
+    @classmethod
+    def _create_picking(cls, picking_type=None, lines=None, confirm=True):
+        picking_form = Form(cls.env["stock.picking"])
+        picking_form.picking_type_id = picking_type or cls.picking_type
+        picking_form.partner_id = cls.customer
+        if lines is None:
+            lines = [(cls.product_a, 10), (cls.product_b, 10)]
+        for product, qty in lines:
+            with picking_form.move_ids_without_package.new() as move:
+                move.product_id = product
+                move.product_uom_qty = qty
+        picking = picking_form.save()
+        if confirm:
+            picking.action_confirm()
+        return picking
 
     @classmethod
     def _update_qty_in_location(
