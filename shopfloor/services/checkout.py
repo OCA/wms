@@ -260,7 +260,8 @@ class Checkout(Component):
         message = self.actions_for("message")
 
         selection_lines = self._lines_to_pack(picking)
-        # TODO handle no lines in selection go to summary
+        if not selection_lines:
+            return self._response_for_summary(picking)
 
         package = search.package_from_scan(barcode)
         if package:
@@ -410,7 +411,8 @@ class Checkout(Component):
             return self._response_stock_picking_does_not_exist()
 
         selection_lines = self._lines_to_pack(picking)
-        # TODO if no remaining lines, go to summary
+        if not selection_lines:
+            return self._response_for_summary(picking)
 
         if package_id:
             package = self.env["stock.quant.package"].browse(package_id).exists()

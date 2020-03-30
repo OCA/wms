@@ -274,3 +274,28 @@ class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
                 " packages, please scan a package.",
             },
         )
+
+    def test_scan_line_all_lines_done(self):
+        picking = self._create_picking(
+            lines=[(self.product_a, 10), (self.product_b, 10)]
+        )
+        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        picking.action_assign()
+        # set all lines as done
+        picking.move_line_ids.write(
+            {"qty_done": 10.0, "shopfloor_checkout_packed": True}
+        )
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": picking.id,
+                # the barcode doesn't matter as we have no
+                # lines to pack anymore
+                "barcode": self.product_a.barcode,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="summary",
+            data={"picking": self._stock_picking_data(picking)},
+        )
