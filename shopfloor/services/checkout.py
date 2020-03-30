@@ -57,6 +57,7 @@ class Checkout(Component):
           destination pack set
         """
         search = self.actions_for("search")
+        message = self.actions_for("message")
         picking = search.stock_picking_from_scan(barcode)
         if not picking:
             location = search.location_from_scan(barcode)
@@ -64,13 +65,23 @@ class Checkout(Component):
                 if not location.is_sublocation_of(
                     self.picking_type.default_location_src_id
                 ):
-                    return self._response_for_scan_location_not_allowed()
+                    return self._response_for_select_document(
+                        message=message.location_not_allowed()
+                    )
                 lines = location.source_move_line_ids
                 pickings = lines.mapped("picking_id")
                 if len(pickings) == 1:
                     picking = pickings
                 else:
-                    return self._response_for_several_stock_picking_found()
+                    return self._response_for_select_document(
+                        message={
+                            "message_type": "error",
+                            "message": _(
+                                "Several transfers found, please scan a package"
+                                " or select a transfer manually."
+                            ),
+                        }
+                    )
         if not picking:
             package = search.package_from_scan(barcode)
             if package:
@@ -87,22 +98,28 @@ class Checkout(Component):
                 return self._response_for_manual_selection(
                     message=message.stock_picking_not_found()
                 )
-            return self._response_for_barcode_no_stock_picking_found()
+            return self._response_for_select_document(
+                message=message.barcode_not_found()
+            )
         if picking.picking_type_id != self.picking_type:
             if state_for_error == "manual_selection":
                 return self._response_for_manual_selection(
                     message=message.cannot_move_something_in_picking_type()
                 )
-            return self._response_for_scan_picking_type_not_allowed()
+            return self._response_for_select_document(
+                message=message.cannot_move_something_in_picking_type()
+            )
         if picking.state != "assigned":
             if state_for_error == "manual_selection":
                 return self._response_for_manual_selection(
                     message=message.stock_picking_not_available(picking)
                 )
-            return self._response_for_picking_not_assigned(picking)
-        return self._response_for_selected_stock_picking(picking)
+            return self._response_for_select_document(
+                picking, message=message.stock_picking_not_available(picking)
+            )
+        return self._response_for_select_line(picking)
 
-    def _response_for_selected_stock_picking(self, picking, message=None):
+    def _response_for_select_line(self, picking, message=None):
         if all(line.shopfloor_checkout_packed for line in picking.move_line_ids):
             return self._response_for_summary(picking, message=message)
         return self._response(
@@ -118,49 +135,9 @@ class Checkout(Component):
             message=message,
         )
 
-    def _response_for_picking_not_assigned(self, picking):
+    def _response_for_select_document(self, picking, message=None):
         message = self.actions_for("message")
-        return self._response(
-            next_state="select_document",
-            message=message.stock_picking_not_available(picking),
-        )
-
-    def _response_for_several_stock_picking_found(self):
-        return self._response(
-            next_state="select_document",
-            message={
-                "message_type": "error",
-                "message": _(
-                    "Several transfers found, please scan a package"
-                    " or select a transfer manually."
-                ),
-            },
-        )
-
-    def _response_for_scan_picking_type_not_allowed(self):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="select_document",
-            message=message.cannot_move_something_in_picking_type(),
-        )
-
-    def _response_for_scan_location_not_allowed(self):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="select_document", message=message.location_not_allowed()
-        )
-
-    def _response_for_barcode_no_stock_picking_found(self):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="select_document", message=message.barcode_not_found()
-        )
-
-    def _response_for_stock_picking_has_been_deleted(self):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="select_document", message=message.stock_picking_not_found()
-        )
+        return self._response(next_state="select_document", message=message)
 
     def _data_for_stock_picking(self, picking):
         data_struct = self.actions_for("data")
@@ -297,14 +274,14 @@ class Checkout(Component):
         if lot:
             return self._select_lines_from_lot(picking, selection_lines, lot)
 
-        return self._response_for_selected_stock_picking(
+        return self._response_for_select_line(
             picking, message=message.barcode_not_found()
         )
 
     def _select_lines_from_package(self, picking, selection_lines, package):
         lines = selection_lines.filtered(lambda l: l.package_id == package)
         if not lines:
-            return self._response_for_selected_stock_picking(
+            return self._response_for_select_line(
                 picking,
                 message={
                     "message_type": "error",
@@ -319,13 +296,13 @@ class Checkout(Component):
     def _select_lines_from_product(self, picking, selection_lines, product):
         message = self.actions_for("message")
         if product.tracking in ("lot", "serial"):
-            return self._response_for_selected_stock_picking(
+            return self._response_for_select_line(
                 picking, message=message.scan_lot_on_product_tracked_by_lot()
             )
 
         lines = selection_lines.filtered(lambda l: l.product_id == product)
         if not lines:
-            return self._response_for_selected_stock_picking(
+            return self._response_for_select_line(
                 picking,
                 message={
                     "message_type": "error",
@@ -343,7 +320,7 @@ class Checkout(Component):
         # a unit in another line. In both cases, we want the user to scan the
         # package.
         if packages and len({l.package_id for l in lines}) > 1:
-            return self._response_for_selected_stock_picking(
+            return self._response_for_select_line(
                 picking, message=message.product_multiple_packages_scan_package()
             )
         elif packages:
@@ -357,7 +334,7 @@ class Checkout(Component):
     def _select_lines_from_lot(self, picking, selection_lines, lot):
         lines = selection_lines.filtered(lambda l: l.lot_id == lot)
         if not lines:
-            return self._response_for_selected_stock_picking(
+            return self._response_for_select_line(
                 picking,
                 message={
                     "message_type": "error",
@@ -376,7 +353,7 @@ class Checkout(Component):
         # a unit in another line. In both cases, we want the user to scan the
         # package.
         if packages and len({l.package_id for l in lines}) > 1:
-            return self._response_for_selected_stock_picking(
+            return self._response_for_select_line(
                 picking, message=message.lot_multiple_packages_scan_package()
             )
         elif packages:
@@ -390,7 +367,7 @@ class Checkout(Component):
     def _select_line_package(self, picking, selection_lines, package):
         if not package:
             message = self.actions_for("message")
-            return self._response_for_selected_stock_picking(
+            return self._response_for_select_line(
                 picking, message=message.record_not_found()
             )
         return self._select_lines_from_package(picking, selection_lines, package)
@@ -398,7 +375,7 @@ class Checkout(Component):
     def _select_line_move_line(self, picking, selection_lines, move_line):
         if not move_line:
             message = self.actions_for("message")
-            return self._response_for_selected_stock_picking(
+            return self._response_for_select_line(
                 picking, message=message.record_not_found()
             )
         # normally, the client should sent only move lines out of packages, but
@@ -585,7 +562,7 @@ class Checkout(Component):
             {"result_package_id": package.id, "shopfloor_checkout_packed": True}
         )
         # go back to the screen to select the next lines to pack
-        return self._response_for_selected_stock_picking(
+        return self._response_for_select_line(
             picking,
             message={
                 "message_type": "info",
@@ -967,12 +944,11 @@ class Checkout(Component):
                     },
                 )
         picking.action_done()
-        return self._response(
-            next_state="select_document",
+        return self._response_for_select_document(
             message={
                 "message_type": "success",
                 "message": _("Transfer {} done").format(picking.name),
-            },
+            }
         )
 
 
@@ -1219,7 +1195,9 @@ class ShopfloorCheckoutValidatorResponse(Component):
         )
 
     def scan_line(self):
-        return self._response_schema(next_states={"select_line", "select_package"})
+        return self._response_schema(
+            next_states={"select_line", "select_package", "summary"}
+        )
 
     def select_line(self):
         return self.scan_line()
