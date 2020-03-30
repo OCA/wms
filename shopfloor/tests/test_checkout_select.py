@@ -15,22 +15,8 @@ class CheckoutListStockPickingCase(CheckoutCommonCase):
         response = self.service.dispatch("list_stock_picking", params={})
         expected = {
             "pickings": [
-                {
-                    "id": picking1.id,
-                    "line_count": len(picking1.move_line_ids),
-                    "name": picking1.name,
-                    "note": "",
-                    "origin": "",
-                    "partner": {"id": self.customer.id, "name": self.customer.name},
-                },
-                {
-                    "id": picking2.id,
-                    "line_count": len(picking2.move_line_ids),
-                    "name": picking2.name,
-                    "note": "",
-                    "origin": "",
-                    "partner": {"id": self.customer.id, "name": self.customer.name},
-                },
+                self._picking_summary_data(picking1),
+                self._picking_summary_data(picking2),
             ]
         }
 
@@ -61,18 +47,7 @@ class CheckoutSelectCase(CheckoutCommonCase):
             response,
             next_state="manual_selection",
             message={"message_type": "error", "message": msg},
-            data={
-                "pickings": [
-                    {
-                        "id": self.picking.id,
-                        "line_count": len(self.picking.move_line_ids),
-                        "name": self.picking.name,
-                        "note": "",
-                        "origin": "",
-                        "partner": {"id": self.customer.id, "name": self.customer.name},
-                    }
-                ]
-            },
+            data={"pickings": [self._picking_summary_data(self.picking)]},
         )
 
     def test_select_error_not_found(self):
