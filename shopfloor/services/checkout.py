@@ -162,62 +162,13 @@ class Checkout(Component):
             next_state="select_document", message=message.stock_picking_not_found()
         )
 
-    def _data_for_move_line(self, move_line):
-        return {
-            "id": move_line.id,
-            "qty_done": move_line.qty_done,
-            "quantity": move_line.product_uom_qty,
-            "product": {
-                "id": move_line.product_id.id,
-                "name": move_line.product_id.name,
-                "display_name": move_line.product_id.display_name,
-                "default_code": move_line.product_id.default_code or "",
-            },
-            "lot": {"id": move_line.lot_id.id, "name": move_line.lot_id.name}
-            if move_line.lot_id
-            else None,
-            "package_src": {
-                "id": move_line.package_id.id,
-                "name": move_line.package_id.name,
-                # TODO
-                "weight": 0,
-                # TODO
-                "line_count": 0,
-                "packaging_name": (
-                    move_line.package_id.product_packaging_id.name or ""
-                ),
-            }
-            if move_line.package_id
-            else None,
-            "package_dest": {
-                "id": move_line.result_package_id.id,
-                "name": move_line.result_package_id.name,
-                # TODO
-                "weight": 0,
-                # TODO
-                "line_count": 0,
-                "packaging_name": (
-                    move_line.result_package_id.product_packaging_id.name or ""
-                ),
-            }
-            if move_line.result_package_id
-            else None,
-            "location_src": {
-                "id": move_line.location_id.id,
-                "name": move_line.location_id.name,
-            },
-            "location_dest": {
-                "id": move_line.location_dest_id.id,
-                "name": move_line.location_dest_id.name,
-            },
-        }
-
     def _data_for_stock_picking(self, picking):
-        data = self._data_picking_base(picking)
+        data_struct = self.actions_for("data")
+        data = data_struct.picking_summary(picking)
         data.update(
             {
                 "move_lines": [
-                    self._data_for_move_line(ml) for ml in self._lines_to_pack(picking)
+                    data_struct.move_line(ml) for ml in self._lines_to_pack(picking)
                 ]
             }
         )
@@ -251,20 +202,11 @@ class Checkout(Component):
             self._domain_for_list_stock_picking(),
             order=self._order_for_list_stock_picking(),
         )
-        data = {"pickings": [self._data_picking_base(picking) for picking in pickings]}
-        return self._response(next_state="manual_selection", data=data, message=message)
-
-    def _data_picking_base(self, picking):
-        return {
-            "id": picking.id,
-            "name": picking.name,
-            "origin": picking.origin or "",
-            "note": picking.note or "",
-            "line_count": len(picking.move_line_ids),
-            "partner": {"id": picking.partner_id.id, "name": picking.partner_id.name}
-            if picking.partner_id
-            else None,
+        data_struct = self.actions_for("data")
+        data = {
+            "pickings": [data_struct.picking_summary(picking) for picking in pickings]
         }
+        return self._response(next_state="manual_selection", data=data, message=message)
 
     def select(self, picking_id):
         """Select a stock picking for the process
@@ -288,14 +230,15 @@ class Checkout(Component):
         return self._select_picking(picking, "manual_selection")
 
     def _response_for_select_package(self, lines, message=None):
+        data_struct = self.actions_for("data")
         picking = lines.mapped("picking_id")
         return self._response(
             next_state="select_package",
             data={
                 "selected_move_lines": [
-                    self._data_for_move_line(line) for line in lines.sorted()
+                    data_struct.move_line(line) for line in lines.sorted()
                 ],
-                "picking": self._data_picking_base(picking),
+                "picking": data_struct.picking_summary(picking),
             },
             message=message,
         )
@@ -755,19 +698,6 @@ class Checkout(Component):
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         return self._create_and_assign_new_packaging(picking, selected_lines)
 
-    def _data_package(self, picking, package):
-        line_count = len(
-            picking.move_line_ids.filtered(lambda l: l.package_id == package)
-        )
-        return {
-            "id": package.id,
-            "name": package.name,
-            # TODO
-            "weight": 0,
-            "line_count": line_count,
-            "packaging_name": package.product_packaging_id.name or "",
-        }
-
     def list_dest_package(self, picking_id, selected_line_ids):
         """Return a list of packages the user can select for the lines
 
@@ -797,17 +727,20 @@ class Checkout(Component):
                     "message": _("No valid package to select."),
                 },
             )
-        picking_data = self._data_picking_base(picking)
+        data_struct = self.actions_for("data")
+        picking_data = data_struct.picking_summary(picking)
         packages_data = [
-            self._data_package(picking, package) for package in packages.sorted()
+            data_struct.package(package, picking=picking)
+            for package in packages.sorted()
         ]
+        data_struct = self.actions_for("data")
         return self._response(
             next_state="select_dest_package",
             data={
                 "picking": picking_data,
                 "packages": packages_data,
                 "selected_move_lines": [
-                    self._data_for_move_line(line) for line in move_lines.sorted()
+                    data_struct.move_line(line) for line in move_lines.sorted()
                 ],
             },
             message=message,
@@ -884,9 +817,6 @@ class Checkout(Component):
             return self._response_stock_picking_does_not_exist()
         return self._response_for_summary(picking)
 
-    def _data_packaging(self, packaging):
-        return {"id": packaging.id, "name": packaging.name}
-
     def _get_allowed_packaging(self):
         return self.env["product.packaging"].search([("product_id", "=", False)])
 
@@ -910,17 +840,19 @@ class Checkout(Component):
 
     def _response_for_change_packaging(self, picking, package, packaging_list):
         message = self.actions_for("message")
+        data_struct = self.actions_for("data")
         if not package:
             return self._response_for_summary(
                 picking, message=message.record_not_found()
             )
+
         return self._response(
             next_state="change_packaging",
             data={
-                "picking": self._data_picking_base(picking),
-                "package": self._data_package(picking, package),
+                "picking": data_struct.picking_summary(picking),
+                "package": data_struct.package(package, picking=picking),
                 "packagings": [
-                    self._data_packaging(packaging)
+                    data_struct.packaging(packaging)
                     for packaging in packaging_list.sorted()
                 ],
             },

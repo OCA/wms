@@ -19,7 +19,7 @@ class SelectDestPackageMixin:
                     "partner": {"id": self.customer.id, "name": self.customer.name},
                 },
                 "packages": [
-                    self._package_data(picking, package) for package in packages
+                    self._package_data(package, picking) for package in packages
                 ],
                 "selected_move_lines": [
                     self._move_line_data(ml) for ml in selected_lines.sorted()
