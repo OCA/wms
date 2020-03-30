@@ -8,14 +8,7 @@ class CheckoutSelectPackageMixin:
                 "selected_move_lines": [
                     self._move_line_data(ml) for ml in selected_lines
                 ],
-                "picking": {
-                    "id": picking.id,
-                    "name": picking.name,
-                    "note": "",
-                    "origin": "",
-                    "line_count": len(picking.move_line_ids),
-                    "partner": {"id": self.customer.id, "name": self.customer.name},
-                },
+                "picking": self._picking_summary_data(picking),
             },
             message=message,
         )

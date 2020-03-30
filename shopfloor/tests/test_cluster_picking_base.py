@@ -5,24 +5,6 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
-        cls.product_a = cls.env["product.product"].create(
-            {
-                "name": "Product A",
-                "type": "product",
-                "default_code": "A",
-                "barcode": "A",
-                "weight": 2,
-            }
-        )
-        cls.product_b = cls.env["product.product"].create(
-            {
-                "name": "Product B",
-                "type": "product",
-                "default_code": "B",
-                "barcode": "B",
-                "weight": 3,
-            }
-        )
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
         cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")

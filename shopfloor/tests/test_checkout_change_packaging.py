@@ -51,32 +51,13 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             response,
             next_state="change_packaging",
             data={
-                "picking": {
-                    "id": self.picking.id,
-                    "name": self.picking.name,
-                    "note": "",
-                    "origin": "",
-                    "line_count": len(self.picking.move_line_ids),
-                    "partner": {"id": self.customer.id, "name": self.customer.name},
-                },
-                "package": {
-                    "id": self.package.id,
-                    "name": self.package.name,
-                    # TODO
-                    "weight": 0,
-                    "line_count": 1,
-                    "packaging_name": self.package.product_packaging_id.name or "",
-                },
+                "picking": self._picking_summary_data(self.picking),
+                "package": self._package_data(self.package, self.picking),
                 "packagings": [
-                    {
-                        "id": self.packaging_inner_box.id,
-                        "name": self.packaging_inner_box.name,
-                    },
-                    {"id": self.packaging_box.id, "name": self.packaging_box.name},
-                    {
-                        "id": self.packaging_pallet.id,
-                        "name": self.packaging_pallet.name,
-                    },
+                    self._packaging_data(packaging)
+                    for packaging in self.packaging_inner_box
+                    + self.packaging_box
+                    + self.packaging_pallet
                 ],
             },
         )
