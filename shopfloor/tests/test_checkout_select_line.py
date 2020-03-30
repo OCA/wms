@@ -90,3 +90,23 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
                 "message": "The record you were working on does not exist anymore.",
             },
         )
+
+    def test_select_line_all_lines_done(self):
+        # set all lines as done
+        self.picking.move_line_ids.write(
+            {"qty_done": 10.0, "shopfloor_checkout_packed": True}
+        )
+        response = self.service.dispatch(
+            "select_line",
+            params={
+                "picking_id": self.picking.id,
+                # doesn't matter as all lines are done, we should be
+                # redirected to the summary
+                "package_id": self.picking.move_line_ids[0].package_id.id,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="summary",
+            data={"picking": self._stock_picking_data(self.picking)},
+        )
