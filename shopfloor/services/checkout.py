@@ -115,7 +115,7 @@ class Checkout(Component):
                     message=message.stock_picking_not_available(picking)
                 )
             return self._response_for_select_document(
-                picking, message=message.stock_picking_not_available(picking)
+                message=message.stock_picking_not_available(picking)
             )
         return self._response_for_select_line(picking)
 
@@ -135,8 +135,7 @@ class Checkout(Component):
             message=message,
         )
 
-    def _response_for_select_document(self, picking, message=None):
-        message = self.actions_for("message")
+    def _response_for_select_document(self, message=None):
         return self._response(next_state="select_document", message=message)
 
     def _data_for_stock_picking(self, picking):
