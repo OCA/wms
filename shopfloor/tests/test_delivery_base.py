@@ -19,3 +19,14 @@ class DeliveryCommonCase(CommonCase):
         super().setUp()
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="delivery")
+
+    def _stock_picking_data(self, picking):
+        return self.service._data_for_stock_picking(picking)
+
+    def assert_response_deliver(self, response, picking=None, message=None):
+        self.assert_response(
+            response,
+            next_state="deliver",
+            data={"picking": self._stock_picking_data(picking) if picking else None},
+            message=message,
+        )
