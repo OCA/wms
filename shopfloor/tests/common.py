@@ -231,6 +231,18 @@ class CommonCase(SavepointCase, ComponentMixin):
                 }
             )
         )
+        cls.product_e = cls.env["product.product"].create(
+            {
+                "name": "Product E",
+                "type": "product",
+                "default_code": "E",
+                "barcode": "E",
+                "weight": 3,
+            }
+        )
+        cls.product_e_packaging = cls.env["product.packaging"].create(
+            {"name": "Box", "product_id": cls.product_d.id, "barcode": "ProductEBox"}
+        )
 
     def assert_response(
         self, response, next_state=None, message=None, data=None, popup=None
