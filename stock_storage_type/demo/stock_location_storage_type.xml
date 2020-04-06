@@ -2,6 +2,7 @@
 <odoo noupdate="1">
     <record id="location_storage_type_pallets" model="stock.location.storage.type">
         <field name="name">Pallets EUR</field>
+        <field name="only_empty" eval="True" />
     </record>
     <record id="location_storage_type_pallets_uk" model="stock.location.storage.type">
         <field name="name">Pallets UK</field>

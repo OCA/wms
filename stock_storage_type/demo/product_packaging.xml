@@ -16,5 +16,9 @@
         <field name="qty">48</field>
         <field name="product_id" ref="product.product_product_9" />
         <field name="package_storage_type_id" ref="package_storage_type_pallets" />
+        <field name="lngth">1200</field>
+        <field name="width">800</field>
+        <field name="height">1500</field>
+        <field name="max_weight">60</field>
     </record>
 </odoo>
