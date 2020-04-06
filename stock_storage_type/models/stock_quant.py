@@ -48,9 +48,17 @@ class StockQuant(models.Model):
                 'product_id'
             )
             lots_in_location = other_quants_in_location.mapped('lot_id')
+            lst_fails = []
             for loc_storage_type in lst_allowed_for_pst:
                 # Check content constraints
                 if loc_storage_type.only_empty and other_quants_in_location:
+                    lst_fails.append(
+                        _(
+                            "Location storage type %s is flagged 'only empty'"
+                            " with other quants in location." %
+                            loc_storage_type
+                        )
+                    )
                     continue
                 if (
                     loc_storage_type.do_not_mix_products and (
@@ -59,6 +67,13 @@ class StockQuant(models.Model):
                         package_products != products_in_location
                     )
                 ):
+                    lst_fails.append(
+                        _(
+                            "Location storage type %s is flagged 'do not mix"
+                            " products' but there are other products in "
+                            "location." % loc_storage_type
+                        )
+                    )
                     continue
                 if (
                     loc_storage_type.do_not_mix_lots and (
@@ -67,17 +82,44 @@ class StockQuant(models.Model):
                         package_lots != lots_in_location
                     )
                 ):
+                    lst_fails.append(
+                        _(
+                            "Location storage type %s is flagged 'do not mix"
+                            " lots' but there are other lots in "
+                            "location." % loc_storage_type
+                        )
+                    )
                     continue
                 # Check size constraint
                 if (
                     loc_storage_type.max_height and
                     quant.package_id.height > loc_storage_type.max_height
                 ):
+                    lst_fails.append(
+                        _(
+                            "Location storage type %s defines max height of %s"
+                            " but the package is bigger: %s." % (
+                                loc_storage_type,
+                                loc_storage_type.max_height,
+                                quant.package_id.height
+                            )
+                        )
+                    )
                     continue
                 if (
                     loc_storage_type.max_weight and
                     quant.package_id.pack_weight > loc_storage_type.max_weight
                 ):
+                    lst_fails.append(
+                        _(
+                            "Location storage type %s defines max weight of %s"
+                            " but the package is heavier: %s." % (
+                                loc_storage_type,
+                                loc_storage_type.max_weight,
+                                quant.package_id.pack_weight
+                            )
+                        )
+                    )
                     continue
                 # If we get here, it means there is a location storage type
                 #  allowing the package into the location
@@ -88,9 +130,12 @@ class StockQuant(models.Model):
                     _(
                         "Package %s is not allowed into location %s, because "
                         "there isn't any location storage type that allows "
-                        "package storage type %s into it."
+                        "package storage type %s into it:\n\n%s"
                     ) % (
-                        quant.package_id.name, location.name, pack_storage_type.name
+                        quant.package_id.name,
+                        location.complete_name,
+                        pack_storage_type.name,
+                        '\n'.join(lst_fails)
                     )
                 )
 

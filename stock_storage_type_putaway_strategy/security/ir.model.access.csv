@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_stock_storage_location_sequence_user,access_stock_storage_location_sequence_user,model_stock_storage_location_sequence,base.group_user,1,0,0,0
-access_stock_storage_location_sequence_manager,access_stock_storage_location_sequence_manager,model_stock_storage_location_sequence,stock.group_stock_multi_locations,1,1,1,1

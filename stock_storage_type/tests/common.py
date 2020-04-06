@@ -20,7 +20,7 @@ class TestStorageTypeCommon(SavepointCase):
         cls.cardboxes_location = ref("stock_storage_type.stock_location_cardboxes")
         cls.pallets_location = ref("stock_storage_type.stock_location_pallets")
         cls.pallets_reserve_location = ref(
-            "stock_storage_type_putaway_strategy.stock_location_pallets_reserve"
+            "stock_storage_type.stock_location_pallets_reserve"
         )
         cls.areas = (
             cls.cardboxes_location | cls.pallets_location | cls.pallets_reserve_location
@@ -39,6 +39,7 @@ class TestStorageTypeCommon(SavepointCase):
         cls.cardboxes_bin_4_location = cls.cardboxes_bin_1_location.copy(
             {"name": "Bin 4"}
         )
+        cls.env['stock.location']._parent_store_compute()
         cls.pallets_bin_1_location = ref(
             "stock_storage_type.stock_location_pallets_bin_1"
         )

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<odoo>
-    <record id="stock_storage_type.product_product_9_packaging_48_pallet" model="product.packaging">
-        <field name="lngth">1200</field>
-        <field name="width">800</field>
-        <field name="height">1500</field>
-        <field name="max_weight">60</field>
-    </record>
-</odoo>
