@@ -11,14 +11,22 @@
     "license": "AGPL-3",
     "application": False,
     "installable": True,
-    "depends": ["base_m2m_custom_field", "stock"],
+    "depends": [
+        "base_m2m_custom_field",
+        "stock_location_children",
+        "stock_quant_package_dimension",
+
+    ],
     "data": [
         "security/ir.model.access.csv",
         "views/product_packaging.xml",
         "views/stock_location.xml",
-        "views/stock_location_storage_type.xml",
-        "views/stock_package_storage_type.xml",
         "views/stock_location_package_storage_type_rel.xml",
+        "views/stock_location_storage_type.xml",
+        "views/stock_package_level.xml",
+        "views/stock_package_storage_type.xml",
+        "views/stock_quant_package.xml",
+        "views/stock_storage_location_sequence.xml",
         "views/storage_type_menus.xml",
     ],
     "demo": [
@@ -26,5 +34,6 @@
         "demo/stock_package_storage_type.xml",
         "demo/product_packaging.xml",
         "demo/stock_location.xml",
+        "demo/stock_storage_location_sequence.xml",
     ],
 }
