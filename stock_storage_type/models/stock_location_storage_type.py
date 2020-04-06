@@ -61,6 +61,7 @@ class StockLocationStorageType(models.Model):
         help="If defined, moves to the destination location will only be "
         "allowed if the packaging wight is lower than this maximum.",
     )
+    has_restrictions = fields.Boolean(compute="_compute_has_restrictions")
 
     @api.constrains("only_empty", "do_not_mix_lots", "do_not_mix_products")
     def _check_empty_mix(self):
@@ -94,3 +95,22 @@ class StockLocationStorageType(models.Model):
     def _onchange_do_not_mix_products(self):
         if not self.do_not_mix_products:
             self.do_not_mix_lots = False
+
+    @api.depends(
+        "only_empty",
+        "do_not_mix_lots",
+        "do_not_mix_products",
+        "max_height",
+        "max_weight",
+    )
+    def _compute_has_restrictions(self):
+        for slst in self:
+            slst.has_restrictions = any(
+                [
+                    slst.only_empty,
+                    slst.do_not_mix_lots,
+                    slst.do_not_mix_products,
+                    slst.max_height,
+                    slst.max_weight,
+                ]
+            )
