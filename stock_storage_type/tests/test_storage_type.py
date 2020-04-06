@@ -87,5 +87,7 @@ class TestStorageType(SavepointCase):
         # Cannot set do not mix lots without do not mix products
         with self.assertRaises(ValidationError):
             self.pallets_location_storage_type.do_not_mix_lots = True
+        self.pallets_location_storage_type.do_not_mix_lots = False
+        self.pallets_location_storage_type.only_empty = False
         self.pallets_location_storage_type.do_not_mix_products = True
         self.pallets_location_storage_type.do_not_mix_lots = True
