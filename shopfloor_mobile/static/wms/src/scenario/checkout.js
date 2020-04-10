@@ -33,7 +33,7 @@ export var Checkout = Vue.component('checkout', {
             <div v-if="state_is('select_line')">
                 <checkout-picking-detail
                     :info="state.data"
-                    :grouped_lines="group_lines_by_location(state.data.lines)"
+                    :grouped_lines="group_lines_by_location(state.data.move_lines)"
                     v-on:select="state.on_select"
                     v-on:back="state.on_back"
                     />
@@ -49,7 +49,7 @@ export var Checkout = Vue.component('checkout', {
             <div v-if="state_is('summary')">
                 <checkout-summary-detail
                     :info="state.data"
-                    :grouped_lines="group_lines_by_location(state.data.lines, {'group_key': 'location_dst', 'prepare_records': group_by_pack})"
+                    :grouped_lines="group_lines_by_location(state.data.move_lines, {'group_key': 'location_dest', 'prepare_records': group_by_pack})"
                     v-on:select="state.on_select"
                     v-on:back="state.on_back"
                     />
@@ -123,9 +123,9 @@ export var Checkout = Vue.component('checkout', {
             const self = this;
             const res = [];
             const packs = _.uniqBy(_.map(lines, function (x) {
-                return x.pack;
+                return x.package_dest;
             }), 'id');
-            const grouped = _.groupBy(lines, 'pack.id');
+            const grouped = _.groupBy(lines, 'package_dest.id');
             _.forEach(grouped, function (products, pack_id) {
                 const pack = _.first(_.filter(packs, {'id': parseInt(pack_id)}));
                 res.push({
@@ -141,11 +141,11 @@ export var Checkout = Vue.component('checkout', {
         group_by_package_type: function (lines) {
             const res = [];
             const pkgs = _.uniqBy(_.map(lines, function (x) {
-                return x.pack ? x.pack.package_type : null;
+                return x.package_dest ? x.package_dest.package_name : null;
             }), 'id');
-            const grouped = _.groupBy(lines, 'pack.package_type.id');
-            _.forEach(grouped, function (products, pkg_type_id) {
-                const pkg = _.first(_.filter(pkgs, {'id': parseInt(pkg_type_id)}));
+            const grouped = _.groupBy(lines, 'package_dest.package_name');
+            _.forEach(grouped, function (products, package_name) {
+                const pkg = _.first(_.filter(pkgs, {'package_name': package_name}));
                 res.push({
                     'key': pkg ? pkg.name : 'no-pkg',
                     // No pack, just display the product name
@@ -218,18 +218,16 @@ export var Checkout = Vue.component('checkout', {
                         if (!selected) {
                             return;
                         }
-                        const line = this.record_by_id(this.state.data.lines, selected);
+                        const line = this.record_by_id(this.state.data.move_lines, selected);
                         console.log('SELECTED', line, 'TODO');
-                        if (false) {
-                            this.go_state(
-                                'wait_call',
-                                this.odoo.call('select_line', {
-                                    'picking_id': this.picking_id,
-                                    'move_line_id': line.id,
-                                    'package_id': line.pack ? line.pack.id : null,
-                                }),
-                            );
-                        }
+                        this.go_state(
+                            'wait_call',
+                            this.odoo.call('select_line', {
+                                'picking_id': this.picking_id,
+                                'move_line_id': line.id,
+                                'package_id': line.package_dest ? line.package_dest.id : null,
+                            }),
+                        );
                     },
                     on_back: () => {
                         this.go_state('start');

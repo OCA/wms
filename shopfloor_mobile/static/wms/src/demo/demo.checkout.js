@@ -42,7 +42,7 @@ var DEMO_CHECKOUT = {
     "select_line": {
         "next_state": "select_pack",
         "data": {
-            "select_pack": demotools.makePicking({"lines_count": 5, "line_random_pack": true, "line_random_dst": true}),
+            "select_pack": demotools.makePicking({"lines_count": 5, "line_random_pack": true, "line_random_dest": true}),
         },
     },
     // TODO

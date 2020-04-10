@@ -17,7 +17,7 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
                     name: "Location SRC 1",
                     barcode: "loc1",
                 },
-                location_dst: {
+                location_dest: {
                     id: 2,
                     name: "Location DST 2",
                     barcode: "loc2",

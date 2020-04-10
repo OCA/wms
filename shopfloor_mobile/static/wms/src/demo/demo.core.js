@@ -8,7 +8,7 @@ export class DemoTools {
         this.locations_src = [
             this.makeLocation('LOC-SRC'), this.makeLocation('LOC-SRC'), this.makeLocation('LOC-SRC'),
         ];
-        this.locations_dst = [
+        this.locations_dest = [
             this.makeLocation('LOC-DST'), this.makeLocation('LOC-DST'), this.makeLocation('LOC-DST'),
         ];
     }
@@ -68,13 +68,12 @@ export class DemoTools {
         return this.makeSimpleRecord({name_prefix: 'LOT'});
     }
 
-    makePack () {
-        const pack = this.makeSimpleRecord({name_prefix: 'PACK', padding: 10});
+    makePack (options={}) {
+        _.extend(options, {name_prefix: 'PACK', padding: 10});
+        const pack = this.makeSimpleRecord(options);
         _.extend(pack, {
-            "package_type": {
-                "id": this.getRandomInt(),
-                "name": "PKG type " + this.getRandomInt(),
-            },
+            "weight": this.getRandomInt() + "Kg",
+            "packaging_name": "PKG type " + this.getRandomInt(10),
         });
         return pack;
     }
@@ -85,6 +84,7 @@ export class DemoTools {
         _.extend(prod, {
             "default_code": default_code,
             "display_name": "[" + default_code + "] " + prod.name,
+            // TODO: check if still needed
             "qty": this.getRandomInt(200),
             "qty_available": this.getRandomInt(200),
         });
@@ -99,53 +99,70 @@ export class DemoTools {
                 // No pack every 3 items
                 pack = null;
             }
-            let loc_dst = this.randomFromArray(this.locations_dst);
-            if (options.line_random_dst && i % 3 == 0) {
+            let loc_dest = this.randomFromArray(this.locations_dest);
+            if (options.line_random_dest && i % 3 == 0) {
                 // No pack every 3 items
-                loc_dst = null;
+                loc_dest = null;
             }
-            lines.push({
+            lines.push(this.makeMoveLine({
                 "id": i,
-                "picking_id": options.picking ? options.picking.id : null,
+                "picking": options.picking ? options.picking : null,
                 "product": this.makeProduct(i),
-                "pack": pack,
+                "package_dest": pack,
                 "location_src": this.randomFromArray(this.locations_src),
-                "location_dst": loc_dst,
-            });
+                "location_dest": loc_dest,
+            }));
         }
         return lines;
     }
 
-    makePicking (options={}) {
-        const picking = this.makeSimpleRecord({name_prefix: 'PICK', padding: 8});
-        _.extend(picking, {
+    makePicking (defaults={}, options={}) {
+        _.defaults(defaults, {
+            "name_prefix": 'PICK',
+            "padding": 8,
             "origin": "SO" + _.padStart(this.getRandomInt(), 6, 0),
             "move_line_count": this.getRandomInt(10),
             "weight": this.getRandomInt(1000),
+            "move_lines": [],
             "lines_count": 0,
             "partner": this.makeSimpleRecord({
                 'name': this.randomFromArray(this.customerNames()),
             }),
+            "note": this.randomFromArray([null, "demo picking note"]),
         });
-        options.picking = picking;
-        picking.lines = this.makePickingLines(options);
+        const picking = this.makeSimpleRecord(defaults);
+        picking.move_lines = this.makePickingLines({picking: picking}, options);
+        picking.lines_count = picking.move_lines.length;
         return picking;
     }
 
-    makeBatchPickingLine () {
+    makeMoveLine (defaults={}, options={}) {
+        _.defaults(defaults, {
+            "qty_done": 0,
+        });
+        const qty = this.getRandomInt();
+        const qty_done = options.qty_done_full ? qty : defaults.qty_done;
         return {
             "id": this.getRandomInt(),
+            "quantity": qty,
+            "qty_done": qty_done,
+            "product": this.makeProduct(),
+            "lot": this.makeLot(),
+            "package_src": this.makePack({"name_prefix": "PACK-SRC"}),
+            "package_dest": this.makePack({"name_prefix": "PACK-DST"}),
+            "origin": "S0" + this.getRandomInt(),
+            "location_src": this.makeLocation('LOC-SRC'),
+            "location_dest": this.makeLocation('LOC-DST'),
+        };
+    }
+
+    makeBatchPickingLine (defaults={}) {
+        _.defaults(defaults, {
             "postponed": true,
             "picking": this.makePicking(),
             "batch": this.makeSimpleRecord({name_prefix: 'BATCH'}),
-            "lot": this.makeLot(),
-            "pack": this.makePack(),
-            "origin": "S0" + this.getRandomInt(),
-            "move_line_count": this.getRandomInt(20),
-            "product": this.makeProduct(),
-            "location_src": this.makeLocation('LOC-SRC'),
-            "location_dst": this.makeLocation('LOC-DST'),
-        };
+        });
+        return this.makeMoveLine(defaults);
     }
 
     customerNames () {

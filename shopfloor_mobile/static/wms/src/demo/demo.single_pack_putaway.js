@@ -14,7 +14,7 @@ var DEMO_SINGLE_PUTAWAY_1 = {
                     id: 1,
                     name: "Location SRC 1",
                 },
-                location_dst: {
+                location_dest: {
                     id: 2,
                     name: "Location SRC 2",
                 },
@@ -66,7 +66,7 @@ var DEMO_SINGLE_PUTAWAY_4 = {
                     id: 1,
                     name: "Location SRC 4",
                 },
-                location_dst: {
+                location_dest: {
                     id: 2,
                     name: "Location DST 4",
                 },
@@ -103,7 +103,7 @@ var DEMO_SINGLE_PUTAWAY_5 = {
                     id: 1,
                     name: "Location SRC 5",
                 },
-                location_dst: {
+                location_dest: {
                     id: 2,
                     name: "Location DST 5",
                 },
@@ -137,7 +137,7 @@ var DEMO_SINGLE_PUTAWAY_6 = {
                     id: 1,
                     name: "Location SRC 6",
                 },
-                location_dst: {
+                location_dest: {
                     id: 2,
                     name: "Location DST 6",
                 },
@@ -172,7 +172,7 @@ var DEMO_SINGLE_PUTAWAY_7 = {
                     id: 1,
                     name: "Location SRC 7",
                 },
-                location_dst: {
+                location_dest: {
                     id: 2,
                     name: "Location DST 7",
                 },

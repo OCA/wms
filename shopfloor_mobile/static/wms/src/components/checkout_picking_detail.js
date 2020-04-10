@@ -29,7 +29,7 @@ var CheckoutPickingDetailMixin = {
     </v-card>
 
     <manual-select
-        :records="info.lines"
+        :records="info.move_lines"
         :grouped_records="grouped_lines"
         :options="select_options"
         />
@@ -50,13 +50,13 @@ Vue.component('checkout-select-content', {
     },
     template: `
     <div>
-        <div class="has_pack" v-if="record.pack">
+        <div class="has_pack" v-if="record.package_dest">
             <div class="item-counter">
                 <span>{{ index + 1 }} / {{ count }}</span>
             </div>
-            <span>{{ record.pack.name }}</span>
+            <span>{{ record.package_dest.name }}</span>
         </div>
-        <div class="no_pack" v-if="!record.pack">
+        <div class="no_pack" v-if="!record.package_dest">
             <div class="item-counter">
                 <span>{{ index + 1 }} / {{ count }}</span>
             </div>

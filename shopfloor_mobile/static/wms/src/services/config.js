@@ -1,5 +1,5 @@
 import {Odoo} from "./odoo.js";
-import {Storage} from "./storage.js";
+
 
 export class Config {
     constructor() {
@@ -18,13 +18,13 @@ export class Config {
                 if (!_.isUndefined(result.data)) {
                     this.data = result.data;
                     // TMP DEV add menu item for XXX process to draft
-                    this.data.menus.push({
-                        'id': 99, 'name': 'Checkout', 'process': {'id': 99, 'code': 'checkout'},
-                    });
                     this.authenticated = true;
                 } else {
                     console.log(result);
                 }
+                this.data.menus.push({
+                    'id': 99, 'name': 'Checkout', 'process': {'id': 99, 'code': 'checkout'},
+                });
             });
     }
 }
