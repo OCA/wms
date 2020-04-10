@@ -266,6 +266,7 @@ class ClusterPicking(Component):
         return self._data_move_line(remaining_lines[0])
 
     def _data_move_line(self, line):
+        # TODO: use shopfloor.data.action.move_line
         picking = line.picking_id
         batch = picking.batch_id
         product = line.product_id
