@@ -37,8 +37,8 @@ var operationDetail = Vue.component("operation-detail", {
       </tr>
       <tr class="amber">
         <th>Destination</th>
-        <td>{{ operation.location_dst.name }}
-            <v-btn @click="show_popup(operation.location_dst.barcode)" icon text class="float-right">
+        <td>{{ operation.location_dest.name }}
+            <v-btn @click="show_popup(operation.location_dest.barcode)" icon text class="float-right">
                 <v-icon large dark>mdi-help-circle</v-icon>
             </v-btn>
         </td>

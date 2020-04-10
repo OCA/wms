@@ -77,7 +77,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                         <div class="main-info">
                             <div class="destination">
                                 <span class="label">Destination:</span>
-                                {{ state.data.location_dst.name }}
+                                {{ state.data.location_dest.name }}
                             </div>
                         </div>
                     </v-card-title>

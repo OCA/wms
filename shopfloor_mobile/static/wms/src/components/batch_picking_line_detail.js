@@ -18,9 +18,9 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     <v-card-title>
       <div class="main-info">
         <div class="source"><span class="label">Location:</span> {{ line.location_src.name }}</div>
-        <div v-if="line.destination_pack" class="destination-bin"><span class="label">Destination bin:</span> {{ line.destination_pack.name }}</div>
+        <div v-if="line.package_dest" class="pack pack-dest"><span class="label">Destination bin:</span> {{ line.package_dest.name }}</div>
         <div v-if="line.lot" class="lot"><span class="label">Lot:</span> {{ line.lot.name }}</div>
-        <div class="pack"><span class="label">Pack:</span> {{ line.pack.name }}</div>
+        <div v-if="line.package_src" class="pack pack-src"><span class="label">Pack:</span> {{ line.package_src.name }}</div>
         <div class="qty-pkg"><span class="label">Qty:</span> {{ line.quantity }}</div>
       </div>
     </v-card-title>
@@ -43,7 +43,7 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
         <span>{{ line.picking.partner.name }}</span>
       </div>
       <div class="qty-on-hand"><span class="label">On hand qty:</span> {{ line.product.qty_available }}</div>
-      <div class="destination"><span class="label">Destination:</span> {{ line.location_dst.name }}</div>
+      <div class="destination"><span class="label">Destination:</span> {{ line.location_dest.name }}</div>
     </v-card-text>
   </v-card>
 

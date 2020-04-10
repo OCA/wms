@@ -10,7 +10,7 @@ var DEMO_SCAN_ANYTHING_PACK = {
                 id: 1923,
                 name: "B1S08A34",
             },
-            location_dst: {
+            location_dest: {
                 id: 224,
                 name: "B1S00A01",
             },

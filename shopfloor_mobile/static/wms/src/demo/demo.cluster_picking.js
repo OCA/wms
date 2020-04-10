@@ -1,5 +1,12 @@
 /* eslint no-use-before-define: 0 */ // --> OFF
 
+
+/*
+TODO: fix data as per `shopfloor.data.action`
+In demo.core.js I've adjusted generated data to match checkout's format
+that comes from data.move_line().
+*/
+
 var DEMO_CLUSTER_PICKING_1 = {
     find_batch: {
         next_state: "confirm_start",
