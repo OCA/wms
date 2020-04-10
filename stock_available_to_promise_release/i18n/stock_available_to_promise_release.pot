@@ -1,0 +1,201 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_available_to_promise_release
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_move__ordered_available_to_promise
+msgid ""
+"Available to Promise quantity minus quantities promised  to older promised "
+"operations."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_move_release_form
+msgid "Cancel"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model,name:stock_available_to_promise_release.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
+msgid ""
+"Compute product quantity to be delivered based on given days of horizon."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_res_company__stock_reservation_horizon
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_res_config_settings__stock_reservation_horizon
+msgid ""
+"Compute promised quantities for order planned to be shipped until this "
+"number of days from today."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model,name:stock_available_to_promise_release.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.actions.act_window,help:stock_available_to_promise_release.stock_move_release_action
+msgid "Create a new stock movement"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move_release__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move_release__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_move__date_priority
+msgid ""
+"Date/time used to sort moves to deliver first. Used to calculate the ordered"
+" available to promise."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move_release__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_location_route__available_to_promise_defer_pull
+msgid ""
+"Do not create chained moved automatically for delivery. Transfers must be "
+"released manually when they have enough available to promise."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move_release__id
+msgid "ID"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model,name:stock_available_to_promise_release.model_stock_location_route
+msgid "Inventory Routes"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move_release____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move_release__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move_release__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__need_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__need_release
+msgid "Need Release"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__ordered_available_to_promise
+msgid "Ordered Available to Promise"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__date_priority
+msgid "Priority Date"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model,name:stock_available_to_promise_release.model_procurement_group
+msgid "Procurement Group"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_picking_release_form
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_move_release_form
+msgid "Release"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_move_release_form
+msgid "Release Stock Move"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_move_release_form
+msgid "Release Stock Moves"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_location_route__available_to_promise_defer_pull
+msgid "Release based on Available to Promise"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model,name:stock_available_to_promise_release.model_stock_move
+msgid "Stock Move"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model,name:stock_available_to_promise_release.model_stock_move_release
+msgid "Stock Move Release"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.actions.act_window,name:stock_available_to_promise_release.stock_move_release_action
+#: model:ir.ui.menu,name:stock_available_to_promise_release.stock_move_release_menu
+msgid "Stock Moves To Release"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_res_company__stock_reservation_horizon
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_res_config_settings__stock_reservation_horizon
+msgid "Stock Reservation Horizon"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model,name:stock_available_to_promise_release.model_stock_rule
+msgid "Stock Rule"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
+msgid "Stock reservation"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_move_release_form
+msgid "The selected stock moves will be released."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.actions.act_window,help:stock_available_to_promise_release.stock_move_release_action
+msgid ""
+"This menu gives you the full traceability of inventory\n"
+"                operations on a specific product. You can filter on the product\n"
+"                to see all the past or future movements for the product."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model,name:stock_available_to_promise_release.model_stock_picking
+msgid "Transfer"
+msgstr ""

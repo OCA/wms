@@ -1,11 +1,9 @@
-Vue.component('detail-product', {
-    data: function () {
-        return {
-        };
+Vue.component("detail-product", {
+    data: function() {
+        return {};
     },
-    props:['productDetail'],
-    methods: {
-    },
+    props: ["productDetail"],
+    methods: {},
     template: `
         <v-simple-table>
         <template v-slot:default>

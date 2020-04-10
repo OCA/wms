@@ -1,12 +1,12 @@
-export var batch_picking_line = Vue.component('batch-picking-line-detail', {
+export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     props: {
-        'line': Object,
-        'showFullInfo': {
-            'type': Boolean,
-            'default': true,
+        line: Object,
+        showFullInfo: {
+            type: Boolean,
+            default: true,
         },
     },
-    data () {
+    data() {
         return {
             dialog: false,
         };
@@ -51,10 +51,9 @@ export var batch_picking_line = Vue.component('batch-picking-line-detail', {
 `,
 });
 
-
-export var batch_picking_line_actions = Vue.component('batch-picking-line-actions', {
-    props:['line'],
-    data () {
+export var batch_picking_line_actions = Vue.component("batch-picking-line-actions", {
+    props: ["line"],
+    data() {
         return {
             dialog: false,
         };
@@ -104,10 +103,11 @@ export var batch_picking_line_actions = Vue.component('batch-picking-line-action
 `,
 });
 
-
-export var batch_picking_line_stock_out = Vue.component('batch-picking-line-stock-out', {
-    props:['line'],
-    template: `
+export var batch_picking_line_stock_out = Vue.component(
+    "batch-picking-line-stock-out",
+    {
+        props: ["line"],
+        template: `
     <div class="batch-picking-line-stock-out">
       <batch-picking-line-detail :line="line" :showFullInfo="false" />
       <div class="button-list button-vertical-list full">
@@ -124,4 +124,5 @@ export var batch_picking_line_stock_out = Vue.component('batch-picking-line-stoc
       </div>
     </div>
 `,
-});
+    }
+);

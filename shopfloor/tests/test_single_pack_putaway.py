@@ -38,10 +38,6 @@ class SinglePackPutawayCase(CommonCase):
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="single_pack_putaway")
 
-    def test_to_openapi(self):
-        # will raise if it fails to generate the openapi specs
-        self.service.to_openapi()
-
     def test_start(self):
         """Test the happy path for single pack putaway /start endpoint
 
@@ -76,7 +72,7 @@ class SinglePackPutawayCase(CommonCase):
             move_line, [{"qty_done": 1.0, "location_dest_id": self.shelf1.id}]
         )
         self.assertRecordValues(
-            move, [{"state": "assigned", "location_dest_id": self.stock_location.id}]
+            move, [{"state": "assigned", "location_dest_id": self.shelf1.id}]
         )
         self.assert_response(
             response,

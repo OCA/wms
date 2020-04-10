@@ -1,8 +1,8 @@
-Vue.component('reset-screen-button', {
-    props: ['show_reset_button'],
+Vue.component("reset-screen-button", {
+    props: ["show_reset_button"],
     methods: {
-        reset: function () {
-            this.$emit('reset');
+        reset: function() {
+            this.$emit("reset");
         },
     },
     template: `
@@ -14,7 +14,7 @@ Vue.component('reset-screen-button', {
     `,
 });
 
-Vue.component('cancel-button', {
+Vue.component("cancel-button", {
     template: `
         <div class="action reset">
             <v-btn depressed x-large color="error" v-on:click="$emit('cancel')">Cancel</v-btn>
@@ -23,10 +23,10 @@ Vue.component('cancel-button', {
 });
 
 // TODO: could be merged w/ userConfirmation
-Vue.component('last-operation', {
+Vue.component("last-operation", {
     // Props: ['info'],
-    data: function () {
-        return {'info': {}};
+    data: function() {
+        return {info: {}};
     },
     template: `
     <div class="last-operation">
@@ -45,8 +45,7 @@ Vue.component('last-operation', {
     `,
 });
 
-
-Vue.component('get-work', {
+Vue.component("get-work", {
     template: `
     <div class="get-work fullscreen-buttons fullscreen-buttons-50">
       <v-btn id="btn-get-work" color="success" @click="$emit('get_work')">
@@ -59,8 +58,7 @@ Vue.component('get-work', {
     `,
 });
 
-
-Vue.component('stock-zero-check', {
+Vue.component("stock-zero-check", {
     template: `
     <div class="stock-zero-check">
       <v-dialog fullscreen tile value=true class="actions fullscreen">
@@ -86,7 +84,7 @@ Vue.component('stock-zero-check', {
 
 Vue.component('state-display-info', {
     props: {
-        'info': Object,
+        info: Object,
     },
     template: `
   <div class="state-display-info" v-if="info.title">

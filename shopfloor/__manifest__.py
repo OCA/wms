@@ -18,6 +18,10 @@
         "auth_api_key",
         # https://github.com/OCA/stock-logistics-warehouse/pull/808
         "stock_picking_completion_info",
+        # https://github.com/OCA/stock-logistics-workflow/pull/608
+        "stock_quant_package_dimension",
+        # https://github.com/OCA/stock-logistics-workflow/pull/607
+        "stock_quant_package_product_packaging",
     ],
     "data": [
         "security/ir.model.access.csv",

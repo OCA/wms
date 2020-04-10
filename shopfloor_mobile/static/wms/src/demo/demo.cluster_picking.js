@@ -13,13 +13,13 @@ var DEMO_CLUSTER_PICKING_1 = {
             },
         },
     },
-    "list_batch": {
-        "next_state": "manual_selection",
-        "message": {
-            "message_type": "success",
-            "message": "Previous line postponed",
+    list_batch: {
+        next_state: "manual_selection",
+        message: {
+            message_type: "success",
+            message: "Previous line postponed",
         },
-        "data": {
+        data: {
             // Next line to process
             "manual_selection": {
                 "records": demotools.batchList(15),
@@ -44,109 +44,105 @@ var DEMO_CLUSTER_PICKING_1 = {
             "start_line": demotools.makeBatchPickingLine(),
         },
     },
-    "unassign": {
-        "next_state": "start",
+    unassign: {
+        next_state: "start",
     },
-    "scan_line": {
-        "next_state": "scan_destination",
-        "data": {
-            "scan_destination": {
-
-            },
+    scan_line: {
+        next_state: "scan_destination",
+        data: {
+            scan_destination: {},
         },
     },
-    "scan_destination_pack": {
-        "ok": {
-            "next_state": "start_line",
-            "message": {
-                "message_type": "success",
-                "message": "Product 5 put in bin #2",
+    scan_destination_pack: {
+        ok: {
+            next_state: "start_line",
+            message: {
+                message_type: "success",
+                message: "Product 5 put in bin #2",
             },
             "data": {
                 "start_line": demotools.makeBatchPickingLine(),
             },
         },
-        "ko": {
-            "next_state": "zero_check",
-            "message": {
-                "message_type": "info",
-                "message": "Stock check required",
+        ko: {
+            next_state: "zero_check",
+            message: {
+                message_type: "info",
+                message: "Stock check required",
             },
-            "data": {
-                "zero_check": {},
+            data: {
+                zero_check: {},
             },
         },
     },
-    "stock_is_zero": {
-        "next_state": "start_line",
-        "message": {
-            "message_type": "success",
-            "message": "Stock zero confirmed",
+    stock_is_zero: {
+        next_state: "start_line",
+        message: {
+            message_type: "success",
+            message: "Stock zero confirmed",
         },
-        "data": {
+        data: {
             // Next line to process
             "start_line": demotools.makeBatchPickingLine(),
         },
     },
-    "skip_line": {
-        "next_state": "start_line",
-        "message": {
-            "message_type": "success",
-            "message": "Previous line postponed",
+    skip_line: {
+        next_state: "start_line",
+        message: {
+            message_type: "success",
+            message: "Previous line postponed",
         },
-        "data": {
+        data: {
             // Next line to process
             "start_line": demotools.makeBatchPickingLine(),
         },
     },
-    "stock_issue": {
-        "next_state": "start_line",
-        "message": {
-            "message_type": "success",
-            "message": "Stock out confirmed",
+    stock_issue: {
+        next_state: "start_line",
+        message: {
+            message_type: "success",
+            message: "Stock out confirmed",
         },
-        "data": {
+        data: {
             // Next line to process
             "start_line": demotools.makeBatchPickingLine(),
         },
     },
-    "check_pack_lot": {},
-    "prepare_unload": {
-        "next_state": "unload_all",
-        "data": {
-            "unload_all": {
-
-            },
+    check_pack_lot: {},
+    prepare_unload: {
+        next_state: "unload_all",
+        data: {
+            unload_all: {},
         },
     },
-    "set_destination_all": {
-        "OK": {
-            "next_state": "start_line",
-            "message": {
-                "message_type": "success",
-                "message": "Destination set",
+    set_destination_all: {
+        OK: {
+            next_state: "start_line",
+            message: {
+                message_type: "success",
+                message: "Destination set",
             },
-            "data": {
+            data: {
                 // Next line to process
                 "start_line": demotools.makeBatchPickingLine(),
             },
         },
-        "KO": {
-            "next_state": "confirm_unload_all",
-            "data": {
+        KO: {
+            next_state: "confirm_unload_all",
+            data: {
                 // Next line to process
-                "unload_all": {},
+                unload_all: {},
             },
-            "message": {
-                "message_type": "warning",
-                "message": "Confirm you want to unload them all?",
+            message: {
+                message_type: "warning",
+                message: "Confirm you want to unload them all?",
             },
         },
     },
-    "unload_split": {},
-    "unload_scan_pack": {},
-    "unload_scan_destination": {},
-    "unload_router": {},
+    unload_split: {},
+    unload_scan_pack: {},
+    unload_scan_destination: {},
+    unload_router: {},
 };
 
 demotools.add_case('cluster_picking', DEMO_CLUSTER_PICKING_1);

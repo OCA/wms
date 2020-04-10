@@ -5,24 +5,6 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
-        cls.product_a = cls.env["product.product"].create(
-            {
-                "name": "Product A",
-                "type": "product",
-                "default_code": "A",
-                "barcode": "A",
-                "weight": 2,
-            }
-        )
-        cls.product_b = cls.env["product.product"].create(
-            {
-                "name": "Product B",
-                "type": "product",
-                "default_code": "B",
-                "barcode": "B",
-                "weight": 3,
-            }
-        )
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
         cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
@@ -93,13 +75,13 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
             "pack": {"id": package.id, "name": package.name} if package else None,
         }
 
-
-class ClusterPickingAPICase(ClusterPickingCommonCase):
-    """Base tests for the cluster picking API"""
-
-    def test_to_openapi(self):
-        # will raise if it fails to generate the openapi specs
-        self.service.to_openapi()
+    @classmethod
+    def _set_dest_package_and_done(cls, move_lines, dest_package):
+        """Simulate what would have been done in the previous steps"""
+        for line in move_lines:
+            line.write(
+                {"qty_done": line.product_uom_qty, "result_package_id": dest_package.id}
+            )
 
 
 class ClusterPickingLineCommonCase(ClusterPickingCommonCase):

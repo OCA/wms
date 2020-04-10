@@ -20,7 +20,7 @@ export var SinglePackTransfer = Vue.component('single-pack-transfer', {
             <cancel-button v-on:cancel="on_cancel" v-if="show_cancel_button"></cancel-button>
         </Screen>
     `,
-    data: function () {
+    data: function() {
         return {
             'usage': 'single_pack_transfer',
             'show_reset_button': true,
@@ -29,7 +29,7 @@ export var SinglePackTransfer = Vue.component('single-pack-transfer', {
                 'show_completion_info': {
                     on_confirm: () => {
                         // TODO: turn the cone?
-                        this.go_state('start');
+                        this.go_state("start");
                     },
                 },
             },

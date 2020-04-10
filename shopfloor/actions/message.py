@@ -35,6 +35,9 @@ class MessageAction(Component):
             "message": _("The package %s doesn't exist") % barcode,
         }
 
+    def bin_not_found_for_barcode(self, barcode):
+        return {"message_type": "error", "message": _("Bin %s doesn't exist") % barcode}
+
     def package_not_allowed_in_src_location(self, barcode, picking_type):
         return {
             "message_type": "error",
@@ -65,10 +68,16 @@ class MessageAction(Component):
             "message": _("This operation does not exist anymore."),
         }
 
+    def stock_picking_not_found(self):
+        return {
+            "message_type": "error",
+            "message": _("This transfer does not exist anymore."),
+        }
+
     def record_not_found(self):
         return {
             "message_type": "error",
-            "message": _("This record you were working on does not exist anymore."),
+            "message": _("The record you were working on does not exist anymore."),
         }
 
     def barcode_not_found(self):
@@ -85,6 +94,9 @@ class MessageAction(Component):
             "message_type": "error",
             "message": _("No location found for this barcode."),
         }
+
+    def location_not_allowed(self):
+        return {"message_type": "error", "message": _("Location not allowed here.")}
 
     def dest_location_not_allowed(self):
         return {"message_type": "error", "message": _("You cannot place it here")}
@@ -148,4 +160,46 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "message": _("No pending operation for package %s." % pack.name),
+        }
+
+    def unrecoverable_error(self):
+        return {
+            "message_type": "error",
+            "message": _("Unrecoverable error, please restart."),
+        }
+
+    def x_units_put_in_package(self, qty, product, package):
+        return {
+            "message_type": "success",
+            "message": _("{} {} put in {}").format(
+                qty, product.display_name, package.name
+            ),
+        }
+
+    def cannot_move_something_in_picking_type(self):
+        return {
+            "message_type": "error",
+            "message": _("You cannot move this using this menu."),
+        }
+
+    def stock_picking_not_available(self, picking):
+        return {
+            "message_type": "error",
+            "message": _("Transfer {} is not available.").format(picking.name),
+        }
+
+    def product_multiple_packages_scan_package(self):
+        return {
+            "message_type": "warning",
+            "message": _(
+                "This product is part of multiple packages, please scan a package."
+            ),
+        }
+
+    def lot_multiple_packages_scan_package(self):
+        return {
+            "message_type": "warning",
+            "message": _(
+                "This lot is part of multiple packages, please scan a package."
+            ),
         }

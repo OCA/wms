@@ -1,26 +1,26 @@
-Vue.component('Screen', {
+Vue.component("Screen", {
     props: {
-        'title': String,
-        'showMenu': {
-            'type': Boolean,
-            'default': true,
+        title: String,
+        showMenu: {
+            type: Boolean,
+            default: true,
         },
-        'klass': {
-            'type': String,
-            'default': 'generic',
+        klass: {
+            type: String,
+            default: "generic",
         },
     },
     computed: {
-        navigation () {
-            return this.$root.config.get('menus');
+        navigation() {
+            return this.$root.config.get("menus");
         },
-        screen_css_class () {
+        screen_css_class() {
             return [
-                'screen',
-                'screen-' + this.klass,
-                this.$slots.header ? 'with-header': '',
-                this.$slots.footer ? 'with-footer': '',
-            ].join(' ');
+                "screen",
+                "screen-" + this.klass,
+                this.$slots.header ? "with-header" : "",
+                this.$slots.footer ? "with-footer" : "",
+            ].join(" ");
         },
     },
     data: () => ({

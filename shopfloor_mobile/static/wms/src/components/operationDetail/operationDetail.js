@@ -1,14 +1,13 @@
-
-var operationDetail = Vue.component('operation-detail', {
-    data: function () {
+var operationDetail = Vue.component("operation-detail", {
+    data: function() {
         return {
             show_popup_dialog: false,
-            barcodeOpen: '',
+            barcodeOpen: "",
         };
     },
-    props:['operation'],
+    props: ["operation"],
     methods: {
-        show_popup: function (barcode) {
+        show_popup: function(barcode) {
             this.barcodeOpen = barcode;
             this.show_popup_dialog = true;
         },

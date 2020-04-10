@@ -17,3 +17,23 @@ class SearchAction(Component):
 
     def package_from_scan(self, barcode):
         return self.env["stock.quant.package"].search([("name", "=", barcode)])
+
+    def stock_picking_from_scan(self, barcode):
+        return self.env["stock.picking"].search([("name", "=", barcode)])
+
+    def product_from_scan(self, barcode):
+        product = self.env["product.product"].search([("barcode", "=", barcode)])
+        if not product:
+            packaging = self.env["product.packaging"].search(
+                [("product_id", "!=", False), ("barcode", "=", barcode)]
+            )
+            product = packaging.product_id
+        return product
+
+    def lot_from_scan(self, barcode):
+        return self.env["stock.production.lot"].search([("name", "=", barcode)])
+
+    def generic_packaging_from_scan(self, barcode):
+        return self.env["product.packaging"].search(
+            [("barcode", "=", barcode), ("product_id", "=", False)]
+        )

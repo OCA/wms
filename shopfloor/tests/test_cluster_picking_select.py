@@ -1,5 +1,3 @@
-import unittest
-
 from .test_cluster_picking_base import ClusterPickingCommonCase
 
 
@@ -409,16 +407,27 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
             response,
             message={
                 "message_type": "error",
-                "message": "This record you were working on does not exist anymore.",
+                "message": "The record you were working on does not exist anymore.",
             },
             next_state="start",
         )
 
-    # TODO
-    @unittest.skip("not sure yet what we have to do, keep for later")
     def test_confirm_start_all_is_done(self):
         """User confirms start but all lines are already done"""
         # we want to jump to the start because there are no lines
         # to process anymore, but we want to set pickings and
         # picking batch to done if not done yet (because the process
         # was interrupted for instance)
+        self._set_dest_package_and_done(
+            self.batch.mapped("picking_ids.move_line_ids"),
+            self.env["stock.quant.package"].create({}),
+        )
+        self.batch.done()
+        response = self.service.dispatch(
+            "confirm_start", params={"picking_batch_id": self.batch.id}
+        )
+        self.assert_response(
+            response,
+            next_state="start",
+            message={"message": "Batch Transfer complete", "message_type": "success"},
+        )

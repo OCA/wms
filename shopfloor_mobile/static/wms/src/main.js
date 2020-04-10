@@ -6,7 +6,7 @@ import {process_registry} from './services/process_registry.js';
 
 var AppConfig = new Config();
 
-if ( Storage.apikey ) {
+if (Storage.apikey) {
     AppConfig.load().then(() => {
         // Adding the routes dynamically when received from ther server
         AppConfig.get('menus').forEach(function (item) {
@@ -28,16 +28,15 @@ if ( Storage.apikey ) {
 
 const vuetify_themes = {
     light: {
-        primary: '#491966',
-        secondary: '#424242',
-        accent: '#82B1FF',
-        error: '#FF5252',
-        info: '#2196F3',
-        success: '#4CAF50',
-        warning: '#FFC107',
+        primary: "#491966",
+        secondary: "#424242",
+        accent: "#82B1FF",
+        error: "#FF5252",
+        info: "#2196F3",
+        success: "#4CAF50",
+        warning: "#FFC107",
     },
 };
-
 
 const app = new Vue({
     router: router,
@@ -51,14 +50,14 @@ const app = new Vue({
         demo_mode: false,
         config: AppConfig,
     },
-    created: function () {
-        this.demo_mode = window.location.pathname.includes('demo');
+    created: function() {
+        this.demo_mode = window.location.pathname.includes("demo");
         if (this.demo_mode) {
-            this.loadJS('src/demo/demo.core.js', 'demo_core');
+            this.loadJS("src/demo/demo.core.js", "demo_core");
         }
     },
     methods: {
-        loadJS: function (url, script_id) {
+        loadJS: function(url, script_id) {
             if (script_id && !document.getElementById(script_id)) {
                 console.log('Load JS', url);
                 var script = document.createElement('script');
@@ -69,5 +68,4 @@ const app = new Vue({
             }
         },
     },
-
-}).$mount('#app');
+}).$mount("#app");

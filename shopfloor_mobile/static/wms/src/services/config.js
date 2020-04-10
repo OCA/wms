@@ -1,17 +1,17 @@
-import {Odoo} from './odoo.js';
-import {Storage} from './storage.js';
+import {Odoo} from "./odoo.js";
+import {Storage} from "./storage.js";
 
 export class Config {
-    constructor () {
+    constructor() {
         this.data = {};
         this.authenticated = false;
     }
 
-    get (key) {
+    get(key) {
         return this.data[key];
     }
 
-    load () {
+    load() {
         var odoo = new Odoo({usage: "app"});
         return odoo._call('app/user_config', 'POST', {})
             .then((result) => {
