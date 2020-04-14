@@ -4,15 +4,19 @@ var CheckoutPickingDetailMixin = {
     props: {
         info: Object,
         grouped_lines: Array,
-        // TODO: maybe this should be provided by manual select component
-        select_options: {
-            type: Object,
-            default: function() {
-                return {
-                    showActions: false,
-                    list_item_component: "checkout-select-content",
-                };
-            },
+        selectable_lines: Array,
+        select_options: Object,
+    },
+    computed: {
+        select_opts() {
+            // Defining defaults for an Object property
+            // works only if you don't pass the property at all.
+            // If you pass only one key, you'll lose all defaults.
+            const opts = _.defaults({}, this.$props.select_options, {
+                showActions: false,
+                list_item_component: "checkout-select-content",
+            });
+            return opts;
         },
     },
     template: `
@@ -31,9 +35,9 @@ var CheckoutPickingDetailMixin = {
     </v-card>
 
     <manual-select
-        :records="info.move_lines"
+        :records="selectable_lines || info.move_lines"
         :grouped_records="grouped_lines"
-        :options="select_options"
+        :options="select_opts"
         />
 </div>
 `,
@@ -76,18 +80,19 @@ Vue.component("checkout-select-content", {
 
 Vue.component("checkout-summary-detail", {
     mixins: [CheckoutPickingDetailMixin],
-    props: {
-        select_options: {
-            type: Object,
-            default: function() {
-                return {
-                    multiple: true,
-                    initSelectAll: true,
-                    showCounters: true,
-                    list_item_component: "checkout-summary-content",
-                    list_item_extra_component: "checkout-summary-extra-content",
-                };
-            },
+    computed: {
+        select_opts() {
+            // Defining defaults for an Object property
+            // works only if you don't pass the property at all.
+            // If you pass only one key, you'll lose all defaults.
+            const opts = _.defaults({}, this.$props.select_options, {
+                multiple: true,
+                initSelectAll: true,
+                showCounters: true,
+                list_item_component: "checkout-summary-content",
+                list_item_extra_component: "checkout-summary-extra-content",
+            });
+            return opts;
         },
     },
 });
