@@ -1,3 +1,5 @@
+/* eslint-disable strict */
+/* eslint-disable no-implicit-globals */
 var CheckoutPickingDetailMixin = {
     props: {
         info: Object,
@@ -37,7 +39,7 @@ var CheckoutPickingDetailMixin = {
 `,
 };
 
-var checkout_picking_detail = Vue.component("checkout-picking-detail", {
+Vue.component("checkout-picking-detail", {
     mixins: [CheckoutPickingDetailMixin],
 });
 
@@ -72,7 +74,7 @@ Vue.component("checkout-select-content", {
   `,
 });
 
-var checkout_summary_detail = Vue.component("checkout-summary-detail", {
+Vue.component("checkout-summary-detail", {
     mixins: [CheckoutPickingDetailMixin],
     props: {
         select_options: {
