@@ -17,18 +17,6 @@ Vue.component("manual-select", {
         },
         options: {
             type: Object,
-            default: function() {
-                return {
-                    bubbleUpAction: false,
-                    showActions: true,
-                    initSelectAll: false,
-                    initValue: null,
-                    multiple: false,
-                    showCounters: false,
-                    list_item_component: "manual-select-item",
-                    list_item_extra_component: "",
-                };
-            },
         },
         list_item_fields: {
             type: Array,
@@ -38,31 +26,40 @@ Vue.component("manual-select", {
         },
     },
     data: function() {
-        const self = this;
-        const initValue = this.options.initValue;
-        let selected = null;
-        if (this.options.multiple) {
-            selected = initValue ? [initValue] : [];
-            if (this.options.initSelectAll) {
-                selected = _.map(this.records, function(x) {
-                    return self.records.indexOf(x);
-                });
-            }
-        } else {
-            selected = initValue ? initValue : null;
-        }
         return {
-            selected: selected,
+            selected: null,
         };
     },
+    created() {
+        // Relies on properties
+        this.selected = this._initSelected();
+    },
     methods: {
+        _initSelected() {
+            const self = this;
+            const initValue = this.opts.initValue;
+            let selected = null;
+            if (this.opts.multiple) {
+                selected = initValue ? [initValue] : [];
+                if (this.opts.initSelectAll) {
+                    selected = _.map(this.records, function(x) {
+                        return self.records.indexOf(x);
+                    });
+                }
+            } else {
+                selected = initValue ? initValue : null;
+            }
+            return selected;
+        },
         handleAction(event_name, data) {
             // TODO: any better way to handle this?
             // We want to be able to hook to the action
             // on grand-parent components as well.
             // Maybe we can emit the event on the $root
             // and add a namespace to the event (eg: usage:event_name)
-            if (this.options.bubbleUpAction) {
+            // We should probably use an event hub instead.
+            // See https://vuejs.org/v2/guide/migration.html#dispatch-and-broadcast-replaced
+            if (this.opts.bubbleUpAction) {
                 this.$parent.$emit(event_name, data);
             } else {
                 this.$emit(event_name, data);
@@ -84,10 +81,26 @@ Vue.component("manual-select", {
         has_records() {
             return this.records.length > 0;
         },
+        opts() {
+            // Defining defaults for an Object property
+            // works only if you don't pass the property at all.
+            // If you pass only one key, you'll lose all defaults.
+            const opts = _.defaults({}, this.$props.options, {
+                bubbleUpAction: false,
+                showActions: true,
+                initSelectAll: false,
+                initValue: null,
+                multiple: false,
+                showCounters: false,
+                list_item_component: "manual-select-item",
+                list_item_extra_component: "",
+            });
+            return opts;
+        },
         list_item_options() {
             return {
                 key_title: this.key_title,
-                showCounters: this.options.showCounters,
+                showCounters: this.opts.showCounters,
                 fields: this.list_item_fields,
             };
         },
@@ -100,7 +113,7 @@ Vue.component("manual-select", {
         },
         klass() {
             const bits = ["manual-select"];
-            _.forEach(this.$props.options, function(v, k) {
+            _.forEach(this.opts, function(v, k) {
                 if (v) {
                     bits.push("with-" + k);
                 }
@@ -112,7 +125,7 @@ Vue.component("manual-select", {
     <div :class="klass">
         <v-card outlined>
             <v-list v-if="has_records">
-                <v-list-item-group :multiple="options.multiple" color="success" v-model="selected">
+                <v-list-item-group :multiple="opts.multiple" color="success" v-model="selected">
                     <div class="select-group" v-for="group in selectable" :key="group.key">
                         <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
                         <div class="list-item-wrapper" v-for="(rec, index) in group.records"">
@@ -120,7 +133,7 @@ Vue.component("manual-select", {
                                 <template v-slot:default="{ active, toggle }">
                                     <v-list-item-content>
                                         <component
-                                            :is="options.list_item_component"
+                                            :is="opts.list_item_component"
                                             :options="list_item_options"
                                             :record="rec"
                                             :index="index"
@@ -137,9 +150,9 @@ Vue.component("manual-select", {
                                     </v-list-item-action>
                                 </template>
                             </v-list-item>
-                            <div class="extra" v-if="options.list_item_extra_component">
+                            <div class="extra" v-if="opts.list_item_extra_component">
                                 <component
-                                    :is="options.list_item_extra_component"
+                                    :is="opts.list_item_extra_component"
                                     :options="list_item_options"
                                     :record="rec"
                                     :index="index"
@@ -154,7 +167,7 @@ Vue.component("manual-select", {
                 No record found.
             </v-alert>
         </v-card>
-        <v-row class="actions bottom-actions" v-if="has_records && options.showActions">
+        <v-row class="actions bottom-actions" v-if="has_records && opts.showActions">
             <v-col>
                 <v-btn color="success" @click="handleAction('select', selected)">
                     Start
