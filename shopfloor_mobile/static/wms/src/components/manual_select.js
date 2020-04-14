@@ -1,22 +1,23 @@
-Vue.component('manual-select', {
+/* eslint-disable strict */
+Vue.component("manual-select", {
     props: {
         records: {
-            'type': Array,
-            'default': [],
+            type: Array,
+            default: [],
         },
         grouped_records: {
-            'type': Array,
-            'default':  function () {
+            type: Array,
+            default: function() {
                 return [];
             },
         },
         key_title: {
-            'type': String,
-            'default': 'name',
+            type: String,
+            default: "name",
         },
         options: {
-            'type': Object,
-            'default': function () {
+            type: Object,
+            default: function() {
                 return {
                     bubbleUpAction: false,
                     showActions: true,
@@ -24,26 +25,26 @@ Vue.component('manual-select', {
                     initValue: null,
                     multiple: false,
                     showCounters: false,
-                    list_item_component: 'manual-select-item',
-                    list_item_extra_component: '',
+                    list_item_component: "manual-select-item",
+                    list_item_extra_component: "",
                 };
             },
         },
         list_item_fields: {
-            'type': Array,
-            'default':  function () {
+            type: Array,
+            default: function() {
                 return [];
             },
         },
     },
-    data: function () {
+    data: function() {
         const self = this;
         const initValue = this.options.initValue;
-        let selected;
+        let selected = null;
         if (this.options.multiple) {
             selected = initValue ? [initValue] : [];
             if (this.options.initSelectAll) {
-                selected = _.map(this.records, function (x) {
+                selected = _.map(this.records, function(x) {
                     return self.records.indexOf(x);
                 });
             }
@@ -55,7 +56,7 @@ Vue.component('manual-select', {
         };
     },
     methods: {
-        handleAction (event_name, data) {
+        handleAction(event_name, data) {
             // TODO: any better way to handle this?
             // We want to be able to hook to the action
             // on grand-parent components as well.
@@ -69,45 +70,42 @@ Vue.component('manual-select', {
         },
     },
     watch: {
-        selected: function (val, oldVal) {
+        // eslint-disable-next-line no-unused-vars
+        selected: function(val, oldVal) {
+            const self = this;
             // Bubble up select action (handy when no action used)
-            const selected_records = _.pickBy(
-                this.records, function (x) {
-                    return _.has(val, x.id);
-                },
-            );
-            this.handleAction('select', selected_records);
+            const selected_records = _.pickBy(this.records, function(x) {
+                return self.records.indexOf(x) === val;
+            });
+            this.handleAction("select", selected_records);
         },
     },
     computed: {
-        has_records () {
+        has_records() {
             return this.records.length > 0;
         },
-        list_item_options () {
+        list_item_options() {
             return {
-                'key_title': this.key_title,
-                'showCounters': this.options.showCounters,
-                'fields': this.list_item_fields,
+                key_title: this.key_title,
+                showCounters: this.options.showCounters,
+                fields: this.list_item_fields,
             };
         },
-        selectable () {
+        selectable() {
             if (!this.grouped_records.length) {
                 // Simulate grouping (allows to keep template the same)
-                return [
-                    {'key': 'no-group', 'title': '', 'records': this.records},
-                ];
+                return [{key: "no-group", title: "", records: this.records}];
             }
             return this.grouped_records;
-
         },
-        klass () {
+        klass() {
             const bits = ["manual-select"];
-            _.forEach(this.$props.options, function (v, k) {
+            _.forEach(this.$props.options, function(v, k) {
                 if (v) {
-                    bits.push('with-' + k);
+                    bits.push("with-" + k);
                 }
             });
-            return bits.join(' ');
+            return bits.join(" ");
         },
     },
     template: `
@@ -173,13 +171,13 @@ Vue.component('manual-select', {
 });
 
 // TODO: this could be use for display detail as well
-Vue.component('manual-select-item', {
+Vue.component("manual-select-item", {
     props: {
         record: Object,
         options: Object,
     },
     methods: {
-        render_field_value (record, field) {
+        render_field_value(record, field) {
             console.log(field);
             if (field.renderer) {
                 return field.renderer(record);
