@@ -1,13 +1,14 @@
 import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
 import {demotools} from "../demo/demo.core.js";
+import {} from "../demo/demo.checkout.js"; // FIXME: dev only
 
 export var Checkout = Vue.component("checkout", {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
     template: `
         <Screen :title="screen_info.title" :klass="screen_info.klass">
             <!-- FOR DEBUG -->
-            <!-- {{ current_state_key }} -->
+            {{ current_state_key }}
             <template v-slot:header>
                 <user-information
                     v-if="!need_confirmation && user_notification.message"
@@ -33,9 +34,11 @@ export var Checkout = Vue.component("checkout", {
             <div v-if="state_is('select_line')">
                 <checkout-picking-detail
                     :info="state.data"
-                    :grouped_lines="group_lines_by_location(state.data.move_lines)"
-                    v-on:select="state.on_select"
-                    v-on:back="state.on_back"
+                    :select_records="state.data.move_lines"
+                    :select_records_grouped="group_lines_by_location(state.data.move_lines)"
+                    :select_options="{bubbleUpAction: true}"
+                    v-on:select="on_select"
+                    v-on:back="on_back"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -46,12 +49,39 @@ export var Checkout = Vue.component("checkout", {
                 </div>
             </div>
 
+            <div v-if="state_is('select_pack')">
+                <checkout-picking-detail
+                    :info="state.data.picking"
+                    :select_records="state.data.selected_move_lines"
+                    :select_options="{multiple: true, initSelectAll: true, bubbleUpAction: true, list_item_component: 'checkout-select-package-content'}"
+                    v-on:select="on_select"
+                    v-on:back="on_back"
+                    />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn depressed color="primary" @click="state.on_existing_pack">Existing pack</v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn depressed color="primary" @click="state.on_new_pack">New pack [TODO]</v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn depressed color="primary" @click="state.on_without_pack">Process w/o pack [TODO]</v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
+            </div>
+
             <div v-if="state_is('summary')">
                 <checkout-summary-detail
                     :info="state.data"
-                    :grouped_lines="group_lines_by_location(state.data.move_lines, {'group_key': 'location_dest', 'prepare_records': group_by_pack})"
-                    v-on:select="state.on_select"
-                    v-on:back="state.on_back"
+                    :select_records_grouped="group_lines_by_location(state.data.move_lines, {'group_key': 'location_dest', 'prepare_records': group_by_pack})"
+                    v-on:select="on_select"
+                    v-on:back="on_back"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -63,10 +93,19 @@ export var Checkout = Vue.component("checkout", {
             </div>
             <div v-if="state_is('manual_selection')">
                 <manual-select
-                    v-on:select="state.on_select"
-                    v-on:back="state.on_back"
+                    v-on:select="on_select"
+                    v-on:back="on_back"
                     :records="state.data.records"
                     :list_item_fields="manual_select_picking_fields"
+                    />
+            </div>
+            <div v-if="state_is('select_dest_package')">
+                <checkout-picking-detail
+                    :info="state.data.picking"
+                    :select_records="state.data.packages"
+                    :select_options="{bubbleUpAction: true, list_item_fields: existing_package_select_fields, list_item_component: 'manual-select-item'}"
+                    v-on:select="on_select"
+                    v-on:back="on_back"
                     />
             </div>
         </Screen>
@@ -75,6 +114,7 @@ export var Checkout = Vue.component("checkout", {
         picking_id: function() {
             return this.erp_data.data.select_line.id;
         },
+        // TODO: move these to methods
         manual_select_picking_fields: function() {
             return [
                 {path: "partner.name"},
@@ -82,13 +122,26 @@ export var Checkout = Vue.component("checkout", {
                 {path: "move_line_count", label: "Lines"},
             ];
         },
+        existing_package_select_fields: function() {
+            return [
+                {path: "weight"},
+                {path: "move_line_count", label: "Line count"},
+                {path: "packaging_name"},
+            ];
+        },
     },
-    // Mounted: function () {
-    //     // FIXME: just for dev
-    //     this.initial_state_key = 'summary'
-    //     this.set_erp_data('data', {
-    //         'summary': demotools.makePicking({}, {"lines_count": 5, "line_random_pack": true}),
-    //     });
+    // FIXME: just for dev
+    // Mmounted: function () {
+    //     // TEST summary only
+    //     // this.initial_state_key = 'summary'
+    //     // this.set_erp_data('data', {
+    //     //     'summary': demotools.makePicking({}, {"lines_count": 5, "line_random_pack": true}),
+    //     // });
+    //     // TEST select_pack only
+    //     this.initial_state_key = 'select_pack'
+    //     this.set_erp_data('data', demotools.get_case(this.usage).select_line.data);
+    //     // this.initial_state_key = 'select_dest_package'
+    //     // this.set_erp_data('data', demotools.get_case(this.usage).select_line.data);
     // },
     methods: {
         record_by_id: function(records, _id) {
@@ -174,8 +227,9 @@ export var Checkout = Vue.component("checkout", {
     data: function() {
         return {
             usage: "checkout",
-            // 'initial_state_key': 'summary',
-            initial_state_key: "select_document",
+            // initial_state_key: "select_document",
+            initial_state_key: "select_pack", // FIXME: just for dev
+            // initial_state_key: "select_dest_package",  // FIXME: just for dev
             states: {
                 select_document: {
                     display_info: {
@@ -233,14 +287,12 @@ export var Checkout = Vue.component("checkout", {
                         if (!selected) {
                             return;
                         }
-                        const line = selected[0];
-                        console.log("SELECTED", line);
                         this.go_state(
                             "wait_call",
                             this.odoo.call("select_line", {
                                 picking_id: this.picking_id,
-                                move_line_id: line.id,
-                                package_id: _.result(line, "package_dest.id", null),
+                                move_line_id: selected.id,
+                                package_id: _.result(selected, "package_dest.id", null),
                             })
                         );
                     },
@@ -274,26 +326,47 @@ export var Checkout = Vue.component("checkout", {
                             })
                         );
                     },
-                    on_action: action => {
-                        this.state["on_" + action].call(this);
-                    },
-                    on_select_line: () => {
-                        throw "NOT IMPLEMENTED";
-                        this.go_state(
-                            "wait_call",
-                            this.odoo.call("set_line_qty", {
-                                move_line_id: this.state.data.id,
-                            })
+                    on_select: selected => {
+                        if (!selected) {
+                            return;
+                        }
+                        // keep selected lines on the state
+                        this.state.data.selected = selected;
+                        // Must pick unselected line and reset its qty
+                        const unselected = _.head(
+                            _.difference(this.state.data.selected_move_lines, selected)
                         );
+                        if (unselected) {
+                            console.log("unselected", unselected);
+                            this.go_state(
+                                "wait_call",
+                                this.odoo.call("reset_line_qty", {
+                                    move_line_id: unselected.id,
+                                })
+                            );
+                        }
                     },
                     on_new_pack: () => {
                         throw "NOT IMPLEMENTED";
                     },
                     on_existing_pack: () => {
-                        throw "NOT IMPLEMENTED";
+                        this.go_state(
+                            "wait_call",
+                            this.odoo.call("list_dest_package", {
+                                picking_id: this.state.data.picking.id,
+                                selected_line_ids: _.map(
+                                    this.state.data.selected,
+                                    _.property("id")
+                                ),
+                            })
+                        );
                     },
                     on_without_pack: () => {
                         throw "NOT IMPLEMENTED";
+                    },
+                    on_back: () => {
+                        this.go_state("select_line");
+                        this.reset_notification();
                     },
                 },
                 change_qty: {
@@ -322,25 +395,41 @@ export var Checkout = Vue.component("checkout", {
                         title: "Select destination package",
                     },
                     on_scan: scanned => {
+                        const selected_lines = this.state_get_data("select_pack")
+                            .selected;
                         this.go_state(
                             "wait_call",
                             this.odoo.call("scan_dest_package", {
+                                picking_id: this.state.data.picking.id,
+                                selected_line_ids: _.map(
+                                    selected_lines,
+                                    _.property("id")
+                                ),
                                 barcode: scanned.text,
                             })
                         );
                     },
-                    on_action: action => {
-                        this.state["on_" + action].call(this);
-                    },
-                    on_set_package: pkg => {
-                        throw "NOT IMPLEMENTED";
+                    on_select: selected => {
+                        if (!selected) {
+                            return;
+                        }
+                        const selected_lines = this.state_get_data("select_pack")
+                            .selected;
                         this.go_state(
                             "wait_call",
                             this.odoo.call("set_dest_package", {
-                                move_line_id: this.state.data.id,
-                                package_id: pkg.id,
+                                picking_id: this.state.data.picking.id,
+                                selected_line_ids: _.map(
+                                    selected_lines,
+                                    _.property("id")
+                                ),
+                                package_id: selected.id,
                             })
                         );
+                    },
+                    on_back: () => {
+                        this.go_state("select_pack");
+                        this.reset_notification();
                     },
                 },
                 summary: {

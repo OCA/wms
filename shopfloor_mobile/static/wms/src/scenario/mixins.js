@@ -15,8 +15,8 @@ export var ScenarioBaseMixin = {
                     // $next_state: {},
                 },
             },
-            initial_state_key: "start_scan_pack",
-            current_state_key: "start_scan_pack",
+            initial_state_key: "start",
+            current_state_key: "",
             states: {},
             usage: "", // Match component usage on odoo
         };
@@ -39,6 +39,10 @@ export var ScenarioBaseMixin = {
         // FIXME: init data should come from specific scenario
         else {
             this.odoo = new Odoo(odoo_params);
+        }
+        if (!this.current_state_key) {
+            // Default to initial state
+            this.current_state_key = this.initial_state_key;
         }
     },
     computed: {
@@ -63,6 +67,12 @@ export var ScenarioBaseMixin = {
         },
         show_cancel_button: function() {
             return this.state.display_info.show_cancel_button;
+        },
+        screen_info: function() {
+            return {
+                title: this.menuItem.name,
+                klass: this.usage + " " + "state-" + this.state.key,
+            };
         },
     },
     methods: {
@@ -139,6 +149,16 @@ export var ScenarioBaseMixin = {
                 this.state.on_scan(scanned);
             }
         },
+        on_select: function(selected) {
+            if (this.state.on_select) {
+                this.state.on_select(selected);
+            }
+        },
+        on_back: function() {
+            if (this.state.on_back) {
+                this.state.on_back();
+            }
+        },
         on_cancel: function() {
             if (this.state.on_cancel) {
                 this.state.on_cancel();
@@ -170,6 +190,29 @@ export var ScenarioBaseMixin = {
 };
 
 export var GenericStatesMixin = {
+    data: function() {
+        return {
+            states: {
+                wait_call: {
+                    success: result => {
+                        if (!_.isUndefined(result.data)) {
+                            this.set_erp_data("data", result.data);
+                        }
+                        if (!_.isUndefined(result) && !result.error) {
+                            // TODO: consider not changing the state if it is the same to no refresh
+                            this.go_state(result.next_state);
+                        } else {
+                            alert(result.status + " " + result.error);
+                        }
+                    },
+                },
+            },
+        };
+    },
+};
+
+// TODO: move it to a specific file maybe
+export var SinglePackStatesMixin = {
     data: function() {
         return {
             states: {
@@ -205,19 +248,6 @@ export var GenericStatesMixin = {
                         );
                     },
                 },
-                wait_call: {
-                    success: result => {
-                        if (!_.isUndefined(result.data)) {
-                            this.set_erp_data("data", result.data);
-                        }
-                        if (!_.isUndefined(result) && !result.error) {
-                            // TODO: consider not changing the state if it is the same to no refresh
-                            this.go_state(result.next_state);
-                        } else {
-                            alert(result.status + " " + result.error);
-                        }
-                    },
-                },
                 // TODO: these states should be splitted out to a specific mixin
                 // for putaway and pack transfer
                 scan_location: {
@@ -244,17 +274,6 @@ export var GenericStatesMixin = {
                                 package_level_id: this.state.data.id,
                             })
                         );
-                    },
-                },
-                wait_validation: {
-                    success: result => {
-                        if (!_.isUndefined(result.data)) {
-                            this.set_erp_data("data", result.data);
-                        }
-                        this.go_state(result.next_state);
-                    },
-                    error: result => {
-                        this.go_state("scan_location");
                     },
                 },
                 wait_cancel: {
