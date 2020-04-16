@@ -3,8 +3,8 @@
 var CheckoutPickingDetailMixin = {
     props: {
         info: Object,
-        grouped_lines: Array,
-        selectable_lines: Array,
+        select_records: Array,
+        select_records_grouped: Array,
         select_options: Object,
     },
     computed: {
@@ -14,7 +14,7 @@ var CheckoutPickingDetailMixin = {
             // If you pass only one key, you'll lose all defaults.
             const opts = _.defaults({}, this.$props.select_options, {
                 showActions: false,
-                list_item_component: "checkout-select-content",
+                list_item_component: "checkout-select-line-content",
             });
             return opts;
         },
@@ -35,8 +35,8 @@ var CheckoutPickingDetailMixin = {
     </v-card>
 
     <manual-select
-        :records="selectable_lines || info.move_lines"
-        :grouped_records="grouped_lines"
+        :records="select_records || info.move_lines"
+        :grouped_records="select_records_grouped"
         :options="select_opts"
         />
 </div>
@@ -47,7 +47,7 @@ Vue.component("checkout-picking-detail", {
     mixins: [CheckoutPickingDetailMixin],
 });
 
-Vue.component("checkout-select-content", {
+Vue.component("checkout-select-line-content", {
     props: {
         record: Object,
         options: Object,
@@ -72,6 +72,28 @@ Vue.component("checkout-select-content", {
             </div>
             <div class="qty">
                 <span class="label">Qty:</span> <span>{{ record.product.qty }}</span>
+            </div>
+        </div>
+    </div>
+  `,
+});
+
+Vue.component("checkout-select-package-content", {
+    props: {
+        record: Object,
+        options: Object,
+        index: Number,
+        count: Number,
+    },
+    template: `
+    <div>
+        <div :class="record.package_dest ? 'has-pack' : 'no-pack'">
+            <span>{{ record.product.display_name }}</span>
+            <div class="lot" v-if="record.lot">
+                <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
+            </div>
+            <div class="qty">
+                <span class="label">Qty:</span> <span>{{ record.qty_done }} / {{ record.quantity }}</span>
             </div>
         </div>
     </div>

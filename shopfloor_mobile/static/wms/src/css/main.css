@@ -147,7 +147,7 @@ ul.packaging span:first-child {
 .manual-select.with-groups .v-card__title {
     padding: 0.5rem 1rem 1rem 1rem;
 }
-.manual-select.with-groups .select-group:not(:last-child){
+.manual-select.with-groups .select-group:not(:last-child) {
     border-bottom: 2px;
     margin-bottom: 0.5rem;
 }
@@ -157,11 +157,6 @@ ul.packaging span:first-child {
 }
 .manual-select.with-showCounters .item-counter {
     display: inline;
-}
-
-
-.label {
-    font-weight: 600;
 }
 
 .state-display-info .v-alert {
