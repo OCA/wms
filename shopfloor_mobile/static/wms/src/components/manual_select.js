@@ -36,14 +36,14 @@ Vue.component("manual-select", {
     },
     methods: {
         _initSelected() {
-            const self = this;
             const initValue = this.opts.initValue;
             let selected = null;
             if (this.opts.multiple) {
                 selected = initValue ? [initValue] : [];
                 if (this.opts.initSelectAll) {
-                    selected = _.map(this.records, function(x) {
-                        return self.records.indexOf(x);
+                    selected = [];
+                    _.each(this.records, function(rec, index) {
+                        selected.push(index);
                     });
                 }
             } else {
@@ -69,12 +69,26 @@ Vue.component("manual-select", {
     watch: {
         // eslint-disable-next-line no-unused-vars
         selected: function(val, oldVal) {
+            if (_.isUndefined(val)) {
+                // Unselected
+                this.handleAction("select", null);
+                return;
+            }
             const self = this;
-            // Bubble up select action (handy when no action used)
-            const selected_records = _.pickBy(this.records, function(x) {
-                return self.records.indexOf(x) === val;
-            });
-            this.handleAction("select", selected_records);
+            let selected_records = null;
+            if (this.opts.multiple) {
+                selected_records = [];
+                _.each(this.records, function(rec, index) {
+                    if (index in val) selected_records.push(rec);
+                });
+            } else {
+                selected_records = self.records[val];
+            }
+            console.log("SELECTED", selected_records);
+            if (!this.opts.showActions) {
+                // Bubble up select action (handy when no action used)
+                this.handleAction("select", selected_records);
+            }
         },
     },
     computed: {
@@ -101,7 +115,7 @@ Vue.component("manual-select", {
             return {
                 key_title: this.key_title,
                 showCounters: this.opts.showCounters,
-                fields: this.list_item_fields,
+                fields: this.opts.list_item_fields,
             };
         },
         selectable() {
@@ -115,7 +129,11 @@ Vue.component("manual-select", {
             const bits = ["manual-select"];
             _.forEach(this.opts, function(v, k) {
                 if (v) {
-                    bits.push("with-" + k);
+                    let bit = "with-" + k;
+                    if (typeof v === "string") {
+                        bit += "--" + v;
+                    }
+                    bits.push(bit);
                 }
             });
             return bits.join(" ");
@@ -140,14 +158,15 @@ Vue.component("manual-select", {
                                             :count="group.records.length"
                                             />
                                     </v-list-item-content>
-                                    <v-list-item-action>
+                                    <!--v-list-item-action>
+                                     FIXME: this triggers the change 3 times and makes impossible to handle event subscribers properly
                                         <v-checkbox
                                             :input-value="active"
                                             :true-value="index"
                                             color="accent-4"
                                             @click="toggle"
                                         ></v-checkbox>
-                                    </v-list-item-action>
+                                    </v-list-item-action-->
                                 </template>
                             </v-list-item>
                             <div class="extra" v-if="opts.list_item_extra_component">
@@ -191,10 +210,12 @@ Vue.component("manual-select-item", {
     },
     methods: {
         render_field_value(record, field) {
-            console.log(field);
             if (field.renderer) {
                 return field.renderer(record);
             }
+            return this.raw_value(record, field);
+        },
+        raw_value(record, field) {
             return _.result(record, field.path);
         },
     },
@@ -203,7 +224,9 @@ Vue.component("manual-select-item", {
         <v-list-item-title v-text="record[options.key_title]"></v-list-item-title>
         <div class="details">
             <div class="field-detail" v-for="(field, index) in options.fields">
-                <span v-if="field.label" class="label">{{ field.label }}:</span> {{ render_field_value(record, field) }}
+                <span v-if="raw_value(record, field) || field.display_no_value">
+                    <span v-if="field.label" class="label">{{ field.label }}:</span> {{ render_field_value(record, field) }}
+                </span>
             </div>
         </div>
     </div>
