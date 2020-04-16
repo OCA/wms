@@ -77,15 +77,23 @@ export class DemoTools {
         _.extend(options, {name_prefix: "PACK", padding: 10});
         const pack = this.makeSimpleRecord({}, options);
         _.extend(pack, {
-            weight: this.getRandomInt() + "Kg",
+            weight: this.getRandomInt(100) + " Kg",
             packaging_name: "PKG type " + this.getRandomInt(10),
+            move_line_count: this.getRandomInt(10),
         });
         return pack;
     }
 
-    makeProduct(i) {
+    makeProduct(i = 0) {
+        i = i != 0 ? i : this.getRandomInt();
         const prod = this.makeSimpleRecord({}, {name_prefix: "Prod " + i, padding: 0});
-        const default_code = _.padStart(this.getRandomInt(), 8, 0);
+        const default_code = _.padEnd(
+            this.randomFromArray("ABCDEFGHIJK") +
+                this.randomFromArray("ABCDEFGHIJK") +
+                this.getRandomInt(),
+            8,
+            0
+        );
         _.extend(prod, {
             default_code: default_code,
             display_name: "[" + default_code + "] " + prod.name,
@@ -152,8 +160,12 @@ export class DemoTools {
         _.defaults(defaults, {
             qty_done: 0,
         });
-        const qty = this.getRandomInt();
-        const qty_done = options.qty_done_full ? qty : defaults.qty_done;
+        _.defaults(options, {
+            qty_done_random: true,
+        });
+        const qty = this.getRandomInt(100);
+        let qty_done = options.qty_done_full ? qty : defaults.qty_done;
+        qty_done = options.qty_done_random ? this.getRandomInt(qty) : qty_done;
         return {
             id: this.getRandomInt(),
             quantity: qty,

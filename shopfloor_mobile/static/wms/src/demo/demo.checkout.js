@@ -1,8 +1,13 @@
 import {demotools} from "./demo.core.js";
 
-var select_pack_picking = demotools.makePicking(
+const select_pack_picking = demotools.makePicking(
     {},
     {lines_count: 5, line_random_pack: true, line_random_dest: true}
+);
+
+const select_line_data = demotools.makePicking(
+    {},
+    {lines_count: 5, line_random_pack: true}
 );
 
 var DEMO_CHECKOUT = {
@@ -19,10 +24,7 @@ var DEMO_CHECKOUT = {
             // All line have a destination pack
             next_state: "select_line",
             data: {
-                select_line: demotools.makePicking(
-                    {},
-                    {lines_count: 5, line_random_pack: true}
-                ),
+                select_line: select_line_data,
             },
         },
     },
@@ -47,8 +49,6 @@ var DEMO_CHECKOUT = {
             },
         },
     },
-
-    // TODO
     select_line: {
         next_state: "select_pack",
         data: {
@@ -56,6 +56,49 @@ var DEMO_CHECKOUT = {
                 picking: select_pack_picking,
                 selected_move_lines: select_pack_picking.move_lines,
             },
+        },
+    },
+    reset_line_qty: {
+        next_state: "select_pack",
+        data: {
+            select_pack: {
+                picking: select_pack_picking,
+                // simulate unselecting 1 line
+                selected_move_lines: select_pack_picking.move_lines,
+            },
+        },
+    },
+    list_dest_package: {
+        next_state: "select_dest_package",
+        data: {
+            select_dest_package: {
+                picking: select_pack_picking,
+                packages: _.sampleSize(
+                    [
+                        demotools.makePack(),
+                        demotools.makePack(),
+                        demotools.makePack(),
+                        demotools.makePack(),
+                        demotools.makePack(),
+                        demotools.makePack(),
+                        demotools.makePack(),
+                        demotools.makePack(),
+                    ],
+                    _.random(8)
+                ),
+                // simulate unselecting 1 line
+                selected_move_lines: select_pack_picking.move_lines,
+            },
+        },
+    },
+    set_dest_package: {
+        next_state: "select_line",
+        data: {
+            select_line: select_line_data,
+        },
+        message: {
+            message_type: "info",
+            message: "Product(s) packed in XYZ",
         },
     },
     // TODO

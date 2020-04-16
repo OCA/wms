@@ -15,10 +15,10 @@ export var ScenarioBaseMixin = {
                     // $next_state: {},
                 },
             },
-            'initial_state_key': 'start',
-            'current_state_key': '',
-            'states': {},
-            'usage': '', // Match component usage on odoo
+            initial_state_key: "start",
+            current_state_key: "",
+            states: {},
+            usage: "", // Match component usage on odoo
         };
     },
     beforeMount: function() {
@@ -68,10 +68,10 @@ export var ScenarioBaseMixin = {
         show_cancel_button: function() {
             return this.state.display_info.show_cancel_button;
         },
-        screen_info: function () {
+        screen_info: function() {
             return {
-                'title': this.menuItem.name,
-                'klass': this.usage + ' ' + 'state-' + this.state.key,
+                title: this.menuItem.name,
+                klass: this.usage + " " + "state-" + this.state.key,
             };
         },
     },
@@ -149,6 +149,16 @@ export var ScenarioBaseMixin = {
                 this.state.on_scan(scanned);
             }
         },
+        on_select: function(selected) {
+            if (this.state.on_select) {
+                this.state.on_select(selected);
+            }
+        },
+        on_back: function() {
+            if (this.state.on_back) {
+                this.state.on_back();
+            }
+        },
         on_cancel: function() {
             if (this.state.on_cancel) {
                 this.state.on_cancel();
@@ -182,34 +192,30 @@ export var ScenarioBaseMixin = {
 export var GenericStatesMixin = {
     data: function() {
         return {
-            'states': {
-                'wait_call': {
-                    success: (result) => {
+            states: {
+                wait_call: {
+                    success: result => {
                         if (!_.isUndefined(result.data)) {
-                            this.set_erp_data('data', result.data);
+                            this.set_erp_data("data", result.data);
                         }
                         if (!_.isUndefined(result) && !result.error) {
                             // TODO: consider not changing the state if it is the same to no refresh
                             this.go_state(result.next_state);
                         } else {
-                            alert(result.status + ' ' + result.error);
+                            alert(result.status + " " + result.error);
                         }
-
                     },
                 },
             },
         };
     },
-
 };
-
 
 // TODO: move it to a specific file maybe
 export var SinglePackStatesMixin = {
-
-    data: function () {
+    data: function() {
         return {
-            'states': {
+            states: {
                 // Generic state for when to start w/ scanning a pack
                 start_scan_pack: {
                     display_info: {
@@ -270,9 +276,9 @@ export var SinglePackStatesMixin = {
                         );
                     },
                 },
-                'wait_cancel': {
-                    success: (result) => {
-                        this.go_state('start');
+                wait_cancel: {
+                    success: result => {
+                        this.go_state("start");
                     },
                     error: result => {
                         this.go_state("start");
