@@ -164,3 +164,9 @@ ul.packaging span:first-child {
 }
 .state-title {
 }
+
+.manual-select .v-btn.destroy{
+    min-width: 0;
+    font-size: 1.2em;
+    padding: 15px 5px;
+}

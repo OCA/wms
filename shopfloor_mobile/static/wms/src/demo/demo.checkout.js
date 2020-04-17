@@ -114,8 +114,13 @@ var DEMO_CHECKOUT = {
             message: "Product(s) packed in XYZ",
         },
     },
-    // TODO
     summary: {
+        next_state: "summary",
+        data: {
+            summary: summary_data,
+        },
+    },
+    remove_package: {
         next_state: "summary",
         data: {
             summary: summary_data,
