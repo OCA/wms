@@ -89,13 +89,14 @@ export var Checkout = Vue.component("checkout", {
                 <checkout-summary-detail
                     :info="state.data.picking"
                     :select_records_grouped="group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': group_by_pack})"
+                    :select_options="{showActions: false}"
                     v-on:select="on_select"
                     v-on:back="on_back"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="$emit('action', 'TODO')">TODO</v-btn>
+                            <v-btn depressed color="primary" @click="$root.trigger('mark_as_done')">Mark as done</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -204,6 +205,7 @@ export var Checkout = Vue.component("checkout", {
                     key: pack ? pack_id : "no-pack",
                     // No pack, just display the product name
                     title: pack ? pack.name : products[0].display_name,
+                    pack: pack,
                     records: products,
                     records_by_pkg_type: pack
                         ? self.group_by_package_type(products)
@@ -452,19 +454,18 @@ export var Checkout = Vue.component("checkout", {
                     },
                     events: {
                         pkg_destroy: "on_pkg_destroy",
+                        pkg_change_type: "on_pkg_change_type",
+                        mark_as_done: "on_mark_as_done",
                     },
                     on_select: selected => {
                         if (!selected) {
                             return;
                         }
-                        console.log("ON SELECT - TODO");
+                        this.state.data.selected = selected;
                     },
                     on_back: () => {
                         this.go_state("start");
                         this.reset_notification();
-                    },
-                    on_action: action => {
-                        this.state["on_" + action].call(this);
                     },
                     on_pkg_change_type: pkg => {
                         throw "NOT IMPLEMENTED";
@@ -475,8 +476,10 @@ export var Checkout = Vue.component("checkout", {
                             package_id: pkg.id,
                         });
                     },
-                    on_mark_as_done: pkg => {
-                        throw "NOT IMPLEMENTED";
+                    on_mark_as_done: () => {
+                        this.odoo.call("done", {
+                            picking_id: this.state.data.picking.id,
+                        });
                     },
                 },
                 change_package_type: {

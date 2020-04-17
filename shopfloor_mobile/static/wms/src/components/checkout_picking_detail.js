@@ -126,15 +126,10 @@ Vue.component("checkout-summary-content", {
         index: Number,
         count: Number,
     },
-    methods: {
-        destroy: function(record) {
-            this.$root.trigger("pkg_destroy", parseInt(record.key, 10));
-        },
-    },
     template: `
     <div class="summary-content">
         <div class="has-pack" v-if="record.key != 'no-pack'">
-            <v-btn depressed color="default" @click="destroy(record)">Nuke</v-btn>
+            <checkout-summary-destroy-action :pack="record.pack" />
             <v-list-item-title>
                 <span class="item-counter">
                     <span>{{ index + 1 }} / {{ count }}</span>
@@ -149,6 +144,42 @@ Vue.component("checkout-summary-content", {
         </div>
     </div>
     `,
+});
+
+Vue.component("checkout-summary-destroy-action", {
+    props: ["pack"],
+    data() {
+        return {
+            dialog: false,
+        };
+    },
+    methods: {
+        on_user_confirm: function(answer) {
+            this.dialog = false;
+            if (answer === "yes") {
+                this.$root.trigger("pkg_destroy", this.pack);
+            }
+        },
+    },
+    computed: {
+        message: function() {
+            return "Please confirm delivery cancellation for pack " + this.pack.name
+        }
+    },
+    template: `
+  <div class="destroy-action">
+    <v-dialog v-model="dialog" fullscreen tile class="actions fullscreen text-center">
+      <template v-slot:activator="{ on }">
+        <v-btn class="destroy float-right" depressed small rounded color="error" v-on="on">&#10006;</v-btn>
+      </template>
+      <v-card>
+        <user-confirmation
+            v-on:user-confirmation="on_user_confirm"
+            v-bind:question="message"></user-confirmation>
+      </v-card>
+    </v-dialog>
+  </div>
+`,
 });
 
 Vue.component("checkout-summary-product-detail", {

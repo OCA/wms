@@ -52,13 +52,8 @@ Vue.component("manual-select", {
             return selected;
         },
         handleAction(event_name, data) {
-            // TODO: any better way to handle this?
-            // We want to be able to hook to the action
-            // on grand-parent components as well.
-            // Maybe we can emit the event on the $root
-            // and add a namespace to the event (eg: usage:event_name)
-            // We should probably use an event hub instead.
-            // See https://vuejs.org/v2/guide/migration.html#dispatch-and-broadcast-replaced
+            // TODO: use `$root.trigger` and replace handling of select event
+            // everywhere.
             if (this.opts.bubbleUpAction) {
                 this.$parent.$emit(event_name, data);
             } else {
