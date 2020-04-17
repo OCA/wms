@@ -1,9 +1,10 @@
 import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
+import {process_registry} from "../services/process_registry.js";
 
 export var ClusterPicking = Vue.component("cluster-picking", {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
     template: `
-        <Screen :title="menuItem.name" :klass="usage + ' ' + 'state-' + state.key">
+        <Screen :title="screen_info.title" :klass="screen_info.klass">
             <!-- FOR DEBUG -->
             <!-- {{ current_state_key }} -->
             <template v-slot:header>
@@ -67,7 +68,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 v-on:select="state.on_select"
                 v-on:back="state.on_back"
                 :records="state.data.records"
-                :key_value="'id'"
+                :list_item_fields="manual_select_picking_fields"
                 />
 
             <!-- TODO: do we need a component for this? -->
@@ -103,6 +104,12 @@ export var ClusterPicking = Vue.component("cluster-picking", {
     computed: {
         batch_id: function() {
             return this.erp_data.data.confirm_start.id;
+        },
+        manual_select_picking_fields: function() {
+            return [
+                {path: "picking_count", label: "Operations"},
+                {path: "move_line_count", label: "Lines"},
+            ];
         },
     },
     methods: {
@@ -302,7 +309,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                             const scan_data = this.state_get_data("unload_all");
                             this.state.on_scan(scan_data.location_barcode, true);
                         } else {
-                            this.go_state("scan_location");
+                            this.go_state("scan_destination");
                         }
                     },
                     on_scan: (scanned, confirmation = true) => {
@@ -407,3 +414,4 @@ export var ClusterPicking = Vue.component("cluster-picking", {
         };
     },
 });
+process_registry.add("cluster_picking", ClusterPicking);

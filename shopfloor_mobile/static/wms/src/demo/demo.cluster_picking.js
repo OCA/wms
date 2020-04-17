@@ -1,5 +1,4 @@
-/* eslint no-use-before-define: 0 */ // --> OFF
-
+import {demotools} from "./demo.core.js";
 
 /*
 TODO: fix data as per `shopfloor.data.action`
@@ -16,26 +15,7 @@ var DEMO_CLUSTER_PICKING_1 = {
                 name: "BATCH001",
                 picking_count: 3,
                 move_line_count: 6,
-                pickings: [
-                    {
-                        id: 1,
-                        name: "OP001",
-                        customer: {
-                            name: "Customer 1",
-                        },
-                        origin: "SO000CUST001",
-                        move_line_count: 4,
-                    },
-                    {
-                        id: 2,
-                        name: "OP002",
-                        customer: {
-                            name: "Customer 2",
-                        },
-                        origin: "SO000CUST002",
-                        move_line_count: 2,
-                    },
-                ],
+                pickings: [demotools.makePicking(), demotools.makePicking()],
             },
         },
     },
@@ -48,7 +28,7 @@ var DEMO_CLUSTER_PICKING_1 = {
         data: {
             // Next line to process
             manual_selection: {
-                records: batchList(15),
+                records: demotools.batchList(15),
             },
         },
     },
@@ -60,33 +40,14 @@ var DEMO_CLUSTER_PICKING_1 = {
                 name: "BATCHXXX",
                 picking_count: 3,
                 move_line_count: 6,
-                records: [
-                    {
-                        id: 1,
-                        name: "OP001",
-                        customer: {
-                            name: "Customer 1",
-                        },
-                        origin: "SO000CUST001",
-                        move_line_count: 4,
-                    },
-                    {
-                        id: 2,
-                        name: "OP002",
-                        customer: {
-                            name: "Customer 2",
-                        },
-                        origin: "SO000CUST002",
-                        move_line_count: 2,
-                    },
-                ],
+                pickings: [demotools.makePicking(), demotools.makePicking()],
             },
         },
     },
     confirm_start: {
         next_state: "start_line",
         data: {
-            start_line: makeBatchPickingLine(),
+            start_line: demotools.makeBatchPickingLine(),
         },
     },
     unassign: {
@@ -106,7 +67,7 @@ var DEMO_CLUSTER_PICKING_1 = {
                 message: "Product 5 put in bin #2",
             },
             data: {
-                start_line: makeBatchPickingLine(),
+                start_line: demotools.makeBatchPickingLine(),
             },
         },
         ko: {
@@ -128,7 +89,7 @@ var DEMO_CLUSTER_PICKING_1 = {
         },
         data: {
             // Next line to process
-            start_line: makeBatchPickingLine(),
+            start_line: demotools.makeBatchPickingLine(),
         },
     },
     skip_line: {
@@ -139,7 +100,7 @@ var DEMO_CLUSTER_PICKING_1 = {
         },
         data: {
             // Next line to process
-            start_line: makeBatchPickingLine(),
+            start_line: demotools.makeBatchPickingLine(),
         },
     },
     stock_issue: {
@@ -150,7 +111,7 @@ var DEMO_CLUSTER_PICKING_1 = {
         },
         data: {
             // Next line to process
-            start_line: makeBatchPickingLine(),
+            start_line: demotools.makeBatchPickingLine(),
         },
     },
     check_pack_lot: {},
@@ -169,7 +130,7 @@ var DEMO_CLUSTER_PICKING_1 = {
             },
             data: {
                 // Next line to process
-                start_line: makeBatchPickingLine(),
+                start_line: demotools.makeBatchPickingLine(),
             },
         },
         KO: {
@@ -190,6 +151,4 @@ var DEMO_CLUSTER_PICKING_1 = {
     unload_router: {},
 };
 
-window.DEMO_CASES.cluster_picking = DEMO_CLUSTER_PICKING_1;
-
-/* eslint no-use-before-define: 2 */ // --> ON
+demotools.add_case("cluster_picking", DEMO_CLUSTER_PICKING_1);
