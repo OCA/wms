@@ -126,9 +126,15 @@ Vue.component("checkout-summary-content", {
         index: Number,
         count: Number,
     },
+    methods: {
+        destroy: function(record) {
+            this.$root.trigger("pkg_destroy", parseInt(record.key, 10));
+        },
+    },
     template: `
     <div class="summary-content">
         <div class="has-pack" v-if="record.key != 'no-pack'">
+            <v-btn depressed color="default" @click="destroy(record)">Nuke</v-btn>
             <v-list-item-title>
                 <span class="item-counter">
                     <span>{{ index + 1 }} / {{ count }}</span>
@@ -183,7 +189,7 @@ Vue.component("checkout-summary-extra-content", {
             </v-expansion-panel-header>
             <v-expansion-panel-content>
                 <div v-for="(prod, i) in pkg_type.records">
-                    <checkout-summary-product-detail :record="prod" />
+                    <checkout-summary-product-detail :record="prod" :index="i" :count="pkg_type.records.length" />
                 </div>
             </v-expansion-panel-content>
         </v-expansion-panel>

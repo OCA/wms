@@ -17,7 +17,7 @@ export var Checkout = Vue.component("checkout", {
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar
-                v-if="state_in(['select_document', 'select_line'])"
+                v-if="state.on_scan"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
                 />
@@ -60,17 +60,26 @@ export var Checkout = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="state.on_existing_pack">Existing pack</v-btn>
+                            <v-btn depressed color="primary"
+                                   @click="state.on_existing_pack"
+                                   :disabled="state.data.selected && !state.data.selected.length"
+                                   >Existing pack</v-btn>
                         </v-col>
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="state.on_new_pack">New pack [TODO]</v-btn>
+                            <v-btn depressed color="primary"
+                                   @click="state.on_new_pack"
+                                   :disabled="state.data.selected && !state.data.selected.length"
+                                   >New pack</v-btn>
                         </v-col>
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="state.on_without_pack">Process w/o pack [TODO]</v-btn>
+                            <v-btn depressed color="primary"
+                                   @click="state.on_without_pack"
+                                   :disabled="state.data.selected && !state.data.selected.length"
+                                   >Process w/o pack</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -78,8 +87,8 @@ export var Checkout = Vue.component("checkout", {
 
             <div v-if="state_is('summary')">
                 <checkout-summary-detail
-                    :info="state.data"
-                    :select_records_grouped="group_lines_by_location(state.data.move_lines, {'group_key': 'location_dest', 'prepare_records': group_by_pack})"
+                    :info="state.data.picking"
+                    :select_records_grouped="group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': group_by_pack})"
                     v-on:select="on_select"
                     v-on:back="on_back"
                     />
@@ -192,7 +201,7 @@ export var Checkout = Vue.component("checkout", {
             _.forEach(grouped, function(products, pack_id) {
                 const pack = _.first(_.filter(packs, {id: parseInt(pack_id)}));
                 res.push({
-                    key: pack ? pack.name : "no-pack",
+                    key: pack ? pack_id : "no-pack",
                     // No pack, just display the product name
                     title: pack ? pack.name : products[0].display_name,
                     records: products,
@@ -205,19 +214,11 @@ export var Checkout = Vue.component("checkout", {
         },
         group_by_package_type: function(lines) {
             const res = [];
-            const pkgs = _.uniqBy(
-                _.map(lines, function(x) {
-                    return x.package_dest ? x.package_dest.package_name : null;
-                }),
-                "id"
-            );
-            const grouped = _.groupBy(lines, "package_dest.package_name");
-            _.forEach(grouped, function(products, package_name) {
-                const pkg = _.first(_.filter(pkgs, {package_name: package_name}));
+            const grouped = _.groupBy(lines, "package_dest.packaging_name");
+            _.forEach(grouped, function(products, packaging_name) {
                 res.push({
-                    key: pkg ? pkg.name : "no-pkg",
-                    // No pack, just display the product name
-                    title: pkg ? pkg.name : "NO-PKG",
+                    key: packaging_name,
+                    title: packaging_name,
                     records: products,
                 });
             });
@@ -347,7 +348,16 @@ export var Checkout = Vue.component("checkout", {
                         }
                     },
                     on_new_pack: () => {
-                        throw "NOT IMPLEMENTED";
+                        this.go_state(
+                            "wait_call",
+                            this.odoo.call("new_package", {
+                                picking_id: this.state.data.picking.id,
+                                selected_line_ids: _.map(
+                                    this.state.data.selected,
+                                    _.property("id")
+                                ),
+                            })
+                        );
                     },
                     on_existing_pack: () => {
                         this.go_state(
@@ -362,7 +372,11 @@ export var Checkout = Vue.component("checkout", {
                         );
                     },
                     on_without_pack: () => {
-                        throw "NOT IMPLEMENTED";
+                        this.set_notification({
+                            message_type: "info",
+                            message: "Product(s) processed as raw product(s)",
+                        });
+                        this.go_state("select_line");
                     },
                     on_back: () => {
                         this.go_state("select_line");
@@ -436,6 +450,9 @@ export var Checkout = Vue.component("checkout", {
                     display_info: {
                         title: "Summary",
                     },
+                    events: {
+                        pkg_destroy: "on_pkg_destroy",
+                    },
                     on_select: selected => {
                         if (!selected) {
                             return;
@@ -453,7 +470,10 @@ export var Checkout = Vue.component("checkout", {
                         throw "NOT IMPLEMENTED";
                     },
                     on_pkg_destroy: pkg => {
-                        throw "NOT IMPLEMENTED";
+                        this.odoo.call("remove_package", {
+                            picking_id: this.state.data.picking.id,
+                            package_id: pkg.id,
+                        });
                     },
                     on_mark_as_done: pkg => {
                         throw "NOT IMPLEMENTED";
