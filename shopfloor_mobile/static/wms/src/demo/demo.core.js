@@ -166,7 +166,7 @@ export class DemoTools {
         const qty = this.getRandomInt(100);
         let qty_done = options.qty_done_full ? qty : defaults.qty_done;
         qty_done = options.qty_done_random ? this.getRandomInt(qty) : qty_done;
-        return {
+        return _.defaults({}, defaults, {
             id: this.getRandomInt(),
             quantity: qty,
             qty_done: qty_done,
@@ -177,7 +177,7 @@ export class DemoTools {
             origin: "S0" + this.getRandomInt(),
             location_src: this.makeLocation("LOC-SRC"),
             location_dest: this.makeLocation("LOC-DST"),
-        };
+        });
     }
 
     makeBatchPickingLine(defaults = {}) {
