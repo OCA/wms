@@ -31,6 +31,12 @@ var DEMO_CHECKOUT = {
             },
         },
     },
+    select: {
+        next_state: "select_line",
+        data: {
+            select_line: select_line_data,
+        },
+    },
     list_stock_picking: {
         next_state: "manual_selection",
         message: null,
@@ -53,18 +59,26 @@ var DEMO_CHECKOUT = {
         },
     },
     select_line: {
-        next_state: "select_pack",
+        next_state: "select_package",
         data: {
-            select_pack: {
+            select_package: {
+                picking: select_pack_picking,
+                selected_move_lines: select_pack_picking.move_lines,
+            },
+        },
+    },
+    select_package: {
+        data: {
+            select_package: {
                 picking: select_pack_picking,
                 selected_move_lines: select_pack_picking.move_lines,
             },
         },
     },
     reset_line_qty: {
-        next_state: "select_pack",
+        next_state: "select_package",
         data: {
-            select_pack: {
+            select_package: {
                 picking: select_pack_picking,
                 // simulate unselecting 1 line
                 selected_move_lines: select_pack_picking.move_lines,
@@ -104,6 +118,16 @@ var DEMO_CHECKOUT = {
             message: "Product(s) packed in XYZ",
         },
     },
+    scan_dest_package: {
+        next_state: "select_line",
+        data: {
+            select_line: select_line_data,
+        },
+        message: {
+            message_type: "info",
+            message: "Product(s) packed in XYZ",
+        },
+    },
     new_package: {
         next_state: "select_line",
         data: {
@@ -124,6 +148,13 @@ var DEMO_CHECKOUT = {
         next_state: "summary",
         data: {
             summary: summary_data,
+        },
+    },
+    done: {
+        next_state: "select_document",
+        message: {
+            message_type: "info",
+            message: "Done",
         },
     },
 };

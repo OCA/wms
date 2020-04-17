@@ -165,7 +165,12 @@ ul.packaging span:first-child {
 .state-title {
 }
 
-.manual-select .v-btn.destroy{
+.manual-select .action {
+    margin: 0;
+    float: right;
+}
+
+.manual-select .action .v-btn{
     min-width: 0;
     font-size: 1.2em;
     padding: 15px 5px;
