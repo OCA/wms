@@ -9,6 +9,9 @@ const select_line_data = demotools.makePicking(
     {},
     {lines_count: 5, line_random_pack: true}
 );
+const summary_data = {
+    picking: demotools.makePicking({}, {lines_count: 5, line_random_pack: true}),
+};
 
 var DEMO_CHECKOUT = {
     scan_document: {
@@ -101,14 +104,21 @@ var DEMO_CHECKOUT = {
             message: "Product(s) packed in XYZ",
         },
     },
+    new_package: {
+        next_state: "select_line",
+        data: {
+            select_line: select_line_data,
+        },
+        message: {
+            message_type: "info",
+            message: "Product(s) packed in XYZ",
+        },
+    },
     // TODO
     summary: {
         next_state: "summary",
         data: {
-            summary: demotools.makePicking(
-                {},
-                {lines_count: 5, line_random_pack: true}
-            ),
+            summary: summary_data,
         },
     },
 };
