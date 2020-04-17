@@ -47,8 +47,7 @@ export var CheckoutPickingDetailSelectMixin = {
     <checkout-picking-detail :picking="picking" />
 
     <manual-select
-        v-if="select_records"
-        :records="select_records || info.move_lines"
+        :records="select_records || picking.move_lines"
         :grouped_records="select_records_grouped"
         :options="select_opts"
         />

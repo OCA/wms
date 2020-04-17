@@ -44,7 +44,7 @@ export var ScenarioBaseMixin = {
             // Default to initial state
             this.current_state_key = this.initial_state_key;
         }
-        this.go_state("start");
+        this.go_state(this.current_state_key);
     },
     beforeUpdate: function() {
         if (this.state.events) {
@@ -127,7 +127,7 @@ export var ScenarioBaseMixin = {
         },
         // Generic states methods
         go_state: function(state_key, promise) {
-            console.log("GO TO STATE", state_key);
+            // console.log("GO TO STATE", state_key);
             if (state_key == "start") {
                 // Alias "start" to the initial state
                 state_key = this.initial_state_key;

@@ -33,7 +33,6 @@ Vue.component("checkout-summary-content", {
     <div class="summary-content">
         <div class="has-pack" v-if="record.key != 'no-pack'">
             <checkout-summary-destroy-action :pack="record.pack" />
-            <checkout-summary-edit-action :pack="record.pack" />
             <v-list-item-title>
                 <span class="item-counter">
                     <span>{{ index + 1 }} / {{ count }}</span>
@@ -50,6 +49,7 @@ Vue.component("checkout-summary-content", {
     `,
 });
 
+// TODO: split these actions out of checkout
 Vue.component("checkout-summary-destroy-action", {
     props: ["pack"],
     data() {
@@ -71,7 +71,7 @@ Vue.component("checkout-summary-destroy-action", {
         }
     },
     template: `
-  <div class="edit destroy-action">
+  <div class="action action-destroy">
     <v-dialog v-model="dialog" fullscreen tile class="actions fullscreen text-center">
       <template v-slot:activator="{ on }">
         <v-btn class="destroy" depressed small rounded color="error" v-on="on">&#10006;</v-btn>
@@ -86,14 +86,6 @@ Vue.component("checkout-summary-destroy-action", {
 `,
 });
 
-Vue.component("checkout-summary-edit-action", {
-    props: ["pack"],
-    template: `
-  <div class="action edit-action">
-    <v-btn class="edit" depressed small rounded color="default" @click="$root.trigger('edit_package', pack)">&#10000;</v-btn>
-  </div>
-`,
-});
 
 Vue.component("checkout-summary-product-detail", {
     props: {

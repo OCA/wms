@@ -211,7 +211,6 @@ export class DemoTools {
             "Floyd Steward",
             "Edwin Hansen",
             "Soham Palmer",
-            "Default User Template",
             "Gordon Owens",
             "Oscar Morgan",
             "Lorraine Douglas",
@@ -222,13 +221,10 @@ export class DemoTools {
             "Theodore Gardner",
             "Wood Corner",
             "Deco Addict",
-            "My Company (Chicago)",
             "Dwayne Newman",
-            "My Company (San Francisco)",
             "Chester Reed",
             "Lumber Inc",
             "Jeff Lawson",
-            "Mitchell Admin",
             "Marc Demo",
         ];
     }

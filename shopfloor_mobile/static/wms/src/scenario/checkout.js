@@ -49,7 +49,7 @@ export var Checkout = Vue.component("checkout", {
                 </div>
             </div>
 
-            <div v-if="state_is('select_pack')">
+            <div v-if="state_is('select_package')">
                 <checkout-picking-detail-select
                     :picking="state.data.picking"
                     :select_records="state.data.selected_move_lines"
@@ -111,7 +111,7 @@ export var Checkout = Vue.component("checkout", {
             </div>
             <div v-if="state_is('select_dest_package')">
                 <checkout-picking-detail-select
-                    :info="state.data.picking"
+                    :picking="state.data.picking"
                     :select_records="state.data.packages"
                     :select_options="{bubbleUpAction: true, list_item_fields: existing_package_select_fields, list_item_component: 'manual-select-item'}"
                     v-on:select="on_select"
@@ -277,6 +277,9 @@ export var Checkout = Vue.component("checkout", {
                         title: "Pick the product by scanning something",
                         scan_placeholder: "Scan pack / product / lot",
                     },
+                    events: {
+                        summary: "on_summary",
+                    },
                     on_scan: scanned => {
                         this.go_state(
                             "wait_call",
@@ -312,9 +315,17 @@ export var Checkout = Vue.component("checkout", {
                         );
                     },
                 },
-                select_pack: {
+                select_package: {
+                    // TODO: /set_line_qty is not handled yet
+                    // because is not clear how to handle line selection
+                    // and qty set.
+                    // ATM given that manual-select uses v-list-item-group
+                    // when you touch a line you select/unselect it
+                    // which means we cannot rely on this to go to edit.
+                    // If we need it, we have to change manual-select
+                    // to use pure list + checkboxes.
                     display_info: {
-                        title: "Select pack",
+                        title: "Select package",
                     },
                     on_qty_update: qty => {
                         this.scan_destination_qty = parseInt(qty);
@@ -385,18 +396,21 @@ export var Checkout = Vue.component("checkout", {
                         this.reset_notification();
                     },
                 },
-                change_qty: {
+                change_quantity: {
                     display_info: {
                         title: "Change quantity",
                     },
-                    on_qty_update: qty => {
-                        this.state.data.qty = parseInt(qty);
+                    events: {
+                        qty_update: "on_qty_update",
                     },
-                    on_action: action => {
-                        this.state["on_" + action].call(this);
+                    on_back: () => {
+                        this.go_state("select_line");
+                        this.reset_notification();
                     },
-                    on_change_qty: () => {
-                        throw "NOT IMPLEMENTED";
+                    on_confirm: qty => {
+                        console.log(qty);
+                    },
+                    on_qty_update: () => {
                         this.go_state(
                             "wait_call",
                             this.odoo.call("set_custom_qty", {
@@ -411,7 +425,7 @@ export var Checkout = Vue.component("checkout", {
                         title: "Select destination package",
                     },
                     on_scan: scanned => {
-                        const selected_lines = this.state_get_data("select_pack")
+                        const selected_lines = this.state_get_data("select_package")
                             .selected;
                         this.go_state(
                             "wait_call",
@@ -429,7 +443,7 @@ export var Checkout = Vue.component("checkout", {
                         if (!selected) {
                             return;
                         }
-                        const selected_lines = this.state_get_data("select_pack")
+                        const selected_lines = this.state_get_data("select_package")
                             .selected;
                         this.go_state(
                             "wait_call",
@@ -444,7 +458,7 @@ export var Checkout = Vue.component("checkout", {
                         );
                     },
                     on_back: () => {
-                        this.go_state("select_pack");
+                        this.go_state("select_package");
                         this.reset_notification();
                     },
                 },
@@ -482,6 +496,7 @@ export var Checkout = Vue.component("checkout", {
                         });
                     },
                 },
+                // TODO
                 change_package_type: {
                     display_info: {
                         title: "Change package type",
@@ -491,6 +506,12 @@ export var Checkout = Vue.component("checkout", {
                     },
                     on_do_it: pkg => {
                         throw "NOT IMPLEMENTED";
+                    },
+                },
+                // TODO
+                confirm_done: {
+                    display_info: {
+                        title: "Confirm done [TODO]",
                     },
                 },
             },
