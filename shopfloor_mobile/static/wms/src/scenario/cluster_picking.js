@@ -1,5 +1,5 @@
 import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
-import {process_registry} from '../services/process_registry.js';
+import {process_registry} from "../services/process_registry.js";
 
 export var ClusterPicking = Vue.component("cluster-picking", {
     mixins: [ScenarioBaseMixin, GenericStatesMixin],
@@ -105,10 +105,10 @@ export var ClusterPicking = Vue.component("cluster-picking", {
         batch_id: function() {
             return this.erp_data.data.confirm_start.id;
         },
-        manual_select_picking_fields: function () {
+        manual_select_picking_fields: function() {
             return [
-                {'path': 'picking_count', 'label': 'Operations'},
-                {'path': 'move_line_count', 'label': 'Lines'},
+                {path: "picking_count", label: "Operations"},
+                {path: "move_line_count", label: "Lines"},
             ];
         },
     },
@@ -309,7 +309,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                             const scan_data = this.state_get_data("unload_all");
                             this.state.on_scan(scan_data.location_barcode, true);
                         } else {
-                            this.go_state('scan_destination');
+                            this.go_state("scan_destination");
                         }
                     },
                     on_scan: (scanned, confirmation = true) => {
@@ -414,4 +414,4 @@ export var ClusterPicking = Vue.component("cluster-picking", {
         };
     },
 });
-process_registry.add('cluster_picking', ClusterPicking);
+process_registry.add("cluster_picking", ClusterPicking);

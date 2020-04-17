@@ -1,7 +1,11 @@
-import {GenericStatesMixin, ScenarioBaseMixin, SinglePackStatesMixin} from "./mixins.js";
-import {process_registry} from '../services/process_registry.js';
+import {
+    GenericStatesMixin,
+    ScenarioBaseMixin,
+    SinglePackStatesMixin,
+} from "./mixins.js";
+import {process_registry} from "../services/process_registry.js";
 
-export var SinglePackTransfer = Vue.component('single-pack-transfer', {
+export var SinglePackTransfer = Vue.component("single-pack-transfer", {
     mixins: [ScenarioBaseMixin, GenericStatesMixin, SinglePackStatesMixin],
     template: `
         <Screen :title="screen_info.title" :klass="screen_info.klass">
@@ -22,11 +26,11 @@ export var SinglePackTransfer = Vue.component('single-pack-transfer', {
     `,
     data: function() {
         return {
-            'usage': 'single_pack_transfer',
-            'show_reset_button': true,
-            'initial_state_key': 'start_scan_pack_or_location',
-            'states': {
-                'show_completion_info': {
+            usage: "single_pack_transfer",
+            show_reset_button: true,
+            initial_state_key: "start_scan_pack_or_location",
+            states: {
+                show_completion_info: {
                     on_confirm: () => {
                         // TODO: turn the cone?
                         this.go_state("start");
@@ -36,4 +40,4 @@ export var SinglePackTransfer = Vue.component('single-pack-transfer', {
         };
     },
 });
-process_registry.add('single_pack_transfer', SinglePackTransfer);
+process_registry.add("single_pack_transfer", SinglePackTransfer);

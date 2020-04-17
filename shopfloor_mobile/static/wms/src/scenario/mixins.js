@@ -18,7 +18,7 @@ export var ScenarioBaseMixin = {
             initial_state_key: "start",
             current_state_key: "",
             states: {},
-            usage: "", // Match component usage on odoo
+            usage: "", // Match component usage on odoo,
         };
     },
     beforeMount: function() {
@@ -199,7 +199,7 @@ export var GenericStatesMixin = {
                             this.set_erp_data("data", result.data);
                         }
                         if (!_.isUndefined(result) && !result.error) {
-                            // TODO: consider not changing the state if it is the same to no refresh
+                            // TODO: consider not changing the state if it is the same to not refresh
                             this.go_state(result.next_state);
                         } else {
                             alert(result.status + " " + result.error);

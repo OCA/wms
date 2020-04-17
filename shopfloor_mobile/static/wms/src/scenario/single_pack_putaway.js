@@ -1,7 +1,11 @@
-import {GenericStatesMixin, ScenarioBaseMixin, SinglePackStatesMixin} from "./mixins.js";
-import {process_registry} from '../services/process_registry.js';
+import {
+    GenericStatesMixin,
+    ScenarioBaseMixin,
+    SinglePackStatesMixin,
+} from "./mixins.js";
+import {process_registry} from "../services/process_registry.js";
 
-export var SinglePackPutAway = Vue.component('single-pack-putaway', {
+export var SinglePackPutAway = Vue.component("single-pack-putaway", {
     mixins: [ScenarioBaseMixin, GenericStatesMixin, SinglePackStatesMixin],
     template: `
         <Screen :title="screen_info.title" :klass="screen_info.klass">
@@ -23,8 +27,8 @@ export var SinglePackPutAway = Vue.component('single-pack-putaway', {
             usage: "single_pack_putaway",
             show_reset_button: true,
             // FIXME: scenario has changed -> we should use `start_scan_pack_or_location` as on pack transfer
-            'initial_state_key': 'start_scan_pack',
+            initial_state_key: "start_scan_pack",
         };
     },
 });
-process_registry.add('single_pack_putaway', SinglePackPutAway);
+process_registry.add("single_pack_putaway", SinglePackPutAway);

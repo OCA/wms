@@ -81,8 +81,7 @@ Vue.component("stock-zero-check", {
   `,
 });
 
-
-Vue.component('state-display-info', {
+Vue.component("state-display-info", {
     props: {
         info: Object,
     },

@@ -1,5 +1,4 @@
-import {demotools} from './demo.core.js';
-
+import {demotools} from "./demo.core.js";
 
 /*
 TODO: fix data as per `shopfloor.data.action`
@@ -8,15 +7,15 @@ that comes from data.move_line().
 */
 
 var DEMO_CLUSTER_PICKING_1 = {
-    "find_batch": {
-        "next_state": "confirm_start",
-        "data": {
-            "confirm_start": {
-                "id": 100,
-                "name": "BATCH001",
-                "picking_count": 3,
-                "move_line_count": 6,
-                "pickings": [demotools.makePicking(), demotools.makePicking()],
+    find_batch: {
+        next_state: "confirm_start",
+        data: {
+            confirm_start: {
+                id: 100,
+                name: "BATCH001",
+                picking_count: 3,
+                move_line_count: 6,
+                pickings: [demotools.makePicking(), demotools.makePicking()],
             },
         },
     },
@@ -28,27 +27,27 @@ var DEMO_CLUSTER_PICKING_1 = {
         },
         data: {
             // Next line to process
-            "manual_selection": {
-                "records": demotools.batchList(15),
+            manual_selection: {
+                records: demotools.batchList(15),
             },
         },
     },
-    "select": {
-        "next_state": "confirm_start",
-        "data": {
-            "confirm_start": {
-                "id": 100,
-                "name": "BATCHXXX",
-                "picking_count": 3,
-                "move_line_count": 6,
-                "pickings": [demotools.makePicking(), demotools.makePicking()],
+    select: {
+        next_state: "confirm_start",
+        data: {
+            confirm_start: {
+                id: 100,
+                name: "BATCHXXX",
+                picking_count: 3,
+                move_line_count: 6,
+                pickings: [demotools.makePicking(), demotools.makePicking()],
             },
         },
     },
-    "confirm_start": {
-        "next_state": "start_line",
-        "data": {
-            "start_line": demotools.makeBatchPickingLine(),
+    confirm_start: {
+        next_state: "start_line",
+        data: {
+            start_line: demotools.makeBatchPickingLine(),
         },
     },
     unassign: {
@@ -67,8 +66,8 @@ var DEMO_CLUSTER_PICKING_1 = {
                 message_type: "success",
                 message: "Product 5 put in bin #2",
             },
-            "data": {
-                "start_line": demotools.makeBatchPickingLine(),
+            data: {
+                start_line: demotools.makeBatchPickingLine(),
             },
         },
         ko: {
@@ -90,7 +89,7 @@ var DEMO_CLUSTER_PICKING_1 = {
         },
         data: {
             // Next line to process
-            "start_line": demotools.makeBatchPickingLine(),
+            start_line: demotools.makeBatchPickingLine(),
         },
     },
     skip_line: {
@@ -101,7 +100,7 @@ var DEMO_CLUSTER_PICKING_1 = {
         },
         data: {
             // Next line to process
-            "start_line": demotools.makeBatchPickingLine(),
+            start_line: demotools.makeBatchPickingLine(),
         },
     },
     stock_issue: {
@@ -112,7 +111,7 @@ var DEMO_CLUSTER_PICKING_1 = {
         },
         data: {
             // Next line to process
-            "start_line": demotools.makeBatchPickingLine(),
+            start_line: demotools.makeBatchPickingLine(),
         },
     },
     check_pack_lot: {},
@@ -131,7 +130,7 @@ var DEMO_CLUSTER_PICKING_1 = {
             },
             data: {
                 // Next line to process
-                "start_line": demotools.makeBatchPickingLine(),
+                start_line: demotools.makeBatchPickingLine(),
             },
         },
         KO: {
@@ -152,4 +151,4 @@ var DEMO_CLUSTER_PICKING_1 = {
     unload_router: {},
 };
 
-demotools.add_case('cluster_picking', DEMO_CLUSTER_PICKING_1);
+demotools.add_case("cluster_picking", DEMO_CLUSTER_PICKING_1);

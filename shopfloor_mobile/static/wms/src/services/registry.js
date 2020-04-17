@@ -1,16 +1,13 @@
-
 export class Registry {
-
-    constructor () {
+    constructor() {
         this._data = {};
     }
 
-    get (key) {
+    get(key) {
         return this._data[key];
     }
 
-    add (key, item) {
+    add(key, item) {
         this._data[key] = item;
     }
-
 }
