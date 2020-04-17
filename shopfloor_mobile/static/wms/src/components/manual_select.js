@@ -183,12 +183,12 @@ Vue.component("manual-select", {
         </v-card>
         <v-row class="actions bottom-actions" v-if="has_records && opts.showActions">
             <v-col>
-                <v-btn color="success" @click="handleAction('select', selected)">
+                <v-btn depressed color="success" @click="handleAction('select', selected)">
                     Start
                 </v-btn>
             </v-col>
             <v-col>
-                <v-btn color="default" @click="handleAction('back')" class="float-right">
+                <v-btn depressed color="default" @click="handleAction('back')" class="float-right">
                     Back
                 </v-btn>
             </v-col>
