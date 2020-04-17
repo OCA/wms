@@ -15,7 +15,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar
-                v-if="state_in(['start_line', 'unload_all', 'confirm_unload_all', 'scan_destination'])"
+                v-if="state.on_scan"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
                 />
