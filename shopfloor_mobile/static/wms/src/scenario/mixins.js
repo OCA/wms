@@ -44,6 +44,37 @@ export var ScenarioBaseMixin = {
             // Default to initial state
             this.current_state_key = this.initial_state_key;
         }
+        this.go_state("start");
+    },
+    beforeUpdate: function() {
+        if (this.state.events) {
+            /*
+            Automatically bind events defined by states.
+            A state can define `events` w/ this structure:
+
+                events: {
+                    '$event_name': '$handler',
+                },
+
+            `$handler_name` must match a function or the name of a function
+            available in the state.
+
+            The event name is prefixed w/ the state key so that
+            any component can subscribe globally,
+            via the event hub at root level,
+            to a particular event fired on a specific state
+            */
+            const self = this;
+            _.each(self.state.events, function(handler, name) {
+                if (typeof handler == "string") handler = self.state[handler];
+                const event_name = self.state.key + ":" + name;
+                self.$root.event_hub.$on(event_name, handler);
+            });
+        }
+    },
+    beforeDestroy: function() {
+        // TODO: we should turn off only handlers for the current state
+        this.$root.event_hub.$off();
     },
     computed: {
         /*
@@ -111,6 +142,8 @@ export var ScenarioBaseMixin = {
             } else {
                 this.on_enter();
             }
+            // notify root
+            this.$root.$emit("state:change", state_key);
         },
         on_enter: function() {
             if (this.state.enter) {

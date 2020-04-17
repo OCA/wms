@@ -3,6 +3,7 @@ import {Config} from "./services/config.js";
 import {Storage} from "./services/storage.js";
 import {process_registry} from "./services/process_registry.js";
 
+var EventHub = new Vue();
 
 var AppConfig = new Config();
 
@@ -54,12 +55,23 @@ const app = new Vue({
     data: {
         demo_mode: false,
         config: AppConfig,
+        global_state_key: "",
+        // collect global events
+        event_hub: EventHub,
     },
     created: function() {
         this.demo_mode = window.location.pathname.includes("demo");
         if (this.demo_mode) {
             this.loadJS("src/demo/demo.core.js", "demo_core");
         }
+    },
+    mounted: function() {
+        const self = this;
+        // components can trigger `state:change` on the root
+        // and the current state gets stored into `global_state_key`
+        this.$root.$on("state:change", function(key) {
+            self.global_state_key = key;
+        });
     },
     methods: {
         loadJS: function(url, script_id) {
@@ -71,6 +83,19 @@ const app = new Vue({
                 script.setAttribute("id", script_id);
                 document.getElementsByTagName("head")[0].appendChild(script);
             }
+        },
+        /*
+        Trigger and event on the event hub.
+        If a state is available, prefix event name w/ it.
+        Components using our mixin for state machine can define events
+        on each state using `events` array. See mixin for details.
+        Components can use `$root.trigger(...)` to trigger and event on the hub.
+        */
+        trigger(event_name, data) {
+            if (this.global_state_key) {
+                event_name = this.global_state_key + ":" + event_name;
+            }
+            this.event_hub.$emit(event_name, data);
         },
     },
 }).$mount("#app");
