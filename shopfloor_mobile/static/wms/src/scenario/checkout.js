@@ -1,6 +1,6 @@
 import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
-import {demotools} from "../demo/demo.core.js";
+import {demotools} from "../demo/demo.core.js"; // FIXME: dev only
 import {} from "../demo/demo.checkout.js"; // FIXME: dev only
 
 export var Checkout = Vue.component("checkout", {
@@ -32,8 +32,8 @@ export var Checkout = Vue.component("checkout", {
             </div>
 
             <div v-if="state_is('select_line')">
-                <checkout-picking-detail
-                    :info="state.data"
+                <checkout-picking-detail-select
+                    :picking="state.data"
                     :select_records="state.data.move_lines"
                     :select_records_grouped="group_lines_by_location(state.data.move_lines)"
                     :select_options="{bubbleUpAction: true}"
@@ -43,15 +43,15 @@ export var Checkout = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="state.on_summary">Summary</v-btn>
+                            <v-btn depressed color="primary" @click="$root.trigger('summary')">Summary</v-btn>
                         </v-col>
                     </v-row>
                 </div>
             </div>
 
             <div v-if="state_is('select_pack')">
-                <checkout-picking-detail
-                    :info="state.data.picking"
+                <checkout-picking-detail-select
+                    :picking="state.data.picking"
                     :select_records="state.data.selected_move_lines"
                     :select_options="{multiple: true, initSelectAll: true, bubbleUpAction: true, list_item_component: 'checkout-select-package-content'}"
                     v-on:select="on_select"
@@ -87,7 +87,7 @@ export var Checkout = Vue.component("checkout", {
 
             <div v-if="state_is('summary')">
                 <checkout-summary-detail
-                    :info="state.data.picking"
+                    :picking="state.data.picking"
                     :select_records_grouped="group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': group_by_pack})"
                     :select_options="{showActions: false}"
                     v-on:select="on_select"
@@ -110,7 +110,7 @@ export var Checkout = Vue.component("checkout", {
                     />
             </div>
             <div v-if="state_is('select_dest_package')">
-                <checkout-picking-detail
+                <checkout-picking-detail-select
                     :info="state.data.picking"
                     :select_records="state.data.packages"
                     :select_options="{bubbleUpAction: true, list_item_fields: existing_package_select_fields, list_item_component: 'manual-select-item'}"
