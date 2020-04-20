@@ -1,21 +1,19 @@
 /* eslint-disable strict */
 /* eslint-disable no-implicit-globals */
-import {CheckoutPickingDetailSelectMixin} from "./mixins.js";
+import {CheckoutPickingDetailListMixin} from "./mixins.js";
 
 
 Vue.component("checkout-summary-detail", {
-    mixins: [CheckoutPickingDetailSelectMixin],
+    mixins: [CheckoutPickingDetailListMixin],
     computed: {
-        select_opts() {
+        list_opts() {
             // Defining defaults for an Object property
             // works only if you don't pass the property at all.
             // If you pass only one key, you'll lose all defaults.
-            const opts = _.defaults({}, this.$props.select_options, {
-                multiple: true,
-                initSelectAll: true,
+            const opts = _.defaults({}, this.$props.list_options, {
                 showCounters: true,
                 list_item_component: "checkout-summary-content",
-                list_item_extra_component: "checkout-summary-extra-content",
+                // list_item_action_component: "checkout-summary-content",
             });
             return opts;
         },
@@ -30,26 +28,38 @@ Vue.component("checkout-summary-content", {
         count: Number,
     },
     template: `
-    <div class="summary-content">
-        <div class="has-pack" v-if="record.key != 'no-pack'">
-            <checkout-summary-destroy-action :pack="record.pack" />
-            <v-list-item-title>
-                <span class="item-counter">
-                    <span>{{ index + 1 }} / {{ count }}</span>
-                </span>
-                {{ record.title }}
-            </v-list-item-title>
-        </div>
-        <div class="no-pack" v-else>
-            <div v-for="(subrec, i) in record.records">
+    <div class="summary-content d-flex">
+        <v-list-item-content :class="'justify-start ' + (record.key == 'no-pack'? 'no-pack' : 'has-pack' )">
+            <v-expansion-panels v-if="record.key != 'no-pack' && record.records_by_pkg_type" flat>
+                <v-expansion-panel v-for="pkg_type in record.records_by_pkg_type" :key="pkg_type.key"">
+                    <v-expansion-panel-header>
+                        <span class="item-counter">
+                            <span>{{ index + 1 }} / {{ count }}</span>
+                        </span>
+                        {{ record.title }}
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <strong>{{ pkg_type.title }}</strong>
+                        <edit-action :record="record.pack" :click_event="'pkg_change_type'" />
+                        <div v-for="(prod, i) in pkg_type.records">
+                            <checkout-summary-product-detail :record="prod" :index="i" :count="pkg_type.records.length" />
+                        </div>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
+            </v-expansion-panels>
+            <div v-else v-for="(subrec, i) in record.records">
                 <checkout-summary-product-detail :record="subrec" :index="index" :count="count" />
             </div>
-        </div>
+        </v-list-item-content>
+        <v-list-item-action v-if="record.key != 'no-pack'" class="justify-end">
+            <checkout-summary-destroy-action :pack="record.pack" />
+        </v-list-item-action>
     </div>
     `,
 });
 
 // TODO: split these actions out of checkout
+            // 
 Vue.component("checkout-summary-destroy-action", {
     props: ["pack"],
     data() {
@@ -112,24 +122,3 @@ Vue.component("checkout-summary-product-detail", {
         </div>
     `,
 });
-
-Vue.component("checkout-summary-extra-content", {
-    props: {
-        record: Object,
-    },
-    template: `
-    <v-expansion-panels flat v-if="record.key != 'no-pack' && record.records_by_pkg_type">
-        <v-expansion-panel v-for="pkg_type in record.records_by_pkg_type" :key="pkg_type.key">
-            <v-expansion-panel-header>
-                <span>{{ pkg_type.title }}</span>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-                <div v-for="(prod, i) in pkg_type.records">
-                    <checkout-summary-product-detail :record="prod" :index="i" :count="pkg_type.records.length" />
-                </div>
-            </v-expansion-panel-content>
-        </v-expansion-panel>
-    </v-expansion-panels>
-    `,
-});
-

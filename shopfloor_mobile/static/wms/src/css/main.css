@@ -40,9 +40,9 @@ ul.packaging span:first-child {
 .v-dialog.v-dialog--active.v-dialog--fullscreen .v-alert__wrapper .message {
 }
 
-.action {
+/* .action {
     margin-top: 2rem;
-}
+} */
 
 .fullscreen-buttons {
     display: flex;
@@ -167,7 +167,9 @@ ul.packaging span:first-child {
 
 .manual-select .action {
     margin: 0;
-    float: right;
+}
+.manual-select .action.action-edit {
+    padding: 8px 16px;
 }
 
 .manual-select .action .v-btn{
@@ -175,3 +177,16 @@ ul.packaging span:first-child {
     font-size: 1.2em;
     padding: 15px 5px;
 }
+.list .v-expansion-panel-header {
+    padding: 0;
+}
+.list .v-expansion-panel-header > :not(.v-expansion-panel-header__icon) { flex: none }
+.list .v-expansion-panel-header > .item-counter { margin-right: 0.5em; }
+
+.list .list-item-wrapper:not(:last-child) .v-list-item__content {
+    border-bottom: 1px solid #ccc;
+}
+.list .list-group:not(:last-child) {
+    border-bottom: 2px solid #ccc;
+}
+.list .v-list-item__content.has-pack { padding: 0;}
