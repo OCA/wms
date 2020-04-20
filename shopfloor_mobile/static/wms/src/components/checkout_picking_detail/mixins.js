@@ -43,7 +43,7 @@ export var CheckoutPickingDetailSelectMixin = {
     },
     template: `
 <div class="checkout-picking-detail-select" v-if="!_.isEmpty(picking)">
-    
+
     <checkout-picking-detail :picking="picking" />
 
     <manual-select
@@ -54,3 +54,36 @@ export var CheckoutPickingDetailSelectMixin = {
 </div>
 `,
 };
+
+export var CheckoutPickingDetailListMixin = {
+    mixins: [CheckoutPickingDetailMixin],
+    props: {
+        records: Array,
+        records_grouped: Array,
+        list_options: Object,
+    },
+    computed: {
+        list_opts() {
+            // Defining defaults for an Object property
+            // works only if you don't pass the property at all.
+            // If you pass only one key, you'll lose all defaults.
+            const opts = _.defaults({}, this.$props.list_options, {
+                showCounters: false,
+            });
+            return opts;
+        },
+    },
+    template: `
+<div class="checkout-picking-detail-list" v-if="!_.isEmpty(picking)">
+
+    <checkout-picking-detail :picking="picking" />
+
+    <list
+        :records="records || picking.move_lines"
+        :grouped_records="records_grouped"
+        :options="list_opts"
+        />
+</div>
+`,
+};
+
