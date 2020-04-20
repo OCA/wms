@@ -30,7 +30,14 @@ export var Checkout = Vue.component("checkout", {
                     </v-row>
                 </div>
             </div>
-
+            <div v-if="state_is('manual_selection')">
+                <manual-select
+                    v-on:select="on_select"
+                    v-on:back="on_back"
+                    :records="state.data.records"
+                    :list_item_fields="manual_select_picking_fields"
+                    />
+            </div>
             <div v-if="state_is('select_line')">
                 <checkout-picking-detail-select
                     :picking="state.data"
@@ -88,8 +95,7 @@ export var Checkout = Vue.component("checkout", {
             <div v-if="state_is('summary')">
                 <checkout-summary-detail
                     :picking="state.data.picking"
-                    :select_records_grouped="group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': group_by_pack})"
-                    :select_options="{showActions: false}"
+                    :records_grouped="group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': group_by_pack})"
                     v-on:select="on_select"
                     v-on:back="on_back"
                     />
@@ -101,19 +107,24 @@ export var Checkout = Vue.component("checkout", {
                     </v-row>
                 </div>
             </div>
-            <div v-if="state_is('manual_selection')">
-                <manual-select
-                    v-on:select="on_select"
-                    v-on:back="on_back"
-                    :records="state.data.records"
-                    :list_item_fields="manual_select_picking_fields"
-                    />
-            </div>
             <div v-if="state_is('select_dest_package')">
                 <checkout-picking-detail-select
                     :picking="state.data.picking"
                     :select_records="state.data.packages"
-                    :select_options="{bubbleUpAction: true, list_item_fields: existing_package_select_fields, list_item_component: 'manual-select-item'}"
+                    :select_options="{bubbleUpAction: true, list_item_fields: existing_package_select_fields, list_item_component: 'list-item'}"
+                    v-on:select="on_select"
+                    />
+            </div>
+            <div v-if="state_is('change_quantity')">
+                <checkout-picking-change-qty
+                    :picking="state.data.picking"
+                    />
+            </div>
+            <div v-if="state_is('change_packaging')">
+                <checkout-picking-detail-select
+                    :picking="state.data.picking"
+                    :select_records="state.data.packagings"
+                    :select_options="{bubbleUpAction: true,  list_item_component: 'list-item'}"
                     v-on:select="on_select"
                     v-on:back="on_back"
                     />
@@ -314,6 +325,10 @@ export var Checkout = Vue.component("checkout", {
                             })
                         );
                     },
+                    on_edit_package: (pkg) => {
+                        this.state_set_data({"package": pkg}, change_quantity);
+                        this.go_state("change_quantity");
+                    },
                 },
                 select_package: {
                     // TODO: /set_line_qty is not handled yet
@@ -471,41 +486,57 @@ export var Checkout = Vue.component("checkout", {
                         pkg_change_type: "on_pkg_change_type",
                         mark_as_done: "on_mark_as_done",
                     },
-                    on_select: selected => {
-                        if (!selected) {
-                            return;
-                        }
-                        this.state.data.selected = selected;
-                    },
                     on_back: () => {
                         this.go_state("start");
                         this.reset_notification();
                     },
                     on_pkg_change_type: pkg => {
-                        throw "NOT IMPLEMENTED";
+                        this.go_state(
+                            "wait_call",
+                            this.odoo.call("list_packaging", {
+                                picking_id: this.state.data.picking.id,
+                                package_id: pkg.id,
+                            })
+                        );
                     },
                     on_pkg_destroy: pkg => {
-                        this.odoo.call("remove_package", {
-                            picking_id: this.state.data.picking.id,
-                            package_id: pkg.id,
-                        });
+                        this.go_state(
+                            "wait_call",
+                            this.odoo.call("remove_package", {
+                                picking_id: this.state.data.picking.id,
+                                package_id: pkg.id,
+                            })
+                        );
                     },
                     on_mark_as_done: () => {
-                        this.odoo.call("done", {
-                            picking_id: this.state.data.picking.id,
-                        });
+                        this.go_state(
+                            "wait_call",
+                            this.odoo.call("done", {
+                                picking_id: this.state.data.picking.id,
+                            })
+                        );
                     },
                 },
-                // TODO
-                change_package_type: {
+                change_packaging: {
                     display_info: {
-                        title: "Change package type",
+                        title: "Change packaging",
                     },
-                    on_action: action => {
-                        this.state["on_" + action].call(this);
+                    on_select: selected => {
+                        if (!selected) {
+                            return;
+                        }
+                        this.go_state(
+                            "wait_call",
+                            this.odoo.call("set_packaging", {
+                                picking_id: this.state.data.picking.id,
+                                pickage_id: this.state.data.package.id,
+                                packaging_id: selected.id,
+                            })
+                        );
                     },
-                    on_do_it: pkg => {
-                        throw "NOT IMPLEMENTED";
+                    on_back: () => {
+                        this.go_state("start");
+                        this.reset_notification();
                     },
                 },
                 // TODO

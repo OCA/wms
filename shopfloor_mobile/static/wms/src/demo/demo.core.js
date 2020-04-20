@@ -73,12 +73,16 @@ export class DemoTools {
         return this.makeSimpleRecord({}, {name_prefix: "LOT"});
     }
 
+    makePackaging() {
+        return this.makeSimpleRecord({}, {name_prefix: "Packaging"});
+    }
+
     makePack(options = {}) {
         _.extend(options, {name_prefix: "PACK", padding: 10});
         const pack = this.makeSimpleRecord({}, options);
         _.extend(pack, {
             weight: this.getRandomInt(100) + " Kg",
-            packaging_name: "PKG type " + this.getRandomInt(10),
+            packaging_name: this.makePackaging().name,
             move_line_count: this.getRandomInt(10),
         });
         return pack;
