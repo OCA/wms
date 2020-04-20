@@ -157,6 +157,36 @@ var DEMO_CHECKOUT = {
             message: "Done",
         },
     },
+    list_packaging: {
+        next_state: "change_packaging",
+        data: {
+            change_packaging: {
+                picking: select_pack_picking,
+                package: demotools.makePack(),
+                packagings: _.sampleSize(
+                    [
+                        demotools.makePackaging(),
+                        demotools.makePackaging(),
+                        demotools.makePackaging(),
+                        demotools.makePackaging(),
+                        demotools.makePackaging(),
+                        demotools.makePackaging(),
+                        demotools.makePackaging(),
+                        demotools.makePackaging(),
+                    ],
+                    _.random(8)
+                ),
+            },
+        },
+    },
+    set_packaging: {
+        next_state: "summary",
+        summary: summary_data,
+        message: {
+            message_type: "info",
+            message: "Package changed",
+        },
+    },
 };
 
 demotools.add_case("checkout", DEMO_CHECKOUT);
