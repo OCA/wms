@@ -101,7 +101,7 @@ Vue.component("manual-select", {
                 initValue: null,
                 multiple: false,
                 showCounters: false,
-                list_item_component: "manual-select-item",
+                list_item_component: "list-item",
                 list_item_extra_component: "",
             });
             return opts;
@@ -193,37 +193,6 @@ Vue.component("manual-select", {
                 </v-btn>
             </v-col>
         </v-row>
-    </div>
-  `,
-});
-
-// TODO: this could be use for display detail as well
-Vue.component("manual-select-item", {
-    props: {
-        record: Object,
-        options: Object,
-    },
-    methods: {
-        render_field_value(record, field) {
-            if (field.renderer) {
-                return field.renderer(record);
-            }
-            return this.raw_value(record, field);
-        },
-        raw_value(record, field) {
-            return _.result(record, field.path);
-        },
-    },
-    template: `
-    <div>
-        <v-list-item-title v-text="record[options.key_title]"></v-list-item-title>
-        <div class="details">
-            <div class="field-detail" v-for="(field, index) in options.fields">
-                <span v-if="raw_value(record, field) || field.display_no_value">
-                    <span v-if="field.label" class="label">{{ field.label }}:</span> {{ render_field_value(record, field) }}
-                </span>
-            </div>
-        </div>
     </div>
   `,
 });
