@@ -32,8 +32,6 @@ export var Checkout = Vue.component("checkout", {
             </div>
             <div v-if="state_is('manual_selection')">
                 <manual-select
-                    v-on:select="on_select"
-                    v-on:back="on_back"
                     :records="state.data.records"
                     :list_item_fields="manual_select_picking_fields"
                     />
@@ -44,8 +42,6 @@ export var Checkout = Vue.component("checkout", {
                     :select_records="state.data.move_lines"
                     :select_records_grouped="group_lines_by_location(state.data.move_lines)"
                     :select_options="{bubbleUpAction: true}"
-                    v-on:select="on_select"
-                    v-on:back="on_back"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -61,8 +57,6 @@ export var Checkout = Vue.component("checkout", {
                     :picking="state.data.picking"
                     :select_records="state.data.selected_move_lines"
                     :select_options="{multiple: true, initSelectAll: true, bubbleUpAction: true, list_item_component: 'checkout-select-package-content'}"
-                    v-on:select="on_select"
-                    v-on:back="on_back"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -96,8 +90,6 @@ export var Checkout = Vue.component("checkout", {
                 <checkout-summary-detail
                     :picking="state.data.picking"
                     :records_grouped="group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': group_by_pack})"
-                    v-on:select="on_select"
-                    v-on:back="on_back"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -112,7 +104,6 @@ export var Checkout = Vue.component("checkout", {
                     :picking="state.data.picking"
                     :select_records="state.data.packages"
                     :select_options="{bubbleUpAction: true, list_item_fields: existing_package_select_fields, list_item_component: 'list-item'}"
-                    v-on:select="on_select"
                     />
             </div>
             <div v-if="state_is('change_quantity')">
@@ -125,8 +116,6 @@ export var Checkout = Vue.component("checkout", {
                     :picking="state.data.picking"
                     :select_records="state.data.packagings"
                     :select_options="{bubbleUpAction: true,  list_item_component: 'list-item'}"
-                    v-on:select="on_select"
-                    v-on:back="on_back"
                     />
             </div>
         </Screen>
@@ -267,6 +256,13 @@ export var Checkout = Vue.component("checkout", {
                     },
                 },
                 manual_selection: {
+                    display_info: {
+                        title: "Select a picking and start",
+                    },
+                    events: {
+                        select: "on_select",
+                        back: "on_back",
+                    },
                     on_back: () => {
                         this.go_state("start");
                         this.reset_notification();
@@ -279,9 +275,6 @@ export var Checkout = Vue.component("checkout", {
                             })
                         );
                     },
-                    display_info: {
-                        title: "Select a picking and start",
-                    },
                 },
                 select_line: {
                     display_info: {
@@ -290,6 +283,8 @@ export var Checkout = Vue.component("checkout", {
                     },
                     events: {
                         summary: "on_summary",
+                        select: "on_select",
+                        back: "on_back",
                     },
                     on_scan: scanned => {
                         this.go_state(
@@ -341,6 +336,7 @@ export var Checkout = Vue.component("checkout", {
                     // to use pure list + checkboxes.
                     display_info: {
                         title: "Select package",
+                        scan_placeholder: "Scan package",
                     },
                     on_qty_update: qty => {
                         this.scan_destination_qty = parseInt(qty);
@@ -439,6 +435,10 @@ export var Checkout = Vue.component("checkout", {
                     display_info: {
                         title: "Select destination package",
                     },
+                    events: {
+                        select: "on_select",
+                        back: "on_back",
+                    },
                     on_scan: scanned => {
                         const selected_lines = this.state_get_data("select_package")
                             .selected;
@@ -482,6 +482,8 @@ export var Checkout = Vue.component("checkout", {
                         title: "Summary",
                     },
                     events: {
+                        select: "on_select",
+                        back: "on_back",
                         pkg_destroy: "on_pkg_destroy",
                         pkg_change_type: "on_pkg_change_type",
                         mark_as_done: "on_mark_as_done",
@@ -520,6 +522,10 @@ export var Checkout = Vue.component("checkout", {
                 change_packaging: {
                     display_info: {
                         title: "Change packaging",
+                    },
+                    events: {
+                        select: "on_select",
+                        back: "on_back",
                     },
                     on_select: selected => {
                         if (!selected) {
