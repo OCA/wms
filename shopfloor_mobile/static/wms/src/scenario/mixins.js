@@ -160,16 +160,16 @@ export var ScenarioBaseMixin = {
                 this.state.on_scan(scanned);
             }
         },
-        on_select: function(selected) {
-            if (this.state.on_select) {
-                this.state.on_select(selected);
-            }
-        },
-        on_back: function() {
-            if (this.state.on_back) {
-                this.state.on_back();
-            }
-        },
+        // on_select: function(selected) {
+        //     if (this.state.on_select) {
+        //         this.state.on_select(selected);
+        //     }
+        // },
+        // on_back: function() {
+        //     if (this.state.on_back) {
+        //         this.state.on_back();
+        //     }
+        // },
         on_cancel: function() {
             if (this.state.on_cancel) {
                 this.state.on_cancel();
