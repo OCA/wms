@@ -46,9 +46,6 @@ export var ScenarioBaseMixin = {
         }
         this.go_state(this.current_state_key);
     },
-    beforeUpdate: function() {
-        this._state_bind_events()
-    },
     beforeDestroy: function() {
         // TODO: we should turn off only handlers for the current state
         this.$root.event_hub.$off();
@@ -219,6 +216,9 @@ export var ScenarioBaseMixin = {
                 _.each(self.state.events, function(handler, name) {
                     if (typeof handler == "string") handler = self.state[handler];
                     const event_name = self.state.key + ":" + name;
+                    // Wipe old handlers
+                    // TODO: any way to register them just once?
+                    self.$root.event_hub.$off(event_name, handler);
                     self.$root.event_hub.$on(event_name, handler);
                 });
             }
