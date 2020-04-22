@@ -155,17 +155,13 @@ export var Checkout = Vue.component("checkout", {
         },
     },
     // FIXME: just for dev
-    // Mmounted: function () {
-    //     // TEST summary only
-    //     // this.initial_state_key = 'summary'
-    //     // this.set_erp_data('data', {
-    //     //     'summary': demotools.makePicking({}, {"lines_count": 5, "line_random_pack": true}),
-    //     // });
-    //     // TEST select_pack only
-    //     this.initial_state_key = 'select_pack'
-    //     this.set_erp_data('data', demotools.get_case(this.usage).select_line.data);
-    //     // this.initial_state_key = 'select_dest_package'
-    //     // this.set_erp_data('data', demotools.get_case(this.usage).select_line.data);
+    // mounted: function() {
+    //     // TEST force state and data
+    //     const state = "select_package";
+    //     const dcase = demotools.get_case(this.usage);
+    //     const data = dcase["select_package"].data[state];
+    //     this.state_set_data(data, state);
+    //     this.go_state(state);
     // },
     methods: {
         record_by_id: function(records, _id) {
@@ -244,9 +240,7 @@ export var Checkout = Vue.component("checkout", {
     data: function() {
         return {
             usage: "checkout",
-            // initial_state_key: "select_document",
-            initial_state_key: "select_pack", // FIXME: just for dev
-            // initial_state_key: "select_dest_package",  // FIXME: just for dev
+            initial_state_key: "select_document",
             states: {
                 select_document: {
                     display_info: {
