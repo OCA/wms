@@ -33,16 +33,7 @@ Vue.component("Screen", {
                 app
                 >
             <v-list>
-                <v-list-item
-                    v-for="item in navigation"
-                    :key="item.name"
-                    :href="'#/' + item.process.code"
-                    link
-                    >
-                    <v-list-item-content>
-                        <v-list-item-title>{{ item.name }}</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
+                <nav-items :navigation="navigation"/>
                 <v-list-item @click="$router.push({'name': 'home'})" link>
                     <v-list-item-content>
                         <v-list-item-title>Main menu</v-list-item-title>
@@ -80,5 +71,31 @@ Vue.component("Screen", {
             </div>
         </v-content>
     </v-app>
+    `,
+});
+
+Vue.component("nav-items", {
+    props: {
+        navigation: Array,
+    },
+    template: `
+    <div>
+        <v-list-item
+            v-for="item in navigation"
+            :key="item.id"
+            :href="'#/' + item.process.code"
+            link
+            >
+            <v-list-item-content>
+                <v-list-item-title>
+                    {{ item.name }}
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                    <!-- TODO: hide this w/ v-if="$root.demo_mode" -->
+                    <small class="warning">Process: {{ item.process.code }}</small>
+                </v-list-item-subtitle>
+            </v-list-item-content>
+        </v-list-item>
+    </div>
     `,
 });
