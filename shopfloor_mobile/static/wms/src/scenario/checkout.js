@@ -110,6 +110,20 @@ export var Checkout = Vue.component("checkout", {
                 <checkout-picking-change-qty
                     :picking="state.data.picking"
                     />
+                <div class="qty">
+                    <input-number-spinner
+                        v-on:input="state.on_qty_update"
+                        :init_value="state.data.record.qty_done"
+                        class="mb-2"
+                        />
+                </div>
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn depressed color="primary" @click="$root.trigger('qty_change_confirm')">Confirm</v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
             </div>
             <div v-if="state_is('change_packaging')">
                 <checkout-picking-detail-select
@@ -320,8 +334,9 @@ export var Checkout = Vue.component("checkout", {
                             })
                         );
                     },
-                    on_edit_package: (pkg) => {
-                        this.state_set_data({"package": pkg}, change_quantity);
+                    // FIXME: is not to change qty
+                    on_edit_package: pkg => {
+                        this.state_set_data({package: pkg}, change_quantity);
                         this.go_state("change_quantity");
                     },
                 },
@@ -338,16 +353,24 @@ export var Checkout = Vue.component("checkout", {
                         title: "Select package",
                         scan_placeholder: "Scan package",
                     },
-                    on_qty_update: qty => {
-                        this.scan_destination_qty = parseInt(qty);
+                    events: {
+                        qty_edit: "on_qty_edit",
+                        select: "on_select",
+                        back: "on_back",
+                    },
+                    enter: () => {
+                        this.state.data.selected = this.state.data.selected_move_lines;
                     },
                     on_scan: scanned => {
                         this.go_state(
                             "wait_call",
-                            this.odoo.call("scan_pack_action", {
-                                move_line_id: this.state.data.id,
+                            this.odoo.call("scan_package_action", {
+                                picking_id: this.state.data.picking.id,
+                                selected_line_ids: _.map(
+                                    this.state.data.selected,
+                                    _.property("id")
+                                ),
                                 barcode: scanned.text,
-                                quantity: this.scan_destination_qty,
                             })
                         );
                     },
@@ -370,6 +393,20 @@ export var Checkout = Vue.component("checkout", {
                                 })
                             );
                         }
+                    },
+                    on_qty_edit: record => {
+                        this.state_set_data(
+                            {
+                                picking: this.state.data.picking,
+                                record: record,
+                                selected_line_ids: _.map(
+                                    this.state.data.selected,
+                                    _.property("id")
+                                ),
+                            },
+                            "change_quantity"
+                        );
+                        this.go_state("change_quantity");
                     },
                     on_new_pack: () => {
                         this.go_state(
@@ -412,20 +449,23 @@ export var Checkout = Vue.component("checkout", {
                         title: "Change quantity",
                     },
                     events: {
-                        qty_update: "on_qty_update",
+                        qty_change_confirm: "on_confirm",
+                        back: "on_back",
                     },
                     on_back: () => {
-                        this.go_state("select_line");
+                        this.go_state("select_package");
                         this.reset_notification();
                     },
-                    on_confirm: qty => {
+                    on_qty_update: qty => {
                         console.log(qty);
+                        this.state.data.qty = qty;
                     },
-                    on_qty_update: () => {
+                    on_confirm: () => {
                         this.go_state(
                             "wait_call",
                             this.odoo.call("set_custom_qty", {
-                                move_line_id: this.state.data.id,
+                                picking_id: this.state.data.picking.id,
+                                selected_line_ids: this.state.data.selected_line_ids,
                                 quantity: this.state.data.qty,
                             })
                         );
