@@ -2,7 +2,6 @@
 /* eslint-disable no-implicit-globals */
 import {CheckoutPickingDetailSelectMixin} from "./mixins.js";
 
-
 Vue.component("checkout-picking-detail-select", {
     mixins: [CheckoutPickingDetailSelectMixin],
 });
@@ -49,6 +48,7 @@ Vue.component("checkout-select-package-content", {
     <div>
         <div :class="record.package_dest ? 'has-pack' : 'no-pack'">
             <span>{{ record.product.display_name }}</span>
+            <edit-action class="float-right" :record="record" :click_event="'qty_edit'" />
             <div class="lot" v-if="record.lot">
                 <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
             </div>

@@ -181,10 +181,26 @@ var DEMO_CHECKOUT = {
     },
     set_packaging: {
         next_state: "summary",
-        summary: summary_data,
+        data: {
+            summary: summary_data,
+        },
         message: {
             message_type: "info",
             message: "Package changed",
+        },
+    },
+    set_custom_qty: {
+        next_state: "select_package",
+        data: {
+            select_package: {
+                picking: select_pack_picking,
+                // simulate unselecting 1 line
+                selected_move_lines: select_pack_picking.move_lines,
+            },
+        },
+        message: {
+            message_type: "info",
+            message: "Quantity changed",
         },
     },
 };
