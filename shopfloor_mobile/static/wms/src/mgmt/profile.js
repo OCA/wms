@@ -1,33 +1,31 @@
 export var Profile = Vue.component("profile", {
     data: function() {
         return {
-            current_profile_id: this.$root.profile.id,
+            current_profile_id: this.$root.has_profile ? this.$root.profile.id : null,
             profile_selected: false,
-            user_notification: {
+            user_notif_updated: {
                 message: "Profile updated",
                 message_type: "info",
             },
         };
-    },
-    computed: {
-        foo: function() {
-            console.log("foo");
-        },
     },
     template: `
         <Screen title="Select profile" :klass="'select-profile'">
             <template v-slot:header>
                 <user-information
                     v-if="profile_selected"
-                    v-bind:info="user_notification"
+                    v-bind:info="user_notif_updated"
                     />
             </template>
             <manual-select
-                :records="$root.config.data.profiles"
-                :options="{initValue: this.$root.profile.id}"
+                :records="$root.appconfig.profiles"
+                :options="{initValue: current_profile_id}"
                 v-on:select="on_select"
                 />
-        </Screen>
+            <!-- FIXME: maybe not a good place here -->
+            <v-btn depressed x-large color="error" v-on:click="reset_data()">Reload config</v-btn>
+            <v-btn depressed x-large color="warning" v-on:click="logout()">Logout</v-btn>
+            </Screen>
     `,
     methods: {
         on_select: function(selected) {
@@ -39,6 +37,13 @@ export var Profile = Vue.component("profile", {
             setTimeout(function() {
                 self.$root.$router.back();
             }, 2000);
+        },
+        logout: function() {
+            this.$root.logout();
+        },
+        reset_data: function() {
+            this.$root._clearConfig();
+            this.$root.$router.push({name: "home"});
         },
     },
 });

@@ -1,7 +1,7 @@
 export var HomePage = Vue.component("home-page", {
     computed: {
         navigation() {
-            return this.$root.config.get("menus");
+            return this.$root.appconfig.menus;
         },
     },
     props: ["routes"],
@@ -11,7 +11,7 @@ export var HomePage = Vue.component("home-page", {
             klass="home"
             :show-menu="false"
             >
-            <v-list>
+            <v-list v-if="$root.has_profile">
                 <nav-items :navigation="navigation"/>
             </v-list>
 

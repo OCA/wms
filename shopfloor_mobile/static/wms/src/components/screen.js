@@ -1,3 +1,4 @@
+/* eslint-disable strict */
 Vue.component("Screen", {
     props: {
         title: String,
@@ -12,9 +13,16 @@ Vue.component("Screen", {
     },
     computed: {
         navigation() {
-            return this.$root.config.get("menus");
+            return this.$root.appconfig.menus;
         },
-        screen_css_class() {
+        screen_app_class() {
+            return [
+                this.$root.authenticated ? "authenticated" : "anonymous",
+                this.$root.loading ? "loading" : "",
+                this.$root.demo_mode ? "demo_mode" : "",
+            ].join(" ");
+        },
+        screen_content_class() {
             return [
                 "screen",
                 "screen-" + this.klass,
@@ -25,9 +33,13 @@ Vue.component("Screen", {
     },
     data: () => ({
         drawer: null,
+        missing_profile_msg: {
+            message: "",
+            message_type: "warning",
+        },
     }),
     template: `
-    <v-app :class="$root.demo_mode ? 'demo_mode': ''">
+    <v-app :class="screen_app_class">
         <v-navigation-drawer
                 v-model="drawer"
                 app
@@ -49,23 +61,31 @@ Vue.component("Screen", {
                 dense
                 >
             <v-app-bar-nav-icon @click.stop="drawer = !drawer" v-if="showMenu" />
-
             <v-toolbar-title>{{ title }}</v-toolbar-title>
             <v-spacer></v-spacer>
             <app-bar-actions />
         </v-app-bar>
-        <v-content :class="screen_css_class">
+        <v-content :class="screen_content_class">
             <div class="header" v-if="$slots.header">
                 <slot name="header">Optional header - no content</slot>
             </div>
+
+            <v-alert type="warning" tile v-if="!this.$root.has_profile && this.$route.name!='profile'">
+                <p>Profile not configured yet. Please select one.</p>
+            </v-alert>
+
             <v-container>
                 <div class="main-content">
-                    <slot>No content provided</slot>
+                    <slot>No content provided or profile not configured.</slot>
                 </div>
             </v-container>
             <!-- TODO: use flexbox to put it always at the bottom -->
             <div class="footer" v-if="$slots.footer">
                 <slot name="footer">Optional footer - no content</slot>
+            </div>
+            <div class="loading" v-if="$root.loading">
+                Loading...
+                <!-- TODO: show a spinner -->
             </div>
         </v-content>
     </v-app>

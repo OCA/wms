@@ -1,5 +1,3 @@
-import {Storage} from "./services/storage.js";
-
 export var LoginPage = Vue.component("login-page", {
     data: function() {
         return {
@@ -11,15 +9,17 @@ export var LoginPage = Vue.component("login-page", {
         login: function(evt) {
             evt.preventDefault();
             // Call odoo application load => set the result in the local storage in json
-            Storage.apikey = this.apikey;
             this.error = "";
-            this.$root.config
-                .load()
+            this.$root.apikey = this.apikey;
+            this.$root
+                ._loadConfig()
                 .catch(error => {
                     this.error = "Invalid API KEY";
+                    this.$root.apikey = "";
                 })
                 .then(() => {
-                    if (this.$root.config.authenticated) {
+                    // TODO: shall we do this in $root._loadRoutes?
+                    if (this.$root.authenticated) {
                         this.$router.push({name: "home"});
                     }
                 });
@@ -29,15 +29,17 @@ export var LoginPage = Vue.component("login-page", {
     <Screen title="Login"
             klass="login"
             :show-menu="false"
-      <v-form v-on:submit="login">
-        <p v-if="error">{{ error }}</p>
-        <v-text-field
-          v-model="apikey"
-          label="API Key"
-          placeholder="Scan your access badge or fill your credential"
-          autofocus></v-text-field>
-        <v-btn type="submit"></v-btn>
-      </v-form>
+        <div class="login-wrapper">
+            <v-form v-on:submit="login">
+                <p v-if="error">{{ error }}</p>
+                <v-text-field
+                v-model="apikey"
+                label="API Key"
+                placeholder="Scan your access badge or fill your credential"
+                autofocus></v-text-field>
+                <v-btn type="submit"></v-btn>
+            </v-form>
+        </div>
     </Screen>
     `,
 });
