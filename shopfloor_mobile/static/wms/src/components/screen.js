@@ -52,9 +52,7 @@ Vue.component("Screen", {
 
             <v-toolbar-title>{{ title }}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon @click="$router.push({'name': 'scananything'})" :disabled="this.$route.name=='scananything'">
-                <v-icon >mdi-magnify</v-icon>
-            </v-btn>
+            <app-bar-actions />
         </v-app-bar>
         <v-content :class="screen_css_class">
             <div class="header" v-if="$slots.header">
@@ -96,6 +94,20 @@ Vue.component("nav-items", {
                 </v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
+    </div>
+    `,
+});
+
+Vue.component("app-bar-actions", {
+    template: `
+    <div>
+        <v-btn icon @click="$router.push({'name': 'scananything'})" :disabled="this.$route.name=='scananything'">
+            <v-icon >mdi-magnify</v-icon>
+        </v-btn>
+
+        <v-btn icon @click="$router.push({'name': 'profile'})" :disabled="this.$route.name=='profile'">
+            <v-icon >mdi-account-cog</v-icon>
+        </v-btn>
     </div>
     `,
 });

@@ -52,12 +52,15 @@ const app = new Vue({
         //     themes: vuetify_themes
         // }
     }),
-    data: {
-        demo_mode: false,
-        config: AppConfig,
-        global_state_key: "",
-        // collect global events
-        event_hub: EventHub,
+    data: function() {
+        return {
+            demo_mode: false,
+            config: AppConfig,
+            global_state_key: "",
+            // collect global events
+            event_hub: EventHub,
+            current_profile: {},
+        };
     },
     created: function() {
         this.demo_mode = window.location.pathname.includes("demo");
@@ -72,6 +75,16 @@ const app = new Vue({
         this.$root.$on("state:change", function(key) {
             self.global_state_key = key;
         });
+        this.$root.event_hub.$on("profile:selected", function(profile) {
+            self.current_profile = profile;
+        });
+    },
+    computed: {
+        profile: function() {
+            // TODO: retrieve profile from session.
+            // ATM we always have to trigger the selection to set it.
+            return this.current_profile;
+        },
     },
     methods: {
         loadJS: function(url, script_id) {

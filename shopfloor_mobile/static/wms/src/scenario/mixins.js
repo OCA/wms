@@ -30,6 +30,7 @@ export var ScenarioBaseMixin = {
         const odoo_params = {
             process_id: this.menuItem.process.id,
             process_menu_id: this.menuItem.id,
+            profile_id: this.$root.profile.id,
             usage: this.usage,
             debug: this.$root.demo_mode,
         };
@@ -116,7 +117,7 @@ export var ScenarioBaseMixin = {
             } else {
                 this.on_enter();
             }
-            this._state_bind_events()
+            this._state_bind_events();
             // notify root
             this.$root.$emit("state:change", state_key);
         },
