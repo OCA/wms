@@ -96,12 +96,17 @@ Vue.component("state-display-info", {
 `,
 });
 
-
 Vue.component("edit-action", {
-  props: ["record", "click_event"],
-  template: `
+    props: ["record", "click_event"],
+    template: `
 <div class="action action-edit">
   <v-btn class="edit" depressed small rounded color="default" @click="$root.trigger(click_event, record)">&#10000;</v-btn>
 </div>
 `,
+});
+
+Vue.component("btn-back", {
+    template: `
+  <v-btn depressed x-large color="blue" v-on:click="$router.back()">Back</v-btn>
+  `,
 });
