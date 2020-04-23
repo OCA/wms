@@ -1,36 +1,15 @@
 import {router} from "./router.js";
 import {Config} from "./services/config.js";
-import {Storage} from "./services/storage.js";
 import {process_registry} from "./services/process_registry.js";
+import {Odoo, OdooMocked} from "./services/odoo.js";
+
+Vue.use(Vue2Storage, {
+    prefix: "shopfloor_",
+    driver: "session", // local|session|memory
+    ttl: 60 * 60 * 24 * 1000, // 24 hours
+});
 
 var EventHub = new Vue();
-
-var AppConfig = new Config();
-
-if (Storage.apikey) {
-    AppConfig.load().then(() => {
-        // Adding the routes dynamically when received from ther server
-        AppConfig.get("menus").forEach(function(item) {
-            const registered = process_registry.get(item.process.code);
-            if (registered) {
-                app.$router.addRoutes([
-                    {
-                        path: "/" + item.process.code,
-                        component: process_registry.get(item.process.code),
-                        props: {menuItem: item},
-                    },
-                ]);
-            } else {
-                // TODO: use NotFound component
-                console.error(
-                    "Cannot find process component for",
-                    item.process.code,
-                    item
-                );
-            }
-        });
-    });
-}
 
 const vuetify_themes = {
     light: {
@@ -55,11 +34,14 @@ const app = new Vue({
     data: function() {
         return {
             demo_mode: false,
-            config: AppConfig,
             global_state_key: "",
             // collect global events
             event_hub: EventHub,
             current_profile: {},
+            current_apikey: null,
+            loading: false,
+            appconfig: null,
+            authenticated: false,
         };
     },
     created: function() {
@@ -67,6 +49,7 @@ const app = new Vue({
         if (this.demo_mode) {
             this.loadJS("src/demo/demo.core.js", "demo_core");
         }
+        this.loadConfig();
     },
     mounted: function() {
         const self = this;
@@ -76,17 +59,120 @@ const app = new Vue({
             self.global_state_key = key;
         });
         this.$root.event_hub.$on("profile:selected", function(profile) {
-            self.current_profile = profile;
+            self.profile = profile;
         });
+        if (this.authenticated) {
+            // TODO: this should be done by a watcher on appconfig change
+            this._loadRoutes();
+        }
     },
     computed: {
-        profile: function() {
-            // TODO: retrieve profile from session.
-            // ATM we always have to trigger the selection to set it.
-            return this.current_profile;
+        has_profile: function() {
+            return !_.isEmpty(this.profile);
+        },
+        profile: {
+            get: function() {
+                if (_.isEmpty(this.current_profile)) {
+                    this.current_profile = this.$storage.get("profile");
+                }
+                return this.current_profile;
+            },
+            set: function(v) {
+                this.current_profile = v;
+                this.$storage.set("profile", v);
+            },
+        },
+        apikey: {
+            get: function() {
+                if (!this.current_apikey) {
+                    this.current_apikey = this.$storage.get("apikey");
+                }
+                return this.current_apikey;
+            },
+            set: function(v) {
+                this.current_apikey = v;
+                this.$storage.set("apikey", v);
+            },
         },
     },
     methods: {
+        getOdoo: function(odoo_params) {
+            const params = _.defaults({}, odoo_params, {
+                apikey: this.apikey,
+                debug: this.demo_mode,
+            });
+            let OdooClass;
+            if (this.demo_mode) {
+                OdooClass = OdooMocked;
+            } else {
+                OdooClass = Odoo;
+            }
+            return new OdooClass(params);
+        },
+        loadConfig: function() {
+            if (this.appconfig) {
+                return this.appconfig;
+            }
+            const stored = this.$storage.get("appconfig");
+            if (stored) {
+                this.appconfig = stored;
+                // Storage is by session, hence we assume we are authenticated.
+                // TODO: any better way?
+                this.authenticated = true;
+                return this.appconfig;
+            }
+            this._loadConfig();
+        },
+        _loadConfig: function(odoo_params) {
+            const self = this;
+            self.loading = true;
+            const odoo = self.getOdoo({usage: "app"});
+            const config = new Config(odoo);
+            return config.load().then(function() {
+                if (config.authenticated) {
+                    self.appconfig = config.data;
+                    self.authenticated = config.authenticated;
+                    self.$storage.set("appconfig", self.appconfig);
+                    self.loading = false;
+                }
+            });
+        },
+        _loadRoutes: function() {
+            const self = this;
+            // Adding the routes dynamically when received from ther server
+            self.appconfig.menus.forEach(function(item) {
+                const registered = process_registry.get(item.process.code);
+                if (registered) {
+                    self.$router.addRoutes([
+                        {
+                            path: "/" + item.process.code,
+                            component: process_registry.get(item.process.code),
+                            props: {menuItem: item},
+                        },
+                    ]);
+                } else {
+                    // TODO: use NotFound component
+                    console.error(
+                        "Cannot find process component for",
+                        item.process.code,
+                        item
+                    );
+                }
+            });
+            // TODO: any better way to do it?
+            // As we load routes on demand the router does not know it yet,
+            // Hence we have to force the switch.
+            self.$router.push({path: window.location.hash.split("/")[1]});
+        },
+        _clearConfig: function() {
+            this.$storage.remove("appconfig");
+            return this._loadConfig();
+        },
+        logout: function() {
+            this.apikey = "";
+            this.authenticated = false;
+            this.$router.push({name: "login"});
+        },
         loadJS: function(url, script_id) {
             if (script_id && !document.getElementById(script_id)) {
                 console.log("Load JS", url);

@@ -1,9 +1,9 @@
-import {Storage} from "./storage.js";
 import {demotools} from "../demo/demo.core.js";
 
 export class OdooMixin {
     constructor(params) {
         this.params = params;
+        this.apikey = params.apikey;
         this.usage = params.usage;
         this.process_id = this.params.process_id;
         this.process_menu_id = this.params.process_menu_id;
@@ -49,7 +49,6 @@ export class OdooMixin {
         };
     }
     _handle_403(response) {
-        Storage.apikey = "";
         return this._error_info(response);
     }
     _handle_404(response) {
@@ -74,7 +73,7 @@ export class OdooMixin {
             "Content-Type": "application/json",
             "SERVICE-CTX-MENU-ID": this.process_menu_id,
             "SERVICE-CTX-PROFILE-ID": this.profile_id,
-            "API-KEY": Storage.apikey,
+            "API-KEY": this.apikey,
         };
     }
     _get_url(endpoint) {

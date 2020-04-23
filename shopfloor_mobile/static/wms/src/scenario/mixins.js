@@ -1,5 +1,3 @@
-import {Odoo, OdooMocked} from "../services/odoo.js";
-
 export var ScenarioBaseMixin = {
     props: ["menuItem"],
     data: function() {
@@ -32,15 +30,9 @@ export var ScenarioBaseMixin = {
             process_menu_id: this.menuItem.id,
             profile_id: this.$root.profile.id,
             usage: this.usage,
-            debug: this.$root.demo_mode,
         };
-        if (this.$root.demo_mode) {
-            this.odoo = new OdooMocked(odoo_params);
-        }
-        // FIXME: init data should come from specific scenario
-        else {
-            this.odoo = new Odoo(odoo_params);
-        }
+
+        this.odoo = this.$root.getOdoo(odoo_params);
         if (!this.current_state_key) {
             // Default to initial state
             this.current_state_key = this.initial_state_key;
