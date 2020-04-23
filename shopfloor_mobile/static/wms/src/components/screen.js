@@ -101,7 +101,7 @@ Vue.component("nav-items", {
         <v-list-item
             v-for="item in navigation"
             :key="item.id"
-            :href="'#/' + item.process.code"
+            :href="'#' + $root.registry.make_path(item.process.code, item.id)"
             link
             >
             <v-list-item-content>

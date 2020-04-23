@@ -4,9 +4,6 @@ import {Profile} from "./mgmt/profile.js";
 import {LoginPage} from "./loginpage.js";
 // Const NotFound = { template: '<div>Lost in the scanner app.</div>' }
 
-// Fake item to play nice with the mixin because it does not exist on the backend
-const fakeItem = {process: {id: 99}, id: 99};
-
 // TODO: handle routes via registry
 const routes = [
     {path: "/", component: HomePage, name: "home"},
@@ -16,13 +13,11 @@ const routes = [
         path: "/scananything/:codebar?",
         component: ScanAnything,
         name: "scananything",
-        props: {menuItem: fakeItem},
     },
     {
         path: "/scananything/:codebar?",
         component: ScanAnything,
         name: "scananything",
-        props: {menuItem: fakeItem},
     },
     // TODO Fix this it needs to be the last route, but I think it is not anymore with the dynamic one added.
     // { path: '*', component: NotFound },
