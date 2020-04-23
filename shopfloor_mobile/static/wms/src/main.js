@@ -42,6 +42,7 @@ const app = new Vue({
             loading: false,
             appconfig: null,
             authenticated: false,
+            registry: process_registry,
         };
     },
     created: function() {
@@ -141,13 +142,12 @@ const app = new Vue({
             const self = this;
             // Adding the routes dynamically when received from ther server
             self.appconfig.menus.forEach(function(item) {
-                const registered = process_registry.get(item.process.code);
+                const registered = self.registry.get(item.process.code);
                 if (registered) {
                     self.$router.addRoutes([
                         {
-                            path: "/" + item.process.code,
-                            component: process_registry.get(item.process.code),
-                            props: {menuItem: item},
+                            path: self.registry.make_route(item.process.code),
+                            component: self.registry.get(item.process.code),
                         },
                     ]);
                 } else {
@@ -162,7 +162,8 @@ const app = new Vue({
             // TODO: any better way to do it?
             // As we load routes on demand the router does not know it yet,
             // Hence we have to force the switch.
-            self.$router.push({path: window.location.hash.split("/")[1]});
+            // hash is smth like "#/checkout/12"
+            self.$router.push({path: window.location.hash.replace("#/", "")});
         },
         _clearConfig: function() {
             this.$storage.remove("appconfig");

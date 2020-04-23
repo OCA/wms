@@ -1,5 +1,4 @@
 export var ScenarioBaseMixin = {
-    props: ["menuItem"],
     data: function() {
         return {
             user_notification: {
@@ -23,15 +22,15 @@ export var ScenarioBaseMixin = {
         if (this.$root.demo_mode) {
             this.$root.loadJS("src/demo/demo." + this.usage + ".js", this.usage);
         }
+        this._loadMenuItem();
     },
     mounted: function() {
         const odoo_params = {
-            process_id: this.menuItem.process.id,
-            process_menu_id: this.menuItem.id,
+            process_id: this.menu_item.process.id,
+            process_menu_id: this.menu_item.id,
             profile_id: this.$root.profile.id,
             usage: this.usage,
         };
-
         this.odoo = this.$root.getOdoo(odoo_params);
         if (!this.current_state_key) {
             // Default to initial state
@@ -68,12 +67,23 @@ export var ScenarioBaseMixin = {
         },
         screen_info: function() {
             return {
-                title: this.menuItem.name,
+                title: this.menu_item.name,
                 klass: this.usage + " " + "state-" + this.state.key,
             };
         },
     },
     methods: {
+        /*
+        Load menu item from storage using route's menu id
+        */
+        _loadMenuItem: function() {
+            const self = this;
+            this.menu_item = _.head(
+                _.filter(this.$root.appconfig.menus, function(m) {
+                    return m.id === parseInt(self.$route.params.menu_id, 10);
+                })
+            );
+        },
         state_is: function(state_key) {
             return state_key == this.current_state_key;
         },

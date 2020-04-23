@@ -10,4 +10,12 @@ export class Registry {
     add(key, item) {
         this._data[key] = item;
     }
+
+    make_route(code) {
+        return _.template("/${ code }/:menu_id")({code: code});
+    }
+
+    make_path(code, menu_id) {
+        return _.template("/${ code }/${ menu_id }")({code: code, menu_id: menu_id});
+    }
 }
