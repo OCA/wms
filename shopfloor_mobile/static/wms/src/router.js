@@ -1,5 +1,6 @@
 import {HomePage} from "./homepage.js";
 import {ScanAnything} from "./scenario/scan_anything.js";
+import {Profile} from "./mgmt/profile.js";
 import {LoginPage} from "./loginpage.js";
 // Const NotFound = { template: '<div>Lost in the scanner app.</div>' }
 
@@ -10,6 +11,13 @@ const fakeItem = {process: {id: 99}, id: 99};
 const routes = [
     {path: "/", component: HomePage, name: "home"},
     {path: "/login", component: LoginPage, name: "login"},
+    {path: "/profile", component: Profile, name: "profile"},
+    {
+        path: "/scananything/:codebar?",
+        component: ScanAnything,
+        name: "scananything",
+        props: {menuItem: fakeItem},
+    },
     {
         path: "/scananything/:codebar?",
         component: ScanAnything,

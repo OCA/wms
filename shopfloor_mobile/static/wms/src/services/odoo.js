@@ -7,6 +7,7 @@ export class OdooMixin {
         this.usage = params.usage;
         this.process_id = this.params.process_id;
         this.process_menu_id = this.params.process_menu_id;
+        this.profile_id = this.params.profile_id;
         this.debug = this.params.debug;
     }
     call(path, data, method = "POST", fullpath = false) {
@@ -72,7 +73,7 @@ export class OdooMixin {
         return {
             "Content-Type": "application/json",
             "SERVICE-CTX-MENU-ID": this.process_menu_id,
-            "SERVICE-CTX-PROFILE-ID": 1, // FIXME
+            "SERVICE-CTX-PROFILE-ID": this.profile_id,
             "API-KEY": Storage.apikey,
         };
     }
