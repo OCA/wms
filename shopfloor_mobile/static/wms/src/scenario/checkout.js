@@ -35,6 +35,13 @@ export var Checkout = Vue.component("checkout", {
                     :records="state.data.records"
                     :list_item_fields="manual_select_picking_fields"
                     />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn depressed color="default" @click="state.on_back">Back</v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
             </div>
             <div v-if="state_is('select_line')">
                 <checkout-picking-detail-select
@@ -269,7 +276,6 @@ export var Checkout = Vue.component("checkout", {
                     },
                     events: {
                         select: "on_select",
-                        back: "on_back",
                     },
                     on_back: () => {
                         this.go_state("start");
