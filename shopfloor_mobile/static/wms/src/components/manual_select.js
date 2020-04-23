@@ -24,6 +24,10 @@ Vue.component("manual-select", {
                 return [];
             },
         },
+        selected_event: {
+            type: String,
+            default: "select",
+        },
     },
     data: function() {
         return {
@@ -109,11 +113,16 @@ Vue.component("manual-select", {
                 .closest(".list-item-wrapper")
                 .toggleClass("active", elem.checked);
             if (!this.opts.showActions) {
-                this.$root.trigger("select", this._getSelected());
+                this._emitSelected(this._getSelected());
             }
         },
+        _emitSelected(data) {
+            this.$root.trigger(this.opts.selected_event, data);
+            // You can subscribe to local event too
+            this.$emit(this.opts.selected_event, data);
+        },
         handleAction(action) {
-            this.$root.trigger("select", this._getSelected());
+            this._emitSelected(this._getSelected());
         },
         is_selected(rec) {
             return this.opts.multiple
@@ -138,6 +147,7 @@ Vue.component("manual-select", {
                 showCounters: false,
                 list_item_component: "list-item",
                 list_item_extra_component: "",
+                selected_event: "select",
             });
             return opts;
         },
@@ -217,13 +227,11 @@ Vue.component("manual-select", {
         <v-row class="actions bottom-actions" v-if="has_records && opts.showActions">
             <v-col>
                 <v-btn depressed color="success" @click="handleAction('submit')">
-                    Start
+                    Confirm
                 </v-btn>
             </v-col>
             <v-col>
-                <v-btn depressed color="default" @click="$root.trigger('back')" class="float-right">
-                    Back
-                </v-btn>
+                <btn-back />
             </v-col>
         </v-row>
     </div>
