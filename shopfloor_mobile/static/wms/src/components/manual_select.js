@@ -3,7 +3,9 @@ Vue.component("manual-select", {
     props: {
         records: {
             type: Array,
-            default: [],
+            default: function() {
+                return [];
+            },
         },
         grouped_records: {
             type: Array,
