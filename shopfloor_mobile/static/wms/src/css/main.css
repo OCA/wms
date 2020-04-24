@@ -172,7 +172,7 @@ ul.packaging span:first-child {
     padding: 8px 16px;
 }
 
-.manual-select .action .v-btn{
+.manual-select .action .v-btn {
     min-width: 0;
     font-size: 1.2em;
     padding: 15px 5px;
@@ -180,16 +180,24 @@ ul.packaging span:first-child {
 .list .v-expansion-panel-header {
     padding: 0;
 }
-.list .v-expansion-panel-header > :not(.v-expansion-panel-header__icon) { flex: none }
-.list .v-expansion-panel-header > .item-counter { margin-right: 0.5em; }
-
+.list .v-expansion-panel-header > :not(.v-expansion-panel-header__icon) {
+    flex: none;
+}
+.list .v-expansion-panel-header > .item-counter {
+    margin-right: 0.5em;
+}
+.list .v-expansion-panel-content .v-expansion-panel-content__wrap {
+    padding: 0 6px 10px;
+}
 .list .list-item-wrapper:not(:last-child) .v-list-item__content {
     border-bottom: 1px solid #ccc;
 }
 .list .list-group:not(:last-child) {
     border-bottom: 2px solid #ccc;
 }
-.list .v-list-item__content.has-pack { padding: 0;}
+.list .v-list-item__content.has-pack {
+    padding: 0;
+}
 
 .list-item-wrapper.active {
     background-color: lightgreen;
@@ -203,14 +211,23 @@ ul.packaging span:first-child {
 }
 
 .my-checkbox {
-    -webkit-appearance:none;
-    width:30px;
-    height:30px;
-    background:white;
-    border-radius:5px;
-    border:2px solid #555;
+    -webkit-appearance: none;
+    width: 30px;
+    height: 30px;
+    background: white;
+    border-radius: 5px;
+    border: 2px solid #555;
 }
 
-input.my-checkbox[type='checkbox']:checked {
+input.my-checkbox[type="checkbox"]:checked {
     background: green;
+}
+
+.summary-content {
+    max-width: 100%;
+}
+.summary-content .v-list-item__title {
+    max-width: 100%;
+    white-space: normal;
+    font-size: 0.9rem;
 }

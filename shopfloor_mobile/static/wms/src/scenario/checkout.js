@@ -32,7 +32,7 @@ export var Checkout = Vue.component("checkout", {
             </div>
             <div v-if="state_is('manual_selection')">
                 <manual-select
-                    :records="state.data.records"
+                    :records="state.data.pickings"
                     :list_item_fields="manual_select_picking_fields"
                     />
                 <div class="button-list button-vertical-list full">
@@ -45,8 +45,8 @@ export var Checkout = Vue.component("checkout", {
             </div>
             <div v-if="state_is('select_line')">
                 <checkout-picking-detail-select
-                    :picking="state.data"
-                    :select_records="state.data.move_lines"
+                    :picking="state.data.picking"
+                    :select_records="state.data.picking.move_lines"
                     :select_records_grouped="group_lines_by_location(state.data.move_lines)"
                     :select_options="{bubbleUpAction: true}"
                     />
@@ -130,6 +130,11 @@ export var Checkout = Vue.component("checkout", {
                             <v-btn depressed color="primary" @click="$root.trigger('qty_change_confirm')">Confirm</v-btn>
                         </v-col>
                     </v-row>
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn depressed color="default" @click="state.on_back">Back</v-btn>
+                        </v-col>
+                    </v-row>
                 </div>
             </div>
             <div v-if="state_is('change_packaging')">
@@ -138,6 +143,21 @@ export var Checkout = Vue.component("checkout", {
                     :select_records="state.data.packagings"
                     :select_options="{bubbleUpAction: true,  list_item_component: 'list-item'}"
                     />
+            </div>
+            <div v-if="state_is('confirm_done')">
+                <checkout-picking-detail :picking="state.data.picking" />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn depressed color="success" @click="state.on_confirm">Confirm</v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn depressed color="default" @click="state.on_back">Back</v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
             </div>
         </Screen>
         `,
@@ -304,7 +324,7 @@ export var Checkout = Vue.component("checkout", {
                         this.go_state(
                             "wait_call",
                             this.odoo.call("scan_line", {
-                                picking_id: this.picking_id,
+                                picking_id: this.state.data.picking.id,
                                 barcode: scanned.text,
                             })
                         );
@@ -316,7 +336,7 @@ export var Checkout = Vue.component("checkout", {
                         this.go_state(
                             "wait_call",
                             this.odoo.call("select_line", {
-                                picking_id: this.picking_id,
+                                picking_id: this.state.data.picking.id,
                                 move_line_id: selected.id,
                                 package_id: _.result(selected, "package_dest.id", null),
                             })
@@ -330,7 +350,7 @@ export var Checkout = Vue.component("checkout", {
                         this.go_state(
                             "wait_call",
                             this.odoo.call("summary", {
-                                picking_id: this.picking_id,
+                                picking_id: this.state.data.picking.id,
                             })
                         );
                     },
@@ -450,7 +470,6 @@ export var Checkout = Vue.component("checkout", {
                     },
                     events: {
                         qty_change_confirm: "on_confirm",
-                        back: "on_back",
                     },
                     on_back: () => {
                         this.go_state("select_package");
@@ -466,7 +485,8 @@ export var Checkout = Vue.component("checkout", {
                             this.odoo.call("set_custom_qty", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_ids: this.state.data.selected_line_ids,
-                                quantity: this.state.data.qty,
+                                move_line_id: this.state.data.record.id,
+                                qty_done: this.state.data.qty,
                             })
                         );
                     },
@@ -585,10 +605,22 @@ export var Checkout = Vue.component("checkout", {
                         this.reset_notification();
                     },
                 },
-                // TODO
                 confirm_done: {
                     display_info: {
-                        title: "Confirm done [TODO]",
+                        title: "Confirm done",
+                    },
+                    on_confirm: () => {
+                        this.go_state(
+                            "wait_call",
+                            this.odoo.call("done", {
+                                picking_id: this.state.data.picking.id,
+                                confirmation: true,
+                            })
+                        );
+                    },
+                    on_back: () => {
+                        this.go_state("summary");
+                        this.reset_notification();
                     },
                 },
             },
