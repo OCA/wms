@@ -141,7 +141,6 @@ Vue.component("manual-select", {
             // works only if you don't pass the property at all.
             // If you pass only one key, you'll lose all defaults.
             const opts = _.defaults({}, this.$props.options, {
-                bubbleUpAction: false,
                 showActions: true,
                 initSelectAll: false,
                 initValue: null,
@@ -231,9 +230,6 @@ Vue.component("manual-select", {
                 <v-btn depressed color="success" @click="handleAction('submit')">
                     Confirm
                 </v-btn>
-            </v-col>
-            <v-col>
-                <btn-back />
             </v-col>
         </v-row>
     </div>

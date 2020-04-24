@@ -48,7 +48,6 @@ export var Checkout = Vue.component("checkout", {
                     :picking="state.data.picking"
                     :select_records="state.data.picking.move_lines"
                     :select_records_grouped="group_lines_by_location(state.data.move_lines)"
-                    :select_options="{bubbleUpAction: true}"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -63,7 +62,7 @@ export var Checkout = Vue.component("checkout", {
                 <checkout-picking-detail-select
                     :picking="state.data.picking"
                     :select_records="state.data.selected_move_lines"
-                    :select_options="{multiple: true, initSelectAll: true, bubbleUpAction: true, list_item_component: 'checkout-select-package-content'}"
+                    :select_options="{multiple: true, initSelectAll: true, list_item_component: 'checkout-select-package-content'}"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -110,7 +109,7 @@ export var Checkout = Vue.component("checkout", {
                 <checkout-picking-detail-select
                     :picking="state.data.picking"
                     :select_records="state.data.packages"
-                    :select_options="{bubbleUpAction: true, list_item_fields: existing_package_select_fields, list_item_component: 'list-item'}"
+                    :select_options="{list_item_fields: existing_package_select_fields, list_item_component: 'list-item'}"
                     />
             </div>
             <div v-if="state_is('change_quantity')">
@@ -141,7 +140,7 @@ export var Checkout = Vue.component("checkout", {
                 <checkout-picking-detail-select
                     :picking="state.data.picking"
                     :select_records="state.data.packagings"
-                    :select_options="{bubbleUpAction: true,  list_item_component: 'list-item'}"
+                    :select_options="{list_item_component: 'list-item'}"
                     />
             </div>
             <div v-if="state_is('confirm_done')">
