@@ -179,6 +179,11 @@ Vue.component("manual-select", {
             });
             return bits.join(" ");
         },
+        valued() {
+            return this.opts.multiple
+                ? this.selected.length > 0
+                : this.selected !== false;
+        },
     },
     template: `
     <div :class="klass">
@@ -227,7 +232,7 @@ Vue.component("manual-select", {
         </v-card>
         <v-row class="actions bottom-actions" v-if="has_records && opts.showActions">
             <v-col>
-                <v-btn depressed color="success" @click="handleAction('submit')">
+                <v-btn depressed color="success" @click="handleAction('submit')" :disabled="!valued">
                     Confirm
                 </v-btn>
             </v-col>
