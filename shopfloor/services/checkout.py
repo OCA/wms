@@ -131,24 +131,24 @@ class Checkout(Component):
     def _response_for_summary(self, picking, need_confirm=False, message=None):
         return self._response(
             next_state="summary" if not need_confirm else "confirm_done",
-            data={"picking": self._data_for_stock_picking(picking)},
+            data={"picking": self._data_for_stock_picking(picking, packed=True)},
             message=message,
         )
 
     def _response_for_select_document(self, message=None):
         return self._response(next_state="select_document", message=message)
 
-    def _data_for_stock_picking(self, picking):
+    def _data_for_stock_picking(self, picking, packed=False):
         data_struct = self.actions_for("data")
         data = data_struct.picking_summary(picking)
+        line_picker = self._lines_packed if packed else self._lines_to_pack
         data.update(
-            {
-                "move_lines": [
-                    data_struct.move_line(ml) for ml in self._lines_to_pack(picking)
-                ]
-            }
+            {"move_lines": [data_struct.move_line(ml) for ml in line_picker(picking)]}
         )
         return data
+
+    def _lines_packed(self, picking):
+        return picking.move_line_ids.filtered(self._filter_lines_packed)
 
     def _lines_to_pack(self, picking):
         return picking.move_line_ids.filtered(self._filter_lines_unpacked)
@@ -1211,7 +1211,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
         )
 
     def new_package(self):
-        return self._response_schema(next_states={"select_line"})
+        return self._response_schema(next_states={"select_line", "summary"})
 
     def list_dest_package(self):
         return self._response_schema(
