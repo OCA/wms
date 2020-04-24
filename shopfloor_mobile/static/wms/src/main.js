@@ -141,15 +141,15 @@ const app = new Vue({
         _loadRoutes: function() {
             const self = this;
             // Adding the routes dynamically when received from ther server
-            self.appconfig.menus.forEach(function(item) {
-                const registered = self.registry.get(item.process.code);
-                if (registered) {
-                    self.$router.addRoutes([
-                        {
-                            path: self.registry.make_route(item.process.code),
-                            component: self.registry.get(item.process.code),
-                        },
-                    ]);
+            let routes = [];
+            _.uniqBy(self.appconfig.menus, "process.code").forEach(function(item) {
+                const component = self.registry.get(item.process.code);
+                if (component) {
+                    routes.push({
+                        name: item.process.code,
+                        path: self.registry.make_route(item.process.code),
+                        component: component,
+                    });
                 } else {
                     // TODO: use NotFound component
                     console.error(
@@ -159,10 +159,14 @@ const app = new Vue({
                     );
                 }
             });
+            if (routes) {
+                self.$router.addRoutes(routes);
+            }
             // TODO: any better way to do it?
             // As we load routes on demand the router does not know it yet,
-            // Hence we have to force the switch.
-            // hash is smth like "#/checkout/12"
+            // Hence we have to force the switch otherwise reload
+            // from process won't work.
+            // `hash` is smth like "#/checkout/12"
             self.$router.push({path: window.location.hash.replace("#/", "")});
         },
         _clearConfig: function() {
