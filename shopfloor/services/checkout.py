@@ -898,13 +898,6 @@ class Checkout(Component):
             )
         return self._response_for_summary(picking)
 
-    @staticmethod
-    def _filter_lines_(move_line):
-        return (
-            move_line.qty_done == move_line.product_uom_qty
-            and move_line.shopfloor_checkout_packed
-        )
-
     def done(self, picking_id, confirmation=False):
         """Set the moves as done
 
