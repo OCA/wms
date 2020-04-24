@@ -2,7 +2,6 @@
 /* eslint-disable no-implicit-globals */
 import {CheckoutPickingDetailListMixin} from "./mixins.js";
 
-
 Vue.component("checkout-summary-detail", {
     mixins: [CheckoutPickingDetailListMixin],
     computed: {
@@ -59,7 +58,7 @@ Vue.component("checkout-summary-content", {
 });
 
 // TODO: split these actions out of checkout
-            // 
+//
 Vue.component("checkout-summary-destroy-action", {
     props: ["pack"],
     data() {
@@ -77,8 +76,8 @@ Vue.component("checkout-summary-destroy-action", {
     },
     computed: {
         message: function() {
-            return "Please confirm delivery cancellation for pack " + this.pack.name
-        }
+            return "Please confirm delivery cancellation for pack " + this.pack.name;
+        },
     },
     template: `
   <div class="action action-destroy">
@@ -95,7 +94,6 @@ Vue.component("checkout-summary-destroy-action", {
   </div>
 `,
 });
-
 
 Vue.component("checkout-summary-product-detail", {
     props: {
@@ -116,7 +114,7 @@ Vue.component("checkout-summary-product-detail", {
                     <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
                 </div>
                 <div class="qty">
-                    <span class="label">Qty:</span> <span>{{ record.product.qty }}</span>
+                    <span class="label">Qty:</span> <span>{{ record.qty_done }}</span>
                 </div>
             </v-list-item-subtitle>
         </div>

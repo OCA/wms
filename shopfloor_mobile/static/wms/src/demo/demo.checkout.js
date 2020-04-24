@@ -5,10 +5,9 @@ const select_pack_picking = demotools.makePicking(
     {lines_count: 5, line_random_pack: true, line_random_dest: true}
 );
 
-const select_line_data = demotools.makePicking(
-    {},
-    {lines_count: 5, line_random_pack: true}
-);
+const select_line_data = {
+    picking: demotools.makePicking({}, {lines_count: 5, line_random_pack: true}),
+};
 const summary_data = {
     picking: demotools.makePicking({}, {lines_count: 5, line_random_pack: true}),
 };
@@ -42,7 +41,7 @@ var DEMO_CHECKOUT = {
         message: null,
         data: {
             manual_selection: {
-                records: _.sampleSize(
+                pickings: _.sampleSize(
                     [
                         demotools.makePicking(),
                         demotools.makePicking(),
