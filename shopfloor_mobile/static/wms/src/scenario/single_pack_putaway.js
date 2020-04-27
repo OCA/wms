@@ -1,12 +1,8 @@
-import {
-    GenericStatesMixin,
-    ScenarioBaseMixin,
-    SinglePackStatesMixin,
-} from "./mixins.js";
+import {ScenarioBaseMixin, SinglePackStatesMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
 
 export var SinglePackPutAway = Vue.component("single-pack-putaway", {
-    mixins: [ScenarioBaseMixin, GenericStatesMixin, SinglePackStatesMixin],
+    mixins: [ScenarioBaseMixin, SinglePackStatesMixin],
     template: `
         <Screen :title="screen_info.title" :klass="screen_info.klass">
             <template v-slot:header>

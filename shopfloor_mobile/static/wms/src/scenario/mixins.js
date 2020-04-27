@@ -273,30 +273,6 @@ export var ScenarioBaseMixin = {
     },
 };
 
-export var GenericStatesMixin = {
-    data: function() {
-        return {
-            states: {
-                // FIXME: refactor old process implementations
-                // w/ new `wait_call` function.
-                // Then get rid of this.
-                wait_call: {
-                    success: result => {
-                        if (!_.isUndefined(result.data)) {
-                            this.state_set_data(result.data, result.next_state);
-                        }
-                        if (!_.isUndefined(result) && !result.error) {
-                            this.state_to(result.next_state);
-                        } else {
-                            alert(result.status + " " + result.error);
-                        }
-                    },
-                },
-            },
-        };
-    },
-};
-
 // TODO: move it to a specific file maybe
 export var SinglePackStatesMixin = {
     data: function() {

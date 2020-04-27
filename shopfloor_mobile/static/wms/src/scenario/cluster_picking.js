@@ -1,8 +1,8 @@
-import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
+import {ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
 
 export var ClusterPicking = Vue.component("cluster-picking", {
-    mixins: [ScenarioBaseMixin, GenericStatesMixin],
+    mixins: [ScenarioBaseMixin],
     template: `
         <Screen :title="screen_info.title" :klass="screen_info.klass">
             <!-- FOR DEBUG -->
