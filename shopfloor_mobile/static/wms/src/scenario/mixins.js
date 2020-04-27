@@ -159,6 +159,22 @@ export var ScenarioBaseMixin = {
             // TODO: maybe not needed after introducing routing
             this.$root.$emit("state:change", state_key);
         },
+        // TODO: refactor all transitions to state `wait_call` with this call
+        wait_call: function(promise, next_state) {
+            const self = this;
+            return promise.then(function(result) {
+                const state = next_state || result.next_state;
+                if (!_.isUndefined(result.data)) {
+                    self.state_set_data(result.data[state], state);
+                }
+                if (!_.isUndefined(result) && !result.error) {
+                    // TODO: consider not changing the state if it is the same to not refresh
+                    self.state_to(state);
+                } else {
+                    alert(result.status + " " + result.error);
+                }
+            });
+        },
         on_enter: function() {
             if (this.state.enter) {
                 this.state.enter();
@@ -260,15 +276,15 @@ export var GenericStatesMixin = {
     data: function() {
         return {
             states: {
-                // TODO: get rid of `wait_call` as state.
-                // It should be a normal function.
+                // FIXME: refactor old process implementations
+                // w/ new `wait_call` function.
+                // Then get rid of this.
                 wait_call: {
                     success: result => {
                         if (!_.isUndefined(result.data)) {
                             this.state_set_data(result.data, result.next_state);
                         }
                         if (!_.isUndefined(result) && !result.error) {
-                            // TODO: consider not changing the state if it is the same to not refresh
                             this.state_to(result.next_state);
                         } else {
                             alert(result.status + " " + result.error);
