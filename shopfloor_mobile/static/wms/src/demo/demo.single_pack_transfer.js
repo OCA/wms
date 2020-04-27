@@ -1,11 +1,12 @@
-/* eslint no-use-before-define: 0 */ // --> OFF
-/* eslint no-use-before-define: 0 */ // --> OFF
-var CANCEL_MSG_DEFAULT = {
+import {demotools} from "./demo.core.js";
+
+// TODO: refactor w/ demotools data
+const CANCEL_MSG_DEFAULT = {
     message: "Operation cancelled",
     message_type: "info",
 };
 
-var DEMO_SINGLE_PACK_TRANSFER_1 = {
+const DEMO_SINGLE_PACK_TRANSFER_1 = {
     start: {
         data: {
             scan_location: {
@@ -72,5 +73,4 @@ var DEMO_SINGLE_PACK_TRANSFER_1 = {
     },
 };
 
-window.DEMO_CASES.single_pack_transfer = DEMO_SINGLE_PACK_TRANSFER_1;
-/* eslint no-use-before-define: 2 */ // --> ON
+demotools.add_case("single_pack_transfer", DEMO_SINGLE_PACK_TRANSFER_1);

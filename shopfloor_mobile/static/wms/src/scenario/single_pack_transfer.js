@@ -33,7 +33,7 @@ export var SinglePackTransfer = Vue.component("single-pack-transfer", {
                 show_completion_info: {
                     on_confirm: () => {
                         // TODO: turn the cone?
-                        this.go_state("start");
+                        this.state_to("start");
                     },
                 },
             },

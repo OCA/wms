@@ -1,4 +1,7 @@
-/* eslint no-use-before-define: 0 */ // --> OFF
+import {demotools} from "./demo.core.js";
+
+// TODO: refactor w/ demotools data
+
 var CANCEL_MSG_DEFAULT = {
     message: "Operation cancelled",
     message_type: "info",
@@ -198,7 +201,7 @@ var DEMO_SINGLE_PUTAWAY_7 = {
     },
 };
 
-window.DEMO_CASES.single_pack_putaway = {
+demotools.add_case("single_pack_putaway", {
     "1": DEMO_SINGLE_PUTAWAY_1,
     "2": DEMO_SINGLE_PUTAWAY_2,
     "3": DEMO_SINGLE_PUTAWAY_3,
@@ -206,6 +209,4 @@ window.DEMO_CASES.single_pack_putaway = {
     "5": DEMO_SINGLE_PUTAWAY_5,
     "6": DEMO_SINGLE_PUTAWAY_6,
     "7": DEMO_SINGLE_PUTAWAY_7,
-};
-
-/* eslint no-use-before-define: 2 */ // --> ON
+});
