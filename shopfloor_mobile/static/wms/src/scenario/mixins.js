@@ -311,8 +311,7 @@ export var SinglePackStatesMixin = {
                         this.state_reset_data();
                     },
                     on_scan: scanned => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("start", {barcode: scanned.text})
                         );
                     },
@@ -327,8 +326,7 @@ export var SinglePackStatesMixin = {
                         this.state_reset_data();
                     },
                     on_scan: scanned => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("start", {barcode: scanned.text})
                         );
                     },
@@ -343,8 +341,7 @@ export var SinglePackStatesMixin = {
                     },
                     on_scan: (scanned, confirmation = false) => {
                         this.state_set_data({location_barcode: scanned.text});
-                        this.go_state(
-                            "wait_validation",
+                        this.wait_call(
                             this.odoo.call("validate", {
                                 package_level_id: this.state.data.id,
                                 location_barcode: scanned.text,
@@ -353,20 +350,11 @@ export var SinglePackStatesMixin = {
                         );
                     },
                     on_cancel: () => {
-                        this.go_state(
-                            "wait_cancel",
+                        this.wait_call(
                             this.odoo.call("cancel", {
                                 package_level_id: this.state.data.id,
                             })
                         );
-                    },
-                },
-                wait_cancel: {
-                    success: result => {
-                        this.go_state("start");
-                    },
-                    error: result => {
-                        this.go_state("start");
                     },
                 },
                 confirm_location: {
@@ -391,7 +379,7 @@ export var SinglePackStatesMixin = {
                                 true
                             );
                         } else {
-                            this.go_state("scan_location");
+                            this.state_to("scan_location");
                         }
                     },
                     on_scan: (scanned, confirmation = true) => {
@@ -419,9 +407,9 @@ export var SinglePackStatesMixin = {
                             );
                             state_data.message = {};
                             this.state_set_data(state_data, "scan_location");
-                            this.go_state("scan_location");
+                            this.state_to("scan_location");
                         } else {
-                            this.go_state("start");
+                            this.state_to("start");
                         }
                     },
                     on_scan: scanned => {

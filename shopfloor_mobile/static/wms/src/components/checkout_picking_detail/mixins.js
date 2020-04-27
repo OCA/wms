@@ -86,4 +86,3 @@ export var CheckoutPickingDetailListMixin = {
 </div>
 `,
 };
-
