@@ -40,9 +40,9 @@ ul.packaging span:first-child {
 .v-dialog.v-dialog--active.v-dialog--fullscreen .v-alert__wrapper .message {
 }
 
-.action {
+/* .action {
     margin-top: 2rem;
-}
+} */
 
 .fullscreen-buttons {
     display: flex;
@@ -122,7 +122,7 @@ ul.packaging span:first-child {
     color: #999;
 }
 
-.with-bottom-actions {
+.manual-select.with-bottom-actions {
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -130,26 +130,104 @@ ul.packaging span:first-child {
     align-items: stretch; /* align items in Cross Axis */
     align-content: stretch; /* Extra space in Cross Axis */
 }
-.with-bottom-actions > div:first-child {
+.manual-select.with-bottom-actions > div:first-child {
     height: 68vh;
     margin-bottom: 2vh;
     overflow-y: scroll;
 }
-.actions.bottom-actions {
+.manual-select .actions.bottom-actions {
     flex-grow: 1;
 }
-.actions.bottom-actions .v-btn {
+.manual-select .actions.bottom-actions .v-btn {
     font-size: 1.2rem;
     height: 3.5rem;
     width: 100%;
 }
 
-.label {
-    font-weight: 600;
+.manual-select.with-groups .v-card__title {
+    padding: 0.5rem 1rem 1rem 1rem;
+}
+.manual-select.with-groups .select-group:not(:last-child) {
+    border-bottom: 2px;
+    margin-bottom: 0.5rem;
+}
+.manual-select .item-counter {
+    display: none;
+    padding-right: 0.5rem;
+}
+.manual-select.with-showCounters .item-counter {
+    display: inline;
 }
 
 .state-display-info .v-alert {
     margin-bottom: 0;
 }
 .state-title {
+}
+
+.manual-select .action {
+    margin: 0;
+}
+.manual-select .action.action-edit {
+    padding: 8px 16px;
+}
+
+.manual-select .action .v-btn {
+    min-width: 0;
+    font-size: 1.2em;
+    padding: 15px 5px;
+}
+.list .v-expansion-panel-header {
+    padding: 0;
+}
+.list .v-expansion-panel-header > :not(.v-expansion-panel-header__icon) {
+    flex: none;
+}
+.list .v-expansion-panel-header > .item-counter {
+    margin-right: 0.5em;
+}
+.list .v-expansion-panel-content .v-expansion-panel-content__wrap {
+    padding: 0 6px 10px;
+}
+.list .list-item-wrapper:not(:last-child) .v-list-item__content {
+    border-bottom: 1px solid #ccc;
+}
+.list .list-group:not(:last-child) {
+    border-bottom: 2px solid #ccc;
+}
+.list .v-list-item__content.has-pack {
+    padding: 0;
+}
+
+.list-item-wrapper.active {
+    background-color: lightgreen;
+}
+.list-item-wrapper .action-edit {
+    display: none;
+}
+
+.list-item-wrapper.active .action-edit {
+    display: block;
+}
+
+.my-checkbox {
+    -webkit-appearance: none;
+    width: 30px;
+    height: 30px;
+    background: white;
+    border-radius: 5px;
+    border: 2px solid #555;
+}
+
+input.my-checkbox[type="checkbox"]:checked {
+    background: green;
+}
+
+.summary-content {
+    max-width: 100%;
+}
+.summary-content .v-list-item__title {
+    max-width: 100%;
+    white-space: normal;
+    font-size: 0.9rem;
 }

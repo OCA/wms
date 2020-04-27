@@ -1,7 +1,4 @@
-import {Odoo, OdooMocked} from "../services/odoo.js";
-
 export var ScenarioBaseMixin = {
-    props: ["menuItem"],
     data: function() {
         return {
             user_notification: {
@@ -10,36 +7,49 @@ export var ScenarioBaseMixin = {
             },
             need_confirmation: false,
             show_reset_button: false,
-            erp_data: {
-                data: {
-                    // $next_state: {},
-                },
-            },
-            initial_state_key: "start_scan_pack",
-            current_state_key: "start_scan_pack",
+            initial_state_key: "start",
+            current_state_key: "",
             states: {},
-            usage: "", // Match component usage on odoo
+            usage: "", // Match component usage on odoo,
         };
     },
+    beforeRouteUpdate(to, from, next) {
+        // Load initial state
+        // const state = to.params.state ? to.params.state : 'start';
+        const state = to.query.state ? to.query.state : "start";
+        this.go_state(state);
+        next();
+    },
     beforeMount: function() {
+        this._loadParams();
         if (this.$root.demo_mode) {
             this.$root.loadJS("src/demo/demo." + this.usage + ".js", this.usage);
         }
+        /*
+        Ensure initial state is set.
+        beforeRouteUpdate` runs only if the route has changed,
+        which means that if your reload the page it won't get called :(
+        We could use `beforeRouteEnter` but that's not tied to the current instance
+        and we won't be able to call `go_state`.
+        */
+        if (!this.current_state_key) {
+            // Default to initial state
+            this.current_state_key = this.initial_state_key;
+        }
+        this.go_state(this.current_state_key);
     },
     mounted: function() {
         const odoo_params = {
-            process_id: this.menuItem.process.id,
-            process_menu_id: this.menuItem.id,
+            process_id: this.menu_item.process.id,
+            process_menu_id: this.menu_item.id,
+            profile_id: this.$root.profile.id,
             usage: this.usage,
-            debug: this.$root.demo_mode,
         };
-        if (this.$root.demo_mode) {
-            this.odoo = new OdooMocked(odoo_params);
-        }
-        // FIXME: init data should come from specific scenario
-        else {
-            this.odoo = new Odoo(odoo_params);
-        }
+        this.odoo = this.$root.getOdoo(odoo_params);
+    },
+    beforeDestroy: function() {
+        // TODO: we should turn off only handlers for the current state
+        this.$root.event_hub.$off();
     },
     computed: {
         /*
@@ -48,7 +58,7 @@ export var ScenarioBaseMixin = {
         state: function() {
             const state = {
                 key: this.current_state_key,
-                data: this._state_get_data_raw(this.current_state_key),
+                data: this.state_get_data(),
             };
             _.extend(state, this.states[this.current_state_key]);
             _.defaults(state, {display_info: {}});
@@ -64,29 +74,72 @@ export var ScenarioBaseMixin = {
         show_cancel_button: function() {
             return this.state.display_info.show_cancel_button;
         },
+        screen_info: function() {
+            return {
+                title: this.menu_item.name,
+                klass: this.usage + " " + "state-" + this.state.key,
+            };
+        },
     },
     methods: {
+        /*
+        Load menu item from storage using route's menu id
+        */
+        _loadParams: function() {
+            const self = this;
+            this.menu_item = _.head(
+                _.filter(this.$root.appconfig.menus, function(m) {
+                    return m.id === parseInt(self.$route.query.menu_id, 10);
+                })
+            );
+            this.current_state_key = this.$route.query.state;
+        },
+        storage_key: function(state_key) {
+            state_key = _.isUndefined(state_key) ? this.current_state_key : state_key;
+            return this.usage + "." + state_key;
+        },
+        /*
+        Switch state to given one.
+        */
+        state_to: function(state_key) {
+            return this.$router
+                .push({
+                    path: this.$route.path,
+                    query: {
+                        menu_id: this.menu_item.id,
+                        state: state_key,
+                    },
+                })
+                .catch(() => {
+                    // see https://github.com/quasarframework/quasar/issues/5672
+                    console.error("No new route found");
+                });
+        },
+        // Generic states methods
         state_is: function(state_key) {
             return state_key == this.current_state_key;
         },
         state_in: function(state_keys) {
             return _.filter(state_keys, this.state_is).length > 0;
         },
-        _state_get_data_raw: function(state_key) {
-            return _.result(this.erp_data.data, state_key, {});
+        state_reset_data: function() {
+            this.$root.$storage.remove(this.storage_key());
+        },
+        _state_get_data: function(storage_key) {
+            return this.$root.$storage.get(storage_key, {});
+        },
+        _state_set_data: function(storage_key, v) {
+            this.$root.$storage.set(storage_key, v);
         },
         state_get_data: function(state_key) {
-            state_key = _.isUndefined(state_key) ? this.current_state_key : state_key;
-            return this._state_get_data_raw(state_key);
+            return this._state_get_data(this.storage_key(state_key));
         },
         state_set_data: function(data, state_key) {
-            state_key = _.isUndefined(state_key) ? this.current_state_key : state_key;
-            const new_data = _.merge(this._state_get_data_raw(state_key), data);
-            this.$set(this.erp_data.data, state_key, new_data);
+            const new_data = _.merge({}, this.state_get_data(state_key), data);
+            this._state_set_data(this.storage_key(state_key), new_data);
         },
-        // Generic states methods
         go_state: function(state_key, promise) {
-            console.log("GO TO STATE", state_key);
+            // console.log("GO TO STATE", state_key);
             if (state_key == "start") {
                 // Alias "start" to the initial state
                 state_key = this.initial_state_key;
@@ -101,6 +154,26 @@ export var ScenarioBaseMixin = {
             } else {
                 this.on_enter();
             }
+            this._state_bind_events();
+            // notify root
+            // TODO: maybe not needed after introducing routing
+            this.$root.$emit("state:change", state_key);
+        },
+        // TODO: refactor all transitions to state `wait_call` with this call
+        wait_call: function(promise, next_state) {
+            const self = this;
+            return promise.then(function(result) {
+                const state = next_state || result.next_state;
+                if (!_.isUndefined(result.data)) {
+                    self.state_set_data(result.data[state], state);
+                }
+                if (!_.isUndefined(result) && !result.error) {
+                    // TODO: consider not changing the state if it is the same to not refresh
+                    self.state_to(state);
+                } else {
+                    alert(result.status + " " + result.error);
+                }
+            });
         },
         on_enter: function() {
             if (this.state.enter) {
@@ -129,7 +202,7 @@ export var ScenarioBaseMixin = {
             }
         },
         on_reset: function(e) {
-            this.reset_erp_data();
+            this.state_reset_data();
             this.reset_notification();
             this.go_state(this.initial_state_key);
         },
@@ -139,6 +212,16 @@ export var ScenarioBaseMixin = {
                 this.state.on_scan(scanned);
             }
         },
+        // on_select: function(selected) {
+        //     if (this.state.on_select) {
+        //         this.state.on_select(selected);
+        //     }
+        // },
+        // on_back: function() {
+        //     if (this.state.on_back) {
+        //         this.state.on_back();
+        //     }
+        // },
         on_cancel: function() {
             if (this.state.on_cancel) {
                 this.state.on_cancel();
@@ -157,19 +240,64 @@ export var ScenarioBaseMixin = {
             this.user_notification.message = false;
             this.user_notification.message_type = false;
         },
-        set_erp_data: function(key, data) {
-            const new_data = this.erp_data[key];
-            _.merge(new_data, data);
-            this.$set(this.erp_data, key, new_data);
-        },
-        reset_erp_data: function(key) {
-            // FIXME
-            this.$set(this.erp_data, key, {});
+        _state_bind_events: function() {
+            if (this.state.events) {
+                /*
+                Automatically bind events defined by states.
+                A state can define `events` w/ this structure:
+
+                    events: {
+                        '$event_name': '$handler',
+                    },
+
+                `$handler_name` must match a function or the name of a function
+                available in the state.
+
+                The event name is prefixed w/ the state key so that
+                any component can subscribe globally,
+                via the event hub at root level,
+                to a particular event fired on a specific state
+                */
+                const self = this;
+                _.each(self.state.events, function(handler, name) {
+                    if (typeof handler == "string") handler = self.state[handler];
+                    const event_name = self.state.key + ":" + name;
+                    // Wipe old handlers
+                    // TODO: any way to register them just once?
+                    self.$root.event_hub.$off(event_name, handler);
+                    self.$root.event_hub.$on(event_name, handler);
+                });
+            }
         },
     },
 };
 
 export var GenericStatesMixin = {
+    data: function() {
+        return {
+            states: {
+                // FIXME: refactor old process implementations
+                // w/ new `wait_call` function.
+                // Then get rid of this.
+                wait_call: {
+                    success: result => {
+                        if (!_.isUndefined(result.data)) {
+                            this.state_set_data(result.data, result.next_state);
+                        }
+                        if (!_.isUndefined(result) && !result.error) {
+                            this.state_to(result.next_state);
+                        } else {
+                            alert(result.status + " " + result.error);
+                        }
+                    },
+                },
+            },
+        };
+    },
+};
+
+// TODO: move it to a specific file maybe
+export var SinglePackStatesMixin = {
     data: function() {
         return {
             states: {
@@ -180,7 +308,7 @@ export var GenericStatesMixin = {
                         scan_placeholder: "Scan pack",
                     },
                     enter: () => {
-                        this.reset_erp_data("data");
+                        this.state_reset_data();
                     },
                     on_scan: scanned => {
                         this.go_state(
@@ -196,26 +324,13 @@ export var GenericStatesMixin = {
                         scan_placeholder: "Scan pack",
                     },
                     enter: () => {
-                        this.reset_erp_data("data");
+                        this.state_reset_data();
                     },
                     on_scan: scanned => {
                         this.go_state(
                             "wait_call",
                             this.odoo.call("start", {barcode: scanned.text})
                         );
-                    },
-                },
-                wait_call: {
-                    success: result => {
-                        if (!_.isUndefined(result.data)) {
-                            this.set_erp_data("data", result.data);
-                        }
-                        if (!_.isUndefined(result) && !result.error) {
-                            // TODO: consider not changing the state if it is the same to no refresh
-                            this.go_state(result.next_state);
-                        } else {
-                            alert(result.status + " " + result.error);
-                        }
                     },
                 },
                 // TODO: these states should be splitted out to a specific mixin
@@ -244,17 +359,6 @@ export var GenericStatesMixin = {
                                 package_level_id: this.state.data.id,
                             })
                         );
-                    },
-                },
-                wait_validation: {
-                    success: result => {
-                        if (!_.isUndefined(result.data)) {
-                            this.set_erp_data("data", result.data);
-                        }
-                        this.go_state(result.next_state);
-                    },
-                    error: result => {
-                        this.go_state("scan_location");
                     },
                 },
                 wait_cancel: {

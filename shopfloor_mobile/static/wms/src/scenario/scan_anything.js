@@ -1,5 +1,3 @@
-import {Odoo, OdooMocked} from "../services/odoo.js";
-
 export var ScanAnything = Vue.component("scan-anything", {
     template: `
         <Screen title="Scan Anything" :klass="'scan_anything'">
@@ -9,7 +7,7 @@ export var ScanAnything = Vue.component("scan-anything", {
             <detail-location :locationDetail="dataReceived.detail_info" v-if="dataReceived.type=='location'" v-on:url-change="urlChanged"></detail-location>
             <detail-operation :operationDetail="dataReceived.detail_info" v-if="dataReceived.type=='operation'"></detail-operation>
             <reset-screen-button v-on:reset="on_reset" :show_reset_button="show_reset_button"></reset-screen-button>
-            <v-btn v-if="showBackButon" depressed x-large color="blue" v-on:click="$router.back()">Back</v-btn>
+            <btn-back v-if="showBackBtn" />
         </Screen>
     `,
     mounted() {
@@ -19,11 +17,9 @@ export var ScanAnything = Vue.component("scan-anything", {
             usage: this.usage,
             debug: this.$root.demo_mode,
         };
+        this.odoo = this.$root.getOdoo(odoo_params);
         if (this.$root.demo_mode) {
             this.$root.loadJS("src/demo/demo." + this.usage + ".js", this.usage);
-            this.odoo = new OdooMocked(odoo_params);
-        } else {
-            this.odoo = new Odoo(odoo_params);
         }
         if (this.$route.params.codebar) {
             this.getData(this.$route.params.codebar);
@@ -67,7 +63,7 @@ export var ScanAnything = Vue.component("scan-anything", {
         },
     },
     computed: {
-        showBackButon: function() {
+        showBackBtn: function() {
             return "childOf" in this.$route.query;
         },
         show_reset_button: function() {

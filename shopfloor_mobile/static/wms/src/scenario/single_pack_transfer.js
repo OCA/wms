@@ -1,9 +1,14 @@
-import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
+import {
+    GenericStatesMixin,
+    ScenarioBaseMixin,
+    SinglePackStatesMixin,
+} from "./mixins.js";
+import {process_registry} from "../services/process_registry.js";
 
 export var SinglePackTransfer = Vue.component("single-pack-transfer", {
-    mixins: [ScenarioBaseMixin, GenericStatesMixin],
+    mixins: [ScenarioBaseMixin, GenericStatesMixin, SinglePackStatesMixin],
     template: `
-        <Screen :title="menuItem.name" :klass="usage">
+        <Screen :title="screen_info.title" :klass="screen_info.klass">
             <template v-slot:header>
                 <user-information
                     v-if="!need_confirmation && user_notification.message"
@@ -24,7 +29,6 @@ export var SinglePackTransfer = Vue.component("single-pack-transfer", {
             usage: "single_pack_transfer",
             show_reset_button: true,
             initial_state_key: "start_scan_pack_or_location",
-            current_state_key: "start_scan_pack_or_location",
             states: {
                 show_completion_info: {
                     on_confirm: () => {
@@ -36,3 +40,4 @@ export var SinglePackTransfer = Vue.component("single-pack-transfer", {
         };
     },
 });
+process_registry.add("single_pack_transfer", SinglePackTransfer);

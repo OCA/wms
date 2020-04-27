@@ -1,11 +1,13 @@
-import {Storage} from "./storage.js";
+import {demotools} from "../demo/demo.core.js";
 
 export class OdooMixin {
     constructor(params) {
         this.params = params;
+        this.apikey = params.apikey;
         this.usage = params.usage;
         this.process_id = this.params.process_id;
         this.process_menu_id = this.params.process_menu_id;
+        this.profile_id = this.params.profile_id;
         this.debug = this.params.debug;
     }
     call(path, data, method = "POST", fullpath = false) {
@@ -47,7 +49,6 @@ export class OdooMixin {
         };
     }
     _handle_403(response) {
-        Storage.apikey = "";
         return this._error_info(response);
     }
     _handle_404(response) {
@@ -71,8 +72,8 @@ export class OdooMixin {
         return {
             "Content-Type": "application/json",
             "SERVICE-CTX-MENU-ID": this.process_menu_id,
-            "SERVICE-CTX-PROFILE-ID": 1, // FIXME
-            "API-KEY": Storage.apikey,
+            "SERVICE-CTX-PROFILE-ID": this.profile_id,
+            "API-KEY": this.apikey,
         };
     }
     _get_url(endpoint) {
@@ -82,7 +83,7 @@ export class OdooMixin {
 
 export class OdooMocked extends OdooMixin {
     _set_demo_data() {
-        this.demo_data = window.DEMO_CASES[this.usage];
+        this.demo_data = demotools.get_case(this.usage);
     }
     call(path, data, method = "POST", fullpath = false) {
         this._set_demo_data();
