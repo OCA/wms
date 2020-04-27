@@ -3,6 +3,7 @@ import {Config} from "./services/config.js";
 import {process_registry} from "./services/process_registry.js";
 import {Odoo, OdooMocked} from "./services/odoo.js";
 
+// TODO: we need a local storage handler too, to store device/profile specific data
 Vue.use(Vue2Storage, {
     prefix: "shopfloor_",
     driver: "session", // local|session|memory
@@ -62,10 +63,6 @@ const app = new Vue({
         this.$root.event_hub.$on("profile:selected", function(profile) {
             self.profile = profile;
         });
-        if (this.authenticated) {
-            // TODO: this should be done by a watcher on appconfig change
-            this._loadRoutes();
-        }
     },
     computed: {
         has_profile: function() {
@@ -137,37 +134,6 @@ const app = new Vue({
                     self.loading = false;
                 }
             });
-        },
-        _loadRoutes: function() {
-            const self = this;
-            // Adding the routes dynamically when received from ther server
-            let routes = [];
-            _.uniqBy(self.appconfig.menus, "process.code").forEach(function(item) {
-                const component = self.registry.get(item.process.code);
-                if (component) {
-                    routes.push({
-                        name: item.process.code,
-                        path: self.registry.make_route(item.process.code),
-                        component: component,
-                    });
-                } else {
-                    // TODO: use NotFound component
-                    console.error(
-                        "Cannot find process component for",
-                        item.process.code,
-                        item
-                    );
-                }
-            });
-            if (routes) {
-                self.$router.addRoutes(routes);
-            }
-            // TODO: any better way to do it?
-            // As we load routes on demand the router does not know it yet,
-            // Hence we have to force the switch otherwise reload
-            // from process won't work.
-            // `hash` is smth like "#/checkout/12"
-            self.$router.push({path: window.location.hash.replace("#/", "")});
         },
         _clearConfig: function() {
             this.$storage.remove("appconfig");
