@@ -2,9 +2,15 @@ from .common import CommonCase
 
 
 class AppCase(CommonCase):
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super().setUpClass(*args, **kwargs)
+        cls.profile = cls.env.ref("shopfloor.shopfloor_profile_hb_truck_demo")
+        cls.profile2 = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
+
     def setUp(self):
         super().setUp()
-        with self.work_on_services() as work:
+        with self.work_on_services(profile=self.profile) as work:
             self.service = work.component(usage="app")
 
     def test_user_config(self):
@@ -41,38 +47,26 @@ class AppCase(CommonCase):
                     {
                         "id": menu.id,
                         "name": menu.name,
-                        "op_groups": [
-                            {"id": x.id, "name": x.name}
-                            for x in menu.operation_group_ids
+                        "scenario": menu.scenario,
+                        "picking_types": [
+                            {"id": picking_type.id, "name": picking_type.name}
+                            for picking_type in menu.picking_type_ids
                         ],
-                        "process": {
-                            "id": menu.process_id.id,
-                            "code": menu.process_id.code,
-                            "picking_type": {
-                                "id": menu.process_id.picking_type_id.id,
-                                "name": menu.process_id.picking_type_id.name,
-                            },
-                        },
                     }
                     for menu in menus
-                ],
+                ]
             },
         )
 
     def test_menu_by_profile(self):
         """Request /app/menu w/ a specific profile"""
         # Simulate the client asking the menu
-        op_type = self.env.ref("shopfloor.shopfloor_operation_group_highbay_demo")
         menus = self.env["shopfloor.menu"].search([])
         menu = menus[0]
-        menu.operation_group_ids = op_type
-        profile = self.env.ref("shopfloor.shopfloor_profile_hb_truck_demo")
-        profile.operation_group_ids = op_type
+        menu.profile_ids = self.profile
+        (menus - menu).profile_ids = self.profile2
 
-        with self.work_on_services(profile=profile) as work:
-            service = work.component(usage="app")
-
-        response = service.dispatch("menu")
+        response = self.service.dispatch("menu")
         self.assert_response(
             response,
             data={
@@ -80,16 +74,12 @@ class AppCase(CommonCase):
                     {
                         "id": menu.id,
                         "name": menu.name,
-                        "op_groups": [{"id": op_type.id, "name": op_type.name}],
-                        "process": {
-                            "id": menu.process_id.id,
-                            "code": menu.process_id.code,
-                            "picking_type": {
-                                "id": menu.process_id.picking_type_id.id,
-                                "name": menu.process_id.picking_type_id.name,
-                            },
-                        },
+                        "scenario": menu.scenario,
+                        "picking_types": [
+                            {"id": picking_type.id, "name": picking_type.name}
+                            for picking_type in menu.picking_type_ids
+                        ],
                     }
-                ],
+                ]
             },
         )

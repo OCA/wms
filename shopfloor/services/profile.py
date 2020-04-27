@@ -1,6 +1,3 @@
-from odoo import fields
-from odoo.osv import expression
-
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
@@ -10,13 +7,9 @@ class ShopfloorProfile(Component):
     Profile storing the configuration for the interaction from the client.
 
     A client application must use a profile, passed to every request in the
-    HTTP header (TODO put the name of the header).
+    HTTP header HTTP_SERVICE_CTX_PROFILE_ID.
 
-    The list of profiles available for a user is restricted by 2 things:
-
-    * If the profile has operation groups, the profile can be used only
-      if the user is at least in one of these groups.
-    * If the user has an assigned profile, the user can use only this profile.
+    Only stock managers should be allowed to change the profile for a device.
     """
 
     _inherit = "base.shopfloor.service"
@@ -33,29 +26,10 @@ class ShopfloorProfile(Component):
         return records
 
     def search(self, name_fragment=None):
-        """List available profiles for current user"""
+        """List available profiles"""
         records = self._search(name_fragment=name_fragment)
         return self._response(
             data={"size": len(records), "records": self._to_json(records)}
-        )
-
-    def _get_base_search_domain(self):
-        # shopfloor_profile_ids is a one2one in practice.
-        base_domain = super()._get_base_search_domain()
-        user = self.env.user
-        assigned_profile = fields.first(user.shopfloor_profile_ids)
-        if assigned_profile:
-            return expression.AND([base_domain, [("id", "=", assigned_profile.id)]])
-
-        return expression.AND(
-            [
-                base_domain,
-                [
-                    "|",
-                    ("operation_group_ids", "=", False),
-                    ("operation_group_ids.user_ids", "=", user.id),
-                ],
-            ]
         )
 
     def _convert_one_record(self, record):

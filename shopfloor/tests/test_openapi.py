@@ -9,7 +9,6 @@ class TestOpenAPICommonCase(CommonCase):
         # we don't really care about which menu and profile we use
         # to read the OpenAPI specs
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_delivery")
-        cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
 
     def setUp(self):

@@ -11,14 +11,14 @@ class ClusterPicking(Component):
     """
     Methods for the Cluster Picking Process
 
-    The goal of this process is to do the pickings for a Picking Batch, for
+    The goal of this scenario is to do the pickings for a Picking Batch, for
     several customers at once.
     The process assumes that picking batch records already exist.
 
     At first, a user gets automatically a batch to work on (assigned to them),
     or can select one from a list.
 
-    The process has 2 main phases, which can be done one after the other or a
+    The scenario has 2 main phases, which can be done one after the other or a
     bit of both. The first one is picking goods and put them in a roller-cage.
 
     First phase, picking:
@@ -59,7 +59,7 @@ class ClusterPicking(Component):
       the move lines will become unavailable or partially unavailable and will
       generate a back-order.
     * Full bin: declaring a full bin allows to move directly to the first phase
-      (picking) to the second one (unload). The process will go
+      (picking) to the second one (unload). The scenario will go
       back to the first phase if some lines remain in the queue of lines to pick.
 
     Flow Diagram: https://www.draw.io/#G1qRenBcezk50ggIazDuu2qOfkTsoIAxXP
@@ -73,7 +73,7 @@ class ClusterPicking(Component):
     def find_batch(self):
         """Find a picking batch to work on and start it
 
-        Usually the starting point of the process.
+        Usually the starting point of the scenario.
 
         Business rules to find a batch, try in order:
 
@@ -604,7 +604,7 @@ class ClusterPicking(Component):
         return len(lines_to_unload.mapped("location_dest_id")) == 1
 
     def prepare_unload(self, picking_batch_id):
-        """Initiate the unloading phase of the process
+        """Initiate the unloading phase of the scenario
 
         If the destination of all the move lines still to unload is the same,
         it sets the flag ``cluster_picking_unload_all`` to True on
