@@ -33,7 +33,6 @@ export var ScenarioBaseMixin = {
     },
     mounted: function() {
         const odoo_params = {
-            process_id: this.menu_item.process.id,
             process_menu_id: this.menu_item.id,
             profile_id: this.$root.profile.id,
             usage: this.usage,

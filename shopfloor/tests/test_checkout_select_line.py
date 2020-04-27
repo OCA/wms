@@ -37,10 +37,7 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         # a package and use the move line id only for lines without package
         response = self.service.dispatch(
             "select_line",
-            params={
-                "picking_id": self.picking.id,
-                "move_line_id": selected_lines[0].id,
-            },
+            params={"picking_id": self.picking.id, "move_line_id": selected_lines[0].id},
         )
         self._assert_selected(response, selected_lines)
 
@@ -48,10 +45,7 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         selected_lines = self.move_single.move_line_ids
         response = self.service.dispatch(
             "select_line",
-            params={
-                "picking_id": self.picking.id,
-                "move_line_id": selected_lines[0].id,
-            },
+            params={"picking_id": self.picking.id, "move_line_id": selected_lines[0].id},
         )
         self._assert_selected(response, selected_lines)
 
