@@ -7,22 +7,36 @@ export var ScenarioBaseMixin = {
             },
             need_confirmation: false,
             show_reset_button: false,
-            erp_data: {
-                data: {
-                    // $next_state: {},
-                },
-            },
             initial_state_key: "start",
             current_state_key: "",
             states: {},
             usage: "", // Match component usage on odoo,
         };
     },
+    beforeRouteUpdate(to, from, next) {
+        // Load initial state
+        // const state = to.params.state ? to.params.state : 'start';
+        const state = to.query.state ? to.query.state : "start";
+        this.go_state(state);
+        next();
+    },
     beforeMount: function() {
+        this._loadParams();
         if (this.$root.demo_mode) {
             this.$root.loadJS("src/demo/demo." + this.usage + ".js", this.usage);
         }
-        this._loadMenuItem();
+        /*
+        Ensure initial state is set.
+        beforeRouteUpdate` runs only if the route has changed,
+        which means that if your reload the page it won't get called :(
+        We could use `beforeRouteEnter` but that's not tied to the current instance
+        and we won't be able to call `go_state`.
+        */
+        if (!this.current_state_key) {
+            // Default to initial state
+            this.current_state_key = this.initial_state_key;
+        }
+        this.go_state(this.current_state_key);
     },
     mounted: function() {
         const odoo_params = {
@@ -32,11 +46,6 @@ export var ScenarioBaseMixin = {
             usage: this.usage,
         };
         this.odoo = this.$root.getOdoo(odoo_params);
-        if (!this.current_state_key) {
-            // Default to initial state
-            this.current_state_key = this.initial_state_key;
-        }
-        this.go_state(this.current_state_key);
     },
     beforeDestroy: function() {
         // TODO: we should turn off only handlers for the current state
@@ -49,7 +58,7 @@ export var ScenarioBaseMixin = {
         state: function() {
             const state = {
                 key: this.current_state_key,
-                data: this._state_get_data_raw(this.current_state_key),
+                data: this.state_get_data(),
             };
             _.extend(state, this.states[this.current_state_key]);
             _.defaults(state, {display_info: {}});
@@ -76,33 +85,59 @@ export var ScenarioBaseMixin = {
         /*
         Load menu item from storage using route's menu id
         */
-        _loadMenuItem: function() {
+        _loadParams: function() {
             const self = this;
             this.menu_item = _.head(
                 _.filter(this.$root.appconfig.menus, function(m) {
-                    return m.id === parseInt(self.$route.params.menu_id, 10);
+                    return m.id === parseInt(self.$route.query.menu_id, 10);
                 })
             );
+            this.current_state_key = this.$route.query.state;
         },
+        storage_key: function(state_key) {
+            state_key = _.isUndefined(state_key) ? this.current_state_key : state_key;
+            return this.usage + "." + state_key;
+        },
+        /*
+        Switch state to given one.
+        */
+        state_to: function(state_key) {
+            return this.$router
+                .push({
+                    path: this.$route.path,
+                    query: {
+                        menu_id: this.menu_item.id,
+                        state: state_key,
+                    },
+                })
+                .catch(() => {
+                    // see https://github.com/quasarframework/quasar/issues/5672
+                    console.error("No new route found");
+                });
+        },
+        // Generic states methods
         state_is: function(state_key) {
             return state_key == this.current_state_key;
         },
         state_in: function(state_keys) {
             return _.filter(state_keys, this.state_is).length > 0;
         },
-        _state_get_data_raw: function(state_key) {
-            return _.result(this.erp_data.data, state_key, {});
+        state_reset_data: function() {
+            this.$root.$storage.remove(this.storage_key());
+        },
+        _state_get_data: function(storage_key) {
+            return this.$root.$storage.get(storage_key, {});
+        },
+        _state_set_data: function(storage_key, v) {
+            this.$root.$storage.set(storage_key, v);
         },
         state_get_data: function(state_key) {
-            state_key = _.isUndefined(state_key) ? this.current_state_key : state_key;
-            return this._state_get_data_raw(state_key);
+            return this._state_get_data(this.storage_key(state_key));
         },
         state_set_data: function(data, state_key) {
-            state_key = _.isUndefined(state_key) ? this.current_state_key : state_key;
-            const new_data = _.merge(this._state_get_data_raw(state_key), data);
-            this.$set(this.erp_data.data, state_key, new_data);
+            const new_data = _.merge({}, this.state_get_data(state_key), data);
+            this._state_set_data(this.storage_key(state_key), new_data);
         },
-        // Generic states methods
         go_state: function(state_key, promise) {
             // console.log("GO TO STATE", state_key);
             if (state_key == "start") {
@@ -121,6 +156,7 @@ export var ScenarioBaseMixin = {
             }
             this._state_bind_events();
             // notify root
+            // TODO: maybe not needed after introducing routing
             this.$root.$emit("state:change", state_key);
         },
         on_enter: function() {
@@ -150,7 +186,7 @@ export var ScenarioBaseMixin = {
             }
         },
         on_reset: function(e) {
-            this.reset_erp_data();
+            this.state_reset_data();
             this.reset_notification();
             this.go_state(this.initial_state_key);
         },
@@ -188,15 +224,6 @@ export var ScenarioBaseMixin = {
             this.user_notification.message = false;
             this.user_notification.message_type = false;
         },
-        set_erp_data: function(key, data) {
-            const new_data = this.erp_data[key];
-            _.merge(new_data, data);
-            this.$set(this.erp_data, key, new_data);
-        },
-        reset_erp_data: function(key) {
-            // FIXME
-            this.$set(this.erp_data, key, {});
-        },
         _state_bind_events: function() {
             if (this.state.events) {
                 /*
@@ -233,14 +260,16 @@ export var GenericStatesMixin = {
     data: function() {
         return {
             states: {
+                // TODO: get rid of `wait_call` as state.
+                // It should be a normal function.
                 wait_call: {
                     success: result => {
                         if (!_.isUndefined(result.data)) {
-                            this.set_erp_data("data", result.data);
+                            this.state_set_data(result.data, result.next_state);
                         }
                         if (!_.isUndefined(result) && !result.error) {
                             // TODO: consider not changing the state if it is the same to not refresh
-                            this.go_state(result.next_state);
+                            this.state_to(result.next_state);
                         } else {
                             alert(result.status + " " + result.error);
                         }
@@ -263,7 +292,7 @@ export var SinglePackStatesMixin = {
                         scan_placeholder: "Scan pack",
                     },
                     enter: () => {
-                        this.reset_erp_data("data");
+                        this.state_reset_data();
                     },
                     on_scan: scanned => {
                         this.go_state(
@@ -279,7 +308,7 @@ export var SinglePackStatesMixin = {
                         scan_placeholder: "Scan pack",
                     },
                     enter: () => {
-                        this.reset_erp_data("data");
+                        this.state_reset_data();
                     },
                     on_scan: scanned => {
                         this.go_state(
