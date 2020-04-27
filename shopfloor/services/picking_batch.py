@@ -61,7 +61,7 @@ class PickingBatch(Component):
         """List available stock picking batches for current user
 
         Show only picking batches where all the pickings are available and
-        where all pickings are in the picking type of the current process.
+        where all pickings are in the picking type of the current scenario.
         """
         records = self._search(name_fragment=name_fragment)
         return self._response(

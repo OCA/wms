@@ -11,26 +11,9 @@ class ShopfloorProfile(models.Model):
         required=True,
         default=lambda self: self._default_warehouse_id(),
     )
-    operation_group_ids = fields.Many2many(
-        "shopfloor.operation.group",
-        string="Shopfloor Operation Groups",
-        help="When unset, all users can use the profile. When set,"
-        "only users belonging to at least one group can use the profile.",
+    menu_ids = fields.Many2many(
+        "shopfloor.menu", string="Menus", help="Menus visible for this profile"
     )
-    user_id = fields.Many2one(
-        "res.users",
-        copy=False,
-        help="Optional user using the profile. When a profile has a"
-        "user assigned to it, the user is not allowed to use another profile.",
-    )
-
-    _sql_constraints = [
-        (
-            "user_id_uniq",
-            "unique(user_id)",
-            "A user can be assigned to only one profile.",
-        )
-    ]
 
     @api.model
     def _default_warehouse_id(self):

@@ -7,8 +7,17 @@
             <tree editable="bottom">
                 <field name="sequence" widget="handle" />
                 <field name="name" />
-                <field name="operation_group_ids" widget="many2many_tags" />
-                <field name="process_id" required="1" />
+                <field name="scenario" />
+                <field
+                    name="profile_ids"
+                    widget="many2many_tags"
+                    options="{'no_create': 1}"
+                />
+                <field
+                    name="picking_type_ids"
+                    widget="many2many_tags"
+                    options="{'no_create': 1}"
+                />
             </tree>
         </field>
     </record>
@@ -18,6 +27,9 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name" />
+                <field name="scenario" />
+                <field name="profile_ids" />
+                <field name="picking_type_ids" />
             </search>
         </field>
     </record>
