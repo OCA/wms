@@ -122,8 +122,8 @@ export var ScenarioBaseMixin = {
         state_in: function(state_keys) {
             return _.filter(state_keys, this.state_is).length > 0;
         },
-        state_reset_data: function() {
-            this.$root.$storage.remove(this.storage_key());
+        state_reset_data: function(state_key) {
+            this.$root.$storage.remove(this.storage_key(state_key));
         },
         _state_get_data: function(storage_key) {
             return this.$root.$storage.get(storage_key, {});
@@ -165,6 +165,7 @@ export var ScenarioBaseMixin = {
             return promise.then(function(result) {
                 const state = next_state || result.next_state;
                 if (!_.isUndefined(result.data)) {
+                    self.state_reset_data(state);
                     self.state_set_data(result.data[state], state);
                 }
                 if (!_.isUndefined(result) && !result.error) {
