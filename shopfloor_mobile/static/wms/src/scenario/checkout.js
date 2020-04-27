@@ -1,10 +1,10 @@
-import {GenericStatesMixin, ScenarioBaseMixin} from "./mixins.js";
+import {ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
 import {demotools} from "../demo/demo.core.js"; // FIXME: dev only
 import {} from "../demo/demo.checkout.js"; // FIXME: dev only
 
 export var Checkout = Vue.component("checkout", {
-    mixins: [ScenarioBaseMixin, GenericStatesMixin],
+    mixins: [ScenarioBaseMixin],
     template: `
         <Screen :title="screen_info.title" :klass="screen_info.klass">
             <!-- FOR DEBUG -->
