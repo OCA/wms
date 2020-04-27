@@ -8,8 +8,23 @@ class ShopfloorMenu(models.Model):
 
     name = fields.Char(translate=True)
     sequence = fields.Integer()
-    operation_group_ids = fields.Many2many(
-        "shopfloor.operation.group", string="Groups", help="visible for these groups"
+    profile_ids = fields.Many2many(
+        "shopfloor.profile", string="Profiles", help="Visible for these profiles"
     )
-    process_id = fields.Many2one("shopfloor.process", name="Process", required=True)
-    process_code = fields.Selection(related="process_id.code", readonly=True)
+    picking_type_ids = fields.Many2many(
+        comodel_name="stock.picking.type", string="Operation Types",
+        required=True,
+    )
+    # TODO allow only one picking type when 'move creation' is allowed
+
+    scenario = fields.Selection(selection="_selection_scenario", required=True)
+
+    def _selection_scenario(self):
+        return [
+            # these must match a REST service's '_usage'
+            ("single_pack_putaway", "Single Pack Put-away"),
+            ("single_pack_transfer", "Single Pack Transfer"),
+            ("cluster_picking", "Cluster Picking"),
+            ("checkout", "Checkout/Packing"),
+            ("delivery", "Delivery"),
+        ]

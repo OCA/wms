@@ -29,7 +29,6 @@ class SinglePackPutawayCase(CommonCase):
             }
         )
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_put_away_reach_truck")
-        cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
 
@@ -128,7 +127,7 @@ class SinglePackPutawayCase(CommonCase):
                 "message": "You cannot work on a package (%s) outside of location: %s"
                 % (
                     self.pack_a.name,
-                    self.process.picking_type_id.default_location_src_id.name,
+                    self.menu.picking_type_ids.default_location_src_id.name,
                 ),
             },
         )
@@ -167,7 +166,7 @@ class SinglePackPutawayCase(CommonCase):
             message={
                 "message_type": "error",
                 "message": "An operation exists in Delivery Orders %s. You cannot"
-                " process it with this shopfloor process." % (picking.name,),
+                " process it with this shopfloor scenario." % (picking.name,),
             },
         )
 
@@ -222,7 +221,7 @@ class SinglePackPutawayCase(CommonCase):
         Used to test the next endpoints (/validate and /cancel)
         """
         picking_form = Form(self.env["stock.picking"])
-        picking_form.picking_type_id = self.menu.process_id.picking_type_id
+        picking_form.picking_type_id = self.menu.picking_type_ids
         with picking_form.move_ids_without_package.new() as move:
             move.product_id = self.product_a
             move.product_uom_qty = 1

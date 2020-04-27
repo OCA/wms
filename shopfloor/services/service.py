@@ -28,10 +28,9 @@ class BaseShopfloorService(AbstractComponent):
         """
         Get the current picking type based on the menu and the warehouse of the profile.
         """
-        # TODO: this validation should be done in the service
-        # and should return a proper error for the client
-        # or the client should handle exceptions properly.
-        picking_type = self.work.menu.process_id.picking_type_id
+        # TODO adapt scenarios to handle multiple types, rename this to picking_types
+        # and filter by warehouse of the profile
+        picking_type = self.work.menu.picking_type_ids
         if picking_type.warehouse_id != self.work.profile.warehouse_id:
             raise exceptions.UserError(
                 _("Process {} cannot be used on warehouse {}").format(
@@ -74,9 +73,7 @@ class BaseShopfloorService(AbstractComponent):
     def _get_output_validator(self, method_name):
         # override the method to get the validator in a component
         # instead of a method, to keep things apart
-        validator_component = self.component(
-            usage="%s.validator.response" % self._usage
-        )
+        validator_component = self.component(usage="%s.validator.response" % self._usage)
         return validator_component._get_validator(method_name)
 
     def _response(self, base_response=None, data=None, next_state=None, message=None):
@@ -153,10 +150,11 @@ class BaseShopfloorService(AbstractComponent):
         demo_api_key = self.env.ref("shopfloor.api_key_demo", raise_if_not_found=False)
 
         # Try to first the first menu that implements the current service.
-        # Not all usages have a process, in that case, well set the first
-        # process found, because it should not matter for the service.
-        processes = self.env["shopfloor.process"].search([("code", "=", self._usage)])
-        menu = fields.first(processes.menu_ids)
+        # Not all usages have a process, in that case, we'll set the first
+        # menu found
+        menu = self.env["shopfloor.menu"].search(
+            [("scenario", "=", self._usage)], limit=1
+        )
         if not menu:
             menu = self.env["shopfloor.menu"].search([], limit=1)
         profile = self.env["shopfloor.profile"].search([], limit=1)

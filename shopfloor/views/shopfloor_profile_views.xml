@@ -7,8 +7,6 @@
             <tree editable="bottom">
                 <field name="name" />
                 <field name="warehouse_id" />
-                <field name="operation_group_ids" widget="many2many_tags" />
-                <field name="user_id" />
             </tree>
         </field>
     </record>
@@ -24,8 +22,6 @@
                         </group>
                         <group>
                             <field name="warehouse_id" />
-                            <field name="operation_group_ids" widget="many2many_tags" />
-                            <field name="user_id" />
                         </group>
                     </group>
                 </sheet>
@@ -39,8 +35,6 @@
             <search>
                 <field name="name" />
                 <field name="warehouse_id" />
-                <field name="user_id" />
-                <field name="operation_group_ids" />
             </search>
         </field>
     </record>

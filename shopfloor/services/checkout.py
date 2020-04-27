@@ -10,7 +10,7 @@ class Checkout(Component):
     """
     Methods for the Checkout Process
 
-    This process runs on existing moves.
+    This scenario runs on existing moves.
     It happens on the "Packing" step of a pick/pack/ship.
 
     Use cases:
@@ -187,7 +187,7 @@ class Checkout(Component):
         return self._response(next_state="manual_selection", data=data, message=message)
 
     def select(self, picking_id):
-        """Select a stock picking for the process
+        """Select a stock picking for the scenario
 
         Used from the list of stock pickings (manual_selection), from there,
         the user can click on a stock.picking record which calls this method.
