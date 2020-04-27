@@ -274,19 +274,15 @@ export var Checkout = Vue.component("checkout", {
                         scan_placeholder: "Scan pack / picking / location",
                     },
                     enter: () => {
-                        this.reset_erp_data("data");
+                        this.state_reset_data();
                     },
                     on_scan: scanned => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("scan_document", {barcode: scanned.text})
                         );
                     },
                     on_manual_selection: evt => {
-                        this.go_state(
-                            "wait_call",
-                            this.odoo.call("list_stock_picking")
-                        );
+                        this.wait_call(this.odoo.call("list_stock_picking"));
                     },
                 },
                 manual_selection: {
@@ -297,14 +293,13 @@ export var Checkout = Vue.component("checkout", {
                         select: "on_select",
                     },
                     on_back: () => {
-                        this.go_state("start");
+                        this.state_to("start");
                         this.reset_notification();
                     },
                     on_select: selected => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("select", {
-                                picking_id: selected,
+                                picking_id: selected.id,
                             })
                         );
                     },
@@ -320,8 +315,7 @@ export var Checkout = Vue.component("checkout", {
                         back: "on_back",
                     },
                     on_scan: scanned => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("scan_line", {
                                 picking_id: this.state.data.picking.id,
                                 barcode: scanned.text,
@@ -332,8 +326,7 @@ export var Checkout = Vue.component("checkout", {
                         if (!selected) {
                             return;
                         }
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("select_line", {
                                 picking_id: this.state.data.picking.id,
                                 move_line_id: selected.id,
@@ -342,12 +335,11 @@ export var Checkout = Vue.component("checkout", {
                         );
                     },
                     on_back: () => {
-                        this.go_state("start");
+                        this.state_to("start");
                         this.reset_notification();
                     },
                     on_summary: () => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("summary", {
                                 picking_id: this.state.data.picking.id,
                             })
@@ -356,7 +348,7 @@ export var Checkout = Vue.component("checkout", {
                     // FIXME: is not to change qty
                     on_edit_package: pkg => {
                         this.state_set_data({package: pkg}, change_quantity);
-                        this.go_state("change_quantity");
+                        this.state_to("change_quantity");
                     },
                 },
                 select_package: {
@@ -381,8 +373,7 @@ export var Checkout = Vue.component("checkout", {
                         this.state.data.selected = this.state.data.selected_move_lines;
                     },
                     on_scan: scanned => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("scan_package_action", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_ids: _.map(
@@ -405,8 +396,7 @@ export var Checkout = Vue.component("checkout", {
                         );
                         if (unselected) {
                             console.log("unselected", unselected);
-                            this.go_state(
-                                "wait_call",
+                            this.wait_call(
                                 this.odoo.call("reset_line_qty", {
                                     move_line_id: unselected.id,
                                 })
@@ -425,11 +415,10 @@ export var Checkout = Vue.component("checkout", {
                             },
                             "change_quantity"
                         );
-                        this.go_state("change_quantity");
+                        this.state_to("change_quantity");
                     },
                     on_new_pack: () => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("new_package", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_ids: _.map(
@@ -440,8 +429,7 @@ export var Checkout = Vue.component("checkout", {
                         );
                     },
                     on_existing_pack: () => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("list_dest_package", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_ids: _.map(
@@ -456,10 +444,10 @@ export var Checkout = Vue.component("checkout", {
                             message_type: "info",
                             message: "Product(s) processed as raw product(s)",
                         });
-                        this.go_state("select_line");
+                        this.state_to("select_line");
                     },
                     on_back: () => {
-                        this.go_state("select_line");
+                        this.state_to("select_line");
                         this.reset_notification();
                     },
                 },
@@ -471,7 +459,7 @@ export var Checkout = Vue.component("checkout", {
                         qty_change_confirm: "on_confirm",
                     },
                     on_back: () => {
-                        this.go_state("select_package");
+                        this.state_to("select_package");
                         this.reset_notification();
                     },
                     on_qty_update: qty => {
@@ -479,8 +467,7 @@ export var Checkout = Vue.component("checkout", {
                         this.state.data.qty = qty;
                     },
                     on_confirm: () => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("set_custom_qty", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_ids: this.state.data.selected_line_ids,
@@ -501,8 +488,7 @@ export var Checkout = Vue.component("checkout", {
                     on_scan: scanned => {
                         const selected_lines = this.state_get_data("select_package")
                             .selected;
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("scan_dest_package", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_ids: _.map(
@@ -519,8 +505,7 @@ export var Checkout = Vue.component("checkout", {
                         }
                         const selected_lines = this.state_get_data("select_package")
                             .selected;
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("set_dest_package", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_ids: _.map(
@@ -532,7 +517,7 @@ export var Checkout = Vue.component("checkout", {
                         );
                     },
                     on_back: () => {
-                        this.go_state("select_package");
+                        this.state_to("select_package");
                         this.reset_notification();
                     },
                 },
@@ -548,12 +533,11 @@ export var Checkout = Vue.component("checkout", {
                         mark_as_done: "on_mark_as_done",
                     },
                     on_back: () => {
-                        this.go_state("start");
+                        this.state_to("start");
                         this.reset_notification();
                     },
                     on_pkg_change_type: pkg => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("list_packaging", {
                                 picking_id: this.state.data.picking.id,
                                 package_id: pkg.id,
@@ -561,8 +545,7 @@ export var Checkout = Vue.component("checkout", {
                         );
                     },
                     on_pkg_destroy: pkg => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("remove_package", {
                                 picking_id: this.state.data.picking.id,
                                 package_id: pkg.id,
@@ -570,8 +553,7 @@ export var Checkout = Vue.component("checkout", {
                         );
                     },
                     on_mark_as_done: () => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("done", {
                                 picking_id: this.state.data.picking.id,
                             })
@@ -590,8 +572,7 @@ export var Checkout = Vue.component("checkout", {
                         if (!selected) {
                             return;
                         }
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("set_packaging", {
                                 picking_id: this.state.data.picking.id,
                                 pickage_id: this.state.data.package.id,
@@ -600,7 +581,7 @@ export var Checkout = Vue.component("checkout", {
                         );
                     },
                     on_back: () => {
-                        this.go_state("start");
+                        this.state_to("start");
                         this.reset_notification();
                     },
                 },
@@ -609,8 +590,7 @@ export var Checkout = Vue.component("checkout", {
                         title: "Confirm done",
                     },
                     on_confirm: () => {
-                        this.go_state(
-                            "wait_call",
+                        this.wait_call(
                             this.odoo.call("done", {
                                 picking_id: this.state.data.picking.id,
                                 confirmation: true,
@@ -618,7 +598,7 @@ export var Checkout = Vue.component("checkout", {
                         );
                     },
                     on_back: () => {
-                        this.go_state("summary");
+                        this.state_to("summary");
                         this.reset_notification();
                     },
                 },
