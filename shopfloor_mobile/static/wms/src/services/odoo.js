@@ -5,7 +5,6 @@ export class OdooMixin {
         this.params = params;
         this.apikey = params.apikey;
         this.usage = params.usage;
-        this.process_id = this.params.process_id;
         this.process_menu_id = this.params.process_menu_id;
         this.profile_id = this.params.profile_id;
         this.debug = this.params.debug;
