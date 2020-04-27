@@ -47,7 +47,7 @@ export var Checkout = Vue.component("checkout", {
                 <checkout-picking-detail-select
                     :picking="state.data.picking"
                     :select_records="state.data.picking.move_lines"
-                    :select_records_grouped="group_lines_by_location(state.data.move_lines)"
+                    :select_records_grouped="group_lines_by_location(state.data.picking.move_lines)"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
