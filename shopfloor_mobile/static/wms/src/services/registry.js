@@ -11,11 +11,21 @@ export class Registry {
         this._data[key] = item;
     }
 
-    make_route(code) {
-        return _.template("/${ code }/:menu_id")({code: code});
+    all() {
+        return this._data;
     }
 
-    make_path(code, menu_id) {
-        return _.template("/${ code }/${ menu_id }")({code: code, menu_id: menu_id});
+    make_route(code) {
+        // return _.template("/${ code }/:menu_id/:state?")({code: code});
+        return "/" + code;
+    }
+    // TODO: remove this and use router.push straight in nav
+    make_path(code, menu_id, state) {
+        return (
+            _.template("/${ code }?menu_id=${ menu_id }")({
+                code: code,
+                menu_id: menu_id,
+            }) + (state ? "&state=" + state : "")
+        );
     }
 }
