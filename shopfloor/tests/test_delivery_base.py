@@ -7,11 +7,10 @@ class DeliveryCommonCase(CommonCase):
         super().setUpClass(*args, **kwargs)
 
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_delivery")
-        cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
         cls.wh.delivery_steps = "pick_pack_ship"
-        cls.picking_type = cls.process.picking_type_id
+        cls.picking_type = cls.menu.picking_type_ids
 
     def setUp(self):
         super().setUp()

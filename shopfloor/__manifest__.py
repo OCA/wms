@@ -25,9 +25,7 @@
     ],
     "data": [
         "security/ir.model.access.csv",
-        "views/shopfloor_operation_group.xml",
         "views/shopfloor_menu.xml",
-        "views/shopfloor_process.xml",
         "views/stock_picking_type.xml",
         "views/stock_location.xml",
         "views/stock_move_line.xml",
@@ -37,9 +35,7 @@
     "demo": [
         "demo/auth_api_key_demo.xml",
         "demo/stock_picking_type_demo.xml",
-        "demo/shopfloor_process_demo.xml",
         "demo/shopfloor_menu_demo.xml",
-        "demo/shopfloor_operation_group_demo.xml",
         "demo/shopfloor_profile_demo.xml",
     ],
 }

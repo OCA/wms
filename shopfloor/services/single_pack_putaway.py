@@ -44,7 +44,7 @@ class SinglePackPutaway(Component):
                 "message_type": "error",
                 "message": _(
                     "An operation exists in %s %s. "
-                    "You cannot process it with this shopfloor process."
+                    "You cannot process it with this shopfloor scenario."
                 )
                 % (
                     existing_operations[0].picking_id.picking_type_id.name,

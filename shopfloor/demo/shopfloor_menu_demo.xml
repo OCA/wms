@@ -2,26 +2,46 @@
     <record id="shopfloor_menu_put_away_reach_truck" model="shopfloor.menu">
         <field name="name">Put-Away Reach Truck</field>
         <field name="sequence">10</field>
-        <field name="process_id" ref="shopfloor_process_put_away_reach_truck" />
+        <field name="scenario">single_pack_putaway</field>
+        <field
+            name="picking_type_ids"
+            eval="[(4, ref('shopfloor.picking_type_putaway_reach_truck_demo'))]"
+        />
     </record>
     <record id="shopfloor_menu_single_pallet_transfer" model="shopfloor.menu">
         <field name="name">Single Pallet Transfer</field>
         <field name="sequence">20</field>
-        <field name="process_id" ref="shopfloor_process_single_pallet_transfer" />
+        <field name="scenario">single_pack_transfer</field>
+        <field
+            name="picking_type_ids"
+            eval="[(4, ref('shopfloor.picking_type_single_pallet_transfer_demo'))]"
+        />
     </record>
     <record id="shopfloor_menu_cluster_picking" model="shopfloor.menu">
         <field name="name">Cluster Picking</field>
         <field name="sequence">30</field>
-        <field name="process_id" ref="shopfloor_process_cluster_picking" />
+        <field name="scenario">cluster_picking</field>
+        <field
+            name="picking_type_ids"
+            eval="[(4, ref('shopfloor.picking_type_cluster_picking_demo'))]"
+        />
     </record>
     <record id="shopfloor_menu_checkout" model="shopfloor.menu">
         <field name="name">Checkout</field>
         <field name="sequence">40</field>
-        <field name="process_id" ref="shopfloor_process_checkout" />
+        <field name="scenario">checkout</field>
+        <field
+            name="picking_type_ids"
+            eval="[(4, ref('shopfloor.picking_type_checkout_demo'))]"
+        />
     </record>
     <record id="shopfloor_menu_delivery" model="shopfloor.menu">
         <field name="name">Delivery</field>
         <field name="sequence">50</field>
-        <field name="process_id" ref="shopfloor_process_delivery" />
+        <field name="scenario">delivery</field>
+        <field
+            name="picking_type_ids"
+            eval="[(4, ref('shopfloor.picking_type_delivery_demo'))]"
+        />
     </record>
 </odoo>

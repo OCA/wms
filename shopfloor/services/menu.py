@@ -8,9 +8,8 @@ class ShopfloorMenu(Component):
     """
     Menu Structure for the client application.
 
-    The list of menus is restricted by the operation groups. A menu without
-    groups is visible for all users, a menu with group(s) is visible if the
-    user is in at least one of the groups.
+    The list of menus is restricted by the profiles.
+    A menu without profile is shown in every profiles.
     """
 
     _inherit = "base.shopfloor.service"
@@ -21,21 +20,16 @@ class ShopfloorMenu(Component):
 
     def _get_base_search_domain(self):
         base_domain = super()._get_base_search_domain()
-        user = self.env.user
-        profile = getattr(self.work, "profile", None)
-        op_group_domain = [
-            "|",
-            ("operation_group_ids", "=", False),
-            ("operation_group_ids.user_ids", "=", user.id),
-        ]
-        if profile:
-            # TODO: this probably should be the default only one way
-            # What to do w/ profiles linked to specific user?
-            # This data model is a bit messy :/
-            op_group_domain = [
-                ("operation_group_ids", "in", profile.operation_group_ids.ids),
+        return expression.AND(
+            [
+                base_domain,
+                [
+                    "|",
+                    ("profile_ids", "=", False),
+                    ("profile_ids", "in", self.work.profile.id),
+                ],
             ]
-        return expression.AND([base_domain, op_group_domain])
+        )
 
     def _search(self, name_fragment=None):
         domain = self._get_base_search_domain()
@@ -45,7 +39,7 @@ class ShopfloorMenu(Component):
         return records
 
     def search(self, name_fragment=None):
-        """List available menu entries for current user"""
+        """List available menu entries for current profile"""
         records = self._search(name_fragment=name_fragment)
         return self._response(
             data={"size": len(records), "records": self._to_json(records)}
@@ -56,16 +50,10 @@ class ShopfloorMenu(Component):
         return {
             "id": record.id,
             "name": record.name,
-            "process": {
-                "id": record.process_id.id,
-                "code": record.process_code,
-                "picking_type": {
-                    "id": record.process_id.picking_type_id.id,
-                    "name": record.process_id.picking_type_id.name,
-                },
-            },
-            "op_groups": [
-                {"id": g.id, "name": g.name} for g in record.operation_group_ids
+            "scenario": record.scenario,
+            "picking_types": [
+                {"id": picking_type.id, "name": picking_type.name}
+                for picking_type in record.picking_type_ids
             ],
         }
 
@@ -78,9 +66,7 @@ class ShopfloorMenuValidator(Component):
     _usage = "menu.validator"
 
     def search(self):
-        return {
-            "name_fragment": {"type": "string", "nullable": True, "required": False}
-        }
+        return {"name_fragment": {"type": "string", "nullable": True, "required": False}}
 
 
 class ShopfloorMenuValidatorResponse(Component):
@@ -107,30 +93,11 @@ class ShopfloorMenuValidatorResponse(Component):
         return {
             "id": {"coerce": to_int, "required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
-            "op_groups": {
+            "scenario": {"type": "string", "nullable": False, "required": True},
+            "picking_types": {
                 "type": "list",
-                "required": True,
-                "schema": {"type": "dict", "schema": self._op_group_schema},
+                "schema": {"type": "dict", "schema": self._picking_type_schema},
             },
-            "process": {
-                "type": "dict",
-                "required": True,
-                "schema": {
-                    "id": {"coerce": to_int, "required": True, "type": "integer"},
-                    "code": {"type": "string", "nullable": False, "required": True},
-                    "picking_type": {
-                        "type": "dict",
-                        "schema": self._picking_type_schema,
-                    },
-                },
-            },
-        }
-
-    @property
-    def _op_group_schema(self):
-        return {
-            "id": {"coerce": to_int, "required": True, "type": "integer"},
-            "name": {"type": "string", "nullable": False, "required": True},
         }
 
     @property
