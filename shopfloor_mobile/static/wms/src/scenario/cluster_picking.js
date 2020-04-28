@@ -301,7 +301,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                         }
                     },
                     on_scan: (scanned, confirmation = true) => {
-                        this.on_exit();
+                        this.on_state_exit();
                         this.current_state_key = "unload_all";
                         this.state.on_scan(scanned, confirmation);
                     },

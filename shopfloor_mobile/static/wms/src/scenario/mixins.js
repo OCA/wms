@@ -16,7 +16,7 @@ export var ScenarioBaseMixin = {
     beforeRouteUpdate(to, from, next) {
         // Load initial state
         const state = to.params.state ? to.params.state : "start";
-        this.go_state(state);
+        this._state_load(state);
         next();
     },
     beforeMount: function() {
@@ -29,13 +29,13 @@ export var ScenarioBaseMixin = {
         beforeRouteUpdate` runs only if the route has changed,
         which means that if your reload the page it won't get called :(
         We could use `beforeRouteEnter` but that's not tied to the current instance
-        and we won't be able to call `go_state`.
+        and we won't be able to call `_state_load`.
         */
         if (!this.current_state_key) {
             // Default to initial state
             this.current_state_key = this.initial_state_key;
         }
-        this.go_state(this.current_state_key);
+        this._state_load(this.current_state_key);
     },
     mounted: function() {
         const odoo_params = {
@@ -52,7 +52,10 @@ export var ScenarioBaseMixin = {
     },
     computed: {
         /*
-        Full object of current state
+        Full object of current state.
+        TODO: for a future refactoring consider moving out of data `states`
+        they are not really data that changes and then we can make them
+        standalone object w/ their own class.
         */
         state: function() {
             const state = {
@@ -136,9 +139,18 @@ export var ScenarioBaseMixin = {
         },
         state_set_data: function(data, state_key) {
             const new_data = _.merge({}, this.state_get_data(state_key), data);
+            // Trigger update of computed `state.data` and refreshes the UI.
             this._state_set_data(this.storage_key(state_key), new_data);
+            this.$set(
+                this.states[state_key || this.current_state_key],
+                "data",
+                new_data
+            );
         },
-        go_state: function(state_key, promise) {
+        /*
+            Load given state, handle transition, setup event handlers.
+        */
+        _state_load: function(state_key, promise) {
             if (state_key == "start") {
                 // Alias "start" to the initial state
                 state_key = this.initial_state_key;
@@ -146,12 +158,12 @@ export var ScenarioBaseMixin = {
             if (!_.has(this.states, state_key)) {
                 alert("State `" + state_key + "` does not exists!");
             }
-            this.on_exit();
+            this.on_state_exit();
             this.current_state_key = state_key;
             if (promise) {
-                promise.then(this.on_success, this.on_error);
+                promise.then();
             } else {
-                this.on_enter();
+                this.on_state_enter();
             }
             this._state_bind_events();
             // notify root
@@ -159,33 +171,29 @@ export var ScenarioBaseMixin = {
             this.$root.$emit("state:change", state_key);
         },
         // TODO: refactor all transitions to state `wait_call` with this call
-        wait_call: function(promise, next_state) {
-            const self = this;
-            return promise.then(function(result) {
-                const state = next_state || result.next_state;
-                if (!_.isUndefined(result.data)) {
-                    self.state_reset_data(state);
-                    self.state_set_data(result.data[state], state);
-                }
-                if (!_.isUndefined(result) && !result.error) {
-                    // TODO: consider not changing the state if it is the same to not refresh
-                    self.state_to(state);
-                } else {
-                    alert(result.status + " " + result.error);
-                }
-            });
+        wait_call: function(promise) {
+            return promise.then(this.on_call_success, this.on_call_error);
         },
-        on_enter: function() {
+        on_state_enter: function() {
             if (this.state.enter) {
                 this.state.enter();
             }
         },
-        on_exit: function() {
+        on_state_exit: function() {
             if (this.state.exit) {
                 this.state.exit();
             }
         },
-        on_success: function(result) {
+        on_call_success: function(result) {
+            if (_.isUndefined(result)) {
+                console.error(result);
+                alert("Something went wrong. Check log.");
+            }
+            const state = result.next_state;
+            if (!_.isUndefined(result.data)) {
+                this.state_reset_data(state);
+                this.state_set_data(result.data[state], state);
+            }
             if (result.message) {
                 this.set_notification(result.message);
             } else {
@@ -194,17 +202,20 @@ export var ScenarioBaseMixin = {
             if (this.state.success) {
                 this.state.success(result);
             }
-            this.on_enter();
+            if (this.current_state_key != state) {
+                this.state_to(state);
+            }
         },
-        on_error: function(result) {
+        on_call_error: function(result) {
             if (this.state.error) {
                 this.state.error(result);
             }
+            alert(result.status + " " + result.error);
         },
         on_reset: function(e) {
             this.state_reset_data();
             this.reset_notification();
-            this.go_state(this.initial_state_key);
+            this.state_to("start");
         },
         // Specific states methods
         on_scan: function(scanned) {
@@ -212,6 +223,8 @@ export var ScenarioBaseMixin = {
                 this.state.on_scan(scanned);
             }
         },
+        // TODO: check if we really need these
+        // as we have state event handlers auto binding.
         // on_select: function(selected) {
         //     if (this.state.on_select) {
         //         this.state.on_select(selected);
@@ -222,6 +235,8 @@ export var ScenarioBaseMixin = {
         //         this.state.on_back();
         //     }
         // },
+        // TODO: get rid of this as it's used on cluster_picking only and
+        // we can use state events binding.
         on_cancel: function() {
             if (this.state.on_cancel) {
                 this.state.on_cancel();
@@ -359,7 +374,7 @@ export var SinglePackStatesMixin = {
                         }
                     },
                     on_scan: (scanned, confirmation = true) => {
-                        this.on_exit();
+                        this.on_state_exit();
                         this.current_state_key = "scan_location";
                         this.state.on_scan(scanned, confirmation);
                     },
@@ -389,7 +404,7 @@ export var SinglePackStatesMixin = {
                         }
                     },
                     on_scan: scanned => {
-                        this.on_exit();
+                        this.on_state_exit();
                         this.current_state_key = "scan_location";
                         this.state.on_scan(scanned);
                     },
