@@ -5,10 +5,20 @@ import {} from "../demo/demo.checkout.js"; // FIXME: dev only
 
 export var Checkout = Vue.component("checkout", {
     mixins: [ScenarioBaseMixin],
+    /*
+        /!\ IMPORTANT: we use many times the same component
+        (eg: manual-select or checkout-picking-detail-select)
+        and to make sure they don't get cached together
+        we MUST call them using `:key` to make them unique!
+        If you don't, you'll have severe problems of data being shared
+        between each instances. This is the real problem:
+        you assume to have different instance but indeed you get only 1
+        which is reused every time!
+    */
     template: `
         <Screen :title="screen_info.title" :klass="screen_info.klass">
             <!-- FOR DEBUG -->
-            {{ current_state_key }}
+            <!-- {{ current_state_key }} -->
             <template v-slot:header>
                 <user-information
                     v-if="!need_confirmation && user_notification.message"
@@ -34,6 +44,7 @@ export var Checkout = Vue.component("checkout", {
                 <manual-select
                     :records="state.data.pickings"
                     :list_item_fields="manual_select_picking_fields"
+                    :key="current_state_key + '-manual-select'"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -48,6 +59,7 @@ export var Checkout = Vue.component("checkout", {
                     :picking="state.data.picking"
                     :select_records="state.data.picking.move_lines"
                     :select_records_grouped="group_lines_by_location(state.data.picking.move_lines)"
+                    :key="current_state_key + '-checkout-picking-detail-select'"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -63,6 +75,7 @@ export var Checkout = Vue.component("checkout", {
                     :picking="state.data.picking"
                     :select_records="state.data.selected_move_lines"
                     :select_options="{multiple: true, initSelectAll: true, list_item_component: 'checkout-select-package-content'}"
+                    :key="current_state_key + '-checkout-picking-detail-select'"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -103,6 +116,11 @@ export var Checkout = Vue.component("checkout", {
                             <v-btn depressed color="primary" @click="$root.trigger('mark_as_done')">Mark as done</v-btn>
                         </v-col>
                     </v-row>
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back />
+                        </v-col>
+                    </v-row>
                 </div>
             </div>
             <div v-if="state_is('select_dest_package')">
@@ -110,7 +128,15 @@ export var Checkout = Vue.component("checkout", {
                     :picking="state.data.picking"
                     :select_records="state.data.packages"
                     :select_options="{list_item_fields: existing_package_select_fields, list_item_component: 'list-item'}"
+                    :key="current_state_key + '-checkout-picking-detail-select'"
                     />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back />
+                        </v-col>
+                    </v-row>
+                </div>
             </div>
             <div v-if="state_is('change_quantity')">
                 <checkout-picking-change-qty
@@ -141,6 +167,7 @@ export var Checkout = Vue.component("checkout", {
                     :picking="state.data.picking"
                     :select_records="state.data.packagings"
                     :select_options="{list_item_component: 'list-item'}"
+                    :key="current_state_key + '-checkout-picking-detail-select'"
                     />
             </div>
             <div v-if="state_is('confirm_done')">
@@ -370,7 +397,9 @@ export var Checkout = Vue.component("checkout", {
                         back: "on_back",
                     },
                     enter: () => {
-                        this.state.data.selected = this.state.data.selected_move_lines;
+                        this.state_set_data({
+                            selected: this.state.data.selected_move_lines,
+                        });
                     },
                     on_scan: scanned => {
                         this.wait_call(
@@ -389,7 +418,7 @@ export var Checkout = Vue.component("checkout", {
                             return;
                         }
                         // keep selected lines on the state
-                        this.state.data.selected = selected;
+                        this.state_set_data({selected: selected});
                         // Must pick unselected line and reset its qty
                         const unselected = _.head(
                             _.difference(this.state.data.selected_move_lines, selected)
