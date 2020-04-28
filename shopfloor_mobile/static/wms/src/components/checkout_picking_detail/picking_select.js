@@ -30,7 +30,7 @@ Vue.component("checkout-select-line-content", {
                 <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
             </div>
             <div class="qty">
-                <span class="label">Qty:</span> <span>{{ record.product.qty }}</span>
+                <span class="label">Qty:</span> <span>{{ record.quantity }}</span>
             </div>
         </div>
     </div>
