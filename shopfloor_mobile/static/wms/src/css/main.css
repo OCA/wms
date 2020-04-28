@@ -151,11 +151,11 @@ ul.packaging span:first-child {
     border-bottom: 2px;
     margin-bottom: 0.5rem;
 }
-.manual-select .item-counter {
+.item-counter {
     display: none;
     padding-right: 0.5rem;
 }
-.manual-select.with-showCounters .item-counter {
+.with-showCounters .item-counter {
     display: inline;
 }
 
@@ -229,5 +229,15 @@ input.my-checkbox[type="checkbox"]:checked {
 .summary-content .v-list-item__title {
     max-width: 100%;
     white-space: normal;
-    font-size: 0.9rem;
+    font-size: 0.87rem;
+}
+.summary-content .v-list-item__subtitle {
+    font-size: 0.765rem;
+}
+.summary-content .summary-content-item {
+    margin-bottom: 0.4em;
+    padding-bottom: 0.4em;
+}
+.summary-content .summary-content-item:not(:last-child) {
+    border-bottom: 1px dotted #ccc;
 }

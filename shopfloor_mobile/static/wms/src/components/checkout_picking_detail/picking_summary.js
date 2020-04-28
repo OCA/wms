@@ -38,11 +38,14 @@ Vue.component("checkout-summary-content", {
                         {{ record.title }}
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                        <strong>{{ pkg_type.title }}</strong>
+                        <strong class="pkg-type-name">{{ pkg_type.title }}</strong>
                         <edit-action :record="record.pack" :click_event="'pkg_change_type'" />
-                        <div v-for="(prod, i) in pkg_type.records">
-                            <checkout-summary-product-detail :record="prod" :index="i" :count="pkg_type.records.length" />
-                        </div>
+                        <checkout-summary-product-detail
+                            v-for="(prod, i) in pkg_type.records"
+                            :record="prod"
+                            :index="i"
+                            :count="pkg_type.records.length"
+                            />
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>

@@ -58,7 +58,7 @@ export var Checkout = Vue.component("checkout", {
                 <checkout-picking-detail-select
                     :picking="state.data.picking"
                     :select_records="state.data.picking.move_lines"
-                    :select_records_grouped="group_lines_by_location(state.data.picking.move_lines)"
+                    :select_records_grouped="group_lines_by_location(state.data.picking.move_lines, {'prepare_records': only_one_package})"
                     :key="current_state_key + '-checkout-picking-detail-select'"
                     />
                 <div class="button-list button-vertical-list full">
@@ -109,6 +109,7 @@ export var Checkout = Vue.component("checkout", {
                 <checkout-summary-detail
                     :picking="state.data.picking"
                     :records_grouped="group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': group_by_pack})"
+                    :key="current_state_key + '-checkout-summary-detail'"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -262,10 +263,12 @@ export var Checkout = Vue.component("checkout", {
                 "id"
             );
             const grouped = _.groupBy(lines, "package_dest.id");
+            let counter = 0;
             _.forEach(grouped, function(products, pack_id) {
+                counter++;
                 const pack = _.first(_.filter(packs, {id: parseInt(pack_id)}));
                 res.push({
-                    key: pack ? pack_id : "no-pack",
+                    key: pack ? pack_id : products[0].id + "-" + counter,
                     // No pack, just display the product name
                     title: pack ? pack.name : products[0].display_name,
                     pack: pack,
@@ -286,6 +289,20 @@ export var Checkout = Vue.component("checkout", {
                     title: packaging_name,
                     records: products,
                 });
+            });
+            return res;
+        },
+        only_one_package: function(lines) {
+            let res = [];
+            let pkg_seen = [];
+            lines.forEach(function(line) {
+                if (line.package_dest && !pkg_seen.includes(line.package_dest.id)) {
+                    // got a pack
+                    res.push(line);
+                } else {
+                    // no pack
+                    res.push(line);
+                }
             });
             return res;
         },
@@ -357,7 +374,11 @@ export var Checkout = Vue.component("checkout", {
                             this.odoo.call("select_line", {
                                 picking_id: this.state.data.picking.id,
                                 move_line_id: selected.id,
-                                package_id: _.result(selected, "package_dest.id", null),
+                                package_id: _.result(
+                                    selected,
+                                    "package_dest.id",
+                                    false
+                                ),
                             })
                         );
                     },
