@@ -36,7 +36,7 @@ Vue.component("manual-select", {
             selected: null,
         };
     },
-    created() {
+    mounted() {
         // Relies on properties
         this.selected = this._initSelected();
     },
@@ -45,7 +45,7 @@ Vue.component("manual-select", {
             const initValue = this.opts.initValue;
             let selected = false;
             if (this.opts.multiple) {
-                selected = initValue ? [initValue] : [];
+                selected = initValue ? initValue : [];
                 if (this.opts.initSelectAll) {
                     selected = [];
                     _.each(this.records, function(rec, __) {
@@ -127,6 +127,9 @@ Vue.component("manual-select", {
             this._emitSelected(this._getSelected());
         },
         is_selected(rec) {
+            if (!this.valued) {
+                return false;
+            }
             return this.opts.multiple
                 ? this.selected.includes(rec.id)
                 : this.selected === rec.id;
@@ -180,6 +183,9 @@ Vue.component("manual-select", {
             return bits.join(" ");
         },
         valued() {
+            if (this.selected === null) {
+                return false;
+            }
             return this.opts.multiple
                 ? this.selected.length > 0
                 : this.selected !== false;
