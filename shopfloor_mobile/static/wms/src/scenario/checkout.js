@@ -215,7 +215,7 @@ export var Checkout = Vue.component("checkout", {
     //     const dcase = demotools.get_case(this.usage);
     //     const data = dcase["select_package"].data[state];
     //     this.state_set_data(data, state);
-    //     this.go_state(state);
+    //     this._state_load(state);
     // },
     methods: {
         record_by_id: function(records, _id) {
