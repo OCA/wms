@@ -15,8 +15,7 @@ export var ScenarioBaseMixin = {
     },
     beforeRouteUpdate(to, from, next) {
         // Load initial state
-        // const state = to.params.state ? to.params.state : 'start';
-        const state = to.query.state ? to.query.state : "start";
+        const state = to.params.state ? to.params.state : "start";
         this.go_state(state);
         next();
     },
@@ -89,10 +88,10 @@ export var ScenarioBaseMixin = {
             const self = this;
             this.menu_item = _.head(
                 _.filter(this.$root.appconfig.menus, function(m) {
-                    return m.id === parseInt(self.$route.query.menu_id, 10);
+                    return m.id === parseInt(self.$route.params.menu_id, 10);
                 })
             );
-            this.current_state_key = this.$route.query.state;
+            this.current_state_key = this.$route.params.state;
         },
         storage_key: function(state_key) {
             state_key = _.isUndefined(state_key) ? this.current_state_key : state_key;
@@ -102,10 +101,11 @@ export var ScenarioBaseMixin = {
         Switch state to given one.
         */
         state_to: function(state_key) {
+            const self = this;
             return this.$router
                 .push({
-                    path: this.$route.path,
-                    query: {
+                    name: this.usage,
+                    params: {
                         menu_id: this.menu_item.id,
                         state: state_key,
                     },
@@ -139,7 +139,6 @@ export var ScenarioBaseMixin = {
             this._state_set_data(this.storage_key(state_key), new_data);
         },
         go_state: function(state_key, promise) {
-            // console.log("GO TO STATE", state_key);
             if (state_key == "start") {
                 // Alias "start" to the initial state
                 state_key = this.initial_state_key;

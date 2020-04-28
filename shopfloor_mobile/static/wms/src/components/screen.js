@@ -101,7 +101,7 @@ Vue.component("nav-items", {
         <v-list-item
             v-for="item in navigation"
             :key="item.id"
-            :href="'#' + $root.registry.make_path(item.process.code, item.id, 'start')"
+            @click="$router.push({name: item.process.code, params: {menu_id: item.id, state: 'start'}})"
             link
             >
             <v-list-item-content>

@@ -16,16 +16,6 @@ export class Registry {
     }
 
     make_route(code) {
-        // return _.template("/${ code }/:menu_id/:state?")({code: code});
-        return "/" + code;
-    }
-    // TODO: remove this and use router.push straight in nav
-    make_path(code, menu_id, state) {
-        return (
-            _.template("/${ code }?menu_id=${ menu_id }")({
-                code: code,
-                menu_id: menu_id,
-            }) + (state ? "&state=" + state : "")
-        );
+        return _.template("/${ code }/:menu_id/:state?")({code: code});
     }
 }
