@@ -39,9 +39,8 @@ router.beforeEach(async (to, from, next) => {
     await Vue.nextTick();
     if (!router.app.authenticated && to.name != "login" && !router.app.demo_mode) {
         next("login");
-    } else {
-        next();
     }
+    next();
 });
 
 export {router};
