@@ -395,7 +395,7 @@ class SinglePackPutawayValidatorResponse(Component):
                     "name": {"type": "string", "nullable": False, "required": True},
                 },
             },
-            "location_dst": {
+            "location_dest": {
                 "type": "dict",
                 "schema": {
                     "id": {"required": True, "type": "integer"},

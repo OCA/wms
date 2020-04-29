@@ -350,7 +350,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data={
                 "id": self.batch.id,
                 "name": self.batch.name,
-                "location_dst": {
+                "location_dest": {
                     "id": self.packing_location.id,
                     "name": self.packing_location.name,
                 },
