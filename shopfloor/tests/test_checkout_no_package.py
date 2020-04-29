@@ -33,16 +33,14 @@ class CheckoutNoPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         )
 
         self.assertRecordValues(
-            move_line1,
-            [{"result_package_id": False, "shopfloor_checkout_packed": True}],
+            move_line1, [{"result_package_id": False, "shopfloor_checkout_done": True}],
         )
         self.assertRecordValues(
-            move_line2,
-            [{"result_package_id": False, "shopfloor_checkout_packed": True}],
+            move_line2, [{"result_package_id": False, "shopfloor_checkout_done": True}],
         )
         self.assertRecordValues(
             move_line3,
-            [{"result_package_id": False, "shopfloor_checkout_packed": False}],
+            [{"result_package_id": False, "shopfloor_checkout_done": False}],
         )
         self.assert_response(
             response,

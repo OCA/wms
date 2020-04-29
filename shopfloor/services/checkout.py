@@ -23,8 +23,8 @@ class Checkout(Component):
     5) Products are not packed (e.g. raw products) and we create new packages
     6) Products are not packed (e.g. raw products) and we do not create packages
 
-    A new flag ``shopfloor_checkout_packed`` on move lines allows to track which
-    lines have been put in a package.
+    A new flag ``shopfloor_checkout_done`` on move lines allows to track which
+    lines have been checked out (can be with or without package).
 
     Flow Diagram: https://www.draw.io/#G1qRenBcezk50ggIazDuu2qOfkTsoIAxXP
     """
@@ -120,7 +120,7 @@ class Checkout(Component):
         return self._response_for_select_line(picking)
 
     def _response_for_select_line(self, picking, message=None):
-        if all(line.shopfloor_checkout_packed for line in picking.move_line_ids):
+        if all(line.shopfloor_checkout_done for line in picking.move_line_ids):
             return self._response_for_summary(picking, message=message)
         return self._response(
             next_state="select_line",
@@ -131,24 +131,24 @@ class Checkout(Component):
     def _response_for_summary(self, picking, need_confirm=False, message=None):
         return self._response(
             next_state="summary" if not need_confirm else "confirm_done",
-            data={"picking": self._data_for_stock_picking(picking, packed=True)},
+            data={"picking": self._data_for_stock_picking(picking, done=True)},
             message=message,
         )
 
     def _response_for_select_document(self, message=None):
         return self._response(next_state="select_document", message=message)
 
-    def _data_for_stock_picking(self, picking, packed=False):
+    def _data_for_stock_picking(self, picking, done=False):
         data_struct = self.actions_for("data")
         data = data_struct.picking_summary(picking)
-        line_picker = self._lines_packed if packed else self._lines_to_pack
+        line_picker = self._lines_checkout_done if done else self._lines_to_pack
         data.update(
             {"move_lines": [data_struct.move_line(ml) for ml in line_picker(picking)]}
         )
         return data
 
-    def _lines_packed(self, picking):
-        return picking.move_line_ids.filtered(self._filter_lines_packed)
+    def _lines_checkout_done(self, picking):
+        return picking.move_line_ids.filtered(self._filter_lines_checkout_done)
 
     def _lines_to_pack(self, picking):
         return picking.move_line_ids.filtered(self._filter_lines_unpacked)
@@ -221,7 +221,7 @@ class Checkout(Component):
 
     def _select_lines(self, lines):
         for line in lines:
-            if line.shopfloor_checkout_packed:
+            if line.shopfloor_checkout_done:
                 continue
             line.qty_done = line.product_uom_qty
 
@@ -230,7 +230,7 @@ class Checkout(Component):
         self._deselect_lines(other_lines)
 
     def _deselect_lines(self, lines):
-        lines.filtered(lambda l: not l.shopfloor_checkout_packed).qty_done = 0
+        lines.filtered(lambda l: not l.shopfloor_checkout_done).qty_done = 0
 
     def scan_line(self, picking_id, barcode):
         """Scan move lines of the stock picking
@@ -522,15 +522,15 @@ class Checkout(Component):
 
     @staticmethod
     def _filter_lines_unpacked(move_line):
-        return move_line.qty_done == 0 and not move_line.shopfloor_checkout_packed
+        return move_line.qty_done == 0 and not move_line.shopfloor_checkout_done
 
     @staticmethod
     def _filter_lines_to_pack(move_line):
-        return move_line.qty_done > 0 and not move_line.shopfloor_checkout_packed
+        return move_line.qty_done > 0 and not move_line.shopfloor_checkout_done
 
     @staticmethod
-    def _filter_lines_packed(move_line):
-        return move_line.qty_done > 0 and move_line.shopfloor_checkout_packed
+    def _filter_lines_checkout_done(move_line):
+        return move_line.qty_done > 0 and move_line.shopfloor_checkout_done
 
     def _is_package_allowed(self, picking, package):
         existing_packages = picking.mapped("move_line_ids.result_package_id")
@@ -560,7 +560,7 @@ class Checkout(Component):
     def _put_lines_in_allowed_package(self, picking, selected_lines, package):
         lines_to_pack = selected_lines.filtered(self._filter_lines_to_pack)
         lines_to_pack.write(
-            {"result_package_id": package.id, "shopfloor_checkout_packed": True}
+            {"result_package_id": package.id, "shopfloor_checkout_done": True}
         )
         # go back to the screen to select the next lines to pack
         return self._response_for_select_line(
@@ -610,7 +610,7 @@ class Checkout(Component):
 
         Lines to pack are move lines in the list of ``selected_line_ids``
         where ``qty_done`` > 0 and have not been packed yet
-        (``shopfloor_checkout_packed is False``).
+        (``shopfloor_checkout_done is False``).
 
         Transitions:
         * select_package: when a product or lot is scanned to select/deselect,
@@ -665,7 +665,7 @@ class Checkout(Component):
 
         Selected lines are move lines in the list of ``move_line_ids`` where
         ``qty_done`` > 0 and have no destination package
-        (shopfloor_checkout_packed is False).
+        (shopfloor_checkout_done is False).
 
         Transitions:
         * select_line: goes back to selection of lines to work on next lines
@@ -681,7 +681,7 @@ class Checkout(Component):
 
         Selected lines are move lines in the list of ``move_line_ids`` where
         ``qty_done`` > 0 and have no destination package
-        (shopfloor_checkout_packed is False).
+        (shopfloor_checkout_done is False).
 
         Transitions:
         * select_line: goes back to selection of lines to work on next lines
@@ -690,7 +690,7 @@ class Checkout(Component):
         if not picking.exists():
             return self._response_stock_picking_does_not_exist()
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
-        selected_lines.write({"shopfloor_checkout_packed": True})
+        selected_lines.write({"shopfloor_checkout_done": True})
         return self._response_for_select_line(
             picking,
             message={
@@ -893,7 +893,7 @@ class Checkout(Component):
         All the move lines with the package as ``result_package_id`` have their
         ``result_package_id`` reset to the source package (default odoo behavior)
         and their ``qty_done`` set to 0.
-        It flags ``shopfloor_checkout_packed`` to False so they have to be packed again.
+        It flags ``shopfloor_checkout_done`` to False so they have to be packed again.
 
         Transitions:
         * summary
@@ -909,14 +909,15 @@ class Checkout(Component):
                 picking, message=message.record_not_found()
             )
         move_lines = picking.move_line_ids.filtered(
-            lambda l: self._filter_lines_packed(l) and l.result_package_id == package
+            lambda l: self._filter_lines_checkout_done(l)
+            and l.result_package_id == package
         )
         for move_line in move_lines:
             move_line.write(
                 {
                     "qty_done": 0,
                     "result_package_id": move_line.package_id,
-                    "shopfloor_checkout_packed": False,
+                    "shopfloor_checkout_done": False,
                 }
             )
         return self._response_for_summary(picking)
@@ -949,7 +950,7 @@ class Checkout(Component):
                         ),
                     },
                 )
-            elif not all(line.shopfloor_checkout_packed for line in lines):
+            elif not all(line.shopfloor_checkout_done for line in lines):
                 return self._response_for_summary(
                     picking,
                     need_confirm=True,

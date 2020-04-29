@@ -282,9 +282,7 @@ class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         self._fill_stock_for_moves(picking.move_lines, in_package=True)
         picking.action_assign()
         # set all lines as done
-        picking.move_line_ids.write(
-            {"qty_done": 10.0, "shopfloor_checkout_packed": True}
-        )
+        picking.move_line_ids.write({"qty_done": 10.0, "shopfloor_checkout_done": True})
         response = self.service.dispatch(
             "scan_line",
             params={
@@ -297,5 +295,5 @@ class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         self.assert_response(
             response,
             next_state="summary",
-            data={"picking": self._stock_picking_data(picking)},
+            data={"picking": self._stock_picking_data(picking, done=True)},
         )

@@ -38,17 +38,17 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
 
         self.assertRecordValues(
             move_line1,
-            [{"result_package_id": new_package.id, "shopfloor_checkout_packed": True}],
+            [{"result_package_id": new_package.id, "shopfloor_checkout_done": True}],
         )
         self.assertRecordValues(
             move_line2,
-            [{"result_package_id": new_package.id, "shopfloor_checkout_packed": True}],
+            [{"result_package_id": new_package.id, "shopfloor_checkout_done": True}],
         )
         self.assertRecordValues(
             move_line3,
             # qty_done was zero so we don't set it as packed and it remains in
             # the same package
-            [{"result_package_id": pack1.id, "shopfloor_checkout_packed": False}],
+            [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
         )
         self.assert_response(
             response,

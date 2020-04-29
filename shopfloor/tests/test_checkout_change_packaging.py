@@ -69,7 +69,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="summary",
-            data={"picking": self._stock_picking_data(self.picking)},
+            data={"picking": self._stock_picking_data(self.picking, done=True)},
             message={
                 "message_type": "error",
                 "message": "The record you were working on does not exist anymore.",
@@ -91,7 +91,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="summary",
-            data={"picking": self._stock_picking_data(self.picking)},
+            data={"picking": self._stock_picking_data(self.picking, done=True)},
             message={
                 "message_type": "success",
                 "message": "Packaging changed on package {}".format(self.package.name),
@@ -110,7 +110,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="summary",
-            data={"picking": self._stock_picking_data(self.picking)},
+            data={"picking": self._stock_picking_data(self.picking, done=True)},
             message={
                 "message_type": "error",
                 "message": "The record you were working on does not exist anymore.",
@@ -129,7 +129,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="summary",
-            data={"picking": self._stock_picking_data(self.picking)},
+            data={"picking": self._stock_picking_data(self.picking, done=True)},
             message={
                 "message_type": "error",
                 "message": "The record you were working on does not exist anymore.",
