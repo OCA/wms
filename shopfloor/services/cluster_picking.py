@@ -297,7 +297,7 @@ class ClusterPicking(Component):
             if lot
             else None,
             "location_src": {"id": line.location_id.id, "name": line.location_id.name},
-            "location_dst": {
+            "location_dest": {
                 "id": line.location_dest_id.id,
                 "name": line.location_dest_id.name,
             },
@@ -637,7 +637,7 @@ class ClusterPicking(Component):
         return {
             "id": batch.id,
             "name": batch.name,
-            "location_dst": {
+            "location_dest": {
                 "id": first_line.location_dest_id.id,
                 "name": first_line.location_dest_id.name,
             },
@@ -652,7 +652,7 @@ class ClusterPicking(Component):
             "id": batch.id,
             "name": batch.name,
             "package": {"id": package.id, "name": package.name},
-            "location_dst": {
+            "location_dest": {
                 "id": line.location_dest_id.id,
                 "name": line.location_dest_id.name,
             },
@@ -1435,7 +1435,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                     "name": {"type": "string", "nullable": False, "required": True},
                 },
             },
-            "location_dst": {
+            "location_dest": {
                 "type": "dict",
                 "schema": {
                     "id": {"required": True, "type": "integer"},
@@ -1468,7 +1468,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             # stock.batch.picking
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
-            "location_dst": {
+            "location_dest": {
                 "type": "dict",
                 "schema": {
                     "id": {"required": True, "type": "integer"},
@@ -1490,7 +1490,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                     "name": {"type": "string", "nullable": False, "required": True},
                 },
             },
-            "location_dst": {
+            "location_dest": {
                 "type": "dict",
                 "schema": {
                     "id": {"required": True, "type": "integer"},
