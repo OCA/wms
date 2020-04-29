@@ -140,7 +140,10 @@ class Checkout(Component):
     def _response_for_summary(self, picking, need_confirm=False, message=None):
         return self._response(
             next_state="summary" if not need_confirm else "confirm_done",
-            data={"picking": self._data_for_stock_picking(picking, done=True)},
+            data={
+                "picking": self._data_for_stock_picking(picking, done=True),
+                "all_processed": not bool(self._lines_to_pack(picking)),
+            },
             message=message,
         )
 
@@ -965,8 +968,8 @@ class Checkout(Component):
                     message={
                         "message_type": "warning",
                         "message": _(
-                            "Not all lines have been processed, do you"
-                            " want to confirm partial operation?"
+                            "Not all lines have been processed with full quantity. "
+                            "Do you confirm partial operation?"
                         ),
                     },
                 )
@@ -1171,7 +1174,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
             "select_package": self._schema_selected_lines,
             "change_quantity": self._schema_selected_lines,
             "select_dest_package": self._schema_select_package,
-            "summary": self._schema_stock_picking_details,
+            "summary": self._schema_summary,
             "change_packaging": self._schema_select_packaging,
             "confirm_done": self._schema_stock_picking_details,
         }
@@ -1184,10 +1187,16 @@ class ShopfloorCheckoutValidatorResponse(Component):
                 "move_lines": {
                     "type": "list",
                     "schema": {"type": "dict", "schema": self.schemas().move_line()},
-                }
+                },
             }
         )
         return {"picking": {"type": "dict", "schema": schema}}
+
+    @property
+    def _schema_summary(self):
+        return dict(
+            self._schema_stock_picking_details, all_processed={"type": "boolean"}
+        )
 
     @property
     def _schema_selection_list(self):
