@@ -114,12 +114,13 @@ export var Checkout = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="$root.trigger('mark_as_done')">Mark as done</v-btn>
+                            <v-btn depressed color="primary" @click="$root.trigger('mark_as_done')"
+                                   :disabled="state.data.picking.move_lines.length < 1">Mark as done</v-btn>
                         </v-col>
                     </v-row>
-                    <v-row align="center">
+                    <v-row align="center" v-if="!state.data.all_processed">
                         <v-col class="text-center" cols="12">
-                            <btn-back />
+                            <v-btn depressed color="primary" @click="$root.trigger('continue')">Continue checkout</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -588,6 +589,7 @@ export var Checkout = Vue.component("checkout", {
                         cancel: "on_cancel",
                         pkg_change_type: "on_pkg_change_type",
                         mark_as_done: "on_mark_as_done",
+                        continue: "on_continue",
                     },
                     on_back: () => {
                         this.state_to("start");
@@ -614,6 +616,13 @@ export var Checkout = Vue.component("checkout", {
                     on_mark_as_done: () => {
                         this.wait_call(
                             this.odoo.call("done", {
+                                picking_id: this.state.data.picking.id,
+                            })
+                        );
+                    },
+                    on_continue: () => {
+                        this.wait_call(
+                            this.odoo.call("select", {
                                 picking_id: this.state.data.picking.id,
                             })
                         );
