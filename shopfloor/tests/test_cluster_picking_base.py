@@ -46,7 +46,7 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
             "id": move_line.id,
             "quantity": qty or move_line.product_uom_qty,
             "postponed": move_line.shopfloor_postponed,
-            "location_dst": {
+            "location_dest": {
                 "id": move_line.location_dest_id.id,
                 "name": move_line.location_dest_id.name,
             },

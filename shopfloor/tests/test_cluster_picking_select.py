@@ -367,7 +367,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
                 "id": first_move_line.id,
                 "quantity": 1.0,
                 "postponed": False,
-                "location_dst": {
+                "location_dest": {
                     "id": first_move_line.location_dest_id.id,
                     "name": first_move_line.location_dest_id.name,
                 },
