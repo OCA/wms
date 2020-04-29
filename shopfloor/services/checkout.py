@@ -676,6 +676,29 @@ class Checkout(Component):
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         return self._create_and_assign_new_packaging(picking, selected_lines)
 
+    def no_package(self, picking_id, selected_line_ids):
+        """Process all selected lines without any package.
+
+        Selected lines are move lines in the list of ``move_line_ids`` where
+        ``qty_done`` > 0 and have no destination package
+        (shopfloor_checkout_packed is False).
+
+        Transitions:
+        * select_line: goes back to selection of lines to work on next lines
+        """
+        picking = self.env["stock.picking"].browse(picking_id)
+        if not picking.exists():
+            return self._response_stock_picking_does_not_exist()
+        selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
+        selected_lines.write({"shopfloor_checkout_packed": True})
+        return self._response_for_select_line(
+            picking,
+            message={
+                "message_type": "info",
+                "message": _("Product(s) processed as raw product(s)"),
+            },
+        )
+
     def list_dest_package(self, picking_id, selected_line_ids):
         """Return a list of packages the user can select for the lines
 
@@ -1030,6 +1053,9 @@ class ShopfloorCheckoutValidator(Component):
             },
         }
 
+    def no_package(self):
+        return self.new_package()
+
     def list_dest_package(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
@@ -1212,6 +1238,9 @@ class ShopfloorCheckoutValidatorResponse(Component):
 
     def new_package(self):
         return self._response_schema(next_states={"select_line", "summary"})
+
+    def no_package(self):
+        return self.new_package()
 
     def list_dest_package(self):
         return self._response_schema(
