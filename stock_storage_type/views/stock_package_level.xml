@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <record id="package_level_form_view_inherit" model="ir.ui.view">
         <field name="name">Package Level Inherit</field>
@@ -6,10 +6,17 @@
         <field name="inherit_id" ref="stock.package_level_form_view" />
         <field name="arch" type="xml">
             <field name="location_dest_id" position="before">
-                <field name="allowed_location_dest_ids" widget="many2many_tags" groups="base.group_no_one" attrs="{'invisible': [('picking_type_code', '=', 'outgoing')]}"/>
+                <field
+                    name="allowed_location_dest_ids"
+                    widget="many2many_tags"
+                    groups="base.group_no_one"
+                    attrs="{'invisible': [('picking_type_code', '=', 'outgoing')]}"
+                />
             </field>
             <field name="location_dest_id" position="attributes">
-                <attribute name="domain">[('id', 'in', allowed_location_dest_ids)]</attribute>
+                <attribute
+                    name="domain"
+                >[('id', 'in', allowed_location_dest_ids)]</attribute>
             </field>
         </field>
     </record>
@@ -22,7 +29,9 @@
                 <field name="allowed_location_dest_ids" invisible="1" />
             </field>
             <field name="location_dest_id" position="attributes">
-                <attribute name="domain">[('id', 'in', allowed_location_dest_ids)]</attribute>
+                <attribute
+                    name="domain"
+                >[('id', 'in', allowed_location_dest_ids)]</attribute>
             </field>
         </field>
     </record>
