@@ -53,8 +53,8 @@ Vue.component("checkout-summary-content", {
                 <checkout-summary-product-detail :record="subrec" :index="index" :count="count" />
             </div>
         </v-list-item-content>
-        <v-list-item-action v-if="record.key != 'no-pack'" class="justify-end">
-            <checkout-summary-destroy-action :pack="record.pack" />
+        <v-list-item-action>
+            <checkout-summary-destroy-action :record="record" />
         </v-list-item-action>
     </div>
     `,
@@ -63,7 +63,7 @@ Vue.component("checkout-summary-content", {
 // TODO: split these actions out of checkout
 //
 Vue.component("checkout-summary-destroy-action", {
-    props: ["pack"],
+    props: ["record"],
     data() {
         return {
             dialog: false,
@@ -73,13 +73,26 @@ Vue.component("checkout-summary-destroy-action", {
         on_user_confirm: function(answer) {
             this.dialog = false;
             if (answer === "yes") {
-                this.$root.trigger("pkg_destroy", this.pack);
+                let data;
+                if (this.pack) {
+                    data = {pack_id: this.pack.id};
+                } else {
+                    data = {line_id: this.record.records[0].id};
+                }
+                this.$root.trigger("cancel", data);
             }
         },
     },
     computed: {
         message: function() {
-            return "Please confirm delivery cancellation for pack " + this.pack.name;
+            const item = this.pack ? this.pack.name : this.product.name;
+            return "Please confirm delivery cancellation for " + item;
+        },
+        pack: function() {
+            return this.record.pack;
+        },
+        product: function() {
+            return this.record.records[0].product;
         },
     },
     template: `
