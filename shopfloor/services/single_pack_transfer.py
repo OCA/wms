@@ -57,7 +57,7 @@ class SinglePackTransfer(Component):
             "id": move_line.package_level_id.id,
             "name": pack.name,
             "location_src": {"id": pack.location_id.id, "name": pack.location_id.name},
-            "location_dst": {
+            "location_dest": {
                 "id": move_line.location_dest_id.id,
                 "name": move_line.location_dest_id.name,
             },
@@ -299,7 +299,7 @@ class SinglePackTransferValidatorResponse(Component):
                     "name": {"type": "string", "nullable": False, "required": True},
                 },
             },
-            "location_dst": {
+            "location_dest": {
                 "type": "dict",
                 "schema": {
                     "id": {"required": True, "type": "integer"},
