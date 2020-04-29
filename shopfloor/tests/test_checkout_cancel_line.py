@@ -21,7 +21,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
         cls._fill_stock_for_moves(cls.raw_move)
         picking.action_assign()
 
-    def test_remove_package_ok(self):
+    def test_cancel_package_ok(self):
         picking = self.picking
 
         pack1_lines = self.pack1_moves.move_line_ids
@@ -48,7 +48,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
 
         # and now, we want to drop the new_package
         response = self.service.dispatch(
-            "remove_package",
+            "cancel_line",
             params={"picking_id": picking.id, "package_id": new_package.id},
         )
 
@@ -88,10 +88,47 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
             data={"picking": self._stock_picking_data(picking, done=True)},
         )
 
-    def test_remove_package_error_package_not_found(self):
+    def test_cancel_line_ok(self):
+        picking = self.picking
+
+        raw_line = self.raw_move.move_line_ids
+
+        raw_line.write({"qty_done": 10, "shopfloor_checkout_done": True})
+
         # and now, we want to drop the new_package
         response = self.service.dispatch(
-            "remove_package", params={"picking_id": self.picking.id, "package_id": 0}
+            "cancel_line", params={"picking_id": picking.id, "line_id": raw_line.id},
+        )
+
+        self.assertRecordValues(
+            raw_line, [{"qty_done": 0, "shopfloor_checkout_done": False}],
+        )
+
+        self.assert_response(
+            response,
+            next_state="summary",
+            data={"picking": self._stock_picking_data(picking, done=True)},
+        )
+
+    def test_cancel_line_error_package_not_found(self):
+        # and now, we want to drop the new_package
+        response = self.service.dispatch(
+            "cancel_line", params={"picking_id": self.picking.id, "package_id": 0}
+        )
+        self.assert_response(
+            response,
+            next_state="summary",
+            data={"picking": self._stock_picking_data(self.picking, done=True)},
+            message={
+                "message_type": "error",
+                "message": "The record you were working on does not exist anymore.",
+            },
+        )
+
+    def test_cancel_line_error_line_not_found(self):
+        # and now, we want to drop the new_package
+        response = self.service.dispatch(
+            "cancel_line", params={"picking_id": self.picking.id, "line_id": 0}
         )
         self.assert_response(
             response,

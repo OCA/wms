@@ -887,13 +887,18 @@ class Checkout(Component):
             },
         )
 
-    def remove_package(self, picking_id, package_id):
-        """Remove destination package from move lines and set qty done to 0
+    def cancel_line(self, picking_id, package_id=None, line_id=None):
+        """Cancel work done on given line or package.
+
+        If package, remove destination package from lines and set qty done to 0.
+        If line is a raw product, set qty done to 0.
 
         All the move lines with the package as ``result_package_id`` have their
         ``result_package_id`` reset to the source package (default odoo behavior)
         and their ``qty_done`` set to 0.
-        It flags ``shopfloor_checkout_done`` to False so they have to be packed again.
+
+        It flags ``shopfloor_checkout_done`` to False
+        so they have to be processed again.
 
         Transitions:
         * summary
@@ -904,22 +909,28 @@ class Checkout(Component):
             return self._response_stock_picking_does_not_exist()
 
         package = self.env["stock.quant.package"].browse(package_id).exists()
-        if not package:
+        line = self.env["stock.move.line"].browse(line_id).exists()
+        if not package and not line:
             return self._response_for_summary(
                 picking, message=message.record_not_found()
             )
-        move_lines = picking.move_line_ids.filtered(
-            lambda l: self._filter_lines_checkout_done(l)
-            and l.result_package_id == package
-        )
-        for move_line in move_lines:
-            move_line.write(
-                {
-                    "qty_done": 0,
-                    "result_package_id": move_line.package_id,
-                    "shopfloor_checkout_done": False,
-                }
+
+        if package:
+            move_lines = picking.move_line_ids.filtered(
+                lambda l: self._filter_lines_checkout_done(l)
+                and l.result_package_id == package
             )
+            for move_line in move_lines:
+                move_line.write(
+                    {
+                        "qty_done": 0,
+                        "result_package_id": move_line.package_id,
+                        "shopfloor_checkout_done": False,
+                    }
+                )
+        if line:
+            line.write({"qty_done": 0, "shopfloor_checkout_done": False})
+
         return self._response_for_summary(picking)
 
     def done(self, picking_id, confirmation=False):
@@ -1105,10 +1116,21 @@ class ShopfloorCheckoutValidator(Component):
             "packaging_id": {"coerce": to_int, "required": True, "type": "integer"},
         }
 
-    def remove_package(self):
+    def cancel_line(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "package_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "package_id": {
+                "coerce": to_int,
+                "required": True,
+                "type": "integer",
+                "excludes": "line_id",
+            },
+            "line_id": {
+                "coerce": to_int,
+                "required": True,
+                "type": "integer",
+                "excludes": "package_id",
+            },
         }
 
     def done(self):
@@ -1267,7 +1289,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
     def set_packaging(self):
         return self._response_schema(next_states={"change_packaging", "summary"})
 
-    def remove_package(self):
+    def cancel_line(self):
         return self._response_schema(next_states={"summary"})
 
     def done(self):
