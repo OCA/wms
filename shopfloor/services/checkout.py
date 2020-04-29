@@ -85,8 +85,17 @@ class Checkout(Component):
         if not picking:
             package = search.package_from_scan(barcode)
             if package:
-                lines = package.planned_move_line_ids
-                pickings = lines.mapped("picking_id")
+                pickings = (
+                    self.env["stock.move.line"]
+                    .search(
+                        [
+                            ("state", "not in", ("cancel", "done")),
+                            ("package_id", "=", package.id),
+                            ("picking_id.picking_type_id", "=", self.picking_type.id),
+                        ]
+                    )
+                    .mapped("picking_id")
+                )
                 if len(pickings) == 1:
                     picking = pickings
         return self._select_picking(picking, "select_document")
