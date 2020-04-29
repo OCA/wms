@@ -42,21 +42,25 @@ class StockLocation(models.Model):
         return self.children_ids._sort_abc_locations(first(products).abc_storage)
 
     def _sort_abc_locations(self, product_abc):
-        locations = self
+        product_abc = product_abc or "a"
         if product_abc == "a":
             # Already ordered, no need to reorder
-            pass
+            return self
         else:
-            a_locations = b_locations = c_locations = self.browse()
+            a_location_ids = []
+            b_location_ids = []
+            c_location_ids = []
             for loc in self:
                 if loc.abc_storage == "a":
-                    a_locations |= loc
+                    a_location_ids.append(loc.id)
                 elif loc.abc_storage == "b":
-                    b_locations |= loc
+                    b_location_ids.append(loc.id)
                 elif loc.abc_storage == "c":
-                    c_locations |= loc
+                    c_location_ids.append(loc.id)
             if product_abc == "b":
-                locations = b_locations | c_locations | a_locations
+                location_ids = b_location_ids + c_location_ids + a_location_ids
             elif product_abc == "c":
-                locations = c_locations | a_locations | b_locations
-        return locations
+                location_ids = c_location_ids + a_location_ids + b_location_ids
+            else:
+                raise ValueError('product_abc = %s' % product_abc)
+        return self.env['stock.location'].browse(location_ids)
