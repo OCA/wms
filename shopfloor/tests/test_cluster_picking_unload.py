@@ -63,7 +63,7 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
             data={
                 "id": self.batch.id,
                 "name": self.batch.name,
-                "location_dst": {
+                "location_dest": {
                     "id": self.packing_location.id,
                     "name": self.packing_location.name,
                 },
@@ -89,7 +89,7 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
                 "id": self.batch.id,
                 "name": self.batch.name,
                 "package": {"id": self.bin1.id, "name": self.bin1.name},
-                "location_dst": {
+                "location_dest": {
                     "id": first_line.location_dest_id.id,
                     "name": first_line.location_dest_id.name,
                 },
@@ -249,7 +249,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
                 "id": self.batch.id,
                 "name": self.batch.name,
                 "package": {"id": self.bin1.id, "name": self.bin1.name},
-                "location_dst": {
+                "location_dest": {
                     "id": move_lines[0].location_dest_id.id,
                     "name": move_lines[0].location_dest_id.name,
                 },
@@ -272,7 +272,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             data={
                 "id": self.batch.id,
                 "name": self.batch.name,
-                "location_dst": {
+                "location_dest": {
                     "id": move_lines[0].location_dest_id.id,
                     "name": move_lines[0].location_dest_id.name,
                 },
@@ -306,7 +306,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             data={
                 "id": self.batch.id,
                 "name": self.batch.name,
-                "location_dst": {
+                "location_dest": {
                     "id": move_lines[0].location_dest_id.id,
                     "name": move_lines[0].location_dest_id.name,
                 },
@@ -333,7 +333,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             data={
                 "id": self.batch.id,
                 "name": self.batch.name,
-                "location_dst": {
+                "location_dest": {
                     "id": move_lines[0].location_dest_id.id,
                     "name": move_lines[0].location_dest_id.name,
                 },
@@ -406,7 +406,7 @@ class ClusterPickingUnloadSplitCase(ClusterPickingUnloadingCommonCase):
                 "id": self.batch.id,
                 "name": self.batch.name,
                 "package": {"id": self.bin1.id, "name": self.bin1.name},
-                "location_dst": {
+                "location_dest": {
                     "id": move_lines[0].location_dest_id.id,
                     "name": move_lines[0].location_dest_id.name,
                 },
@@ -450,7 +450,7 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
                 "id": self.batch.id,
                 "name": self.batch.name,
                 "package": {"id": self.bin1.id, "name": self.bin1.name},
-                "location_dst": {
+                "location_dest": {
                     "id": self.move_lines[0].location_dest_id.id,
                     "name": self.move_lines[0].location_dest_id.name,
                 },
@@ -474,7 +474,7 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
                 "id": self.batch.id,
                 "name": self.batch.name,
                 "package": {"id": self.bin1.id, "name": self.bin1.name},
-                "location_dst": {
+                "location_dest": {
                     "id": self.move_lines[0].location_dest_id.id,
                     "name": self.move_lines[0].location_dest_id.name,
                 },
@@ -567,7 +567,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
                 "name": self.batch.name,
                 # the line of bin1 is unloaded, next one will be bin2
                 "package": {"id": self.bin2.id, "name": self.bin2.name},
-                "location_dst": {
+                "location_dest": {
                     "id": self.bin2_lines[0].location_dest_id.id,
                     "name": self.bin2_lines[0].location_dest_id.name,
                 },
@@ -637,7 +637,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
                 "name": self.batch.name,
                 # the line of bin2 is unloaded, next one will be bin3
                 "package": {"id": bin3.id, "name": bin3.name},
-                "location_dst": {
+                "location_dest": {
                     "id": bin3_line.location_dest_id.id,
                     "name": bin3_line.location_dest_id.name,
                 },
@@ -708,7 +708,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
                 "id": self.batch.id,
                 "name": self.batch.name,
                 "package": {"id": self.bin1.id, "name": self.bin1.name},
-                "location_dst": {
+                "location_dest": {
                     "id": self.bin1_lines[0].location_dest_id.id,
                     "name": self.bin1_lines[0].location_dest_id.name,
                 },
@@ -740,7 +740,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
                 "id": self.batch.id,
                 "name": self.batch.name,
                 "package": {"id": self.bin1.id, "name": self.bin1.name},
-                "location_dst": {
+                "location_dest": {
                     "id": self.bin1_lines[0].location_dest_id.id,
                     "name": self.bin1_lines[0].location_dest_id.name,
                 },
@@ -765,7 +765,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
                 "id": self.batch.id,
                 "name": self.batch.name,
                 "package": {"id": self.bin1.id, "name": self.bin1.name},
-                "location_dst": {
+                "location_dest": {
                     "id": self.bin1_lines[0].location_dest_id.id,
                     "name": self.bin1_lines[0].location_dest_id.name,
                 },
