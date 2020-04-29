@@ -490,11 +490,15 @@ export var Checkout = Vue.component("checkout", {
                         );
                     },
                     on_without_pack: () => {
-                        this.set_notification({
-                            message_type: "info",
-                            message: "Product(s) processed as raw product(s)",
-                        });
-                        this.state_to("select_line");
+                        this.wait_call(
+                            this.odoo.call("no_package", {
+                                picking_id: this.state.data.picking.id,
+                                selected_line_ids: _.map(
+                                    this.state.data.selected,
+                                    _.property("id")
+                                ),
+                            })
+                        );
                     },
                     on_back: () => {
                         this.state_to("select_line");
@@ -578,7 +582,7 @@ export var Checkout = Vue.component("checkout", {
                     events: {
                         select: "on_select",
                         back: "on_back",
-                        pkg_destroy: "on_pkg_destroy",
+                        cancel: "on_cancel",
                         pkg_change_type: "on_pkg_change_type",
                         mark_as_done: "on_mark_as_done",
                     },
@@ -594,11 +598,13 @@ export var Checkout = Vue.component("checkout", {
                             })
                         );
                     },
-                    on_pkg_destroy: pkg => {
+                    on_cancel: data => {
                         this.wait_call(
-                            this.odoo.call("remove_package", {
+                            this.odoo.call("cancel_line", {
                                 picking_id: this.state.data.picking.id,
-                                package_id: pkg.id,
+                                // we get either line_id or package_id
+                                package_id: data.package_id,
+                                line_id: data.line_id,
                             })
                         );
                     },
