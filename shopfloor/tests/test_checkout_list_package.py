@@ -130,17 +130,14 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             [
                 {
                     "result_package_id": self.package.id,
-                    "shopfloor_checkout_packed": True,
+                    "shopfloor_checkout_done": True,
                 },
                 {
                     "result_package_id": self.package.id,
-                    "shopfloor_checkout_packed": True,
+                    "shopfloor_checkout_done": True,
                 },
                 # qty_done was zero so we don't set it as packed
-                {
-                    "result_package_id": self.pack1.id,
-                    "shopfloor_checkout_packed": False,
-                },
+                {"result_package_id": self.pack1.id, "shopfloor_checkout_done": False},
             ],
         )
         self.assert_response(
