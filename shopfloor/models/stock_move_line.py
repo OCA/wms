@@ -12,7 +12,7 @@ class StockMoveLine(models.Model):
         help="Technical field. "
         "Indicates if a the move has been postponed in a process.",
     )
-    shopfloor_checkout_packed = fields.Boolean(default=False)
+    shopfloor_checkout_done = fields.Boolean(default=False)
 
     # we search lines based on their location in some workflows
     location_id = fields.Many2one(index=True)

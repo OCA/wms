@@ -17,8 +17,8 @@ class CheckoutCommonCase(CommonCase):
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="checkout")
 
-    def _stock_picking_data(self, picking):
-        return self.service._data_for_stock_picking(picking)
+    def _stock_picking_data(self, picking, **kw):
+        return self.service._data_for_stock_picking(picking, **kw)
 
     # we test the methods that structure data in test_actions_data.py
     def _picking_summary_data(self, picking):
