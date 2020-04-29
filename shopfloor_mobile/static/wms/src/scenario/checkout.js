@@ -296,9 +296,12 @@ export var Checkout = Vue.component("checkout", {
             let res = [];
             let pkg_seen = [];
             lines.forEach(function(line) {
-                if (line.package_dest && !pkg_seen.includes(line.package_dest.id)) {
-                    // got a pack
-                    res.push(line);
+                if (line.package_dest) {
+                    if (!pkg_seen.includes(line.package_dest.id)) {
+                        // got a pack
+                        res.push(line);
+                        pkg_seen.push(line.package_dest.id);
+                    }
                 } else {
                     // no pack
                     res.push(line);
