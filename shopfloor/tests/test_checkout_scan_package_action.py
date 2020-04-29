@@ -148,16 +148,16 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
         self.assertRecordValues(
             move_line1,
-            [{"result_package_id": pack1.id, "shopfloor_checkout_packed": True}],
+            [{"result_package_id": pack1.id, "shopfloor_checkout_done": True}],
         )
         self.assertRecordValues(
             move_line2,
-            [{"result_package_id": pack1.id, "shopfloor_checkout_packed": True}],
+            [{"result_package_id": pack1.id, "shopfloor_checkout_done": True}],
         )
         self.assertRecordValues(
             move_line3,
             # qty_done was zero so we don't set it as packed
-            [{"result_package_id": pack1.id, "shopfloor_checkout_packed": False}],
+            [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
         )
         self.assert_response(
             response,
@@ -195,7 +195,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                     # the result package must remain identical, so equal to the
                     # source package
                     "result_package_id": selected_line.package_id.id,
-                    "shopfloor_checkout_packed": False,
+                    "shopfloor_checkout_done": False,
                 }
             ],
         )
@@ -229,7 +229,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         # assume that product d was already put in a package,
         # we must be able to put the lines of pack1 inside the same
         pack2_moves.move_line_ids.write(
-            {"result_package_id": package.id, "shopfloor_checkout_packed": True}
+            {"result_package_id": package.id, "shopfloor_checkout_done": True}
         )
 
         selected_lines = pack1_moves.move_line_ids
@@ -249,9 +249,9 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self.assertRecordValues(
             selected_lines,
             [
-                {"result_package_id": package.id, "shopfloor_checkout_packed": True},
-                {"result_package_id": package.id, "shopfloor_checkout_packed": True},
-                {"result_package_id": package.id, "shopfloor_checkout_packed": True},
+                {"result_package_id": package.id, "shopfloor_checkout_done": True},
+                {"result_package_id": package.id, "shopfloor_checkout_done": True},
+                {"result_package_id": package.id, "shopfloor_checkout_done": True},
             ],
         )
 
@@ -259,7 +259,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             response,
             # all the lines are packed, so we expect to go the summary screen
             next_state="summary",
-            data={"picking": self._stock_picking_data(picking)},
+            data={"picking": self._stock_picking_data(picking, done=True)},
             message={
                 "message_type": "info",
                 "message": "Product(s) packed in {}".format(package.name),
@@ -328,17 +328,17 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
         self.assertRecordValues(
             move_line1,
-            [{"result_package_id": new_package.id, "shopfloor_checkout_packed": True}],
+            [{"result_package_id": new_package.id, "shopfloor_checkout_done": True}],
         )
         self.assertRecordValues(
             move_line2,
-            [{"result_package_id": new_package.id, "shopfloor_checkout_packed": True}],
+            [{"result_package_id": new_package.id, "shopfloor_checkout_done": True}],
         )
         self.assertRecordValues(
             move_line3,
             # qty_done was zero so we don't set it as packed and it remains in
             # the same package
-            [{"result_package_id": pack1.id, "shopfloor_checkout_packed": False}],
+            [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
         )
         self.assert_response(
             response,
