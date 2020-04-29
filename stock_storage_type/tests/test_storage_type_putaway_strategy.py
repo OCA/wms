@@ -4,7 +4,6 @@ from .common import TestStorageTypeCommon
 
 
 class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

@@ -37,8 +37,7 @@ class StockStorageLocationSequence(models.Model):
                     pack_storage_strat = strat[1]
                     break
             msg = ' * <span style="color: green;">{} ({})</span>'.format(
-                self.location_id.name,
-                pack_storage_strat,
+                self.location_id.name, pack_storage_strat,
             )
             if last:
                 # If last, we want to check if restrictions are defined on
