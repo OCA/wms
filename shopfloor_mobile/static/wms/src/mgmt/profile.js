@@ -49,7 +49,7 @@ export var Profile = Vue.component("profile", {
             this.$root.trigger("profile:selected", selected, true);
             this.profile_selected = true;
             setTimeout(function() {
-                self.$root.$router.back();
+                self.$root.$router.push({name: "home"});
             }, 2000);
         },
         logout: function() {
