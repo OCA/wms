@@ -90,7 +90,7 @@ export var ScenarioBaseMixin = {
         _loadParams: function() {
             const self = this;
             this.menu_item = _.head(
-                _.filter(this.$root.appconfig.menus, function(m) {
+                _.filter(this.$root.appmenu.menus, function(m) {
                     return m.id === parseInt(self.$route.params.menu_id, 10);
                 })
             );

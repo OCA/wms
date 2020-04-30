@@ -41,6 +41,7 @@ export var Profile = Vue.component("profile", {
         },
         reset_data: function() {
             this.$root._clearConfig();
+            this.$root._loadMenu();
             this.$root.$router.push({name: "home"});
         },
     },

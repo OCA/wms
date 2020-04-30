@@ -39,6 +39,7 @@ const app = new Vue({
             // collect global events
             event_hub: EventHub,
             current_profile: {},
+            profile_menu: null,
             current_apikey: null,
             loading: false,
             appconfig: null,
@@ -62,12 +63,14 @@ const app = new Vue({
         });
         this.$root.event_hub.$on("profile:selected", function(profile) {
             self.profile = profile;
+            self.loadMenu(true);
         });
     },
     computed: {
         has_profile: function() {
             return !_.isEmpty(this.profile);
         },
+        // TODO: we can add an handler for this and avoid duplicate code
         profile: {
             get: function() {
                 if (_.isEmpty(this.current_profile)) {
@@ -78,6 +81,18 @@ const app = new Vue({
             set: function(v) {
                 this.current_profile = v;
                 this.$storage.set("profile", v);
+            },
+        },
+        appmenu: {
+            get: function() {
+                if (_.isEmpty(this.profile_menu)) {
+                    this.profile_menu = this.$storage.get("menu");
+                }
+                return this.profile_menu || [];
+            },
+            set: function(v) {
+                this.profile_menu = v;
+                this.$storage.set("menu", v);
             },
         },
         apikey: {
@@ -111,6 +126,7 @@ const app = new Vue({
             if (this.appconfig) {
                 return this.appconfig;
             }
+            // TODO: we can do this via watcher
             const stored = this.$storage.get("appconfig");
             if (stored) {
                 this.appconfig = stored;
@@ -121,7 +137,7 @@ const app = new Vue({
             }
             this._loadConfig();
         },
-        _loadConfig: function(odoo_params) {
+        _loadConfig: function() {
             const self = this;
             self.loading = true;
             const odoo = self.getOdoo({usage: "app"});
@@ -138,6 +154,25 @@ const app = new Vue({
         _clearConfig: function() {
             this.$storage.remove("appconfig");
             return this._loadConfig();
+        },
+        loadMenu: function(force) {
+            if (this.appmenu && !force) {
+                return this.appmenu;
+            }
+            this._loadMenu();
+            return this.appmenu;
+        },
+        _loadMenu: function() {
+            const self = this;
+            self.loading = true;
+            const odoo = self.getOdoo({
+                usage: "app",
+                profile_id: this.profile.id,
+            });
+            return odoo.call("menu").then(function(result) {
+                self.appmenu = result.data;
+                self.loading = false;
+            });
         },
         logout: function() {
             this.apikey = "";
