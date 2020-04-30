@@ -22,16 +22,20 @@ class ShopfloorMenu(Component):
     def _get_base_search_domain(self):
         base_domain = super()._get_base_search_domain()
         user = self.env.user
-        return expression.AND(
-            [
-                base_domain,
-                [
-                    "|",
-                    ("operation_group_ids", "=", False),
-                    ("operation_group_ids.user_ids", "=", user.id),
-                ],
+        profile = getattr(self.work, "profile", None)
+        op_group_domain = [
+            "|",
+            ("operation_group_ids", "=", False),
+            ("operation_group_ids.user_ids", "=", user.id),
+        ]
+        if profile:
+            # TODO: this probably should be the default only one way
+            # What to do w/ profiles linked to specific user?
+            # This data model is a bit messy :/
+            op_group_domain = [
+                ("operation_group_ids", "in", profile.operation_group_ids.ids),
             ]
-        )
+        return expression.AND([base_domain, op_group_domain])
 
     def _search(self, name_fragment=None):
         domain = self._get_base_search_domain()
