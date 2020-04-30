@@ -189,27 +189,24 @@ export var ScenarioBaseMixin = {
                 console.error(result);
                 alert("Something went wrong. Check log.");
             }
-            const state = result.next_state;
+            const state_key =
+                result.next_state == "start"
+                    ? this.initial_state_key
+                    : result.next_state;
             if (!_.isUndefined(result.data)) {
-                this.state_reset_data(state);
-                this.state_set_data(result.data[state], state);
+                this.state_reset_data(state_key);
+                this.state_set_data(result.data[state_key], state_key);
             }
             if (result.message) {
                 this.set_notification(result.message);
             } else {
                 this.reset_notification();
             }
-            if (this.state.success) {
-                this.state.success(result);
-            }
-            if (this.current_state_key != state) {
+            if (this.current_state_key != state_key) {
                 this.state_to(state);
             }
         },
         on_call_error: function(result) {
-            if (this.state.error) {
-                this.state.error(result);
-            }
             alert(result.status + " " + result.error);
         },
         on_reset: function(e) {
