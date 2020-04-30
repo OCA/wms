@@ -101,12 +101,12 @@ Vue.component("nav-items", {
         <v-list-item
             v-for="item in navigation"
             :key="item.id"
-            @click="$router.push({name: item.process.code, params: {menu_id: item.id, state: 'start'}})"
             link
             >
             <v-list-item-content>
                 <v-list-item-title>
-                    {{ item.name }}
+                    <router-link :to="{name: item.process.code, params: {menu_id: item.id, state: 'start'}}"
+                                 tag="div">{{ item.name }}</router-link>
                 </v-list-item-title>
                 <v-list-item-subtitle>
                     <!-- TODO: hide this w/ v-if="$root.demo_mode" -->

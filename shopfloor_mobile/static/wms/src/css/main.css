@@ -5,8 +5,19 @@ main.v-content > .v-content__wrap > .header .container {
     padding-bottom: 0;
 }
 
+#app .v-toolbar__content .v-toolbar__title {
+    /* TODO: handle max-width by screen size */
+    /* max-width: 170px; */
+    padding-left: 10px;
+    font-size: 1rem;
+}
+
 #app.demo_mode header {
     border-bottom: 5px dashed orange !important;
+}
+
+#app nav.v-navigation-drawer .router-link-active {
+    font-weight: bold;
 }
 
 .v-data-table th,

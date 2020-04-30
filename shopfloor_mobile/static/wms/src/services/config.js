@@ -9,11 +9,6 @@ export class Config {
             if (!_.isUndefined(result.data)) {
                 this.data = result.data;
                 this.authenticated = true;
-                this.data.menus.push({
-                    id: 99,
-                    name: "Checkout",
-                    process: {id: 99, code: "checkout"},
-                });
             } else {
                 // TODO: any better thing to do here?
                 console.log(result);
