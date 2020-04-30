@@ -31,7 +31,7 @@ export var Profile = Vue.component("profile", {
         on_select: function(selected) {
             const self = this;
             // FIXME
-            this.$root.trigger("state:change", "");
+            this.$root.$emit("state:change", "");
             this.$root.trigger("profile:selected", selected);
             this.profile_selected = true;
             setTimeout(function() {
