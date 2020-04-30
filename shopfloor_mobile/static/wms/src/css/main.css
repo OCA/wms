@@ -19,8 +19,18 @@ main.v-content > .v-content__wrap > .header .container {
 #app nav.v-navigation-drawer.v-navigation-drawer--open {
     width: 100% !important;
 }
+#app nav.v-navigation-drawer .v-list {
+    padding: 0;
+}
+
 #app nav.v-navigation-drawer .router-link-active {
     font-weight: bold;
+}
+#app nav.v-navigation-drawer .close-menu {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 9999;
 }
 
 .v-data-table th,

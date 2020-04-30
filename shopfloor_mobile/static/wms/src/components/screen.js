@@ -45,7 +45,7 @@ Vue.component("Screen", {
                 app
                 >
             <v-list>
-                <v-btn icon class="float-right" @click.stop="drawer = !drawer"><v-icon>mdi-close</v-icon></v-btn>
+                <v-btn icon class="close-menu" @click.stop="drawer = !drawer"><v-icon>mdi-close</v-icon></v-btn>
                 <nav-items :navigation="navigation"/>
                 <v-list-item @click="$router.push({'name': 'home'})" link>
                     <v-list-item-content>
@@ -102,12 +102,12 @@ Vue.component("nav-items", {
         <v-list-item
             v-for="item in navigation"
             :key="item.id"
+            :to="{name: item.process.code, params: {menu_id: item.id, state: 'start'}}"
             link
             >
             <v-list-item-content>
                 <v-list-item-title>
-                    <router-link :to="{name: item.process.code, params: {menu_id: item.id, state: 'start'}}"
-                                 tag="div">{{ item.name }}</router-link>
+                    {{ item.name }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
                     <small class="font-weight-light">Process: {{ item.process.code }}</small>

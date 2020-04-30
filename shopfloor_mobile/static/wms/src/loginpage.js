@@ -39,10 +39,10 @@ export var LoginPage = Vue.component("login-page", {
                         <v-form v-on:submit="login">
                             <p v-if="error">{{ error }}</p>
                             <v-text-field
-                            v-model="apikey"
-                            label="API Key"
-                            placeholder="Scan your access badge or fill your credential"
-                            autofocus></v-text-field>
+                                v-model="apikey"
+                                label="API Key"
+                                placeholder="Scan your access badge or fill your credential"
+                                autofocus></v-text-field>
                             <v-btn depressed color="success" type="submit">Submit</v-btn>
                         </v-form>
                     </div>
