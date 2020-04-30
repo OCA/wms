@@ -1,7 +1,7 @@
 export var HomePage = Vue.component("home-page", {
     computed: {
         navigation() {
-            return this.$root.appconfig.menus;
+            return this.$root.appmenu.menus;
         },
     },
     props: ["routes"],
