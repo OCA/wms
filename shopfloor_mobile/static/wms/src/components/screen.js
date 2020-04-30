@@ -45,10 +45,11 @@ Vue.component("Screen", {
                 app
                 >
             <v-list>
+                <v-btn icon class="float-right" @click.stop="drawer = !drawer"><v-icon>mdi-close</v-icon></v-btn>
                 <nav-items :navigation="navigation"/>
                 <v-list-item @click="$router.push({'name': 'home'})" link>
                     <v-list-item-content>
-                        <v-list-item-title>Main menu</v-list-item-title>
+                        <v-list-item-title><v-icon>mdi-home</v-icon> Home</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
             </v-list>
@@ -109,8 +110,7 @@ Vue.component("nav-items", {
                                  tag="div">{{ item.name }}</router-link>
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                    <!-- TODO: hide this w/ v-if="$root.demo_mode" -->
-                    <small class="warning">Process: {{ item.process.code }}</small>
+                    <small class="font-weight-light">Process: {{ item.process.code }}</small>
                 </v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>

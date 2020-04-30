@@ -16,6 +16,9 @@ main.v-content > .v-content__wrap > .header .container {
     border-bottom: 5px dashed orange !important;
 }
 
+#app nav.v-navigation-drawer.v-navigation-drawer--open {
+    width: 100% !important;
+}
 #app nav.v-navigation-drawer .router-link-active {
     font-weight: bold;
 }
