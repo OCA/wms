@@ -22,10 +22,26 @@ export var Profile = Vue.component("profile", {
                 :options="{initValue: current_profile_id}"
                 v-on:select="on_select"
                 />
-            <!-- FIXME: maybe not a good place here -->
-            <v-btn depressed x-large color="error" v-on:click="reset_data()">Reload config</v-btn>
-            <v-btn depressed x-large color="warning" v-on:click="logout()">Logout</v-btn>
-            </Screen>
+
+            <div class="button-list button-vertical-list full">
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <btn-back/>
+                    </v-col>
+                </v-row>
+                <!-- FIXME: maybe not a good place here -->
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <v-btn depressed x-large color="error" v-on:click="reset_data()">Reload config and menu</v-btn>
+                    </v-col>
+                </v-row>
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <v-btn depressed x-large color="warning" v-on:click="logout()">Logout</v-btn>
+                    </v-col>
+                </v-row>
+            </div>
+        </Screen>
     `,
     methods: {
         on_select: function(selected) {
