@@ -232,9 +232,9 @@ Vue.component("manual-select", {
                     </div>
                 </div>
             </v-list>
-            <v-alert tile type="error" v-if="!has_records">
-                No record found.
-            </v-alert>
+            <div class="no-record pa-2" v-if="!has_records">
+                <p class="text--secondary">No item to select.</p>
+            </div>
         </v-card>
         <v-row class="actions bottom-actions" v-if="has_records && opts.showActions">
             <v-col>

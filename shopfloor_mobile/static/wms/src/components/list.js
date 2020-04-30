@@ -88,9 +88,9 @@ Vue.component("list", {
                     </div>
                 </div>
             </v-list>
-            <v-alert tile type="error" v-if="!has_records">
-                No record found.
-            </v-alert>
+            <div class="no-record pa-2" v-if="!has_records">
+                <p class="text--secondary">No item to list.</p>
+            </div>
         </v-card>
     </div>
   `,
