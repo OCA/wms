@@ -161,8 +161,8 @@ const app = new Vue({
         on each state using `events` array. See mixin for details.
         Components can use `$root.trigger(...)` to trigger and event on the hub.
         */
-        trigger(event_name, data) {
-            if (this.global_state_key) {
+        trigger(event_name, data, no_state) {
+            if (this.global_state_key && !no_state) {
                 event_name = this.global_state_key + ":" + event_name;
             }
             this.event_hub.$emit(event_name, data);
