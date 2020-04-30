@@ -10,11 +10,14 @@ class ShopfloorApp(Component):
     _description = __doc__
 
     def user_config(self):
-        menu_comp = self.component("menu")
         profiles_comp = self.component("profile")
-        menus = menu_comp._to_json(menu_comp._search())
         profiles = profiles_comp._to_json(profiles_comp._search())
-        return self._response(data={"menus": menus, "profiles": profiles})
+        return self._response(data={"profiles": profiles})
+
+    def menu(self):
+        menu_comp = self.component("menu")
+        menus = menu_comp._to_json(menu_comp._search())
+        return self._response(data={"menus": menus})
 
 
 class ShopfloorAppValidator(Component):
@@ -27,6 +30,9 @@ class ShopfloorAppValidator(Component):
     def user_config(self):
         return {}
 
+    def menu(self):
+        return {}
+
 
 class ShopfloorAppValidatorResponse(Component):
     """Validators for the Application endpoints responses"""
@@ -36,8 +42,22 @@ class ShopfloorAppValidatorResponse(Component):
     _usage = "app.validator.response"
 
     def user_config(self):
-        menu_return_validator = self.component("menu.validator.response")
         profile_return_validator = self.component("profile.validator.response")
+        return self._response_schema(
+            {
+                "profiles": {
+                    "type": "list",
+                    "required": True,
+                    "schema": {
+                        "type": "dict",
+                        "schema": profile_return_validator._record_schema,
+                    },
+                },
+            }
+        )
+
+    def menu(self):
+        menu_return_validator = self.component("menu.validator.response")
         return self._response_schema(
             {
                 "menus": {
@@ -46,14 +66,6 @@ class ShopfloorAppValidatorResponse(Component):
                     "schema": {
                         "type": "dict",
                         "schema": menu_return_validator._record_schema,
-                    },
-                },
-                "profiles": {
-                    "type": "list",
-                    "required": True,
-                    "schema": {
-                        "type": "dict",
-                        "schema": profile_return_validator._record_schema,
                     },
                 },
             }
