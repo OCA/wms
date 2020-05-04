@@ -41,9 +41,17 @@ class AppCase(CommonCase):
                     {
                         "id": menu.id,
                         "name": menu.name,
+                        "op_groups": [
+                            {"id": x.id, "name": x.name}
+                            for x in menu.operation_group_ids
+                        ],
                         "process": {
                             "id": menu.process_id.id,
                             "code": menu.process_id.code,
+                            "picking_type": {
+                                "id": menu.process_id.picking_type_id.id,
+                                "name": menu.process_id.picking_type_id.name,
+                            },
                         },
                     }
                     for menu in menus
@@ -72,9 +80,14 @@ class AppCase(CommonCase):
                     {
                         "id": menu.id,
                         "name": menu.name,
+                        "op_groups": [{"id": op_type.id, "name": op_type.name}],
                         "process": {
                             "id": menu.process_id.id,
                             "code": menu.process_id.code,
+                            "picking_type": {
+                                "id": menu.process_id.picking_type_id.id,
+                                "name": menu.process_id.picking_type_id.name,
+                            },
                         },
                     }
                 ],

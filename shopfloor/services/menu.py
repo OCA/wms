@@ -52,10 +52,21 @@ class ShopfloorMenu(Component):
         )
 
     def _convert_one_record(self, record):
+        # TODO: use `jsonify`
         return {
             "id": record.id,
             "name": record.name,
-            "process": {"id": record.process_id.id, "code": record.process_code},
+            "process": {
+                "id": record.process_id.id,
+                "code": record.process_code,
+                "picking_type": {
+                    "id": record.process_id.picking_type_id.id,
+                    "name": record.process_id.picking_type_id.name,
+                },
+            },
+            "op_groups": [
+                {"id": g.id, "name": g.name} for g in record.operation_group_ids
+            ],
         }
 
 
@@ -79,21 +90,6 @@ class ShopfloorMenuValidatorResponse(Component):
     _name = "shopfloor.menu.validator.response"
     _usage = "menu.validator.response"
 
-    @property
-    def _record_schema(self):
-        return {
-            "id": {"coerce": to_int, "required": True, "type": "integer"},
-            "name": {"type": "string", "nullable": False, "required": True},
-            "process": {
-                "type": "dict",
-                "required": True,
-                "schema": {
-                    "code": {"type": "string", "nullable": False, "required": True},
-                    "id": {"coerce": to_int, "required": True, "type": "integer"},
-                },
-            },
-        }
-
     def return_search(self):
         return self._response_schema(
             {
@@ -105,3 +101,41 @@ class ShopfloorMenuValidatorResponse(Component):
                 },
             }
         )
+
+    @property
+    def _record_schema(self):
+        return {
+            "id": {"coerce": to_int, "required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+            "op_groups": {
+                "type": "list",
+                "required": True,
+                "schema": {"type": "dict", "schema": self._op_group_schema},
+            },
+            "process": {
+                "type": "dict",
+                "required": True,
+                "schema": {
+                    "id": {"coerce": to_int, "required": True, "type": "integer"},
+                    "code": {"type": "string", "nullable": False, "required": True},
+                    "picking_type": {
+                        "type": "dict",
+                        "schema": self._picking_type_schema,
+                    },
+                },
+            },
+        }
+
+    @property
+    def _op_group_schema(self):
+        return {
+            "id": {"coerce": to_int, "required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+        }
+
+    @property
+    def _picking_type_schema(self):
+        return {
+            "id": {"coerce": to_int, "required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+        }
