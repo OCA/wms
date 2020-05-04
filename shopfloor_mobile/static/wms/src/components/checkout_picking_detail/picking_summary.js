@@ -75,7 +75,7 @@ Vue.component("checkout-summary-destroy-action", {
             if (answer === "yes") {
                 let data;
                 if (this.pack) {
-                    data = {pack_id: this.pack.id};
+                    data = {package_id: this.pack.id};
                 } else {
                     data = {line_id: this.record.records[0].id};
                 }
