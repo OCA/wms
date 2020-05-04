@@ -199,7 +199,7 @@ export var ScenarioBaseMixin = {
                 this.reset_notification();
             }
             if (this.current_state_key != state_key) {
-                this.state_to(state);
+                this.state_to(state_key);
             }
         },
         on_call_error: function(result) {
