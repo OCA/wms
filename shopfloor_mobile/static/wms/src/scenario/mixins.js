@@ -46,10 +46,6 @@ export var ScenarioBaseMixin = {
         };
         this.odoo = this.$root.getOdoo(odoo_params);
     },
-    beforeDestroy: function() {
-        // TODO: we should turn off only handlers for the current state
-        this.$root.event_hub.$off();
-    },
     computed: {
         /*
         Full object of current state.
