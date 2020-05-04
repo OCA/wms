@@ -1,0 +1,3 @@
+odoo13-addon-stock_quant_package_product_packaging @ git+https://github.com/OCA/stock-logistics-workflow@refs/pull/607/head#subdirectory=setup/stock_quant_package_product_packaging
+odoo13-addon-stock_quant_package_dimension @ git+https://github.com/OCA/stock-logistics-workflow@refs/pull/608/head#subdirectory=setup/stock_quant_package_dimension
+odoo13-addon-stock_picking_completion_info @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/808/head#subdirectory=setup/stock_picking_completion_info
