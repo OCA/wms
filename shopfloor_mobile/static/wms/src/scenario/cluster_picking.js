@@ -103,7 +103,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
     `,
     computed: {
         batch_id: function() {
-            return this.erp_data.data.confirm_start.id;
+            return this.state_get_data("confirm_start").id;
         },
         manual_select_picking_fields: function() {
             return [
@@ -220,7 +220,9 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     },
                     enter: () => {
                         // TODO: shalle we hook v-model for qty input straight to the state data?
-                        this.scan_destination_qty = this.erp_data.data.start_line.quantity;
+                        this.scan_destination_qty = this.state_get_data(
+                            "start_line"
+                        ).quantity;
                     },
                     on_qty_update: qty => {
                         this.scan_destination_qty = parseInt(qty);

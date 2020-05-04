@@ -190,9 +190,6 @@ export var Checkout = Vue.component("checkout", {
         </Screen>
         `,
     computed: {
-        picking_id: function() {
-            return this.erp_data.data.select_line.id;
-        },
         // TODO: move these to methods
         manual_select_picking_fields: function() {
             return [
