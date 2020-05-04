@@ -136,7 +136,6 @@ export var ClusterPicking = Vue.component("cluster-picking", {
         return {
             usage: "cluster_picking",
             initial_state_key: "start",
-            current_state_key: "start",
             scan_destination_qty: 1,
             states: {
                 start: {
@@ -314,6 +313,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     },
                     on_scan: (scanned, confirmation = true) => {
                         this.on_state_exit();
+                        // FIXME: use state_load or traverse the state
                         this.current_state_key = "unload_all";
                         this.state.on_scan(scanned, confirmation);
                     },

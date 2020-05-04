@@ -15,12 +15,10 @@ export var ScenarioBaseMixin = {
     },
     beforeRouteUpdate(to, from, next) {
         // Load initial state
-        const state = to.params.state ? to.params.state : "start";
-        this._state_load(state);
+        this._state_load(to.params.state);
         next();
     },
     beforeMount: function() {
-        this._loadParams();
         if (this.$root.demo_mode) {
             this.$root.loadJS("src/demo/demo." + this.usage + ".js", this.usage);
         }
@@ -31,11 +29,7 @@ export var ScenarioBaseMixin = {
         We could use `beforeRouteEnter` but that's not tied to the current instance
         and we won't be able to call `_state_load`.
         */
-        if (!this.current_state_key) {
-            // Default to initial state
-            this.current_state_key = this.initial_state_key;
-        }
-        this._state_load(this.current_state_key);
+        this._state_load(this.$route.params.state);
     },
     mounted: function() {
         const odoo_params = {
@@ -47,6 +41,14 @@ export var ScenarioBaseMixin = {
         this.odoo = this.$root.getOdoo(odoo_params);
     },
     computed: {
+        menu_item: function() {
+            const self = this;
+            return _.head(
+                _.filter(this.$root.appmenu.menus, function(m) {
+                    return m.id === parseInt(self.$route.params.menu_id, 10);
+                })
+            );
+        },
         /*
         Full object of current state.
         TODO: for a future refactoring consider moving out of data `states`
@@ -80,18 +82,6 @@ export var ScenarioBaseMixin = {
         },
     },
     methods: {
-        /*
-        Load menu item from storage using route's menu id
-        */
-        _loadParams: function() {
-            const self = this;
-            this.menu_item = _.head(
-                _.filter(this.$root.appmenu.menus, function(m) {
-                    return m.id === parseInt(self.$route.params.menu_id, 10);
-                })
-            );
-            this.current_state_key = this.$route.params.state;
-        },
         storage_key: function(state_key) {
             state_key = _.isUndefined(state_key) ? this.current_state_key : state_key;
             return this.usage + "." + state_key;
@@ -147,6 +137,7 @@ export var ScenarioBaseMixin = {
             Load given state, handle transition, setup event handlers.
         */
         _state_load: function(state_key, promise) {
+            state_key = state_key || "start";
             if (state_key == "start") {
                 // Alias "start" to the initial state
                 state_key = this.initial_state_key;
@@ -368,6 +359,7 @@ export var SinglePackStatesMixin = {
                     },
                     on_scan: (scanned, confirmation = true) => {
                         this.on_state_exit();
+                        // FIXME: use state_load
                         this.current_state_key = "scan_location";
                         this.state.on_scan(scanned, confirmation);
                     },
