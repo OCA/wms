@@ -41,10 +41,10 @@ export var batch_picking_info = Vue.component("batch-picking-detail", {
     </div>
     <v-row class="actions bottom-actions">
       <v-col>
-        <v-btn color="primary" @click="$emit('confirm')">Start</v-btn>
+        <v-btn depressed color="primary" @click="$emit('confirm')">Start</v-btn>
       </v-col>
       <v-col>
-        <v-btn color="error" class="float-right" @click="$emit('cancel')">Cancel</v-btn>
+        <v-btn depressed color="error" class="float-right" @click="$emit('cancel')">Cancel</v-btn>
       </v-col>
     </v-row>
 
