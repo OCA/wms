@@ -148,7 +148,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     on_select: selected => {
                         this.wait_call(
                             this.odoo.call("select", {
-                                picking_batch_id: selected,
+                                picking_batch_id: selected.id,
                             })
                         );
                     },
