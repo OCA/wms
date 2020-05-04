@@ -112,7 +112,11 @@ Vue.component("nav-items", {
                     {{ item.name }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                    <small class="font-weight-light">Process: {{ item.process.code }}</small>
+                    <small class="font-weight-light">Process: {{ item.process.code }} - Op type: {{ item.process.picking_type.name }}</small>
+                    <br />
+                    <small class="font-weight-light">
+                        Op groups: <span v-for="op in item.op_groups" :key="'op-' + item.id + '-' + op.id">{{ op.name }}</span>
+                    </small>
                 </v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
