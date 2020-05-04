@@ -97,6 +97,8 @@ Vue.component("nav-items", {
     props: {
         navigation: Array,
     },
+    // FIXME: the menu click changes the route in the address bar but it does not reload the screen
+    // if the route name is the same but w/ different menu_id. WTF????
     template: `
     <div>
         <v-list-item
