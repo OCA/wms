@@ -47,10 +47,7 @@ export var Profile = Vue.component("profile", {
         on_select: function(selected) {
             const self = this;
             this.$root.trigger("profile:selected", selected, true);
-            this.profile_selected = true;
-            setTimeout(function() {
-                self.$root.$router.push({name: "home"});
-            }, 2000);
+            self.$root.$router.push({name: "home"});
         },
         logout: function() {
             this.$root.logout();
