@@ -64,7 +64,7 @@ export var batch_picking_line_actions = Vue.component("batch-picking-line-action
       <template v-slot:activator="{ on }">
         <v-row class="actions bottom-actions">
           <v-col>
-            <v-btn color="primary" dark v-on="on">Action</v-btn>
+            <v-btn depressed color="primary" dark v-on="on">Action</v-btn>
           </v-col>
         </v-row>
       </template>

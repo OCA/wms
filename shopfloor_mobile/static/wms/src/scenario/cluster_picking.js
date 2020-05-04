@@ -63,13 +63,23 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 v-on:action="state.on_action"
                 :line="state.data"
                 />
-            <manual-select
-                v-if="state_is('manual_selection')"
-                v-on:select="state.on_select"
-                v-on:back="state.on_back"
-                :records="state.data.records"
-                :list_item_fields="manual_select_picking_fields"
-                />
+
+
+            <div v-if="state_is('manual_selection')">
+                <manual-select
+                    v-on:select="state.on_select"
+                    v-on:back="state.on_back"
+                    :records="state.data.records"
+                    :list_item_fields="manual_select_picking_fields"
+                    />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn depressed color="default" @click="state.on_back">Back</v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
+            </div>
 
             <!-- TODO: do we need a component for this? -->
             <div class="unload-all" v-if="state_is('unload_all')">
@@ -93,7 +103,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed @click="$emit('action', 'action_back')">Back [TODO]</v-btn>
+                            <btn-back />
                         </v-col>
                     </v-row>
                 </div>
