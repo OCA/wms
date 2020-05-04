@@ -10,3 +10,10 @@ class StockQuantPackage(models.Model):
         readonly=True,
         help="Technical field. Move lines for which destination is this package.",
     )
+
+    # TODO: we should refactor this like
+
+    # source_planned_move_line_ids
+    # destination_planned_move_line_ids
+
+    # filter out done/cancel lines

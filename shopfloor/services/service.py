@@ -28,6 +28,9 @@ class BaseShopfloorService(AbstractComponent):
         """
         Get the current picking type based on the menu and the warehouse of the profile.
         """
+        # TODO: this validation should be done in the service
+        # and should return a proper error for the client
+        # or the client should handle exceptions properly.
         picking_type = self.work.menu.process_id.picking_type_id
         if picking_type.warehouse_id != self.work.profile.warehouse_id:
             raise exceptions.UserError(
