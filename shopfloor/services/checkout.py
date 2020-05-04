@@ -1133,13 +1133,14 @@ class ShopfloorCheckoutValidator(Component):
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "package_id": {
                 "coerce": to_int,
-                "required": True,
+                "required": False,
                 "type": "integer",
+                # excludes does not set the other as not required??? :/
                 "excludes": "line_id",
             },
             "line_id": {
                 "coerce": to_int,
-                "required": True,
+                "required": False,
                 "type": "integer",
                 "excludes": "package_id",
             },
