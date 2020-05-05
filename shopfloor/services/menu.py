@@ -20,6 +20,8 @@ class ShopfloorMenu(Component):
 
     def _get_base_search_domain(self):
         base_domain = super()._get_base_search_domain()
+        # FIXME exclude menus if they have no picking types
+        # in warehouse matching the profile
         return expression.AND(
             [
                 base_domain,

@@ -32,17 +32,11 @@ class SinglePackTransfer(Component):
             next_state="start", message=message.package_not_found_for_barcode(barcode)
         )
 
-    def _response_for_forbidden_package(self, barcode, picking_type):
+    def _response_for_forbidden_package(self, barcode, picking_types):
         message = self.actions_for("message")
         return self._response(
             next_state="start",
-            message=message.package_not_allowed_in_src_location(barcode, picking_type),
-        )
-
-    def _response_for_several_picking_types(self):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="start", message=message.several_picking_types()
+            message=message.package_not_allowed_in_src_location(barcode, picking_types),
         )
 
     def _response_for_operation_not_found(self, pack):
@@ -81,11 +75,7 @@ class SinglePackTransfer(Component):
 
     def start(self, barcode):
         search = self.actions_for("search")
-
-        picking_type = self.picking_type
-        if len(picking_type) > 1:
-            return self._response_for_several_picking_types()
-
+        picking_types = self.picking_types
         location = search.location_from_scan(barcode)
 
         pack = self.env["stock.quant.package"]
@@ -104,14 +94,16 @@ class SinglePackTransfer(Component):
         if not pack:
             return self._response_for_package_not_found(barcode)
 
-        if not pack.location_id.is_sublocation_of(picking_type.default_location_src_id):
-            return self._response_for_forbidden_package(barcode, picking_type)
+        if not pack.location_id.is_sublocation_of(
+            picking_types.mapped("default_location_src_id")
+        ):
+            return self._response_for_forbidden_package(barcode, picking_types)
 
         existing_operations = self.env["stock.move.line"].search(
             [
                 ("package_id", "=", pack.id),
                 ("state", "!=", "done"),
-                ("picking_id.picking_type_id", "=", self.picking_type.id),
+                ("picking_id.picking_type_id", "in", picking_types.ids),
             ]
         )
         if not existing_operations:

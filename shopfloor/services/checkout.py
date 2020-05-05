@@ -63,7 +63,7 @@ class Checkout(Component):
             location = search.location_from_scan(barcode)
             if location:
                 if not location.is_sublocation_of(
-                    self.picking_type.default_location_src_id
+                    self.picking_types.mapped("default_location_src_id")
                 ):
                     return self._response_for_select_document(
                         message=message.location_not_allowed()
@@ -96,7 +96,7 @@ class Checkout(Component):
                     # with the proper error message.
                     # Side note: rather unlikely to have several transfers ready
                     # and moving the same things
-                    pickings = pickings.filtered(lambda p: p.picking_type_id == self.picking_type)
+                    pickings = pickings.filtered(lambda p: p.picking_type_id in self.picking_types)
                 if len(pickings) == 1:
                     picking = pickings
         return self._select_picking(picking, "select_document")
@@ -111,7 +111,7 @@ class Checkout(Component):
             return self._response_for_select_document(
                 message=message.barcode_not_found()
             )
-        if picking.picking_type_id != self.picking_type:
+        if picking.picking_type_id not in self.picking_types:
             if state_for_error == "manual_selection":
                 return self._response_for_manual_selection(
                     message=message.cannot_move_something_in_picking_type()
@@ -169,7 +169,7 @@ class Checkout(Component):
     def _domain_for_list_stock_picking(self):
         return [
             ("state", "=", "assigned"),
-            ("picking_type_id", "=", self.picking_type.id),
+            ("picking_type_id", "in", self.picking_types.ids),
         ]
 
     def _order_for_list_stock_picking(self):
