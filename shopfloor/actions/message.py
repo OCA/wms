@@ -42,7 +42,10 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "message": _("You cannot work on a package (%s) outside of locations: %s")
-            % (barcode, ", ".join(picking_types.mapped("default_location_src_id.name"))),
+            % (
+                barcode,
+                ", ".join(picking_types.mapped("default_location_src_id.name")),
+            ),
         }
 
     def already_running_ask_confirmation(self):
