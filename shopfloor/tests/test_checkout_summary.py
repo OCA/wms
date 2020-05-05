@@ -16,5 +16,8 @@ class CheckoutSummaryCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="summary",
-            data={"picking": self._stock_picking_data(picking, done=True)},
+            data={
+                "picking": self._stock_picking_data(picking, done=True),
+                "all_processed": True,
+            },
         )
