@@ -20,9 +20,14 @@ class MenuCase(CommonCase):
                     {
                         "id": menu.id,
                         "name": menu.name,
+                        "op_groups": [],
                         "process": {
                             "id": menu.process_id.id,
                             "code": menu.process_id.code,
+                            "picking_type": {
+                                "id": menu.process_id.picking_type_id.id,
+                                "name": menu.process_id.picking_type_id.name,
+                            },
                         },
                     }
                     for menu in menus

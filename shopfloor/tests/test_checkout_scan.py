@@ -80,7 +80,7 @@ class CheckoutScanCase(CheckoutCommonCase):
             message={"message_type": "error", "message": "Location not allowed here."},
         )
 
-    def _test_scan_document_error_different_picking_type(self, barcode_func):
+    def _test_scan_document_error_different_picking_type(self, barcode_func, msg):
         picking = self._create_picking(picking_type=self.wh.pick_type_id)
         self._fill_stock_for_moves(picking.move_lines, in_package=True)
         picking.action_assign()
@@ -89,20 +89,18 @@ class CheckoutScanCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            message={
-                "message_type": "error",
-                "message": "You cannot move this using this menu.",
-            },
+            message={"message_type": "error", "message": msg},
         )
 
     def test_scan_document_error_different_picking_type_picking(self):
         self._test_scan_document_error_different_picking_type(
-            lambda picking: picking.name
+            lambda picking: picking.name, msg="You cannot move this using this menu."
         )
 
     def test_scan_document_error_different_picking_type_package(self):
         self._test_scan_document_error_different_picking_type(
-            lambda picking: picking.move_line_ids.package_id.name
+            lambda picking: picking.move_line_ids.package_id.name,
+            msg="Barcode not found",
         )
 
     def test_scan_document_error_location_several_pickings(self):

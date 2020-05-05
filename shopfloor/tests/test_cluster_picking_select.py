@@ -191,6 +191,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
                         "name": self.batch1.name,
                         "picking_count": 1,
                         "move_line_count": 1,
+                        "weight": 6.0,
                     },
                     # batch 2 is excluded because assigned to someone else
                     {
@@ -198,6 +199,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
                         "name": self.batch3.name,
                         "picking_count": 1,
                         "move_line_count": 1,
+                        "weight": 6.0,
                     },
                     # batch 4 is excluded because not all of its pickings are
                     # assigned
