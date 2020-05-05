@@ -87,7 +87,6 @@ class Checkout(Component):
             if package:
                 pickings = package.move_line_ids.filtered(
                     lambda ml: ml.state not in ("cancel", "done")
-
                 ).mapped("picking_id")
                 if len(pickings) > 1:
                     # Filter only if we find several pickings to narrow the
@@ -96,7 +95,9 @@ class Checkout(Component):
                     # with the proper error message.
                     # Side note: rather unlikely to have several transfers ready
                     # and moving the same things
-                    pickings = pickings.filtered(lambda p: p.picking_type_id in self.picking_types)
+                    pickings = pickings.filtered(
+                        lambda p: p.picking_type_id in self.picking_types
+                    )
                 if len(pickings) == 1:
                     picking = pickings
         return self._select_picking(picking, "select_document")

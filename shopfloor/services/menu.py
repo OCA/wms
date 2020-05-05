@@ -68,7 +68,9 @@ class ShopfloorMenuValidator(Component):
     _usage = "menu.validator"
 
     def search(self):
-        return {"name_fragment": {"type": "string", "nullable": True, "required": False}}
+        return {
+            "name_fragment": {"type": "string", "nullable": True, "required": False}
+        }
 
 
 class ShopfloorMenuValidatorResponse(Component):

@@ -1,4 +1,4 @@
-from odoo import _, exceptions, fields
+from odoo import _, exceptions
 from odoo.exceptions import MissingError
 from odoo.osv import expression
 
@@ -25,9 +25,7 @@ class BaseShopfloorService(AbstractComponent):
 
     @property
     def picking_types(self):
-        """
-        Get the allowed picking types based on the menu and the warehouse of the profile.
-        """
+        """Return picking types for the menu and profile"""
         # TODO make this a lazy property or computed field avoid running the
         # filter every time?
         picking_types = self.work.menu.picking_type_ids.filtered(
@@ -75,7 +73,9 @@ class BaseShopfloorService(AbstractComponent):
     def _get_output_validator(self, method_name):
         # override the method to get the validator in a component
         # instead of a method, to keep things apart
-        validator_component = self.component(usage="%s.validator.response" % self._usage)
+        validator_component = self.component(
+            usage="%s.validator.response" % self._usage
+        )
         return validator_component._get_validator(method_name)
 
     def _response(self, base_response=None, data=None, next_state=None, message=None):
