@@ -86,7 +86,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
             response,
             next_state="summary",
             data={
-                "picking": self._stock_picking_data(self.picking, done=True),
+                "picking": self._stock_picking_data(picking, done=True),
                 "all_processed": False,
             },
         )
@@ -111,7 +111,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
             response,
             next_state="summary",
             data={
-                "picking": self._stock_picking_data(self.picking, done=True),
+                "picking": self._stock_picking_data(picking, done=True),
                 "all_processed": False,
             },
         )
