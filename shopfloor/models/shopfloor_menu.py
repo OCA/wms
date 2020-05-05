@@ -12,8 +12,7 @@ class ShopfloorMenu(models.Model):
         "shopfloor.profile", string="Profiles", help="Visible for these profiles"
     )
     picking_type_ids = fields.Many2many(
-        comodel_name="stock.picking.type", string="Operation Types",
-        required=True,
+        comodel_name="stock.picking.type", string="Operation Types", required=True,
     )
     # TODO allow only one picking type when 'move creation' is allowed
 
