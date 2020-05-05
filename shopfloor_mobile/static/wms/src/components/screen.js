@@ -84,9 +84,9 @@ Vue.component("Screen", {
             <div class="footer" v-if="$slots.footer">
                 <slot name="footer">Optional footer - no content</slot>
             </div>
-            <div class="loading" v-if="$root.loading">
+            <div class="loading" v-if="$root.loading && !$root.demo_mode">
                 Loading...
-                <!-- TODO: show a spinner -->
+                <!-- TODO: show a spinner + FIXME: demo mode should work properly -->
             </div>
         </v-content>
     </v-app>

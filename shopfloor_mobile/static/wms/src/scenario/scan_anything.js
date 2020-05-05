@@ -1,13 +1,28 @@
 export var ScanAnything = Vue.component("scan-anything", {
     template: `
-        <Screen title="Scan Anything" :klass="'scan_anything'">
-            <searchbar v-on:found="on_scan" :input_placeholder="search_input_placeholder"></searchbar>
+        <Screen :title="screen_title" :klass="'scan_anything'">
+            <searchbar
+                v-if="!displayOnly"
+                v-on:found="on_scan"
+                :input_placeholder="search_input_placeholder"
+                />
             <component
                 :is="detail_component_name()"
                 :record="dataReceived.detail_info"
+                :options="{on_url_change: on_url_change, full_detail: true}"
                 />
-            <reset-screen-button v-on:reset="on_reset" :show_reset_button="show_reset_button"></reset-screen-button>
-            <btn-back v-if="showBackBtn" />
+            <div class="button-list button-vertical-list full">
+                <v-row align="center" v-if="showBackBtn">
+                    <v-col class="text-center" cols="12">
+                        <btn-back />
+                    </v-col>
+                </v-row>
+                <v-row align="center" v-if="!displayOnly && showResetBtn">
+                    <v-col class="text-center" cols="12">
+                        <reset-screen-button v-on:reset="on_reset" :show_reset_button="showResetBtn"></reset-screen-button>
+                    </v-col>
+                </v-row>
+            </div>
         </Screen>
     `,
     data: function() {
@@ -42,7 +57,7 @@ export var ScanAnything = Vue.component("scan-anything", {
             this.dataReceived = {};
             this.$router.push({name: "scananything", params: {codebar: undefined}});
         },
-        urlChanged: function(codebar) {
+        on_url_change: function(codebar) {
             // Change the route on when more info clicked in children
             const query = {};
             if ("codebar" in this.$route.params) {
@@ -78,11 +93,21 @@ export var ScanAnything = Vue.component("scan-anything", {
         },
     },
     computed: {
-        showBackBtn: function() {
-            return "childOf" in this.$route.query;
+        displayOnly: function() {
+            return this.$route.query.displayOnly;
         },
-        show_reset_button: function() {
+        showBackBtn: function() {
+            return "childOf" in this.$route.query || this.displayOnly;
+        },
+        showResetBtn: function() {
             return !_.isEmpty(this.dataReceived);
+        },
+        screen_title: function() {
+            let title = "Scan anything";
+            if (this.$route.params.codebar) {
+                title += ": " + this.$route.params.codebar;
+            }
+            return title;
         },
     },
 });

@@ -91,6 +91,14 @@ ul.packaging span:first-child {
     margin-bottom: 1rem;
     border-width: 4px;
 }
+.detail.item-detail-card.loud .v-card__text.details {
+    font-size: 1.3em;
+    line-height: 1.4em;
+}
+.detail.item-detail-card.loud .v-card__text.details .label {
+    font-weight: bold;
+}
+
 .button-vertical-list.full .v-btn {
     width: 90%;
     height: 5rem;

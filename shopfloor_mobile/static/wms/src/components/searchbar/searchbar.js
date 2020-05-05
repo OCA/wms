@@ -1,3 +1,4 @@
+/* eslint-disable strict */
 Vue.component("searchbar", {
     data: function() {
         return {
@@ -12,10 +13,11 @@ Vue.component("searchbar", {
     methods: {
         search: function(e) {
             e.preventDefault();
+            // Talk to parent
             this.$emit("found", {
                 text: this.entered,
                 type: e.target.dataset.type,
-            }); // Talk to parent
+            });
             this.reset();
         },
         reset: function() {

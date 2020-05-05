@@ -2,7 +2,7 @@
 /* eslint-disable no-implicit-globals */
 import {CheckoutPickingDetailSelectMixin} from "./mixins.js";
 
-Vue.component("checkout-picking-detail-select", {
+Vue.component("detail-picking-select", {
     mixins: [CheckoutPickingDetailSelectMixin],
 });
 
