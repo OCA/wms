@@ -143,9 +143,7 @@ class ClusterPicking(Component):
     def _response_for_confirm_start(self, batch):
         pickings = []
         for picking in batch.picking_ids:
-            p_weight = 0.0
-            for move_line in picking.mapped("move_line_ids"):
-                p_weight += move_line.product_qty * move_line.product_id.weight
+            p_weight = batch.picking_weight(picking)
             p_values = {
                 "id": picking.id,
                 "name": picking.name,
