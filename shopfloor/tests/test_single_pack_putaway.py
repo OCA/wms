@@ -124,7 +124,7 @@ class SinglePackPutawayCase(CommonCase):
             next_state="start",
             message={
                 "message_type": "error",
-                "message": "You cannot work on a package (%s) outside of location: %s"
+                "message": "You cannot work on a package (%s) outside of locations: %s"
                 % (
                     self.pack_a.name,
                     self.menu.picking_type_ids.default_location_src_id.name,

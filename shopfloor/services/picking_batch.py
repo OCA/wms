@@ -51,7 +51,7 @@ class PickingBatch(Component):
                     batch.state == "in_progress"
                     or picking.state in ("assigned", "done", "cancel")
                 )
-                and picking.picking_type_id == self.picking_type
+                and picking.picking_type_id in self.picking_types
                 for picking in batch.picking_ids
             )
         )

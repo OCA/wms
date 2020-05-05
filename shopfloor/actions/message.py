@@ -38,11 +38,11 @@ class MessageAction(Component):
     def bin_not_found_for_barcode(self, barcode):
         return {"message_type": "error", "message": _("Bin %s doesn't exist") % barcode}
 
-    def package_not_allowed_in_src_location(self, barcode, picking_type):
+    def package_not_allowed_in_src_location(self, barcode, picking_types):
         return {
             "message_type": "error",
-            "message": _("You cannot work on a package (%s) outside of location: %s")
-            % (barcode, picking_type.default_location_src_id.name),
+            "message": _("You cannot work on a package (%s) outside of locations: %s")
+            % (barcode, ", ".join(picking_types.mapped("default_location_src_id.name"))),
         }
 
     def already_running_ask_confirmation(self):
