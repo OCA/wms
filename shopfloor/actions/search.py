@@ -37,16 +37,3 @@ class SearchAction(Component):
         return self.env["product.packaging"].search(
             [("barcode", "=", barcode), ("product_id", "=", False)]
         )
-
-    def stock_picking_from_package(self, package, picking_type):
-        return (
-            self.env["stock.move.line"]
-            .search(
-                [
-                    ("state", "not in", ("cancel", "done")),
-                    ("package_id", "=", package.id),
-                    ("picking_id.picking_type_id", "=", picking_type.id),
-                ]
-            )
-            .mapped("picking_id")
-        )
