@@ -85,7 +85,18 @@ class Checkout(Component):
         if not picking:
             package = search.package_from_scan(barcode)
             if package:
-                pickings = search.stock_picking_from_package(package, self.picking_type)
+                pickings = package.move_line_ids.filtered(
+                    lambda ml: ml.state not in ("cancel", "done")
+
+                ).mapped("picking_id")
+                if len(pickings) > 1:
+                    # Filter only if we find several pickings to narrow the
+                    # selection to one of the good type. If we have one picking
+                    # of the wrong type, it will be caught in _select_picking
+                    # with the proper error message.
+                    # Side note: rather unlikely to have several transfers ready
+                    # and moving the same things
+                    pickings = pickings.filtered(lambda p: p.picking_type_id == self.picking_type)
                 if len(pickings) == 1:
                     picking = pickings
         return self._select_picking(picking, "select_document")
