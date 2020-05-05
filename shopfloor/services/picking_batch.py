@@ -77,6 +77,7 @@ class PickingBatch(Component):
             "name": record.name,
             "picking_count": len(assigned_pickings),
             "move_line_count": len(assigned_pickings.mapped("move_line_ids")),
+            "weight": record.total_weight(),
         }
 
 
@@ -119,4 +120,5 @@ class ShopfloorPickingBatchValidatorResponse(Component):
             "name": {"type": "string", "nullable": False, "required": True},
             "picking_count": {"required": True, "type": "integer"},
             "move_line_count": {"required": True, "type": "integer"},
+            "weight": {"required": True, "nullable": True, "type": "float"},
         }
