@@ -83,6 +83,12 @@ const app = new Vue({
                 this.$storage.set("profile", v);
             },
         },
+        // TODO: demo mode is half working now because
+        // if we don't load real menu/profiles 1st
+        // we don't have any menu nor profile to play with.
+        profiles: function() {
+            return this.appconfig ? this.appconfig.profiles || [] : [];
+        },
         appmenu: {
             get: function() {
                 if (_.isEmpty(this.profile_menu)) {
