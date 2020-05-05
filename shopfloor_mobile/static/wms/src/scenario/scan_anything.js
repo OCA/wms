@@ -2,20 +2,24 @@ export var ScanAnything = Vue.component("scan-anything", {
     template: `
         <Screen title="Scan Anything" :klass="'scan_anything'">
             <searchbar v-on:found="on_scan" :input_placeholder="search_input_placeholder"></searchbar>
-            <detail-pack :packDetail="dataReceived.detail_info" v-if="dataReceived.type=='pack'"></detail-pack>
-            <detail-product :productDetail="dataReceived.detail_info" v-if="dataReceived.type=='product'"></detail-product>
-            <detail-location :locationDetail="dataReceived.detail_info" v-if="dataReceived.type=='location'" v-on:url-change="urlChanged"></detail-location>
-            <detail-operation :operationDetail="dataReceived.detail_info" v-if="dataReceived.type=='operation'"></detail-operation>
+            <component
+                :is="detail_component_name()"
+                :record="dataReceived.detail_info"
+                />
             <reset-screen-button v-on:reset="on_reset" :show_reset_button="show_reset_button"></reset-screen-button>
             <btn-back v-if="showBackBtn" />
         </Screen>
     `,
+    data: function() {
+        return {
+            usage: "scan_anything",
+            dataReceived: {},
+            search_input_placeholder: "Scan anything",
+        };
+    },
     mounted() {
         const odoo_params = {
-            process_id: 99,
-            process_menu_id: 99,
             usage: this.usage,
-            debug: this.$root.demo_mode,
         };
         this.odoo = this.$root.getOdoo(odoo_params);
         if (this.$root.demo_mode) {
@@ -51,7 +55,7 @@ export var ScanAnything = Vue.component("scan-anything", {
             });
         },
         getData: function(codebar) {
-            this.odoo.scan_anything(codebar).then(result => {
+            this.odoo.call(codebar).then(result => {
                 this.dataReceived = result.data || {};
             });
         },
@@ -61,6 +65,17 @@ export var ScanAnything = Vue.component("scan-anything", {
                 params: {codebar: scanned.text},
             });
         },
+        detail_component_name() {
+            if (_.isEmpty(this.dataReceived)) {
+                return null;
+            }
+            const name = "detail-" + this.dataReceived.type;
+            if (!name in Vue.options.components) {
+                console.error("Detail component ", name, " not found.");
+                return null;
+            }
+            return name;
+        },
     },
     computed: {
         showBackBtn: function() {
@@ -69,12 +84,5 @@ export var ScanAnything = Vue.component("scan-anything", {
         show_reset_button: function() {
             return !_.isEmpty(this.dataReceived);
         },
-    },
-    data: function() {
-        return {
-            usage: "scan_anything",
-            dataReceived: {},
-            search_input_placeholder: "Scan anything",
-        };
     },
 });

@@ -125,18 +125,7 @@ export class OdooMocked extends OdooMixin {
         console.dir("CALL RETURN data:", result);
         return Promise.resolve(result);
     }
-    scan_anything(barcode) {
-        console.log("Scan anything", barcode, this.usage);
-        this._set_demo_data();
-        var demo_case = this.demo_data[barcode];
-        if (!demo_case) {
-            return Promise.resolve({
-                message: {message_type: "error", message: "Unknown barcode"},
-            });
-        }
-        console.dir(demo_case);
-        return Promise.resolve(demo_case);
-    }
+    // TODO: check if still needed.
     cluster_picking_set_destination_all(data) {
         let result = this.demo_data.set_destination_all;
         if (data.confirmation) {
