@@ -71,7 +71,7 @@ Vue.component("Screen", {
                 <slot name="header">Optional header - no content</slot>
             </div>
 
-            <v-alert type="warning" tile v-if="!this.$root.has_profile && this.$route.name!='profile'">
+            <v-alert type="warning" tile v-if="!this.$root.demo_mode && !this.$root.has_profile && this.$route.name!='profile'">
                 <p>Profile not configured yet. Please select one.</p>
             </v-alert>
 

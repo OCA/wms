@@ -1,3 +1,5 @@
+import {process_registry} from "../services/process_registry.js";
+
 export class DemoTools {
     constructor(demo_cases) {
         this.demo_cases = demo_cases.length ? demo_cases : {};
@@ -236,6 +238,20 @@ export class DemoTools {
             "Jeff Lawson",
             "Marc Demo",
         ];
+    }
+
+    makeAppMenu() {
+        let menu;
+        _.forEach(process_registry.all(), function(component, key) {
+            menu.push({
+                id: key,
+                process: {
+                    id: key,
+                    code: key,
+                },
+            });
+        });
+        return menu;
     }
 }
 
