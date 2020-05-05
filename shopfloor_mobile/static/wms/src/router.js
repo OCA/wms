@@ -15,11 +15,6 @@ let routes = [
         component: ScanAnything,
         name: "scananything",
     },
-    {
-        path: "/scananything/:codebar?",
-        component: ScanAnything,
-        name: "scananything",
-    },
     // TODO Fix this it needs to be the last route, but I think it is not anymore with the dynamic one added.
     // { path: '*', component: NotFound },
 ];

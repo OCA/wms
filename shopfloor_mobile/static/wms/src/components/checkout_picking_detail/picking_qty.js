@@ -1,13 +1,13 @@
 /* eslint-disable strict */
 /* eslint-disable no-implicit-globals */
-import {CheckoutPickingDetailMixin} from "./mixins.js";
+import {PickingDetailMixin} from "../detail/detail_picking.js";
 
 Vue.component("checkout-picking-change-qty", {
-    mixins: [CheckoutPickingDetailMixin],
+    mixins: [PickingDetailMixin],
     template: `
 <div class="checkout-picking-change-qty" v-if="!_.isEmpty(picking)">
 
-    <checkout-picking-detail :picking="picking" />
+    <detail-picking :picking="picking" />
 
     TODO
 </div>

@@ -9,14 +9,36 @@ export class DemoTools {
             this.makeLocation(),
         ];
         this.locations_src = [
-            this.makeLocation("LOC-SRC"),
-            this.makeLocation("LOC-SRC"),
-            this.makeLocation("LOC-SRC"),
+            this.makeLocation({}, {name_prefix: "LOC-SRC"}),
+            this.makeLocation({}, {name_prefix: "LOC-SRC"}),
+            this.makeLocation({}, {name_prefix: "LOC-SRC"}),
         ];
         this.locations_dest = [
-            this.makeLocation("LOC-DST"),
-            this.makeLocation("LOC-DST"),
-            this.makeLocation("LOC-DST"),
+            this.makeLocation({}, {name_prefix: "LOC-DST"}),
+            this.makeLocation({}, {name_prefix: "LOC-DST"}),
+            this.makeLocation({}, {name_prefix: "LOC-DST"}),
+        ];
+        this.packagings = [
+            this.makePackaging({
+                name: "Little Box",
+                qty: 10,
+                qty_unit: "Unit",
+            }),
+            this.makePackaging({
+                name: "Box",
+                qty: 20,
+                qty_unit: "Unit",
+            }),
+            this.makePackaging({
+                name: "Big Box",
+                qty: 30,
+                qty_unit: "Box",
+            }),
+            this.makePackaging({
+                name: "Pallette",
+                qty: 50,
+                qty_unit: "Big Box",
+            }),
         ];
     }
 
@@ -32,6 +54,13 @@ export class DemoTools {
     getRandomInt(max) {
         max = max ? max : 10000;
         return Math.floor(Math.random() * Math.floor(max)) + 1;
+    }
+
+    randomFutureDate(days) {
+        days = days ? days : this.getRandomInt(30);
+        const start = new Date();
+        let stop = new Date();
+        return stop.setDate(start.getDate() + days);
     }
 
     batchList(count = 5) {
@@ -62,32 +91,89 @@ export class DemoTools {
         });
     }
 
-    makeLocation(prefix) {
-        return this.makeSimpleRecord({}, {name_prefix: prefix || "LOC"});
+    makeLocation(defaults = {}, options = {}) {
+        _.defaults(options, {
+            name_prefix: "LOC ",
+        });
+        _.defaults(defaults, {
+            barcode: "loc1",
+        });
+        const self = this;
+        const loc = this.makeSimpleRecord(defaults, options);
+        if (options.full_detail) {
+            let products = [];
+            _.forEach(
+                _.range(1, options.products_count || this.getRandomInt(10)),
+                function() {
+                    products.push(self.makeProductFullDetail({}, {}));
+                }
+            );
+            _.extend(loc, {
+                parent_name: _.sample([
+                    "Loc A/ Loc B/ Loc C",
+                    "Loc X/ Loc Y/ Loc Z",
+                    "Loc Foo/ Loc Bar/ Loc Baz",
+                ]),
+                products: products,
+            });
+        }
+        return loc;
     }
 
     makeLot() {
         return this.makeSimpleRecord({}, {name_prefix: "LOT"});
     }
 
-    makePackaging() {
-        return this.makeSimpleRecord({}, {name_prefix: "Packaging"});
+    makePackaging(defaults = {}, options = {}) {
+        _.defaults(defaults, {
+            name: "Packging",
+            qty: 1,
+            qty_unit: "Unit",
+        });
+        return this.makeSimpleRecord(defaults, {});
     }
 
-    makePack(options = {}) {
-        _.extend(options, {name_prefix: "PACK", padding: 10});
-        const pack = this.makeSimpleRecord({}, options);
-        _.extend(pack, {
+    makePack(defaults = {}, options = {}) {
+        const self = this;
+        _.defaults(options, {name_prefix: "PACK", padding: 10});
+        _.defaults(defaults, {
+            barcode: "pack",
             weight: this.getRandomInt(100) + " Kg",
             packaging_name: this.makePackaging().name,
             move_line_count: this.getRandomInt(10),
         });
+        if (options.full_detail) {
+            let products = [];
+            _.forEach(
+                _.range(1, options.products_count || this.getRandomInt(5)),
+                function() {
+                    products.push(self.makeProductFullDetail({}, {}));
+                }
+            );
+            let pickings = [];
+            _.forEach(
+                _.range(1, options.pickings_count || this.getRandomInt(3)),
+                function() {
+                    pickings.push(self.makePicking({}, {no_lines: true}));
+                }
+            );
+            _.defaults(defaults, {
+                location_src: _.sample(this.locations_src),
+                storage_type: "Storage type XXX", // TODO
+                package_type: "Package type XXX", // TODO
+                products: products,
+                pickings: pickings,
+            });
+        }
+        const pack = this.makeSimpleRecord(defaults, options);
         return pack;
     }
 
-    makeProduct(i = 0) {
-        i = i != 0 ? i : this.getRandomInt();
-        const prod = this.makeSimpleRecord({}, {name_prefix: "Prod " + i, padding: 0});
+    makeProduct(defaults = {}, options = {}) {
+        _.defaults(options, {
+            name_prefix: "Prod " + this.getRandomInt(),
+            padding: 0,
+        });
         const default_code = _.padEnd(
             this.randomFromArray("ABCDEFGHIJK") +
                 this.randomFromArray("ABCDEFGHIJK") +
@@ -95,19 +181,37 @@ export class DemoTools {
             8,
             0
         );
-        _.extend(prod, {
+        _.defaults(defaults, {
             default_code: default_code,
-            display_name: "[" + default_code + "] " + prod.name,
-            // TODO: check if still needed
-            qty: this.getRandomInt(200),
             qty_available: this.getRandomInt(200),
+        });
+        const prod = this.makeSimpleRecord(defaults, options);
+        _.extend(prod, {
+            display_name: "[" + default_code + "] " + prod.name,
         });
         return prod;
     }
 
+    makeProductFullDetail(defaults = {}, options = {}) {
+        _.defaults(defaults, {
+            qty_instock: this.getRandomInt(),
+            qty_reserved: this.getRandomInt(),
+            expiry_date: "2020-12-01",
+            supplier_code: "SUP" + this.getRandomInt(200),
+            packagings: _.sampleSize(this.packagings, this.getRandomInt(4)),
+            // TODO: load some random images
+            image: null,
+            barcode: "prod",
+        });
+        _.defaults(options, {
+            full_detail: true,
+        });
+        return this.makeProduct(defaults, options);
+    }
+
     makePickingLines(defaults = {}, options = {}) {
         _.defaults(defaults, {
-            picking: null,
+            picking: options.picking_auto ? this.makePicking() : null,
         });
         const lines = [];
         for (let i = 1; i < options.lines_count + 1; i++) {
@@ -124,7 +228,7 @@ export class DemoTools {
             let line = _.defaults(
                 this.makeMoveLine({
                     id: i,
-                    product: this.makeProduct(i),
+                    product: this.makeProduct({name: "Prod " + i}),
                     package_dest: pack,
                     location_src: this.randomFromArray(this.locations_src),
                     location_dest: loc_dest,
@@ -146,14 +250,30 @@ export class DemoTools {
             }),
             note: this.randomFromArray([null, "demo picking note"]),
         });
+        if (options.full_detail) {
+            _.defaults(defaults, {
+                schedule_date: this.randomFutureDate(),
+                operation_type: "An operation type",
+                location_dest: _.sample(this.locations_dest),
+                carrier: this.randomFromArray([
+                    null,
+                    "Carrier 1",
+                    "Carrier 2",
+                    "Carrier 3",
+                ]),
+                priority: this.getRandomInt(10),
+            });
+        }
         _.defaults(options, {
             name_prefix: "PICK",
             padding: 8,
             lines_count: options.lines_count || 0,
         });
         const picking = this.makeSimpleRecord(defaults, options);
-        picking.move_lines = this.makePickingLines({picking: picking}, options);
-        picking.lines_count = picking.move_lines.length;
+        if (!options.no_lines) {
+            picking.move_lines = this.makePickingLines({picking: picking}, options);
+            picking.lines_count = picking.move_lines.length;
+        }
         return picking;
     }
 
@@ -176,8 +296,8 @@ export class DemoTools {
             package_src: this.makePack({name_prefix: "PACK-SRC"}),
             package_dest: this.makePack({name_prefix: "PACK-DST"}),
             origin: "S0" + this.getRandomInt(),
-            location_src: this.makeLocation("LOC-SRC"),
-            location_dest: this.makeLocation("LOC-DST"),
+            location_src: this.makeLocation({}, {name_prefix: "LOC-SRC"}),
+            location_dest: this.makeLocation({}, {name_prefix: "LOC-DST"}),
         });
     }
 
@@ -198,6 +318,10 @@ export class DemoTools {
             batch: this.makeBatch(),
         });
         return this.makeMoveLine(defaults);
+    }
+
+    makeSingleLineOperation() {
+        return _.head(this.makePickingLines({}, {picking_auto: true, lines_count: 1}));
     }
 
     customerNames() {

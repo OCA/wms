@@ -11,22 +11,22 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
             dialog: false,
         };
     },
+    methods: {
+        detail_fields() {
+            return [
+                {path: "location_src.name", label: "Location"},
+                {path: "package_dest.name", label: "Destination"},
+                {path: "package_src.name", label: "Pack"},
+                {path: "quantity", label: "Qty"},
+            ];
+        },
+    },
     template: `
 <div v-if="!_.isEmpty(line)" :class="'detail batch-picking-line-detail ' + (line.postponed ? 'line-postponed' : '')">
-  <v-card outlined class="main">
-    <!-- use card-title just to get some big styles for prominent information for free -->
-    <v-card-title>
-      <div class="main-info">
-        <div class="source"><span class="label">Location:</span> {{ line.location_src.name }}</div>
-        <div v-if="line.package_dest" class="pack pack-dest"><span class="label">Destination bin:</span> {{ line.package_dest.name }}</div>
-        <div v-if="line.lot" class="lot"><span class="label">Lot:</span> {{ line.lot.name }}</div>
-        <div v-if="line.package_src" class="pack pack-src"><span class="label">Pack:</span> {{ line.package_src.name }}</div>
-        <div class="qty-pkg"><span class="label">Qty:</span> {{ line.quantity }}</div>
-      </div>
-    </v-card-title>
-  </v-card>
 
+  <item-detail-card :record="line" :options="{main: true, loud: true, no_title: true, fields: detail_fields()}" />
 
+  <!-- TODO: replace this w/ detail card too -->
   <v-card outlined v-if="showFullInfo">
     <v-card-title>{{ line.product.default_code }}</v-card-title>
     <v-card-subtitle>{{ line.product.name }}</v-card-subtitle>

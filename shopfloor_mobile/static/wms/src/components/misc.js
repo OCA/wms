@@ -6,9 +6,9 @@ Vue.component("reset-screen-button", {
         },
     },
     template: `
-        <div class="action reset">
-            <v-form class="m-t5" v-if="show_reset_button" v-on:reset="reset">
-                <v-btn depressed x-large @click="reset">Reset</v-btn>
+        <div class="action reset" v-if="show_reset_button">
+            <v-form class="m-t5"  v-on:reset="reset">
+                <v-btn depressed color="warning" x-large @click="reset">Reset</v-btn>
             </v-form>
         </div>
     `,

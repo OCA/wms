@@ -1,29 +1,9 @@
 /* eslint-disable strict */
 /* eslint-disable no-implicit-globals */
-export var CheckoutPickingDetailMixin = {
-    props: {
-        picking: Object,
-    },
-    template: `
-<div class="detail checkout-picking-detail" v-if="!_.isEmpty(picking)">
-    <v-card outlined class="main">
-        <v-card-title>{{ picking.name }}</v-card-title>
-        <v-card-subtitle>
-            <span class="origin" v-if="picking.origin">
-                <span>{{ picking.origin }}</span>
-            </span>
-            <span v-if="picking.origin && picking.partner"> - </span>
-            <span class="partner" v-if="picking.partner">
-                <span>{{ picking.partner.name }}</span>
-            </span>
-        </v-card-subtitle>
-    </v-card>
-</div>
-`,
-};
+import {PickingDetailMixin} from "../detail/detail_picking.js";
 
 export var CheckoutPickingDetailSelectMixin = {
-    mixins: [CheckoutPickingDetailMixin],
+    mixins: [PickingDetailMixin],
     props: {
         select_records: Array,
         select_records_grouped: Array,
@@ -42,9 +22,9 @@ export var CheckoutPickingDetailSelectMixin = {
         },
     },
     template: `
-<div class="checkout-picking-detail-select" v-if="!_.isEmpty(picking)">
+<div class="detail-picking-select" v-if="!_.isEmpty(picking)">
 
-    <checkout-picking-detail :picking="picking" />
+    <detail-picking :picking="picking" />
 
     <manual-select
         :records="select_records || picking.move_lines"
@@ -56,7 +36,7 @@ export var CheckoutPickingDetailSelectMixin = {
 };
 
 export var CheckoutPickingDetailListMixin = {
-    mixins: [CheckoutPickingDetailMixin],
+    mixins: [PickingDetailMixin],
     props: {
         records: Array,
         records_grouped: Array,
@@ -74,9 +54,9 @@ export var CheckoutPickingDetailListMixin = {
         },
     },
     template: `
-<div class="checkout-picking-detail-list" v-if="!_.isEmpty(picking)">
+<div class="detail-picking-list" v-if="!_.isEmpty(picking)">
 
-    <checkout-picking-detail :picking="picking" />
+    <detail-picking :picking="picking" />
 
     <list
         :records="records || picking.move_lines"

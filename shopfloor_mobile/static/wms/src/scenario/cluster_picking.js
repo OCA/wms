@@ -64,7 +64,6 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 :line="state.data"
                 />
 
-
             <div v-if="state_is('manual_selection')">
                 <manual-select
                     v-on:select="state.on_select"
@@ -314,8 +313,9 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     on_scan: (scanned, confirmation = true) => {
                         this.on_state_exit();
                         // FIXME: use state_load or traverse the state
-                        this.current_state_key = "unload_all";
-                        this.state.on_scan(scanned, confirmation);
+                        // this.current_state_key = "unload_all";
+                        // this.state.on_scan(scanned, confirmation);
+                        this.states["unload_all"].on_scan(scanned, confirmation);
                     },
                 },
                 unload_single: {

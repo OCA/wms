@@ -7,7 +7,7 @@ export var Checkout = Vue.component("checkout", {
     mixins: [ScenarioBaseMixin],
     /*
         /!\ IMPORTANT: we use many times the same component
-        (eg: manual-select or checkout-picking-detail-select)
+        (eg: manual-select or detail-picking-select)
         and to make sure they don't get cached together
         we MUST call them using `:key` to make them unique!
         If you don't, you'll have severe problems of data being shared
@@ -15,6 +15,13 @@ export var Checkout = Vue.component("checkout", {
         you assume to have different instance but indeed you get only 1
         which is reused every time!
     */
+    /*
+    TODO QUESTIONS:
+
+    * summary: raw products not listed -> no move lines from backend
+    * destroy raw product: what to do? Just drop the flag?
+    *
+     */
     template: `
         <Screen :title="screen_info.title" :klass="screen_info.klass">
             <!-- FOR DEBUG -->
@@ -55,11 +62,11 @@ export var Checkout = Vue.component("checkout", {
                 </div>
             </div>
             <div v-if="state_is('select_line')">
-                <checkout-picking-detail-select
+                <detail-picking-select
                     :picking="state.data.picking"
                     :select_records="state.data.picking.move_lines"
                     :select_records_grouped="group_lines_by_location(state.data.picking.move_lines, {'prepare_records': only_one_package})"
-                    :key="current_state_key + '-checkout-picking-detail-select'"
+                    :key="current_state_key + '-detail-picking-select'"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -71,11 +78,11 @@ export var Checkout = Vue.component("checkout", {
             </div>
 
             <div v-if="state_is('select_package')">
-                <checkout-picking-detail-select
+                <detail-picking-select
                     :picking="state.data.picking"
                     :select_records="state.data.selected_move_lines"
                     :select_options="{multiple: true, initSelectAll: true, list_item_component: 'checkout-select-package-content'}"
-                    :key="current_state_key + '-checkout-picking-detail-select'"
+                    :key="current_state_key + '-detail-picking-select'"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -126,11 +133,11 @@ export var Checkout = Vue.component("checkout", {
                 </div>
             </div>
             <div v-if="state_is('select_dest_package')">
-                <checkout-picking-detail-select
+                <detail-picking-select
                     :picking="state.data.picking"
                     :select_records="state.data.packages"
                     :select_options="{list_item_fields: existing_package_select_fields, list_item_component: 'list-item'}"
-                    :key="current_state_key + '-checkout-picking-detail-select'"
+                    :key="current_state_key + '-detail-picking-select'"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -165,15 +172,15 @@ export var Checkout = Vue.component("checkout", {
                 </div>
             </div>
             <div v-if="state_is('change_packaging')">
-                <checkout-picking-detail-select
+                <detail-picking-select
                     :picking="state.data.picking"
                     :select_records="state.data.packagings"
                     :select_options="{list_item_component: 'list-item'}"
-                    :key="current_state_key + '-checkout-picking-detail-select'"
+                    :key="current_state_key + '-detail-picking-select'"
                     />
             </div>
             <div v-if="state_is('confirm_done')">
-                <checkout-picking-detail :picking="state.data.picking" />
+                <detail-picking :picking="state.data.picking" />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">

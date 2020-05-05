@@ -1,10 +1,14 @@
+import {ItemDetailMixin} from "./detail/detail_mixin.js";
+
 /* eslint-disable strict */
 Vue.component("list", {
     // TODO: move most of this stuff to a mixin and reuse it in manual-select
     props: {
         records: {
             type: Array,
-            default: [],
+            default: function() {
+                return [];
+            },
         },
         grouped_records: {
             type: Array,
@@ -14,7 +18,6 @@ Vue.component("list", {
         },
         key_title: {
             type: String,
-            default: "name",
         },
         options: {
             type: Object,
@@ -43,17 +46,23 @@ Vue.component("list", {
             // If you pass only one key, you'll lose all defaults.
             const opts = _.defaults({}, this.$props.options, {
                 showCounters: false,
+                key_title: "name",
                 list_item_component: "list-item",
                 list_item_action_component: null,
+                list_item_on_click: null,
             });
             return opts;
         },
         list_item_options() {
-            return {
-                key_title: this.key_title,
+            const opts = _.defaults({}, this.$props.options.list_item_options, {
+                key_title: this.opts.key_title,
                 showCounters: this.opts.showCounters,
+                // customize fields
                 fields: this.opts.list_item_fields,
-            };
+                // customize action per all detail fields
+                detail_action: null,
+            });
+            return opts;
         },
         klass() {
             const bits = ["list"];
@@ -76,7 +85,7 @@ Vue.component("list", {
                 <div class="list-group" v-for="group in listable" :key="group.key">
                     <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
                     <div class="list-item-wrapper" v-for="(rec, index) in group.records"">
-                        <v-list-item :key="index">
+                        <v-list-item :key="index" @click="opts.list_item_on_click ? opts.list_item_on_click(rec) : null">
                             <component
                                 :is="opts.list_item_component"
                                 :options="list_item_options"
@@ -96,23 +105,8 @@ Vue.component("list", {
   `,
 });
 
-// TODO: this could be use for display detail as well
 Vue.component("list-item", {
-    props: {
-        record: Object,
-        options: Object,
-    },
-    methods: {
-        render_field_value(record, field) {
-            if (field.renderer) {
-                return field.renderer(record);
-            }
-            return this.raw_value(record, field);
-        },
-        raw_value(record, field) {
-            return _.result(record, field.path);
-        },
-    },
+    mixins: [ItemDetailMixin],
     template: `
     <v-list-item-content>
         <v-list-item-title v-text="record[options.key_title]"></v-list-item-title>
@@ -121,6 +115,11 @@ Vue.component("list-item", {
                 <span v-if="raw_value(record, field) || field.display_no_value">
                     <span v-if="field.label" class="label">{{ field.label }}:</span> {{ render_field_value(record, field) }}
                 </span>
+                <v-btn icon class="detail-action"
+                        v-if="(field.detail_action || opts.detail_action) && _.result(record, field.action_val_path)"
+                        @click="field.detail_action ? field.detail_action(record, field) : options.detail_action(record, field)">
+                    <v-icon color="blue lighten-1">mdi-information</v-icon>
+                </v-btn>
             </div>
         </div>
     </v-list-item-content>
