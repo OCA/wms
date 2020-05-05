@@ -35,12 +35,7 @@ export class DemoTools {
     batchList(count = 5) {
         const list = [];
         for (let i = 1; i < count + 1; i++) {
-            list.push({
-                id: i,
-                name: "Batch #" + i,
-                picking_count: this.getRandomInt(3),
-                move_line_count: this.getRandomInt(15),
-            });
+            list.push(this.makeBatch({}, {name_prefix: "Batch #" + i}));
         }
         return list;
     }
@@ -184,11 +179,21 @@ export class DemoTools {
         });
     }
 
+    makeBatch(defaults = {}, options = {}) {
+        _.defaults(defaults, {
+            weight: this.getRandomInt(1000) + " Kg",
+            move_line_count: this.getRandomInt(20),
+        });
+        _.defaults(options, {name_prefix: "BATCH", padding: 10});
+        const batch = this.makeSimpleRecord(defaults, options);
+        return batch;
+    }
+
     makeBatchPickingLine(defaults = {}) {
         _.defaults(defaults, {
             postponed: true,
             picking: this.makePicking(),
-            batch: this.makeSimpleRecord({}, {name_prefix: "BATCH"}),
+            batch: this.makeBatch(),
         });
         return this.makeMoveLine(defaults);
     }
