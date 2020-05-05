@@ -259,7 +259,10 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             response,
             # all the lines are packed, so we expect to go the summary screen
             next_state="summary",
-            data={"picking": self._stock_picking_data(picking, done=True)},
+            data={
+                "picking": self._stock_picking_data(picking, done=True),
+                "all_processed": True,
+            },
             message={
                 "message_type": "info",
                 "message": "Product(s) packed in {}".format(package.name),

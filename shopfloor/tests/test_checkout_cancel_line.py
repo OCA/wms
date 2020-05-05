@@ -85,7 +85,10 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="summary",
-            data={"picking": self._stock_picking_data(picking, done=True)},
+            data={
+                "picking": self._stock_picking_data(self.picking, done=True),
+                "all_processed": False,
+            },
         )
 
     def test_cancel_line_ok(self):
@@ -107,7 +110,10 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="summary",
-            data={"picking": self._stock_picking_data(picking, done=True)},
+            data={
+                "picking": self._stock_picking_data(self.picking, done=True),
+                "all_processed": False,
+            },
         )
 
     def test_cancel_line_error_package_not_found(self):
@@ -118,7 +124,10 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="summary",
-            data={"picking": self._stock_picking_data(self.picking, done=True)},
+            data={
+                "picking": self._stock_picking_data(self.picking, done=True),
+                "all_processed": False,
+            },
             message={
                 "message_type": "error",
                 "message": "The record you were working on does not exist anymore.",
@@ -133,7 +142,10 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="summary",
-            data={"picking": self._stock_picking_data(self.picking, done=True)},
+            data={
+                "picking": self._stock_picking_data(self.picking, done=True),
+                "all_processed": False,
+            },
             message={
                 "message_type": "error",
                 "message": "The record you were working on does not exist anymore.",

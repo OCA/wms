@@ -48,8 +48,8 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
             data={"picking": self._stock_picking_data(self.picking, done=True)},
             message={
                 "message_type": "warning",
-                "message": "Not all lines have been processed, do"
-                " you want to confirm partial operation?",
+                "message": "Not all lines have been processed with full quantity. "
+                "Do you confirm partial operation?",
             },
         )
 
