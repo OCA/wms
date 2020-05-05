@@ -24,21 +24,23 @@ class BaseShopfloorService(AbstractComponent):
     _expose_model = None
 
     @property
-    def picking_type(self):
+    def picking_types(self):
         """
-        Get the current picking type based on the menu and the warehouse of the profile.
+        Get the allowed picking types based on the menu and the warehouse of the profile.
         """
-        # TODO adapt scenarios to handle multiple types, rename this to picking_types
-        # and filter by warehouse of the profile
-        picking_type = self.work.menu.picking_type_ids
-        if picking_type.warehouse_id != self.work.profile.warehouse_id:
+        # TODO make this a lazy property or computed field avoid running the
+        # filter every time?
+        picking_types = self.work.menu.picking_type_ids.filtered(
+            lambda pt: not pt.warehouse_id
+            or pt.warehouse_id == self.work.profile.warehouse_id
+        )
+        if not picking_types:
             raise exceptions.UserError(
-                _("Process {} cannot be used on warehouse {}").format(
-                    picking_type.display_name,
-                    self.work.profile.warehouse_id.display_name,
+                _("No operation types configured on menu {} for warehouse {}.").format(
+                    self.work.menu.name, self.work.profile.warehouse_id.display_name
                 )
             )
-        return picking_type
+        return picking_types
 
     def _get(self, _id):
         domain = expression.normalize_domain(self._get_base_search_domain())
