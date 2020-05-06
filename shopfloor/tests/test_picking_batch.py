@@ -13,10 +13,9 @@ class BatchPickingCase(CommonCase, PickingBatchMixin):
         )
         # which menu we pick should not matter for the batch picking api
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
-        cls.process = cls.menu.process_id
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
-        cls.picking_type = cls.process.picking_type_id
+        cls.picking_type = cls.menu.picking_type_ids
         cls.batch1 = cls._create_picking_batch(
             [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
         )

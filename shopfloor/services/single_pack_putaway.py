@@ -44,7 +44,7 @@ class SinglePackPutaway(Component):
                 "message_type": "error",
                 "message": _(
                     "An operation exists in %s %s. "
-                    "You cannot process it with this shopfloor process."
+                    "You cannot process it with this shopfloor scenario."
                 )
                 % (
                     existing_operations[0].picking_id.picking_type_id.name,
@@ -85,8 +85,12 @@ class SinglePackPutaway(Component):
 
     def start(self, barcode):
         """Scan a pack barcode"""
-
-        picking_type = self.picking_type
+        # TODO we have to rework this and single_pack_transfer, 'pack putaway'
+        # will be integrated within 'pack transfer' with an option "create
+        # move" on the menu. When "create move" is active on the menu, an
+        # additional M2o field must be filled on the menu with the picking type
+        # used for creations.
+        picking_type = self.picking_types
         if len(picking_type) > 1:
             return self._response_for_several_picking_types()
         elif not picking_type:

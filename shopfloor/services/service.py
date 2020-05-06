@@ -1,4 +1,4 @@
-from odoo import _, exceptions, fields
+from odoo import _, exceptions
 from odoo.exceptions import MissingError
 from odoo.osv import expression
 
@@ -24,22 +24,21 @@ class BaseShopfloorService(AbstractComponent):
     _expose_model = None
 
     @property
-    def picking_type(self):
-        """
-        Get the current picking type based on the menu and the warehouse of the profile.
-        """
-        # TODO: this validation should be done in the service
-        # and should return a proper error for the client
-        # or the client should handle exceptions properly.
-        picking_type = self.work.menu.process_id.picking_type_id
-        if picking_type.warehouse_id != self.work.profile.warehouse_id:
+    def picking_types(self):
+        """Return picking types for the menu and profile"""
+        # TODO make this a lazy property or computed field avoid running the
+        # filter every time?
+        picking_types = self.work.menu.picking_type_ids.filtered(
+            lambda pt: not pt.warehouse_id
+            or pt.warehouse_id == self.work.profile.warehouse_id
+        )
+        if not picking_types:
             raise exceptions.UserError(
-                _("Process {} cannot be used on warehouse {}").format(
-                    picking_type.display_name,
-                    self.work.profile.warehouse_id.display_name,
+                _("No operation types configured on menu {} for warehouse {}.").format(
+                    self.work.menu.name, self.work.profile.warehouse_id.display_name
                 )
             )
-        return picking_type
+        return picking_types
 
     def _get(self, _id):
         domain = expression.normalize_domain(self._get_base_search_domain())
@@ -126,10 +125,11 @@ class BaseShopfloorService(AbstractComponent):
         demo_api_key = self.env.ref("shopfloor.api_key_demo", raise_if_not_found=False)
 
         # Try to first the first menu that implements the current service.
-        # Not all usages have a process, in that case, well set the first
-        # process found, because it should not matter for the service.
-        processes = self.env["shopfloor.process"].search([("code", "=", self._usage)])
-        menu = fields.first(processes.menu_ids)
+        # Not all usages have a process, in that case, we'll set the first
+        # menu found
+        menu = self.env["shopfloor.menu"].search(
+            [("scenario", "=", self._usage)], limit=1
+        )
         if not menu:
             menu = self.env["shopfloor.menu"].search([], limit=1)
         profile = self.env["shopfloor.profile"].search([], limit=1)

@@ -51,7 +51,7 @@ class PickingBatch(Component):
                     batch.state == "in_progress"
                     or picking.state in ("assigned", "done", "cancel")
                 )
-                and picking.picking_type_id == self.picking_type
+                and picking.picking_type_id in self.picking_types
                 for picking in batch.picking_ids
             )
         )
@@ -61,7 +61,7 @@ class PickingBatch(Component):
         """List available stock picking batches for current user
 
         Show only picking batches where all the pickings are available and
-        where all pickings are in the picking type of the current process.
+        where all pickings are in the picking type of the current scenario.
         """
         records = self._search(name_fragment=name_fragment)
         return self._response(

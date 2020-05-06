@@ -104,7 +104,7 @@ Vue.component("nav-items", {
         <v-list-item
             v-for="item in navigation"
             :key="item.id"
-            :to="{name: item.process.code, params: {menu_id: item.id, state: 'start'}}"
+            :to="{name: item.scenario, params: {menu_id: item.id, state: 'start'}}"
             link
             >
             <v-list-item-content>
@@ -112,10 +112,10 @@ Vue.component("nav-items", {
                     {{ item.name }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                    <small class="font-weight-light">Process: {{ item.process.code }} - Op type: {{ item.process.picking_type.name }}</small>
+                    <small class="font-weight-light">Scenario: {{ item.scenario }}</small>
                     <br />
                     <small class="font-weight-light">
-                        Op groups: <span v-for="op in item.op_groups" :key="'op-' + item.id + '-' + op.id">{{ op.name }}</span>
+                        Op Types: <span v-for="pt in item.picking_types" :key="'pt-' + item.id + '-' + pt.id">{{ pt.name }}</span>
                     </small>
                 </v-list-item-subtitle>
             </v-list-item-content>
