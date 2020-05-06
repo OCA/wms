@@ -13,9 +13,10 @@ class SelectDestPackageMixin:
                 "picking": {
                     "id": picking.id,
                     "name": picking.name,
-                    "note": "",
-                    "origin": "",
-                    "line_count": len(picking.move_line_ids),
+                    "note": None,
+                    "origin": None,
+                    "weight": 110.0,
+                    "move_line_count": len(picking.move_line_ids),
                     "partner": {"id": self.customer.id, "name": self.customer.name},
                 },
                 "packages": [

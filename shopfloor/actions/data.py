@@ -12,81 +12,142 @@ class DataAction(Component):
     _inherit = "shopfloor.process.action"
     _usage = "data"
 
-    def picking_summary(self, picking):
-        return {
-            "id": picking.id,
-            "name": picking.name,
-            "origin": picking.origin or "",
-            "note": picking.note or "",
-            "line_count": len(picking.move_line_ids),
-            "partner": {"id": picking.partner_id.id, "name": picking.partner_id.name}
-            if picking.partner_id
-            else None,
-        }
+    def _jsonify(self, recordset, parser, multi=False, **kw):
+        res = recordset.jsonify(parser)
+        if not multi:
+            return res[0] if res else None
+        return res
 
-    def package(self, package, picking=None):
+    def partner(self, record, **kw):
+        return self._jsonify(record, self._partner_parser, **kw)
+
+    def partners(self, record, **kw):
+        return self.partner(record, multi=True)
+
+    @property
+    def _partner_parser(self):
+        return ["id", "name"]
+
+    def picking(self, record, **kw):
+        return self._jsonify(record, self._picking_parser, **kw)
+
+    def pickings(self, record, **kw):
+        return self.picking(record, multi=True)
+
+    @property
+    def _picking_parser(self):
+        return [
+            "id",
+            "name",
+            "origin",
+            "note",
+            ("partner_id:partner", self._partner_parser),
+            "move_line_count",
+            "total_weight:weight",
+        ]
+
+    def package(self, record, picking=None, **kw):
         """Return data for a stock.quant.package
 
         If a picking is given, it will include the number of lines of the package
         for the picking.
         """
-        line_count = (
-            len(picking.move_line_ids.filtered(lambda l: l.package_id == package))
-            if picking
-            else 0
-        )
-        return {
-            "id": package.id,
-            "name": package.name,
-            # TODO
-            "weight": 0,
-            "line_count": line_count,
-            "packaging_name": package.product_packaging_id.name or "",
-        }
+        data = self._jsonify(record, self._package_parser, **kw)
+        # handle special cases
+        if data and picking:
+            # TODO: exclude canceled and done?
+            lines = picking.move_line_ids.filtered(lambda l: l.package_id == record)
+            data.update({"move_line_count": len(lines)})
+        return data
 
-    def packaging(self, packaging):
-        return {"id": packaging.id, "name": packaging.name}
+    def packages(self, records, picking=None, **kw):
+        return [self.package(rec, picking=picking) for rec in records]
 
-    def lot(self, lot):
-        return {"id": lot.id, "name": lot.name}
+    @property
+    def _package_parser(self):
+        return [
+            "id",
+            "name",
+            "pack_weight:weight",
+            ("product_packaging_id:packaging", self._packaging_parser),
+        ]
 
-    def location(self, location):
-        return {"id": location.id, "name": location.name}
+    def packaging(self, record, **kw):
+        return self._jsonify(record, self._packaging_parser, **kw)
 
-    def move_line(self, move_line):
-        return {
-            "id": move_line.id,
-            "qty_done": move_line.qty_done,
-            "quantity": move_line.product_uom_qty,
-            "product": {
-                "id": move_line.product_id.id,
-                "name": move_line.product_id.name,
-                "display_name": move_line.product_id.display_name,
-                "default_code": move_line.product_id.default_code or "",
-            },
-            "lot": {"id": move_line.lot_id.id, "name": move_line.lot_id.name}
-            if move_line.lot_id
-            else None,
-            "package_src": self.package(move_line.package_id, move_line.picking_id)
-            if move_line.package_id
-            else None,
-            "package_dest": self.package(
-                move_line.result_package_id, move_line.picking_id
+    def packagings(self, record, **kw):
+        return self.packaging(record, multi=True)
+
+    @property
+    def _packaging_parser(self):
+        return ["id", "name"]
+
+    def lot(self, record, **kw):
+        return self._jsonify(record, self._lot_parser, **kw)
+
+    def lots(self, record, **kw):
+        return self.lot(record, multi=True)
+
+    @property
+    def _lot_parser(self):
+        return ["id", "name", "ref"]
+
+    def location(self, record, **kw):
+        return self._jsonify(record, self._location_parser, **kw)
+
+    def locations(self, record, **kw):
+        return self.location(record, multi=True)
+
+    @property
+    def _location_parser(self):
+        return ["id", "name"]
+
+    def move_line(self, record, **kw):
+        data = self._jsonify(record, self._move_line_parser)
+        if data:
+            data.update(
+                {
+                    "package_src": self.package(record.package_id, record.picking_id),
+                    "package_dest": self.package(
+                        record.result_package_id, record.picking_id,
+                    ),
+                }
             )
-            if move_line.result_package_id
-            else None,
-            "location_src": self.location(move_line.location_id),
-            "location_dest": self.location(move_line.location_dest_id),
-        }
+        return data
 
-    def _jsonify(self, recordset, parser):
-        res = recordset.jsonify(parser)
-        if len(recordset.ids) == 1:
-            return res[0]
-        return res
+    def move_lines(self, records, **kw):
+        return [self.move_line(rec) for rec in records]
 
-    def picking_batch(self, record):
-        return self._jsonify(record, self._picking_batch_parser)
+    @property
+    def _move_line_parser(self):
+        return [
+            "id",
+            "qty_done",
+            "product_uom_qty:quantity",
+            ("product_id:product", self._product_parser),
+            ("lot_id:lot", self._lot_parser),
+            ("location_id:location_src", self._location_parser),
+            ("location_dest_id:location_dest", self._location_parser),
+        ]
+
+    def product(self, record, **kw):
+        return self._jsonify(record, self._product_parser, **kw)
+
+    def products(self, record, **kw):
+        return self.product(record, multi=True)
+
+    @property
+    def _product_parser(self):
+        return ["id", "name", "display_name", "default_code"]
+
+    def picking_batch(self, record, with_pickings=True, **kw):
+        parser = self._picking_batch_parser
+        if with_pickings:
+            parser.append(("picking_ids:pickings", self._picking_parser))
+        return self._jsonify(record, parser, **kw)
+
+    def picking_batches(self, record, **kw):
+        return self.picking_batch(record, multi=True)
 
     @property
     def _picking_batch_parser(self):
