@@ -15,6 +15,7 @@
         "stock",
         "stock_picking_batch",
         "base_rest",
+        "base_jsonify",
         "auth_api_key",
         # https://github.com/OCA/stock-logistics-warehouse/pull/808
         "stock_picking_completion_info",
