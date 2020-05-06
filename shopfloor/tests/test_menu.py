@@ -12,11 +12,7 @@ class MenuCase(CommonCase):
         with self.work_on_services(profile=self.profile) as work:
             self.service = work.component(usage="menu")
 
-    def test_menu_search(self):
-        """Request /menu/search"""
-        # Simulate the client searching menus
-        response = self.service.dispatch("search")
-        menus = self.env["shopfloor.menu"].search([])
+    def _assert_menu_response(self, response, menus):
         self.assert_response(
             response,
             data={
@@ -36,6 +32,13 @@ class MenuCase(CommonCase):
             },
         )
 
+    def test_menu_search(self):
+        """Request /menu/search"""
+        # Simulate the client searching menus
+        response = self.service.dispatch("search")
+        menus = self.env["shopfloor.menu"].search([])
+        self._assert_menu_response(response, menus)
+
     def test_menu_search_restricted(self):
         """Request /menu/search with profile attributions"""
         # Simulate the client searching menus
@@ -48,21 +51,20 @@ class MenuCase(CommonCase):
         response = self.service.dispatch("search")
 
         my_menus = menus - menus_without_profile
-        self.assert_response(
-            response,
-            data={
-                "size": len(my_menus),
-                "records": [
-                    {
-                        "id": menu.id,
-                        "name": menu.name,
-                        "scenario": menu.scenario,
-                        "picking_types": [
-                            {"id": picking_type.id, "name": picking_type.name}
-                            for picking_type in menu.picking_type_ids
-                        ],
-                    }
-                    for menu in my_menus
-                ],
-            },
-        )
+        self._assert_menu_response(response, my_menus)
+
+    def test_menu_search_warehouse_filter(self):
+        """Request /menu/search with different warehouse on profile"""
+        menus = self.env["shopfloor.menu"].search([])
+        # should not be visible as the profile has another wh
+        menu_different_wh = menus[0]
+        other_wh = self.env["stock.warehouse"].create({"name": "Test", "code": "test"})
+        menu_different_wh.picking_type_ids.warehouse_id = other_wh
+
+        # should be visible to any profile
+        menu_no_wh = menus[1]
+        menu_no_wh.picking_type_ids.warehouse_id = False
+
+        response = self.service.dispatch("search")
+
+        self._assert_menu_response(response, menus - menu_different_wh)
