@@ -10,13 +10,9 @@ var DEMO_CLUSTER_PICKING_1 = {
     find_batch: {
         next_state: "confirm_start",
         data: {
-            confirm_start: {
-                id: 100,
-                name: "BATCH001",
-                picking_count: 3,
-                move_line_count: 6,
+            confirm_start: demotools.makeBatch({
                 pickings: [demotools.makePicking(), demotools.makePicking()],
-            },
+            }),
         },
     },
     list_batch: {
@@ -35,13 +31,9 @@ var DEMO_CLUSTER_PICKING_1 = {
     select: {
         next_state: "confirm_start",
         data: {
-            confirm_start: {
-                id: 100,
-                name: "BATCHXXX",
-                picking_count: 3,
-                move_line_count: 6,
+            confirm_start: demotools.makeBatch({
                 pickings: [demotools.makePicking(), demotools.makePicking()],
-            },
+            }),
         },
     },
     confirm_start: {

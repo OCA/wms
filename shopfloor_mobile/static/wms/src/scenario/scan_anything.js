@@ -1,21 +1,40 @@
 export var ScanAnything = Vue.component("scan-anything", {
     template: `
-        <Screen title="Scan Anything" :klass="'scan_anything'">
-            <searchbar v-on:found="on_scan" :input_placeholder="search_input_placeholder"></searchbar>
-            <detail-pack :packDetail="dataReceived.detail_info" v-if="dataReceived.type=='pack'"></detail-pack>
-            <detail-product :productDetail="dataReceived.detail_info" v-if="dataReceived.type=='product'"></detail-product>
-            <detail-location :locationDetail="dataReceived.detail_info" v-if="dataReceived.type=='location'" v-on:url-change="urlChanged"></detail-location>
-            <detail-operation :operationDetail="dataReceived.detail_info" v-if="dataReceived.type=='operation'"></detail-operation>
-            <reset-screen-button v-on:reset="on_reset" :show_reset_button="show_reset_button"></reset-screen-button>
-            <btn-back v-if="showBackBtn" />
+        <Screen :title="screen_title" :klass="'scan_anything'">
+            <searchbar
+                v-if="!displayOnly"
+                v-on:found="on_scan"
+                :input_placeholder="search_input_placeholder"
+                />
+            <component
+                :is="detail_component_name()"
+                :record="dataReceived.detail_info"
+                :options="{on_url_change: on_url_change, full_detail: true}"
+                />
+            <div class="button-list button-vertical-list full">
+                <v-row align="center" v-if="showBackBtn">
+                    <v-col class="text-center" cols="12">
+                        <btn-back />
+                    </v-col>
+                </v-row>
+                <v-row align="center" v-if="!displayOnly && showResetBtn">
+                    <v-col class="text-center" cols="12">
+                        <reset-screen-button v-on:reset="on_reset" :show_reset_button="showResetBtn"></reset-screen-button>
+                    </v-col>
+                </v-row>
+            </div>
         </Screen>
     `,
+    data: function() {
+        return {
+            usage: "scan_anything",
+            dataReceived: {},
+            search_input_placeholder: "Scan anything",
+        };
+    },
     mounted() {
         const odoo_params = {
-            process_id: 99,
-            process_menu_id: 99,
             usage: this.usage,
-            debug: this.$root.demo_mode,
         };
         this.odoo = this.$root.getOdoo(odoo_params);
         if (this.$root.demo_mode) {
@@ -38,7 +57,7 @@ export var ScanAnything = Vue.component("scan-anything", {
             this.dataReceived = {};
             this.$router.push({name: "scananything", params: {codebar: undefined}});
         },
-        urlChanged: function(codebar) {
+        on_url_change: function(codebar) {
             // Change the route on when more info clicked in children
             const query = {};
             if ("codebar" in this.$route.params) {
@@ -51,7 +70,7 @@ export var ScanAnything = Vue.component("scan-anything", {
             });
         },
         getData: function(codebar) {
-            this.odoo.scan_anything(codebar).then(result => {
+            this.odoo.call(codebar).then(result => {
                 this.dataReceived = result.data || {};
             });
         },
@@ -61,20 +80,34 @@ export var ScanAnything = Vue.component("scan-anything", {
                 params: {codebar: scanned.text},
             });
         },
+        detail_component_name() {
+            if (_.isEmpty(this.dataReceived)) {
+                return null;
+            }
+            const name = "detail-" + this.dataReceived.type;
+            if (!name in Vue.options.components) {
+                console.error("Detail component ", name, " not found.");
+                return null;
+            }
+            return name;
+        },
     },
     computed: {
-        showBackBtn: function() {
-            return "childOf" in this.$route.query;
+        displayOnly: function() {
+            return this.$route.query.displayOnly;
         },
-        show_reset_button: function() {
+        showBackBtn: function() {
+            return "childOf" in this.$route.query || this.displayOnly;
+        },
+        showResetBtn: function() {
             return !_.isEmpty(this.dataReceived);
         },
-    },
-    data: function() {
-        return {
-            usage: "scan_anything",
-            dataReceived: {},
-            search_input_placeholder: "Scan anything",
-        };
+        screen_title: function() {
+            let title = "Scan anything";
+            if (this.$route.params.codebar) {
+                title += ": " + this.$route.params.codebar;
+            }
+            return title;
+        },
     },
 });

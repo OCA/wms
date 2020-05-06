@@ -1,0 +1,52 @@
+import {ItemDetailMixin} from "./detail_mixin.js";
+
+Vue.component("detail-operation", {
+    mixins: [ItemDetailMixin],
+    methods: {
+        detail_fields() {
+            return [
+                {
+                    path: "location_src.name",
+                    label: "Source",
+                    action_val_path: "location_src.barcode",
+                },
+                {
+                    path: "location_dest.name",
+                    label: "Destination",
+                    action_val_path: "location_dest.barcode",
+                },
+                {path: "product.display_name", action_val_path: "product.barcode"},
+                {path: "package_dest.name", action_val_path: "package_dest.barcode"},
+                {path: "lot.name", action_val_path: "lot.barcode"},
+            ];
+        },
+        op_card_options() {
+            return {
+                loud: true,
+                no_title: true,
+                fields: this.detail_fields(),
+                detail_action: this.on_detail_action,
+            };
+        },
+        on_detail_action(record, field) {
+            const barcode = _.result(record, field.action_val_path);
+            if (barcode) {
+                this.$router.push({
+                    name: "scananything",
+                    params: {codebar: barcode},
+                    query: {displayOnly: 1},
+                });
+            }
+        },
+    },
+    template: `
+  <div :class="$options._componentTag">
+    <detail-picking
+        :key="record.picking.id"
+        :picking="record.picking"
+        :options="{main: true}"
+        />
+    <item-detail-card v-bind="$props" :options="op_card_options()" />
+  </div>
+`,
+});

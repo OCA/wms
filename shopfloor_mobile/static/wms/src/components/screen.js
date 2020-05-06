@@ -71,7 +71,7 @@ Vue.component("Screen", {
                 <slot name="header">Optional header - no content</slot>
             </div>
 
-            <v-alert type="warning" tile v-if="!this.$root.has_profile && this.$route.name!='profile'">
+            <v-alert type="warning" tile v-if="!this.$root.demo_mode && !this.$root.has_profile && this.$route.name!='profile'">
                 <p>Profile not configured yet. Please select one.</p>
             </v-alert>
 
@@ -84,9 +84,9 @@ Vue.component("Screen", {
             <div class="footer" v-if="$slots.footer">
                 <slot name="footer">Optional footer - no content</slot>
             </div>
-            <div class="loading" v-if="$root.loading">
+            <div class="loading" v-if="$root.loading && !$root.demo_mode">
                 Loading...
-                <!-- TODO: show a spinner -->
+                <!-- TODO: show a spinner + FIXME: demo mode should work properly -->
             </div>
         </v-content>
     </v-app>

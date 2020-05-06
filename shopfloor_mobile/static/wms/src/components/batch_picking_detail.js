@@ -1,42 +1,43 @@
-export var batch_picking_info = Vue.component("batch-picking-detail", {
+/* eslint-disable strict */
+Vue.component("batch-picking-detail", {
     props: ["info"],
+    methods: {
+        detail_fields() {
+            return [
+                {path: "move_line_count", label: "Lines"},
+                {path: "weight", label: "Weight"},
+            ];
+        },
+        picking_detail_fields() {
+            return [
+                {path: "move_line_count", label: "Lines"},
+                {path: "weight", label: "Weight"},
+            ];
+        },
+    },
     template: `
   <div class="detail batch-picking-detail with-bottom-actions" v-if="!_.isEmpty(info)">
     <div>
-      <v-card outlined class="main">
-        <v-card-title>Operations: {{ info.pickings.length }}</v-card-title>
-        <v-card-subtitle>{{ info.name }}</v-card-subtitle>
-        <v-card-text>
-          <div class="lines-nr">
-            <span class="label">Lines:</span>
-            {{ _.sumBy(info.pickings, function(p) { return p.move_line_count; }) }}
-          </div>
-          <div class="weight">
-            <span class="label">Weight:</span>
-            {{ _.sumBy(info.pickings, function(p) { return p.weight; }) }}
-          </div>
-        </v-card-text>
-      </v-card>
 
-      <v-card outlined v-for="rec in info.pickings" :key="rec.id">
-        <v-card-title> {{ rec.name }} </v-card-title>
-        <v-card-text>
-          <div class="lines-nr">
-            <span class="label">Lines:</span>
-            {{ _.sumBy(info.pickings, function(p) { return p.move_line_count; }) }}
-          </div>
-          <div class="weight">
-            <span class="label">Weight:</span>
-            {{ _.sumBy(info.pickings, function(p) { return p.weight; }) }}
-          </div>
-          <div class="partner" v-if="rec.partner">
-            <span class="label">Customer:</span> {{ rec.partner.name }}
-          </div>
-          <div class="origin" v-if="rec.origin">
-            <span class="label">REF:</span> {{ rec.origin }}
-          </div>
-        </v-card-text>
-      </v-card>
+      <item-detail-card :record="info" :options="{main: true, fields: detail_fields()}">
+
+        <template v-slot:title>
+          Operations: {{ info.pickings.length }}
+        </template>
+
+        <template v-slot:subtitle>
+          {{ info.name }}
+        </template>
+
+      </item-detail-card>
+
+      <detail-picking
+        v-for="picking in info.pickings"
+        :key="picking.id"
+        :picking="picking"
+        :klass="'listed'"
+        :options="{fields: picking_detail_fields()}"
+        />
 
     </div>
     <v-row class="actions bottom-actions">
