@@ -78,3 +78,16 @@ class DataAction(Component):
             "location_src": self.location(move_line.location_id),
             "location_dest": self.location(move_line.location_dest_id),
         }
+
+    def _jsonify(self, recordset, parser):
+        res = recordset.jsonify(parser)
+        if len(recordset.ids) == 1:
+            return res[0]
+        return res
+
+    def picking_batch(self, record):
+        return self._jsonify(record, self._picking_batch_parser)
+
+    @property
+    def _picking_batch_parser(self):
+        return ["id", "name", "picking_count", "move_line_count", "total_weight:weight"]

@@ -1,7 +1,7 @@
 from .common import CommonCase, PickingBatchMixin
 
 
-class BatchPickingCase(CommonCase, PickingBatchMixin):
+class ClusterPickingBatchCase(CommonCase, PickingBatchMixin):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
@@ -41,14 +41,13 @@ class BatchPickingCase(CommonCase, PickingBatchMixin):
     def setUp(self):
         super().setUp()
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
-            self.service = work.component(usage="picking_batch")
+            self.service = work.component(usage="cluster_picking")
 
     def test_search_empty(self):
         """No batch is available"""
         # Simulate the client asking the list of picking batch
-        response = self.service.dispatch("search")
         # none of the pickings are assigned, so we can't work on them
-        self.assert_response(response, data={"size": 0, "records": []})
+        self.assertFalse(self.service._batch_picking_search())
 
     def test_search(self):
         """Return only draft batches with assigned pickings """
@@ -68,33 +67,30 @@ class BatchPickingCase(CommonCase, PickingBatchMixin):
         self.batch3.confirm_picking()
 
         # Simulate the client asking the list of picking batch
-        response = self.service.dispatch("search")
-        self.assert_response(
-            response,
-            data={
-                "size": 3,
-                "records": [
-                    {
-                        "id": self.batch1.id,
-                        "name": self.batch1.name,
-                        "picking_count": 1,
-                        "move_line_count": 1,
-                        "weight": 0.0,
-                    },
-                    {
-                        "id": self.batch2.id,
-                        "name": self.batch2.name,
-                        "picking_count": 1,
-                        "move_line_count": 1,
-                        "weight": 0.0,
-                    },
-                    {
-                        "id": self.batch3.id,
-                        "name": self.batch3.name,
-                        "picking_count": 1,
-                        "move_line_count": 1,
-                        "weight": 0.0,
-                    },
-                ],
-            },
+        res = self.service._batch_picking_search()
+        self.assertRecordValues(
+            res,
+            [
+                {
+                    "id": self.batch1.id,
+                    "name": self.batch1.name,
+                    "picking_count": 1,
+                    "move_line_count": 1,
+                    "total_weight": 0.0,
+                },
+                {
+                    "id": self.batch2.id,
+                    "name": self.batch2.name,
+                    "picking_count": 1,
+                    "move_line_count": 1,
+                    "total_weight": 0.0,
+                },
+                {
+                    "id": self.batch3.id,
+                    "name": self.batch3.name,
+                    "picking_count": 1,
+                    "move_line_count": 1,
+                    "total_weight": 0.0,
+                },
+            ],
         )

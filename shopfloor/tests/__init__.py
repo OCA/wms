@@ -3,10 +3,10 @@ from . import test_menu
 from . import test_openapi
 from . import test_profile
 from . import test_actions_data
-from . import test_picking_batch
 from . import test_single_pack_putaway
 from . import test_single_pack_transfer
 from . import test_cluster_picking_base
+from . import test_cluster_picking_batch
 from . import test_cluster_picking_select
 from . import test_cluster_picking_scan
 from . import test_cluster_picking_skip
