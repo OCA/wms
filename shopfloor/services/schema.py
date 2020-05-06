@@ -102,3 +102,12 @@ class BaseShopfloorSchemaResponse(Component):
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
         }
+
+    def picking_batch(self):
+        return {
+            "id": {"required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+            "picking_count": {"required": True, "type": "integer"},
+            "move_line_count": {"required": True, "type": "integer"},
+            "weight": {"required": True, "nullable": True, "type": "float"},
+        }

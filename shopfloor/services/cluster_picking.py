@@ -1,4 +1,5 @@
 from odoo import _, fields
+from odoo.osv import expression
 from odoo.tools.float_utils import float_compare
 
 from odoo.addons.base_rest.components.service import to_bool, to_int
@@ -88,8 +89,7 @@ class ClusterPicking(Component):
         * confirm_start: when it could find a batch
         * start: when no batch is available
         """
-        batch_service = self.component(usage="picking_batch")
-        batches = batch_service._search()
+        batches = self._batch_picking_search()
         selected = self._select_a_picking_batch(batches)
         if selected:
             return self._response_for_confirm_start(selected)
@@ -105,9 +105,48 @@ class ClusterPicking(Component):
         Transitions:
         * manual_selection: to the selection screen
         """
-        batch_service = self.component(usage="picking_batch")
-        batches = batch_service.search()["data"]
-        return self._response(next_state="manual_selection", data=batches)
+        data_struct = self.actions_for("data")
+        batches = self._batch_picking_search()
+        data = {"records": data_struct.picking_batch(batches), "size": len(batches)}
+        return self._response(next_state="manual_selection", data=data)
+
+    def _batch_picking_base_search_domain(self):
+        return [
+            "|",
+            "&",
+            ("user_id", "=", False),
+            ("state", "=", "draft"),
+            "&",
+            ("user_id", "=", self.env.user.id),
+            ("state", "in", ("draft", "in_progress")),
+        ]
+
+    def _batch_picking_search(self, name_fragment=None, batch_ids=None):
+        domain = self._batch_picking_base_search_domain()
+        if name_fragment:
+            domain = expression.AND([domain, [("name", "ilike", name_fragment)]])
+        if batch_ids:
+            domain = expression.AND([domain, [("id", "in", batch_ids)]])
+        records = self.env["stock.picking.batch"].search(domain, order="id asc")
+        records = records.filtered(
+            # Include done/cancel because we want to be able to work on the
+            # batch even if some pickings are done/canceled. They'll should be
+            # ignored later.
+            lambda batch: all(
+                (
+                    # When the batch is already in progress, we do not care
+                    # about state of the pickings, because we want to be able
+                    # to recover it in any case, even if, for instance, a stock
+                    # error changed a picking to unavailable after the user
+                    # started to work on the batch.
+                    batch.state == "in_progress"
+                    or picking.state in ("assigned", "done", "cancel")
+                )
+                and picking.picking_type_id == self.picking_type
+                for picking in batch.picking_ids
+            )
+        )
+        return records
 
     # TODO this may be used in other scenarios? if so, extract
     def _select_a_picking_batch(self, batches):
@@ -142,14 +181,14 @@ class ClusterPicking(Component):
 
     def _response_for_confirm_start(self, batch):
         pickings = []
+        # TODO: use data.picking_batch
         for picking in batch.picking_ids:
-            p_weight = batch.picking_weight(picking)
             p_values = {
                 "id": picking.id,
                 "name": picking.name,
                 "partner": None,
                 "move_line_count": len(picking.move_line_ids),
-                "weight": p_weight,
+                "weight": picking.total_weight,
                 "origin": picking.origin or "",
             }
             if picking.partner_id:
@@ -160,7 +199,12 @@ class ClusterPicking(Component):
             pickings.append(p_values)
         return self._response(
             next_state="confirm_start",
-            data={"id": batch.id, "name": batch.name, "pickings": pickings},
+            data={
+                "id": batch.id,
+                "name": batch.name,
+                "picking_count": batch.picking_count,
+                "pickings": pickings,
+            },
         )
 
     def _response_for_batch_cannot_be_selected(self):
@@ -189,9 +233,8 @@ class ClusterPicking(Component):
           concurrently for instance)
         * confirm_start: after the batch has been assigned to the user
         """
-        batch_service = self.component(usage="picking_batch")
-        batch = batch_service._search(batch_ids=[picking_batch_id])
-        selected = self._select_a_picking_batch(batch)
+        batches = self._batch_picking_search(batch_ids=[picking_batch_id])
+        selected = self._select_a_picking_batch(batches)
         if selected:
             return self._response_for_confirm_start(selected)
         else:
@@ -271,8 +314,7 @@ class ClusterPicking(Component):
         lot = line.lot_id
         package = line.package_id
         data = {
-            # TODO have common methods to return general info
-            # for each model
+            # TODO use `data` component
             "id": line.id,
             "quantity": line.product_uom_qty,
             "postponed": line.shopfloor_postponed,
@@ -1522,5 +1564,11 @@ class ShopfloorClusterPickingValidatorResponse(Component):
 
     @property
     def _schema_for_batch_selection(self):
-        batch_validator = self.component(usage="picking_batch.validator.response")
-        return batch_validator.search()["data"]["schema"]
+        return {
+            "size": {"required": True, "type": "integer"},
+            "records": {
+                "type": "list",
+                "required": True,
+                "schema": {"type": "dict", "schema": self.schemas().picking_batch()},
+            },
+        }
