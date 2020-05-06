@@ -154,11 +154,9 @@ class Checkout(Component):
 
     def _data_for_stock_picking(self, picking, done=False):
         data_struct = self.actions_for("data")
-        data = data_struct.picking_summary(picking)
+        data = data_struct.picking(picking)
         line_picker = self._lines_checkout_done if done else self._lines_to_pack
-        data.update(
-            {"move_lines": [data_struct.move_line(ml) for ml in line_picker(picking)]}
-        )
+        data.update({"move_lines": data_struct.move_lines(line_picker(picking))})
         return data
 
     def _lines_checkout_done(self, picking):
@@ -193,9 +191,7 @@ class Checkout(Component):
             order=self._order_for_list_stock_picking(),
         )
         data_struct = self.actions_for("data")
-        data = {
-            "pickings": [data_struct.picking_summary(picking) for picking in pickings]
-        }
+        data = {"pickings": data_struct.pickings(pickings)}
         return self._response(next_state="manual_selection", data=data, message=message)
 
     def select(self, picking_id):
@@ -225,10 +221,8 @@ class Checkout(Component):
         return self._response(
             next_state="select_package",
             data={
-                "selected_move_lines": [
-                    data_struct.move_line(line) for line in lines.sorted()
-                ],
-                "picking": data_struct.picking_summary(picking),
+                "selected_move_lines": data_struct.move_lines(lines.sorted()),
+                "picking": data_struct.picking(picking),
             },
             message=message,
         )
@@ -743,20 +737,15 @@ class Checkout(Component):
                 },
             )
         data_struct = self.actions_for("data")
-        picking_data = data_struct.picking_summary(picking)
-        packages_data = [
-            data_struct.package(package, picking=picking)
-            for package in packages.sorted()
-        ]
+        picking_data = data_struct.picking(picking)
+        packages_data = data_struct.packages(packages.sorted(), picking=picking)
         data_struct = self.actions_for("data")
         return self._response(
             next_state="select_dest_package",
             data={
                 "picking": picking_data,
                 "packages": packages_data,
-                "selected_move_lines": [
-                    data_struct.move_line(line) for line in move_lines.sorted()
-                ],
+                "selected_move_lines": data_struct.move_lines(move_lines.sorted()),
             },
             message=message,
         )
@@ -864,12 +853,9 @@ class Checkout(Component):
         return self._response(
             next_state="change_packaging",
             data={
-                "picking": data_struct.picking_summary(picking),
+                "picking": data_struct.picking(picking),
                 "package": data_struct.package(package, picking=picking),
-                "packagings": [
-                    data_struct.packaging(packaging)
-                    for packaging in packaging_list.sorted()
-                ],
+                "packagings": data_struct.packagings(packaging_list.sorted()),
             },
         )
 

@@ -380,7 +380,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
                 "picking": {
                     "id": picking.id,
                     "name": picking.name,
-                    "note": "",
+                    "note": None,
                     "origin": picking.origin,
                     "partner": {"id": self.customer.id, "name": self.customer.name},
                 },
@@ -393,7 +393,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
                     "qty_available": first_move_line.product_id.qty_available,
                 },
                 "lot": None,
-                "pack": {"id": package.id, "name": package.name},
+                "package_src": {"id": package.id, "name": package.name},
             },
             next_state="start_line",
         )
