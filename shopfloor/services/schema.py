@@ -20,7 +20,8 @@ class BaseShopfloorSchemaResponse(Component):
             "name": {"type": "string", "nullable": False, "required": True},
             "origin": {"type": "string", "nullable": True, "required": True},
             "note": {"type": "string", "nullable": True, "required": True},
-            "line_count": {"type": "integer", "nullable": True, "required": True},
+            "move_line_count": {"type": "integer", "nullable": True, "required": True},
+            "weight": {"required": True, "nullable": True, "type": "float"},
             "partner": {
                 "type": "dict",
                 "nullable": True,
@@ -81,14 +82,20 @@ class BaseShopfloorSchemaResponse(Component):
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
             "weight": {"required": True, "nullable": True, "type": "float"},
-            "line_count": {"required": True, "nullable": True, "type": "integer"},
-            "packaging_name": {"required": True, "nullable": True, "type": "string"},
+            "move_line_count": {"required": True, "nullable": True, "type": "integer"},
+            "packaging": {
+                "type": "dict",
+                "required": True,
+                "nullable": True,
+                "schema": self.packaging(),
+            },
         }
 
     def lot(self):
         return {
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
+            "ref": {"type": "string", "nullable": True, "required": False},
         }
 
     def location(self):
