@@ -56,7 +56,7 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
             "picking": {
                 "id": picking.id,
                 "name": picking.name,
-                "note": "",
+                "note": None,
                 "origin": picking.origin,
                 "partner": {"id": self.customer.id, "name": self.customer.name},
             },
@@ -68,10 +68,12 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
                 "name": move_line.product_id.name,
                 "qty_available": move_line.product_id.qty_available,
             },
-            "lot": {"id": lot.id, "name": lot.name, "ref": lot.ref or ""}
+            "lot": {"id": lot.id, "name": lot.name, "ref": lot.ref or None}
             if lot
             else None,
-            "pack": {"id": package.id, "name": package.name} if package else None,
+            "package_src": {"id": package.id, "name": package.name}
+            if package
+            else None,
         }
 
     @classmethod
