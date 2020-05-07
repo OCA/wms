@@ -12,7 +12,7 @@ class StockPickingBatch(models.Model):
     )
     picking_count = fields.Integer(
         compute="_compute_picking_info",
-        help="Technical field. Indicates number of pickings included.",
+        help="Technical field. Indicates number of transfers included.",
     )
     move_line_count = fields.Integer(
         compute="_compute_picking_info",
@@ -20,7 +20,7 @@ class StockPickingBatch(models.Model):
     )
     total_weight = fields.Float(
         compute="_compute_picking_info",
-        help="Technical field. Indicates total weight of pickings included.",
+        help="Technical field. Indicates total weight of transfers included.",
     )
 
     @api.depends("picking_ids.total_weight", "picking_ids.move_line_ids")
