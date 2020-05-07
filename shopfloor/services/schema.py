@@ -82,7 +82,7 @@ class BaseShopfloorSchemaResponse(Component):
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
             "weight": {"required": True, "nullable": True, "type": "float"},
-            "move_line_count": {"required": True, "nullable": True, "type": "integer"},
+            "move_line_count": {"required": False, "nullable": True, "type": "integer"},
             "packaging": {
                 "type": "dict",
                 "required": True,
