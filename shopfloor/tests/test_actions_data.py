@@ -68,11 +68,15 @@ class ActionsDataCase(CommonCase):
 
     def test_data_lot(self):
         lot = self.env["stock.production.lot"].create(
-            {"product_id": self.product_b.id, "company_id": self.env.company.id}
+            {
+                "product_id": self.product_b.id,
+                "company_id": self.env.company.id,
+                "ref": "#FOO",
+            }
         )
         data = self.data.lot(lot)
         self.assert_schema(self.schema.lot(), data)
-        expected = {"id": lot.id, "name": lot.name}
+        expected = {"id": lot.id, "name": lot.name, "ref": "#FOO"}
         self.assertDictEqual(data, expected)
 
     def test_data_package(self):
@@ -83,23 +87,23 @@ class ActionsDataCase(CommonCase):
         expected = {
             "id": package.id,
             "name": package.name,
-            "line_count": 1,
-            "packaging_name": self.packaging.name,
-            # TODO
+            "move_line_count": 1,
+            "packaging": self.data.packaging(package.product_packaging_id),
             "weight": 0,
         }
         self.assertDictEqual(data, expected)
 
-    def test_data_picking_summary(self):
+    def test_data_picking(self):
         self.picking.write({"origin": "created by test", "note": "read me"})
-        data = self.data.picking_summary(self.picking)
+        data = self.data.picking(self.picking)
         self.assert_schema(self.schema.picking(), data)
         expected = {
             "id": self.picking.id,
-            "line_count": 4,
+            "move_line_count": 4,
             "name": self.picking.name,
             "note": "read me",
             "origin": "created by test",
+            "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
         }
         self.assertDictEqual(data, expected)
@@ -126,16 +130,16 @@ class ActionsDataCase(CommonCase):
             "package_src": {
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
-                "line_count": 1,
-                "packaging_name": "",
+                "move_line_count": 1,
+                "packaging": None,
                 # TODO
                 "weight": 0,
             },
             "package_dest": {
                 "id": result_package.id,
                 "name": result_package.name,
-                "line_count": 0,
-                "packaging_name": self.packaging.name,
+                "move_line_count": 0,
+                "packaging": self.data.packaging(self.packaging),
                 # TODO
                 "weight": 0,
             },
@@ -164,7 +168,11 @@ class ActionsDataCase(CommonCase):
                 "display_name": "[B] Product B",
                 "default_code": "B",
             },
-            "lot": {"id": move_line.lot_id.id, "name": move_line.lot_id.name},
+            "lot": {
+                "id": move_line.lot_id.id,
+                "name": move_line.lot_id.name,
+                "ref": None,
+            },
             "package_src": None,
             "package_dest": None,
             "location_src": {
@@ -193,20 +201,24 @@ class ActionsDataCase(CommonCase):
                 "display_name": "[C] Product C",
                 "default_code": "C",
             },
-            "lot": {"id": move_line.lot_id.id, "name": move_line.lot_id.name},
+            "lot": {
+                "id": move_line.lot_id.id,
+                "name": move_line.lot_id.name,
+                "ref": None,
+            },
             "package_src": {
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
-                "line_count": 1,
-                "packaging_name": "",
+                "move_line_count": 1,
+                "packaging": None,
                 # TODO
                 "weight": 0,
             },
             "package_dest": {
                 "id": move_line.result_package_id.id,
                 "name": move_line.result_package_id.name,
-                "line_count": 1,
-                "packaging_name": "",
+                "move_line_count": 1,
+                "packaging": None,
                 # TODO
                 "weight": 0,
             },

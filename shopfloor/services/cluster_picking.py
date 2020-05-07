@@ -1,4 +1,5 @@
 from odoo import _, fields
+from odoo.osv import expression
 from odoo.tools.float_utils import float_compare
 
 from odoo.addons.base_rest.components.service import to_bool, to_int
@@ -70,6 +71,10 @@ class ClusterPicking(Component):
     _usage = "cluster_picking"
     _description = __doc__
 
+    @property
+    def data_struct(self):
+        return self.actions_for("data")
+
     def find_batch(self):
         """Find a picking batch to work on and start it
 
@@ -88,8 +93,7 @@ class ClusterPicking(Component):
         * confirm_start: when it could find a batch
         * start: when no batch is available
         """
-        batch_service = self.component(usage="picking_batch")
-        batches = batch_service._search()
+        batches = self._batch_picking_search()
         selected = self._select_a_picking_batch(batches)
         if selected:
             return self._response_for_confirm_start(selected)
@@ -105,9 +109,50 @@ class ClusterPicking(Component):
         Transitions:
         * manual_selection: to the selection screen
         """
-        batch_service = self.component(usage="picking_batch")
-        batches = batch_service.search()["data"]
-        return self._response(next_state="manual_selection", data=batches)
+        batches = self._batch_picking_search()
+        data = {
+            "records": self.data_struct.picking_batches(batches),
+            "size": len(batches),
+        }
+        return self._response(next_state="manual_selection", data=data)
+
+    def _batch_picking_base_search_domain(self):
+        return [
+            "|",
+            "&",
+            ("user_id", "=", False),
+            ("state", "=", "draft"),
+            "&",
+            ("user_id", "=", self.env.user.id),
+            ("state", "in", ("draft", "in_progress")),
+        ]
+
+    def _batch_picking_search(self, name_fragment=None, batch_ids=None):
+        domain = self._batch_picking_base_search_domain()
+        if name_fragment:
+            domain = expression.AND([domain, [("name", "ilike", name_fragment)]])
+        if batch_ids:
+            domain = expression.AND([domain, [("id", "in", batch_ids)]])
+        records = self.env["stock.picking.batch"].search(domain, order="id asc")
+        records = records.filtered(
+            # Include done/cancel because we want to be able to work on the
+            # batch even if some pickings are done/canceled. They'll should be
+            # ignored later.
+            lambda batch: all(
+                (
+                    # When the batch is already in progress, we do not care
+                    # about state of the pickings, because we want to be able
+                    # to recover it in any case, even if, for instance, a stock
+                    # error changed a picking to unavailable after the user
+                    # started to work on the batch.
+                    batch.state == "in_progress"
+                    or picking.state in ("assigned", "done", "cancel")
+                )
+                and picking.picking_type_id in self.picking_types
+                for picking in batch.picking_ids
+            )
+        )
+        return records
 
     # TODO this may be used in other scenarios? if so, extract
     def _select_a_picking_batch(self, batches):
@@ -141,26 +186,9 @@ class ClusterPicking(Component):
         )
 
     def _response_for_confirm_start(self, batch):
-        pickings = []
-        for picking in batch.picking_ids:
-            p_weight = batch.picking_weight(picking)
-            p_values = {
-                "id": picking.id,
-                "name": picking.name,
-                "partner": None,
-                "move_line_count": len(picking.move_line_ids),
-                "weight": p_weight,
-                "origin": picking.origin or "",
-            }
-            if picking.partner_id:
-                p_values["partner"] = {
-                    "id": picking.partner_id.id,
-                    "name": picking.partner_id.name,
-                }
-            pickings.append(p_values)
         return self._response(
             next_state="confirm_start",
-            data={"id": batch.id, "name": batch.name, "pickings": pickings},
+            data=self.data_struct.picking_batch(batch, with_pickings=True),
         )
 
     def _response_for_batch_cannot_be_selected(self):
@@ -189,9 +217,8 @@ class ClusterPicking(Component):
           concurrently for instance)
         * confirm_start: after the batch has been assigned to the user
         """
-        batch_service = self.component(usage="picking_batch")
-        batch = batch_service._search(batch_ids=[picking_batch_id])
-        selected = self._select_a_picking_batch(batch)
+        batches = self._batch_picking_search(batch_ids=[picking_batch_id])
+        selected = self._select_a_picking_batch(batches)
         if selected:
             return self._response_for_confirm_start(selected)
         else:
@@ -264,50 +291,16 @@ class ClusterPicking(Component):
         return self._data_move_line(remaining_lines[0])
 
     def _data_move_line(self, line):
-        # TODO: use shopfloor.data.action.move_line
         picking = line.picking_id
         batch = picking.batch_id
         product = line.product_id
-        lot = line.lot_id
-        package = line.package_id
-        data = {
-            # TODO have common methods to return general info
-            # for each model
-            "id": line.id,
-            "quantity": line.product_uom_qty,
-            "postponed": line.shopfloor_postponed,
-            "picking": {
-                "id": picking.id,
-                "name": picking.name,
-                "origin": picking.origin or "",
-                "note": picking.note or "",
-                "partner": None,
-            },
-            "batch": {"id": batch.id, "name": batch.name},
-            "product": {
-                "id": product.id,
-                "name": product.name,
-                "display_name": product.display_name,
-                "default_code": product.default_code or "",
-                "qty_available": product.qty_available,
-            },
-            "lot": {"id": lot.id, "name": lot.name, "ref": lot.ref or ""}
-            if lot
-            else None,
-            "location_src": {"id": line.location_id.id, "name": line.location_id.name},
-            "location_dest": {
-                "id": line.location_dest_id.id,
-                "name": line.location_dest_id.name,
-            },
-            "pack": {"id": package.id, "name": package.name} if package else None,
-        }
-        if picking.partner_id:
-            # TODO retrieve info always in the same way
-            # maybe using base_jsonify
-            data["picking"]["partner"] = {
-                "id": picking.partner_id.id,
-                "name": picking.partner_id.name,
-            }
+        data = self.data_struct.move_line(line)
+        # additional values
+        data.pop("package_dest", None)
+        data["batch"] = self.data_struct.picking_batch(batch)
+        data["picking"] = self.data_struct.picking(picking)
+        data["postponed"] = line.shopfloor_postponed
+        data["product"]["qty_available"] = product.qty_available
         return data
 
     def unassign(self, picking_batch_id):
@@ -471,10 +464,9 @@ class ClusterPicking(Component):
         last_picked_line = self._last_picked_line(move_line.picking_id)
         if last_picked_line:
             # suggest pack to be used for the next line
-            data["destination_pack"] = {
-                "id": last_picked_line.result_package_id.id,
-                "name": last_picked_line.result_package_id.name,
-            }
+            data["package_dest"] = self.data_struct.package(
+                last_picked_line.result_package_id
+            )
         return self._response(next_state="scan_destination", data=data, message=message)
 
     def scan_destination_pack(self, move_line_id, barcode, quantity):
@@ -588,16 +580,11 @@ class ClusterPicking(Component):
         return compare <= 0
 
     def _response_for_zero_check(self, move_line):
-        return self._response(
-            next_state="zero_check",
-            data={
-                "id": move_line.id,
-                "location_src": {
-                    "id": move_line.location_id.id,
-                    "name": move_line.location_id.name,
-                },
-            },
-        )
+        data = {
+            "id": move_line.id,
+            "location_src": self.data_struct.location(move_line.location_id),
+        }
+        return self._response(next_state="zero_check", data=data)
 
     def _are_all_dest_location_same(self, batch):
         lines_to_unload = self._lines_to_unload(batch)
@@ -632,29 +619,25 @@ class ClusterPicking(Component):
         # all the lines destinations are the same here, it looks
         # only for the first one
         first_line = fields.first(lines)
-        return {
-            "id": batch.id,
-            "name": batch.name,
-            "location_dest": {
-                "id": first_line.location_dest_id.id,
-                "name": first_line.location_dest_id.name,
-            },
-        }
+        data = self.data_struct.picking_batch(batch)
+        data.update(
+            {"location_dest": self.data_struct.location(first_line.location_dest_id)}
+        )
+        return data
 
     def _data_for_unload_single(self, batch, package):
         line = fields.first(
             package.planned_move_line_ids.filtered(self._filter_for_unload)
         )
-        return {
-            # TODO disambiguate "id" everywhere? (id -> picking_batch_id)
-            "id": batch.id,
-            "name": batch.name,
-            "package": {"id": package.id, "name": package.name},
-            "location_dest": {
-                "id": line.location_dest_id.id,
-                "name": line.location_dest_id.name,
-            },
-        }
+        # TODO disambiguate "id" everywhere? (id -> picking_batch_id)
+        data = self.data_struct.picking_batch(batch)
+        data.update(
+            {
+                "package": self.data_struct.package(package),
+                "location_dest": self.data_struct.location(line.location_dest_id),
+            }
+        )
+        return data
 
     def _response_for_unload_all(self, batch, message=None):
         return self._response(
@@ -1369,8 +1352,8 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                 "schema": {
                     "id": {"required": True, "type": "integer"},
                     "name": {"type": "string", "nullable": False, "required": True},
-                    "origin": {"type": "string", "nullable": False, "required": True},
-                    "note": {"type": "string", "nullable": False, "required": True},
+                    "origin": {"type": "string", "nullable": True, "required": True},
+                    "note": {"type": "string", "nullable": True, "required": True},
                     "partner": {
                         "type": "dict",
                         "required": False,
@@ -1422,7 +1405,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                 "schema": {
                     "id": {"required": True, "type": "integer"},
                     "name": {"type": "string", "nullable": False, "required": True},
-                    "ref": {"type": "string", "nullable": False, "required": True},
+                    "ref": {"type": "string", "nullable": True, "required": True},
                 },
             },
             # TODO share parts of the schema?
@@ -1440,7 +1423,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                     "name": {"type": "string", "nullable": False, "required": True},
                 },
             },
-            "pack": {
+            "package_src": {
                 "type": "dict",
                 "required": False,
                 "nullable": True,
@@ -1449,7 +1432,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                     "name": {"type": "string", "nullable": False, "required": True},
                 },
             },
-            "destination_pack": {
+            "package_dest": {
                 "type": "dict",
                 "required": False,
                 "nullable": True,
@@ -1522,5 +1505,11 @@ class ShopfloorClusterPickingValidatorResponse(Component):
 
     @property
     def _schema_for_batch_selection(self):
-        batch_validator = self.component(usage="picking_batch.validator.response")
-        return batch_validator.search()["data"]["schema"]
+        return {
+            "size": {"required": True, "type": "integer"},
+            "records": {
+                "type": "list",
+                "required": True,
+                "schema": {"type": "dict", "schema": self.schemas().picking_batch()},
+            },
+        }
