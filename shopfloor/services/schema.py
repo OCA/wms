@@ -118,3 +118,13 @@ class BaseShopfloorSchemaResponse(Component):
             "move_line_count": {"required": True, "type": "integer"},
             "weight": {"required": True, "nullable": True, "type": "float"},
         }
+
+    def package_level(self):
+        return {
+            "id": {"required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+            "location_src": {"type": "dict", "schema": self.location()},
+            "location_dest": {"type": "dict", "schema": self.location()},
+            "product": {"type": "dict", "schema": self.product()},
+            "picking": {"type": "dict", "schema": self.picking()},
+        }
