@@ -7,9 +7,6 @@ class SinglePackTransferCase(CommonCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
-        cls.product_a = cls.env["product.product"].create(
-            {"name": "Product A", "type": "product"}
-        )
         cls.pack_a = cls.env["stock.quant.package"].create(
             {"location_id": cls.stock_location.id}
         )
@@ -60,6 +57,29 @@ class SinglePackTransferCase(CommonCase):
         package_level.is_done = True
         return package_level
 
+    def _response_package_level_data(self, package_level):
+        return {
+            "id": package_level.id,
+            "name": package_level.package_id.name,
+            "location_src": {"id": self.shelf1.id, "name": self.shelf1.name},
+            "location_dest": {"id": self.shelf2.id, "name": self.shelf2.name},
+            "picking": {
+                "id": self.picking.id,
+                "name": self.picking.name,
+                "note": None,
+                "origin": None,
+                "partner": None,
+                "move_line_count": len(self.picking.move_line_ids),
+                "weight": 2.0,
+            },
+            "product": {
+                "id": self.product_a.id,
+                "name": self.product_a.name,
+                "default_code": self.product_a.default_code,
+                "display_name": self.product_a.display_name,
+            },
+        }
+
     def test_start(self):
         """Test the happy path for single pack transfer /start endpoint
 
@@ -92,14 +112,7 @@ class SinglePackTransferCase(CommonCase):
         self.assert_response(
             response,
             next_state="scan_location",
-            data={
-                "id": self.ANY,
-                "name": package_level.package_id.name,
-                "location_src": {"id": self.shelf1.id, "name": self.shelf1.name},
-                "location_dest": {"id": self.shelf2.id, "name": self.shelf2.name},
-                "picking": {"id": self.picking.id, "name": self.picking.name},
-                "product": {"id": self.product_a.id, "name": self.product_a.name},
-            },
+            data=self._response_package_level_data(package_level),
         )
 
     def test_start_no_operation(self):
@@ -315,14 +328,7 @@ class SinglePackTransferCase(CommonCase):
                 "message": "Operation's already running."
                 " Would you like to take it over?",
             },
-            data={
-                "id": self.ANY,
-                "name": package_level.package_id.name,
-                "location_src": {"id": self.shelf1.id, "name": self.shelf1.name},
-                "location_dest": {"id": self.shelf2.id, "name": self.shelf2.name},
-                "picking": {"id": self.picking.id, "name": self.picking.name},
-                "product": {"id": self.product_a.id, "name": self.product_a.name},
-            },
+            data=self._response_package_level_data(package_level),
         )
 
     def test_validate(self):
@@ -556,14 +562,7 @@ class SinglePackTransferCase(CommonCase):
             response,
             next_state="confirm_location",
             message=message,
-            data={
-                "id": self.ANY,
-                "name": package_level.package_id.name,
-                "location_src": {"id": self.shelf1.id, "name": self.shelf1.name},
-                "location_dest": {"id": self.shelf2.id, "name": self.shelf2.name},
-                "picking": {"id": self.picking.id, "name": self.picking.name},
-                "product": {"id": self.product_a.id, "name": self.product_a.name},
-            },
+            data=self._response_package_level_data(package_level),
         )
 
     def test_validate_location_with_confirm(self):
