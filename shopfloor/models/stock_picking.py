@@ -6,7 +6,7 @@ class StockPicking(models.Model):
 
     total_weight = fields.Float(
         compute="_compute_picking_info",
-        help="Technical field. Indicates total weight of pickings included.",
+        help="Technical field. Indicates total weight of transfers included.",
     )
     move_line_count = fields.Integer(
         compute="_compute_picking_info",
