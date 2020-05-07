@@ -1,6 +1,7 @@
 from odoo.addons.component.core import Component
 
 
+# TODO remove
 # TODO think BETTER about how we want to share the common methods / workflows
 class PackTransferValidateAction(Component):
     """Pack Transfer shared business logic

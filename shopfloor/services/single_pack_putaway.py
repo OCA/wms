@@ -3,6 +3,9 @@ from odoo import _
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
+# NOTE a lot of code is duplicated with SinglePackTransfer, but
+# this service will be replaced
+
 
 class SinglePackPutaway(Component):
     """Methods for the Single Pack Put-Away Process"""
