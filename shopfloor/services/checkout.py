@@ -58,7 +58,7 @@ class Checkout(Component):
         """
         search = self.actions_for("search")
         message = self.actions_for("message")
-        picking = search.stock_picking_from_scan(barcode)
+        picking = search.picking_from_scan(barcode)
         if not picking:
             location = search.location_from_scan(barcode)
             if location:
