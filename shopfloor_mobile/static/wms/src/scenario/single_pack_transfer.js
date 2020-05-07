@@ -15,7 +15,7 @@ export var SinglePackTransfer = Vue.component("single-pack-transfer", {
             <searchbar v-if="state_is(initial_state_key)" v-on:found="on_scan" :input_placeholder="search_input_placeholder"></searchbar>
             <searchbar v-if="state_is('scan_location')" v-on:found="on_scan" :input_placeholder="search_input_placeholder" :input_data_type="'location'"></searchbar>
             <user-confirmation v-if="need_confirmation" v-on:user-confirmation="on_user_confirm" v-bind:question="user_notification.message"></user-confirmation>
-            <detail-operation v-if="state.key != initial_state_key" :record="state.data" />
+            <detail-operation v-if="state.key != initial_state_key && state.key != 'show_completion_info'" :record="state.data" />
             <last-operation v-if="state_is('show_completion_info')" v-on:confirm="state.on_confirm"></last-operation>
             <cancel-button v-on:cancel="on_cancel" v-if="show_cancel_button"></cancel-button>
         </Screen>
