@@ -11,7 +11,7 @@ except ImportError:
     _logger.debug("Can not import cerberus")
 
 
-class ActionsDataCase(CommonCase):
+class ActionsDataCaseBase(CommonCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -42,6 +42,8 @@ class ActionsDataCase(CommonCase):
         cls._fill_stock_for_moves(cls.move_d)
         cls.picking.action_assign()
 
+
+class ActionsDataCase(ActionsDataCaseBase):
     def setUp(self):
         super().setUp()
         with self.work_on_actions() as work:
