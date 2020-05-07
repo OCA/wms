@@ -10,38 +10,9 @@ class SinglePackTransfer(Component):
     _usage = "single_pack_transfer"
     _description = __doc__
 
-    # TODO get rid of these methods now that we have a component
-    # for the messages? could help for extensibility though...?
-    def _response_for_empty_location(self, location):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="start", message=message.no_pack_in_location(location)
-        )
-
-    def _response_for_several_packages(self, location):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="start", message=message.several_packs_in_location(location)
-        )
-
-    def _response_for_package_not_found(self, barcode):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="start", message=message.package_not_found_for_barcode(barcode)
-        )
-
-    def _response_for_forbidden_package(self, barcode, picking_types):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="start",
-            message=message.package_not_allowed_in_src_location(barcode, picking_types),
-        )
-
-    def _response_for_operation_not_found(self, pack):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="start", message=message.no_pending_operation_for_pack(pack)
-        )
+    @property
+    def msg_store(self):
+        return self.actions_for("message")
 
     def _data_after_package_scanned(self, move_line, pack):
         move = move_line.move_id
@@ -57,19 +28,32 @@ class SinglePackTransfer(Component):
             "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
         }
 
-    def _response_for_start_to_confirm(self, move_line, pack):
-        message = self.actions_for("message")
+    def _response_for_start(self, message=None, popup=None):
+        return self._response(next_state="start", message=message, popup=popup)
+
+    def _response_for_confirm_start(self, move_line, pack):
         return self._response(
             next_state="confirm_start",
-            message=message.already_running_ask_confirmation(),
+            message=self.msg_store.already_running_ask_confirmation(),
             data=self._data_after_package_scanned(move_line, pack),
         )
 
-    def _response_for_start_success(self, move_line, pack):
+    def _response_for_scan_location(self, move_line, pack, message=None):
         return self._response(
             next_state="scan_location",
             data=self._data_after_package_scanned(move_line, pack),
         )
+
+    def _response_for_confirm_location(self, move_line, pack, message=None):
+        message = self.actions_for("message")
+        return self._response(
+            next_state="confirm_location",
+            data=self._data_after_package_scanned(move_line, pack),
+            message=message,
+        )
+
+    def _response_for_show_completion_info(self, message=None):
+        return self._response(next_state="show_completion_info", message=message)
 
     def start(self, barcode):
         search = self.actions_for("search")
@@ -82,20 +66,30 @@ class SinglePackTransfer(Component):
                 [("location_id", "=", location.id)]
             )
             if not pack:
-                return self._response_for_empty_location(location)
+                return self._response_for_start(
+                    message=self.msg_store.no_pack_in_location(location)
+                )
             if len(pack) > 1:
-                return self._response_for_several_packages(location)
+                return self._response_for_start(
+                    message=self.msg_store.several_packs_in_location(location)
+                )
 
         if not pack:
             pack = search.package_from_scan(barcode)
 
         if not pack:
-            return self._response_for_package_not_found(barcode)
+            return self._response_for_start(
+                self.msg_store.package_not_found_for_barcode(barcode)
+            )
 
         if not pack.location_id.is_sublocation_of(
             picking_types.mapped("default_location_src_id")
         ):
-            return self._response_for_forbidden_package(barcode, picking_types)
+            return self._response_for_start(
+                message=self.msg_store.package_not_allowed_in_src_location(
+                    barcode, picking_types
+                )
+            )
 
         existing_operations = self.env["stock.move.line"].search(
             [
@@ -105,119 +99,109 @@ class SinglePackTransfer(Component):
             ]
         )
         if not existing_operations:
-            return self._response_for_operation_not_found(pack)
+            return self._response_for_start(
+                message=self.msg_store.no_pending_operation_for_pack(pack)
+            )
         # TODO can we have more than one move line?
         if existing_operations[0].package_level_id.is_done:
-            return self._response_for_start_to_confirm(existing_operations, pack)
+            return self._response_for_confirm_start(existing_operations, pack)
 
         existing_operations[0].package_level_id.is_done = True
-        return self._response_for_start_success(existing_operations[0], pack)
+        return self._response_for_scan_location(existing_operations[0], pack)
 
-    def _response_for_package_level_not_found(self):
-        message = self.actions_for("message")
-        return self._response(next_state="start", message=message.operation_not_found())
+    def _is_move_state_valid(self, move):
+        return move.state != "cancel"
 
-    def _response_for_move_canceled_elsewhere(self):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="start", message=message.operation_has_been_canceled_elsewhere()
+    def _is_dest_location_valid(self, move, scanned_location):
+        """Forbid a dest location to be used"""
+        return scanned_location.is_sublocation_of(
+            move.picking_id.picking_type_id.default_location_dest_id
         )
 
-    def _response_for_location_not_found(self, move_line, pack):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="scan_location",
-            message=message.no_location_found(),
-            data=self._data_after_package_scanned(move_line, pack),
-        )
-
-    def _response_for_forbidden_location(self, move_line, pack):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="scan_location",
-            message=message.dest_location_not_allowed(),
-            data=self._data_after_package_scanned(move_line, pack),
-        )
-
-    def _response_for_location_need_confirm(self, move_line, pack, to_location):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="confirm_location",
-            message=message.confirm_location_changed(
-                move_line.location_dest_id, to_location
-            ),
-            data=self._data_after_package_scanned(move_line, pack),
-        )
-
-    def _response_for_validate_success(self, completion_info_popup=None):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="start",
-            message=message.confirm_pack_moved(),
-            popup=completion_info_popup,
-        )
+    def _is_dest_location_to_confirm(self, move, scanned_location):
+        """Destination that could be used but need confirmation"""
+        move_dest_location = move.move_line_ids[0].location_dest_id
+        return not scanned_location.is_sublocation_of(move_dest_location)
 
     def validate(self, package_level_id, location_barcode, confirmation=False):
         """Validate the transfer"""
-        # TODO this method is duplicated in putaway
-        pack_transfer = self.actions_for("pack.transfer.validate")
         search = self.actions_for("search")
+        message = self.actions_for("message")
 
         package = self.env["stock.package_level"].browse(package_level_id)
         if not package.exists():
-            return self._response_for_package_level_not_found()
+            return self._response_for_start(message=message.operation_not_found())
 
         move_line = package.move_line_ids[0]
         move = move_line.move_id
-        if not pack_transfer.is_move_state_valid(move):
-            return self._response_for_move_canceled_elsewhere()
+        if not self._is_move_state_valid(move):
+            return self._response_for_start(
+                message=self.msg_store.operation_has_been_canceled_elsewhere()
+            )
 
         scanned_location = search.location_from_scan(location_barcode)
         if not scanned_location:
-            return self._response_for_location_not_found(move_line, package.package_id)
-        if not pack_transfer.is_dest_location_valid(move, scanned_location):
-            return self._response_for_forbidden_location(move_line, package.package_id)
+            return self._response_for_scan_location(
+                move_line,
+                package.package_id,
+                message=self.msg_store.no_location_found(),
+            )
+        if not self._is_dest_location_valid(move, scanned_location):
+            return self._response_for_scan_location(
+                move_line,
+                package.package_id,
+                message=self.msg_store.dest_location_not_allowed(),
+            )
 
-        if pack_transfer.is_dest_location_to_confirm(move, scanned_location):
+        if self._is_dest_location_to_confirm(move, scanned_location):
             if confirmation:
                 # If the destination of the move would be incoherent
                 # (move line outside of it), we change the moves' destination
                 if not scanned_location.is_sublocation_of(move.location_dest_id):
                     move.location_dest_id = scanned_location.id
             else:
-                return self._response_for_location_need_confirm(
-                    move_line, package.package_id, scanned_location
+                return self._response_for_confirm_location(
+                    move_line,
+                    package.package_id,
+                    message=self.msg_store.confirm_location_changed(
+                        move_line.location_dest_id, scanned_location
+                    ),
                 )
 
-        pack_transfer.set_destination_and_done(move, scanned_location)
+        self._set_destination_and_done(move, scanned_location)
+        return self._router_validate_success(package)
 
-        completion_info = self.actions_for("completion.info")
-        completion_info_popup = completion_info.popup(package.move_line_ids)
+    def _is_last_move(self, move):
+        return move.picking_id.completion_info == "next_picking_ready"
 
-        return self._response_for_validate_success(
-            completion_info_popup=completion_info_popup
-        )
+    def _router_validate_success(self, package_level):
+        move = package_level.move_line_ids.move_id
+
+        message = self.msg_store.confirm_pack_moved()
+
+        completion_info_popup = None
+        if self._is_last_move(move):
+            completion_info = self.actions_for("completion.info")
+            completion_info_popup = completion_info.popup(package_level.move_line_ids)
+        return self._response_for_start(message=message, popup=completion_info_popup)
+
+    def _set_destination_and_done(self, move, scanned_location):
+        move.move_line_ids[0].location_dest_id = scanned_location.id
+        move._action_done()
 
     def cancel(self, package_level_id):
+        message = self.actions_for("message")
         package = self.env["stock.package_level"].browse(package_level_id)
         if not package.exists():
-            return self._response_for_package_level_not_found()
+            return self._response_for_start(message=message.operation_not_found())
         # package.move_ids may be empty, it seems
         move = package.move_line_ids.move_id
         if move.state == "done":
-            return self._response_for_move_already_processed()
+            return self._response_for_start(message=self.msg_store.already_done())
 
         package.is_done = False
-        return self._response_for_confirm_cancel()
-
-    def _response_for_move_already_processed(self):
-        message = self.actions_for("message")
-        return self._response(next_state="start", message=message.already_done())
-
-    def _response_for_confirm_cancel(self):
-        message = self.actions_for("message")
-        return self._response(
-            next_state="start", message=message.confirm_canceled_scan_next_pack()
+        return self._response_for_start(
+            message=self.msg_store.confirm_canceled_scan_next_pack()
         )
 
 
