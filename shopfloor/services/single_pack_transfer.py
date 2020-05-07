@@ -14,41 +14,43 @@ class SinglePackTransfer(Component):
     def msg_store(self):
         return self.actions_for("message")
 
-    def _data_after_package_scanned(self, move_line, pack):
-        move = move_line.move_id
+    @property
+    def data_struct(self):
+        return self.actions_for("data")
+
+    def _data_after_package_scanned(self, package_level):
+        move_line = package_level.move_line_ids[0]
+        package = package_level.package_id
         return {
-            "id": move_line.package_level_id.id,
-            "name": pack.name,
-            "location_src": {"id": pack.location_id.id, "name": pack.location_id.name},
-            "location_dest": {
-                "id": move_line.location_dest_id.id,
-                "name": move_line.location_dest_id.name,
-            },
-            "product": {"id": move.product_id.id, "name": move.product_id.name},
-            "picking": {"id": move.picking_id.id, "name": move.picking_id.name},
+            "id": package_level.id,
+            "name": package.name,
+            "location_src": self.data_struct.location(move_line.location_id),
+            "location_dest": self.data_struct.location(package_level.location_dest_id),
+            "product": self.data_struct.product(move_line.product_id),
+            "picking": self.data_struct.picking(move_line.picking_id),
         }
 
     def _response_for_start(self, message=None, popup=None):
         return self._response(next_state="start", message=message, popup=popup)
 
-    def _response_for_confirm_start(self, move_line, pack):
+    def _response_for_confirm_start(self, package_level, message=None):
         return self._response(
             next_state="confirm_start",
-            message=self.msg_store.already_running_ask_confirmation(),
-            data=self._data_after_package_scanned(move_line, pack),
+            data=self._data_after_package_scanned(package_level),
+            message=message,
         )
 
-    def _response_for_scan_location(self, move_line, pack, message=None):
+    def _response_for_scan_location(self, package_level, message=None):
         return self._response(
             next_state="scan_location",
-            data=self._data_after_package_scanned(move_line, pack),
+            data=self._data_after_package_scanned(package_level),
+            message=message,
         )
 
-    def _response_for_confirm_location(self, move_line, pack, message=None):
-        message = self.actions_for("message")
+    def _response_for_confirm_location(self, package_level, message=None):
         return self._response(
             next_state="confirm_location",
-            data=self._data_after_package_scanned(move_line, pack),
+            data=self._data_after_package_scanned(package_level),
             message=message,
         )
 
@@ -60,29 +62,29 @@ class SinglePackTransfer(Component):
         picking_types = self.picking_types
         location = search.location_from_scan(barcode)
 
-        pack = self.env["stock.quant.package"]
+        package = self.env["stock.quant.package"]
         if location:
-            pack = self.env["stock.quant.package"].search(
+            package = self.env["stock.quant.package"].search(
                 [("location_id", "=", location.id)]
             )
-            if not pack:
+            if not package:
                 return self._response_for_start(
                     message=self.msg_store.no_pack_in_location(location)
                 )
-            if len(pack) > 1:
+            if len(package) > 1:
                 return self._response_for_start(
                     message=self.msg_store.several_packs_in_location(location)
                 )
 
-        if not pack:
-            pack = search.package_from_scan(barcode)
+        if not package:
+            package = search.package_from_scan(barcode)
 
-        if not pack:
+        if not package:
             return self._response_for_start(
                 self.msg_store.package_not_found_for_barcode(barcode)
             )
 
-        if not pack.location_id.is_sublocation_of(
+        if not package.location_id.is_sublocation_of(
             picking_types.mapped("default_location_src_id")
         ):
             return self._response_for_start(
@@ -91,23 +93,25 @@ class SinglePackTransfer(Component):
                 )
             )
 
-        existing_operations = self.env["stock.move.line"].search(
+        move_lines = self.env["stock.move.line"].search(
             [
-                ("package_id", "=", pack.id),
-                ("state", "!=", "done"),
+                ("package_id", "=", package.id),
+                ("state", "not in", ("cancel", "done")),
                 ("picking_id.picking_type_id", "in", picking_types.ids),
             ]
         )
-        if not existing_operations:
+        if not move_lines:
             return self._response_for_start(
-                message=self.msg_store.no_pending_operation_for_pack(pack)
+                message=self.msg_store.no_pending_operation_for_pack(package)
             )
-        # TODO can we have more than one move line?
-        if existing_operations[0].package_level_id.is_done:
-            return self._response_for_confirm_start(existing_operations, pack)
+        if move_lines[0].package_level_id.is_done:
+            return self._response_for_confirm_start(
+                move_lines[0].package_level_id,
+                message=self.msg_store.already_running_ask_confirmation(),
+            )
 
-        existing_operations[0].package_level_id.is_done = True
-        return self._response_for_scan_location(existing_operations[0], pack)
+        move_lines[0].package_level_id.is_done = True
+        return self._response_for_scan_location(move_lines[0].package_level_id)
 
     def _is_move_state_valid(self, move):
         return move.state != "cancel"
@@ -126,13 +130,16 @@ class SinglePackTransfer(Component):
     def validate(self, package_level_id, location_barcode, confirmation=False):
         """Validate the transfer"""
         search = self.actions_for("search")
-        message = self.actions_for("message")
 
-        package = self.env["stock.package_level"].browse(package_level_id)
-        if not package.exists():
-            return self._response_for_start(message=message.operation_not_found())
+        package_level = self.env["stock.package_level"].browse(package_level_id)
+        if not package_level.exists():
+            return self._response_for_start(
+                message=self.msg_store.operation_not_found()
+            )
 
-        move_line = package.move_line_ids[0]
+        # if we have more than one move, we should assume they go to the same
+        # place
+        move_line = package_level.move_line_ids[0]
         move = move_line.move_id
         if not self._is_move_state_valid(move):
             return self._response_for_start(
@@ -142,15 +149,12 @@ class SinglePackTransfer(Component):
         scanned_location = search.location_from_scan(location_barcode)
         if not scanned_location:
             return self._response_for_scan_location(
-                move_line,
-                package.package_id,
-                message=self.msg_store.no_location_found(),
+                package_level, message=self.msg_store.no_location_found()
             )
+
         if not self._is_dest_location_valid(move, scanned_location):
             return self._response_for_scan_location(
-                move_line,
-                package.package_id,
-                message=self.msg_store.dest_location_not_allowed(),
+                package_level, message=self.msg_store.dest_location_not_allowed()
             )
 
         if self._is_dest_location_to_confirm(move, scanned_location):
@@ -161,15 +165,14 @@ class SinglePackTransfer(Component):
                     move.location_dest_id = scanned_location.id
             else:
                 return self._response_for_confirm_location(
-                    move_line,
-                    package.package_id,
+                    package_level,
                     message=self.msg_store.confirm_location_changed(
                         move_line.location_dest_id, scanned_location
                     ),
                 )
 
         self._set_destination_and_done(move, scanned_location)
-        return self._router_validate_success(package)
+        return self._router_validate_success(package_level)
 
     def _is_last_move(self, move):
         return move.picking_id.completion_info == "next_picking_ready"
@@ -191,15 +194,15 @@ class SinglePackTransfer(Component):
 
     def cancel(self, package_level_id):
         message = self.actions_for("message")
-        package = self.env["stock.package_level"].browse(package_level_id)
-        if not package.exists():
+        package_level = self.env["stock.package_level"].browse(package_level_id)
+        if not package_level.exists():
             return self._response_for_start(message=message.operation_not_found())
         # package.move_ids may be empty, it seems
-        move = package.move_line_ids.move_id
+        move = package_level.move_line_ids.move_id
         if move.state == "done":
             return self._response_for_start(message=self.msg_store.already_done())
 
-        package.is_done = False
+        package_level.is_done = False
         return self._response_for_start(
             message=self.msg_store.confirm_canceled_scan_next_pack()
         )
@@ -243,9 +246,9 @@ class SinglePackTransferValidatorResponse(Component):
         """
         return {
             "start": {},
-            "confirm_start": self._schema_for_location,
-            "scan_location": self._schema_for_location,
-            "confirm_location": self._schema_for_location,
+            "confirm_start": self._schema_for_package_level_details,
+            "scan_location": self._schema_for_package_level_details,
+            "confirm_location": self._schema_for_package_level_details,
         }
 
     def start(self):
@@ -260,36 +263,5 @@ class SinglePackTransferValidatorResponse(Component):
         )
 
     @property
-    def _schema_for_location(self):
-        return {
-            "id": {"required": True, "type": "integer"},
-            "name": {"type": "string", "nullable": False, "required": True},
-            "location_src": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
-            "location_dest": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
-            "product": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
-            "picking": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
-        }
+    def _schema_for_package_level_details(self):
+        return self.schemas().package_level()
