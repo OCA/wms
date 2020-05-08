@@ -206,3 +206,9 @@ class MessageAction(Component):
                 "This lot is part of multiple packages, please scan a package."
             ),
         }
+
+    def batch_transfer_complete(self):
+        return {
+            "message_type": "success",
+            "message": _("Batch Transfer complete"),
+        }
