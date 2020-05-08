@@ -25,7 +25,7 @@ class Delivery(Component):
     Flow Diagram: https://www.draw.io/#G1qRenBcezk50ggIazDuu2qOfkTsoIAxXP
     """
 
-    _inherit = "base.shopfloor.service"
+    _inherit = "base.shopfloor.process"
     _name = "shopfloor.delivery"
     _usage = "delivery"
     _description = __doc__
