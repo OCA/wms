@@ -23,23 +23,6 @@ class BaseShopfloorService(AbstractComponent):
     _actions_collection_name = "shopfloor.action"
     _expose_model = None
 
-    @property
-    def picking_types(self):
-        """Return picking types for the menu and profile"""
-        # TODO make this a lazy property or computed field avoid running the
-        # filter every time?
-        picking_types = self.work.menu.picking_type_ids.filtered(
-            lambda pt: not pt.warehouse_id
-            or pt.warehouse_id == self.work.profile.warehouse_id
-        )
-        if not picking_types:
-            raise exceptions.UserError(
-                _("No operation types configured on menu {} for warehouse {}.").format(
-                    self.work.menu.name, self.work.profile.warehouse_id.display_name
-                )
-            )
-        return picking_types
-
     def _get(self, _id):
         domain = expression.normalize_domain(self._get_base_search_domain())
         domain = expression.AND([domain, [("id", "=", _id)]])
@@ -158,28 +141,27 @@ class BaseShopfloorService(AbstractComponent):
     def _get_openapi_default_parameters(self):
         defaults = super()._get_openapi_default_parameters()
         demo_api_key = self.env.ref("shopfloor.api_key_demo", raise_if_not_found=False)
-
-        # Try to first the first menu that implements the current service.
-        # Not all usages have a process, in that case, we'll set the first
-        # menu found
-        menu = self.env["shopfloor.menu"].search(
-            [("scenario", "=", self._usage)], limit=1
-        )
-        if not menu:
-            menu = self.env["shopfloor.menu"].search([], limit=1)
-        profile = self.env["shopfloor.profile"].search([], limit=1)
-
-        defaults.extend(
-            [
-                {
-                    "name": "API-KEY",
-                    "in": "header",
-                    "description": "API key for Authorization",
-                    "required": True,
-                    "schema": {"type": "string"},
-                    "style": "simple",
-                    "value": demo_api_key.key if demo_api_key else "",
-                },
+        service_params = [
+            {
+                "name": "API-KEY",
+                "in": "header",
+                "description": "API key for Authorization",
+                "required": True,
+                "schema": {"type": "string"},
+                "style": "simple",
+                "value": demo_api_key.key if demo_api_key else "",
+            },
+        ]
+        if self._requires_header_menu:
+            # Try to first the first menu that implements the current service.
+            # Not all usages have a process, in that case, we'll set the first
+            # menu found
+            menu = self.env["shopfloor.menu"].search(
+                [("scenario", "=", self._usage)], limit=1
+            )
+            if not menu:
+                menu = self.env["shopfloor.menu"].search([], limit=1)
+            service_params.append(
                 {
                     "name": "SERVICE_CTX_MENU_ID",
                     "in": "header",
@@ -188,7 +170,11 @@ class BaseShopfloorService(AbstractComponent):
                     "schema": {"type": "integer"},
                     "style": "simple",
                     "value": menu.id,
-                },
+                }
+            )
+        if self._requires_header_profile:
+            profile = self.env["shopfloor.profile"].search([], limit=1)
+            service_params.append(
                 {
                     "name": "SERVICE_CTX_PROFILE_ID",
                     "in": "header",
@@ -197,9 +183,9 @@ class BaseShopfloorService(AbstractComponent):
                     "schema": {"type": "integer"},
                     "style": "simple",
                     "value": profile.id,
-                },
-            ]
-        )
+                }
+            ),
+        defaults.extend(service_params)
         return defaults
 
     @property
@@ -228,3 +214,30 @@ class BaseShopfloorService(AbstractComponent):
         if method_name == "actions_for":
             return False
         return super()._is_public_api_method(method_name)
+
+
+class BaseShopfloorProcess(AbstractComponent):
+    """Base class for process rest service"""
+
+    _inherit = "base.shopfloor.service"
+    _name = "base.shopfloor.process"
+
+    _requires_header_menu = True
+    _requires_header_profile = True
+
+    @property
+    def picking_types(self):
+        """Return picking types for the menu and profile"""
+        # TODO make this a lazy property or computed field avoid running the
+        # filter every time?
+        picking_types = self.work.menu.picking_type_ids.filtered(
+            lambda pt: not pt.warehouse_id
+            or pt.warehouse_id == self.work.profile.warehouse_id
+        )
+        if not picking_types:
+            raise exceptions.UserError(
+                _("No operation types configured on menu {} for warehouse {}.").format(
+                    self.work.menu.name, self.work.profile.warehouse_id.display_name
+                )
+            )
+        return picking_types

@@ -8,6 +8,9 @@ class ShopfloorApp(Component):
     _name = "shopfloor.app"
     _usage = "app"
     _description = __doc__
+    # TODO this is required only for `menu` and not for `user_config`
+    # Maybe we should split them.
+    _requires_header_profile = True
 
     def user_config(self):
         profiles_comp = self.component("profile")

@@ -29,7 +29,7 @@ class Checkout(Component):
     Flow Diagram: https://www.draw.io/#G1qRenBcezk50ggIazDuu2qOfkTsoIAxXP
     """
 
-    _inherit = "base.shopfloor.service"
+    _inherit = "base.shopfloor.process"
     _name = "shopfloor.checkout"
     _usage = "checkout"
     _description = __doc__
