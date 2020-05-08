@@ -70,6 +70,7 @@ class CommonCase(SavepointCase, ComponentMixin):
     def setUpClassVars(cls):
         stock_location = cls.env.ref("stock.stock_location_stock")
         cls.stock_location = stock_location
+        cls.customer_location = cls.env.ref("stock.stock_location_customers")
         cls.dispatch_location = cls.env.ref("stock.location_dispatch_zone")
         cls.dispatch_location.barcode = "DISPATCH"
         cls.packing_location = cls.env.ref("stock.location_pack_zone")
@@ -129,7 +130,9 @@ class CommonCase(SavepointCase, ComponentMixin):
             {"name": "Box", "product_id": cls.product_d.id, "barcode": "ProductDBox"}
         )
 
-    def assert_response(self, response, next_state=None, message=None, data=None):
+    def assert_response(
+        self, response, next_state=None, message=None, data=None, popup=None
+    ):
         """Assert a response from the webservice
 
         The data and message dictionaries can use ``self.ANY`` to accept any
@@ -138,6 +141,8 @@ class CommonCase(SavepointCase, ComponentMixin):
         expected = {}
         if message:
             expected["message"] = message
+        if popup:
+            expected["popup"] = popup
         if next_state:
             expected.update(
                 {"next_state": next_state, "data": {next_state: data or {}}}
