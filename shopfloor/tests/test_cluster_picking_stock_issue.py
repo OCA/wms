@@ -28,13 +28,18 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
         )
         cls.dest_package = cls.env["stock.quant.package"].create({})
 
-    def _stock_issue(self, line, next_line=None):
+    def _stock_issue(self, line, next_line_func=None):
         response = self.service.dispatch(
             "stock_issue", params={"move_line_id": line.id}
         )
-        if next_line:
+        # use a function/lambda to delay the read of the next line,
+        # when calling _stock_issue(), the move_line may not exist and
+        # be created during the call to the stock_issue service
+        if next_line_func:
             self.assert_response(
-                response, next_state="start_line", data=self._line_data(next_line)
+                response,
+                next_state="start_line",
+                data=self._line_data(next_line_func()),
             )
         else:
             self.assert_response(
@@ -269,7 +274,9 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
 
         # on the third move, the operator can't pick anymore in the location,
         # because there is nothing inside, they declare a stock issue
-        self._stock_issue(self.move3.move_line_ids, next_line=self.move5.move_line_ids)
+        self._stock_issue(
+            self.move3.move_line_ids, next_line_func=lambda: self.move5.move_line_ids
+        )
 
         self.assertRecordValues(
             self.moves,
@@ -305,4 +312,37 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
             self.move3.product_id,
             expected_reserved_qty,
             lot=lot_b,
+        )
+
+    def test_stock_issue_reserve_elsewhere(self):
+        self._update_qty_in_location(self.shelf1, self.product_a, 100)
+        self._simulate_batch_selected(self.batch, fill_stock=False)
+        # now, everything is reserved in shelf1 as we had enough stock
+        self.assertEqual(set(self.batch.picking_ids.mapped("state")), {"assigned"})
+
+        # put stock in shelf2, so we can test the outcome: goods should be
+        # reserved in shelf2 after a stock issue
+        self._update_qty_in_location(self.shelf2, self.product_a, 100)
+
+        # the operator picks the first line
+        self._set_dest_package_and_done(self.move1.move_line_ids, self.dest_package)
+
+        # and has a stock issue on the second line
+        # because there is nothing inside, they declare a stock issue
+        self._stock_issue(
+            self.move2.move_line_ids, next_line_func=lambda: self.move2.move_line_ids
+        )
+
+        # the inventory should have been done for shelf1, and all the remaining
+        # moves after move1 (already picked) should have been reserved in
+        # shelf2
+        self.assertEqual(set(self.batch.picking_ids.mapped("state")), {"assigned"})
+        self.assertEqual(self.move1.move_line_ids.location_id, self.shelf1)
+        # all the following moves have been reserved in shelf2 as we still have
+        # stock there
+        self.assertEqual(
+            (self.move2 | self.move3 | self.move4 | self.move5).mapped(
+                "move_line_ids.location_id"
+            ),
+            self.shelf2,
         )
