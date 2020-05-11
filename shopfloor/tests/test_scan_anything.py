@@ -1,19 +1,9 @@
-from .test_actions_data import ActionsDataCaseBase
+from .test_actions_data_detail import ActionsDataDetailCaseBase
 
 
-class ScanAnythingCase(ActionsDataCaseBase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.package = cls.move_a.move_line_ids.package_id
-        cls.lot = cls.env["stock.production.lot"].create(
-            {"product_id": cls.product_b.id, "company_id": cls.env.company.id}
-        )
-
+class ScanAnythingCase(ActionsDataDetailCaseBase):
     def setUp(self):
         super().setUp()
-        with self.work_on_actions() as work:
-            self.data = work.component(usage="data")
         with self.work_on_services() as work:
             self.service = work.component(usage="scan_anything")
 
@@ -39,35 +29,35 @@ class ScanAnythingCase(ActionsDataCaseBase):
         record.barcode = "PROD-B"
         rec_type = "product"
         identifier = record.barcode
-        data = self.data.product(record)
+        data = self.data.product_detail(record)
         self._test_response_ok(rec_type, data, identifier)
 
     def test_scan_location(self):
         record = self.stock_location
         rec_type = "location"
         identifier = record.barcode
-        data = self.data.location(record)
+        data = self.data.location_detail(record)
         self._test_response_ok(rec_type, data, identifier)
 
     def test_scan_package(self):
         record = self.package
         rec_type = "package"
         identifier = record.name
-        data = self.data.package(record)
+        data = self.data.package_detail(record)
         self._test_response_ok(rec_type, data, identifier)
 
     def test_scan_lot(self):
         record = self.lot
         rec_type = "lot"
         identifier = record.name
-        data = self.data.lot(record)
+        data = self.data.lot_detail(record)
         self._test_response_ok(rec_type, data, identifier)
 
     def test_scan_transfer(self):
         record = self.picking
         rec_type = "transfer"
         identifier = record.name
-        data = self.data.picking(record)
+        data = self.data.picking_detail(record)
         self._test_response_ok(rec_type, data, identifier)
 
     def test_scan_error(self):

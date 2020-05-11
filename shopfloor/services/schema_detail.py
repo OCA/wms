@@ -1,0 +1,131 @@
+from odoo.addons.component.core import Component
+
+
+class ShopfloorSchemaDetailResponse(Component):
+    """Provide methods to share schema structures
+
+    The methods should be used in Service Components, so we try to
+    have similar schema structures across scenarios.
+    """
+
+    _inherit = "base.shopfloor.schemas"
+    _name = "base.shopfloor.schemas.detail"
+    _usage = "schema_detail"
+
+    def _schema_list_of(self, schema, **kw):
+        return {
+            "type": "list",
+            "nullable": True,
+            "required": False,
+            "schema": {"type": "dict", "schema": schema},
+        }
+
+    def _simple_record(self):
+        return {
+            "id": {"required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+        }
+
+    def _schema_dict_of(self, schema, **kw):
+        schema = {
+            "type": "dict",
+            "nullable": True,
+            "required": False,
+            "schema": schema,
+        }
+        schema.update(kw)
+        return schema
+
+    def location_detail(self):
+        schema = self.location()
+        schema.update(
+            {
+                "complete_name": {
+                    "type": "string",
+                    "nullable": False,
+                    "required": True,
+                },
+                "reserved_move_lines": self._schema_list_of(self.move_line()),
+            }
+        )
+        return schema
+
+    def picking_detail(self):
+        schema = self.picking()
+        schema.update(
+            {
+                "priority": {"type": "string", "nullable": True, "required": False},
+                "scheduled_date": {
+                    "type": "string",
+                    "nullable": False,
+                    "required": True,
+                },
+                "operation_type": self._schema_dict_of(self._simple_record()),
+                "carrier": self._schema_dict_of(self._simple_record()),
+                "lines": self._schema_list_of(self.move_line()),
+            }
+        )
+        return schema
+
+    def package_detail(self):
+        schema = self.package()
+        schema.update(
+            {
+                "pickings": self._schema_list_of(self.picking()),
+                "storage_type": self._schema_dict_of(self._simple_record()),
+                "lines": self._schema_list_of(self.move_line()),
+            }
+        )
+        return schema
+
+    def lot_detail(self):
+        schema = self.lot()
+        schema.update(
+            {
+                "removal_date": {"type": "string", "nullable": True, "required": False},
+                "expire_date": {"type": "string", "nullable": True, "required": False},
+                "product": self._schema_dict_of(self.product_detail()),
+                # TODO: packaging
+            }
+        )
+        return schema
+
+    def product(self):
+        schema = super().product()
+        schema.update(
+            {
+                "qty_available": {"type": "float", "required": True},
+                "qty_reserved": {"type": "float", "required": True},
+            }
+        )
+        return schema
+
+    def product_detail(self):
+        schema = self.product()
+        schema.update(
+            {
+                "image": {"type": "string", "nullable": True, "required": False},
+                "manufacturer": self._schema_dict_of(self._simple_record()),
+                "suppliers": self._schema_list_of(self.product_supplierinfo()),
+            }
+        )
+        return schema
+
+    def product_supplierinfo(self):
+        schema = self._simple_record()
+        schema.update(
+            {
+                "product_name": {"type": "string", "nullable": True, "required": False},
+                "product_code": {"type": "string", "nullable": True, "required": False},
+            }
+        )
+        return schema
+
+    # TODO
+    # def packaging_detail(self):
+    #     schema = self.packaging()
+    #     schema.update(
+    #         {
+    #         }
+    #     )
+    #     return schema
