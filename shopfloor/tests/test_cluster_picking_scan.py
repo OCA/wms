@@ -455,6 +455,9 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
     def test_scan_destination_pack_quantity_less(self):
         """Pick less units than expected"""
         line = self.one_line_picking.move_line_ids
+        # when we pick less quantity than expected, the line is split
+        # and the user is proposed to pick the next line for the remaining
+        # quantity
         response = self.service.dispatch(
             "scan_destination_pack",
             params={
@@ -477,8 +480,6 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="start_line",
-            # TODO ensure the duplicated line is the next line, it works now but
-            # maybe only by chance
             data=self._line_data(new_line),
             message={
                 "message_type": "success",
