@@ -16,9 +16,13 @@ class ShopfloorController(main.RestController):
     _root_path = "/shopfloor/"
     _collection_name = "shopfloor.service"
     _default_auth = "api_key"
+    # TODO: this should come from registered services.
+    # We would need to change how their ctx is initialized tho
+    # because ATM the ctx is computed before lookup.
     _service_headers_rules = {
         # no special header required for config
         "app/user_config": (),
+        "scan_anything/scan": (),
         # profile header is required to get menu items
         # fmt: off
         # NOTE: turn off formatting here is mandatory
