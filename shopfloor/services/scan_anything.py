@@ -60,15 +60,45 @@ class ShopfloorScanAnything(Component):
         return self._response(message=message)
 
     def _scan_handlers(self):
+        """Return a tuple of tuples describing handlers for scan requests.
+
+        Tuple schema:
+
+            0. record type
+            1. finder
+            2. json detail converter
+            3. detail schema validator
+
+        """
         search = self.actions_for("search")
-        data = self.actions_for("data")
-        schema = self.component(usage="schema")
+        data = self.actions_for("data_detail")
+        schema = self.component(usage="schema_detail")
         return (
-            ("location", search.location_from_scan, data.location, schema.location),
-            ("package", search.package_from_scan, data.package, schema.package),
-            ("product", search.product_from_scan, data.product, schema.product),
-            ("lot", search.lot_from_scan, data.lot, schema.lot),
-            ("transfer", search.picking_from_scan, data.picking, schema.picking),
+            (
+                "location",
+                search.location_from_scan,
+                data.location_detail,
+                schema.location_detail,
+            ),
+            (
+                "package",
+                search.package_from_scan,
+                data.package_detail,
+                schema.package_detail,
+            ),
+            (
+                "product",
+                search.product_from_scan,
+                data.product_detail,
+                schema.product_detail,
+            ),
+            ("lot", search.lot_from_scan, data.lot_detail, schema.lot_detail),
+            (
+                "transfer",
+                search.picking_from_scan,
+                data.picking_detail,
+                schema.picking_detail,
+            ),
         )
 
 

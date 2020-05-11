@@ -360,7 +360,9 @@ class ClusterPicking(Component):
         data["batch"] = self.data_struct.picking_batch(batch)
         data["picking"] = self.data_struct.picking(picking)
         data["postponed"] = line.shopfloor_postponed
-        data["product"]["qty_available"] = product.qty_available
+        data["product"]["qty_available"] = product.with_context(
+            location=line.location_id.id
+        ).qty_available
         return data
 
     def unassign(self, picking_batch_id):

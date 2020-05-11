@@ -2,6 +2,7 @@
 from . import service
 from . import validator
 from . import schema
+from . import schema_detail
 
 # generic services
 from . import app

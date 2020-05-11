@@ -42,6 +42,10 @@ class ActionsDataCaseBase(CommonCase):
         cls._fill_stock_for_moves(cls.move_d)
         cls.picking.action_assign()
 
+    def assert_schema(self, schema, data):
+        validator = Validator(schema)
+        self.assertTrue(validator.validate(data), validator.errors)
+
 
 class ActionsDataCase(ActionsDataCaseBase):
     def setUp(self):
@@ -50,10 +54,6 @@ class ActionsDataCase(ActionsDataCaseBase):
             self.data = work.component(usage="data")
         with self.work_on_services() as work:
             self.schema = work.component(usage="schema")
-
-    def assert_schema(self, schema, data):
-        validator = Validator(schema)
-        self.assertTrue(validator.validate(data), validator.errors)
 
     def test_data_packaging(self):
         data = self.data.packaging(self.packaging)

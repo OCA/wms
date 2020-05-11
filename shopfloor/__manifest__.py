@@ -23,6 +23,18 @@
         "stock_quant_package_dimension",
         # https://github.com/OCA/stock-logistics-workflow/pull/607
         "stock_quant_package_product_packaging",
+        # TODO: used for manuf info on prod detail.
+        # This must be an optional dep
+        "product_manufacturer",
+        # TODO: used for prod lot expire detail info.
+        # This must be an optional dep
+        "product_expiry",
+        # TODO: used for package.package_storage_type_id detail info.
+        # This must be an optional dep
+        "stock_storage_type",
+        # TODO: used for picking.carrier_id detail info.
+        # This must be an optional dep
+        "delivery",
     ],
     "data": [
         "security/ir.model.access.csv",
