@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class StockQuantPackage(models.Model):
@@ -17,6 +17,20 @@ class StockQuantPackage(models.Model):
         readonly=True,
         help="Technical field. Move lines for which destination is this package.",
     )
+    # TODO: review other fields
+    reserved_move_line_ids = fields.One2many(
+        comodel_name="stock.move.line", compute="_compute_reserved_move_lines",
+    )
+
+    def _get_reserved_move_lines(self):
+        return self.env["stock.move.line"].search(
+            [("package_id", "=", self.id), ("state", "not in", ("done", "cancel"))]
+        )
+
+    @api.depends("move_line_ids.state")
+    def _compute_reserved_move_lines(self):
+        for rec in self:
+            rec.update({"reserved_move_line_ids": rec._get_reserved_move_lines()})
 
     # TODO: we should refactor this like
 
