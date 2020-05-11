@@ -3,6 +3,7 @@ from . import test_menu
 from . import test_openapi
 from . import test_profile
 from . import test_actions_data
+from . import test_actions_data_detail
 from . import test_single_pack_putaway
 from . import test_single_pack_transfer
 from . import test_cluster_picking_base
