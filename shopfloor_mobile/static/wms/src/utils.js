@@ -32,6 +32,42 @@ export class Utils {
         return res;
     }
 
+    group_lines_by_locations(lines, options) {
+        // {key: 'no-group', location_src: {}, location_dest: {} records: []}
+        options = _.defaults(options || {}, {
+            prepare_records: function(recs) {
+                return recs;
+            },
+        });
+        const res = [];
+        const locations = _.uniqBy(
+            _.concat(
+                _.map(lines, function(x) {
+                    return x.location_src;
+                }),
+                _.map(lines, function(x) {
+                    return x.location_dest;
+                })
+            ),
+            "id"
+        );
+        const grouped = _.chain(lines)
+            .groupBy(item => `${item.location_src.id}--${item.location_dest.id}`)
+            .value();
+        _.forEach(grouped, function(value, loc_ids) {
+            const [src_id, dest_id] = loc_ids.split("--");
+            const src_loc = _.first(_.filter(locations, {id: parseInt(src_id)}));
+            const dest_loc = _.first(_.filter(locations, {id: parseInt(dest_id)}));
+            res.push({
+                key: loc_ids,
+                location_src: src_loc,
+                location_dest: dest_loc,
+                records: options.prepare_records(value),
+            });
+        });
+        return res;
+    }
+
     group_by_pack(lines) {
         const self = this;
         const res = [];
