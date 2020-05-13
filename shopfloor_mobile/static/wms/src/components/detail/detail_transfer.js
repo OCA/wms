@@ -27,9 +27,17 @@ Vue.component("detail-transfer", {
         },
         line_list_fields() {
             return [
-                {path: "product.display_name", klass: "loud"},
-                {path: "package_src.name", label: "Pack"},
-                {path: "lot.name", label: "Lot"},
+                {
+                    path: "product.display_name",
+                    action_val_path: "product.barcode",
+                    klass: "loud",
+                },
+                {
+                    path: "package_src.name",
+                    label: "Pack",
+                    action_val_path: "package_src.name",
+                },
+                {path: "lot.name", label: "Lot", action_val_path: "lot.name"},
                 {path: "product.qty_reserved", label: "Qty reserved"},
                 {path: "product.qty_available", label: "Qty in stock"},
             ];
