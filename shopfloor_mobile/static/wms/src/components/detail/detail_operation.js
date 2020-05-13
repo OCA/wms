@@ -1,5 +1,6 @@
 import {ItemDetailMixin} from "./detail_mixin.js";
 
+// TODO: this should probably trashed in favour of detail-transfer
 Vue.component("detail-operation", {
     mixins: [ItemDetailMixin],
     methods: {
