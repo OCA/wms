@@ -34,7 +34,7 @@ Vue.component("detail-operation", {
             if (barcode) {
                 this.$router.push({
                     name: "scananything",
-                    params: {codebar: barcode},
+                    params: {identifier: barcode},
                     query: {displayOnly: 1},
                 });
             }
