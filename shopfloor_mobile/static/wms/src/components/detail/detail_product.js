@@ -1,5 +1,6 @@
 import {ItemDetailMixin} from "./detail_mixin.js";
 
+// TODO: refactor according to new data from backend and maybe merge w/ `detail-lot`
 Vue.component("detail-product", {
     mixins: [ItemDetailMixin],
     methods: {
