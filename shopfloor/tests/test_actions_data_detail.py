@@ -34,6 +34,50 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
         with self.work_on_services() as work:
             self.schema = work.component(usage="schema_detail")
 
+    def _expected_location_detail(self, record, **kw):
+        return dict(
+            **self._expected_location(record),
+            **{
+                "complete_name": record.complete_name,
+                "reserved_move_lines": self.data.move_lines(kw.get("move_lines", [])),
+            }
+        )
+
+    def _expected_product_detail(self, record, **kw):
+        qty_available = record.qty_available
+        qty_reserved = float_round(
+            record.qty_available - record.free_qty,
+            precision_rounding=record.uom_id.rounding,
+        )
+        detail = {
+            "qty_available": qty_available,
+            "qty_reserved": qty_reserved,
+        }
+        if kw.get("full"):
+            detail.update(
+                {
+                    "image": "/web/image/product.product/{}/image_128".format(record.id)
+                    if record.image_128
+                    else None,
+                    "manufacturer": {
+                        "id": record.manufacturer.id,
+                        "name": record.manufacturer.name,
+                    }
+                    if record.manufacturer
+                    else None,
+                    "suppliers": [
+                        {
+                            "id": v.name.id,
+                            "name": v.name.name,
+                            "product_name": None,
+                            "product_code": v.product_code,
+                        }
+                        for v in record.seller_ids
+                    ],
+                }
+            )
+        return dict(**self._expected_product(record), **detail)
+
 
 class ActionsDataDetailCase(ActionsDataDetailCaseBase):
     def test_data_location(self):
@@ -47,13 +91,9 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
                 ("state", "not in", ("done", "cancel")),
             ]
         )
-        expected = {
-            "id": location.id,
-            "name": location.name,
-            "complete_name": location.complete_name,
-            "reserved_move_lines": self.data.move_lines(move_lines),
-        }
-        self.assertDictEqual(data, expected)
+        self.assertDictEqual(
+            data, self._expected_location_detail(location, move_lines=move_lines)
+        )
 
     def test_data_packaging(self):
         data = self.data.packaging(self.packaging)
@@ -78,7 +118,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
             "id": lot.id,
             "name": lot.name,
             "ref": "#FOO",
-            "product": self.data.product_detail(self.product_b),
+            "product": self._expected_product_detail(self.product_b, full=True),
         }
         # ignore time and TZ, we don't care here
         self.assertEqual(data.pop("removal_date").split("T")[0], "2020-05-20")
@@ -155,23 +195,11 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
         data = self.data.move_line(move_line)
         self.assert_schema(self.schema.move_line(), data)
         product = self.product_a.with_context(location=move_line.location_id.id)
-        qty_available = product.qty_available
-        qty_reserved = float_round(
-            product.qty_available - product.free_qty,
-            precision_rounding=product.uom_id.rounding,
-        )
         expected = {
             "id": move_line.id,
             "qty_done": 3.0,
             "quantity": move_line.product_uom_qty,
-            "product": {
-                "id": self.product_a.id,
-                "name": "Product A",
-                "display_name": "[A] Product A",
-                "default_code": "A",
-                "qty_available": qty_available,
-                "qty_reserved": qty_reserved,
-            },
+            "product": self._expected_product_detail(product),
             "lot": None,
             "package_src": {
                 "id": move_line.package_id.id,
@@ -187,14 +215,8 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "packaging": self.data.packaging(self.packaging),
                 "weight": 0.0,
             },
-            "location_src": {
-                "id": move_line.location_id.id,
-                "name": move_line.location_id.name,
-            },
-            "location_dest": {
-                "id": move_line.location_dest_id.id,
-                "name": move_line.location_dest_id.name,
-            },
+            "location_src": self._expected_location(move_line.location_id),
+            "location_dest": self._expected_location(move_line.location_dest_id),
         }
         self.assertDictEqual(data, expected)
 
@@ -203,23 +225,11 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
         data = self.data.move_line(move_line)
         self.assert_schema(self.schema.move_line(), data)
         product = self.product_b.with_context(location=move_line.location_id.id)
-        qty_available = product.qty_available
-        qty_reserved = float_round(
-            product.qty_available - product.free_qty,
-            precision_rounding=product.uom_id.rounding,
-        )
         expected = {
             "id": move_line.id,
             "qty_done": 0.0,
             "quantity": move_line.product_uom_qty,
-            "product": {
-                "id": self.product_b.id,
-                "name": "Product B",
-                "display_name": "[B] Product B",
-                "default_code": "B",
-                "qty_available": qty_available,
-                "qty_reserved": qty_reserved,
-            },
+            "product": self._expected_product_detail(product),
             "lot": {
                 "id": move_line.lot_id.id,
                 "name": move_line.lot_id.name,
@@ -227,14 +237,8 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
             },
             "package_src": None,
             "package_dest": None,
-            "location_src": {
-                "id": move_line.location_id.id,
-                "name": move_line.location_id.name,
-            },
-            "location_dest": {
-                "id": move_line.location_dest_id.id,
-                "name": move_line.location_dest_id.name,
-            },
+            "location_src": self._expected_location(move_line.location_id),
+            "location_dest": self._expected_location(move_line.location_dest_id),
         }
         self.assertDictEqual(data, expected)
 
@@ -244,23 +248,11 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
         data = self.data.move_line(move_line)
         self.assert_schema(self.schema.move_line(), data)
         product = self.product_c.with_context(location=move_line.location_id.id)
-        qty_available = product.qty_available
-        qty_reserved = float_round(
-            product.qty_available - product.free_qty,
-            precision_rounding=product.uom_id.rounding,
-        )
         expected = {
             "id": move_line.id,
             "qty_done": 0.0,
             "quantity": move_line.product_uom_qty,
-            "product": {
-                "id": self.product_c.id,
-                "name": "Product C",
-                "display_name": "[C] Product C",
-                "default_code": "C",
-                "qty_available": qty_available,
-                "qty_reserved": qty_reserved,
-            },
+            "product": self._expected_product_detail(product),
             "lot": {
                 "id": move_line.lot_id.id,
                 "name": move_line.lot_id.name,
@@ -280,14 +272,8 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "packaging": None,
                 "weight": 0.0,
             },
-            "location_src": {
-                "id": move_line.location_id.id,
-                "name": move_line.location_id.name,
-            },
-            "location_dest": {
-                "id": move_line.location_dest_id.id,
-                "name": move_line.location_dest_id.name,
-            },
+            "location_src": self._expected_location(move_line.location_id),
+            "location_dest": self._expected_location(move_line.location_dest_id),
         }
         self.assertDictEqual(data, expected)
 
@@ -296,34 +282,16 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
         data = self.data.move_line(move_line)
         self.assert_schema(self.schema.move_line(), data)
         product = self.product_d.with_context(location=move_line.location_id.id)
-        qty_available = product.qty_available
-        qty_reserved = float_round(
-            product.qty_available - product.free_qty,
-            precision_rounding=product.uom_id.rounding,
-        )
         expected = {
             "id": move_line.id,
             "qty_done": 0.0,
             "quantity": move_line.product_uom_qty,
-            "product": {
-                "id": self.product_d.id,
-                "name": "Product D",
-                "display_name": "[D] Product D",
-                "default_code": "D",
-                "qty_available": qty_available,
-                "qty_reserved": qty_reserved,
-            },
+            "product": self._expected_product_detail(product),
             "lot": None,
             "package_src": None,
             "package_dest": None,
-            "location_src": {
-                "id": move_line.location_id.id,
-                "name": move_line.location_id.name,
-            },
-            "location_dest": {
-                "id": move_line.location_dest_id.id,
-                "name": move_line.location_dest_id.name,
-            },
+            "location_src": self._expected_location(move_line.location_id),
+            "location_dest": self._expected_location(move_line.location_dest_id),
         }
         self.assertDictEqual(data, expected)
 
@@ -357,29 +325,5 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
         )
         data = self.data.product_detail(product)
         self.assert_schema(self.schema.product_detail(), data)
-        qty_available = product.qty_available
-        qty_reserved = float_round(
-            product.qty_available - product.free_qty,
-            precision_rounding=product.uom_id.rounding,
-        )
-        expected = {
-            "id": product.id,
-            "name": "Product B",
-            "display_name": "[B] Product B",
-            "default_code": "B",
-            "qty_available": qty_available,
-            "qty_reserved": qty_reserved,
-            "image": "/web/image/product.product/{}/image_128".format(product.id),
-            "manufacturer": {"id": manuf.id, "name": manuf.name},
-            "suppliers": [
-                {
-                    "id": v.name.id,
-                    "name": v.name.name,
-                    "product_name": None,
-                    "product_code": v.product_code,
-                }
-                for v in product.seller_ids
-            ],
-        }
-        self.maxDiff = None
+        expected = self._expected_product_detail(product, full=True)
         self.assertDictEqual(data, expected)
