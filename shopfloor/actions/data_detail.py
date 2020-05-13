@@ -68,7 +68,7 @@ class DataDetailAction(Component):
                 lambda record, fname: self.pickings(record[fname].mapped("picking_id")),
             ),
             (
-                "reserved_move_line_ids:lines",
+                "reserved_move_line_ids:move_lines",
                 lambda record, fname: self.move_lines(record[fname]),
             ),
             ("package_storage_type_id:storage_type", ["id", "name"]),
