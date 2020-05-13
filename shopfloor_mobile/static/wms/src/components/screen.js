@@ -71,13 +71,27 @@ Vue.component("Screen", {
                 <slot name="header">Optional header - no content</slot>
             </div>
 
-            <v-alert type="warning" tile v-if="!this.$root.demo_mode && !this.$root.has_profile && this.$route.name!='profile'">
-                <p>Profile not configured yet. Please select one.</p>
-            </v-alert>
+            <div class="profile-not-ready" v-if="!this.$root.demo_mode && !this.$root.has_profile && this.$route.name!='profile'">
+                <v-alert type="warning" tile>
+                    <p>Profile not configured yet. Please select one.</p>
+                </v-alert>
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn @click="$router.push({'name': 'profile'})">
+                                <v-icon>mdi-account-cog</v-icon>
+                                <span>Configure profile</span>
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
+            </div>
 
             <v-container>
                 <div class="main-content">
-                    <slot>No content provided or profile not configured.</slot>
+                    <slot>
+                        <span v-if="this.$root.has_profile">No content provided.</span>
+                    </slot>
                 </div>
             </v-container>
             <!-- TODO: use flexbox to put it always at the bottom -->
@@ -130,9 +144,8 @@ Vue.component("app-bar-actions", {
         <v-btn icon @click="$router.push({'name': 'scananything'})" :disabled="this.$route.name=='scananything'">
             <v-icon >mdi-magnify</v-icon>
         </v-btn>
-
-        <v-btn icon @click="$router.push({'name': 'profile'})" :disabled="this.$route.name=='profile'">
-            <v-icon >mdi-account-cog</v-icon>
+        <v-btn icon @click="$router.push({'name': 'settings'})" :disabled="this.$route.name=='settings'">
+            <v-icon >mdi-settings-outline</v-icon>
         </v-btn>
     </div>
     `,

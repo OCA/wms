@@ -10,7 +10,7 @@ export var Profile = Vue.component("profile", {
         };
     },
     template: `
-        <Screen title="Select profile" :klass="'select-profile'">
+        <Screen :title="$t('screen.settings.profile.title')" :klass="'settings settings-profile'">
             <template v-slot:header>
                 <user-information
                     v-if="profile_selected"

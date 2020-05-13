@@ -107,7 +107,7 @@ Vue.component("edit-action", {
 
 Vue.component("btn-back", {
     template: `
-  <v-btn depressed x-large color="default" v-on:click="$router.back()">Back</v-btn>
+  <v-btn depressed x-large color="default" v-on:click="$router.back()">{{ $t("btn.back.title") }}</v-btn>
   `,
 });
 
