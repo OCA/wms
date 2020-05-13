@@ -281,3 +281,14 @@ input.my-checkbox[type="checkbox"]:checked {
 .v-list-item__title {
     white-space: normal;
 }
+
+/* TODO: adapt colors */
+.transfer-line-done {
+    background-color: lightgreen;
+}
+.transfer-line-partial {
+    background-color: #ffbf30;
+}
+.transfer-line-not-done {
+    background-color: green;
+}
