@@ -20,7 +20,17 @@ export var ItemDetailMixin = {
         /*
         List of fields' description in the format:
 
-            {path: "field.subfield", label: "Line count"},
+            {
+                // lodash.result path like value
+                path: "field.subfield",
+                // use a lable for the field if present
+                label: "Line count",
+                // add extra class to field wrapper
+                klass: "foo",
+                // lodash.result path like value for an action
+                // (eg: product.barcode)
+                action_val_path
+            },
 
         Path is the dotted path to the field value.
         Label is optional and if not provided only the value will be shown.
@@ -32,6 +42,27 @@ export var ItemDetailMixin = {
         },
         _render_date(record, field) {
             return utils.format_date_display(_.result(record, field.path));
+        },
+        has_detail_action(record, field) {
+            return _.result(record, field.action_val_path);
+        },
+        on_detail_action(record, field, options = {}) {
+            let handler = this.default_detail_action_handler;
+            handler = field.detail_action
+                ? field.detail_action
+                : options.detail_action || handler;
+            handler.call(this, record, field);
+        },
+        default_detail_action_handler(record, field) {
+            const identifier = _.result(record, field.action_val_path);
+            if (identifier) {
+                // TODO: we should probably delegate this to a global event
+                this.$router.push({
+                    name: "scananything",
+                    params: {identifier: identifier},
+                    query: {displayOnly: 1},
+                });
+            }
         },
     },
     computed: {

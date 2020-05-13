@@ -20,8 +20,8 @@ Vue.component("item-detail-card", {
                         <div v-if="raw_value(record, field) || field.display_no_value">
                             <span v-if="field.label" class="label">{{ field.label }}:</span> {{ render_field_value(record, field) }}
                             <v-btn icon class="detail-action"
-                                    v-if="(field.detail_action || opts.detail_action) && _.result(record, field.action_val_path)"
-                                    @click="field.detail_action ? field.detail_action(record, field) : opts.detail_action(record, field)">
+                                    v-if="has_detail_action(record, field)"
+                                    @click="on_detail_action(record, field, opts)">
                                 <v-icon color="blue lighten-1">mdi-information</v-icon>
                             </v-btn>
                         </div>

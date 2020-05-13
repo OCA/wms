@@ -72,4 +72,3 @@ Vue.component("detail-transfer", {
     </div>
 `,
 });
-// :options="{key_title: 'display_name', list_item_fields: product_list_fields(), list_item_on_click: handle_product_click}"
