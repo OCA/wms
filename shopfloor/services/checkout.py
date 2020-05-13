@@ -29,7 +29,7 @@ class Checkout(Component):
     Flow Diagram: https://www.draw.io/#G1qRenBcezk50ggIazDuu2qOfkTsoIAxXP
     """
 
-    _inherit = "base.shopfloor.service"
+    _inherit = "base.shopfloor.process"
     _name = "shopfloor.checkout"
     _usage = "checkout"
     _description = __doc__
@@ -58,7 +58,7 @@ class Checkout(Component):
         """
         search = self.actions_for("search")
         message = self.actions_for("message")
-        picking = search.stock_picking_from_scan(barcode)
+        picking = search.picking_from_scan(barcode)
         if not picking:
             location = search.location_from_scan(barcode)
             if location:

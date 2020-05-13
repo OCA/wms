@@ -11,7 +11,7 @@ except ImportError:
     _logger.debug("Can not import cerberus")
 
 
-class ActionsDataCase(CommonCase):
+class ActionsDataCaseBase(CommonCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -42,16 +42,34 @@ class ActionsDataCase(CommonCase):
         cls._fill_stock_for_moves(cls.move_d)
         cls.picking.action_assign()
 
+    def assert_schema(self, schema, data):
+        validator = Validator(schema)
+        self.assertTrue(validator.validate(data), validator.errors)
+
+    def _expected_location(self, record, **kw):
+        return {
+            "id": record.id,
+            "name": record.name,
+            "barcode": record.barcode,
+        }
+
+    def _expected_product(self, record, **kw):
+        return {
+            "id": record.id,
+            "name": record.name,
+            "display_name": record.display_name,
+            "default_code": record.default_code,
+            "barcode": record.barcode,
+        }
+
+
+class ActionsDataCase(ActionsDataCaseBase):
     def setUp(self):
         super().setUp()
         with self.work_on_actions() as work:
             self.data = work.component(usage="data")
         with self.work_on_services() as work:
             self.schema = work.component(usage="schema")
-
-    def assert_schema(self, schema, data):
-        validator = Validator(schema)
-        self.assertTrue(validator.validate(data), validator.errors)
 
     def test_data_packaging(self):
         data = self.data.packaging(self.packaging)
@@ -63,7 +81,11 @@ class ActionsDataCase(CommonCase):
         location = self.stock_location
         data = self.data.location(location)
         self.assert_schema(self.schema.location(), data)
-        expected = {"id": location.id, "name": location.name}
+        expected = {
+            "id": location.id,
+            "name": location.name,
+            "barcode": location.barcode,
+        }
         self.assertDictEqual(data, expected)
 
     def test_data_lot(self):
@@ -120,12 +142,7 @@ class ActionsDataCase(CommonCase):
             "id": move_line.id,
             "qty_done": 3.0,
             "quantity": move_line.product_uom_qty,
-            "product": {
-                "id": self.product_a.id,
-                "name": "Product A",
-                "display_name": "[A] Product A",
-                "default_code": "A",
-            },
+            "product": self._expected_product(self.product_a),
             "lot": None,
             "package_src": {
                 "id": move_line.package_id.id,
@@ -143,14 +160,8 @@ class ActionsDataCase(CommonCase):
                 # TODO
                 "weight": 0,
             },
-            "location_src": {
-                "id": move_line.location_id.id,
-                "name": move_line.location_id.name,
-            },
-            "location_dest": {
-                "id": move_line.location_dest_id.id,
-                "name": move_line.location_dest_id.name,
-            },
+            "location_src": self._expected_location(move_line.location_id),
+            "location_dest": self._expected_location(move_line.location_dest_id),
         }
         self.assertDictEqual(data, expected)
 
@@ -162,12 +173,7 @@ class ActionsDataCase(CommonCase):
             "id": move_line.id,
             "qty_done": 0.0,
             "quantity": move_line.product_uom_qty,
-            "product": {
-                "id": self.product_b.id,
-                "name": "Product B",
-                "display_name": "[B] Product B",
-                "default_code": "B",
-            },
+            "product": self._expected_product(self.product_b),
             "lot": {
                 "id": move_line.lot_id.id,
                 "name": move_line.lot_id.name,
@@ -175,14 +181,8 @@ class ActionsDataCase(CommonCase):
             },
             "package_src": None,
             "package_dest": None,
-            "location_src": {
-                "id": move_line.location_id.id,
-                "name": move_line.location_id.name,
-            },
-            "location_dest": {
-                "id": move_line.location_dest_id.id,
-                "name": move_line.location_dest_id.name,
-            },
+            "location_src": self._expected_location(move_line.location_id),
+            "location_dest": self._expected_location(move_line.location_dest_id),
         }
         self.assertDictEqual(data, expected)
 
@@ -195,12 +195,7 @@ class ActionsDataCase(CommonCase):
             "id": move_line.id,
             "qty_done": 0.0,
             "quantity": move_line.product_uom_qty,
-            "product": {
-                "id": self.product_c.id,
-                "name": "Product C",
-                "display_name": "[C] Product C",
-                "default_code": "C",
-            },
+            "product": self._expected_product(self.product_c),
             "lot": {
                 "id": move_line.lot_id.id,
                 "name": move_line.lot_id.name,
@@ -222,14 +217,8 @@ class ActionsDataCase(CommonCase):
                 # TODO
                 "weight": 0,
             },
-            "location_src": {
-                "id": move_line.location_id.id,
-                "name": move_line.location_id.name,
-            },
-            "location_dest": {
-                "id": move_line.location_dest_id.id,
-                "name": move_line.location_dest_id.name,
-            },
+            "location_src": self._expected_location(move_line.location_id),
+            "location_dest": self._expected_location(move_line.location_dest_id),
         }
         self.assertDictEqual(data, expected)
 
@@ -241,22 +230,11 @@ class ActionsDataCase(CommonCase):
             "id": move_line.id,
             "qty_done": 0.0,
             "quantity": move_line.product_uom_qty,
-            "product": {
-                "id": self.product_d.id,
-                "name": "Product D",
-                "display_name": "[D] Product D",
-                "default_code": "D",
-            },
+            "product": self._expected_product(self.product_d),
             "lot": None,
             "package_src": None,
             "package_dest": None,
-            "location_src": {
-                "id": move_line.location_id.id,
-                "name": move_line.location_id.name,
-            },
-            "location_dest": {
-                "id": move_line.location_dest_id.id,
-                "name": move_line.location_dest_id.name,
-            },
+            "location_src": self._expected_location(move_line.location_id),
+            "location_dest": self._expected_location(move_line.location_dest_id),
         }
         self.assertDictEqual(data, expected)

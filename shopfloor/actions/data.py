@@ -28,6 +28,18 @@ class DataAction(Component):
     def _partner_parser(self):
         return ["id", "name"]
 
+    def location(self, record, **kw):
+        return self._jsonify(
+            record.with_context(location=record.id), self._location_parser, **kw
+        )
+
+    def locations(self, record, **kw):
+        return self.location(record, multi=True)
+
+    @property
+    def _location_parser(self):
+        return ["id", "name", "barcode"]
+
     def picking(self, record, **kw):
         return self._jsonify(record, self._picking_parser, **kw)
 
@@ -92,21 +104,14 @@ class DataAction(Component):
     def _lot_parser(self):
         return ["id", "name", "ref"]
 
-    def location(self, record, **kw):
-        return self._jsonify(record, self._location_parser, **kw)
-
-    def locations(self, record, **kw):
-        return self.location(record, multi=True)
-
-    @property
-    def _location_parser(self):
-        return ["id", "name"]
-
     def move_line(self, record, **kw):
+        record = record.with_context(location=record.location_id.id)
         data = self._jsonify(record, self._move_line_parser)
         if data:
             data.update(
                 {
+                    # cannot use sub-parser here
+                    # because result might depend on picking
                     "package_src": self.package(record.package_id, record.picking_id),
                     "package_dest": self.package(
                         record.result_package_id, record.picking_id,
@@ -138,7 +143,7 @@ class DataAction(Component):
 
     @property
     def _product_parser(self):
-        return ["id", "name", "display_name", "default_code"]
+        return ["id", "name", "display_name", "default_code", "barcode"]
 
     def picking_batch(self, record, with_pickings=True, **kw):
         parser = self._picking_batch_parser

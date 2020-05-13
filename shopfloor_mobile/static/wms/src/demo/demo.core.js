@@ -101,11 +101,11 @@ export class DemoTools {
         const self = this;
         const loc = this.makeSimpleRecord(defaults, options);
         if (options.full_detail) {
-            let products = [];
+            let move_lines = [];
             _.forEach(
-                _.range(1, options.products_count || this.getRandomInt(10)),
+                _.range(1, options.move_lines_count || this.getRandomInt(10)),
                 function() {
-                    products.push(self.makeProductFullDetail({}, {}));
+                    move_lines.push(self.makeProductFullDetail({}, {}));
                 }
             );
             _.extend(loc, {
@@ -114,14 +114,24 @@ export class DemoTools {
                     "Loc X/ Loc Y/ Loc Z",
                     "Loc Foo/ Loc Bar/ Loc Baz",
                 ]),
-                products: products,
+                reserved_move_lines: move_lines,
             });
         }
         return loc;
     }
 
-    makeLot() {
-        return this.makeSimpleRecord({}, {name_prefix: "LOT"});
+    makeLot(defaults = {}, options = {}) {
+        _.defaults(options, {name_prefix: "LOT"});
+        return this.makeSimpleRecord(defaults, options);
+    }
+
+    makeLotFullDetail(defaults = {}, options = {}) {
+        _.defaults(defaults, {
+            removal_date: "2021-08-31T00:00:00+00:00",
+            expire_date: "2021-08-31T00:00:00+00:00",
+            product: this.makeProductFullDetail(),
+        });
+        return this.makeLot(defaults, options);
     }
 
     makePackaging(defaults = {}, options = {}) {
@@ -142,31 +152,45 @@ export class DemoTools {
             packaging_name: this.makePackaging().name,
             move_line_count: this.getRandomInt(10),
         });
-        if (options.full_detail) {
-            let products = [];
-            _.forEach(
-                _.range(1, options.products_count || this.getRandomInt(5)),
-                function() {
-                    products.push(self.makeProductFullDetail({}, {}));
-                }
-            );
-            let pickings = [];
-            _.forEach(
-                _.range(1, options.pickings_count || this.getRandomInt(3)),
-                function() {
-                    pickings.push(self.makePicking({}, {no_lines: true}));
-                }
-            );
-            _.defaults(defaults, {
-                location_src: _.sample(this.locations_src),
-                storage_type: "Storage type XXX", // TODO
-                package_type: "Package type XXX", // TODO
-                products: products,
-                pickings: pickings,
-            });
-        }
         const pack = this.makeSimpleRecord(defaults, options);
         return pack;
+    }
+
+    makePackFullDetail(defaults = {}, options = {}) {
+        _.defaults(options, {lines_count: 1});
+        let move_lines = [];
+        let pickings = [];
+        for (let i = 1; i < options.lines_count + 1; i++) {
+            let lines = this.makePickingLines(
+                {},
+                {
+                    productFactory: _.bind(this.makeProductFullDetail, this),
+                    picking_auto: true,
+                    lines_count: this.getRandomInt(3),
+                }
+            );
+            move_lines = _.concat(move_lines, lines);
+            pickings.push(move_lines[0].picking);
+        }
+        _.defaults(defaults, {
+            location_src: _.sample(this.locations_src),
+            storage_type: {id: 1, name: "Storage type XXX"},
+            package_type: {id: 1, name: "Package type XXX"},
+            move_lines: move_lines,
+            pickings: pickings,
+        });
+        const pack = this.makePack(defaults, options);
+        return pack;
+    }
+
+    makeProductCode() {
+        return _.padEnd(
+            this.randomFromArray("ABCDEFGHIJK") +
+                this.randomFromArray("ABCDEFGHIJK") +
+                this.getRandomInt(),
+            8,
+            0
+        );
     }
 
     makeProduct(defaults = {}, options = {}) {
@@ -174,13 +198,7 @@ export class DemoTools {
             name_prefix: "Prod " + this.getRandomInt(),
             padding: 0,
         });
-        const default_code = _.padEnd(
-            this.randomFromArray("ABCDEFGHIJK") +
-                this.randomFromArray("ABCDEFGHIJK") +
-                this.getRandomInt(),
-            8,
-            0
-        );
+        const default_code = this.makeProductCode();
         _.defaults(defaults, {
             default_code: default_code,
             qty_available: this.getRandomInt(200),
@@ -194,24 +212,41 @@ export class DemoTools {
 
     makeProductFullDetail(defaults = {}, options = {}) {
         _.defaults(defaults, {
-            qty_instock: this.getRandomInt(),
+            qty_available: this.getRandomInt(),
+            qty_available: this.getRandomInt(),
             qty_reserved: this.getRandomInt(),
             expiry_date: "2020-12-01",
-            supplier_code: "SUP" + this.getRandomInt(200),
             packagings: _.sampleSize(this.packagings, this.getRandomInt(4)),
             // TODO: load some random images
             image: null,
             barcode: "prod",
+            manufacturer: this.makeSimpleRecord({
+                name: this.randomFromArray(this.partnerNames()),
+            }),
         });
-        _.defaults(options, {
-            full_detail: true,
+        const product = this.makeProduct(defaults, options);
+        let suppliers = [];
+        for (let i = 1; i < this.getRandomInt(3) + 1; i++) {
+            let supp = this.makeSimpleRecord({
+                id: i,
+                name: this.randomFromArray(this.partnerNames()),
+                product_code: "SUP/" + product.default_code,
+                product_name: "SUP/" + product.name,
+            });
+            suppliers.push(supp);
+        }
+        _.extend(product, {
+            suppliers: suppliers,
         });
-        return this.makeProduct(defaults, options);
+        return product;
     }
 
     makePickingLines(defaults = {}, options = {}) {
         _.defaults(defaults, {
             picking: options.picking_auto ? this.makePicking() : null,
+        });
+        _.defaults(options, {
+            productFactory: _.bind(this.makeProduct, this),
         });
         const lines = [];
         for (let i = 1; i < options.lines_count + 1; i++) {
@@ -228,7 +263,7 @@ export class DemoTools {
             let line = _.defaults(
                 this.makeMoveLine({
                     id: i,
-                    product: this.makeProduct({name: "Prod " + i}),
+                    product: options.productFactory({name: "Prod " + i}),
                     package_dest: pack,
                     location_src: this.randomFromArray(this.locations_src),
                     location_dest: loc_dest,
@@ -246,7 +281,7 @@ export class DemoTools {
             move_line_count: this.getRandomInt(10),
             weight: this.getRandomInt(1000),
             partner: this.makeSimpleRecord({
-                name: this.randomFromArray(this.customerNames()),
+                name: this.randomFromArray(this.partnerNames()),
             }),
             note: this.randomFromArray([null, "demo picking note"]),
         });
@@ -255,13 +290,10 @@ export class DemoTools {
                 schedule_date: this.randomFutureDate(),
                 operation_type: "An operation type",
                 location_dest: _.sample(this.locations_dest),
-                carrier: this.randomFromArray([
-                    null,
-                    "Carrier 1",
-                    "Carrier 2",
-                    "Carrier 3",
-                ]),
-                priority: this.getRandomInt(10),
+                carrier: this.makeSimpleRecord({
+                    name: "CARR/" + this.randomFromArray(this.partnerNames()),
+                }),
+                priority: _.sample(["Not urgent", "Normal", "Urgent", "Very Urgent"]),
             });
         }
         _.defaults(options, {
@@ -324,7 +356,7 @@ export class DemoTools {
         return _.head(this.makePickingLines({}, {picking_auto: true, lines_count: 1}));
     }
 
-    customerNames() {
+    partnerNames() {
         return [
             "Edith Sanchez",
             "Brandon Freeman",

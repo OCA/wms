@@ -97,7 +97,9 @@ export class OdooMocked extends OdooMixin {
             return this[this.usage + "_" + path].call(this, data);
         }
         let result;
-        const barcode = data ? data.barcode || data.location_barcode : null;
+        const barcode = data
+            ? data.barcode || data.identifier || data.location_barcode
+            : null;
         if (_.has(this.demo_data, barcode)) {
             // Pick a specific case for this barcode
             result = this.demo_data[barcode];

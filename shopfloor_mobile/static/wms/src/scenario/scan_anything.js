@@ -1,6 +1,12 @@
 export var ScanAnything = Vue.component("scan-anything", {
     template: `
         <Screen :title="screen_title" :klass="'scan_anything'">
+            <template v-slot:header>
+                <user-information
+                    v-if="scan_message.length"
+                    v-bind:info="scan_message"
+                    />
+            </template>
             <searchbar
                 v-if="!displayOnly"
                 v-on:found="on_scan"
@@ -8,8 +14,8 @@ export var ScanAnything = Vue.component("scan-anything", {
                 />
             <component
                 :is="detail_component_name()"
-                :record="dataReceived.detail_info"
-                :options="{on_url_change: on_url_change, full_detail: true}"
+                :record="scan_data.record"
+                :options="{full_detail: true}"
                 />
             <div class="button-list button-vertical-list full">
                 <v-row align="center" v-if="showBackBtn">
@@ -28,7 +34,9 @@ export var ScanAnything = Vue.component("scan-anything", {
     data: function() {
         return {
             usage: "scan_anything",
-            dataReceived: {},
+            scan_full_data: {},
+            scan_data: {},
+            scan_message: {},
             search_input_placeholder: "Scan anything",
         };
     },
@@ -40,51 +48,55 @@ export var ScanAnything = Vue.component("scan-anything", {
         if (this.$root.demo_mode) {
             this.$root.loadJS("src/demo/demo." + this.usage + ".js", this.usage);
         }
-        if (this.$route.params.codebar) {
-            this.getData(this.$route.params.codebar);
+        if (this.$route.params.identifier) {
+            this.getData(this.$route.params.identifier);
         }
     },
     beforeRouteUpdate(to, from, next) {
-        if (to.params.codebar) {
-            this.getData(to.params.codebar);
+        if (to.params.identifier) {
+            this.getData(to.params.identifier);
         } else {
-            this.dataReceived = {};
+            this.scan_data = {};
         }
         next();
     },
     methods: {
         on_reset: function(e) {
-            this.dataReceived = {};
-            this.$router.push({name: "scananything", params: {codebar: undefined}});
+            this.scan_data = {};
+            this.$router.push({name: "scananything", params: {identifier: undefined}});
         },
-        on_url_change: function(codebar) {
+        // TODO: this was used to handle click on details inside detail components.
+        // It's probably useless now since we handle the event in detail mixin.
+        on_url_change: function(identifier) {
             // Change the route on when more info clicked in children
             const query = {};
-            if ("codebar" in this.$route.params) {
-                query.childOf = this.$route.params.codebar;
+            if ("identifier" in this.$route.params) {
+                query.childOf = this.$route.params.identifier;
             }
             this.$router.push({
                 name: "scananything",
-                params: {codebar: codebar},
+                params: {identifier: identifier},
                 query: query,
             });
         },
-        getData: function(codebar) {
-            this.odoo.call(codebar).then(result => {
-                this.dataReceived = result.data || {};
+        getData: function(identifier) {
+            this.odoo.call("scan", {identifier: identifier}).then(result => {
+                this.scan_full_data = result || {};
+                this.scan_data = result.data || {};
+                this.scan_message = result.message || {};
             });
         },
         on_scan: function(scanned) {
             this.$router.push({
                 name: "scananything",
-                params: {codebar: scanned.text},
+                params: {identifier: scanned.text},
             });
         },
         detail_component_name() {
-            if (_.isEmpty(this.dataReceived)) {
+            if (_.isEmpty(this.scan_data)) {
                 return null;
             }
-            const name = "detail-" + this.dataReceived.type;
+            const name = "detail-" + this.scan_data.type;
             if (!name in Vue.options.components) {
                 console.error("Detail component ", name, " not found.");
                 return null;
@@ -100,12 +112,12 @@ export var ScanAnything = Vue.component("scan-anything", {
             return "childOf" in this.$route.query || this.displayOnly;
         },
         showResetBtn: function() {
-            return !_.isEmpty(this.dataReceived);
+            return !_.isEmpty(this.scan_data);
         },
         screen_title: function() {
             let title = "Scan anything";
-            if (this.$route.params.codebar) {
-                title += ": " + this.$route.params.codebar;
+            if (this.$route.params.identifier) {
+                title = "Scanned: " + this.$route.params.identifier;
             }
             return title;
         },

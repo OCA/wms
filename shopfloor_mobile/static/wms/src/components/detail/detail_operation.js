@@ -1,5 +1,6 @@
 import {ItemDetailMixin} from "./detail_mixin.js";
 
+// TODO: this should probably trashed in favour of detail-transfer
 Vue.component("detail-operation", {
     mixins: [ItemDetailMixin],
     methods: {
@@ -25,18 +26,7 @@ Vue.component("detail-operation", {
                 loud: true,
                 no_title: true,
                 fields: this.detail_fields(),
-                detail_action: this.on_detail_action,
             };
-        },
-        on_detail_action(record, field) {
-            const barcode = _.result(record, field.action_val_path);
-            if (barcode) {
-                this.$router.push({
-                    name: "scananything",
-                    params: {codebar: barcode},
-                    query: {displayOnly: 1},
-                });
-            }
         },
     },
     template: `

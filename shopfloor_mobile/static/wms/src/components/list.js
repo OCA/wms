@@ -50,17 +50,16 @@ Vue.component("list", {
                 list_item_component: "list-item",
                 list_item_action_component: null,
                 list_item_on_click: null,
+                list_item_options: {},
             });
             return opts;
         },
         list_item_options() {
-            const opts = _.defaults({}, this.$props.options.list_item_options, {
+            const opts = _.defaults({}, this.opts.list_item_options, {
                 key_title: this.opts.key_title,
                 showCounters: this.opts.showCounters,
                 // customize fields
                 fields: this.opts.list_item_fields,
-                // customize action per all detail fields
-                detail_action: null,
             });
             return opts;
         },
@@ -85,7 +84,8 @@ Vue.component("list", {
                 <div class="list-group" v-for="group in listable" :key="group.key">
                     <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
                     <div class="list-item-wrapper" v-for="(rec, index) in group.records"">
-                        <v-list-item :key="index" @click="opts.list_item_on_click ? opts.list_item_on_click(rec) : null">
+                        <v-list-item :key="index" @click="opts.list_item_on_click ? opts.list_item_on_click(rec) : undefined"
+                                     :class="list_item_options.list_item_klass_maker ? list_item_options.list_item_klass_maker(rec) : ''">
                             <component
                                 :is="opts.list_item_component"
                                 :options="list_item_options"
@@ -109,15 +109,15 @@ Vue.component("list-item", {
     mixins: [ItemDetailMixin],
     template: `
     <v-list-item-content>
-        <v-list-item-title v-text="record[options.key_title]"></v-list-item-title>
+        <v-list-item-title v-if="opts.key_title" v-text="_.result(record, opts.key_title)"></v-list-item-title>
         <div class="details">
-            <div class="field-detail" v-for="(field, index) in options.fields">
+            <div v-for="(field, index) in options.fields" :class="'field-detail ' + field.path.replace('.', '-') + ' ' + (field.klass || '')">
                 <span v-if="raw_value(record, field) || field.display_no_value">
                     <span v-if="field.label" class="label">{{ field.label }}:</span> {{ render_field_value(record, field) }}
                 </span>
                 <v-btn icon class="detail-action"
-                        v-if="(field.detail_action || opts.detail_action) && _.result(record, field.action_val_path)"
-                        @click="field.detail_action ? field.detail_action(record, field) : options.detail_action(record, field)">
+                        v-if="has_detail_action(record, field)"
+                        @click="on_detail_action(record, field, opts)">
                     <v-icon color="blue lighten-1">mdi-information</v-icon>
                 </v-btn>
             </div>

@@ -75,6 +75,7 @@ class BaseShopfloorSchemaResponse(Component):
             "name": {"type": "string", "nullable": False, "required": True},
             "display_name": {"type": "string", "nullable": False, "required": True},
             "default_code": {"type": "string", "nullable": False, "required": True},
+            "barcode": {"type": "string", "nullable": True, "required": False},
         }
 
     def package(self):
@@ -82,7 +83,7 @@ class BaseShopfloorSchemaResponse(Component):
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
             "weight": {"required": True, "nullable": True, "type": "float"},
-            "move_line_count": {"required": True, "nullable": True, "type": "integer"},
+            "move_line_count": {"required": False, "nullable": True, "type": "integer"},
             "packaging": {
                 "type": "dict",
                 "required": True,
@@ -102,6 +103,7 @@ class BaseShopfloorSchemaResponse(Component):
         return {
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
+            "barcode": {"type": "string", "nullable": True, "required": False},
         }
 
     def packaging(self):

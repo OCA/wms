@@ -7,7 +7,10 @@ Vue.component("item-detail-card", {
         <v-card outlined :class="opts.main ? 'main' : ''" v-if="!_.isEmpty(record)">
             <v-card-title v-if="!opts.no_title">
                 <slot name="title">
-                    <span v-text="record[opts.key_title]" />
+                    <span v-text="_.result(record, opts.key_title)" />
+                    <v-btn icon class="detail-action" v-if="opts.on_title_action" @click="opts.on_title_action()">
+                        <v-icon color="blue lighten-1">mdi-information</v-icon>
+                    </v-btn>
                 </slot>
             </v-card-title>
             <v-card-subtitle v-if="$slots.subtitle">
@@ -16,12 +19,12 @@ Vue.component("item-detail-card", {
             <slot name="details">
                 <!-- TODO: this loop is the same in list-item => make it a component -->
                 <v-card-text class="details" v-if="opts.fields.length">
-                    <div v-for="(field, index) in opts.fields" :class="'field-detail ' + field.path.replace('.', '-')" >
+                    <div v-for="(field, index) in opts.fields" :class="'field-detail ' + field.path.replace('.', '-') + ' ' + (field.klass || '')">
                         <div v-if="raw_value(record, field) || field.display_no_value">
                             <span v-if="field.label" class="label">{{ field.label }}:</span> {{ render_field_value(record, field) }}
                             <v-btn icon class="detail-action"
-                                    v-if="(field.detail_action || opts.detail_action) && _.result(record, field.action_val_path)"
-                                    @click="field.detail_action ? field.detail_action(record, field) : opts.detail_action(record, field)">
+                                    v-if="has_detail_action(record, field)"
+                                    @click="on_detail_action(record, field, opts)">
                                 <v-icon color="blue lighten-1">mdi-information</v-icon>
                             </v-btn>
                         </div>
