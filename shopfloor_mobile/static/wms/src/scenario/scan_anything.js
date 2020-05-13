@@ -48,13 +48,13 @@ export var ScanAnything = Vue.component("scan-anything", {
         if (this.$root.demo_mode) {
             this.$root.loadJS("src/demo/demo." + this.usage + ".js", this.usage);
         }
-        if (this.$route.params.codebar) {
-            this.getData(this.$route.params.codebar);
+        if (this.$route.params.identifier) {
+            this.getData(this.$route.params.identifier);
         }
     },
     beforeRouteUpdate(to, from, next) {
-        if (to.params.codebar) {
-            this.getData(to.params.codebar);
+        if (to.params.identifier) {
+            this.getData(to.params.identifier);
         } else {
             this.scan_data = {};
         }
@@ -63,23 +63,22 @@ export var ScanAnything = Vue.component("scan-anything", {
     methods: {
         on_reset: function(e) {
             this.scan_data = {};
-            this.$router.push({name: "scananything", params: {codebar: undefined}});
+            this.$router.push({name: "scananything", params: {identifier: undefined}});
         },
-        on_url_change: function(codebar) {
+        on_url_change: function(identifier) {
             // Change the route on when more info clicked in children
             const query = {};
-            if ("codebar" in this.$route.params) {
-                query.childOf = this.$route.params.codebar;
+            if ("identifier" in this.$route.params) {
+                query.childOf = this.$route.params.identifier;
             }
             this.$router.push({
                 name: "scananything",
-                params: {codebar: codebar},
+                params: {identifier: identifier},
                 query: query,
             });
         },
-        getData: function(codebar) {
-            // TODO: rename `codebar` to `identifier` all around
-            this.odoo.call("scan", {identifier: codebar}).then(result => {
+        getData: function(identifier) {
+            this.odoo.call("scan", {identifier: identifier}).then(result => {
                 this.scan_full_data = result || {};
                 this.scan_data = result.data || {};
                 this.scan_message = result.message || {};
@@ -88,7 +87,7 @@ export var ScanAnything = Vue.component("scan-anything", {
         on_scan: function(scanned) {
             this.$router.push({
                 name: "scananything",
-                params: {codebar: scanned.text},
+                params: {identifier: scanned.text},
             });
         },
         detail_component_name() {
@@ -115,8 +114,8 @@ export var ScanAnything = Vue.component("scan-anything", {
         },
         screen_title: function() {
             let title = "Scan anything";
-            if (this.$route.params.codebar) {
-                title = "Scanned: " + this.$route.params.codebar;
+            if (this.$route.params.identifier) {
+                title = "Scanned: " + this.$route.params.identifier;
             }
             return title;
         },

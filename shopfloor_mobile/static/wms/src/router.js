@@ -11,7 +11,7 @@ let routes = [
     {path: "/login", component: LoginPage, name: "login"},
     {path: "/profile", component: Profile, name: "profile"},
     {
-        path: "/scananything/:codebar?",
+        path: "/scananything/:identifier?",
         component: ScanAnything,
         name: "scananything",
     },
