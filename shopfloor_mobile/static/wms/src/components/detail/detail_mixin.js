@@ -1,3 +1,5 @@
+import {utils} from "../../utils.js";
+
 export var ItemDetailMixin = {
     props: {
         record: Object,
@@ -27,6 +29,9 @@ export var ItemDetailMixin = {
         */
         detail_fields() {
             return [];
+        },
+        _render_date(record, field) {
+            return utils.format_date_display(_.result(record, field.path));
         },
     },
     computed: {
