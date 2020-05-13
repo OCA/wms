@@ -61,8 +61,6 @@ ul.packaging span:first-child {
     height: 100vh;
     margin: 0;
 }
-.v-dialog.v-dialog--active.v-dialog--fullscreen .v-alert__wrapper .message {
-}
 
 /* .action {
     margin-top: 2rem;
@@ -95,10 +93,13 @@ ul.packaging span:first-child {
     font-size: 1.3em;
     line-height: 1.4em;
 }
+.detail.item-detail-card .field-detail.loud-label .label,
 .detail.item-detail-card.loud .v-card__text.details .label {
     font-weight: bold;
 }
-
+.field-detail.loud {
+    font-weight: bold;
+}
 .button-vertical-list.full .v-btn {
     width: 90%;
     height: 5rem;
@@ -193,8 +194,6 @@ ul.packaging span:first-child {
 
 .state-display-info .v-alert {
     margin-bottom: 0;
-}
-.state-title {
 }
 
 .manual-select .action {
