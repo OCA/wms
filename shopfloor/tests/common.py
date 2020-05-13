@@ -71,12 +71,17 @@ class CommonCase(SavepointCase, ComponentMixin):
         stock_location = cls.env.ref("stock.stock_location_stock")
         cls.stock_location = stock_location
         cls.customer_location = cls.env.ref("stock.stock_location_customers")
+        cls.customer_location.barcode = "CUSTOMERS"
         cls.dispatch_location = cls.env.ref("stock.location_dispatch_zone")
         cls.dispatch_location.barcode = "DISPATCH"
         cls.packing_location = cls.env.ref("stock.location_pack_zone")
+        cls.packing_location.barcode = "PACKING"
         cls.input_location = cls.env.ref("stock.stock_location_company")
+        cls.input_location.barcode = "INPUT"
         cls.shelf1 = cls.env.ref("stock.stock_location_components")
+        cls.shelf1.barcode = "SHELF1"
         cls.shelf2 = cls.env.ref("stock.stock_location_14")
+        cls.shelf2.barcode = "SHELF2"
         cls.customer = cls.env["res.partner"].create({"name": "Customer"})
 
     @classmethod
