@@ -38,7 +38,7 @@ class DataAction(Component):
 
     @property
     def _location_parser(self):
-        return ["id", "name"]
+        return ["id", "name", "barcode"]
 
     def picking(self, record, **kw):
         return self._jsonify(record, self._picking_parser, **kw)
@@ -143,7 +143,7 @@ class DataAction(Component):
 
     @property
     def _product_parser(self):
-        return ["id", "name", "display_name", "default_code"]
+        return ["id", "name", "display_name", "default_code", "barcode"]
 
     def picking_batch(self, record, with_pickings=True, **kw):
         parser = self._picking_batch_parser
