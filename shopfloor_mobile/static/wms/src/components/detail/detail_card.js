@@ -8,6 +8,9 @@ Vue.component("item-detail-card", {
             <v-card-title v-if="!opts.no_title">
                 <slot name="title">
                     <span v-text="_.result(record, opts.key_title)" />
+                    <v-btn icon class="detail-action" v-if="opts.on_title_action" @click="opts.on_title_action()">
+                        <v-icon color="blue lighten-1">mdi-information</v-icon>
+                    </v-btn>
                 </slot>
             </v-card-title>
             <v-card-subtitle v-if="$slots.subtitle">
