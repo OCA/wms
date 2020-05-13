@@ -5,19 +5,20 @@ Vue.component("detail-location", {
     methods: {
         product_list_fields() {
             return [
-                {path: "product.display_name", klass: "loud"},
-                {path: "package_src.name", label: "Pack"},
-                {path: "lot.name", label: "Lot"},
+                {
+                    path: "product.display_name",
+                    action_val_path: "product.barcode",
+                    klass: "loud",
+                },
+                {
+                    path: "package_src.name",
+                    label: "Pack",
+                    action_val_path: "package_src.name",
+                },
+                {path: "lot.name", label: "Lot", action_val_path: "lot.name"},
                 {path: "product.qty_reserved", label: "Qty reserved"},
                 {path: "product.qty_available", label: "Qty in stock"},
             ];
-        },
-        handle_product_click(product) {
-            if (this.opts.on_url_change) {
-                this.opts.on_url_change(
-                    product.pack ? product.pack.barcode : product.barcode
-                );
-            }
         },
     },
     template: `
@@ -35,7 +36,7 @@ Vue.component("detail-location", {
 
         <list
             :records="record.reserved_move_lines"
-            :options="{key_title: 'display_name', list_item_fields: product_list_fields(), list_item_on_click: handle_product_click}"
+            :options="{key_title: 'display_name', list_item_fields: product_list_fields()}"
             />
 
     </div>
