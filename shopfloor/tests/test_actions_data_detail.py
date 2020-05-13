@@ -144,7 +144,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
             "packaging": self.data.packaging(package.product_packaging_id),
             "weight": 0,
             "pickings": self.data.pickings(pickings),
-            "lines": self.data.move_lines(lines),
+            "move_lines": self.data.move_lines(lines),
             "storage_type": {
                 "id": self.storage_type_pallet.id,
                 "name": self.storage_type_pallet.name,
