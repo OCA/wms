@@ -273,3 +273,12 @@ input.my-checkbox[type="checkbox"]:checked {
 .summary-content .summary-content-item:not(:last-child) {
     border-bottom: 1px dotted #ccc;
 }
+.separator-title {
+    padding-left: 0.8rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.v-list-item__title {
+    white-space: normal;
+}

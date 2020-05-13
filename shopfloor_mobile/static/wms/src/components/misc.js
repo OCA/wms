@@ -110,3 +110,9 @@ Vue.component("btn-back", {
   <v-btn depressed x-large color="default" v-on:click="$router.back()">Back</v-btn>
   `,
 });
+
+Vue.component("separator-title", {
+    template: `
+  <h3 class="separator-title"><slot></slot></h3>
+`,
+});
