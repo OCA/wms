@@ -26,18 +26,7 @@ Vue.component("detail-operation", {
                 loud: true,
                 no_title: true,
                 fields: this.detail_fields(),
-                detail_action: this.on_detail_action,
             };
-        },
-        on_detail_action(record, field) {
-            const barcode = _.result(record, field.action_val_path);
-            if (barcode) {
-                this.$router.push({
-                    name: "scananything",
-                    params: {identifier: barcode},
-                    query: {displayOnly: 1},
-                });
-            }
         },
     },
     template: `

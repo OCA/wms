@@ -15,7 +15,7 @@ export var ScanAnything = Vue.component("scan-anything", {
             <component
                 :is="detail_component_name()"
                 :record="scan_data.record"
-                :options="{on_url_change: on_url_change, full_detail: true}"
+                :options="{full_detail: true}"
                 />
             <div class="button-list button-vertical-list full">
                 <v-row align="center" v-if="showBackBtn">
@@ -65,6 +65,8 @@ export var ScanAnything = Vue.component("scan-anything", {
             this.scan_data = {};
             this.$router.push({name: "scananything", params: {identifier: undefined}});
         },
+        // TODO: this was used to handle click on details inside detail components.
+        // It's probably useless now since we handle the event in detail mixin.
         on_url_change: function(identifier) {
             // Change the route on when more info clicked in children
             const query = {};
