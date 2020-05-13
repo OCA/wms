@@ -1,6 +1,8 @@
 import {HomePage} from "./homepage.js";
 import {ScanAnything} from "./scenario/scan_anything.js";
-import {Profile} from "./mgmt/profile.js";
+import {SettingsControlPanel} from "./settings/settings.js";
+import {Profile} from "./settings/profile.js";
+import {Language} from "./settings/language.js";
 import {LoginPage} from "./loginpage.js";
 import {process_registry} from "./services/process_registry.js";
 // Const NotFound = { template: '<div>Lost in the scanner app.</div>' }
@@ -9,7 +11,9 @@ import {process_registry} from "./services/process_registry.js";
 let routes = [
     {path: "/", component: HomePage, name: "home"},
     {path: "/login", component: LoginPage, name: "login"},
+    {path: "/settings", component: SettingsControlPanel, name: "settings"},
     {path: "/profile", component: Profile, name: "profile"},
+    {path: "/language", component: Language, name: "language"},
     {
         path: "/scananything/:identifier?",
         component: ScanAnything,

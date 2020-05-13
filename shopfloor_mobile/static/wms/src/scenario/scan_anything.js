@@ -115,11 +115,13 @@ export var ScanAnything = Vue.component("scan-anything", {
             return !_.isEmpty(this.scan_data);
         },
         screen_title: function() {
-            let title = "Scan anything";
+            let title = "Scan";
             if (this.$route.params.identifier) {
                 title = "Scanned: " + this.$route.params.identifier;
             }
-            return title;
+            return this.$t("screen.scan_anything.title", {
+                what: this.$route.params.identifier,
+            });
         },
     },
 });

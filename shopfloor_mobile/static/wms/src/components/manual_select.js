@@ -240,7 +240,7 @@ Vue.component("manual-select", {
         <v-row class="actions bottom-actions" v-if="has_records && opts.showActions">
             <v-col>
                 <v-btn depressed color="success" @click="handleAction('submit')" :disabled="!valued">
-                    Confirm
+                    {{ $t("btn.confirm.title") }}
                 </v-btn>
             </v-col>
         </v-row>

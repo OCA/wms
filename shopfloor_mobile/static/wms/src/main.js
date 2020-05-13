@@ -1,4 +1,5 @@
 import {router} from "./router.js";
+import {i18n} from "./i18n.js";
 import {Config} from "./services/config.js";
 import {process_registry} from "./services/process_registry.js";
 import {Odoo, OdooMocked} from "./services/odoo.js";
@@ -25,6 +26,7 @@ const vuetify_themes = {
 };
 
 const app = new Vue({
+    i18n,
     router: router,
     vuetify: new Vuetify({
         // FIXME: has no effect
