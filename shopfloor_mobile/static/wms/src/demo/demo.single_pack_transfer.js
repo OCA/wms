@@ -10,7 +10,8 @@ const DEMO_SINGLE_PACK_TRANSFER_1 = {
     start: {
         data: {
             scan_location: {
-                type: "pack",
+                // FIXME: outdated data here
+                type: "package",
                 id: 1,
                 name: "A nice pack 1",
                 location_src: {
