@@ -771,9 +771,9 @@ class ClusterPicking(Component):
             )
         # flag as postponed
         move_line.shopfloor_postponed = True
-        return self._response_for_skip_line(move_line)
+        return self._pick_after_skip_line(move_line)
 
-    def _response_for_skip_line(self, move_line):
+    def _pick_after_skip_line(self, move_line):
         batch = move_line.picking_id.batch_id
         return self._pick_next_line(batch)
 
