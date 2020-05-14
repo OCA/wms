@@ -110,7 +110,8 @@ Vue.component("manual-select", {
         },
         handleSelect(rec, event) {
             const elem = event.target;
-            this._updateValue(parseInt(elem.value, 10), elem.checked);
+            const val = isNaN(elem.value) ? elem.value : parseInt(elem.value, 10);
+            this._updateValue(val, elem.checked);
             $(elem)
                 .closest(".list-item-wrapper")
                 .toggleClass("active", elem.checked);
