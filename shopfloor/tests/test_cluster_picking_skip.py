@@ -35,8 +35,16 @@ class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
 
     def test_skip_line(self):
         self._simulate_batch_selected(self.batch, in_package=True)
-        lines = self.batch.picking_ids.move_line_ids
-        # 1st line, next is 2nd
+        lines = self.batch.picking_ids.move_line_ids.sorted(
+            lambda line: (
+                line.location_id,
+                line.shopfloor_postponed,
+                line.move_id.sequence,
+                line.move_id.id,
+                line.id,
+            )
+        )
+
         self.assertFalse(lines[0].shopfloor_postponed)
         self._skip_line(lines[0], lines[1])
         self.assertTrue(lines[0].shopfloor_postponed)
