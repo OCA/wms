@@ -5,8 +5,6 @@ from odoo import api, fields, models
 from odoo.osv import expression
 from odoo.tools import date_utils, float_compare
 
-from odoo.addons import decimal_precision as dp
-
 
 class StockMove(models.Model):
     _inherit = "stock.move"
@@ -21,7 +19,7 @@ class StockMove(models.Model):
     ordered_available_to_promise = fields.Float(
         string="Ordered Available to Promise",
         compute="_compute_ordered_available_to_promise",
-        digits=dp.get_precision("Product Unit of Measure"),
+        digits="Product Unit of Measure",
         help="Available to Promise quantity minus quantities promised "
         " to older promised operations.",
     )
