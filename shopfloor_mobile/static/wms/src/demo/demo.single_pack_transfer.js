@@ -2,7 +2,7 @@ import {demotools} from "./demo.core.js";
 
 // TODO: refactor w/ demotools data
 const CANCEL_MSG_DEFAULT = {
-    message: "Operation cancelled",
+    body: "Operation cancelled",
     message_type: "info",
 };
 
@@ -38,7 +38,7 @@ const DEMO_SINGLE_PACK_TRANSFER_1 = {
         data: undefined,
         next_state: "start",
         message: {
-            message: "Pack validated",
+            body: "Pack validated",
             message_type: "success",
         },
     },
@@ -50,7 +50,7 @@ const DEMO_SINGLE_PACK_TRANSFER_1 = {
         data: undefined,
         next_state: "start",
         message: {
-            message: "Pack validated",
+            body: "Pack validated",
             message_type: "success",
         },
     },
@@ -68,7 +68,7 @@ const DEMO_SINGLE_PACK_TRANSFER_1 = {
         data: undefined,
         next_state: "start",
         message: {
-            message: "Pack validated",
+            body: "Pack validated",
             message_type: "success",
         },
     },

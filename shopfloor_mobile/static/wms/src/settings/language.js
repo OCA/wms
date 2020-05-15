@@ -1,13 +1,4 @@
 export var Language = Vue.component("language", {
-    data: function() {
-        return {
-            language_selected: false,
-            user_notif_updated: {
-                message: "Language updated",
-                message_type: "info",
-            },
-        };
-    },
     template: `
         <Screen :title="$t('screen.settings.language.title')" :klass="'settings settings-language'">
             <manual-select

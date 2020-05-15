@@ -4,7 +4,7 @@ export var Profile = Vue.component("profile", {
             current_profile_id: this.$root.has_profile ? this.$root.profile.id : null,
             profile_selected: false,
             user_notif_updated: {
-                message: "Profile updated",
+                body: "Profile updated",
                 message_type: "info",
             },
         };
@@ -12,9 +12,10 @@ export var Profile = Vue.component("profile", {
     template: `
         <Screen :title="$t('screen.settings.profile.title')" :klass="'settings settings-profile'">
             <template v-slot:header>
+                <!-- TODO: rely on global notification -->
                 <user-information
                     v-if="profile_selected"
-                    v-bind:info="user_notif_updated"
+                    :message="user_notif_updated"
                     />
             </template>
             <manual-select

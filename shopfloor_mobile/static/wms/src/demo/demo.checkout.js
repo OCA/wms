@@ -19,7 +19,7 @@ var DEMO_CHECKOUT = {
             next_state: "select_document",
             message: {
                 message_type: "error",
-                message: "No picking found for PACK1",
+                body: "No picking found for PACK1",
             },
         },
         PACK2: {
@@ -114,7 +114,7 @@ var DEMO_CHECKOUT = {
         },
         message: {
             message_type: "info",
-            message: "Product(s) packed in XYZ",
+            body: "Product(s) packed in XYZ",
         },
     },
     scan_dest_package: {
@@ -124,7 +124,7 @@ var DEMO_CHECKOUT = {
         },
         message: {
             message_type: "info",
-            message: "Product(s) packed in XYZ",
+            body: "Product(s) packed in XYZ",
         },
     },
     new_package: {
@@ -134,7 +134,7 @@ var DEMO_CHECKOUT = {
         },
         message: {
             message_type: "info",
-            message: "Product(s) packed in XYZ",
+            body: "Product(s) packed in XYZ",
         },
     },
     summary: {
@@ -153,7 +153,7 @@ var DEMO_CHECKOUT = {
         next_state: "select_document",
         message: {
             message_type: "info",
-            message: "Done",
+            body: "Done",
         },
     },
     list_packaging: {
@@ -185,7 +185,7 @@ var DEMO_CHECKOUT = {
         },
         message: {
             message_type: "info",
-            message: "Package changed",
+            body: "Package changed",
         },
     },
     set_custom_qty: {
@@ -199,7 +199,7 @@ var DEMO_CHECKOUT = {
         },
         message: {
             message_type: "info",
-            message: "Quantity changed",
+            body: "Quantity changed",
         },
     },
 };
