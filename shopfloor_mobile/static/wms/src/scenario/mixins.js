@@ -26,6 +26,8 @@ export var ScenarioBaseMixin = {
     beforeMount: function() {
         if (this.$root.demo_mode) {
             this.$root.loadJS("src/demo/demo." + this.usage + ".js", this.usage);
+            // this should be always loaded
+            this.$root.loadJS("src/demo/demo.scan_anything.js", "scan_anything");
         }
         /*
         Ensure initial state is set.

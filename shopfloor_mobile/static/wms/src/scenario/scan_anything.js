@@ -39,9 +39,6 @@ export var ScanAnything = Vue.component("scan-anything", {
             usage: this.usage,
         };
         this.odoo = this.$root.getOdoo(odoo_params);
-        if (this.$root.demo_mode) {
-            this.$root.loadJS("src/demo/demo." + this.usage + ".js", this.usage);
-        }
         if (this.$route.params.identifier) {
             this.getData(this.$route.params.identifier);
         }
