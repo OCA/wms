@@ -1,9 +1,14 @@
 export var ScenarioBaseMixin = {
     data: function() {
         return {
-            user_notification: {
-                message: "",
-                message_type: "",
+            messages: {
+                message: {
+                    message: "",
+                    message_type: "",
+                },
+                popup: {
+                    body: "",
+                },
             },
             need_confirmation: false,
             show_reset_button: false,
@@ -77,7 +82,22 @@ export var ScenarioBaseMixin = {
             return {
                 title: this.menu_item.name,
                 klass: this.usage + " " + "state-" + this.state.key,
+                user_message: this.user_message,
+                user_popup: this.user_popup,
+                noUserMessage: this.need_confirmation,
             };
+        },
+        user_message: function() {
+            if (_.result(this.messages, "message.message")) {
+                return this.messages.message;
+            }
+            return null;
+        },
+        user_popup: function() {
+            if (_.result(this.messages, "popup.body")) {
+                return this.messages.popup;
+            }
+            return null;
         },
     },
     methods: {
@@ -183,10 +203,12 @@ export var ScenarioBaseMixin = {
                 this.state_reset_data(state_key);
                 this.state_set_data(result.data[state_key], state_key);
             }
+            this.reset_notification();
             if (result.message) {
-                this.set_notification(result.message);
-            } else {
-                this.reset_notification();
+                this.set_message(result.message);
+            }
+            if (result.popup) {
+                this.set_popup(result.popup);
             }
             if (this.current_state_key != state_key) {
                 this.state_to(state_key);
@@ -230,13 +252,16 @@ export var ScenarioBaseMixin = {
             this.need_confirmation = false;
             this.reset_notification();
         },
-        set_notification: function(message) {
-            this.user_notification.message = message.message;
-            this.user_notification.message_type = message.message_type;
+        set_message: function(message) {
+            this.messages.message = message;
+        },
+        set_popup: function(popup) {
+            this.messages.popup.body = popup.body;
         },
         reset_notification: function() {
-            this.user_notification.message = false;
-            this.user_notification.message_type = false;
+            this.messages.message = null;
+            this.messages.message_type = null;
+            this.messages.popup.body = null;
         },
         _state_bind_events: function() {
             if (this.state.events) {

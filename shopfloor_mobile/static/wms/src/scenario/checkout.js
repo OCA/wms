@@ -17,14 +17,8 @@ export var Checkout = Vue.component("checkout", {
         which is reused every time!
     */
     template: `
-        <Screen :title="screen_info.title" :klass="screen_info.klass">
-            <!-- FOR DEBUG -->
-            <!-- {{ current_state_key }} -->
+        <Screen :screen_info="screen_info">
             <template v-slot:header>
-                <user-information
-                    v-if="!need_confirmation && user_notification.message"
-                    v-bind:info="user_notification"
-                    />
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar

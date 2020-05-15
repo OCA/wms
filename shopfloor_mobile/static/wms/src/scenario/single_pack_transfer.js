@@ -4,12 +4,8 @@ import {process_registry} from "../services/process_registry.js";
 export var SinglePackTransfer = Vue.component("single-pack-transfer", {
     mixins: [ScenarioBaseMixin, SinglePackStatesMixin],
     template: `
-        <Screen :title="screen_info.title" :klass="screen_info.klass">
+        <Screen :screen_info="screen_info">
             <template v-slot:header>
-                <user-information
-                    v-if="!need_confirmation && user_notification.message"
-                    v-bind:info="user_notification"
-                    />
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar v-if="state_is(initial_state_key)" v-on:found="on_scan" :input_placeholder="search_input_placeholder"></searchbar>

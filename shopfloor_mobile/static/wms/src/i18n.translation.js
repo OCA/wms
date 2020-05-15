@@ -34,6 +34,9 @@ export const messages = {
             confirm: {
                 title: "Confirm",
             },
+            ok: {
+                title: "Ok",
+            },
         },
     },
     "fr-FR": {
@@ -71,6 +74,9 @@ export const messages = {
             confirm: {
                 title: "Confirmer",
             },
+            ok: {
+                title: "Ok",
+            },
         },
     },
     "de-DE": {
@@ -107,6 +113,9 @@ export const messages = {
             },
             confirm: {
                 title: "Bestätigen",
+            },
+            ok: {
+                title: "Ok",
             },
         },
     },
