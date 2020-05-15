@@ -14,11 +14,9 @@ class StockLocation(models.Model):
     def is_sublocation_of(self, others):
         """Return True if self is a sublocation of at least one other"""
         self.ensure_one()
-        return bool(
-            self.env["stock.location"].search_count(
-                [("id", "child_of", others.ids), ("id", "=", self.id)]
-            )
-        )
+        # Efficient way to verify that the current location is
+        # below one of the other location without using SQL.
+        return any(self.parent_path.startswith(other.parent_path) for other in others)
 
     def _get_reserved_move_lines(self):
         return self.env["stock.move.line"].search(
