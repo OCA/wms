@@ -1,14 +1,14 @@
 /* eslint-disable strict */
 Vue.component("user-information", {
-    props: ["info"],
+    props: ["message"],
     template: `
     <v-alert :type="alert_type" tile>
-        {{ info.message }}
+        {{ message.body }}
     </v-alert>
     `,
     computed: {
         alert_type: function() {
-            return this.info.message_type || "info";
+            return this.message.message_type || "info";
         },
     },
 });

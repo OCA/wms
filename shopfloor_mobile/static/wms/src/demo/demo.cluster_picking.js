@@ -14,12 +14,16 @@ var DEMO_CLUSTER_PICKING_1 = {
                 pickings: [demotools.makePicking(), demotools.makePicking()],
             }),
         },
+        popup: {
+            body:
+                "Last operation of transfer XYZ. Next operation ABC is ready to proceed.",
+        },
     },
     list_batch: {
         next_state: "manual_selection",
         message: {
             message_type: "success",
-            message: "Previous line postponed",
+            body: "Previous line postponed",
         },
         data: {
             // Next line to process
@@ -56,7 +60,7 @@ var DEMO_CLUSTER_PICKING_1 = {
             next_state: "start_line",
             message: {
                 message_type: "success",
-                message: "Product 5 put in bin #2",
+                body: "Product 5 put in bin #2",
             },
             data: {
                 start_line: demotools.makeBatchPickingLine(),
@@ -66,7 +70,7 @@ var DEMO_CLUSTER_PICKING_1 = {
             next_state: "zero_check",
             message: {
                 message_type: "info",
-                message: "Stock check required",
+                body: "Stock check required",
             },
             data: {
                 zero_check: {},
@@ -77,7 +81,7 @@ var DEMO_CLUSTER_PICKING_1 = {
         next_state: "start_line",
         message: {
             message_type: "success",
-            message: "Stock zero confirmed",
+            body: "Stock zero confirmed",
         },
         data: {
             // Next line to process
@@ -88,7 +92,7 @@ var DEMO_CLUSTER_PICKING_1 = {
         next_state: "start_line",
         message: {
             message_type: "success",
-            message: "Previous line postponed",
+            body: "Previous line postponed",
         },
         data: {
             // Next line to process
@@ -99,7 +103,7 @@ var DEMO_CLUSTER_PICKING_1 = {
         next_state: "start_line",
         message: {
             message_type: "success",
-            message: "Stock out confirmed",
+            body: "Stock out confirmed",
         },
         data: {
             // Next line to process
@@ -118,7 +122,7 @@ var DEMO_CLUSTER_PICKING_1 = {
             next_state: "start_line",
             message: {
                 message_type: "success",
-                message: "Destination set",
+                body: "Destination set",
             },
             data: {
                 // Next line to process
@@ -133,7 +137,7 @@ var DEMO_CLUSTER_PICKING_1 = {
             },
             message: {
                 message_type: "warning",
-                message: "Confirm you want to unload them all?",
+                body: "Confirm you want to unload them all?",
             },
         },
     },

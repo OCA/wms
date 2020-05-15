@@ -3,7 +3,7 @@ export var ScenarioBaseMixin = {
         return {
             messages: {
                 message: {
-                    message: "",
+                    body: "",
                     message_type: "",
                 },
                 popup: {
@@ -88,7 +88,7 @@ export var ScenarioBaseMixin = {
             };
         },
         user_message: function() {
-            if (_.result(this.messages, "message.message")) {
+            if (_.result(this.messages, "message.body")) {
                 return this.messages.message;
             }
             return null;

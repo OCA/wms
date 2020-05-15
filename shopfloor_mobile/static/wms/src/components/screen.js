@@ -45,7 +45,7 @@ Vue.component("Screen", {
     data: () => ({
         drawer: null,
         missing_profile_msg: {
-            message: "",
+            body: "",
             message_type: "warning",
         },
         show_popup: false,
@@ -102,7 +102,7 @@ Vue.component("Screen", {
                 <slot name="notifications">
                     <user-information
                         v-if="show_message"
-                        v-bind:info="info.user_message"
+                        :message="info.user_message"
                         />
                     <user-popup
                         v-if="show_popup"
