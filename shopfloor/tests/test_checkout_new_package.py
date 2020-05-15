@@ -57,6 +57,6 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             data={"picking": self._stock_picking_data(picking)},
             message={
                 "message_type": "info",
-                "message": "Product(s) packed in {}".format(new_package.name),
+                "body": "Product(s) packed in {}".format(new_package.name),
             },
         )

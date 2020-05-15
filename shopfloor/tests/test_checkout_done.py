@@ -17,7 +17,7 @@ class CheckoutDoneCase(CheckoutCommonCase):
             next_state="select_document",
             message={
                 "message_type": "success",
-                "message": "Transfer {} done".format(picking.name),
+                "body": "Transfer {} done".format(picking.name),
             },
         )
 
@@ -48,7 +48,7 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
             data={"picking": self._stock_picking_data(self.picking, done=True)},
             message={
                 "message_type": "warning",
-                "message": "Not all lines have been processed with full quantity. "
+                "body": "Not all lines have been processed with full quantity. "
                 "Do you confirm partial operation?",
             },
         )
@@ -67,7 +67,7 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
             next_state="select_document",
             message={
                 "message_type": "success",
-                "message": "Transfer {} done".format(self.picking.name),
+                "body": "Transfer {} done".format(self.picking.name),
             },
         )
 
@@ -105,7 +105,7 @@ class CheckoutDoneRawUnpackedCase(CheckoutCommonCase):
             data={"picking": self._stock_picking_data(self.picking, done=True)},
             message={
                 "message_type": "warning",
-                "message": "Remaining raw product not packed, proceed anyway?",
+                "body": "Remaining raw product not packed, proceed anyway?",
             },
         )
 
@@ -126,6 +126,6 @@ class CheckoutDoneRawUnpackedCase(CheckoutCommonCase):
             next_state="select_document",
             message={
                 "message_type": "success",
-                "message": "Transfer {} done".format(self.picking.name),
+                "body": "Transfer {} done".format(self.picking.name),
             },
         )

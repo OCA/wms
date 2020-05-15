@@ -68,7 +68,7 @@ class CheckoutResetLineQtyCase(CheckoutSetQtyCommonCase):
             selected_lines,
             {line: line.product_uom_qty for line in selected_lines},
             message={
-                "message": "The record you were working on does not exist anymore.",
+                "body": "The record you were working on does not exist anymore.",
                 "message_type": "error",
             },
         )
@@ -116,7 +116,7 @@ class CheckoutSetLineQtyCase(CheckoutSetQtyCommonCase):
             selected_lines,
             {line: line.product_uom_qty for line in selected_lines},
             message={
-                "message": "The record you were working on does not exist anymore.",
+                "body": "The record you were working on does not exist anymore.",
                 "message_type": "error",
             },
         )
@@ -165,7 +165,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             selected_lines,
             {line: line.product_uom_qty for line in selected_lines},
             message={
-                "message": "The record you were working on does not exist anymore.",
+                "body": "The record you were working on does not exist anymore.",
                 "message_type": "error",
             },
         )
@@ -190,7 +190,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             selected_lines,
             {line1: line1.product_uom_qty, line2: line2.product_uom_qty},
             message={
-                "message": "Not allowed to pack more than the quantity, "
+                "body": "Not allowed to pack more than the quantity, "
                 "the value has been changed to the maximum.",
                 "message_type": "warning",
             },
@@ -214,7 +214,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             selected_lines,
             {line1: line1.product_uom_qty, line2: line2.product_uom_qty},
             message={
-                "message": "Negative quantity not allowed.",
+                "body": "Negative quantity not allowed.",
                 "message_type": "error",
             },
         )

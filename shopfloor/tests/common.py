@@ -31,6 +31,8 @@ class CommonCase(SavepointCase, ComponentMixin):
 
     ANY = AnyObject()
 
+    maxDiff = None
+
     @contextmanager
     def work_on_services(self, **params):
         params = params or {}
