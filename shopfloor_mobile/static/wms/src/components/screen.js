@@ -1,17 +1,28 @@
 /* eslint-disable strict */
 Vue.component("Screen", {
     props: {
-        title: String,
-        showMenu: {
-            type: Boolean,
-            default: true,
-        },
-        klass: {
-            type: String,
-            default: "generic",
+        screen_info: {
+            type: Object,
+            default: function() {
+                return {};
+            },
         },
     },
     computed: {
+        info() {
+            // Defining defaults for an Object property
+            // works only if you don't pass the property at all.
+            // If you pass only one key, you'll lose all defaults.
+            const screen_info = _.defaults({}, this.$props.screen_info, {
+                title: "",
+                showMenu: true,
+                noUserMessage: false,
+                user_message: null,
+                user_popup: null,
+                klass: "generic",
+            });
+            return screen_info;
+        },
         navigation() {
             return this.$root.appmenu.menus;
         },
@@ -25,7 +36,7 @@ Vue.component("Screen", {
         screen_content_class() {
             return [
                 "screen",
-                "screen-" + this.klass,
+                "screen-" + this.info.klass,
                 this.$slots.header ? "with-header" : "",
                 this.$slots.footer ? "with-footer" : "",
             ].join(" ");
@@ -37,7 +48,26 @@ Vue.component("Screen", {
             message: "",
             message_type: "warning",
         },
+        show_popup: false,
+        show_message: false,
     }),
+    mounted() {
+        // Manage popup display by passed property
+        this.$watch(
+            "screen_info.user_popup",
+            value => {
+                this.show_popup = Boolean(value);
+            },
+            {immediate: true}
+        );
+        this.$watch(
+            "screen_info.user_message",
+            value => {
+                this.show_message = !this.info.noUserMessage && Boolean(value);
+            },
+            {immediate: true}
+        );
+    },
     template: `
     <v-app :class="screen_app_class">
         <v-navigation-drawer
@@ -61,14 +91,29 @@ Vue.component("Screen", {
                 app
                 dense
                 >
-            <v-app-bar-nav-icon @click.stop="drawer = !drawer" v-if="showMenu" />
-            <v-toolbar-title>{{ title }}</v-toolbar-title>
+            <v-app-bar-nav-icon @click.stop="drawer = !drawer" v-if="info.showMenu" />
+            <v-toolbar-title v-if="info.title">{{ info.title }}</v-toolbar-title>
             <v-spacer></v-spacer>
             <app-bar-actions />
         </v-app-bar>
         <v-content :class="screen_content_class">
+
+            <div class="notifications">
+                <slot name="notifications">
+                    <user-information
+                        v-if="show_message"
+                        v-bind:info="info.user_message"
+                        />
+                    <user-popup
+                        v-if="show_popup"
+                        :popup="info.user_popup"
+                        :visible="show_popup"
+                        v-on:close="show_popup = false"
+                        />
+                </slot>
+            </div>
             <div class="header" v-if="$slots.header">
-                <slot name="header">Optional header - no content</slot>
+                <slot name="header"></slot>
             </div>
 
             <div class="profile-not-ready" v-if="!this.$root.demo_mode && !this.$root.has_profile && this.$route.name!='profile'">

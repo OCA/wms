@@ -1,12 +1,6 @@
 export var ScanAnything = Vue.component("scan-anything", {
     template: `
-        <Screen :title="screen_title" :klass="'scan_anything'">
-            <template v-slot:header>
-                <user-information
-                    v-if="scan_message.length"
-                    v-bind:info="scan_message"
-                    />
-            </template>
+        <Screen :screen_info="screen_info">
             <searchbar
                 v-if="!displayOnly"
                 v-on:found="on_scan"
@@ -83,7 +77,7 @@ export var ScanAnything = Vue.component("scan-anything", {
             this.odoo.call("scan", {identifier: identifier}).then(result => {
                 this.scan_full_data = result || {};
                 this.scan_data = result.data || {};
-                this.scan_message = result.message || {};
+                this.scan_message = result.message || null;
             });
         },
         on_scan: function(scanned) {
@@ -105,14 +99,12 @@ export var ScanAnything = Vue.component("scan-anything", {
         },
     },
     computed: {
-        displayOnly: function() {
-            return this.$route.query.displayOnly;
-        },
-        showBackBtn: function() {
-            return "childOf" in this.$route.query || this.displayOnly;
-        },
-        showResetBtn: function() {
-            return !_.isEmpty(this.scan_data);
+        screen_info: function() {
+            return {
+                title: this.screen_title,
+                klass: "scan-anything",
+                user_message: this.scan_message,
+            };
         },
         screen_title: function() {
             let title = "Scan";
@@ -122,6 +114,15 @@ export var ScanAnything = Vue.component("scan-anything", {
             return this.$t("screen.scan_anything.title", {
                 what: this.$route.params.identifier,
             });
+        },
+        displayOnly: function() {
+            return this.$route.query.displayOnly;
+        },
+        showBackBtn: function() {
+            return "childOf" in this.$route.query || this.displayOnly;
+        },
+        showResetBtn: function() {
+            return !_.isEmpty(this.scan_data);
         },
     },
 });
