@@ -99,7 +99,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             {move_line: origin_qty_done},
             message={
                 "message_type": "warning",
-                "message": "Product tracked by lot, please scan one.",
+                "body": "Product tracked by lot, please scan one.",
             },
         )
 
@@ -166,7 +166,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             data={"picking": self._stock_picking_data(picking)},
             message={
                 "message_type": "info",
-                "message": "Product(s) packed in {}".format(pack1.name),
+                "body": "Product(s) packed in {}".format(pack1.name),
             },
         )
 
@@ -204,7 +204,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             selected_line,
             message={
                 "message_type": "error",
-                "message": "Not a valid destination package",
+                "body": "Not a valid destination package",
             },
         )
 
@@ -265,7 +265,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             },
             message={
                 "message_type": "info",
-                "message": "Product(s) packed in {}".format(package.name),
+                "body": "Product(s) packed in {}".format(package.name),
             },
         )
 
@@ -350,7 +350,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             data={"picking": self._stock_picking_data(picking)},
             message={
                 "message_type": "info",
-                "message": "Product(s) packed in {}".format(new_package.name),
+                "body": "Product(s) packed in {}".format(new_package.name),
             },
         )
 
@@ -372,5 +372,5 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self._assert_selected_response(
             response,
             selected_line,
-            message={"message_type": "error", "message": "Barcode not found"},
+            message={"message_type": "error", "body": "Barcode not found"},
         )

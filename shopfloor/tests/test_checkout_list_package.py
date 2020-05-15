@@ -84,10 +84,7 @@ class CheckoutListDestPackageCase(
         self._assert_selected_response(
             response,
             picking.move_line_ids,
-            message={
-                "message_type": "warning",
-                "message": "No valid package to select.",
-            },
+            message={"message_type": "warning", "body": "No valid package to select."},
         )
 
 
@@ -148,7 +145,7 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             data={"picking": self._stock_picking_data(self.picking)},
             message={
                 "message_type": "info",
-                "message": "Product(s) packed in {}".format(self.pack1.name),
+                "body": "Product(s) packed in {}".format(self.pack1.name),
             },
         )
 
@@ -194,7 +191,7 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             self.allowed_packages,
             message={
                 "message_type": "error",
-                "message": "Not a valid destination package",
+                "body": "Not a valid destination package",
             },
         )
 
@@ -239,6 +236,6 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             self.allowed_packages,
             message={
                 "message_type": "error",
-                "message": "Not a valid destination package",
+                "body": "Not a valid destination package",
             },
         )

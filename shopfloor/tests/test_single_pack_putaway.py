@@ -98,7 +98,7 @@ class SinglePackPutawayCase(CommonCase):
             next_state="start",
             message={
                 "message_type": "error",
-                "message": "The package NOTHING_SHOULD_EXIST_WITH: 👀 doesn't exist",
+                "body": "The package NOTHING_SHOULD_EXIST_WITH: 👀 doesn't exist",
             },
         )
 
@@ -124,7 +124,7 @@ class SinglePackPutawayCase(CommonCase):
             next_state="start",
             message={
                 "message_type": "error",
-                "message": "You cannot work on a package (%s) outside of locations: %s"
+                "body": "You cannot work on a package (%s) outside of locations: %s"
                 % (
                     self.pack_a.name,
                     self.menu.picking_type_ids.default_location_src_id.name,
@@ -165,7 +165,7 @@ class SinglePackPutawayCase(CommonCase):
             next_state="start",
             message={
                 "message_type": "error",
-                "message": "An operation exists in Delivery Orders %s. You cannot"
+                "body": "An operation exists in Delivery Orders %s. You cannot"
                 " process it with this shopfloor scenario." % (picking.name,),
             },
         )
@@ -199,7 +199,7 @@ class SinglePackPutawayCase(CommonCase):
             next_state="confirm_start",
             message={
                 "message_type": "warning",
-                "message": "Operation's already running."
+                "body": "Operation's already running."
                 " Would you like to take it over?",
             },
             data={
@@ -298,7 +298,7 @@ class SinglePackPutawayCase(CommonCase):
             next_state="start",
             message={
                 "message_type": "error",
-                "message": "This operation does not exist anymore.",
+                "body": "This operation does not exist anymore.",
             },
         )
 
@@ -330,7 +330,7 @@ class SinglePackPutawayCase(CommonCase):
             next_state="scan_location",
             message={
                 "message_type": "error",
-                "message": "No location found for this barcode.",
+                "body": "No location found for this barcode.",
             },
             data=self.ANY,
         )
@@ -365,7 +365,7 @@ class SinglePackPutawayCase(CommonCase):
         self.assert_response(
             response,
             next_state="scan_location",
-            message={"message_type": "error", "message": "You cannot place it here"},
+            message={"message_type": "error", "body": "You cannot place it here"},
             data=self.ANY,
         )
 
@@ -459,7 +459,7 @@ class SinglePackPutawayCase(CommonCase):
             next_state="start",
             message={
                 "message_type": "success",
-                "message": "The pack has been moved, you can scan a new pack.",
+                "body": "The pack has been moved, you can scan a new pack.",
             },
         )
 
@@ -506,7 +506,7 @@ class SinglePackPutawayCase(CommonCase):
             next_state="start",
             message={
                 "message_type": "info",
-                "message": "Canceled, you can scan a new pack.",
+                "body": "Canceled, you can scan a new pack.",
             },
         )
 
@@ -549,7 +549,7 @@ class SinglePackPutawayCase(CommonCase):
             next_state="start",
             message={
                 "message_type": "info",
-                "message": "Canceled, you can scan a new pack.",
+                "body": "Canceled, you can scan a new pack.",
             },
         )
 
@@ -586,7 +586,7 @@ class SinglePackPutawayCase(CommonCase):
         self.assert_response(
             response,
             next_state="start",
-            message={"message_type": "info", "message": "Operation already processed."},
+            message={"message_type": "info", "body": "Operation already processed."},
         )
 
     def test_cancel_not_found(self):
@@ -602,6 +602,6 @@ class SinglePackPutawayCase(CommonCase):
             next_state="start",
             message={
                 "message_type": "error",
-                "message": "This operation does not exist anymore.",
+                "body": "This operation does not exist anymore.",
             },
         )

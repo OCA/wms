@@ -76,7 +76,7 @@ class Checkout(Component):
                     return self._response_for_select_document(
                         message={
                             "message_type": "error",
-                            "message": _(
+                            "body": _(
                                 "Several transfers found, please scan a package"
                                 " or select a transfer manually."
                             ),
@@ -293,7 +293,7 @@ class Checkout(Component):
                 picking,
                 message={
                     "message_type": "error",
-                    "message": _("Package {} is not in the current transfer.").format(
+                    "body": _("Package {} is not in the current transfer.").format(
                         package.name
                     ),
                 },
@@ -314,7 +314,7 @@ class Checkout(Component):
                 picking,
                 message={
                     "message_type": "error",
-                    "message": _("Product is not in the current transfer."),
+                    "body": _("Product is not in the current transfer."),
                 },
             )
 
@@ -346,7 +346,7 @@ class Checkout(Component):
                 picking,
                 message={
                     "message_type": "error",
-                    "message": _("Lot is not in the current transfer."),
+                    "body": _("Lot is not in the current transfer."),
                 },
             )
 
@@ -447,7 +447,7 @@ class Checkout(Component):
             if qty_done > move_line.product_uom_qty:
                 qty_done = move_line.product_uom_qty
                 message = {
-                    "message": _(
+                    "body": _(
                         "Not allowed to pack more than the quantity, "
                         "the value has been changed to the maximum."
                     ),
@@ -455,7 +455,7 @@ class Checkout(Component):
                 }
             if qty_done < 0:
                 message = {
-                    "message": _("Negative quantity not allowed."),
+                    "body": _("Negative quantity not allowed."),
                     "message_type": "error",
                 }
             else:
@@ -558,9 +558,7 @@ class Checkout(Component):
                 selected_lines,
                 message={
                     "message_type": "error",
-                    "message": _("Not a valid destination package").format(
-                        package.name
-                    ),
+                    "body": _("Not a valid destination package").format(package.name),
                 },
             )
         return self._put_lines_in_allowed_package(picking, selected_lines, package)
@@ -575,7 +573,7 @@ class Checkout(Component):
             picking,
             message={
                 "message_type": "info",
-                "message": _("Product(s) packed in {}").format(package.name),
+                "body": _("Product(s) packed in {}").format(package.name),
             },
         )
 
@@ -703,7 +701,7 @@ class Checkout(Component):
             picking,
             message={
                 "message_type": "info",
-                "message": _("Product(s) processed as raw product(s)"),
+                "body": _("Product(s) processed as raw product(s)"),
             },
         )
 
@@ -733,7 +731,7 @@ class Checkout(Component):
                 move_lines,
                 message={
                     "message_type": "warning",
-                    "message": _("No valid package to select."),
+                    "body": _("No valid package to select."),
                 },
             )
         data_struct = self.actions_for("data")
@@ -759,9 +757,7 @@ class Checkout(Component):
                 selected_lines,
                 message={
                     "message_type": "error",
-                    "message": _("Not a valid destination package").format(
-                        package.name
-                    ),
+                    "body": _("Not a valid destination package").format(package.name),
                 },
             )
         return self._put_lines_in_allowed_package(picking, selected_lines, package)
@@ -883,7 +879,7 @@ class Checkout(Component):
             picking,
             message={
                 "message_type": "success",
-                "message": _("Packaging changed on package {}").format(package.name),
+                "body": _("Packaging changed on package {}").format(package.name),
             },
         )
 
@@ -955,7 +951,7 @@ class Checkout(Component):
                     need_confirm=True,
                     message={
                         "message_type": "warning",
-                        "message": _(
+                        "body": _(
                             "Not all lines have been processed with full quantity. "
                             "Do you confirm partial operation?"
                         ),
@@ -967,16 +963,14 @@ class Checkout(Component):
                     need_confirm=True,
                     message={
                         "message_type": "warning",
-                        "message": _(
-                            "Remaining raw product not packed, proceed anyway?"
-                        ),
+                        "body": _("Remaining raw product not packed, proceed anyway?"),
                     },
                 )
         picking.action_done()
         return self._response_for_select_document(
             message={
                 "message_type": "success",
-                "message": _("Transfer {} done").format(picking.name),
+                "body": _("Transfer {} done").format(picking.name),
             }
         )
 

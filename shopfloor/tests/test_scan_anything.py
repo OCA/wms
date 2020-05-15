@@ -20,9 +20,9 @@ class ScanAnythingCase(ActionsDataDetailCaseBase):
         response = self.service.dispatch("scan", params=params)
         message = response["message"]
         self.assertEqual(message["message_type"], "error")
-        self.assertIn("Record not found", message["message"])
+        self.assertIn("Record not found", message["body"])
         for rec_type in tried:
-            self.assertIn(rec_type, message["message"])
+            self.assertIn(rec_type, message["body"])
 
     def test_scan_product(self):
         record = self.product_b
