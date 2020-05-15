@@ -20,28 +20,28 @@ class MessageAction(Component):
     def no_picking_type(self):
         return {
             "message_type": "error",
-            "message": _("No operation type found for this menu and profile."),
+            "body": _("No operation type found for this menu and profile."),
         }
 
     def several_picking_types(self):
         return {
             "message_type": "error",
-            "message": _("Several operation types found for this menu and profile."),
+            "body": _("Several operation types found for this menu and profile."),
         }
 
     def package_not_found_for_barcode(self, barcode):
         return {
             "message_type": "error",
-            "message": _("The package %s doesn't exist") % barcode,
+            "body": _("The package %s doesn't exist") % barcode,
         }
 
     def bin_not_found_for_barcode(self, barcode):
-        return {"message_type": "error", "message": _("Bin %s doesn't exist") % barcode}
+        return {"message_type": "error", "body": _("Bin %s doesn't exist") % barcode}
 
     def package_not_allowed_in_src_location(self, barcode, picking_types):
         return {
             "message_type": "error",
-            "message": _("You cannot work on a package (%s) outside of locations: %s")
+            "body": _("You cannot work on a package (%s) outside of locations: %s")
             % (
                 barcode,
                 ", ".join(picking_types.mapped("default_location_src_id.name")),
@@ -51,94 +51,92 @@ class MessageAction(Component):
     def already_running_ask_confirmation(self):
         return {
             "message_type": "warning",
-            "message": _(
-                "Operation's already running. Would you like to take it over?"
-            ),
+            "body": _("Operation's already running. Would you like to take it over?"),
         }
 
     def scan_destination(self):
-        return {"message_type": "info", "message": _("Scan the destination location")}
+        return {"message_type": "info", "body": _("Scan the destination location")}
 
     def scan_lot_on_product_tracked_by_lot(self):
         return {
             "message_type": "warning",
-            "message": _("Product tracked by lot, please scan one."),
+            "body": _("Product tracked by lot, please scan one."),
         }
 
     def operation_not_found(self):
         return {
             "message_type": "error",
-            "message": _("This operation does not exist anymore."),
+            "body": _("This operation does not exist anymore."),
         }
 
     def stock_picking_not_found(self):
         return {
             "message_type": "error",
-            "message": _("This transfer does not exist anymore."),
+            "body": _("This transfer does not exist anymore."),
         }
 
     def record_not_found(self):
         return {
             "message_type": "error",
-            "message": _("The record you were working on does not exist anymore."),
+            "body": _("The record you were working on does not exist anymore."),
         }
 
     def barcode_not_found(self):
-        return {"message_type": "error", "message": _("Barcode not found")}
+        return {"message_type": "error", "body": _("Barcode not found")}
 
     def operation_has_been_canceled_elsewhere(self):
         return {
             "message_type": "warning",
-            "message": _("Restart the operation, someone has canceled it."),
+            "body": _("Restart the operation, someone has canceled it."),
         }
 
     def no_location_found(self):
         return {
             "message_type": "error",
-            "message": _("No location found for this barcode."),
+            "body": _("No location found for this barcode."),
         }
 
     def location_not_allowed(self):
-        return {"message_type": "error", "message": _("Location not allowed here.")}
+        return {"message_type": "error", "body": _("Location not allowed here.")}
 
     def dest_location_not_allowed(self):
-        return {"message_type": "error", "message": _("You cannot place it here")}
+        return {"message_type": "error", "body": _("You cannot place it here")}
 
     def need_confirmation(self):
-        return {"message_type": "warning", "message": _("Are you sure?")}
+        return {"message_type": "warning", "body": _("Are you sure?")}
 
     def confirm_location_changed(self, from_location, to_location):
         return {
             "message_type": "warning",
-            "message": _("Confirm location change from %s to %s?")
+            "body": _("Confirm location change from %s to %s?")
             % (from_location.name, to_location.name),
         }
 
     def confirm_pack_moved(self):
         return {
             "message_type": "success",
-            "message": _("The pack has been moved, you can scan a new pack."),
+            "body": _("The pack has been moved, you can scan a new pack."),
         }
 
     def already_done(self):
-        return {"message_type": "info", "message": _("Operation already processed.")}
+        return {"message_type": "info", "body": _("Operation already processed.")}
 
     def confirm_canceled_scan_next_pack(self):
         return {
             "message_type": "info",
-            "message": _("Canceled, you can scan a new pack."),
+            "body": _("Canceled, you can scan a new pack."),
         }
 
     def no_pack_in_location(self, location):
         return {
             "message_type": "error",
-            "message": _("Location %s doesn't contain any package." % location.name),
+            "body": _("Location %s doesn't contain any package." % location.name),
         }
 
     def several_packs_in_location(self, location):
         return {
             "message_type": "warning",
-            "message": _(
+            "body": _(
                 "Several packages found in %s, please scan a package." % location.name
             ),
         }
@@ -146,15 +144,13 @@ class MessageAction(Component):
     def several_lots_in_location(self, location):
         return {
             "message_type": "warning",
-            "message": _(
-                "Several lots found in %s, please scan a lot." % location.name
-            ),
+            "body": _("Several lots found in %s, please scan a lot." % location.name),
         }
 
     def several_products_in_location(self, location):
         return {
             "message_type": "warning",
-            "message": _(
+            "body": _(
                 "Several products found in %s, please scan a product." % location.name
             ),
         }
@@ -162,19 +158,19 @@ class MessageAction(Component):
     def no_pending_operation_for_pack(self, pack):
         return {
             "message_type": "error",
-            "message": _("No pending operation for package %s." % pack.name),
+            "body": _("No pending operation for package %s." % pack.name),
         }
 
     def unrecoverable_error(self):
         return {
             "message_type": "error",
-            "message": _("Unrecoverable error, please restart."),
+            "body": _("Unrecoverable error, please restart."),
         }
 
     def x_units_put_in_package(self, qty, product, package):
         return {
             "message_type": "success",
-            "message": _("{} {} put in {}").format(
+            "body": _("{} {} put in {}").format(
                 qty, product.display_name, package.name
             ),
         }
@@ -182,19 +178,19 @@ class MessageAction(Component):
     def cannot_move_something_in_picking_type(self):
         return {
             "message_type": "error",
-            "message": _("You cannot move this using this menu."),
+            "body": _("You cannot move this using this menu."),
         }
 
     def stock_picking_not_available(self, picking):
         return {
             "message_type": "error",
-            "message": _("Transfer {} is not available.").format(picking.name),
+            "body": _("Transfer {} is not available.").format(picking.name),
         }
 
     def product_multiple_packages_scan_package(self):
         return {
             "message_type": "warning",
-            "message": _(
+            "body": _(
                 "This product is part of multiple packages, please scan a package."
             ),
         }
@@ -202,13 +198,11 @@ class MessageAction(Component):
     def lot_multiple_packages_scan_package(self):
         return {
             "message_type": "warning",
-            "message": _(
-                "This lot is part of multiple packages, please scan a package."
-            ),
+            "body": _("This lot is part of multiple packages, please scan a package."),
         }
 
     def batch_transfer_complete(self):
         return {
             "message_type": "success",
-            "message": _("Batch Transfer complete"),
+            "body": _("Batch Transfer complete"),
         }

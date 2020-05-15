@@ -158,7 +158,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
             next_state="start",
             message={
                 "message_type": "info",
-                "message": "No more work to do, please create a new batch transfer",
+                "body": "No more work to do, please create a new batch transfer",
             },
         )
 
@@ -285,7 +285,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
             next_state="manual_selection",
             message={
                 "message_type": "warning",
-                "message": "This batch cannot be selected.",
+                "body": "This batch cannot be selected.",
             },
             data={"size": 0, "records": []},
         )
@@ -305,7 +305,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
             next_state="manual_selection",
             message={
                 "message_type": "warning",
-                "message": "This batch cannot be selected.",
+                "body": "This batch cannot be selected.",
             },
             data={"size": 0, "records": []},
         )
@@ -409,7 +409,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
             response,
             message={
                 "message_type": "error",
-                "message": "The record you were working on does not exist anymore.",
+                "body": "The record you were working on does not exist anymore.",
             },
             next_state="start",
         )
@@ -431,5 +431,5 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="start",
-            message={"message": "Batch Transfer complete", "message_type": "success"},
+            message={"body": "Batch Transfer complete", "message_type": "success"},
         )

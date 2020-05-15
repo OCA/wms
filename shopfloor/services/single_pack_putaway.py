@@ -45,7 +45,7 @@ class SinglePackPutaway(Component):
             next_state="start",
             message={
                 "message_type": "error",
-                "message": _(
+                "body": _(
                     "An operation exists in %s %s. "
                     "You cannot process it with this shopfloor scenario."
                 )

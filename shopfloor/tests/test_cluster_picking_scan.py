@@ -69,7 +69,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             line.product_id.barcode,
             {
                 "message_type": "warning",
-                "message": "Product tracked by lot, please scan one.",
+                "body": "Product tracked by lot, please scan one.",
             },
         )
 
@@ -89,7 +89,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             move.product_id.barcode,
             {
                 "message_type": "warning",
-                "message": "This product is part of multiple"
+                "body": "This product is part of multiple"
                 " packages, please scan a package.",
             },
         )
@@ -110,7 +110,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             move.product_id.barcode,
             {
                 "message_type": "warning",
-                "message": "This product is part of multiple"
+                "body": "This product is part of multiple"
                 " packages, please scan a package.",
             },
         )
@@ -131,7 +131,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             line.lot_id.name,
             {
                 "message_type": "warning",
-                "message": "This lot is part of multiple"
+                "body": "This lot is part of multiple"
                 " packages, please scan a package.",
             },
         )
@@ -151,7 +151,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             line.lot_id.name,
             {
                 "message_type": "warning",
-                "message": "This lot is part of multiple"
+                "body": "This lot is part of multiple"
                 " packages, please scan a package.",
             },
         )
@@ -206,7 +206,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             location.barcode,
             {
                 "message_type": "warning",
-                "message": "Several packages found in Stock, please scan a package.",
+                "body": "Several packages found in Stock, please scan a package.",
             },
         )
 
@@ -225,7 +225,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             location.barcode,
             {
                 "message_type": "warning",
-                "message": "Several products found in Stock, please scan a product.",
+                "body": "Several products found in Stock, please scan a product.",
             },
         )
 
@@ -247,7 +247,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             location.barcode,
             {
                 "message_type": "warning",
-                "message": "Several lots found in Stock, please scan a lot.",
+                "body": "Several lots found in Stock, please scan a lot.",
             },
         )
 
@@ -257,7 +257,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             self.batch.picking_ids.move_line_ids,
             "NO_EXISTING_BARCODE",
-            {"message_type": "error", "message": "Barcode not found"},
+            {"message_type": "error", "body": "Barcode not found"},
         )
 
 
@@ -314,7 +314,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data=self._line_data(next_line),
             message={
                 "message_type": "success",
-                "message": "{} {} put in {}".format(
+                "body": "{} {} put in {}".format(
                     line.qty_done, line.product_id.display_name, self.bin1.name
                 ),
             },
@@ -402,7 +402,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data=self._line_data(line),
             message={
                 "message_type": "error",
-                "message": "The destination bin {} is not empty,"
+                "body": "The destination bin {} is not empty,"
                 " please take another.".format(self.bin1.name),
             },
         )
@@ -425,7 +425,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data=self._line_data(line),
             message={
                 "message_type": "error",
-                "message": "Bin {} doesn't exist".format("⌿"),
+                "body": "Bin {} doesn't exist".format("⌿"),
             },
         )
 
@@ -446,7 +446,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data=self._line_data(line),
             message={
                 "message_type": "error",
-                "message": "You must not pick more than {} units.".format(
+                "body": "You must not pick more than {} units.".format(
                     line.product_uom_qty
                 ),
             },
@@ -482,7 +482,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data=self._line_data(new_line),
             message={
                 "message_type": "success",
-                "message": "{} {} put in {}".format(
+                "body": "{} {} put in {}".format(
                     line.qty_done, line.product_id.display_name, self.bin1.name
                 ),
             },
@@ -565,7 +565,7 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
             data=self._line_data(self.next_line),
             message={
                 "message_type": "success",
-                "message": "{} {} put in {}".format(
+                "body": "{} {} put in {}".format(
                     self.line.qty_done,
                     self.line.product_id.display_name,
                     self.bin1.name,
@@ -596,7 +596,7 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
             data=self._line_data(self.next_line),
             message={
                 "message_type": "success",
-                "message": "{} {} put in {}".format(
+                "body": "{} {} put in {}".format(
                     self.line.qty_done,
                     self.line.product_id.display_name,
                     self.bin1.name,

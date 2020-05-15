@@ -125,7 +125,7 @@ class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         self._test_scan_line_error(
             picking,
             "NOT A BARCODE",
-            {"message_type": "error", "message": "Barcode not found"},
+            {"message_type": "error", "body": "Barcode not found"},
         )
 
     def test_scan_line_error_package_not_in_picking(self):
@@ -141,7 +141,7 @@ class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             package.name,
             {
                 "message_type": "error",
-                "message": "Package {} is not in the current transfer.".format(
+                "body": "Package {} is not in the current transfer.".format(
                     package.name
                 ),
             },
@@ -159,7 +159,7 @@ class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             self.product_a.barcode,
             {
                 "message_type": "warning",
-                "message": "Product tracked by lot, please scan one.",
+                "body": "Product tracked by lot, please scan one.",
             },
         )
 
@@ -177,7 +177,7 @@ class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             self.product_a.barcode,
             {
                 "message_type": "warning",
-                "message": "This product is part of multiple"
+                "body": "This product is part of multiple"
                 " packages, please scan a package.",
             },
         )
@@ -198,7 +198,7 @@ class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             self.product_a.barcode,
             {
                 "message_type": "warning",
-                "message": "This product is part of multiple"
+                "body": "This product is part of multiple"
                 " packages, please scan a package.",
             },
         )
@@ -212,7 +212,7 @@ class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             self.product_b.barcode,
             {
                 "message_type": "error",
-                "message": "Product is not in the current transfer.",
+                "body": "Product is not in the current transfer.",
             },
         )
 
@@ -226,7 +226,7 @@ class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         self._test_scan_line_error(
             picking,
             lot.name,
-            {"message_type": "error", "message": "Lot is not in the current transfer."},
+            {"message_type": "error", "body": "Lot is not in the current transfer."},
         )
 
     def test_scan_line_error_lot_in_two_packages(self):
@@ -247,7 +247,7 @@ class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             lot.name,
             {
                 "message_type": "warning",
-                "message": "This lot is part of multiple"
+                "body": "This lot is part of multiple"
                 " packages, please scan a package.",
             },
         )
@@ -270,7 +270,7 @@ class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             lot.name,
             {
                 "message_type": "warning",
-                "message": "This lot is part of multiple"
+                "body": "This lot is part of multiple"
                 " packages, please scan a package.",
             },
         )
