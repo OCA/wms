@@ -76,7 +76,7 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             {"picking_id": self.picking.id, "package_id": selected_lines[0].id},
             {
                 "message_type": "error",
-                "message": "The record you were working on does not exist anymore.",
+                "body": "The record you were working on does not exist anymore.",
             },
         )
 
@@ -87,7 +87,7 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             {"picking_id": self.picking.id, "move_line_id": selected_lines[0].id},
             {
                 "message_type": "error",
-                "message": "The record you were working on does not exist anymore.",
+                "body": "The record you were working on does not exist anymore.",
             },
         )
 
