@@ -94,7 +94,7 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
                         "required": True,
                         "allowed": ["info", "warning", "error", "success"],
                     },
-                    "message": {"type": "string", "required": True},
+                    "body": {"type": "string", "required": True},
                 },
             },
             "popup": {

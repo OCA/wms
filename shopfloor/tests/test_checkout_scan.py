@@ -28,7 +28,7 @@ class CheckoutScanCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            message={"message_type": "error", "message": "Barcode not found"},
+            message={"message_type": "error", "body": "Barcode not found"},
         )
 
     def _test_scan_document_error_not_available(self, barcode_func):
@@ -49,7 +49,7 @@ class CheckoutScanCase(CheckoutCommonCase):
             next_state="select_document",
             message={
                 "message_type": "error",
-                "message": "Transfer {} is not available.".format(picking.name),
+                "body": "Transfer {} is not available.".format(picking.name),
             },
         )
 
@@ -77,7 +77,7 @@ class CheckoutScanCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            message={"message_type": "error", "message": "Location not allowed here."},
+            message={"message_type": "error", "body": "Location not allowed here."},
         )
 
     def _test_scan_document_error_different_picking_type(self, barcode_func):
@@ -91,7 +91,7 @@ class CheckoutScanCase(CheckoutCommonCase):
             next_state="select_document",
             message={
                 "message_type": "error",
-                "message": "You cannot move this using this menu.",
+                "body": "You cannot move this using this menu.",
             },
         )
 
@@ -122,7 +122,7 @@ class CheckoutScanCase(CheckoutCommonCase):
             next_state="select_document",
             message={
                 "message_type": "error",
-                "message": "Several transfers found, please scan a package"
+                "body": "Several transfers found, please scan a package"
                 " or select a transfer manually.",
             },
         )

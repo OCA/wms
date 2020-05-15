@@ -52,7 +52,7 @@ class ShopfloorScanAnything(Component):
 
     def _response_for_not_found(self, tried):
         message = {
-            "message": _(
+            "body": _(
                 "Record not found.\n" "We've tried with the following types: {}"
             ).format(", ".join(tried)),
             "message_type": "error",

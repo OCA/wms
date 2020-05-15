@@ -130,7 +130,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
             },
             message={
                 "message_type": "error",
-                "message": "The record you were working on does not exist anymore.",
+                "body": "The record you were working on does not exist anymore.",
             },
         )
 
@@ -148,6 +148,6 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
             },
             message={
                 "message_type": "error",
-                "message": "The record you were working on does not exist anymore.",
+                "body": "The record you were working on does not exist anymore.",
             },
         )

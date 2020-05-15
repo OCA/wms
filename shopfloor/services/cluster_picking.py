@@ -181,9 +181,7 @@ class ClusterPicking(Component):
             return self._response_for_start(
                 message={
                     "message_type": "info",
-                    "message": _(
-                        "No more work to do, please create a new batch transfer"
-                    ),
+                    "body": _("No more work to do, please create a new batch transfer"),
                 },
             )
 
@@ -285,7 +283,7 @@ class ClusterPicking(Component):
                 base_response=self.list_batch(),
                 message={
                     "message_type": "warning",
-                    "message": _("This batch cannot be selected."),
+                    "body": _("This batch cannot be selected."),
                 },
             )
 
@@ -551,7 +549,7 @@ class ClusterPicking(Component):
                 move_line,
                 message={
                     "message_type": "error",
-                    "message": _("You must not pick more than {} units.").format(
+                    "body": _("You must not pick more than {} units.").format(
                         move_line.product_uom_qty
                     ),
                 },
@@ -581,7 +579,7 @@ class ClusterPicking(Component):
                 move_line,
                 message={
                     "message_type": "error",
-                    "message": _(
+                    "body": _(
                         "The destination bin {} is not empty, please take another."
                     ).format(bin_package.name),
                 },
@@ -925,7 +923,7 @@ class ClusterPicking(Component):
             return self._response_for_unload_single(
                 batch,
                 package,
-                message={"message_type": "error", "message": _("Wrong bin")},
+                message={"message_type": "error", "body": _("Wrong bin")},
             )
         return self._response_for_unload_set_destination(batch, package)
 

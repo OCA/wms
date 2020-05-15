@@ -46,7 +46,7 @@ class CheckoutSelectCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="manual_selection",
-            message={"message_type": "error", "message": msg},
+            message={"message_type": "error", "body": msg},
             data={"pickings": [self._picking_summary_data(self.picking)]},
         )
 
