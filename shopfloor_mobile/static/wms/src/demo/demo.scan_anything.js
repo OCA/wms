@@ -113,4 +113,5 @@ demotools.add_case("scan_anything", {
     lot: DEMO_SCAN_ANYTHING_LOT,
     lot1: DEMO_SCAN_ANYTHING_LOT1,
     lot2: DEMO_SCAN_ANYTHING_LOT2,
+    // TODO: not found
 });

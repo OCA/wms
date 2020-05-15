@@ -145,6 +145,10 @@ var DEMO_CLUSTER_PICKING_1 = {
     unload_scan_pack: {},
     unload_scan_destination: {},
     unload_router: {},
+    // TODO
+    popup: {
+        body: "Last operation of transfer XYZ. Next operation ABC is ready to proceed.",
+    },
 };
 
 demotools.add_case("cluster_picking", DEMO_CLUSTER_PICKING_1);
