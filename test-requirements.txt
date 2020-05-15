@@ -4,5 +4,6 @@ odoo13-addon-stock_move_common_dest @ git+https://github.com/OCA/stock-logistics
 odoo13-addon-stock_picking_completion_info @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/808/head#subdirectory=setup/stock_picking_completion_info
 odoo13-addon-stock_location_children @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/855/head#subdirectory=setup/stock_location_children
 odoo13-addon-stock_storage_type @ git+https://github.com/OCA/wms@refs/pull/12/head#subdirectory=setup/stock_storage_type
+odoo13-addon-base_jsonify @ git+https://github.com/OCA/server-tools@refs/pull/1829/head#subdirectory=setup/base_jsonify
 
 freezegun
