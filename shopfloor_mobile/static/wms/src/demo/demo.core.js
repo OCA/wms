@@ -71,8 +71,18 @@ export class DemoTools {
         return list;
     }
 
-    randomFromArray(an_array) {
-        return an_array[Math.floor(Math.random() * an_array.length)];
+    randomItemFromArray(an_array, cloned = true) {
+        // using clone ensures we don't reference the same object every time
+        // which can break storage w/ cyclic refs.
+        const rec = an_array[Math.floor(Math.random() * an_array.length)];
+        return cloned ? _.cloneDeep(rec) : rec;
+    }
+
+    randomSetFromArray(an_array, count, cloned = true) {
+        // using clone ensures we don't reference the same object every time
+        // which can break storage w/ cyclic refs.
+        const recs = _.sampleSize(this.packagings, this.getRandomInt(count));
+        return cloned ? _.cloneDeep(recs) : recs;
     }
 
     makeSimpleRecord(defaults = {}, options = {}) {
@@ -185,8 +195,8 @@ export class DemoTools {
 
     makeProductCode() {
         return _.padEnd(
-            this.randomFromArray("ABCDEFGHIJK") +
-                this.randomFromArray("ABCDEFGHIJK") +
+            this.randomItemFromArray("ABCDEFGHIJK") +
+                this.randomItemFromArray("ABCDEFGHIJK") +
                 this.getRandomInt(),
             8,
             0
@@ -216,12 +226,12 @@ export class DemoTools {
             qty_available: this.getRandomInt(),
             qty_reserved: this.getRandomInt(),
             expiry_date: "2020-12-01",
-            packagings: _.sampleSize(this.packagings, this.getRandomInt(4)),
+            packagings: this.randomSetFromArray(this.packagings, 4),
             // TODO: load some random images
             image: null,
             barcode: "prod",
             manufacturer: this.makeSimpleRecord({
-                name: this.randomFromArray(this.partnerNames()),
+                name: this.randomItemFromArray(this.partnerNames()),
             }),
         });
         const product = this.makeProduct(defaults, options);
@@ -229,7 +239,7 @@ export class DemoTools {
         for (let i = 1; i < this.getRandomInt(3) + 1; i++) {
             let supp = this.makeSimpleRecord({
                 id: i,
-                name: this.randomFromArray(this.partnerNames()),
+                name: this.randomItemFromArray(this.partnerNames()),
                 product_code: "SUP/" + product.default_code,
                 product_name: "SUP/" + product.name,
             });
@@ -255,7 +265,7 @@ export class DemoTools {
                 // No pack every 3 items
                 pack = null;
             }
-            let loc_dest = this.randomFromArray(this.locations_dest);
+            let loc_dest = this.randomItemFromArray(this.locations_dest);
             if (options.line_random_dest && i % 3 == 0) {
                 // No pack every 3 items
                 loc_dest = null;
@@ -265,7 +275,7 @@ export class DemoTools {
                     id: i,
                     product: options.productFactory({name: "Prod " + i}),
                     package_dest: pack,
-                    location_src: this.randomFromArray(this.locations_src),
+                    location_src: this.randomItemFromArray(this.locations_src),
                     location_dest: loc_dest,
                 }),
                 defaults
@@ -281,9 +291,9 @@ export class DemoTools {
             move_line_count: this.getRandomInt(10),
             weight: this.getRandomInt(1000),
             partner: this.makeSimpleRecord({
-                name: this.randomFromArray(this.partnerNames()),
+                name: this.randomItemFromArray(this.partnerNames()),
             }),
-            note: this.randomFromArray([null, "demo picking note"]),
+            note: this.randomItemFromArray([null, "demo picking note"]),
         });
         if (options.full_detail) {
             _.defaults(defaults, {
@@ -291,7 +301,7 @@ export class DemoTools {
                 operation_type: "An operation type",
                 location_dest: _.sample(this.locations_dest),
                 carrier: this.makeSimpleRecord({
-                    name: "CARR/" + this.randomFromArray(this.partnerNames()),
+                    name: "CARR/" + this.randomItemFromArray(this.partnerNames()),
                 }),
                 priority: _.sample(["Not urgent", "Normal", "Urgent", "Very Urgent"]),
             });
@@ -303,7 +313,11 @@ export class DemoTools {
         });
         const picking = this.makeSimpleRecord(defaults, options);
         if (!options.no_lines) {
-            picking.move_lines = this.makePickingLines({picking: picking}, options);
+            picking.move_lines = this.makePickingLines({}, options);
+            picking.move_lines.forEach(function(line) {
+                // Avoid cyclic references to the same picking record
+                line.picking = _.cloneDeep(picking);
+            });
             picking.lines_count = picking.move_lines.length;
         }
         return picking;
@@ -408,6 +422,35 @@ export class DemoTools {
             });
         });
         return menu;
+    }
+    /*
+    Detect cyclic references between objects.
+
+    Use this function when you want to debug demo data issues w/ storage
+    complaining about cyclic references.
+
+    Credits: https://stackoverflow.com/questions/14962018
+    */
+    _isCyclic(obj) {
+        var seenObjects = [];
+
+        function detect(obj) {
+            if (obj && typeof obj === "object") {
+                if (seenObjects.indexOf(obj) !== -1) {
+                    return true;
+                }
+                seenObjects.push(obj);
+                for (var key in obj) {
+                    if (obj.hasOwnProperty(key) && detect(obj[key])) {
+                        console.log(obj, "cycle at " + key);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        return detect(obj);
     }
 }
 

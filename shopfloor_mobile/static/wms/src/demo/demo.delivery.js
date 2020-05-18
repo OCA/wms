@@ -4,20 +4,21 @@ const deliver_data = {
     picking: demotools.makePicking({}, {lines_count: 5, line_random_pack: true}),
 };
 
-const move_lines = demotools.makePickingLines({}, {lines_count: 5, line_random_pack: true});
-// set one as done
-move_lines[0].qty_done = move_lines[0].quantity
+const move_lines = demotools.makePickingLines(
+    {},
+    {lines_count: 5, line_random_pack: true}
+);
+// set at least one as done
+move_lines[0].qty_done = move_lines[0].quantity;
 
-const picking1 = demotools.makePicking({
-    move_lines: move_lines,
-}, {no_lines: true})
+const picking1 = demotools.makePicking(
+    {
+        move_lines: move_lines,
+    },
+    {no_lines: true}
+);
 
-const manual_selection_pickings = _.sampleSize(
-    [
-        picking1,
-    ],
-    _.random(1, 8)
-)
+const manual_selection_pickings = _.sampleSize([picking1], _.random(1, 8));
 
 const DEMO_DELIVERY = {
     scan_deliver: {
@@ -56,7 +57,7 @@ manual_selection_pickings.forEach(function(p) {
         data: {
             deliver: {picking: p},
         },
-    }
-})
+    };
+});
 
 demotools.add_case("delivery", DEMO_DELIVERY);

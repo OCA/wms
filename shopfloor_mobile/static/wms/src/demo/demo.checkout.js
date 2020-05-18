@@ -5,14 +5,29 @@ const select_pack_picking = demotools.makePicking(
     {lines_count: 5, line_random_pack: true, line_random_dest: true}
 );
 
-const select_line_data = {
-    picking: demotools.makePicking({}, {lines_count: 5, line_random_pack: true}),
-};
-const summary_data = {
-    picking: demotools.makePicking({}, {lines_count: 5, line_random_pack: true}),
-};
+const move_lines1 = demotools.makePickingLines(
+    {},
+    {lines_count: 5, line_random_pack: true}
+);
+const select_line_picking = demotools.makePicking(
+    {
+        move_lines: move_lines1,
+    },
+    {no_lines: true}
+);
 
-var DEMO_CHECKOUT = {
+const move_lines2 = demotools.makePickingLines(
+    {},
+    {lines_count: 5, line_random_pack: true}
+);
+const summary_picking = demotools.makePicking(
+    {
+        move_lines: move_lines2,
+    },
+    {no_lines: true}
+);
+
+const DEMO_CHECKOUT = {
     scan_document: {
         PACK1: {
             // No picking
@@ -26,14 +41,14 @@ var DEMO_CHECKOUT = {
             // All line have a destination pack
             next_state: "select_line",
             data: {
-                select_line: select_line_data,
+                select_line: {picking: select_line_picking},
             },
         },
     },
     select: {
         next_state: "select_line",
         data: {
-            select_line: select_line_data,
+            select_line: {picking: select_line_picking},
         },
     },
     list_stock_picking: {
@@ -110,7 +125,7 @@ var DEMO_CHECKOUT = {
     set_dest_package: {
         next_state: "select_line",
         data: {
-            select_line: select_line_data,
+            select_line: {picking: select_line_picking},
         },
         message: {
             message_type: "info",
@@ -120,7 +135,7 @@ var DEMO_CHECKOUT = {
     scan_dest_package: {
         next_state: "select_line",
         data: {
-            select_line: select_line_data,
+            select_line: {picking: select_line_picking},
         },
         message: {
             message_type: "info",
@@ -130,7 +145,17 @@ var DEMO_CHECKOUT = {
     new_package: {
         next_state: "select_line",
         data: {
-            select_line: select_line_data,
+            select_line: {picking: select_line_picking},
+        },
+        message: {
+            message_type: "info",
+            body: "Product(s) packed in XYZ",
+        },
+    },
+    no_package: {
+        next_state: "select_line",
+        data: {
+            select_line: {picking: select_line_picking},
         },
         message: {
             message_type: "info",
@@ -140,13 +165,13 @@ var DEMO_CHECKOUT = {
     summary: {
         next_state: "summary",
         data: {
-            summary: summary_data,
+            summary: {picking: summary_picking},
         },
     },
     remove_package: {
         next_state: "summary",
         data: {
-            summary: summary_data,
+            summary: {picking: summary_picking},
         },
     },
     done: {
@@ -181,7 +206,7 @@ var DEMO_CHECKOUT = {
     set_packaging: {
         next_state: "summary",
         data: {
-            summary: summary_data,
+            summary: {picking: summary_picking},
         },
         message: {
             message_type: "info",

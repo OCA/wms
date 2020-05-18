@@ -106,19 +106,17 @@ export var Delivery = Vue.component("checkout", {
             // `manual-select` can now buble up events w/ full record.
             return _.first(_.filter(records, {id: _id}));
         },
-        deliver_move_line_list_options: function(){
+        deliver_move_line_list_options: function() {
             return {
                 list_item_options: {
                     actions: ["action_cancel_line"],
                     fields: this.move_line_detail_fields(),
-                    list_item_klass_maker: this.utils.move_line_color_klass
-                }
-            }
+                    list_item_klass_maker: this.utils.move_line_color_klass,
+                },
+            };
         },
         move_line_detail_fields: function() {
-            return [
-                {path: "package_src.name", klass: "loud"},
-            ];
+            return [{path: "package_src.name", klass: "loud"}];
         },
     },
     data: function() {
@@ -166,12 +164,12 @@ export var Delivery = Vue.component("checkout", {
                             endpoint = "reset_qty_done_package";
                             endpoint_data = {
                                 package_id: data.package_id,
-                            }
+                            };
                         } else {
                             endpoint = "reset_qty_done_line";
                             endpoint_data = {
                                 line_id: data.line_id,
-                            }
+                            };
                         }
                         console.log("TODO: call", endpoint, endpoint_data);
                         // this.wait_call(
@@ -203,6 +201,5 @@ export var Delivery = Vue.component("checkout", {
         };
     },
 });
-
 
 process_registry.add("delivery", Delivery);
