@@ -80,6 +80,7 @@ export class OdooMixin {
     }
 }
 
+// TODO: move this to its on file in demo folder
 export class OdooMocked extends OdooMixin {
     _set_demo_data() {
         this.demo_data = demotools.get_case(this.usage);
@@ -124,6 +125,19 @@ export class OdooMocked extends OdooMixin {
             throw "NOT IMPLEMENTED: " + path;
         }
         console.dir("CALL RETURN data:", result);
+        return Promise.resolve(result);
+    }
+    scan(params) {
+        let result = {};
+        const data = demotools.get_indexed(params.identifier);
+        if (data) {
+            result.data = data;
+        } else {
+            result.message = {
+                body: "Record not found.",
+                message_type: "error",
+            };
+        }
         return Promise.resolve(result);
     }
     // TODO: check if still needed.

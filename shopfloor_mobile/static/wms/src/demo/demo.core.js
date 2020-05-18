@@ -3,6 +3,8 @@ import {process_registry} from "../services/process_registry.js";
 export class DemoTools {
     constructor(demo_cases) {
         this.demo_cases = demo_cases.length ? demo_cases : {};
+        // used to search w/ scan anything
+        this.indexed = {};
         this.locations = [
             this.makeLocation(),
             this.makeLocation(),
@@ -50,6 +52,21 @@ export class DemoTools {
         return (this.demo_cases[key] = demo_case);
     }
 
+    index_record(key_path, rec, type) {
+        const key = _.result(rec, key_path);
+        if (!key) {
+            console.error("Cannot index", rec, "with key_path", key_path);
+            return false;
+        } else {
+            this.indexed[key] = {record: rec, type: type};
+            return true;
+        }
+    }
+
+    get_indexed(key) {
+        return this.indexed[key];
+    }
+
     // Tools to generate data
     getRandomInt(max) {
         max = max ? max : 10000;
@@ -95,18 +112,16 @@ export class DemoTools {
             name = options.name_prefix ? options.name_prefix + "-" : "";
             name += _.padStart(this.getRandomInt(), options.padding, 0);
         }
-        return _.defaults(defaults, {
+        const rec = _.defaults(defaults, {
             id: this.getRandomInt(),
             name: name,
         });
+        return rec;
     }
 
     makeLocation(defaults = {}, options = {}) {
         _.defaults(options, {
             name_prefix: "LOC ",
-        });
-        _.defaults(defaults, {
-            barcode: "loc1",
         });
         const self = this;
         const loc = this.makeSimpleRecord(defaults, options);
@@ -127,12 +142,16 @@ export class DemoTools {
                 reserved_move_lines: move_lines,
             });
         }
+        loc.barcode = loc.name;
+        this.index_record("barcode", loc, "location");
         return loc;
     }
 
     makeLot(defaults = {}, options = {}) {
         _.defaults(options, {name_prefix: "LOT"});
-        return this.makeSimpleRecord(defaults, options);
+        const rec = this.makeSimpleRecord(defaults, options);
+        this.index_record("name", rec, "lot");
+        return rec;
     }
 
     makeLotFullDetail(defaults = {}, options = {}) {
@@ -150,7 +169,9 @@ export class DemoTools {
             qty: 1,
             qty_unit: "Unit",
         });
-        return this.makeSimpleRecord(defaults, {});
+        const rec = this.makeSimpleRecord(defaults, options);
+        this.index_record("name", rec, "packaging");
+        return rec;
     }
 
     makePack(defaults = {}, options = {}) {
@@ -162,8 +183,9 @@ export class DemoTools {
             packaging: this.makePackaging(),
             move_line_count: this.getRandomInt(10),
         });
-        const pack = this.makeSimpleRecord(defaults, options);
-        return pack;
+        const rec = this.makeSimpleRecord(defaults, options);
+        this.index_record("name", rec, "package");
+        return rec;
     }
 
     makePackFullDetail(defaults = {}, options = {}) {
@@ -187,10 +209,12 @@ export class DemoTools {
             storage_type: {id: 1, name: "Storage type XXX"},
             package_type: {id: 1, name: "Package type XXX"},
             move_lines: move_lines,
+            move_line_count: move_lines.length,
             pickings: pickings,
         });
-        const pack = this.makePack(defaults, options);
-        return pack;
+        const rec = this.makePack(defaults, options);
+        this.index_record("name", rec, "package");
+        return rec;
     }
 
     makeProductCode() {
@@ -211,13 +235,15 @@ export class DemoTools {
         const default_code = this.makeProductCode();
         _.defaults(defaults, {
             default_code: default_code,
+            barcode: default_code,
             qty_available: this.getRandomInt(200),
         });
-        const prod = this.makeSimpleRecord(defaults, options);
-        _.extend(prod, {
-            display_name: "[" + default_code + "] " + prod.name,
+        const rec = this.makeSimpleRecord(defaults, options);
+        _.extend(rec, {
+            display_name: "[" + default_code + "] " + rec.name,
         });
-        return prod;
+        this.index_record("barcode", rec, "product");
+        return rec;
     }
 
     makeProductFullDetail(defaults = {}, options = {}) {
@@ -229,7 +255,6 @@ export class DemoTools {
             packagings: this.randomSetFromArray(this.packagings, 4),
             // TODO: load some random images
             image: null,
-            barcode: "prod",
             manufacturer: this.makeSimpleRecord({
                 name: this.randomItemFromArray(this.partnerNames()),
             }),
@@ -320,6 +345,7 @@ export class DemoTools {
             });
             picking.lines_count = picking.move_lines.length;
         }
+        this.index_record("name", picking, "transfer");
         return picking;
     }
 
