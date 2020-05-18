@@ -297,7 +297,8 @@ export var ScenarioBaseMixin = {
     },
 };
 
-// TODO: move it to a specific file maybe
+// TODO: move it back it the transfer scenario when we get rid of
+// the putaway scenario
 export var SinglePackStatesMixin = {
     data: function() {
         return {
