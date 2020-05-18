@@ -2,6 +2,7 @@ export class Utils {
     constructor() {}
 
     group_lines_by_location(lines, options) {
+        let self = this;
         // {'key': 'no-group', 'title': '', 'records': []}
         options = _.defaults(options || {}, {
             group_key: "location_src",
@@ -26,13 +27,14 @@ export class Utils {
             res.push({
                 key: loc_id,
                 title: title,
-                records: options.prepare_records(value),
+                records: options.prepare_records.call(self, value),
             });
         });
         return res;
     }
 
     group_lines_by_locations(lines, options) {
+        let self = this;
         // {key: 'no-group', location_src: {}, location_dest: {} records: []}
         options = _.defaults(options || {}, {
             prepare_records: function(recs) {
@@ -62,14 +64,14 @@ export class Utils {
                 key: loc_ids,
                 location_src: src_loc,
                 location_dest: dest_loc,
-                records: options.prepare_records(value),
+                records: options.prepare_records.call(self, value),
             });
         });
         return res;
     }
 
     group_by_pack(lines) {
-        const self = this;
+        let self = this;
         const res = [];
         const packs = _.uniqBy(
             _.map(lines, function(x) {
