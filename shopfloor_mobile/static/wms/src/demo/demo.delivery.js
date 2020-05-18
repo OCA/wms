@@ -50,14 +50,4 @@ const DEMO_DELIVERY = {
     },
 };
 
-manual_selection_pickings.forEach(function(p) {
-    // make each picking scan-able
-    DEMO_DELIVERY.scan_deliver[p.name] = {
-        next_state: "deliver",
-        data: {
-            deliver: {picking: p},
-        },
-    };
-});
-
 demotools.add_case("delivery", DEMO_DELIVERY);
