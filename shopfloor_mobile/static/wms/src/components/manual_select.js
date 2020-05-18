@@ -160,7 +160,7 @@ Vue.component("manual-select", {
             return {
                 key_title: this.key_title,
                 showCounters: this.opts.showCounters,
-                fields: this.opts.list_item_fields,
+                fields: this.list_item_fields,
             };
         },
         selectable() {
@@ -228,6 +228,7 @@ Vue.component("manual-select", {
                                 :record="rec"
                                 :index="index"
                                 :count="group.records.length"
+                                :key="'extra-' + gindex + '-' + index" :id="'extra-item-' + gindex + '-' + index"
                                 />
                         </div>
                     </div>
