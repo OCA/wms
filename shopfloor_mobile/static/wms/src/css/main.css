@@ -196,18 +196,6 @@ ul.packaging span:first-child {
     margin-bottom: 0;
 }
 
-.manual-select .action {
-    margin: 0;
-}
-.manual-select .action.action-edit {
-    padding: 8px 16px;
-}
-
-.manual-select .action .v-btn {
-    min-width: 0;
-    font-size: 1.2em;
-    padding: 15px 5px;
-}
 .list .v-expansion-panel-header {
     padding: 0;
 }
@@ -294,4 +282,21 @@ input.my-checkbox[type="checkbox"]:checked {
 .move-line-not-done .details {
     border-left: 5px solid green;
     padding-left: 5px;
+}
+
+.action {
+    display: inline;
+}
+.action .v-btn {
+    min-width: 0;
+    font-size: 1.2em;
+}
+
+.v-list-item__action--stack {
+    flex-direction: row;
+}
+.v-application--is-ltr .v-list-item__action:last-of-type:not(:only-child),
+.v-application--is-ltr .v-list-item__avatar:last-of-type:not(:only-child),
+.v-application--is-ltr .v-list-item__icon:last-of-type:not(:only-child) {
+    margin-left: 0;
 }

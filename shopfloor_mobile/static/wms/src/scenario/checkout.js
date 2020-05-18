@@ -104,6 +104,7 @@ export var Checkout = Vue.component("checkout", {
                 <checkout-summary-detail
                     :picking="state.data.picking"
                     :records_grouped="utils.group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': utils.group_by_pack})"
+                    :list_options="{list_item_options: {actions: ['action_change_pkg', 'action_cancel_line']}}"
                     :key="current_state_key + '-checkout-summary-detail'"
                     />
                 <div class="button-list button-vertical-list full">
@@ -495,7 +496,7 @@ export var Checkout = Vue.component("checkout", {
                     events: {
                         select: "on_select",
                         back: "on_back",
-                        cancel: "on_cancel",
+                        cancel_picking_line: "on_cancel",
                         pkg_change_type: "on_pkg_change_type",
                         mark_as_done: "on_mark_as_done",
                         continue: "on_continue",
