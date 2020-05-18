@@ -9,7 +9,14 @@ Vue.component("searchbar", {
             },
         };
     },
-    props: ["input_placeholder", "input_data_type"],
+    props: {
+        input_placeholder: String,
+        input_data_type: String,
+        reset_on_submit: {
+            type: Boolean,
+            default: true,
+        },
+    },
     methods: {
         search: function(e) {
             e.preventDefault();
@@ -18,7 +25,7 @@ Vue.component("searchbar", {
                 text: this.entered,
                 type: e.target.dataset.type,
             });
-            this.reset();
+            if (this.reset_on_submit) this.reset();
         },
         reset: function() {
             this.entered = "";
