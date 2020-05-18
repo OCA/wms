@@ -1,9 +1,9 @@
 /* eslint-disable strict */
 /* eslint-disable no-implicit-globals */
-import {CheckoutPickingDetailListMixin} from "./mixins.js";
+import {PickingDetailListMixin} from "./mixins.js";
 
-Vue.component("checkout-summary-detail", {
-    mixins: [CheckoutPickingDetailListMixin],
+Vue.component("picking-summary", {
+    mixins: [PickingDetailListMixin],
     computed: {
         list_opts() {
             // Defining defaults for an Object property
@@ -12,7 +12,7 @@ Vue.component("checkout-summary-detail", {
             // TODO: we should call `super.list_options` but is not available in vue by default.
             const opts = _.defaults({}, this.$props.list_options, {
                 showCounters: true,
-                list_item_component: "checkout-summary-content",
+                list_item_component: "picking-summary-content",
                 list_item_actions: this._get_list_item_actions(
                     this.$props.list_options.list_item_options.actions || []
                 ),
@@ -86,7 +86,7 @@ Vue.component("checkout-summary-detail", {
     },
 });
 
-Vue.component("checkout-summary-content", {
+Vue.component("picking-summary-content", {
     props: {
         record: Object,
         options: Object,
@@ -106,7 +106,7 @@ Vue.component("checkout-summary-content", {
                 <v-expansion-panel-content>
                     <strong class="pkg-type-name">{{ pkg_type.title }}</strong>
                     <!--edit-action :record="record.pack" :click_event="'pkg_change_type'" /-->
-                    <checkout-summary-product-detail
+                    <picking-summary-product-detail
                         v-for="(prod, i) in pkg_type.records"
                         :record="prod"
                         :index="i"
@@ -116,13 +116,13 @@ Vue.component("checkout-summary-content", {
             </v-expansion-panel>
         </v-expansion-panels>
         <div v-else v-for="(subrec, i) in record.records">
-            <checkout-summary-product-detail :record="subrec" :index="index" :count="count" />
+            <picking-summary-product-detail :record="subrec" :index="index" :count="count" />
         </div>
     </v-list-item-content>
     `,
 });
 
-Vue.component("checkout-summary-product-detail", {
+Vue.component("picking-summary-product-detail", {
     props: {
         record: Object,
         index: Number,

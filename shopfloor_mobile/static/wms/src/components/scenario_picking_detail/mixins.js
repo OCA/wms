@@ -2,7 +2,7 @@
 /* eslint-disable no-implicit-globals */
 import {PickingDetailMixin} from "../detail/detail_picking.js";
 
-export var CheckoutPickingDetailSelectMixin = {
+export var PickingDetailSelectMixin = {
     mixins: [PickingDetailMixin],
     props: {
         select_records: Array,
@@ -16,7 +16,7 @@ export var CheckoutPickingDetailSelectMixin = {
             // If you pass only one key, you'll lose all defaults.
             const opts = _.defaults({}, this.$props.select_options, {
                 showActions: false,
-                list_item_component: "checkout-select-line-content",
+                list_item_component: "picking-select-line-content",
             });
             return opts;
         },
@@ -35,7 +35,7 @@ export var CheckoutPickingDetailSelectMixin = {
 `,
 };
 
-export var CheckoutPickingDetailListMixin = {
+export var PickingDetailListMixin = {
     mixins: [PickingDetailMixin],
     props: {
         records: Array,
