@@ -48,9 +48,28 @@ const DEMO_DELIVERY = {
         message: null,
         data: {
             manual_selection: {
-                // TODO: simulate completeness for progress bar
                 pickings: manual_selection_pickings,
             },
+        },
+    },
+    // TODO: it would be nice if we can define handlers to modify demo data
+    // in "real way".
+    reset_qty_done_pack: {
+        next_state: "deliver",
+        message: {
+            body: "Qty reset done",
+        },
+        data: {
+            deliver: {picking: _.values(scan_deliver)[0]},
+        },
+    },
+    reset_qty_done_line: {
+        next_state: "deliver",
+        message: {
+            body: "Qty reset done",
+        },
+        data: {
+            deliver: {picking: _.values(scan_deliver)[0]},
         },
     },
 };
