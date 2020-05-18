@@ -69,7 +69,7 @@ export var Checkout = Vue.component("checkout", {
                 <detail-picking-select
                     :picking="state.data.picking"
                     :select_records="state.data.selected_move_lines"
-                    :select_options="{multiple: true, initSelectAll: true, list_item_component: 'checkout-select-package-content'}"
+                    :select_options="{multiple: true, initSelectAll: true, list_item_component: 'picking-select-package-content'}"
                     :key="current_state_key + '-detail-picking-select'"
                     />
                 <div class="button-list button-vertical-list full">
@@ -101,11 +101,11 @@ export var Checkout = Vue.component("checkout", {
             </div>
 
             <div v-if="state_is('summary')">
-                <checkout-summary-detail
+                <picking-summary
                     :picking="state.data.picking"
                     :records_grouped="utils.group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': utils.group_by_pack})"
                     :list_options="{list_item_options: {actions: ['action_change_pkg', 'action_cancel_line']}}"
-                    :key="current_state_key + '-checkout-summary-detail'"
+                    :key="current_state_key + '-picking-summary'"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -137,9 +137,7 @@ export var Checkout = Vue.component("checkout", {
                 </div>
             </div>
             <div v-if="state_is('change_quantity')">
-                <checkout-picking-change-qty
-                    :picking="state.data.picking"
-                    />
+                <detail-picking :picking="state.data.picking" />
                 <div class="qty">
                     <input-number-spinner
                         v-on:input="state.on_qty_update"

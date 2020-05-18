@@ -26,7 +26,7 @@ export var Delivery = Vue.component("checkout", {
                 </div>
             </div>
             <div v-if="state_is('deliver')">
-                <checkout-summary-detail
+                <picking-summary
                     :picking="state.data.picking"
                     :records_grouped="utils.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.group_by_pack})"
                     :list_options="deliver_move_line_list_options()"

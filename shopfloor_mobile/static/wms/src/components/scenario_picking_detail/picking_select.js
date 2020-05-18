@@ -1,12 +1,12 @@
 /* eslint-disable strict */
 /* eslint-disable no-implicit-globals */
-import {CheckoutPickingDetailSelectMixin} from "./mixins.js";
+import {PickingDetailSelectMixin} from "./mixins.js";
 
 Vue.component("detail-picking-select", {
-    mixins: [CheckoutPickingDetailSelectMixin],
+    mixins: [PickingDetailSelectMixin],
 });
 
-Vue.component("checkout-select-line-content", {
+Vue.component("picking-select-line-content", {
     props: {
         record: Object,
         options: Object,
@@ -37,7 +37,7 @@ Vue.component("checkout-select-line-content", {
   `,
 });
 
-Vue.component("checkout-select-package-content", {
+Vue.component("picking-select-package-content", {
     props: {
         record: Object,
         options: Object,
