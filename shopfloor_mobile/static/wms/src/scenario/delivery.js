@@ -15,6 +15,7 @@ export var Delivery = Vue.component("checkout", {
                 v-if="state.on_scan"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
+                :reset_on_submit="false"
                 />
             <div v-if="state_is(initial_state_key)">
                 <div class="button-list button-vertical-list full">
@@ -43,7 +44,7 @@ export var Delivery = Vue.component("checkout", {
             <div v-if="state_is('manual_selection')">
                 <manual-select
                     class="with-progress-bar"
-                    :records="utils.order_picking_by_completeness(state.data.pickings)"
+                    :records="state.visible_records(this.state.data.pickings)"
                     :options="{show_title: false, showActions: false, list_item_extra_component: 'picking-list-item-progress-bar'}"
                     :list_item_fields="manual_select_picking_fields()"
                     :key="current_state_key + '-manual-select'"
@@ -183,7 +184,7 @@ export var Delivery = Vue.component("checkout", {
                         select: "on_select",
                     },
                     on_scan: scanned => {
-                        console.log("TODO: filter results");
+                        this.state_set_data({filtered: scanned.text});
                     },
                     on_back: () => {
                         this.state_to("start");
@@ -193,6 +194,18 @@ export var Delivery = Vue.component("checkout", {
                         this.wait_call(
                             this.odoo.call("scan_deliver", {barcode: selected.name})
                         );
+                    },
+                    visible_records: records => {
+                        const self = this;
+                        let visible_records = utils.order_picking_by_completeness(
+                            records
+                        );
+                        if (this.state.data.filtered) {
+                            visible_records = _.filter(visible_records, function(rec) {
+                                return rec.name.search(self.state.data.filtered) > 0;
+                            });
+                        }
+                        return visible_records;
                     },
                 },
             },
