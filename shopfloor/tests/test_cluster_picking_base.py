@@ -17,7 +17,9 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
             self.service = work.component(usage="cluster_picking")
 
     @classmethod
-    def _simulate_batch_selected(cls, batches, in_package=False, in_lot=False):
+    def _simulate_batch_selected(
+        cls, batches, in_package=False, in_lot=False, fill_stock=True
+    ):
         """Create a state as if a batch was selected by the user
 
         * The picking batch is in progress
@@ -28,9 +30,10 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
         all the products of the batch. It is enough for the current tests.
         """
         pickings = batches.mapped("picking_ids")
-        cls._fill_stock_for_moves(
-            pickings.mapped("move_lines"), in_package=in_package, in_lot=in_lot
-        )
+        if fill_stock:
+            cls._fill_stock_for_moves(
+                pickings.mapped("move_lines"), in_package=in_package, in_lot=in_lot
+            )
         pickings.action_assign()
         batches.write({"state": "in_progress", "user_id": cls.env.uid})
 
