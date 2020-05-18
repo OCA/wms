@@ -160,7 +160,7 @@ export var Delivery = Vue.component("checkout", {
                         let endpoint, endpoint_data;
                         // TODO: can't we have a single endpoint as per checkout.summary.destroy?
                         if (data.package_id) {
-                            endpoint = "reset_qty_done_package";
+                            endpoint = "reset_qty_done_pack";
                             endpoint_data = {
                                 package_id: data.package_id,
                             };
@@ -170,10 +170,7 @@ export var Delivery = Vue.component("checkout", {
                                 line_id: data.line_id,
                             };
                         }
-                        console.log("TODO: call", endpoint, endpoint_data);
-                        // this.wait_call(
-                        //     this.odoo.call(endpoint, endpoint_data)
-                        // );
+                        this.wait_call(this.odoo.call(endpoint, endpoint_data));
                     },
                 },
                 manual_selection: {
