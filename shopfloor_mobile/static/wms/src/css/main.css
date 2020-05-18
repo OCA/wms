@@ -300,3 +300,20 @@ input.my-checkbox[type="checkbox"]:checked {
 .v-application--is-ltr .v-list-item__icon:last-of-type:not(:only-child) {
     margin-left: 0;
 }
+
+.list-item-wrapper:not(:last-child) {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 0.5rem;
+}
+
+.list-item-wrapper .extra {
+    padding: 0 16px;
+}
+
+.v-list-item__content {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.with-progress-bar .v-list-item__content {
+    padding-bottom: 5px;
+}
