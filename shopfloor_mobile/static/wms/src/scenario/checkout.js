@@ -201,7 +201,7 @@ export var Checkout = Vue.component("checkout", {
             return [
                 {path: "weight"},
                 {path: "move_line_count", label: "Line count"},
-                {path: "packaging_name"},
+                {path: "packaging.name"},
             ];
         },
     },

@@ -98,7 +98,7 @@ export class Utils {
 
     group_by_package_type(lines) {
         const res = [];
-        const grouped = _.groupBy(lines, "package_dest.packaging_name");
+        const grouped = _.groupBy(lines, "package_dest.packaging.name");
         _.forEach(grouped, function(products, packaging_name) {
             res.push({
                 key: packaging_name,

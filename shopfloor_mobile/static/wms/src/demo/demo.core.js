@@ -136,7 +136,7 @@ export class DemoTools {
 
     makePackaging(defaults = {}, options = {}) {
         _.defaults(defaults, {
-            name: "Packging",
+            name: "Packaging",
             qty: 1,
             qty_unit: "Unit",
         });
@@ -149,7 +149,7 @@ export class DemoTools {
         _.defaults(defaults, {
             barcode: "pack",
             weight: this.getRandomInt(100) + " Kg",
-            packaging_name: this.makePackaging().name,
+            packaging: this.makePackaging(),
             move_line_count: this.getRandomInt(10),
         });
         const pack = this.makeSimpleRecord(defaults, options);
