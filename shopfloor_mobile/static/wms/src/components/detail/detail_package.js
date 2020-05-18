@@ -24,7 +24,7 @@ Vue.component("detail-package", {
             <item-detail-card v-bind="$props" :options="{main: true, fields: detail_fields()}" />
 
 
-            <div class="products mb-4" v-if="record.move_lines.length">
+            <div class="products mb-4" v-if="(record.move_lines || []).length">
                 <separator-title>Products</separator-title>
                 <item-detail-card
                     v-for="line in record.move_lines"
@@ -34,7 +34,7 @@ Vue.component("detail-package", {
                     />
             </div>
 
-            <div class="pickings" v-if="record.pickings.length">
+            <div class="pickings" v-if="(record.pickings || []).length">
                 <separator-title>Transfers</separator-title>
                 <detail-picking
                     v-for="picking in record.pickings"
