@@ -1,5 +1,7 @@
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
+from random import shuffle
+
 from odoo import api, fields, models
 from odoo.fields import first
 
@@ -43,24 +45,25 @@ class StockLocation(models.Model):
 
     def _sort_abc_locations(self, product_abc):
         product_abc = product_abc or "a"
+        a_location_ids = []
+        b_location_ids = []
+        c_location_ids = []
+        for loc in self:
+            if loc.abc_storage == "a":
+                a_location_ids.append(loc.id)
+            elif loc.abc_storage == "b":
+                b_location_ids.append(loc.id)
+            elif loc.abc_storage == "c":
+                c_location_ids.append(loc.id)
+        shuffle(a_location_ids)
+        shuffle(b_location_ids)
+        shuffle(c_location_ids)
         if product_abc == "a":
-            # Already ordered, no need to reorder
-            return self
+            location_ids = a_location_ids + b_location_ids + c_location_ids
+        elif product_abc == "b":
+            location_ids = b_location_ids + c_location_ids + a_location_ids
+        elif product_abc == "c":
+            location_ids = c_location_ids + a_location_ids + b_location_ids
         else:
-            a_location_ids = []
-            b_location_ids = []
-            c_location_ids = []
-            for loc in self:
-                if loc.abc_storage == "a":
-                    a_location_ids.append(loc.id)
-                elif loc.abc_storage == "b":
-                    b_location_ids.append(loc.id)
-                elif loc.abc_storage == "c":
-                    c_location_ids.append(loc.id)
-            if product_abc == "b":
-                location_ids = b_location_ids + c_location_ids + a_location_ids
-            elif product_abc == "c":
-                location_ids = c_location_ids + a_location_ids + b_location_ids
-            else:
-                raise ValueError('product_abc = %s' % product_abc)
-        return self.env['stock.location'].browse(location_ids)
+            raise ValueError("product_abc = %s" % product_abc)
+        return self.env["stock.location"].browse(location_ids)
