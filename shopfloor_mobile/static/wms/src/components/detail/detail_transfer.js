@@ -3,11 +3,6 @@ import {utils} from "../../utils.js";
 
 Vue.component("detail-transfer", {
     mixins: [ItemDetailMixin],
-    computed: {
-        utils: function() {
-            return utils;
-        },
-    },
     methods: {
         detail_fields() {
             return [
