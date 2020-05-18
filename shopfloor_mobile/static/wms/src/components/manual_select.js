@@ -145,6 +145,7 @@ Vue.component("manual-select", {
             // works only if you don't pass the property at all.
             // If you pass only one key, you'll lose all defaults.
             const opts = _.defaults({}, this.$props.options, {
+                show_title: true,
                 showActions: true,
                 initSelectAll: false,
                 initValue: null,
