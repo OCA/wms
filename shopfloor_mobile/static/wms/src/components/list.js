@@ -47,6 +47,7 @@ Vue.component("list", {
             const opts = _.defaults({}, this.$props.options, {
                 showCounters: false,
                 key_title: "name",
+                show_title: true,
                 list_item_component: "list-item",
                 list_item_actions: [],
                 list_item_on_click: null,
@@ -124,7 +125,7 @@ Vue.component("list-item", {
     mixins: [ItemDetailMixin],
     template: `
     <v-list-item-content>
-        <v-list-item-title v-if="opts.key_title" v-text="_.result(record, opts.key_title)"></v-list-item-title>
+        <v-list-item-title v-if="opts.show_title" v-text="_.result(record, opts.key_title)"></v-list-item-title>
         <div class="details">
             <div v-for="(field, index) in options.fields" :class="'field-detail ' + field.path.replace('.', '-') + ' ' + (field.klass || '')">
                 <span v-if="raw_value(record, field) || field.display_no_value">
