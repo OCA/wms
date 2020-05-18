@@ -61,8 +61,16 @@ class SinglePackTransferCase(CommonCase):
         return {
             "id": package_level.id,
             "name": package_level.package_id.name,
-            "location_src": {"id": self.shelf1.id, "name": self.shelf1.name},
-            "location_dest": {"id": self.shelf2.id, "name": self.shelf2.name},
+            "location_src": {
+                "id": self.shelf1.id,
+                "name": self.shelf1.name,
+                "barcode": self.shelf1.barcode,
+            },
+            "location_dest": {
+                "id": self.shelf2.id,
+                "name": self.shelf2.name,
+                "barcode": self.shelf2.barcode,
+            },
             "picking": {
                 "id": self.picking.id,
                 "name": self.picking.name,
@@ -76,6 +84,7 @@ class SinglePackTransferCase(CommonCase):
                 "id": self.product_a.id,
                 "name": self.product_a.name,
                 "default_code": self.product_a.default_code,
+                "barcode": self.product_a.barcode,
                 "display_name": self.product_a.display_name,
             },
         }
