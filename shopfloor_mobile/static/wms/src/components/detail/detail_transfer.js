@@ -3,6 +3,11 @@ import {utils} from "../../utils.js";
 
 Vue.component("detail-transfer", {
     mixins: [ItemDetailMixin],
+    computed: {
+        utils: function() {
+            return utils;
+        },
+    },
     methods: {
         detail_fields() {
             return [
@@ -43,7 +48,7 @@ Vue.component("detail-transfer", {
             ];
         },
         grouped_lines() {
-            return utils.group_lines_by_locations(this.record.lines);
+            return this.utils.group_lines_by_locations(this.record.move_lines);
         },
     },
     template: `
@@ -54,7 +59,7 @@ Vue.component("detail-transfer", {
             :options="picking_detail_options()"
             />
 
-        <div class="lines" v-if="record.lines.length">
+        <div class="lines" v-if="(record.move_lines || []).length">
             <div v-for="group in grouped_lines()">
                 <separator-title>
                     {{group.location_src.name}} -> {{ group.location_dest.name }}
