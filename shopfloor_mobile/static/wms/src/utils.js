@@ -127,6 +127,24 @@ export class Utils {
         return res;
     }
 
+    picking_completed_lines(record) {
+        return _.filter(record.move_lines, function(l) {
+            return l.qty_done > 0;
+        }).length;
+    }
+
+    picking_completeness(record) {
+        return (this.picking_completed_lines(record) / record.move_lines.length) * 100;
+    }
+
+    order_picking_by_completeness(pickings) {
+        const self = this;
+        const ordered = _.sortBy(pickings, function(rec) {
+            return self.picking_completeness(rec);
+        });
+        return _.reverse(ordered);
+    }
+
     format_date_display(date_string, options = {}) {
         _.defaults(options, {
             locale: navigator ? navigator.language : "en-US",
