@@ -1,4 +1,6 @@
 /* eslint-disable strict */
+import {ItemDetailMixin} from "./detail/detail_mixin.js";
+
 Vue.component("reset-screen-button", {
     props: ["show_reset_button"],
     methods: {
@@ -171,5 +173,19 @@ Vue.component("cancel-move-line-action", {
     </v-card>
   </v-dialog>
 </div>
+`,
+});
+
+Vue.component("picking-list-item-progress-bar", {
+    mixins: [ItemDetailMixin],
+    computed: {
+        value() {
+            return this.utils.picking_completeness(this.record);
+        },
+    },
+    template: `
+  <div :class="$options._componentTag">
+    <v-progress-linear :value="value" color="success"></v-progress-linear>
+  </div>
 `,
 });
