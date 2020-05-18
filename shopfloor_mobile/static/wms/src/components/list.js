@@ -48,7 +48,7 @@ Vue.component("list", {
                 showCounters: false,
                 key_title: "name",
                 list_item_component: "list-item",
-                list_item_action_component: null,
+                list_item_actions: [],
                 list_item_on_click: null,
                 list_item_options: {},
             });
@@ -85,7 +85,7 @@ Vue.component("list", {
                     <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
                     <div class="list-items-wrapper">
                         <v-list-item
-                                v-for="(rec, index) in group.records" :key="group.key + '-' + index" 
+                                v-for="(rec, index) in group.records" :key="group.key + '-' + index"
                                 @click="opts.list_item_on_click ? opts.list_item_on_click(rec) : undefined"
                                 :class="list_item_options.list_item_klass_maker ? list_item_options.list_item_klass_maker(rec) : ''">
                             <component
@@ -94,7 +94,20 @@ Vue.component("list", {
                                 :record="rec"
                                 :index="index"
                                 :count="group.records.length"
+                                :key="opts.list_item_component + '-' + index + '-' + rec.id"
                                 />
+                            <v-list-item-action v-if="opts.list_item_actions.length" class="d-flex align-stretch">
+                                <component
+                                    v-for="action in opts.list_item_actions"
+                                    :is="action.comp_name"
+                                    v-if="action.enabled(rec, action)"
+                                    :options="_.merge({}, list_item_options, action.options)"
+                                    :record="action.get_record(rec, action)"
+                                    :index="index"
+                                    :count="group.records.length"
+                                    :key="action.name + '-' + index + '-' + rec.id"
+                                    />
+                            </v-list-item-action>
                         </v-list-item>
                     </div>
                 </div>

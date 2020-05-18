@@ -97,10 +97,21 @@ Vue.component("state-display-info", {
 });
 
 Vue.component("edit-action", {
-    props: ["record", "click_event"],
+    props: {
+        record: Object,
+        options: {
+            type: Object,
+            default: function() {
+                return {
+                    click_event: "edit",
+                };
+            },
+        },
+    },
     template: `
 <div class="action action-edit">
-  <v-btn class="edit" depressed small rounded color="default" @click="$root.trigger(click_event, record)">&#10000;</v-btn>
+  <v-btn icon class="edit" depressed x-large rounded color="default"
+         @click="$root.trigger(options.click_event, record)"><v-icon>mdi-pencil-outline</v-icon></v-btn>
 </div>
 `,
 });
@@ -114,5 +125,50 @@ Vue.component("btn-back", {
 Vue.component("separator-title", {
     template: `
   <h3 class="separator-title"><slot></slot></h3>
+`,
+});
+
+Vue.component("cancel-move-line-action", {
+    props: ["record"],
+    data() {
+        return {
+            dialog: false,
+        };
+    },
+    methods: {
+        on_user_confirm: function(answer) {
+            this.dialog = false;
+            if (answer === "yes") {
+                let data = {};
+                if (this.record.package_dest) {
+                    data = {package_id: this.record.package_dest.id};
+                } else {
+                    data = {line_id: this.record.id};
+                }
+                this.$root.trigger("cancel_picking_line", data);
+            }
+        },
+    },
+    computed: {
+        message: function() {
+            const item = this.record.package_dest
+                ? this.record.package_dest.name
+                : this.record.product.name;
+            return "Please confirm cancellation for " + item;
+        },
+    },
+    template: `
+<div class="action action-destroy">
+  <v-dialog v-model="dialog" fullscreen tile class="actions fullscreen text-center">
+    <template v-slot:activator="{ on }">
+      <v-btn icon class="destroy" depressed x-large rounded color="error" v-on="on"><v-icon>mdi-close-circle</v-icon></v-btn>
+    </template>
+    <v-card>
+      <user-confirmation
+          v-on:user-confirmation="on_user_confirm"
+          v-bind:question="message"></user-confirmation>
+    </v-card>
+  </v-dialog>
+</div>
 `,
 });
