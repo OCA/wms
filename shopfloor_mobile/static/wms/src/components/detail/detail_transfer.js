@@ -45,17 +45,6 @@ Vue.component("detail-transfer", {
         grouped_lines() {
             return utils.group_lines_by_locations(this.record.lines);
         },
-        line_list_color_klass(line) {
-            let klass = "";
-            if (line.qty_done == line.quantity) {
-                klass = "done";
-            } else if (line.qty_done && line.qty_done < line.quantity) {
-                klass = "partial";
-            } else if (line.qty_done == 0) {
-                klass = "not-done";
-            }
-            return "transfer-line-" + klass;
-        },
     },
     template: `
     <div :class="$options._componentTag">
@@ -73,7 +62,7 @@ Vue.component("detail-transfer", {
                 <list
                     :records="group.records"
                     :key="'group-' + group.key"
-                    :options="{key_title: '', list_item_options: {fields: line_list_fields(), list_item_klass_maker: line_list_color_klass}}"
+                    :options="{key_title: '', list_item_options: {fields: line_list_fields(), list_item_klass_maker: utils.move_line_color_klass}}"
                     />
             </div>
         </div>

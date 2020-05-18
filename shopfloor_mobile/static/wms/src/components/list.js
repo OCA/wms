@@ -83,9 +83,11 @@ Vue.component("list", {
             <v-list v-if="has_records">
                 <div class="list-group" v-for="group in listable" :key="group.key">
                     <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
-                    <div class="list-item-wrapper" v-for="(rec, index) in group.records"">
-                        <v-list-item :key="index" @click="opts.list_item_on_click ? opts.list_item_on_click(rec) : undefined"
-                                     :class="list_item_options.list_item_klass_maker ? list_item_options.list_item_klass_maker(rec) : ''">
+                    <div class="list-items-wrapper">
+                        <v-list-item
+                                v-for="(rec, index) in group.records" :key="group.key + '-' + index" 
+                                @click="opts.list_item_on_click ? opts.list_item_on_click(rec) : undefined"
+                                :class="list_item_options.list_item_klass_maker ? list_item_options.list_item_klass_maker(rec) : ''">
                             <component
                                 :is="opts.list_item_component"
                                 :options="list_item_options"

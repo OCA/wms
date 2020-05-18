@@ -143,6 +143,18 @@ export class Utils {
             options.format
         );
     }
+
+    move_line_color_klass(line) {
+        let klass = "";
+        if (line.qty_done == line.quantity) {
+            klass = "done";
+        } else if (line.qty_done && line.qty_done < line.quantity) {
+            klass = "partial";
+        } else if (line.qty_done == 0) {
+            klass = "not-done";
+        }
+        return "move-line-" + klass;
+    }
 }
 
 export const utils = new Utils();

@@ -283,15 +283,15 @@ input.my-checkbox[type="checkbox"]:checked {
 }
 
 /* TODO: adapt colors */
-.transfer-line-done .details {
+.move-line-done .details {
     border-left: 5px solid lightgreen;
     padding-left: 5px;
 }
-.transfer-line-partial .details {
+.move-line-partial .details {
     border-left: 5px solid #ffbf30;
     padding-left: 5px;
 }
-.transfer-line-not-done .details {
+.move-line-not-done .details {
     border-left: 5px solid green;
     padding-left: 5px;
 }
