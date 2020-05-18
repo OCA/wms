@@ -185,7 +185,7 @@ Vue.component("picking-list-item-progress-bar", {
     },
     template: `
   <div :class="$options._componentTag">
-    <v-progress-linear :value="value" color="success"></v-progress-linear>
+    <v-progress-linear :value="value" color="success" height="8"></v-progress-linear>
   </div>
 `,
 });
