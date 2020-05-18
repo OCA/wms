@@ -32,20 +32,6 @@ export var Delivery = Vue.component("checkout", {
                     :list_options="deliver_move_line_list_options()"
                     :key="current_state_key + '-detail-picking-' + state.data.picking.id"
                     />
-                <hr />
-                <!--
-                TEST DETAIL + LIST
-                <detail-picking
-                    :picking="state.data.picking"
-                    :key="current_state_key + '-detail-picking-' + state.data.picking.id + 2"
-                    />
-                <list
-                    :records="state.data.picking.move_lines"
-                    :grouped_records="utils.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.only_one_package})"
-                    :options="deliver_move_line_list_options()"
-                    :key="current_state_key + '-detail-picking-select'"
-                    />
-                -->
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
@@ -56,9 +42,10 @@ export var Delivery = Vue.component("checkout", {
             </div>
             <div v-if="state_is('manual_selection')">
                 <manual-select
-                    :records="state.data.pickings"
-                    :options="{showActions: false}"
-                    :list_item_fields="manual_select_picking_fields"
+                    class="with-progress-bar"
+                    :records="utils.order_picking_by_completeness(state.data.pickings)"
+                    :options="{show_title: false, showActions: false, list_item_extra_component: 'picking-list-item-progress-bar'}"
+                    :list_item_fields="manual_select_picking_fields()"
                     :key="current_state_key + '-manual-select'"
                     />
                 <div class="button-list button-vertical-list full">
@@ -74,21 +61,6 @@ export var Delivery = Vue.component("checkout", {
     computed: {
         utils: function() {
             return utils;
-        },
-        // TODO: move these to methods
-        manual_select_picking_fields: function() {
-            return [
-                {path: "partner.name"},
-                {path: "origin"},
-                {path: "move_line_count", label: "Lines"},
-            ];
-        },
-        existing_package_select_fields: function() {
-            return [
-                {path: "weight"},
-                {path: "move_line_count", label: "Line count"},
-                {path: "packaging.name"},
-            ];
         },
     },
     // FIXME: just for dev
@@ -117,6 +89,32 @@ export var Delivery = Vue.component("checkout", {
         },
         move_line_detail_fields: function() {
             return [{path: "package_src.name", klass: "loud"}];
+        },
+        manual_select_picking_fields: function() {
+            const self = this;
+            return [
+                {path: "name", klass: "loud", action_val_path: "name"},
+                {path: "partner.name"},
+                {path: "origin"},
+                {
+                    path: "move_line_count",
+                    label: "Lines",
+                    renderer: function(rec, field) {
+                        return (
+                            self.utils.picking_completed_lines(rec) +
+                            " / " +
+                            rec.move_lines.length
+                        );
+                    },
+                },
+            ];
+        },
+        existing_package_select_fields: function() {
+            return [
+                {path: "weight"},
+                {path: "move_line_count", label: "Line count"},
+                {path: "packaging.name"},
+            ];
         },
     },
     data: function() {

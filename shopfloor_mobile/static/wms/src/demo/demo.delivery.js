@@ -29,24 +29,20 @@ for (let i = 1; i < count + 1; i++) {
 
 const manual_selection_pickings = _.sampleSize(pickings, _.random(1, 8));
 
+let scan_deliver = {};
+
+manual_selection_pickings.forEach(function(p) {
+    scan_deliver[p.name] = {
+        // All line have a destination pack
+        next_state: "deliver",
+        data: {
+            deliver: {picking: p},
+        },
+    };
+});
+
 const DEMO_DELIVERY = {
-    scan_deliver: {
-        NOPACK: {
-            // No picking
-            next_state: "start",
-            message: {
-                message_type: "error",
-                body: "No picking found for PACK1",
-            },
-        },
-        PACK: {
-            // All line have a destination pack
-            next_state: "deliver",
-            data: {
-                deliver: deliver_data,
-            },
-        },
-    },
+    scan_deliver: scan_deliver,
     list_stock_picking: {
         next_state: "manual_selection",
         message: null,
