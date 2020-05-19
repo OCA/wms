@@ -58,13 +58,16 @@ class DataAction(Component):
             "total_weight:weight",
         ]
 
-    def package(self, record, picking=None, **kw):
+    def package(self, record, picking=None, with_packaging=False, **kw):
         """Return data for a stock.quant.package
 
         If a picking is given, it will include the number of lines of the package
         for the picking.
         """
-        data = self._jsonify(record, self._package_parser, **kw)
+        parser = self._package_parser
+        if with_packaging:
+            parser += self._package_packaging_parser
+        data = self._jsonify(record, parser, **kw)
         # handle special cases
         if data and picking:
             # TODO: exclude canceled and done?
@@ -73,7 +76,7 @@ class DataAction(Component):
         return data
 
     def packages(self, records, picking=None, **kw):
-        return [self.package(rec, picking=picking) for rec in records]
+        return [self.package(rec, picking=picking, **kw) for rec in records]
 
     @property
     def _package_parser(self):
@@ -81,6 +84,11 @@ class DataAction(Component):
             "id",
             "name",
             "pack_weight:weight",
+        ]
+
+    @property
+    def _package_packaging_parser(self):
+        return [
             ("product_packaging_id:packaging", self._packaging_parser),
         ]
 
@@ -112,16 +120,18 @@ class DataAction(Component):
                 {
                     # cannot use sub-parser here
                     # because result might depend on picking
-                    "package_src": self.package(record.package_id, record.picking_id),
+                    "package_src": self.package(
+                        record.package_id, record.picking_id, **kw
+                    ),
                     "package_dest": self.package(
-                        record.result_package_id, record.picking_id,
+                        record.result_package_id, record.picking_id, **kw
                     ),
                 }
             )
         return data
 
     def move_lines(self, records, **kw):
-        return [self.move_line(rec) for rec in records]
+        return [self.move_line(rec, **kw) for rec in records]
 
     @property
     def _move_line_parser(self):
@@ -145,14 +155,14 @@ class DataAction(Component):
     def _product_parser(self):
         return ["id", "name", "display_name", "default_code", "barcode"]
 
-    def picking_batch(self, record, with_pickings=True, **kw):
+    def picking_batch(self, record, with_pickings=False, **kw):
         parser = self._picking_batch_parser
         if with_pickings:
             parser.append(("picking_ids:pickings", self._picking_parser))
         return self._jsonify(record, parser, **kw)
 
-    def picking_batches(self, record, **kw):
-        return self.picking_batch(record, multi=True)
+    def picking_batches(self, record, with_pickings=False, **kw):
+        return self.picking_batch(record, with_pickings=with_pickings, multi=True)
 
     @property
     def _picking_batch_parser(self):

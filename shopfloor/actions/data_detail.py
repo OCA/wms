@@ -53,7 +53,7 @@ class DataDetailAction(Component):
 
     def package_detail(self, record, picking=None, **kw):
         # Define a new method to not overload the base one which is used in many places
-        data = self.package(record, picking=picking, **kw)
+        data = self.package(record, picking=picking, with_packaging=True, **kw)
         data.update(self._jsonify(record, self._package_detail_parser, **kw))
         return data
 

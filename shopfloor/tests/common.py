@@ -67,6 +67,10 @@ class CommonCase(SavepointCase, ComponentMixin):
         cls.setUpComponent()
         cls.setUpClassVars()
         cls.setUpClassBaseData()
+        with cls.work_on_actions(cls) as work:
+            cls.data = work.component(usage="data")
+        with cls.work_on_actions(cls) as work:
+            cls.data_detail = work.component(usage="data_detail")
 
     @classmethod
     def setUpClassVars(cls):
