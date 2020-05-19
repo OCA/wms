@@ -1153,7 +1153,11 @@ class ClusterPicking(Component):
 
         next_line = self._next_line_for_pick(batch)
         if next_line:
-            return self._response_for_start_line(next_line, popup=completion_info_popup)
+            return self._response_for_start_line(
+                next_line,
+                message=self.msg_store.batch_transfer_line_done(),
+                popup=completion_info_popup,
+            )
         else:
             # TODO add tests for this (for instance a picking is not 'done'
             # because a move was unassigned, we want to validate the batch to
