@@ -14,11 +14,6 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: stock_storage_type
-#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__allowed_location_ids
-msgid "Allowed Location"
-msgstr ""
-
-#. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__allowed_stock_location_storage_type_ids
 msgid "Allowed Stock Location Storage Type"
 msgstr ""
