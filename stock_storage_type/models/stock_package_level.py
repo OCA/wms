@@ -48,7 +48,9 @@ class StockPackageLevel(models.Model):
                 intersect_locations |= pack_level.location_dest_id
                 pack_level.allowed_location_dest_ids = intersect_locations.ids
             elif isinstance(pack_level.id, models.NewId):
-                pack_level.allowed_location_dest_ids = pack_level.picking_id.location_dest_id.ids
+                pack_level.allowed_location_dest_ids = (
+                    pack_level.picking_id.location_dest_id.ids
+                )
             else:
                 pack_level.allowed_location_dest_ids = (
                     picking_child_location_dest_ids.ids
@@ -66,7 +68,7 @@ class StockPackageLevel(models.Model):
             ]
         )
         all_allowed_locations = set()
-        products = self.mapped('move_line_ids.product_id')
+        products = self.mapped("move_line_ids.product_id")
         for pack_loc in package_locations:
             pref_loc = pack_loc.location_id
             storage_locations = pref_loc.get_storage_locations(products=products)
