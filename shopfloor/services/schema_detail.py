@@ -12,30 +12,6 @@ class ShopfloorSchemaDetailResponse(Component):
     _name = "base.shopfloor.schemas.detail"
     _usage = "schema_detail"
 
-    def _schema_list_of(self, schema, **kw):
-        return {
-            "type": "list",
-            "nullable": True,
-            "required": False,
-            "schema": {"type": "dict", "schema": schema},
-        }
-
-    def _simple_record(self):
-        return {
-            "id": {"required": True, "type": "integer"},
-            "name": {"type": "string", "nullable": False, "required": True},
-        }
-
-    def _schema_dict_of(self, schema, **kw):
-        schema = {
-            "type": "dict",
-            "nullable": True,
-            "required": False,
-            "schema": schema,
-        }
-        schema.update(kw)
-        return schema
-
     def location_detail(self):
         schema = self.location()
         schema.update(
@@ -68,7 +44,7 @@ class ShopfloorSchemaDetailResponse(Component):
         return schema
 
     def package_detail(self):
-        schema = self.package()
+        schema = self.package(with_packaging=True)
         schema.update(
             {
                 "pickings": self._schema_list_of(self.picking()),
