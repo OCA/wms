@@ -29,35 +29,35 @@ class ScanAnythingCase(ActionsDataDetailCaseBase):
         record.barcode = "PROD-B"
         rec_type = "product"
         identifier = record.barcode
-        data = self.data.product_detail(record)
+        data = self.data_detail.product_detail(record)
         self._test_response_ok(rec_type, data, identifier)
 
     def test_scan_location(self):
         record = self.stock_location
         rec_type = "location"
         identifier = record.barcode
-        data = self.data.location_detail(record)
+        data = self.data_detail.location_detail(record)
         self._test_response_ok(rec_type, data, identifier)
 
     def test_scan_package(self):
         record = self.package
         rec_type = "package"
         identifier = record.name
-        data = self.data.package_detail(record)
+        data = self.data_detail.package_detail(record)
         self._test_response_ok(rec_type, data, identifier)
 
     def test_scan_lot(self):
         record = self.lot
         rec_type = "lot"
         identifier = record.name
-        data = self.data.lot_detail(record)
+        data = self.data_detail.lot_detail(record)
         self._test_response_ok(rec_type, data, identifier)
 
     def test_scan_transfer(self):
         record = self.picking
         rec_type = "transfer"
         identifier = record.name
-        data = self.data.picking_detail(record)
+        data = self.data_detail.picking_detail(record)
         self._test_response_ok(rec_type, data, identifier)
 
     def test_scan_error(self):
