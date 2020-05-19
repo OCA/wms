@@ -14,12 +14,46 @@ class BaseShopfloorSchemaResponse(Component):
     _usage = "schema"
     _is_rest_service_component = False
 
+    def _schema_list_of(self, schema, **kw):
+        return {
+            "type": "list",
+            "nullable": True,
+            "required": False,
+            "schema": {"type": "dict", "schema": schema},
+        }
+
+    def _simple_record(self):
+        return {
+            "id": {"required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+        }
+
+    def _schema_dict_of(self, schema, **kw):
+        schema = {
+            "type": "dict",
+            "nullable": True,
+            "required": False,
+            "schema": schema,
+        }
+        schema.update(kw)
+        return schema
+
+    def _schema_search_results_of(self, schema, **kw):
+        return {
+            "size": {"required": True, "type": "integer"},
+            "records": {
+                "type": "list",
+                "required": True,
+                "schema": {"type": "dict", "schema": schema},
+            },
+        }
+
     def picking(self):
         return {
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
-            "origin": {"type": "string", "nullable": True, "required": True},
-            "note": {"type": "string", "nullable": True, "required": True},
+            "origin": {"type": "string", "nullable": True, "required": False},
+            "note": {"type": "string", "nullable": True, "required": False},
             "move_line_count": {"type": "integer", "nullable": True, "required": True},
             "weight": {"required": True, "nullable": True, "type": "float"},
             "partner": {
@@ -53,7 +87,7 @@ class BaseShopfloorSchemaResponse(Component):
             },
             "package_dest": {
                 "type": "dict",
-                "required": True,
+                "required": False,
                 "nullable": True,
                 "schema": self.package(),
             },
@@ -78,19 +112,21 @@ class BaseShopfloorSchemaResponse(Component):
             "barcode": {"type": "string", "nullable": True, "required": False},
         }
 
-    def package(self):
-        return {
+    def package(self, with_packaging=False):
+        schema = {
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
             "weight": {"required": True, "nullable": True, "type": "float"},
             "move_line_count": {"required": False, "nullable": True, "type": "integer"},
-            "packaging": {
+        }
+        if with_packaging:
+            schema["packaging"] = {
                 "type": "dict",
                 "required": True,
                 "nullable": True,
                 "schema": self.packaging(),
-            },
-        }
+            }
+        return schema
 
     def lot(self):
         return {
