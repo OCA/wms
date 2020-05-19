@@ -71,13 +71,18 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             move.move_line_ids.location_dest_id, self.pallets_bin_1_location
         )
 
-    def test_do_not_mix_products_confirmed_move(self):
+    def test_do_not_mix_products_confirmed_move_ok(self):
         self.pallets_location_storage_type.write(
             {"only_empty": False, "do_not_mix_products": True}
         )
         move = self._test_confirmed_move()
         self.assertEqual(
             move.move_line_ids.location_dest_id, self.pallets_bin_1_location
+        )
+
+    def test_do_not_mix_products_confirmed_move_nok(self):
+        self.pallets_location_storage_type.write(
+            {"only_empty": False, "do_not_mix_products": True}
         )
         move_other_product = self._test_confirmed_move(
             self.env.ref("product.product_product_10")
@@ -317,32 +322,42 @@ class TestStorageTypeMove(TestStorageTypeCommon):
                 | pack_level.location_dest_id
             )
 
-        for pack_level in int_picking.package_level_ids:
-            if pack_level.package_id == first_package:
-                # Pallet into pallets bin
-                self.assertEqual(
-                    pack_level.location_dest_id, self.pallets_bin_1_location
-                )
-            elif pack_level.package_id == second_pack:
-                # Cardbox into cardbox bin
-                self.assertEqual(
-                    pack_level.location_dest_id, self.cardboxes_bin_1_location
-                )
-            elif pack_level.package_id == third_pack:
-                # Cardbox with different product go into different cardbox location
-                self.assertEqual(
-                    pack_level.location_dest_id, self.cardboxes_bin_2_location
-                )
-            elif pack_level.package_id in (fourth_pack | fifth_pack):
-                # Cardbox with same product but different lot go into different
-                # cardbox location
-                # Cardbox with same product same lot go into same location
-                self.assertEqual(
-                    pack_level.location_dest_id, self.cardboxes_bin_3_location
-                )
-            else:
-                # We shouldn't get there
-                raise
+        def _levels_for(packages):
+            return self.env["stock.package_level"].search(
+                [
+                    ("package_id", "in", packages.ids),
+                    ("picking_id", "=", int_picking.id),
+                ]
+            )
+
+        first_level = _levels_for(first_package)
+        self.assertEqual(len(first_level), 1)
+        # Pallet into pallets bin
+        self.assertEqual(first_level.location_dest_id, self.pallets_bin_1_location)
+
+        second_level = _levels_for(second_pack)
+        # Cardbox into cardbox bin
+        self.assertEqual(len(second_level), 1)
+        self.assertEqual(second_level.location_dest_id, self.cardboxes_bin_1_location)
+
+        third_level = _levels_for(third_pack)
+
+        # Cardbox with different product go into different cardbox location
+        self.assertEqual(len(third_level), 1)
+        self.assertEqual(third_level.location_dest_id, self.cardboxes_bin_2_location)
+
+        fourth_fifth_levels = _levels_for(fourth_pack | fifth_pack)
+        # Cardbox with same product but different lot go into different
+        # cardbox location
+        # Cardbox with same product same lot go into same location
+        self.assertEqual(len(fourth_fifth_levels), 2)
+        self.assertEqual(
+            fourth_fifth_levels.location_dest_id, self.cardboxes_bin_3_location
+        )
+
+        for pack_level in (
+            first_level | second_level | third_level | fourth_fifth_levels
+        ):
             # Check domain
             self.assertEqual(
                 pack_level.allowed_location_dest_ids,
@@ -352,12 +367,6 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             for move_line in pack_level.move_line_ids:
                 move_line.qty_done = move_line.product_uom_qty
 
-        second_pack_level = int_picking.package_level_ids.filtered(
-            lambda pl: pl.package_id == second_pack
-        )
-        third_pack_level = int_picking.package_level_ids.filtered(
-            lambda pl: pl.package_id == third_pack
-        )
-        second_pack_level.location_dest_id = third_pack_level.location_dest_id
+        second_level.location_dest_id = third_level.location_dest_id
         with self.assertRaises(ValidationError):
             int_picking.button_validate()

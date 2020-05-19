@@ -1,9 +1,13 @@
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
+import logging
+
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 from odoo.addons.base_m2m_custom_field.fields import Many2manyCustom
+
+_logger = logging.getLogger(__name__)
 
 
 class StockLocationStorageType(models.Model):
@@ -17,13 +21,6 @@ class StockLocationStorageType(models.Model):
         "stock_location_stock_location_storage_type_rel",
         "stock_location_storage_type_id",
         "stock_location_id",
-    )
-    allowed_location_ids = fields.Many2many(
-        "stock.location",
-        "stock_location_allowed_stock_location_storage_type_rel",
-        "stock_location_storage_type_id",
-        "stock_location_id",
-        readonly=True,
     )
 
     package_storage_type_ids = Many2manyCustom(
@@ -53,11 +50,13 @@ class StockLocationStorageType(models.Model):
     )
     max_height = fields.Float(
         string="Max height (mm)",
+        default=0.0,
         help="If defined, moves to the destination location will only be "
         "allowed if the packaging height is lower than this maximum.",
     )
     max_weight = fields.Float(
         string="Max weight (kg)",
+        default=0.0,
         help="If defined, moves to the destination location will only be "
         "allowed if the packaging wight is lower than this maximum.",
     )
@@ -114,3 +113,41 @@ class StockLocationStorageType(models.Model):
                     slst.max_weight,
                 ]
             )
+
+    def _domain_location_storage_type(self, candidate_locations, quants, products):
+        """compute a domain which applies the constraint of the
+        stock.location.storage.type to select locations among candidate
+        locations.
+        """
+        self.ensure_one()
+        location_domain = [
+            ("id", "in", candidate_locations.ids),
+            ("allowed_location_storage_type_ids", "=", self.id),
+        ]
+        # TODO this method and domain is applied once per storage type. If it's
+        # too slow at some point, we could group the storage types by similar
+        # configuration (only_empty, do_not_mix_products, do_not_mix_lots) and
+        # do a single query per set of options
+        if self.only_empty:
+            location_domain.append(("location_is_empty", "=", True))
+        if self.do_not_mix_products:
+            location_domain += [
+                "|",
+                # Ideally, we would like a domain which is a strict comparison:
+                # if we do not mix products, we should be able to filter on ==
+                # product.id. Here, if we can create a move for product B and
+                # set it's destination in a location already used by product A,
+                # then all the new moves for product B will be allowed in the
+                # location.
+                ("location_will_contain_product_ids", "in", products.ids),
+                ("location_will_contain_product_ids", "=", False),
+            ]
+            if self.do_not_mix_lots:
+                lots = quants.mapped("lot_id")
+                location_domain += [
+                    "|",
+                    # same comment as for the products
+                    ("location_will_contain_lot_ids", "in", lots.ids),
+                    ("location_will_contain_lot_ids", "=", False),
+                ]
+        return location_domain
