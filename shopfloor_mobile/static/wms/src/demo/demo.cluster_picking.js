@@ -1,22 +1,12 @@
 import {demotools} from "./demo.core.js";
 
-/*
-TODO: fix data as per `shopfloor.data.action`
-In demo.core.js I've adjusted generated data to match checkout's format
-that comes from data.move_line().
-*/
-
-var DEMO_CLUSTER_PICKING_1 = {
+const DEMO_CLUSTER_PICKING_1 = {
     find_batch: {
         next_state: "confirm_start",
         data: {
             confirm_start: demotools.makeBatch({
                 pickings: [demotools.makePicking(), demotools.makePicking()],
             }),
-        },
-        popup: {
-            body:
-                "Last operation of transfer XYZ. Next operation ABC is ready to proceed.",
         },
     },
     list_batch: {
@@ -100,6 +90,16 @@ var DEMO_CLUSTER_PICKING_1 = {
         },
     },
     stock_issue: {
+        /*
+        # when we still have lines to process
+        "start_line",
+        # when all lines have been processed and have same
+        # destination
+        "unload_all",
+        # when all lines have been processed and have different
+        # destinations
+        "unload_single",
+        */
         next_state: "start_line",
         message: {
             message_type: "success",
@@ -110,11 +110,21 @@ var DEMO_CLUSTER_PICKING_1 = {
             start_line: demotools.makeBatchPickingLine(),
         },
     },
-    check_pack_lot: {},
+    change_pack_lot: {
+        // "change_pack_lot", "scan_destination"
+        next_state: "scan_destination",
+        data: {
+            scan_destination: _.extend({}, demotools.makeBatchPickingLine(), {
+                package_dest: demotools.makePack(),
+            }),
+        },
+    },
     prepare_unload: {
         next_state: "unload_all",
         data: {
-            unload_all: {},
+            unload_all: _.extend({}, demotools.makeBatch(), {
+                location_dest: demotools.makeLocation(),
+            }),
         },
     },
     set_destination_all: {
