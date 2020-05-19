@@ -368,19 +368,23 @@ class ClusterPicking(Component):
     def _response_batch_does_not_exist(self):
         return self._response_for_start(message=self.msg_store.record_not_found())
 
-    def _data_move_line(self, line):
+    def _data_move_line(self, line, **kw):
         picking = line.picking_id
         batch = picking.batch_id
         product = line.product_id
         data = self.data_struct.move_line(line)
         # additional values
-        data.pop("package_dest", None)
+        # Ensure destination pack is never proposed on the frontend.
+        # This should happen only as proposal on `scan_destination`
+        # where we set the last used package.
+        data["package_dest"] = None
         data["batch"] = self.data_struct.picking_batch(batch)
         data["picking"] = self.data_struct.picking(picking)
         data["postponed"] = line.shopfloor_postponed
         data["product"]["qty_available"] = product.with_context(
             location=line.location_id.id
         ).qty_available
+        data.update(kw)
         return data
 
     def unassign(self, picking_batch_id):
@@ -686,7 +690,6 @@ class ClusterPicking(Component):
         line = fields.first(
             package.planned_move_line_ids.filtered(self._filter_for_unload)
         )
-        # TODO disambiguate "id" everywhere? (id -> picking_batch_id)
         data = self.data_struct.picking_batch(batch)
         data.update(
             {
@@ -1541,221 +1544,40 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             }
         )
 
-    # TODO single class for sharing schemas between services
     @property
     def _schema_for_batch_details(self):
-        return {
-            # TODO full name instead of id? or always wrap in batch/move_line?
-            # id is a stock.picking.batch
-            "id": {"required": True, "type": "integer"},
-            "name": {"type": "string", "nullable": False, "required": True},
-            "pickings": {
-                "type": "list",
-                "required": True,
-                "schema": {
-                    "type": "dict",
-                    "schema": {
-                        "id": {"required": True, "type": "integer"},
-                        "name": {"type": "string", "nullable": False, "required": True},
-                        "move_line_count": {"required": True, "type": "integer"},
-                        "weight": {
-                            "type": "float",
-                            "nullable": False,
-                            "required": True,
-                        },
-                        "origin": {
-                            "type": "string",
-                            "nullable": False,
-                            "required": True,
-                        },
-                        "partner": {
-                            "type": "dict",
-                            "required": False,
-                            "nullable": True,
-                            "schema": {
-                                "id": {"required": True, "type": "integer"},
-                                "name": {
-                                    "type": "string",
-                                    "nullable": False,
-                                    "required": True,
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        }
+        schema = self.schemas.picking_batch()
+        schema["pickings"] = self.schemas._schema_list_of(self.schemas.picking())
+        return schema
 
     @property
     def _schema_for_single_line_details(self):
-        return {
-            # id is a stock.move.line
-            "id": {"required": True, "type": "integer"},
-            "quantity": {"type": "float", "required": True},
-            "postponed": {"type": "boolean", "required": False},
-            "picking": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                    "origin": {"type": "string", "nullable": True, "required": True},
-                    "note": {"type": "string", "nullable": True, "required": True},
-                    "partner": {
-                        "type": "dict",
-                        "required": False,
-                        "nullable": True,
-                        "schema": {
-                            "id": {"required": True, "type": "integer"},
-                            "name": {
-                                "type": "string",
-                                "nullable": False,
-                                "required": True,
-                            },
-                        },
-                    },
-                },
-            },
-            "batch": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
-            "product": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                    "display_name": {
-                        "type": "string",
-                        "nullable": False,
-                        "required": True,
-                    },
-                    "default_code": {
-                        "type": "string",
-                        "nullable": False,
-                        "required": True,
-                    },
-                    "qty_available": {
-                        "type": "float",
-                        "nullable": False,
-                        "required": True,
-                    },
-                },
-            },
-            "lot": {
-                "type": "dict",
-                "required": False,
-                "nullable": True,
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                    "ref": {"type": "string", "nullable": True, "required": True},
-                },
-            },
-            # TODO share parts of the schema?
-            "location_src": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
-            "location_dest": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
-            "package_src": {
-                "type": "dict",
-                "required": False,
-                "nullable": True,
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
-            "package_dest": {
-                "type": "dict",
-                "required": False,
-                "nullable": True,
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
-        }
+        schema = self.schemas.move_line()
+        schema["picking"] = self.schemas._schema_dict_of(self.schemas.picking())
+        schema["batch"] = self.schemas._schema_dict_of(self.schemas.picking_batch())
+        return schema
 
     @property
     def _schema_for_unload_all(self):
-        return {
-            # stock.batch.picking
-            "id": {"required": True, "type": "integer"},
-            "name": {"type": "string", "nullable": False, "required": True},
-            "location_dest": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
-        }
+        schema = self.schemas.picking_batch()
+        schema["location_dest"] = self.schemas._schema_dict_of(self.schemas.location())
+        return schema
 
     @property
     def _schema_for_unload_single(self):
-        return {
-            # stock.batch.picking
-            "id": {"required": True, "type": "integer"},
-            "name": {"type": "string", "nullable": False, "required": True},
-            "package": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
-            "location_dest": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
-        }
+        schema = self.schemas.picking_batch()
+        schema["package"] = self.schemas._schema_dict_of(self.schemas.package())
+        schema["location_dest"] = self.schemas._schema_dict_of(self.schemas.location())
+        return schema
 
     @property
     def _schema_for_zero_check(self):
-        return {
-            # stock.move.line
+        schema = {
             "id": {"required": True, "type": "integer"},
-            "location_src": {
-                "type": "dict",
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
         }
-
-    @property
-    def _schema_for_completion_info(self):
-        return {
-            # stock.picking.batch
-            "id": {"required": True, "type": "integer"},
-            "picking_done": {"type": "string", "nullable": False, "required": True},
-            "picking_next": {"type": "string", "nullable": False, "required": True},
-        }
+        schema["location_src"] = self.schemas._schema_dict_of(self.schemas.location())
+        return schema
 
     @property
     def _schema_for_batch_selection(self):
-        return {
-            "size": {"required": True, "type": "integer"},
-            "records": {
-                "type": "list",
-                "required": True,
-                "schema": {"type": "dict", "schema": self.schemas().picking_batch()},
-            },
-        }
+        return self.schemas._schema_search_results_of(self.schemas.picking_batch())
