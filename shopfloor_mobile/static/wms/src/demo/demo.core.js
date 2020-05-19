@@ -98,7 +98,7 @@ export class DemoTools {
     randomSetFromArray(an_array, count, cloned = true) {
         // using clone ensures we don't reference the same object every time
         // which can break storage w/ cyclic refs.
-        const recs = _.sampleSize(this.packagings, this.getRandomInt(count));
+        const recs = _.sampleSize(an_array, this.getRandomInt(count));
         return cloned ? _.cloneDeep(recs) : recs;
     }
 

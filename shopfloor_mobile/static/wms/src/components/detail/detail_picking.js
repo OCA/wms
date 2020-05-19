@@ -19,8 +19,18 @@ export var PickingDetailMixin = {
             });
         },
     },
+    computed: {
+        opts() {
+            const opts = _.defaults({}, this.$props.options, {
+                on_title_action: this.$props.options.clickable
+                    ? this.on_title_action
+                    : null,
+            });
+            return opts;
+        },
+    },
     template: `
-  <item-detail-card :record="picking" v-bind="$props" :options="{on_title_action: clickable ? on_title_action : null}">
+  <item-detail-card :record="picking" :options="opts">
     <template v-slot:subtitle>
       <span class="origin" v-if="picking.origin">
           <span>{{ picking.origin }}</span>
