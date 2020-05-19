@@ -66,6 +66,7 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
         """
         return {}
 
+    @property
     def schemas(self):
         return self.component(usage="schema")
 

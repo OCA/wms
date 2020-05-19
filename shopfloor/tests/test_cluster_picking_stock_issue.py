@@ -45,16 +45,8 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
             self.assert_response(
                 response,
                 next_state="unload_all",
-                data={
-                    "id": self.batch.id,
-                    "location_dest": {
-                        "id": self.packing_location.id,
-                        "name": self.packing_location.name,
-                    },
-                    "name": self.batch.name,
-                },
+                data=self._data_for_batch(self.batch, self.packing_location),
             )
-
         return response
 
     def assert_location_qty_and_reserved(
