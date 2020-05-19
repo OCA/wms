@@ -145,6 +145,7 @@ Vue.component("manual-select", {
             // works only if you don't pass the property at all.
             // If you pass only one key, you'll lose all defaults.
             const opts = _.defaults({}, this.$props.options, {
+                key_title: "name",
                 show_title: true,
                 showActions: true,
                 initSelectAll: false,
@@ -158,11 +159,14 @@ Vue.component("manual-select", {
             return opts;
         },
         list_item_options() {
-            return {
-                key_title: this.key_title,
+            const opts = _.defaults({}, this.opts.list_item_options, {
+                // TODO: we should not mix up propertes and rely on `list_item_options` inside `options`
+                show_title: this.opts.show_title,
+                key_title: this.opts.key_title,
                 showCounters: this.opts.showCounters,
-                fields: this.list_item_fields,
-            };
+                fields: this.$props.list_item_fields,
+            });
+            return opts;
         },
         selectable() {
             if (!this.grouped_records.length) {
