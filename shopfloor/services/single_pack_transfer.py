@@ -264,4 +264,4 @@ class SinglePackTransferValidatorResponse(Component):
 
     @property
     def _schema_for_package_level_details(self):
-        return self.schemas().package_level()
+        return self.schemas.package_level()
