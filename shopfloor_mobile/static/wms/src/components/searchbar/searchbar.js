@@ -37,6 +37,7 @@ Vue.component("searchbar", {
       v-on:submit="search"
       :data-type="input_data_type"
       ref="form"
+      class="searchform"
       >
     <v-text-field
       required v-model="entered"

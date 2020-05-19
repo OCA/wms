@@ -74,6 +74,7 @@ export var ItemDetailMixin = {
                 "detail",
                 this.$options._componentTag,
                 this.opts.loud ? "loud" : "",
+                this.opts.loud_labels ? "loud-labels" : "",
                 this.opts.klass || "",
             ].join(" ");
         },
