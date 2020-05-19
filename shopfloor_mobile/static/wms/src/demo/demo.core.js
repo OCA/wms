@@ -377,6 +377,7 @@ export class DemoTools {
         _.defaults(defaults, {
             weight: this.getRandomInt(1000) + " Kg",
             move_line_count: this.getRandomInt(20),
+            picking_count: this.getRandomInt(20),
         });
         _.defaults(options, {name_prefix: "BATCH", padding: 10});
         const batch = this.makeSimpleRecord(defaults, options);

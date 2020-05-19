@@ -74,7 +74,6 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 </div>
             </div>
 
-            <!-- TODO: do we need a component for this? -->
             <div class="unload-all" v-if="state_is('unload_all')">
                 <v-card outlined class="main">
                     <v-card-title>
