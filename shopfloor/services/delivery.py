@@ -202,12 +202,12 @@ class ShopfloorDeliveryValidatorResponse(Component):
 
     @property
     def _schema_deliver(self):
-        schema = self.schemas().picking()
+        schema = self.schemas.picking()
         schema.update(
             {
                 "move_lines": {
                     "type": "list",
-                    "schema": {"type": "dict", "schema": self.schemas().move_line()},
+                    "schema": {"type": "dict", "schema": self.schemas.move_line()},
                 }
             }
         )
@@ -218,7 +218,7 @@ class ShopfloorDeliveryValidatorResponse(Component):
         return {
             "pickings": {
                 "type": "list",
-                "schema": {"type": "dict", "schema": self.schemas().picking()},
+                "schema": {"type": "dict", "schema": self.schemas.picking()},
             }
         }
 

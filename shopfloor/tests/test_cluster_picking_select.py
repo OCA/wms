@@ -51,27 +51,9 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
 
         # we expect to find batch 3 as it's assigned to the current
         # user and in progress (first priority)
+        data = self.data.picking_batch(self.batch3, with_pickings=True)
         self.assert_response(
-            response,
-            next_state="confirm_start",
-            data={
-                "id": self.batch3.id,
-                "name": self.batch3.name,
-                "pickings": [
-                    {
-                        "id": self.batch3.picking_ids.id,
-                        "name": self.batch3.picking_ids.name,
-                        "move_line_count": len(self.batch3.picking_ids.move_line_ids),
-                        "origin": self.batch3.picking_ids.origin,
-                        # quantity of products (3) * weight of product (2)
-                        "weight": 6.0,
-                        "partner": {
-                            "id": self.batch3.picking_ids.partner_id.id,
-                            "name": self.batch3.picking_ids.partner_id.name,
-                        },
-                    }
-                ],
-            },
+            response, next_state="confirm_start", data=data,
         )
 
     def test_find_batch_assigned(self):
@@ -89,26 +71,9 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         self.assertEqual(self.batch2.state, "in_progress")
 
         # we expect to find batch 2 as it's assigned to the current user
+        data = self.data.picking_batch(self.batch2, with_pickings=True)
         self.assert_response(
-            response,
-            next_state="confirm_start",
-            data={
-                "id": self.batch2.id,
-                "name": self.batch2.name,
-                "pickings": [
-                    {
-                        "id": self.batch2.picking_ids.id,
-                        "name": self.batch2.picking_ids.name,
-                        "move_line_count": len(self.batch2.picking_ids.move_line_ids),
-                        "origin": self.batch2.picking_ids.origin,
-                        "weight": 6.0,
-                        "partner": {
-                            "id": self.batch2.picking_ids.partner_id.id,
-                            "name": self.batch2.picking_ids.partner_id.name,
-                        },
-                    }
-                ],
-            },
+            response, next_state="confirm_start", data=data,
         )
 
     def test_find_batch_unassigned_draft(self):
@@ -125,26 +90,9 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
 
         # we expect to find batch 2 as it's the first one with all pickings
         # available
+        data = self.data.picking_batch(self.batch2, with_pickings=True)
         self.assert_response(
-            response,
-            next_state="confirm_start",
-            data={
-                "id": self.batch2.id,
-                "name": self.batch2.name,
-                "pickings": [
-                    {
-                        "id": self.batch2.picking_ids.id,
-                        "name": self.batch2.picking_ids.name,
-                        "move_line_count": len(self.batch2.picking_ids.move_line_ids),
-                        "origin": self.batch2.picking_ids.origin,
-                        "weight": 6.0,
-                        "partner": {
-                            "id": self.batch2.picking_ids.partner_id.id,
-                            "name": self.batch2.picking_ids.partner_id.name,
-                        },
-                    }
-                ],
-            },
+            response, next_state="confirm_start", data=data,
         )
 
     def test_find_batch_not_found(self):
@@ -152,7 +100,6 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         # No batch match the rules to work on them, because
         # their pickings are not available
         response = self.service.dispatch("find_batch")
-
         self.assert_response(
             response,
             next_state="start",
@@ -185,25 +132,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
             next_state="manual_selection",
             data={
                 "size": 2,
-                "records": [
-                    {
-                        "id": self.batch1.id,
-                        "name": self.batch1.name,
-                        "picking_count": 1,
-                        "move_line_count": 1,
-                        "weight": 6.0,
-                    },
-                    # batch 2 is excluded because assigned to someone else
-                    {
-                        "id": self.batch3.id,
-                        "name": self.batch3.name,
-                        "picking_count": 1,
-                        "move_line_count": 1,
-                        "weight": 6.0,
-                    },
-                    # batch 4 is excluded because not all of its pickings are
-                    # assigned
-                ],
+                "records": self.data.picking_batches(self.batch1 + self.batch3),
             },
         )
 
@@ -215,16 +144,11 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         response = self.service.dispatch(
             "select", params={"picking_batch_id": self.batch1.id}
         )
+        data = self.data.picking_batch(self.batch1)
+        # we don't care in these tests, 'find_batch' tests them already
+        data["pickings"] = self.ANY
         self.assert_response(
-            response,
-            next_state="confirm_start",
-            data={
-                "id": self.batch1.id,
-                "name": self.batch1.name,
-                # we don't care in these tests, the 'find_batch' tests already
-                # check this
-                "pickings": self.ANY,
-            },
+            response, next_state="confirm_start", data=data,
         )
 
     def test_select_draft_assigned(self):
@@ -238,16 +162,11 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         # The endpoint starts the batch and assign it to self
         self.assertEqual(self.batch1.user_id, self.env.user)
         self.assertEqual(self.batch1.state, "in_progress")
+        data = self.data.picking_batch(self.batch1)
+        # we don't care in these tests, 'find_batch' tests them already
+        data["pickings"] = self.ANY
         self.assert_response(
-            response,
-            next_state="confirm_start",
-            data={
-                "id": self.batch1.id,
-                "name": self.batch1.name,
-                # we don't care in these tests, the 'find_batch' tests already
-                # check this
-                "pickings": self.ANY,
-            },
+            response, next_state="confirm_start", data=data,
         )
 
     def test_select_draft_unassigned(self):
@@ -260,16 +179,11 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         # The endpoint starts the batch and assign it to self
         self.assertEqual(self.batch1.user_id, self.env.user)
         self.assertEqual(self.batch1.state, "in_progress")
+        data = self.data.picking_batch(self.batch1)
+        # we don't care in these tests, 'find_batch' tests them already
+        data["pickings"] = self.ANY
         self.assert_response(
-            response,
-            next_state="confirm_start",
-            data={
-                "id": self.batch1.id,
-                "name": self.batch1.name,
-                # we don't care in these tests, the 'find_batch' tests already
-                # check this
-                "pickings": self.ANY,
-            },
+            response, next_state="confirm_start", data=data,
         )
 
     def test_select_not_exists(self):
@@ -363,39 +277,12 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         response = self.service.dispatch(
             "confirm_start", params={"picking_batch_id": self.batch.id}
         )
+        data = self.data.move_line(first_move_line)
+        data["package_dest"] = None
+        data["picking"] = self.data.picking(picking)
+        data["batch"] = self.data.picking_batch(batch)
         self.assert_response(
-            response,
-            data={
-                "id": first_move_line.id,
-                "quantity": 1.0,
-                "postponed": False,
-                "location_dest": {
-                    "id": first_move_line.location_dest_id.id,
-                    "name": first_move_line.location_dest_id.name,
-                },
-                "location_src": {
-                    "id": first_move_line.location_id.id,
-                    "name": first_move_line.location_id.name,
-                },
-                "picking": {
-                    "id": picking.id,
-                    "name": picking.name,
-                    "note": None,
-                    "origin": picking.origin,
-                    "partner": {"id": self.customer.id, "name": self.customer.name},
-                },
-                "batch": {"id": batch.id, "name": batch.name},
-                "product": {
-                    "default_code": first_move_line.product_id.default_code,
-                    "display_name": first_move_line.product_id.display_name,
-                    "id": first_move_line.product_id.id,
-                    "name": first_move_line.product_id.name,
-                    "qty_available": first_move_line.product_id.qty_available,
-                },
-                "lot": None,
-                "package_src": {"id": package.id, "name": package.name},
-            },
-            next_state="start_line",
+            response, data=data, next_state="start_line",
         )
 
     def test_confirm_start_not_exists(self):
@@ -433,3 +320,5 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
             next_state="start",
             message={"body": "Batch Transfer complete", "message_type": "success"},
         )
+
+    # TODO: add a test for lines sorting

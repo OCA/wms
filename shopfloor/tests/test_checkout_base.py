@@ -21,13 +21,13 @@ class CheckoutCommonCase(CommonCase):
 
     # we test the methods that structure data in test_actions_data.py
     def _picking_summary_data(self, picking):
-        return self.service.actions_for("data").picking(picking)
+        return self.data.picking(picking)
 
     def _move_line_data(self, move_line):
-        return self.service.actions_for("data").move_line(move_line)
+        return self.data.move_line(move_line)
 
     def _package_data(self, package, picking):
-        return self.service.actions_for("data").package(package, picking=picking)
+        return self.data.package(package, picking=picking, with_packaging=True)
 
     def _packaging_data(self, packaging):
-        return self.service.actions_for("data").packaging(packaging)
+        return self.data.packaging(packaging)

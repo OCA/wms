@@ -343,18 +343,12 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         self.assertRecordValues(
             line, [{"qty_done": qty_done, "result_package_id": self.bin2.id}]
         )
+        data = self._data_for_batch(self.batch, self.packing_location)
         self.assert_response(
             response,
             # they reach the same destination so next state unload_all
             next_state="unload_all",
-            data={
-                "id": self.batch.id,
-                "name": self.batch.name,
-                "location_dest": {
-                    "id": self.packing_location.id,
-                    "name": self.packing_location.name,
-                },
-            },
+            data=data,
         )
 
     def test_scan_destination_pack_not_empty_same_picking(self):
@@ -510,13 +504,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="zero_check",
-            data={
-                "id": line.id,
-                "location_src": {
-                    "id": line.location_id.id,
-                    "name": line.location_id.name,
-                },
-            },
+            data={"id": line.id, "location_src": self.data.location(line.location_id)},
         )
 
 

@@ -152,11 +152,15 @@ class Checkout(Component):
     def _response_for_select_document(self, message=None):
         return self._response(next_state="select_document", message=message)
 
+    def _data_for_move_lines(self, lines):
+        data_struct = self.actions_for("data")
+        return data_struct.move_lines(lines)
+
     def _data_for_stock_picking(self, picking, done=False):
         data_struct = self.actions_for("data")
         data = data_struct.picking(picking)
         line_picker = self._lines_checkout_done if done else self._lines_to_pack
-        data.update({"move_lines": data_struct.move_lines(line_picker(picking))})
+        data.update({"move_lines": self._data_for_move_lines(line_picker(picking))})
         return data
 
     def _lines_checkout_done(self, picking):
@@ -221,7 +225,7 @@ class Checkout(Component):
         return self._response(
             next_state="select_package",
             data={
-                "selected_move_lines": data_struct.move_lines(lines.sorted()),
+                "selected_move_lines": self._data_for_move_lines(lines.sorted()),
                 "picking": data_struct.picking(picking),
             },
             message=message,
@@ -736,14 +740,16 @@ class Checkout(Component):
             )
         data_struct = self.actions_for("data")
         picking_data = data_struct.picking(picking)
-        packages_data = data_struct.packages(packages.sorted(), picking=picking)
+        packages_data = data_struct.packages(
+            packages.sorted(), picking=picking, with_packaging=True
+        )
         data_struct = self.actions_for("data")
         return self._response(
             next_state="select_dest_package",
             data={
                 "picking": picking_data,
                 "packages": packages_data,
-                "selected_move_lines": data_struct.move_lines(move_lines.sorted()),
+                "selected_move_lines": self._data_for_move_lines(move_lines.sorted()),
             },
             message=message,
         )
@@ -850,7 +856,9 @@ class Checkout(Component):
             next_state="change_packaging",
             data={
                 "picking": data_struct.picking(picking),
-                "package": data_struct.package(package, picking=picking),
+                "package": data_struct.package(
+                    package, picking=picking, with_packaging=True
+                ),
                 "packagings": data_struct.packagings(packaging_list.sorted()),
             },
         )
@@ -1164,12 +1172,12 @@ class ShopfloorCheckoutValidatorResponse(Component):
 
     @property
     def _schema_stock_picking_details(self):
-        schema = self.schemas().picking()
+        schema = self.schemas.picking()
         schema.update(
             {
                 "move_lines": {
                     "type": "list",
-                    "schema": {"type": "dict", "schema": self.schemas().move_line()},
+                    "schema": {"type": "dict", "schema": self.schemas.move_line()},
                 },
             }
         )
@@ -1186,7 +1194,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
         return {
             "pickings": {
                 "type": "list",
-                "schema": {"type": "dict", "schema": self.schemas().picking()},
+                "schema": {"type": "dict", "schema": self.schemas.picking()},
             }
         }
 
@@ -1195,23 +1203,29 @@ class ShopfloorCheckoutValidatorResponse(Component):
         return {
             "selected_move_lines": {
                 "type": "list",
-                "schema": {"type": "dict", "schema": self.schemas().move_line()},
+                "schema": {"type": "dict", "schema": self.schemas.move_line()},
             },
             "packages": {
                 "type": "list",
-                "schema": {"type": "dict", "schema": self.schemas().package()},
+                "schema": {
+                    "type": "dict",
+                    "schema": self.schemas.package(with_packaging=True),
+                },
             },
-            "picking": {"type": "dict", "schema": self.schemas().picking()},
+            "picking": {"type": "dict", "schema": self.schemas.picking()},
         }
 
     @property
     def _schema_select_packaging(self):
         return {
-            "picking": {"type": "dict", "schema": self.schemas().picking()},
-            "package": {"type": "dict", "schema": self.schemas().package()},
+            "picking": {"type": "dict", "schema": self.schemas.picking()},
+            "package": {
+                "type": "dict",
+                "schema": self.schemas.package(with_packaging=True),
+            },
             "packagings": {
                 "type": "list",
-                "schema": {"type": "dict", "schema": self.schemas().packaging()},
+                "schema": {"type": "dict", "schema": self.schemas.packaging()},
             },
         }
 
@@ -1220,9 +1234,9 @@ class ShopfloorCheckoutValidatorResponse(Component):
         return {
             "selected_move_lines": {
                 "type": "list",
-                "schema": {"type": "dict", "schema": self.schemas().move_line()},
+                "schema": {"type": "dict", "schema": self.schemas.move_line()},
             },
-            "picking": {"type": "dict", "schema": self.schemas().picking()},
+            "picking": {"type": "dict", "schema": self.schemas.picking()},
         }
 
     def scan_document(self):
