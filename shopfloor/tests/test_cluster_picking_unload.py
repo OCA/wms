@@ -206,6 +206,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="start_line",
             data=self._line_data(move_lines[2]),
+            message={"body": "Batch Transfer line done", "message_type": "success"},
         )
 
     def test_set_destination_all_but_different_dest(self):

@@ -224,3 +224,9 @@ class MessageAction(Component):
             "message_type": "success",
             "body": _("Batch Transfer complete"),
         }
+
+    def batch_transfer_line_done(self):
+        return {
+            "message_type": "success",
+            "body": _("Batch Transfer line done"),
+        }
