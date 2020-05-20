@@ -10,22 +10,20 @@
         <field name="arch" type="xml">
             <field name="qty_done" position="after">
                 <!-- handy for testing / debugging -->
+                <!-- TODO: make them readonly? -->
                 <field
                     name="shopfloor_checkout_done"
                     string="SF checkout done"
-                    readonly="1"
                     groups="base.group_no_one"
                 />
                 <field
                     name="shopfloor_unloaded"
                     string="SF unloaded"
-                    readonly="1"
                     groups="base.group_no_one"
                 />
                 <field
                     name="shopfloor_postponed"
                     string="SF postponed"
-                    readonly="1"
                     groups="base.group_no_one"
                 />
             </field>
