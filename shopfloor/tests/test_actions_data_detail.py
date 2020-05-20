@@ -27,11 +27,6 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
             "stock_storage_type.package_storage_type_pallets"
         )
 
-    def setUp(self):
-        super().setUp()
-        with self.work_on_services() as work:
-            self.schema = work.component(usage="schema_detail")
-
     def _expected_location_detail(self, record, **kw):
         return dict(
             **self._expected_location(record),
@@ -83,7 +78,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
     def test_data_location(self):
         location = self.stock_location
         data = self.data_detail.location_detail(location)
-        self.assert_schema(self.schema.location_detail(), data)
+        self.assert_schema(self.schema_detail.location_detail(), data)
         move_lines = self.env["stock.move.line"].search(
             [
                 ("location_id", "=", location.id),
@@ -97,7 +92,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
 
     def test_data_packaging(self):
         data = self.data_detail.packaging(self.packaging)
-        self.assert_schema(self.schema.packaging(), data)
+        self.assert_schema(self.schema_detail.packaging(), data)
         expected = {"id": self.packaging.id, "name": self.packaging.name}
         self.assertDictEqual(data, expected)
 
@@ -112,7 +107,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
             }
         )
         data = self.data_detail.lot_detail(lot)
-        self.assert_schema(self.schema.lot_detail(), data)
+        self.assert_schema(self.schema_detail.lot_detail(), data)
 
         expected = {
             "id": lot.id,
@@ -131,7 +126,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
         package.package_storage_type_id = self.storage_type_pallet
         # package.invalidate_cache()
         data = self.data_detail.package_detail(package, picking=self.picking)
-        self.assert_schema(self.schema.package_detail(), data)
+        self.assert_schema(self.schema_detail.package_detail(), data)
 
         lines = self.env["stock.move.line"].search(
             [("package_id", "=", package.id), ("state", "not in", ("done", "cancel"))]
@@ -165,7 +160,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
         )
         picking.move_lines.write({"date_expected": "2020-05-13"})
         data = self.data_detail.picking_detail(picking)
-        self.assert_schema(self.schema.picking_detail(), data)
+        self.assert_schema(self.schema_detail.picking_detail(), data)
         expected = {
             "id": picking.id,
             "move_line_count": 4,
@@ -193,7 +188,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
         )
         move_line.write({"qty_done": 3.0, "result_package_id": result_package.id})
         data = self.data_detail.move_line(move_line)
-        self.assert_schema(self.schema.move_line(), data)
+        self.assert_schema(self.schema_detail.move_line(), data)
         product = self.product_a.with_context(location=move_line.location_id.id)
         expected = {
             "id": move_line.id,
@@ -221,7 +216,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
     def test_data_move_line_lot(self):
         move_line = self.move_b.move_line_ids
         data = self.data_detail.move_line(move_line)
-        self.assert_schema(self.schema.move_line(), data)
+        self.assert_schema(self.schema_detail.move_line(), data)
         product = self.product_b.with_context(location=move_line.location_id.id)
         expected = {
             "id": move_line.id,
@@ -244,7 +239,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
         self.maxDiff = None
         move_line = self.move_c.move_line_ids
         data = self.data_detail.move_line(move_line)
-        self.assert_schema(self.schema.move_line(), data)
+        self.assert_schema(self.schema_detail.move_line(), data)
         product = self.product_c.with_context(location=move_line.location_id.id)
         expected = {
             "id": move_line.id,
@@ -276,7 +271,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
     def test_data_move_line_raw(self):
         move_line = self.move_d.move_line_ids
         data = self.data_detail.move_line(move_line)
-        self.assert_schema(self.schema.move_line(), data)
+        self.assert_schema(self.schema_detail.move_line(), data)
         product = self.product_d.with_context(location=move_line.location_id.id)
         expected = {
             "id": move_line.id,
@@ -320,6 +315,6 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
             }
         )
         data = self.data_detail.product_detail(product)
-        self.assert_schema(self.schema.product_detail(), data)
+        self.assert_schema(self.schema_detail.product_detail(), data)
         expected = self._expected_product_detail(product, full=True)
         self.assertDictEqual(data, expected)

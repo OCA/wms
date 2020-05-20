@@ -71,6 +71,10 @@ class CommonCase(SavepointCase, ComponentMixin):
             cls.data = work.component(usage="data")
         with cls.work_on_actions(cls) as work:
             cls.data_detail = work.component(usage="data_detail")
+        with cls.work_on_services(cls) as work:
+            cls.schema = work.component(usage="schema")
+        with cls.work_on_services(cls) as work:
+            cls.schema_detail = work.component(usage="schema_detail")
 
     @classmethod
     def setUpClassVars(cls):
@@ -263,3 +267,24 @@ class PickingBatchMixin:
         batch.picking_ids.action_confirm()
         batch.picking_ids.action_assign()
         return batch
+
+    @classmethod
+    def _simulate_batch_selected(
+        cls, batches, in_package=False, in_lot=False, fill_stock=True
+    ):
+        """Create a state as if a batch was selected by the user
+
+        * The picking batch is in progress
+        * It is assigned to the current user
+        * All the move lines are available
+
+        Note: currently, this method create a source package that contains
+        all the products of the batch. It is enough for the current tests.
+        """
+        pickings = batches.mapped("picking_ids")
+        if fill_stock:
+            cls._fill_stock_for_moves(
+                pickings.mapped("move_lines"), in_package=in_package, in_lot=in_lot
+            )
+        pickings.action_assign()
+        batches.write({"state": "in_progress", "user_id": cls.env.uid})
