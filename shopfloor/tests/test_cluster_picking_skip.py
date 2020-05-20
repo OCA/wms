@@ -34,34 +34,38 @@ class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
         return response
 
     def test_skip_line(self):
+        # put one picking in another location
+        self.batch.picking_ids[1].location_id = self.shelf1
+        self.batch.picking_ids[1].move_lines.location_id = self.shelf1
+        # select batch
         self._simulate_batch_selected(self.batch, in_package=True)
-        lines = self.batch.picking_ids.move_line_ids.sorted(
-            lambda line: (
-                line.location_id,
-                line.shopfloor_postponed,
-                line.move_id.sequence,
-                line.move_id.id,
-                line.id,
-            )
+
+        # enforce names to have reliable sorting
+        self.stock_location.name = "LOC2"
+        self.shelf1.name = "LOC1"
+        all_lines = self.batch.picking_ids.move_line_ids
+        loc1_lines = all_lines.filtered(lambda line: (line.location_id == self.shelf1))
+        loc2_lines = all_lines.filtered(
+            lambda line: (line.location_id == self.stock_location)
+        )
+        # no line postponed yet
+        self.assertEqual(
+            all_lines.mapped("shopfloor_postponed"), [False, False, False, False]
         )
 
-        self.assertFalse(lines[0].shopfloor_postponed)
-        self._skip_line(lines[0], lines[1])
-        self.assertTrue(lines[0].shopfloor_postponed)
-        # 2nd line, next is 3rd
-        self.assertFalse(lines[1].shopfloor_postponed)
-        self._skip_line(lines[1], lines[2])
-        self.assertTrue(lines[1].shopfloor_postponed)
+        # skip line from loc 1
+        self._skip_line(loc1_lines[0], loc1_lines[1])
+        self.assertTrue(loc1_lines[0].shopfloor_postponed)
+
+        # 2nd line, next is 1st from 2nd location
+        self.assertFalse(loc1_lines[1].shopfloor_postponed)
+        self._skip_line(loc1_lines[1], loc2_lines[0])
+        self.assertTrue(loc1_lines[1].shopfloor_postponed)
+
         # 3rd line, next is 4th
-        self.assertFalse(lines[2].shopfloor_postponed)
-        self._skip_line(lines[2], lines[3])
-        self.assertTrue(lines[2].shopfloor_postponed)
-        # 4th line, next is 1st
-        # the next line for the last one is the 1st,
-        # because you'll have to process it anyway
-        self.assertFalse(lines[3].shopfloor_postponed)
-        self._skip_line(lines[3], lines[0])
-        self.assertTrue(lines[3].shopfloor_postponed)
+        self.assertFalse(loc2_lines[0].shopfloor_postponed)
+        self._skip_line(loc2_lines[0], loc2_lines[1])
+        self.assertTrue(loc2_lines[0].shopfloor_postponed)
 
 
 # TODO tests for transitions to next line / no next lines, ...
