@@ -197,6 +197,10 @@ export var ScenarioBaseMixin = {
                 console.error(result);
                 alert("Something went wrong. Check log.");
             }
+            if (result.error) {
+                this.display_app_error(result.error);
+                return;
+            }
             const state_key =
                 result.next_state == "start"
                     ? this.initial_state_key
@@ -264,6 +268,12 @@ export var ScenarioBaseMixin = {
             this.messages.message = null;
             this.messages.message_type = null;
             this.messages.popup.body = null;
+        },
+        display_app_error: function(error) {
+            this.set_message({
+                body: error.description,
+                message_type: "error",
+            });
         },
         _state_bind_events: function() {
             if (this.state.events) {
