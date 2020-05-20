@@ -29,40 +29,38 @@ export class OdooMixin {
             params.body = JSON.stringify(data);
         }
         return fetch(this._get_url(endpoint), params).then(response => {
-            if (response.ok) {
-                return response.json();
+            if (!response.ok) {
+                let handler = self["_handle_" + response.status.toString()];
+                if (_.isUndefined(handler)) {
+                    handler = this._handle_error;
+                }
+                return response.json().then(json => {
+                    return {error: handler.call(this, response, json)};
+                });
             }
-
-            let handler = self["_handle_" + response.status.toString()];
-            if (_.isUndefined(handler)) {
-                handler = this._handle_error;
-            }
-            return handler.call(this, response);
+            return response.json();
         });
     }
-    _error_info(response) {
-        return {
+    _error_info(response, json) {
+        return _.extend({}, json, {
+            // strip html
+            description: $(json.description).text(),
+            // TODO: this might be superfluous as we get error data wrapper by rest api
             error: response.statusText,
             status: response.status,
             response: response,
-        };
+        });
     }
-    _handle_403(response) {
-        return this._error_info(response);
-    }
-    _handle_404(response) {
+    _handle_404(response, json) {
         console.log(
             "Endpoint not found, please check your odoo configuration. URL: ",
             response.url
         );
-        return this._error_info(response);
+        return this._error_info(response, json);
     }
-    _handle_500(response) {
-        return this._error_info(response);
-    }
-    _handle_error(response) {
+    _handle_error(response, json) {
         console.log(response.status, response.statusText, response.url);
-        return this._error_info(response);
+        return this._error_info(response, json);
     }
     _get_headers() {
         // /!\ IMPORTANT /!\ Always use headers w/out underscores.
