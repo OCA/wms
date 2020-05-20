@@ -323,8 +323,8 @@ class ClusterPicking(Component):
     @staticmethod
     def _sort_key_lines(line):
         return (
-            line.location_id,
             line.shopfloor_postponed,
+            line.location_id.name,
             line.move_id.sequence,
             line.move_id.id,
             line.id,
