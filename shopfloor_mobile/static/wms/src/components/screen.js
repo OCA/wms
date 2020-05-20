@@ -41,6 +41,14 @@ Vue.component("Screen", {
                 this.$slots.footer ? "with-footer" : "",
             ].join(" ");
         },
+        show_profile_not_ready() {
+            return (
+                !this.$root.demo_mode &&
+                !this.$root.has_profile &&
+                this.$route.name != "profile" &&
+                this.$route.name != "settings"
+            );
+        },
     },
     data: () => ({
         drawer: null,
@@ -116,7 +124,7 @@ Vue.component("Screen", {
                 <slot name="header"></slot>
             </div>
 
-            <div class="profile-not-ready" v-if="!this.$root.demo_mode && !this.$root.has_profile && this.$route.name!='profile'">
+            <div class="profile-not-ready" v-if="show_profile_not_ready">
                 <v-alert type="warning" tile>
                     <p>Profile not configured yet. Please select one.</p>
                 </v-alert>
