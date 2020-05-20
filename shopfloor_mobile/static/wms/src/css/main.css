@@ -94,6 +94,7 @@ ul.packaging span:first-child {
     line-height: 1.4em;
 }
 .detail.item-detail-card .field-detail.loud-label .label,
+.detail.item-detail-card.loud-labels .v-card__text.details .label,
 .detail.item-detail-card.loud .v-card__text.details .label {
     font-weight: bold;
 }
@@ -316,4 +317,13 @@ input.my-checkbox[type="checkbox"]:checked {
 }
 .with-progress-bar .v-list-item__content {
     padding-bottom: 5px;
+}
+
+.notifications > .v-alert:last-child {
+    margin-bottom: 0;
+}
+
+.searchform > .v-input:first-child {
+    margin-top: 0;
+    padding-top: 0;
 }

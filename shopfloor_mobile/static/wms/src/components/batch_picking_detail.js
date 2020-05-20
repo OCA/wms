@@ -22,7 +22,7 @@ Vue.component("batch-picking-detail", {
       <item-detail-card :record="info" :options="{main: true, fields: detail_fields()}">
 
         <template v-slot:title>
-          Operations: {{ info.pickings.length }}
+          Operations: {{ info.picking_count }}
         </template>
 
         <template v-slot:subtitle>

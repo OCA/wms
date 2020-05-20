@@ -74,7 +74,6 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 </div>
             </div>
 
-            <!-- TODO: do we need a component for this? -->
             <div class="unload-all" v-if="state_is('unload_all')">
                 <v-card outlined class="main">
                     <v-card-title>
@@ -208,11 +207,8 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                         this.state_to("stock_issue");
                     },
                     on_action_change_pack_or_lot: () => {
-                        this.wait_call(
-                            this.odoo.call("change_pack_lot", {
-                                move_line_id: this.state.data.id,
-                            })
-                        );
+                        this.state_set_data(this.state.data, "change_pack_lot");
+                        this.state_to("change_pack_lot");
                     },
                 },
                 scan_destination: {

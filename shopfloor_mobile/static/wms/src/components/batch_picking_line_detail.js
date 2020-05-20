@@ -20,32 +20,33 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
                 {path: "quantity", label: "Qty"},
             ];
         },
+        full_detail_fields() {
+            return [
+                {path: "product.default_code"},
+                {path: "product.name"},
+                {path: "picking.name"},
+                {path: "batch.name"},
+                {path: "picking.origin", label: "Origin"},
+                {path: "picking.partner.name", label: "Customer"},
+                {path: "product.qty_available", label: "Qty on hand"},
+                {path: "location_dest.name", label: "Destination"},
+            ];
+        },
     },
     template: `
 <div v-if="!_.isEmpty(line)" :class="'detail batch-picking-line-detail ' + (line.postponed ? 'line-postponed' : '')">
 
-  <item-detail-card :record="line" :options="{main: true, loud: true, no_title: true, fields: detail_fields()}" />
-
-  <!-- TODO: replace this w/ detail card too -->
-  <v-card outlined v-if="showFullInfo">
-    <v-card-title>{{ line.product.default_code }}</v-card-title>
-    <v-card-subtitle>{{ line.product.name }}</v-card-subtitle>
-
-    <v-card-title>{{ line.picking.name }}</v-card-title>
-    <v-card-subtitle>
-      <div class="batch"><span class="label">From batch:</span> {{ line.batch.name }}</div>
-    </v-card-subtitle>
-    <v-card-text>
-      <div class="ref" v-if="line.picking.origin">
-        <span>{{ line.picking.origin }}</span>
-      </div>
-      <div class="customer" v-if="line.picking.partner">
-        <span>{{ line.picking.partner.name }}</span>
-      </div>
-      <div class="qty-on-hand"><span class="label">On hand qty:</span> {{ line.product.qty_available }}</div>
-      <div class="destination"><span class="label">Destination:</span> {{ line.location_dest.name }}</div>
-    </v-card-text>
-  </v-card>
+  <item-detail-card
+    :key="'batch-picking-line-detail-1'"
+    :record="line"
+    :options="{main: true, loud: true, no_title: true, fields: detail_fields()}"
+    />
+  <item-detail-card
+    v-if="showFullInfo"
+    :key="'batch-picking-line-detail-2'"
+    :record="line"
+    :options="{no_title: true, loud_labels: true, fields: full_detail_fields()}"
+    />
 
 </div>
 `,
@@ -62,11 +63,13 @@ export var batch_picking_line_actions = Vue.component("batch-picking-line-action
   <div class="batch-picking-line-actions">
     <v-dialog v-model="dialog" fullscreen tile class="actions fullscreen text-center">
       <template v-slot:activator="{ on }">
-        <v-row class="actions bottom-actions">
-          <v-col>
-            <v-btn depressed color="primary" dark v-on="on">Action</v-btn>
-          </v-col>
-        </v-row>
+        <div class="button-list button-vertical-list full">
+          <v-row class="actions bottom-actions">
+            <v-col class="text-center" cols="12">
+              <v-btn depressed color="primary" dark v-on="on">Action</v-btn>
+            </v-col>
+          </v-row>
+        </div>
       </template>
       <v-card>
         <div class="button-list button-vertical-list full">
@@ -88,7 +91,7 @@ export var batch_picking_line_actions = Vue.component("batch-picking-line-action
           </v-row>
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <v-btn depressed x-large color="primary" @click="$emit('action', 'action_change_pack_or_lot')">Change lot or pack [TODO]</v-btn>
+              <v-btn depressed x-large color="primary" @click="$emit('action', 'action_change_pack_or_lot')">Change lot or pack</v-btn>
             </v-col>
           </v-row>
           <v-row align="center">

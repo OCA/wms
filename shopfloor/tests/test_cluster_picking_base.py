@@ -16,68 +16,22 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="cluster_picking")
 
-    @classmethod
-    def _simulate_batch_selected(
-        cls, batches, in_package=False, in_lot=False, fill_stock=True
-    ):
-        """Create a state as if a batch was selected by the user
-
-        * The picking batch is in progress
-        * It is assigned to the current user
-        * All the move lines are available
-
-        Note: currently, this method create a source package that contains
-        all the products of the batch. It is enough for the current tests.
-        """
-        pickings = batches.mapped("picking_ids")
-        if fill_stock:
-            cls._fill_stock_for_moves(
-                pickings.mapped("move_lines"), in_package=in_package, in_lot=in_lot
-            )
-        pickings.action_assign()
-        batches.write({"state": "in_progress", "user_id": cls.env.uid})
-
-    def _line_data(self, move_line, qty=None):
+    def _line_data(self, move_line, qty=None, package_dest=False):
         picking = move_line.picking_id
-        batch = picking.batch_id
         # A package exists on the move line, because the quant created
         # by ``_simulate_batch_selected`` has a package.
-        package = move_line.package_id
-        lot = move_line.lot_id
-        return {
-            "id": move_line.id,
-            "quantity": qty or move_line.product_uom_qty,
-            "postponed": move_line.shopfloor_postponed,
-            "location_dest": {
-                "id": move_line.location_dest_id.id,
-                "name": move_line.location_dest_id.name,
-            },
-            "location_src": {
-                "id": move_line.location_id.id,
-                "name": move_line.location_id.name,
-            },
-            "picking": {
-                "id": picking.id,
-                "name": picking.name,
-                "note": None,
-                "origin": picking.origin,
-                "partner": {"id": self.customer.id, "name": self.customer.name},
-            },
-            "batch": {"id": batch.id, "name": batch.name},
-            "product": {
-                "default_code": move_line.product_id.default_code,
-                "display_name": move_line.product_id.display_name,
-                "id": move_line.product_id.id,
-                "name": move_line.product_id.name,
-                "qty_available": move_line.product_id.qty_available,
-            },
-            "lot": {"id": lot.id, "name": lot.name, "ref": lot.ref or None}
-            if lot
-            else None,
-            "package_src": {"id": package.id, "name": package.name}
-            if package
-            else None,
-        }
+        data = self.data.move_line(move_line)
+        if not package_dest:
+            data["package_dest"] = None
+        if qty:
+            data["quantity"] = qty
+        data.update(
+            {
+                "batch": self.data.picking_batch(picking.batch_id),
+                "picking": self.data.picking(picking),
+            }
+        )
+        return data
 
     @classmethod
     def _set_dest_package_and_done(cls, move_lines, dest_package):
@@ -86,6 +40,13 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
             line.write(
                 {"qty_done": line.product_uom_qty, "result_package_id": dest_package.id}
             )
+
+    def _data_for_batch(self, batch, location, pack=None):
+        data = self.data.picking_batch(batch)
+        data["location_dest"] = self.data.location(location)
+        if pack:
+            data["package"] = self.data.package(pack)
+        return data
 
 
 class ClusterPickingLineCommonCase(ClusterPickingCommonCase):
