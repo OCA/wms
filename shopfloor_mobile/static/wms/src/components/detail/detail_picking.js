@@ -22,9 +22,7 @@ export var PickingDetailMixin = {
     computed: {
         opts() {
             const opts = _.defaults({}, this.$props.options, {
-                on_title_action: this.$props.options.clickable
-                    ? this.on_title_action
-                    : null,
+                on_title_action: this.$props.clickable ? this.on_title_action : null,
             });
             return opts;
         },
