@@ -40,15 +40,18 @@ Vue.component("batch-picking-detail", {
         />
 
     </div>
-    <v-row class="actions bottom-actions">
-      <v-col>
-        <v-btn depressed color="primary" @click="$emit('confirm')">Start</v-btn>
-      </v-col>
-      <v-col>
-        <v-btn depressed color="error" class="float-right" @click="$emit('cancel')">Cancel</v-btn>
-      </v-col>
-    </v-row>
-
+    <div class="button-list button-vertical-list full">
+      <v-row align="center">
+        <v-col class="text-center" cols="12">
+          <v-btn depressed color="primary" @click="$emit('confirm')">Start</v-btn>
+        </v-col>
+      </v-row>
+      <v-row align="center">
+        <v-col class="text-center" cols="12">
+          <v-btn depressed color="error" @click="$emit('cancel')">Cancel</v-btn>
+        </v-col>
+      </v-row>
+    </div>
 </div>
 `,
 });
