@@ -1,6 +1,6 @@
 import logging
 
-from .common import CommonCase
+from .common import CommonCase, PickingBatchMixin
 
 _logger = logging.getLogger(__name__)
 
@@ -64,11 +64,6 @@ class ActionsDataCaseBase(CommonCase):
 
 
 class ActionsDataCase(ActionsDataCaseBase):
-    def setUp(self):
-        super().setUp()
-        with self.work_on_services() as work:
-            self.schema = work.component(usage="schema")
-
     def test_data_packaging(self):
         data = self.data.packaging(self.packaging)
         self.assert_schema(self.schema.packaging(), data)
@@ -183,7 +178,6 @@ class ActionsDataCase(ActionsDataCaseBase):
         self.assertDictEqual(data, expected)
 
     def test_data_move_line_package_lot(self):
-        self.maxDiff = None
         move_line = self.move_c.move_line_ids
         data = self.data.move_line(move_line)
         self.assert_schema(self.schema.move_line(), data)
@@ -230,5 +224,59 @@ class ActionsDataCase(ActionsDataCaseBase):
             "package_dest": None,
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
+        }
+        self.assertDictEqual(data, expected)
+
+
+class ActionsDataCaseBatchPicking(ActionsDataCaseBase, PickingBatchMixin):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.batch = cls._create_picking_batch(
+            [
+                [
+                    cls.BatchProduct(product=cls.product_a, quantity=10),
+                    cls.BatchProduct(product=cls.product_b, quantity=20),
+                ],
+                [cls.BatchProduct(product=cls.product_a, quantity=30)],
+            ]
+        )
+
+    def test_data_picking_batch(self):
+        data = self.data.picking_batch(self.batch)
+        self.assert_schema(self.schema.picking_batch(), data)
+        # no assigned pickings
+        expected = {
+            "id": self.batch.id,
+            "name": self.batch.name,
+            "picking_count": 0,
+            "move_line_count": 0,
+            "weight": 0.0,
+        }
+        self.assertDictEqual(data, expected)
+
+        self._simulate_batch_selected(self.batch, fill_stock=True)
+        expected.update(
+            {
+                "picking_count": 2,
+                "move_line_count": 3,
+                "weight": sum(self.batch.picking_ids.mapped("total_weight")),
+            }
+        )
+        data = self.data.picking_batch(self.batch)
+        self.assertDictEqual(data, expected)
+
+    def test_data_picking_batch_with_pickings(self):
+        self._simulate_batch_selected(self.batch, fill_stock=True)
+        data = self.data.picking_batch(self.batch, with_pickings=True)
+        self.assert_schema(self.schema.picking_batch(with_pickings=True), data)
+        # no assigned pickings
+        expected = {
+            "id": self.batch.id,
+            "name": self.batch.name,
+            "picking_count": 2,
+            "move_line_count": 3,
+            "weight": sum(self.batch.picking_ids.mapped("total_weight")),
+            "pickings": self.data.pickings(self.batch.picking_ids),
         }
         self.assertDictEqual(data, expected)

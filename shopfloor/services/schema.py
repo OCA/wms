@@ -148,14 +148,17 @@ class BaseShopfloorSchemaResponse(Component):
             "name": {"type": "string", "nullable": False, "required": True},
         }
 
-    def picking_batch(self):
-        return {
+    def picking_batch(self, with_pickings=True):
+        schema = {
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
             "picking_count": {"required": True, "type": "integer"},
             "move_line_count": {"required": True, "type": "integer"},
             "weight": {"required": True, "nullable": True, "type": "float"},
         }
+        if with_pickings:
+            schema["pickings"] = self._schema_list_of(self.picking())
+        return schema
 
     def package_level(self):
         return {
