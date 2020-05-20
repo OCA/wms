@@ -16,27 +16,6 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="cluster_picking")
 
-    @classmethod
-    def _simulate_batch_selected(
-        cls, batches, in_package=False, in_lot=False, fill_stock=True
-    ):
-        """Create a state as if a batch was selected by the user
-
-        * The picking batch is in progress
-        * It is assigned to the current user
-        * All the move lines are available
-
-        Note: currently, this method create a source package that contains
-        all the products of the batch. It is enough for the current tests.
-        """
-        pickings = batches.mapped("picking_ids")
-        if fill_stock:
-            cls._fill_stock_for_moves(
-                pickings.mapped("move_lines"), in_package=in_package, in_lot=in_lot
-            )
-        pickings.action_assign()
-        batches.write({"state": "in_progress", "user_id": cls.env.uid})
-
     def _line_data(self, move_line, qty=None, package_dest=False):
         picking = move_line.picking_id
         # A package exists on the move line, because the quant created
