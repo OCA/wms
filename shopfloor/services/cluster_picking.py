@@ -1550,9 +1550,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
 
     @property
     def _schema_for_batch_details(self):
-        schema = self.schemas.picking_batch()
-        schema["pickings"] = self.schemas._schema_list_of(self.schemas.picking())
-        return schema
+        return self.schemas.picking_batch(with_pickings=True)
 
     @property
     def _schema_for_single_line_details(self):
