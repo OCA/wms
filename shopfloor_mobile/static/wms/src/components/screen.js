@@ -90,6 +90,11 @@ Vue.component("Screen", {
                         <v-list-item-title><v-icon>mdi-home</v-icon> Home</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
+                <v-list-item @click="$router.push({'name': 'settings'})" link>
+                    <v-list-item-content>
+                        <v-list-item-title><v-icon>mdi-settings-outline</v-icon> Settings</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
             </v-list>
         </v-navigation-drawer>
         <v-app-bar
@@ -196,9 +201,6 @@ Vue.component("app-bar-actions", {
     <div>
         <v-btn icon @click="$router.push({'name': 'scananything'})" :disabled="this.$route.name=='scananything'">
             <v-icon >mdi-magnify</v-icon>
-        </v-btn>
-        <v-btn icon @click="$router.push({'name': 'settings'})" :disabled="this.$route.name=='settings'">
-            <v-icon >mdi-settings-outline</v-icon>
         </v-btn>
     </div>
     `,
