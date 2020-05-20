@@ -17,7 +17,9 @@ class StockPickingBatch(models.Model):
         help="Technical field. Indicates total weight of transfers included.",
     )
 
-    @api.depends("picking_ids.total_weight", "picking_ids.move_line_ids")
+    @api.depends(
+        "picking_ids.state", "picking_ids.total_weight", "picking_ids.move_line_ids"
+    )
     def _compute_picking_info(self):
         for item in self:
             assigned_pickings = item.picking_ids.filtered(
