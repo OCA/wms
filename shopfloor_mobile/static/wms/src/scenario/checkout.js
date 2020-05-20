@@ -226,7 +226,7 @@ export var Checkout = Vue.component("checkout", {
             states: {
                 select_document: {
                     display_info: {
-                        title: "Start by scanning something",
+                        title: "Choose an order to pack",
                         scan_placeholder: "Scan pack / picking / location",
                     },
                     enter: () => {
@@ -322,7 +322,7 @@ export var Checkout = Vue.component("checkout", {
                     // to use pure list + checkboxes.
                     display_info: {
                         title: "Select package",
-                        scan_placeholder: "Scan package",
+                        scan_placeholder: "Scan existing package / package type",
                     },
                     events: {
                         qty_edit: "on_qty_edit",
