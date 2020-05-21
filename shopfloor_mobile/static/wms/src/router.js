@@ -22,14 +22,17 @@ let routes = [
     // TODO Fix this it needs to be the last route, but I think it is not anymore with the dynamic one added.
     // { path: '*', component: NotFound },
 ];
+let registered = [];
 _.forEach(process_registry.all(), function(component, key) {
     routes.push({
         name: key,
         path: process_registry.make_route(key),
         component: component,
     });
-    console.log("registered component route", key);
+    registered.push(key);
 });
+if (registered.length)
+    console.log("Registered component routes:", registered.join(", "));
 
 const router = new VueRouter({
     routes: routes,
