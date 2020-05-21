@@ -27,7 +27,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
             <batch-picking-line-detail
                 v-if="state_in(['start_line', 'scan_destination'])"
                 :line="state.data"
-                :show-full-info="!state_is('scan_destination')"
+                :article-scanned="state_is('scan_destination')"
                 />
             <batch-picking-line-actions
                 v-if="state_is('start_line')"
@@ -224,7 +224,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 },
                 scan_destination: {
                     display_info: {
-                        title: "Check quantity and scan a destination bin",
+                        title: "Check qty and scan a destination bin",
                         scan_placeholder: "Scan destination bin",
                     },
                     enter: () => {

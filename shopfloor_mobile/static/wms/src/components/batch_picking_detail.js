@@ -4,8 +4,8 @@ Vue.component("batch-picking-detail", {
     methods: {
         detail_fields() {
             return [
-                {path: "move_line_count", label: "Lines"},
-                {path: "weight", label: "Weight"},
+                {path: "move_line_count", label: "Total lines"},
+                {path: "weight", label: "Total weight"},
             ];
         },
         picking_detail_fields() {
@@ -19,10 +19,10 @@ Vue.component("batch-picking-detail", {
   <div class="detail batch-picking-detail with-bottom-actions" v-if="!_.isEmpty(info)">
     <div>
 
-      <item-detail-card :record="info" :options="{main: true, fields: detail_fields()}">
+      <item-detail-card :record="info" :options="{main: true, loud: true, fields: detail_fields()}">
 
         <template v-slot:title>
-          Operations: {{ info.picking_count }}
+          Total operations: {{ info.picking_count }}
         </template>
 
         <template v-slot:subtitle>
@@ -30,6 +30,8 @@ Vue.component("batch-picking-detail", {
         </template>
 
       </item-detail-card>
+
+      <separator-title>Pickings</separator-title>
 
       <detail-picking
         v-for="picking in info.pickings"
@@ -43,12 +45,12 @@ Vue.component("batch-picking-detail", {
     <div class="button-list button-vertical-list full">
       <v-row align="center">
         <v-col class="text-center" cols="12">
-          <v-btn depressed color="primary" @click="$emit('confirm')">Start</v-btn>
+          <v-btn color="primary" @click="$emit('confirm')">Start</v-btn>
         </v-col>
       </v-row>
       <v-row align="center">
         <v-col class="text-center" cols="12">
-          <v-btn depressed color="error" @click="$emit('cancel')">Cancel</v-btn>
+          <v-btn color="error" @click="$emit('cancel')">Cancel</v-btn>
         </v-col>
       </v-row>
     </div>
