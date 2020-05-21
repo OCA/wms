@@ -90,11 +90,9 @@ Vue.component("state-display-info", {
     },
     template: `
   <div class="state-display-info" v-if="info.title">
-    <div class="container">
-      <v-alert tile dense outlined type="info">
-        <div class="state-title text--secondary">{{ info.title }}</div>
-      </v-alert>
-    </div>
+    <v-alert tile dense type="info">
+      <div class="state-title">{{ info.title }}</div>
+    </v-alert>
   </div>
 `,
 });
