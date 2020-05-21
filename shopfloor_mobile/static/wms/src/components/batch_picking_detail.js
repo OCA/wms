@@ -4,6 +4,7 @@ Vue.component("batch-picking-detail", {
     methods: {
         detail_fields() {
             return [
+                {path: "picking_count", label: "Total operations"},
                 {path: "move_line_count", label: "Total lines"},
                 {path: "weight", label: "Total weight"},
             ];
@@ -20,14 +21,6 @@ Vue.component("batch-picking-detail", {
     <div>
 
       <item-detail-card :record="info" :options="{main: true, loud: true, fields: detail_fields()}">
-
-        <template v-slot:title>
-          Total operations: {{ info.picking_count }}
-        </template>
-
-        <template v-slot:subtitle>
-          {{ info.name }}
-        </template>
 
       </item-detail-card>
 
