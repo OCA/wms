@@ -61,12 +61,25 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     />
 
   <item-detail-card
-    v-if="articleScanned"
+    v-if="articleScanned && has_destination_pack"
     :key="'batch-picking-line-detail-3'"
     :record="line"
     :options="{main: true, key_title: 'package_dest.name'}"
     :card_color="$root.colors.color_for(has_destination_pack ? 'screen_step_done': 'screen_step_missing')"
     />
+
+  <item-detail-card
+    v-if="articleScanned && !has_destination_pack"
+    :key="'batch-picking-line-detail-4'"
+    :record="line"
+    :options="{main: true}"
+    :card_color="$root.colors.color_for(has_destination_pack ? 'screen_step_done': 'screen_step_missing')"
+    >
+    <template v-slot:title>
+      Destination pack
+    </template>
+  </item-detail-card>
+
 
   <v-expansion-panels>
     <v-expansion-panel class="with-card">
