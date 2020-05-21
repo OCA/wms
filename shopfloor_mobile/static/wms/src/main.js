@@ -2,6 +2,7 @@ import {router} from "./router.js";
 import {i18n} from "./i18n.js";
 import {Config} from "./services/config.js";
 import {process_registry} from "./services/process_registry.js";
+import {color_registry} from "./services/color_registry.js";
 import {Odoo, OdooMocked} from "./services/odoo.js";
 
 // TODO: we need a local storage handler too, to store device/profile specific data
@@ -47,6 +48,7 @@ const app = new Vue({
             appconfig: null,
             authenticated: false,
             registry: process_registry,
+            colors: color_registry,
         };
     },
     created: function() {
