@@ -85,16 +85,7 @@ Vue.component("Screen", {
             <v-list>
                 <v-btn icon class="close-menu" @click.stop="drawer = !drawer"><v-icon>mdi-close</v-icon></v-btn>
                 <nav-items :navigation="navigation"/>
-                <v-list-item @click="$router.push({'name': 'home'})" link>
-                    <v-list-item-content>
-                        <v-list-item-title><v-icon>mdi-home</v-icon> Home</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                <v-list-item @click="$router.push({'name': 'settings'})" link>
-                    <v-list-item-content>
-                        <v-list-item-title><v-icon>mdi-settings-outline</v-icon> Settings</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
+                <nav-items-extra />
             </v-list>
         </v-navigation-drawer>
         <v-app-bar
@@ -171,10 +162,10 @@ Vue.component("nav-items", {
     // NOTE: activation via router won't work because we can use the same route w/ several menu items.
     // Hence we match via menu id.
     template: `
-    <div>
+    <div :class="$options._componentTag">
         <v-list-item
             v-for="item in navigation"
-            :key="item.id"
+            :key="'nav-item-' + item.id"
             :to="{name: item.scenario, params: {menu_id: item.id, state: 'init'}}"
             link
             active-class="'v-item-active"
@@ -191,6 +182,42 @@ Vue.component("nav-items", {
                         Op Types: <span v-for="pt in item.picking_types" :key="'pt-' + item.id + '-' + pt.id">{{ pt.name }}</span>
                     </small>
                 </v-list-item-subtitle>
+            </v-list-item-content>
+        </v-list-item>
+    </div>
+    `,
+});
+Vue.component("nav-items-extra", {
+    methods: {
+        navigation: function() {
+            return [
+                {
+                    id: "home",
+                    name: "Home",
+                    icon: "mdi-home",
+                    route: {name: "home"},
+                },
+                {
+                    id: "settings",
+                    name: "Settings",
+                    icon: "mdi-settings-outline",
+                    route: {name: "settings"},
+                },
+            ];
+        },
+    },
+    template: `
+    <div :class="$options._componentTag">
+        <v-list-item
+            v-for="item in navigation()"
+            :key="'nav-item-extra-' + item.id"
+            :to="item.route"
+            link
+            active-class="'v-item-active"
+            exact
+            >
+            <v-list-item-content>
+                <v-list-item-title><v-icon>{{ item.icon }}</v-icon> {{ item.name}}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
     </div>
