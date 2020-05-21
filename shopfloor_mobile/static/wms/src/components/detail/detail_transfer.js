@@ -14,9 +14,10 @@ Vue.component("detail-transfer", {
                 },
                 {
                     path: "operation_type.name",
+                    label: "Operation type",
                 },
-                {path: "carrier.name"},
-                {path: "priority"},
+                {path: "carrier.name", label: "Carrier"},
+                {path: "priority", label: "Priority"},
                 {path: "note"},
             ];
         },
