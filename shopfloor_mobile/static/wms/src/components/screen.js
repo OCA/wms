@@ -169,8 +169,8 @@ Vue.component("nav-items", {
     props: {
         navigation: Array,
     },
-    // FIXME: the menu click changes the route in the address bar but it does not reload the screen
-    // if the route name is the same but w/ different menu_id. WTF????
+    // NOTE: activation via router won't work because we can use the same route w/ several menu items.
+    // Hence we match via menu id.
     template: `
     <div>
         <v-list-item
@@ -178,6 +178,8 @@ Vue.component("nav-items", {
             :key="item.id"
             :to="{name: item.scenario, params: {menu_id: item.id, state: 'start'}}"
             link
+            active-class="'v-item-active"
+            :color="$route.params.menu_id == item.id ? 'v-item-active' : null"
             >
             <v-list-item-content>
                 <v-list-item-title>

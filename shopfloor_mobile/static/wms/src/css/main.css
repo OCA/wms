@@ -23,7 +23,7 @@ main.v-content > .v-content__wrap > .header .container {
     padding: 0;
 }
 
-#app nav.v-navigation-drawer .router-link-active {
+#app nav.v-navigation-drawer .v-item-active--text {
     font-weight: bold;
 }
 #app nav.v-navigation-drawer .close-menu {
