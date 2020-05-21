@@ -339,6 +339,12 @@ input.my-checkbox[type="checkbox"]:checked {
     margin-top: 0;
     padding-top: 0;
 }
+/* this does not work :( */
+/* .v-expansion-panel .v-expansion-panel-content__wrap:has(.item-detail-card) { */
+.v-expansion-panel.with-card .v-expansion-panel-content__wrap {
+    padding-left: 12px;
+    padding-right: 12px;
+}
 
 .todo {
     padding: 1em;
