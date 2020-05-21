@@ -82,7 +82,8 @@ export var ScenarioBaseMixin = {
         },
         screen_info: function() {
             return {
-                title: this.menu_item.name,
+                // you can provide a different screen title
+                title: this.screen_title || this.menu_item.name,
                 klass: this.usage + " " + "state-" + this.state.key,
                 user_message: this.user_message,
                 user_popup: this.user_popup,
@@ -206,6 +207,10 @@ export var ScenarioBaseMixin = {
                     ? this.initial_state_key
                     : result.next_state;
             if (!_.isUndefined(result.data)) {
+                // TODO: we should find a way to reset the whole scenario data
+                // as soon as we start w/ the scenario by clicking the menu item
+                // and not just when you go to /start because you could get back
+                // to it from another state.
                 this.state_reset_data(state_key);
                 this.state_set_data(result.data[state_key], state_key);
             }
