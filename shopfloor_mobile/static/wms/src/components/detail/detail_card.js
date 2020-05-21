@@ -2,9 +2,10 @@ import {ItemDetailMixin} from "./detail_mixin.js";
 
 Vue.component("item-detail-card", {
     mixins: [ItemDetailMixin],
+    props: ["card_color"],
     template: `
     <div :class="wrapper_klass">
-        <v-card outlined :class="opts.main ? 'main' : ''" v-if="!_.isEmpty(record)">
+        <v-card :color="card_color" tile :class="{'main': opts.main, 'no-outline': opts.no_outline}" v-if="!_.isEmpty(record)">
             <v-card-title v-if="!opts.no_title">
                 <slot name="title">
                     <span v-text="_.result(record, opts.key_title)" />

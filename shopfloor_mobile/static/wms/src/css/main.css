@@ -85,10 +85,19 @@ ul.packaging span:first-child {
 .detail .v-card {
     margin-bottom: 0.5rem;
 }
+.detail .v-card__subtitle,
+.detail .v-card__text,
+.detail .v-card__title {
+    padding: 10px;
+}
 .detail .v-card.main {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     border-width: 4px;
 }
+.detail .v-card.no-outline {
+    box-shadow: none;
+}
+
 .detail.item-detail-card.loud .v-card__text.details {
     font-size: 1.3em;
     line-height: 1.4em;
