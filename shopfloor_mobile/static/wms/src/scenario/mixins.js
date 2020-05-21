@@ -83,7 +83,7 @@ export var ScenarioBaseMixin = {
         screen_info: function() {
             return {
                 // you can provide a different screen title
-                title: this.screen_title || this.menu_item.name,
+                title: this.screen_title ? this.screen_title() : this.menu_item.name,
                 klass: this.usage + " " + "state-" + this.state.key,
                 user_message: this.user_message,
                 user_popup: this.user_popup,
@@ -134,31 +134,50 @@ export var ScenarioBaseMixin = {
             return _.filter(state_keys, this.state_is).length > 0;
         },
         state_reset_data: function(state_key) {
+            state_key = state_key || this.current_state_key;
             this.$root.$storage.remove(this.storage_key(state_key));
+            this.$set(this.states[state_key], "data", {});
         },
-        _state_get_data: function(storage_key) {
-            return this.$root.$storage.get(storage_key, {});
+        _state_get_data: function(state_key) {
+            return this.$root.$storage.get(this.storage_key(state_key), {});
         },
-        _state_set_data: function(storage_key, v) {
-            this.$root.$storage.set(storage_key, v);
+        _state_set_data: function(state_key, v) {
+            this.$root.$storage.set(this.storage_key(state_key), v);
+            this.$set(this.states[state_key], "data", v);
         },
         state_get_data: function(state_key) {
-            return this._state_get_data(this.storage_key(state_key));
+            state_key = state_key || this.current_state_key;
+            return this._state_get_data(state_key);
         },
         state_set_data: function(data, state_key) {
+            state_key = state_key || this.current_state_key;
             const new_data = _.merge({}, this.state_get_data(state_key), data);
             // Trigger update of computed `state.data` and refreshes the UI.
-            this._state_set_data(this.storage_key(state_key), new_data);
-            this.$set(
-                this.states[state_key || this.current_state_key],
-                "data",
-                new_data
-            );
+            this._state_set_data(state_key, new_data);
+        },
+        state_reset_data_all() {
+            const self = this;
+            const keys_to_clear = _.filter(this.$storage.keys(), x => {
+                return x.includes(self.usage);
+            });
+            keys_to_clear.forEach(key => {
+                // Key includes the whole string w/ prefix, need the state key only
+                self.state_reset_data(_.last(key.split(".")));
+            });
         },
         /*
             Load given state, handle transition, setup event handlers.
         */
         _state_load: function(state_key, promise) {
+            if (state_key == "init") {
+                /*
+                Alias "init" to the initial state
+                and erase all existing data if any.
+                Used when we enter from a menu or to enforce data cleanup.
+                */
+                this.state_reset_data_all();
+                state_key = this.initial_state_key;
+            }
             state_key = state_key || "start";
             if (state_key == "start") {
                 // Alias "start" to the initial state
@@ -229,7 +248,7 @@ export var ScenarioBaseMixin = {
             alert(result.status + " " + result.error);
         },
         on_reset: function(e) {
-            this.state_reset_data();
+            this.state_reset_data_all();
             this.reset_notification();
             this.state_to("start");
         },
