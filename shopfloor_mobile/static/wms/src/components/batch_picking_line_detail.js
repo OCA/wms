@@ -107,7 +107,7 @@ export var batch_picking_line_actions = Vue.component("batch-picking-line-action
         <div class="button-list button-vertical-list full">
           <v-row class="actions bottom-actions">
             <v-col class="text-center" cols="12">
-              <v-btn depressed color="primary" dark v-on="on">Action</v-btn>
+              <v-btn color="primary" dark v-on="on">Action</v-btn>
             </v-col>
           </v-row>
         </div>
@@ -116,28 +116,28 @@ export var batch_picking_line_actions = Vue.component("batch-picking-line-action
         <div class="button-list button-vertical-list full">
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <v-btn depressed x-large color="primary" @click="handle_action('action_full_bin')">Go to destination - full bin(s)</v-btn>
+              <v-btn x-large color="primary" @click="handle_action('action_full_bin')">Go to destination - full bin(s)</v-btn>
             </v-col>
           </v-row>
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <v-btn depressed x-large color="primary" @click="handle_action('action_skip_line')">Skip line</v-btn>
+              <v-btn x-large color="primary" @click="handle_action('action_skip_line')">Skip line</v-btn>
             </v-col>
           </v-row>
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <v-btn depressed x-large color="primary"
+              <v-btn x-large color="primary"
                   @click="handle_action('action_stock_out')">Declare stock out</v-btn>
             </v-col>
           </v-row>
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <v-btn depressed x-large color="primary" @click="handle_action('action_change_pack_or_lot')">Change lot or pack</v-btn>
+              <v-btn x-large color="primary" @click="handle_action('action_change_pack_or_lot')">Change lot or pack</v-btn>
             </v-col>
           </v-row>
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <v-btn depressed x-large color="secondary" @click="dialog = false">Back</v-btn>
+              <v-btn x-large color="secondary" @click="dialog = false">Back</v-btn>
             </v-col>
           </v-row>
         </div>
@@ -162,12 +162,12 @@ export var batch_picking_line_stock_out = Vue.component(
       <div class="button-list button-vertical-list full">
         <v-row align="center">
           <v-col class="text-center" cols="12">
-            <v-btn depressed x-large color="primary" @click="handle_action('confirm_stock_issue')">Confirm stock = 0</v-btn>
+            <v-btn x-large color="primary" @click="handle_action('confirm_stock_issue')">Confirm stock = 0</v-btn>
           </v-col>
         </v-row>
         <v-row align="center">
           <v-col class="text-center" cols="12">
-            <v-btn depressed x-large color="default" @click="handle_action('back')">back</v-btn>
+            <v-btn x-large color="default" @click="handle_action('back')">back</v-btn>
           </v-col>
         </v-row>
       </div>

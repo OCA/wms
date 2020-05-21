@@ -40,7 +40,7 @@ Vue.component("user-popup", {
             <div class="button-list button-vertical-list full">
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <v-btn depressed x-large color="secondary" @click="dialog = false">{{ $t("btn.ok.title") }}</v-btn>
+                        <v-btn x-large color="secondary" @click="dialog = false">{{ $t("btn.ok.title") }}</v-btn>
                     </v-col>
                 </v-row>
             </div>

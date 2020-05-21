@@ -33,12 +33,12 @@ export var Profile = Vue.component("profile", {
                 <!-- FIXME: maybe not a good place here -->
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <v-btn depressed x-large color="error" v-on:click="reset_data()">Reload config and menu</v-btn>
+                        <v-btn x-large color="error" v-on:click="reset_data()">Reload config and menu</v-btn>
                     </v-col>
                 </v-row>
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <v-btn depressed x-large color="warning" v-on:click="logout()">Logout</v-btn>
+                        <v-btn x-large color="warning" v-on:click="logout()">Logout</v-btn>
                     </v-col>
                 </v-row>
             </div>

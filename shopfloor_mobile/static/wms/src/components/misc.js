@@ -11,7 +11,7 @@ Vue.component("reset-screen-button", {
     template: `
         <div class="action reset" v-if="show_reset_button">
             <v-form class="m-t5"  v-on:reset="reset">
-                <v-btn depressed color="warning" x-large @click="reset">Reset</v-btn>
+                <v-btn color="warning" x-large @click="reset">Reset</v-btn>
             </v-form>
         </div>
     `,
@@ -20,7 +20,7 @@ Vue.component("reset-screen-button", {
 Vue.component("cancel-button", {
     template: `
         <div class="action reset">
-            <v-btn depressed x-large color="error" v-on:click="$emit('cancel')">Cancel</v-btn>
+            <v-btn x-large color="error" v-on:click="$emit('cancel')">Cancel</v-btn>
         </div>
     `,
 });
@@ -69,12 +69,12 @@ Vue.component("stock-zero-check", {
           <div class="button-list button-vertical-list">
             <v-row align="center">
               <v-col class="text-center" cols="12">
-                <v-btn depressed x-large color="primary" @click="$emit('action', 'action_confirm_zero')">Confirm stock = 0</v-btn>
+                <v-btn x-large color="primary" @click="$emit('action', 'action_confirm_zero')">Confirm stock = 0</v-btn>
               </v-col>
             </v-row>
             <v-row align="center">
               <v-col class="text-center" cols="12">
-                <v-btn depressed x-large color="warning" @click="$emit('action', 'action_confirm_not_zero')">Confirm stock NOT empty</v-btn>
+                <v-btn x-large color="warning" @click="$emit('action', 'action_confirm_not_zero')">Confirm stock NOT empty</v-btn>
               </v-col>
             </v-row>
           </div>
@@ -111,7 +111,7 @@ Vue.component("edit-action", {
     },
     template: `
 <div class="action action-edit">
-  <v-btn icon class="edit" depressed x-large rounded color="default"
+  <v-btn icon class="edit" x-large rounded color="default"
          @click="$root.trigger(options.click_event, record)"><v-icon>mdi-pencil-outline</v-icon></v-btn>
 </div>
 `,
@@ -119,7 +119,7 @@ Vue.component("edit-action", {
 
 Vue.component("btn-back", {
     template: `
-  <v-btn depressed x-large color="default" v-on:click="$router.back()">{{ $t("btn.back.title") }}</v-btn>
+  <v-btn x-large color="default" v-on:click="$router.back()">{{ $t("btn.back.title") }}</v-btn>
   `,
 });
 
@@ -162,7 +162,7 @@ Vue.component("cancel-move-line-action", {
 <div class="action action-destroy">
   <v-dialog v-model="dialog" fullscreen tile class="actions fullscreen text-center">
     <template v-slot:activator="{ on }">
-      <v-btn icon class="destroy" depressed x-large rounded color="error" v-on="on"><v-icon>mdi-close-circle</v-icon></v-btn>
+      <v-btn icon class="destroy" x-large rounded color="error" v-on="on"><v-icon>mdi-close-circle</v-icon></v-btn>
     </template>
     <v-card>
       <user-confirmation

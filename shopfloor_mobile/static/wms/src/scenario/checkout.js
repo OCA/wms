@@ -30,7 +30,7 @@ export var Checkout = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="state.on_manual_selection">Manual selection</v-btn>
+                            <v-btn color="primary" @click="state.on_manual_selection">Manual selection</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -44,7 +44,7 @@ export var Checkout = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="default" @click="state.on_back">Back</v-btn>
+                            <v-btn color="default" @click="state.on_back">Back</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -59,7 +59,7 @@ export var Checkout = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="$root.trigger('summary')">Summary</v-btn>
+                            <v-btn color="primary" @click="$root.trigger('summary')">Summary</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -75,7 +75,7 @@ export var Checkout = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary"
+                            <v-btn color="primary"
                                    @click="state.on_existing_pack"
                                    :disabled="state.data.selected && !state.data.selected.length"
                                    >Existing pack</v-btn>
@@ -83,7 +83,7 @@ export var Checkout = Vue.component("checkout", {
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary"
+                            <v-btn color="primary"
                                    @click="state.on_new_pack"
                                    :disabled="state.data.selected && !state.data.selected.length"
                                    >New pack</v-btn>
@@ -91,7 +91,7 @@ export var Checkout = Vue.component("checkout", {
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary"
+                            <v-btn color="primary"
                                    @click="state.on_without_pack"
                                    :disabled="state.data.selected && !state.data.selected.length"
                                    >Process w/o pack</v-btn>
@@ -110,13 +110,13 @@ export var Checkout = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="$root.trigger('mark_as_done')"
+                            <v-btn color="primary" @click="$root.trigger('mark_as_done')"
                                    :disabled="state.data.picking.move_lines.length < 1">Mark as done</v-btn>
                         </v-col>
                     </v-row>
                     <v-row align="center" v-if="!state.data.all_processed">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="$root.trigger('continue')">Continue checkout</v-btn>
+                            <v-btn color="primary" @click="$root.trigger('continue')">Continue checkout</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -148,12 +148,12 @@ export var Checkout = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="$root.trigger('qty_change_confirm')">Confirm</v-btn>
+                            <v-btn color="primary" @click="$root.trigger('qty_change_confirm')">Confirm</v-btn>
                         </v-col>
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="default" @click="state.on_back">Back</v-btn>
+                            <v-btn color="default" @click="state.on_back">Back</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -171,12 +171,12 @@ export var Checkout = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="success" @click="state.on_confirm">Confirm</v-btn>
+                            <v-btn color="success" @click="state.on_confirm">Confirm</v-btn>
                         </v-col>
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="default" @click="state.on_back">Back</v-btn>
+                            <v-btn color="default" @click="state.on_back">Back</v-btn>
                         </v-col>
                     </v-row>
                 </div>

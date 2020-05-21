@@ -41,7 +41,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 <div class="button-list button-vertical-list full mt-10">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed @click="state.on_action_full_bin">
+                            <v-btn @click="state.on_action_full_bin">
                                 Full bin
                             </v-btn>
                         </v-col>
@@ -68,7 +68,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="default" @click="state.on_back">Back</v-btn>
+                            <v-btn color="default" @click="state.on_back">Back</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -90,7 +90,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="$emit('action', 'action_split')">Split [TODO]</v-btn>
+                            <v-btn color="primary" @click="$emit('action', 'action_split')">Split [TODO]</v-btn>
                         </v-col>
                     </v-row>
                     <v-row align="center">
