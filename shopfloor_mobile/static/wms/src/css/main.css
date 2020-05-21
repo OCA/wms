@@ -330,3 +330,23 @@ input.my-checkbox[type="checkbox"]:checked {
     margin-top: 0;
     padding-top: 0;
 }
+
+.todo {
+    padding: 1em;
+    margin: 1em;
+    text-align: center;
+    background-image: linear-gradient(
+        45deg,
+        #e0c600 25%,
+        #000000 25%,
+        #000000 50%,
+        #e0c600 50%,
+        #e0c600 75%,
+        #000000 75%,
+        #000000 100%
+    );
+    background-size: 100%;
+}
+.todo .message {
+    background-color: white;
+}

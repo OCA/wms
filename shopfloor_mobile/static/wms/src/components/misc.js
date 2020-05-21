@@ -187,3 +187,14 @@ Vue.component("picking-list-item-progress-bar", {
   </div>
 `,
 });
+
+// handy component to place UI todos
+Vue.component("todo", {
+    template: `
+<div :class="$options._componentTag">
+  <div class="message">
+    <v-icon>mdi-hammer-wrench</v-icon> <strong>TODO: <small><slot></slot></small></strong>
+  </div>
+</div>
+`,
+});
