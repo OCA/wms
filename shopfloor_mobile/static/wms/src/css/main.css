@@ -185,6 +185,9 @@ ul.packaging span:first-child {
     border-bottom: 2px;
     margin-bottom: 0.5rem;
 }
+.manual-select .v-list {
+    padding: 0;
+}
 .item-counter {
     display: none;
     padding-right: 0.5rem;
