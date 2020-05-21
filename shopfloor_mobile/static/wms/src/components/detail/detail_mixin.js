@@ -83,6 +83,7 @@ export var ItemDetailMixin = {
             // works only if you don't pass the property at all.
             // If you pass only one key, you'll lose all defaults.
             const opts = _.defaults({}, this.$props.options, {
+                no_title: false,
                 key_title: "name",
                 fields: this.detail_fields(),
                 full_detail: false,
