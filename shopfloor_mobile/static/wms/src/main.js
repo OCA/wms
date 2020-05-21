@@ -12,8 +12,11 @@ Vue.use(Vue2Storage, {
     ttl: 60 * 60 * 24 * 1000, // 24 hours
 });
 
+Vue.use(Vuetify);
+
 var EventHub = new Vue();
 
+// TODO: move to color registry
 const vuetify_themes = {
     light: {
         primary: "#491966",
@@ -30,10 +33,9 @@ const app = new Vue({
     i18n,
     router: router,
     vuetify: new Vuetify({
-        // FIXME: has no effect
-        // theme: {
-        //     themes: vuetify_themes
-        // }
+        theme: {
+            themes: vuetify_themes,
+        },
     }),
     data: function() {
         return {
