@@ -71,7 +71,7 @@ Vue.component("Screen", {
         this.$watch(
             "screen_info.user_message",
             value => {
-                this.show_message = !this.info.noUserMessage && Boolean(value);
+                this.show_message = !this.info.noUserMessage && !_.isEmpty(value);
             },
             {immediate: true}
         );
