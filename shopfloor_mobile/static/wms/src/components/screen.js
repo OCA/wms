@@ -100,7 +100,6 @@ Vue.component("Screen", {
         <v-app-bar
                 color="#491966"
                 dark
-                flat
                 app
                 dense
                 >
