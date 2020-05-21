@@ -176,7 +176,7 @@ Vue.component("nav-items", {
         <v-list-item
             v-for="item in navigation"
             :key="item.id"
-            :to="{name: item.scenario, params: {menu_id: item.id, state: 'start'}}"
+            :to="{name: item.scenario, params: {menu_id: item.id, state: 'init'}}"
             link
             active-class="'v-item-active"
             :color="$route.params.menu_id == item.id ? 'v-item-active' : null"
