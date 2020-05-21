@@ -43,7 +43,7 @@ export var LoginPage = Vue.component("login-page", {
                                 label="API Key"
                                 placeholder="Scan your access badge or fill your credential"
                                 autofocus></v-text-field>
-                            <v-btn depressed color="success" type="submit">Submit</v-btn>
+                            <v-btn color="success" type="submit">Submit</v-btn>
                         </v-form>
                     </div>
                 </v-col>

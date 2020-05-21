@@ -21,7 +21,7 @@ export var Delivery = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="state.on_manual_selection">Manual selection</v-btn>
+                            <v-btn color="primary" @click="state.on_manual_selection">Manual selection</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -36,7 +36,7 @@ export var Delivery = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="primary" @click="state.on_manual_selection">Manual selection</v-btn>
+                            <v-btn color="primary" @click="state.on_manual_selection">Manual selection</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -52,7 +52,7 @@ export var Delivery = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn depressed color="default" @click="state.on_back">Back</v-btn>
+                            <v-btn color="default" @click="state.on_back">Back</v-btn>
                         </v-col>
                     </v-row>
                 </div>

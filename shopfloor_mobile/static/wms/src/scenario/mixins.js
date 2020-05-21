@@ -199,7 +199,7 @@ export var ScenarioBaseMixin = {
             this.$root.$emit("state:change", state_key);
         },
         // TODO: refactor all transitions to state `wait_call` with this call
-        wait_call: function(promise) {
+        wait_call: function(promise, callback) {
             return promise.then(this.on_call_success, this.on_call_error);
         },
         on_state_enter: function() {
