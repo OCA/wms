@@ -144,7 +144,7 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             next_state="select_line",
             data={"picking": self._stock_picking_data(self.picking)},
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Product(s) packed in {}".format(self.pack1.name),
             },
         )
