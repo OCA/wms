@@ -222,25 +222,31 @@ class ClusterPicking(Component):
         if batch_ids:
             domain = expression.AND([domain, [("id", "in", batch_ids)]])
         records = self.env["stock.picking.batch"].search(domain, order="id asc")
-        records = records.filtered(
-            # Include done/cancel because we want to be able to work on the
-            # batch even if some pickings are done/canceled. They'll should be
-            # ignored later.
-            lambda batch: all(
-                (
-                    # When the batch is already in progress, we do not care
-                    # about state of the pickings, because we want to be able
-                    # to recover it in any case, even if, for instance, a stock
-                    # error changed a picking to unavailable after the user
-                    # started to work on the batch.
-                    batch.state == "in_progress"
-                    or picking.state in ("assigned", "done", "cancel")
-                )
-                and picking.picking_type_id in self.picking_types
-                for picking in batch.picking_ids
-            )
-        )
+        records = records.filtered(self._batch_filter)
         return records
+
+    def _batch_filter(self, batch):
+        if not batch.picking_ids:
+            return False
+        return batch.picking_ids.filtered(self._batch_picking_filter)
+
+    def _batch_picking_filter(self, picking):
+        # Picking type guard
+        if picking.picking_type_id not in self.picking_types:
+            return False
+        # Include done/cancel because we want to be able to work on the
+        # batch even if some pickings are done/canceled. They'll should be
+        # ignored later.
+        # When the batch is already in progress, we do not care
+        # about state of the pickings, because we want to be able
+        # to recover it in any case, even if, for instance, a stock
+        # error changed a picking to unavailable after the user
+        # started to work on the batch.
+        return picking.batch_id.state == "in_progress" or picking.state in (
+            "assigned",
+            "done",
+            "cancel",
+        )
 
     # TODO this may be used in other scenarios? if so, extract
     def _select_a_picking_batch(self, batches):
