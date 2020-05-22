@@ -83,11 +83,11 @@ Vue.component("list", {
     <div :class="klass">
         <v-card>
             <v-list v-if="has_records">
-                <div class="list-group" v-for="group in listable" :key="group.key">
+                <div class="list-group" v-for="group in listable" :key="make_component_key(['group', group.key])">
                     <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
                     <div class="list-items-wrapper">
                         <v-list-item
-                                v-for="(rec, index) in group.records" :key="group.key + '-' + index"
+                                v-for="(rec, index) in group.records" :key="make_component_key(['group', group.key, index])"
                                 @click="opts.list_item_on_click ? opts.list_item_on_click(rec) : undefined"
                                 :class="list_item_options.list_item_klass_maker ? list_item_options.list_item_klass_maker(rec) : ''">
                             <component
@@ -96,7 +96,7 @@ Vue.component("list", {
                                 :record="rec"
                                 :index="index"
                                 :count="group.records.length"
-                                :key="opts.list_item_component + '-' + index + '-' + rec.id"
+                                :key="make_component_key([opts.list_item_component, 'list', index, rec.id])"
                                 />
                             <v-list-item-action v-if="opts.list_item_actions.length" class="d-flex align-stretch">
                                 <component
@@ -107,7 +107,7 @@ Vue.component("list", {
                                     :record="action.get_record(rec, action)"
                                     :index="index"
                                     :count="group.records.length"
-                                    :key="action.name + '-' + index + '-' + rec.id"
+                                    :key="make_component_key([action.comp_name, 'list', index, action.get_record(rec, action).id])"
                                     />
                             </v-list-item-action>
                         </v-list-item>
