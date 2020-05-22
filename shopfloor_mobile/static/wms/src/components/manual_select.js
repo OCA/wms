@@ -202,10 +202,10 @@ Vue.component("manual-select", {
     <div :class="klass">
         <v-card>
             <v-list v-if="has_records">
-                <div class="select-group" v-for="(group, gindex) in selectable" :key="'group-' + gindex">
+                <div class="select-group" v-for="(group, gindex) in selectable" :key="make_component_key([$options._componentTag, 'group', gindex])">
                     <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
                     <div :class="'list-item-wrapper' + (is_selected(rec) ? ' active' : '')" v-for="(rec, index) in group.records"">
-                        <v-list-item :key="gindex + '-' + index" :id="'item-' + gindex + '-' + index">
+                        <v-list-item :key="make_component_key(['group-rec', gindex, index, rec.id])">
                             <v-list-item-content>
                                 <component
                                     :is="opts.list_item_component"
@@ -213,18 +213,19 @@ Vue.component("manual-select", {
                                     :record="rec"
                                     :index="index"
                                     :count="group.records.length"
+                                    :key="make_component_key([opts.list_item_component, index, rec.id])"
                                     />
                             </v-list-item-content>
                             <v-list-item-action  :class="{'d-flex align-stretch': opts.list_item_actions.length}">
                                 <component
-                                    v-for="action in opts.list_item_actions"
+                                    v-for="(action, action_index) in opts.list_item_actions"
                                     :is="action.comp_name"
                                     v-if="action.enabled(rec, action)"
                                     :options="_.merge({}, list_item_options, action.options)"
                                     :record="action.get_record(rec, action)"
                                     :index="index"
                                     :count="group.records.length"
-                                    :key="action.name + '-' + index + '-' + rec.id"
+                                    :key="make_component_key([action.comp_name, index, action_index, rec.id])"
                                     />
                                 <div class="action action-select">
                                     <input
@@ -234,6 +235,7 @@ Vue.component("manual-select", {
                                         :true-value="rec.id"
                                         :value="rec.id"
                                         :checked="is_selected(rec)"
+                                        :key="make_component_key(['list-checkbox', index, rec.id])"
                                         @click="handleSelect(rec, $event)"
                                         />
                                 </div>
