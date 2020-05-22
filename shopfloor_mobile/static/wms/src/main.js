@@ -1,5 +1,6 @@
 import {router} from "./router.js";
 import {i18n} from "./i18n.js";
+import {GlobalMixin} from "./mixin.js";
 import {Config} from "./services/config.js";
 import {process_registry} from "./services/process_registry.js";
 import {color_registry} from "./services/color_registry.js";
@@ -31,6 +32,8 @@ const vuetify_themes = {
         warning: "#FFC107",
     },
 };
+
+Vue.mixin(GlobalMixin);
 
 const app = new Vue({
     i18n,
