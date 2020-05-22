@@ -75,7 +75,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
             </div>
 
             <div class="unload-all" v-if="state_is('unload_all')">
-                <v-card outlined class="main">
+                <v-card class="main">
                     <v-card-title>
                         <div class="main-info">
                             <div class="destination">
@@ -85,8 +85,6 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                         </div>
                     </v-card-title>
                 </v-card>
-            </div>
-            <template v-slot:footer v-if="state_is('unload_all')">
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
@@ -99,7 +97,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                         </v-col>
                     </v-row>
                 </div>
-            </template>
+            </div>
 
         </Screen>
     `,
