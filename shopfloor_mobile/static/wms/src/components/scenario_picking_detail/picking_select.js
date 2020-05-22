@@ -4,6 +4,25 @@ import {PickingDetailSelectMixin} from "./mixins.js";
 
 Vue.component("detail-picking-select", {
     mixins: [PickingDetailSelectMixin],
+    methods: {
+        _get_available_list_item_actions() {
+            // TODO: we should probably make the 1st class citizens w/ their own object class.
+            return {
+                action_qty_edit: {
+                    comp_name: "edit-action",
+                    get_record: function(rec, action) {
+                        return rec;
+                    },
+                    options: {
+                        click_event: "qty_edit",
+                    },
+                    enabled: function(rec, action) {
+                        return true;
+                    },
+                },
+            };
+        },
+    },
 });
 
 Vue.component("picking-select-line-content", {
@@ -44,13 +63,10 @@ Vue.component("picking-select-package-content", {
         index: Number,
         count: Number,
     },
-    // TODO: `list` no supports passing action components dynamically.
-    // Consider moving `edit-action` call to `list_options.list_item_options.actions`.
     template: `
     <div>
         <div :class="record.package_dest ? 'has-pack' : 'no-pack'">
             <span>{{ record.product.display_name }}</span>
-            <edit-action class="float-right" :record="record" :options="{click_event:'qty_edit'}" />
             <div class="lot" v-if="record.lot">
                 <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
             </div>
