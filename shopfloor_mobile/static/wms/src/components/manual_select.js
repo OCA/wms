@@ -153,6 +153,7 @@ Vue.component("manual-select", {
                 multiple: false,
                 showCounters: false,
                 list_item_component: "list-item",
+                list_item_actions: [],
                 list_item_extra_component: "",
                 selected_event: "select",
             });
@@ -199,7 +200,7 @@ Vue.component("manual-select", {
     },
     template: `
     <div :class="klass">
-        <v-card outlined>
+        <v-card>
             <v-list v-if="has_records">
                 <div class="select-group" v-for="(group, gindex) in selectable" :key="'group-' + gindex">
                     <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
@@ -214,16 +215,28 @@ Vue.component("manual-select", {
                                     :count="group.records.length"
                                     />
                             </v-list-item-content>
-                            <v-list-item-action>
-                                <input
-                                    class="my-checkbox"
-                                    type="checkbox"
-                                    :input-value="rec.id"
-                                    :true-value="rec.id"
-                                    :value="rec.id"
-                                    :checked="is_selected(rec)"
-                                    @click="handleSelect(rec, $event)"
+                            <v-list-item-action  :class="{'d-flex align-stretch': opts.list_item_actions.length}">
+                                <component
+                                    v-for="action in opts.list_item_actions"
+                                    :is="action.comp_name"
+                                    v-if="action.enabled(rec, action)"
+                                    :options="_.merge({}, list_item_options, action.options)"
+                                    :record="action.get_record(rec, action)"
+                                    :index="index"
+                                    :count="group.records.length"
+                                    :key="action.name + '-' + index + '-' + rec.id"
                                     />
+                                <div class="action action-select">
+                                    <input
+                                        class="my-checkbox"
+                                        type="checkbox"
+                                        :input-value="rec.id"
+                                        :true-value="rec.id"
+                                        :value="rec.id"
+                                        :checked="is_selected(rec)"
+                                        @click="handleSelect(rec, $event)"
+                                        />
+                                </div>
                             </v-list-item-action>
                         </v-list-item>
                         <div class="extra" v-if="opts.list_item_extra_component">
