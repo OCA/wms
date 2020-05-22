@@ -706,11 +706,13 @@ class Checkout(Component):
         if not picking.exists():
             return self._response_stock_picking_does_not_exist()
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
-        selected_lines.write({"shopfloor_checkout_done": True})
+        selected_lines.write(
+            {"shopfloor_checkout_done": True, "result_package_id": False}
+        )
         return self._response_for_select_line(
             picking,
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": _("Product(s) processed as raw product(s)"),
             },
         )
@@ -938,10 +940,13 @@ class Checkout(Component):
                         "shopfloor_checkout_done": False,
                     }
                 )
+            msg = _("Package cancelled")
         if line:
             line.write({"qty_done": 0, "shopfloor_checkout_done": False})
-
-        return self._response_for_summary(picking)
+            msg = _("Line cancelled")
+        return self._response_for_summary(
+            picking, message={"message_type": "success", "body": msg}
+        )
 
     def done(self, picking_id, confirmation=False):
         """Set the moves as done
