@@ -4,6 +4,9 @@ import {Config} from "./services/config.js";
 import {process_registry} from "./services/process_registry.js";
 import {color_registry} from "./services/color_registry.js";
 import {Odoo, OdooMocked} from "./services/odoo.js";
+import VueSuperMethod from "./lib/vue-super-call.js";
+
+Vue.prototype.$super = VueSuperMethod;
 
 // TODO: we need a local storage handler too, to store device/profile specific data
 Vue.use(Vue2Storage, {
