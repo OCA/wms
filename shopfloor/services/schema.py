@@ -67,7 +67,7 @@ class BaseShopfloorSchemaResponse(Component):
             },
         }
 
-    def move_line(self):
+    def move_line(self, with_packaging=False):
         return {
             "id": {"type": "integer", "required": True},
             "qty_done": {"type": "float", "required": True},
@@ -83,13 +83,13 @@ class BaseShopfloorSchemaResponse(Component):
                 "type": "dict",
                 "required": True,
                 "nullable": True,
-                "schema": self.package(),
+                "schema": self.package(with_packaging=with_packaging),
             },
             "package_dest": {
                 "type": "dict",
                 "required": False,
                 "nullable": True,
-                "schema": self.package(),
+                "schema": self.package(with_packaging=with_packaging),
             },
             "location_src": {
                 "type": "dict",

@@ -152,15 +152,21 @@ class Checkout(Component):
     def _response_for_select_document(self, message=None):
         return self._response(next_state="select_document", message=message)
 
-    def _data_for_move_lines(self, lines):
+    def _data_for_move_lines(self, lines, **kw):
         data_struct = self.actions_for("data")
-        return data_struct.move_lines(lines)
+        return data_struct.move_lines(lines, **kw)
 
     def _data_for_stock_picking(self, picking, done=False):
         data_struct = self.actions_for("data")
         data = data_struct.picking(picking)
         line_picker = self._lines_checkout_done if done else self._lines_to_pack
-        data.update({"move_lines": self._data_for_move_lines(line_picker(picking))})
+        data.update(
+            {
+                "move_lines": self._data_for_move_lines(
+                    line_picker(picking), with_packaging=done
+                )
+            }
+        )
         return data
 
     def _lines_checkout_done(self, picking):
@@ -576,7 +582,7 @@ class Checkout(Component):
         return self._response_for_select_line(
             picking,
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": _("Product(s) packed in {}").format(package.name),
             },
         )
@@ -1167,27 +1173,34 @@ class ShopfloorCheckoutValidatorResponse(Component):
             "select_dest_package": self._schema_select_package,
             "summary": self._schema_summary,
             "change_packaging": self._schema_select_packaging,
-            "confirm_done": self._schema_stock_picking_details,
+            "confirm_done": self._schema_confirm_done,
         }
 
-    @property
-    def _schema_stock_picking_details(self):
+    def _schema_stock_picking(self, lines_with_packaging=False):
         schema = self.schemas.picking()
         schema.update(
             {
-                "move_lines": {
-                    "type": "list",
-                    "schema": {"type": "dict", "schema": self.schemas.move_line()},
-                },
+                "move_lines": self.schemas._schema_list_of(
+                    self.schemas.move_line(with_packaging=lines_with_packaging)
+                ),
             }
         )
-        return {"picking": {"type": "dict", "schema": schema}}
+        return {"picking": self.schemas._schema_dict_of(schema, required=True)}
+
+    @property
+    def _schema_stock_picking_details(self):
+        return self._schema_stock_picking()
 
     @property
     def _schema_summary(self):
         return dict(
-            self._schema_stock_picking_details, all_processed={"type": "boolean"}
+            self._schema_stock_picking(lines_with_packaging=True),
+            all_processed={"type": "boolean"},
         )
+
+    @property
+    def _schema_confirm_done(self):
+        return self._schema_stock_picking(lines_with_packaging=True)
 
     @property
     def _schema_selection_list(self):
