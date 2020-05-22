@@ -89,6 +89,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
                 "picking": self._stock_picking_data(picking, done=True),
                 "all_processed": False,
             },
+            message={"body": "Package cancelled", "message_type": "success"},
         )
 
     def test_cancel_line_ok(self):
@@ -114,6 +115,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
                 "picking": self._stock_picking_data(picking, done=True),
                 "all_processed": False,
             },
+            message={"body": "Line cancelled", "message_type": "success"},
         )
 
     def test_cancel_line_error_package_not_found(self):

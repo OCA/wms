@@ -986,7 +986,7 @@ class ClusterPicking(Component):
             success_body += _(" A draft inventory has been created for control.")
 
         return self._response_for_scan_destination(
-            move_line, message={"message_type": "info", "body": success_body}
+            move_line, message={"message_type": "success", "body": success_body}
         )
 
     def _package_identical_move_lines_qty(self, package, move_lines):
@@ -1075,7 +1075,7 @@ class ClusterPicking(Component):
         return self._response_for_scan_destination(
             move_line,
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": _("Package {} replaced by package {}").format(
                     previous_package.name, package.name
                 ),
