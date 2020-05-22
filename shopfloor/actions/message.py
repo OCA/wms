@@ -123,7 +123,7 @@ class MessageAction(Component):
 
     def confirm_canceled_scan_next_pack(self):
         return {
-            "message_type": "info",
+            "message_type": "success",
             "body": _("Canceled, you can scan a new pack."),
         }
 

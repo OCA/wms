@@ -121,7 +121,7 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
             new_package.name,
             success=True,
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Package {} replaced by package {}".format(
                     initial_package.name, new_package.name
                 ),
@@ -161,7 +161,7 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
             new_package.name,
             success=True,
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Package {} replaced by package {}".format(
                     initial_package.name, new_package.name
                 ),
@@ -197,7 +197,7 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
             new_lot.name,
             success=True,
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Package {} replaced by package {}".format(
                     initial_package.name, new_package.name
                 ),
@@ -286,7 +286,7 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
             new_lot.name,
             success=True,
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Lot {} replaced by lot {}.".format(
                     initial_lot.name, new_lot.name
                 ),
@@ -312,7 +312,7 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
             new_lot.name,
             success=True,
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Lot {} replaced by lot {}. A draft inventory has"
                 " been created for control.".format(initial_lot.name, new_lot.name),
             },
@@ -432,7 +432,7 @@ class ClusterPickingChangePackLotCaseSpecial(ClusterPickingChangePackLotCommon):
             new_package.name,
             success=True,
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Package {} replaced by package {}".format(
                     initial_package.name, new_package.name
                 ),
@@ -487,7 +487,7 @@ class ClusterPickingChangePackLotCaseSpecial(ClusterPickingChangePackLotCommon):
             package2.name,
             success=True,
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Package {} replaced by package {}".format(
                     package1.name, package2.name
                 ),

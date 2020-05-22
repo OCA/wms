@@ -48,7 +48,7 @@ class CheckoutNoPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             next_state="select_line",
             data={"picking": self._stock_picking_data(picking)},
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Product(s) processed as raw product(s)",
             },
         )

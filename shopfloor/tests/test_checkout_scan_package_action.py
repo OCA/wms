@@ -165,7 +165,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             next_state="select_line",
             data={"picking": self._stock_picking_data(picking)},
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Product(s) packed in {}".format(pack1.name),
             },
         )
@@ -264,7 +264,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 "all_processed": True,
             },
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Product(s) packed in {}".format(package.name),
             },
         )
@@ -349,7 +349,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             next_state="select_line",
             data={"picking": self._stock_picking_data(picking)},
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Product(s) packed in {}".format(new_package.name),
             },
         )
