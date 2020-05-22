@@ -76,7 +76,7 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     :card_color="$root.colors.color_for(has_destination_pack ? 'screen_step_done': 'screen_step_missing')"
     >
     <template v-slot:title>
-      Destination pack
+      Destination pack not selected.
     </template>
   </item-detail-card>
 
