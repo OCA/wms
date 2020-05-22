@@ -248,7 +248,7 @@ Vue.component("manual-select", {
                                 :record="rec"
                                 :index="index"
                                 :count="group.records.length"
-                                :key="'extra-' + gindex + '-' + index" :id="'extra-item-' + gindex + '-' + index"
+                                :key="make_component_key(['list-extra', gindex, index, rec.id])"
                                 />
                         </div>
                     </div>
