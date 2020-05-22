@@ -101,8 +101,9 @@ export class Utils {
         const grouped = _.groupBy(lines, "package_dest.packaging.name");
         _.forEach(grouped, function(products, packaging_name) {
             res.push({
-                key: packaging_name,
-                title: packaging_name,
+                // groupBy gives undefined as string
+                key: packaging_name == "undefined" ? "no-packaging" : packaging_name,
+                title: packaging_name == "undefined" ? "" : packaging_name,
                 records: products,
             });
         });
