@@ -187,6 +187,7 @@ Vue.component("manual-select", {
                     bits.push(bit);
                 }
             });
+            if (this.grouped_records.length) bits.push("with-groups");
             return bits.join(" ");
         },
         valued() {
@@ -200,63 +201,61 @@ Vue.component("manual-select", {
     },
     template: `
     <div :class="klass">
-        <v-card>
+        <v-card class="select-group" v-for="(group, gindex) in selectable" :key="make_component_key([$options._componentTag, 'group', gindex])">
+            <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
             <v-list v-if="has_records">
-                <div class="select-group" v-for="(group, gindex) in selectable" :key="make_component_key([$options._componentTag, 'group', gindex])">
-                    <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
-                    <div :class="'list-item-wrapper' + (is_selected(rec) ? ' active' : '')" v-for="(rec, index) in group.records"">
-                        <v-list-item :key="make_component_key(['group-rec', gindex, index, rec.id])">
-                            <v-list-item-content>
-                                <component
-                                    :is="opts.list_item_component"
-                                    :options="list_item_options"
-                                    :record="rec"
-                                    :index="index"
-                                    :count="group.records.length"
-                                    :key="make_component_key([opts.list_item_component, index, rec.id])"
-                                    />
-                            </v-list-item-content>
-                            <v-list-item-action  :class="{'d-flex align-stretch': opts.list_item_actions.length}">
-                                <component
-                                    v-for="(action, action_index) in opts.list_item_actions"
-                                    :is="action.comp_name"
-                                    v-if="action.enabled(rec, action)"
-                                    :options="_.merge({}, list_item_options, action.options)"
-                                    :record="action.get_record(rec, action)"
-                                    :index="index"
-                                    :count="group.records.length"
-                                    :key="make_component_key([action.comp_name, index, action_index, rec.id])"
-                                    />
-                                <div class="action action-select">
-                                    <input
-                                        class="my-checkbox"
-                                        type="checkbox"
-                                        :input-value="rec.id"
-                                        :true-value="rec.id"
-                                        :value="rec.id"
-                                        :checked="is_selected(rec)"
-                                        :key="make_component_key(['list-checkbox', index, rec.id])"
-                                        @click="handleSelect(rec, $event)"
-                                        />
-                                </div>
-                            </v-list-item-action>
-                        </v-list-item>
-                        <div class="extra" v-if="opts.list_item_extra_component">
+                <div :class="'list-item-wrapper' + (is_selected(rec) ? ' active' : '')" v-for="(rec, index) in group.records"">
+                    <v-list-item :key="make_component_key(['group-rec', gindex, index, rec.id])">
+                        <v-list-item-content>
                             <component
-                                :is="opts.list_item_extra_component"
+                                :is="opts.list_item_component"
                                 :options="list_item_options"
                                 :record="rec"
                                 :index="index"
                                 :count="group.records.length"
-                                :key="make_component_key(['list-extra', gindex, index, rec.id])"
+                                :key="make_component_key([opts.list_item_component, index, rec.id])"
                                 />
-                        </div>
+                        </v-list-item-content>
+                        <v-list-item-action  :class="{'d-flex align-stretch': opts.list_item_actions.length}">
+                            <component
+                                v-for="(action, action_index) in opts.list_item_actions"
+                                :is="action.comp_name"
+                                v-if="action.enabled(rec, action)"
+                                :options="_.merge({}, list_item_options, action.options)"
+                                :record="action.get_record(rec, action)"
+                                :index="index"
+                                :count="group.records.length"
+                                :key="make_component_key([action.comp_name, index, action_index, rec.id])"
+                                />
+                            <div class="action action-select">
+                                <input
+                                    class="my-checkbox"
+                                    type="checkbox"
+                                    :input-value="rec.id"
+                                    :true-value="rec.id"
+                                    :value="rec.id"
+                                    :checked="is_selected(rec)"
+                                    :key="make_component_key(['list-checkbox', index, rec.id])"
+                                    @click="handleSelect(rec, $event)"
+                                    />
+                            </div>
+                        </v-list-item-action>
+                    </v-list-item>
+                    <div class="extra" v-if="opts.list_item_extra_component">
+                        <component
+                            :is="opts.list_item_extra_component"
+                            :options="list_item_options"
+                            :record="rec"
+                            :index="index"
+                            :count="group.records.length"
+                            :key="make_component_key(['list-extra', gindex, index, rec.id])"
+                            />
                     </div>
                 </div>
             </v-list>
-            <div class="no-record pa-2" v-if="!has_records">
-                <p class="text--secondary">No item to select.</p>
-            </div>
+        </v-card>
+        <v-card class="no-record pa-2" v-if="!has_records">
+            <p class="text--secondary">No item to select.</p>
         </v-card>
         <v-row class="actions bottom-actions" v-if="has_records && opts.showActions">
             <v-col>

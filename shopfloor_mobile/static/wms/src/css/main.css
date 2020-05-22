@@ -190,9 +190,8 @@ ul.packaging span:first-child {
 .manual-select.with-groups .v-card__title {
     padding: 0.5rem 1rem 1rem 1rem;
 }
-.manual-select.with-groups .select-group:not(:last-child) {
-    border-bottom: 2px;
-    margin-bottom: 0.5rem;
+.manual-select.with-groups .v-card.select-group:not(:last-child) {
+    margin-bottom: 1.2rem;
 }
 .manual-select .v-list {
     padding: 0;
@@ -264,10 +263,12 @@ input.my-checkbox[type="checkbox"]:checked {
 .summary-content .v-list-item__title {
     max-width: 100%;
     white-space: normal;
-    font-size: 0.87rem;
+    font-size: 90%;
+    line-height: 130%;
 }
 .summary-content .v-list-item__subtitle {
-    font-size: 0.765rem;
+    font-size: 85%;
+    line-height: 125%;
 }
 .summary-content .summary-content-item {
     margin-bottom: 0.4em;
@@ -306,6 +307,17 @@ input.my-checkbox[type="checkbox"]:checked {
 .action .v-btn {
     min-width: 0;
     font-size: 1.2em;
+}
+
+.v-list-item.inner-panel-expanded {
+    border: 2px solid #ccc;
+}
+.list
+    .v-list-item.inner-panel-expanded
+    .v-expansion-panel
+    .v-expansion-panel-content__wrap {
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .v-list-item.inner-panel-expanded .v-list-item__action--stack {
