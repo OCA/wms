@@ -39,6 +39,7 @@ export var Checkout = Vue.component("checkout", {
                 <manual-select
                     :records="state.data.pickings"
                     :list_item_fields="manual_select_picking_fields"
+                    :options="{list_item_options: {bold_title: true}}"
                     :key="current_state_key + '-manual-select'"
                     />
                 <div class="button-list button-vertical-list full">
@@ -69,7 +70,7 @@ export var Checkout = Vue.component("checkout", {
                 <detail-picking-select
                     :picking="state.data.picking"
                     :select_records="state.data.selected_move_lines"
-                    :select_options="{multiple: true, initSelectAll: true, list_item_component: 'picking-select-package-content'}"
+                    :select_options="{multiple: true, initSelectAll: true, list_item_component: 'picking-select-package-content', list_item_options: {actions: ['action_qty_edit']}}"
                     :key="current_state_key + '-detail-picking-select'"
                     />
                 <div class="button-list button-vertical-list full">
@@ -108,15 +109,15 @@ export var Checkout = Vue.component("checkout", {
                     :key="current_state_key + '-picking-summary'"
                     />
                 <div class="button-list button-vertical-list full">
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <v-btn color="primary" @click="$root.trigger('mark_as_done')"
-                                   :disabled="state.data.picking.move_lines.length < 1">Mark as done</v-btn>
-                        </v-col>
-                    </v-row>
                     <v-row align="center" v-if="!state.data.all_processed">
                         <v-col class="text-center" cols="12">
                             <v-btn color="primary" @click="$root.trigger('continue')">Continue checkout</v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn color="success" @click="$root.trigger('mark_as_done')"
+                                   :disabled="state.data.picking.move_lines.length < 1">Mark as done</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -165,6 +166,13 @@ export var Checkout = Vue.component("checkout", {
                     :select_options="{list_item_component: 'list-item'}"
                     :key="current_state_key + '-detail-picking-select'"
                     />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back />
+                        </v-col>
+                    </v-row>
+                </div>
             </div>
             <div v-if="state_is('confirm_done')">
                 <detail-picking :picking="state.data.picking" />
@@ -542,7 +550,6 @@ export var Checkout = Vue.component("checkout", {
                     },
                     events: {
                         select: "on_select",
-                        back: "on_back",
                     },
                     on_select: selected => {
                         if (!selected) {
@@ -551,14 +558,10 @@ export var Checkout = Vue.component("checkout", {
                         this.wait_call(
                             this.odoo.call("set_packaging", {
                                 picking_id: this.state.data.picking.id,
-                                pickage_id: this.state.data.package.id,
+                                package_id: this.state.data.package.id,
                                 packaging_id: selected.id,
                             })
                         );
-                    },
-                    on_back: () => {
-                        this.state_to("start");
-                        this.reset_notification();
                     },
                 },
                 confirm_done: {
