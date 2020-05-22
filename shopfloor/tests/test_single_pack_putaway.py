@@ -512,7 +512,7 @@ class SinglePackPutawayCase(CommonCase):
             response,
             next_state="start",
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Canceled, you can scan a new pack.",
             },
         )
@@ -555,7 +555,7 @@ class SinglePackPutawayCase(CommonCase):
             response,
             next_state="start",
             message={
-                "message_type": "info",
+                "message_type": "success",
                 "body": "Canceled, you can scan a new pack.",
             },
         )
