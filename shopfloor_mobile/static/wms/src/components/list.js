@@ -58,6 +58,7 @@ Vue.component("list", {
         list_item_options() {
             const opts = _.defaults({}, this.opts.list_item_options, {
                 key_title: this.opts.key_title,
+                bold_title: false,
                 showCounters: this.opts.showCounters,
                 // customize fields
                 fields: this.opts.list_item_fields,
@@ -80,7 +81,7 @@ Vue.component("list", {
     },
     template: `
     <div :class="klass">
-        <v-card outlined>
+        <v-card>
             <v-list v-if="has_records">
                 <div class="list-group" v-for="group in listable" :key="group.key">
                     <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
@@ -125,7 +126,7 @@ Vue.component("list-item", {
     mixins: [ItemDetailMixin],
     template: `
     <v-list-item-content>
-        <v-list-item-title v-if="opts.show_title" v-text="_.result(record, opts.key_title)"></v-list-item-title>
+        <v-list-item-title v-if="opts.show_title" :class="{'font-weight-bold': opts.bold_title}" v-text="_.result(record, opts.key_title)"></v-list-item-title>
         <div class="details">
             <div v-for="(field, index) in options.fields" :class="'field-detail ' + field.path.replace('.', '-') + ' ' + (field.klass || '')">
                 <span v-if="raw_value(record, field) || field.display_no_value">
