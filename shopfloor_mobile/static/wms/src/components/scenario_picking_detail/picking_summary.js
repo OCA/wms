@@ -4,46 +4,17 @@ import {PickingDetailListMixin} from "./mixins.js";
 
 Vue.component("picking-summary", {
     mixins: [PickingDetailListMixin],
-    computed: {
+    methods: {
         list_opts() {
-            // Defining defaults for an Object property
-            // works only if you don't pass the property at all.
-            // If you pass only one key, you'll lose all defaults.
-            // TODO: we should call `super.list_options` but is not available in vue by default.
-            const opts = _.defaults({}, this.$props.list_options, {
-                showCounters: true,
-                list_item_component: "picking-summary-content",
-                list_item_actions: this._get_list_item_actions(
-                    this.$props.list_options.list_item_options.actions || []
-                ),
-            });
-            // _.defaults is not recursive
-            opts.list_item_options = _.defaults(
+            const opts = _.defaults(
                 {},
-                this.$props.list_options.list_item_options,
+                this.$super(PickingDetailListMixin).list_opts(),
                 {
-                    // more options here
+                    showCounters: true,
+                    list_item_component: "picking-summary-content",
                 }
             );
             return opts;
-        },
-    },
-    methods: {
-        _get_list_item_actions(to_enable) {
-            let actions = [];
-            const avail_list_item_actions = this._get_available_list_item_actions();
-            to_enable.forEach(function(action) {
-                if (
-                    typeof action === "string" &&
-                    !_.isUndefined(avail_list_item_actions[action])
-                ) {
-                    actions.push(avail_list_item_actions[action]);
-                } else {
-                    // we might get an action description object straight
-                    actions.push(action);
-                }
-            });
-            return actions;
         },
         _get_available_list_item_actions() {
             // TODO: we should probably make the 1st class citizens w/ their own object class.
