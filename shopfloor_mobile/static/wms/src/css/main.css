@@ -208,6 +208,9 @@ ul.packaging span:first-child {
 .state-display-info .v-alert {
     margin-bottom: 0;
 }
+.theme--light.v-expansion-panels .v-expansion-panel {
+    background-color: transparent;
+}
 
 .list .v-expansion-panel-header {
     padding: 0;
@@ -305,7 +308,10 @@ input.my-checkbox[type="checkbox"]:checked {
     font-size: 1.2em;
 }
 
-.v-list-item__action--stack {
+.v-list-item.inner-panel-expanded .v-list-item__action--stack {
+    align-self: start;
+}
+.v-list-item:not(.inner-panel-expanded) .v-list-item__action--stack {
     flex-direction: row;
 }
 .v-application--is-ltr .v-list-item__action:last-of-type:not(:only-child),
@@ -316,7 +322,6 @@ input.my-checkbox[type="checkbox"]:checked {
 
 .list-item-wrapper:not(:last-child) {
     border-bottom: 1px solid #ccc;
-    padding-bottom: 0.5rem;
 }
 
 .list-item-wrapper .extra {

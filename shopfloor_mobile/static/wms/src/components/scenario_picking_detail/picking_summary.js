@@ -22,11 +22,11 @@ Vue.component("picking-summary", {
                 action_change_pkg: {
                     comp_name: "edit-action",
                     get_record: function(rec, action) {
-                        if (rec.records) {
+                        if (rec.pack) {
                             // lines grouped, get real line
-                            return rec.records[0].package_src;
+                            return rec.pack;
                         }
-                        return rec.package_src;
+                        return rec.package_dest;
                     },
                     options: {
                         click_event: "pkg_change_type",
@@ -35,7 +35,7 @@ Vue.component("picking-summary", {
                         // Exclude for non-packaged records.
                         // NOTE: `pack` is available only if records are grouped.
                         // See `utils.group_by_pack`.
-                        return Boolean(rec.pack);
+                        return !_.isUndefined(rec.pack);
                     },
                 },
                 action_cancel_line: {
@@ -64,10 +64,23 @@ Vue.component("picking-summary-content", {
         index: Number,
         count: Number,
     },
+    data: function() {
+        return {
+            panel: [],
+        };
+    },
+    watch: {
+        panel: {
+            handler: function(newVal, oldVal) {
+                // The panel is opened
+                $(this.$parent.$el).toggleClass("inner-panel-expanded", newVal == 0);
+            },
+        },
+    },
     template: `
     <v-list-item-content :class="'summary-content ' + (record.key == 'no-pack'? 'no-pack' : 'has-pack' )">
-        <v-expansion-panels v-if="record.key != 'no-pack' && record.records_by_pkg_type" flat>
-            <v-expansion-panel v-for="pkg_type in record.records_by_pkg_type" :key="pkg_type.key"">
+        <v-expansion-panels v-if="record.key != 'no-pack' && record.records_by_pkg_type" flat v-model="panel">
+            <v-expansion-panel v-for="pkg_type in record.records_by_pkg_type" :key="make_component_key(['pkg', index])">
                 <v-expansion-panel-header>
                     <span class="item-counter">
                         <span>{{ index + 1 }} / {{ count }}</span>
@@ -76,7 +89,6 @@ Vue.component("picking-summary-content", {
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <strong class="pkg-type-name">{{ pkg_type.title }}</strong>
-                    <!--edit-action :record="record.pack" :click_event="'pkg_change_type'" /-->
                     <picking-summary-product-detail
                         v-for="(prod, i) in pkg_type.records"
                         :record="prod"
@@ -87,7 +99,7 @@ Vue.component("picking-summary-content", {
             </v-expansion-panel>
         </v-expansion-panels>
         <div v-else v-for="(subrec, i) in record.records">
-            <picking-summary-product-detail :record="subrec" :index="index" :count="count" />
+            <picking-summary-product-detail :record="subrec" :index="index" :count="count" :key="make_component_key(['bare', subrec.id])" />
         </div>
     </v-list-item-content>
     `,

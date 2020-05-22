@@ -98,7 +98,7 @@ Vue.component("list", {
                                 :count="group.records.length"
                                 :key="make_component_key([opts.list_item_component, 'list', index, rec.id])"
                                 />
-                            <v-list-item-action v-if="opts.list_item_actions.length" class="d-flex align-stretch">
+                            <v-list-item-action v-if="opts.list_item_actions.length">
                                 <component
                                     v-for="action in opts.list_item_actions"
                                     :is="action.comp_name"
