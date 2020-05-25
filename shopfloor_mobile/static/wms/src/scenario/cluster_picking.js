@@ -111,13 +111,16 @@ export var ClusterPicking = Vue.component("cluster-picking", {
     },
     methods: {
         screen_title: function() {
-            if (_.isEmpty(this.current_batch()) || this.state_is("confirm_start"))
+            if (_.isEmpty(this.current_doc()) || this.state_is("confirm_start"))
                 return this.menu_item.name;
-            let title = this.current_batch().name;
+            let title = this.current_doc().name;
             // if (this.current_picking) {
             //     title += " - " + this.current_picking.name;
             // }
             return title;
+        },
+        current_doc: function() {
+            return this.current_batch();
         },
         current_batch: function() {
             return this.state_get_data("confirm_start");

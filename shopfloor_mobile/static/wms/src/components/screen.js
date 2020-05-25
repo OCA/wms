@@ -15,12 +15,18 @@ Vue.component("Screen", {
             // If you pass only one key, you'll lose all defaults.
             const screen_info = _.defaults({}, this.$props.screen_info, {
                 title: "",
+                current_doc: {},
+                current_doc_identifier: "",
                 showMenu: true,
                 noUserMessage: false,
                 user_message: null,
                 user_popup: null,
                 klass: "generic",
             });
+            screen_info.current_doc_identifier = _.result(
+                screen_info,
+                "current_doc.identifier"
+            );
             return screen_info;
         },
         navigation() {
@@ -95,8 +101,16 @@ Vue.component("Screen", {
                 dense
                 >
             <v-app-bar-nav-icon @click.stop="drawer = !drawer" v-if="info.showMenu" />
-            <v-toolbar-title v-if="info.title">{{ info.title }}</v-toolbar-title>
+            <v-toolbar-title v-if="info.title">
+                <span>
+                    {{ info.title }}
+                </span>
+            </v-toolbar-title>
+
             <v-spacer></v-spacer>
+            <v-btn icon v-if="info.current_doc_identifier" @click="$router.push({'name': 'scananything', params: {identifier: info.current_doc_identifier}, query: {displayOnly: 1}})">
+                <btn-info-icon color="'#fff'" />
+            </v-btn>
             <app-bar-actions />
         </v-app-bar>
         <v-content :class="screen_content_class">
