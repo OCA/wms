@@ -1,5 +1,3 @@
-import {utils} from "../../utils.js";
-
 export var ItemDetailMixin = {
     props: {
         record: Object,
@@ -41,7 +39,7 @@ export var ItemDetailMixin = {
             return [];
         },
         _render_date(record, field) {
-            return this.utils.format_date_display(_.result(record, field.path));
+            return this.utils.misc.format_date_display(_.result(record, field.path));
         },
         has_detail_action(record, field) {
             return _.result(record, field.action_val_path);
@@ -68,9 +66,6 @@ export var ItemDetailMixin = {
         },
     },
     computed: {
-        utils: function() {
-            return utils;
-        },
         wrapper_klass: function() {
             return [
                 "detail",

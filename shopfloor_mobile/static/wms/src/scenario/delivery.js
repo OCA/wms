@@ -1,6 +1,5 @@
 import {ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
-import {utils} from "../utils.js";
 import {demotools} from "../demo/demo.core.js"; // FIXME: dev only
 import {} from "../demo/demo.delivery.js"; // FIXME: dev only
 
@@ -29,7 +28,7 @@ export var Delivery = Vue.component("checkout", {
             <div v-if="state_is('deliver')">
                 <picking-summary
                     :record="state.data.picking"
-                    :records_grouped="utils.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.group_by_pack})"
+                    :records_grouped="utils.misc.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.misc.group_by_pack})"
                     :list_options="deliver_move_line_list_options()"
                     :key="current_state_key + '-detail-picking-' + state.data.picking.id"
                     />
@@ -59,11 +58,6 @@ export var Delivery = Vue.component("checkout", {
             </div>
         </Screen>
         `,
-    computed: {
-        utils: function() {
-            return utils;
-        },
-    },
     // FIXME: just for dev
     // mounted: function() {
     //     // TEST force state and data
@@ -74,17 +68,12 @@ export var Delivery = Vue.component("checkout", {
     //     this._state_load(state);
     // },
     methods: {
-        record_by_id: function(records, _id) {
-            // TODO: double check when the process is done if this is still needed or not.
-            // `manual-select` can now buble up events w/ full record.
-            return _.first(_.filter(records, {id: _id}));
-        },
         deliver_move_line_list_options: function() {
             return {
                 list_item_options: {
                     actions: ["action_cancel_line"],
                     fields: this.move_line_detail_fields(),
-                    list_item_klass_maker: this.utils.move_line_color_klass,
+                    list_item_klass_maker: this.utils.misc.move_line_color_klass,
                 },
             };
         },
@@ -102,7 +91,7 @@ export var Delivery = Vue.component("checkout", {
                     label: "Lines",
                     renderer: function(rec, field) {
                         return (
-                            self.utils.picking_completed_lines(rec) +
+                            self.utils.misc.picking_completed_lines(rec) +
                             " / " +
                             rec.move_lines.length
                         );
@@ -194,7 +183,7 @@ export var Delivery = Vue.component("checkout", {
                     },
                     visible_records: records => {
                         const self = this;
-                        let visible_records = utils.order_picking_by_completeness(
+                        let visible_records = this.utils.misc.order_picking_by_completeness(
                             records
                         );
                         if (this.state.data.filtered) {
