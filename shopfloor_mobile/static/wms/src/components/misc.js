@@ -201,7 +201,12 @@ Vue.component("todo", {
 
 // TODO: use color registry for the icon color
 Vue.component("btn-info-icon", {
+    props: {
+        color: {
+            type: String,
+        },
+    },
     template: `
-    <v-icon color="blue lighten-1">mdi-information</v-icon>
+    <v-icon :color="color || utils.colors.color_for('info_icon')">mdi-information</v-icon>
 `,
 });
