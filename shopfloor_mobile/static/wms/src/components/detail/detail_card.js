@@ -28,7 +28,7 @@ Vue.component("item-detail-card", {
                             <v-btn icon class="detail-action"
                                     v-if="has_detail_action(record, field)"
                                     @click="on_detail_action(record, field, opts)">
-                                <v-icon color="blue lighten-1">mdi-information</v-icon>
+                                <btn-info-icon />
                             </v-btn>
                         </div>
                     </div>
