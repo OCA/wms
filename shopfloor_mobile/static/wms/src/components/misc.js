@@ -90,7 +90,7 @@ Vue.component("state-display-info", {
     },
     template: `
   <div class="state-display-info" v-if="info.title">
-    <v-alert tile dense type="info">
+    <v-alert tile dense type="info" :icon="false">
       <div class="state-title">{{ info.title }}</div>
     </v-alert>
   </div>
