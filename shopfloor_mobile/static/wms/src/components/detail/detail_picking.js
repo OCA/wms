@@ -3,26 +3,16 @@ export var PickingDetailMixin = {
         // TODO: rename to `record`
         record: Object,
         options: Object,
-        clickable: {
-            type: Boolean,
-            // TODO: this must be false when showing picking screen (eg: scan anything)
-            default: true,
-        },
-    },
-    methods: {
-        on_title_action() {
-            // TODO: we should probably delegate this to a global event
-            this.$router.push({
-                name: "scananything",
-                params: {identifier: this.picking.name},
-                query: {displayOnly: 1},
-            });
-        },
+        // clickable: {
+        //     type: Boolean,
+        //     // TODO: this must be false when showing record screen (eg: scan anything)
+        //     default: true,
+        // },
     },
     computed: {
         opts() {
             const opts = _.defaults({}, this.$props.options, {
-                on_title_action: this.$props.clickable ? this.on_title_action : null,
+                title_action_field: {path: "name", action_val_path: "name"},
             });
             return opts;
         },
