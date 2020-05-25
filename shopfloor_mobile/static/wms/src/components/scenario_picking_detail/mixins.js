@@ -50,6 +50,10 @@ export var ListActionsConsumerMixin = {
 export var PickingDetailSelectMixin = {
     mixins: [PickingDetailMixin, ListActionsConsumerMixin],
     props: {
+        show_picking_info: {
+            type: Boolean,
+            default: false,
+        },
         select_records: Array,
         select_records_grouped: Array,
         select_options: Object,
@@ -66,7 +70,7 @@ export var PickingDetailSelectMixin = {
     template: `
 <div class="detail-picking-select" v-if="!_.isEmpty(record)">
 
-    <detail-picking :record="record" />
+    <detail-picking :record="record" v-if="show_picking_info" />
 
     <manual-select
         :records="select_records || record.move_lines"
@@ -80,6 +84,10 @@ export var PickingDetailSelectMixin = {
 export var PickingDetailListMixin = {
     mixins: [PickingDetailMixin, ListActionsConsumerMixin],
     props: {
+        show_picking_info: {
+            type: Boolean,
+            default: false,
+        },
         records: Array,
         records_grouped: Array,
         list_options: Object,
@@ -95,7 +103,7 @@ export var PickingDetailListMixin = {
     template: `
 <div class="detail-picking-list" v-if="!_.isEmpty(record)">
 
-    <detail-picking :record="record" />
+    <detail-picking :record="record" v-if="show_picking_info" />
 
     <list
         :records="records || record.move_lines"
