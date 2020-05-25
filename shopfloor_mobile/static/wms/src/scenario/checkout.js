@@ -39,7 +39,7 @@ export var Checkout = Vue.component("checkout", {
                     :records="state.data.pickings"
                     :list_item_fields="manual_select_picking_fields"
                     :options="{list_item_options: {bold_title: true}}"
-                    :key="current_state_key + '-manual-select'"
+                    :key="make_state_component_key(['manual-select'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -55,7 +55,7 @@ export var Checkout = Vue.component("checkout", {
                     :select_records="state.data.picking.move_lines"
                     :select_records_grouped="utils.misc.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.misc.only_one_package})"
                     :select_options="select_line_manual_select_opts()"
-                    :key="current_state_key + '-detail-picking-select'"
+                    :key="make_state_component_key(['detail-picking-select'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -71,7 +71,7 @@ export var Checkout = Vue.component("checkout", {
                     :record="state.data.picking"
                     :select_records="state.data.selected_move_lines"
                     :select_options="select_package_manual_select_opts()"
-                    :key="current_state_key + '-detail-picking-select'"
+                    :key="make_state_component_key(['detail-picking-select'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -106,7 +106,7 @@ export var Checkout = Vue.component("checkout", {
                     :record="state.data.picking"
                     :records_grouped="utils.misc.group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': utils.misc.group_by_pack})"
                     :list_options="{list_item_options: {actions: ['action_change_pkg', 'action_cancel_line']}}"
-                    :key="current_state_key + '-picking-summary'"
+                    :key="make_state_component_key(['picking-summary'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center" v-if="!state.data.all_processed">
@@ -127,7 +127,7 @@ export var Checkout = Vue.component("checkout", {
                     :record="state.data.picking"
                     :select_records="state.data.packages"
                     :select_options="{list_item_fields: existing_package_select_fields, list_item_component: 'list-item'}"
-                    :key="current_state_key + '-detail-picking-select'"
+                    :key="make_state_component_key(['detail-picking-select'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -166,7 +166,7 @@ export var Checkout = Vue.component("checkout", {
                     :record="state.data.picking"
                     :select_records="state.data.packagings"
                     :select_options="{list_item_component: 'list-item'}"
-                    :key="current_state_key + '-detail-picking-select'"
+                    :key="make_state_component_key(['detail-picking-select'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
