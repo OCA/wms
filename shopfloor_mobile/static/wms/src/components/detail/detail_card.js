@@ -9,8 +9,10 @@ Vue.component("item-detail-card", {
             <v-card-title v-if="!opts.no_title">
                 <slot name="title">
                     <span v-text="_.result(record, opts.key_title)" />
-                    <v-btn icon class="detail-action" v-if="opts.on_title_action" @click="opts.on_title_action()">
-                        <v-icon color="blue lighten-1">mdi-information</v-icon>
+                    <v-btn icon class="detail-action"
+                            v-if="opts.on_title_action || opts.title_action_field"
+                            @click="opts.on_title_action ? opts.on_title_action(): on_detail_action(record, opts.title_action_field)">
+                        <btn-info-icon />
                     </v-btn>
                 </slot>
             </v-card-title>
