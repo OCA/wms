@@ -327,10 +327,10 @@ export var ScenarioBaseMixin = {
                 _.each(self.state.events, function(handler, name) {
                     if (typeof handler == "string") handler = self.state[handler];
                     const event_name = self.state.key + ":" + name;
-                    // Wipe old handlers
-                    // TODO: any way to register them just once?
-                    self.$root.event_hub.$off(event_name, handler);
-                    self.$root.event_hub.$on(event_name, handler);
+                    const existing = self.$root.event_hub._events[event_name];
+                    if (handler && _.isEmpty(existing)) {
+                        self.$root.event_hub.$on(event_name, handler);
+                    }
                 });
             }
         },
