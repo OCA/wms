@@ -33,7 +33,7 @@ Vue.component("detail-operation", {
   <div :class="$options._componentTag">
     <detail-picking
         :key="record.picking.id"
-        :picking="record.picking"
+        :record="record.picking"
         :options="{main: true}"
         />
     <item-detail-card v-bind="$props" :options="op_card_options()" />

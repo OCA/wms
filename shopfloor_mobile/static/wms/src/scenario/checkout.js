@@ -52,7 +52,7 @@ export var Checkout = Vue.component("checkout", {
             </div>
             <div v-if="state_is('select_line')">
                 <detail-picking-select
-                    :picking="state.data.picking"
+                    :record="state.data.picking"
                     :select_records="state.data.picking.move_lines"
                     :select_records_grouped="utils.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.only_one_package})"
                     :key="current_state_key + '-detail-picking-select'"
@@ -68,7 +68,7 @@ export var Checkout = Vue.component("checkout", {
 
             <div v-if="state_is('select_package')">
                 <detail-picking-select
-                    :picking="state.data.picking"
+                    :record="state.data.picking"
                     :select_records="state.data.selected_move_lines"
                     :select_options="{multiple: true, initSelectAll: true, list_item_component: 'picking-select-package-content', list_item_options: {actions: ['action_qty_edit']}}"
                     :key="current_state_key + '-detail-picking-select'"
@@ -103,7 +103,7 @@ export var Checkout = Vue.component("checkout", {
 
             <div v-if="state_is('summary')">
                 <picking-summary
-                    :picking="state.data.picking"
+                    :record="state.data.picking"
                     :records_grouped="utils.group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': utils.group_by_pack})"
                     :list_options="{list_item_options: {actions: ['action_change_pkg', 'action_cancel_line']}}"
                     :key="current_state_key + '-picking-summary'"
@@ -124,7 +124,7 @@ export var Checkout = Vue.component("checkout", {
             </div>
             <div v-if="state_is('select_dest_package')">
                 <detail-picking-select
-                    :picking="state.data.picking"
+                    :record="state.data.picking"
                     :select_records="state.data.packages"
                     :select_options="{list_item_fields: existing_package_select_fields, list_item_component: 'list-item'}"
                     :key="current_state_key + '-detail-picking-select'"
@@ -138,7 +138,8 @@ export var Checkout = Vue.component("checkout", {
                 </div>
             </div>
             <div v-if="state_is('change_quantity')">
-                <detail-picking :picking="state.data.picking" />
+                <!-- TODO: move picking to header, add line info (prod, lot, etc) -->
+                <detail-picking :record="state.data.picking" />
                 <div class="qty">
                     <input-number-spinner
                         v-on:input="state.on_qty_update"
@@ -146,6 +147,7 @@ export var Checkout = Vue.component("checkout", {
                         class="mb-2"
                         />
                 </div>
+                TODO: pkging widget
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
@@ -161,7 +163,7 @@ export var Checkout = Vue.component("checkout", {
             </div>
             <div v-if="state_is('change_packaging')">
                 <detail-picking-select
-                    :picking="state.data.picking"
+                    :record="state.data.picking"
                     :select_records="state.data.packagings"
                     :select_options="{list_item_component: 'list-item'}"
                     :key="current_state_key + '-detail-picking-select'"
@@ -175,7 +177,7 @@ export var Checkout = Vue.component("checkout", {
                 </div>
             </div>
             <div v-if="state_is('confirm_done')">
-                <detail-picking :picking="state.data.picking" />
+                <detail-picking :record="state.data.picking" />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">

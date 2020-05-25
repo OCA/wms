@@ -1,6 +1,7 @@
 /* eslint-disable strict */
 /* eslint-disable no-implicit-globals */
 import {PickingDetailSelectMixin} from "./mixins.js";
+import {ItemDetailMixin} from "../detail/detail_mixin.js";
 
 Vue.component("detail-picking-select", {
     mixins: [PickingDetailSelectMixin],
@@ -26,9 +27,8 @@ Vue.component("detail-picking-select", {
 });
 
 Vue.component("picking-select-line-content", {
+    mixins: [ItemDetailMixin],
     props: {
-        record: Object,
-        options: Object,
         index: Number,
         count: Number,
     },

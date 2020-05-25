@@ -64,12 +64,12 @@ export var PickingDetailSelectMixin = {
         },
     },
     template: `
-<div class="detail-picking-select" v-if="!_.isEmpty(picking)">
+<div class="detail-picking-select" v-if="!_.isEmpty(record)">
 
-    <detail-picking :picking="picking" />
+    <detail-picking :record="record" />
 
     <manual-select
-        :records="select_records || picking.move_lines"
+        :records="select_records || record.move_lines"
         :grouped_records="select_records_grouped"
         :options="select_opts()"
         />
@@ -93,12 +93,12 @@ export var PickingDetailListMixin = {
         },
     },
     template: `
-<div class="detail-picking-list" v-if="!_.isEmpty(picking)">
+<div class="detail-picking-list" v-if="!_.isEmpty(record)">
 
-    <detail-picking :picking="picking" />
+    <detail-picking :record="record" />
 
     <list
-        :records="records || picking.move_lines"
+        :records="records || record.move_lines"
         :grouped_records="records_grouped"
         :options="list_opts()"
         />
