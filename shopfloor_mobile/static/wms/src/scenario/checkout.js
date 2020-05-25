@@ -55,6 +55,7 @@ export var Checkout = Vue.component("checkout", {
                     :record="state.data.picking"
                     :select_records="state.data.picking.move_lines"
                     :select_records_grouped="utils.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.only_one_package})"
+                    :select_options="select_line_manual_select_opts()"
                     :key="current_state_key + '-detail-picking-select'"
                     />
                 <div class="button-list button-vertical-list full">
@@ -70,7 +71,7 @@ export var Checkout = Vue.component("checkout", {
                 <detail-picking-select
                     :record="state.data.picking"
                     :select_records="state.data.selected_move_lines"
-                    :select_options="{multiple: true, initSelectAll: true, list_item_component: 'picking-select-package-content', list_item_options: {actions: ['action_qty_edit']}}"
+                    :select_options="select_package_manual_select_opts()"
                     :key="current_state_key + '-detail-picking-select'"
                     />
                 <div class="button-list button-vertical-list full">
@@ -227,6 +228,19 @@ export var Checkout = Vue.component("checkout", {
             // TODO: double check when the process is done if this is still needed or not.
             // `manual-select` can now buble up events w/ full record.
             return _.first(_.filter(records, {id: _id}));
+        },
+        select_line_manual_select_opts: function() {
+            return {
+                group_color: this.$root.colors.color_for("screen_step_todo"),
+            };
+        },
+        select_package_manual_select_opts: function() {
+            return {
+                multiple: true,
+                initSelectAll: true,
+                list_item_component: "picking-select-package-content",
+                list_item_options: {actions: ["action_qty_edit"]},
+            };
         },
     },
     data: function() {
