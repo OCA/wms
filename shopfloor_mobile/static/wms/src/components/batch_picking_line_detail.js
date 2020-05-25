@@ -57,7 +57,7 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     :key="'batch-picking-line-detail-2'"
     :record="line"
     :options="{main: true, key_title: 'product.display_name', fields: detail_fields('product')}"
-    :card_color="$root.colors.color_for(articleScanned ? 'screen_step_done': 'screen_step_missing')"
+    :card_color="$root.colors.color_for(articleScanned ? 'screen_step_done': 'screen_step_todo')"
     />
 
   <item-detail-card
@@ -65,7 +65,7 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     :key="'batch-picking-line-detail-3'"
     :record="line"
     :options="{main: true, key_title: 'package_dest.name'}"
-    :card_color="$root.colors.color_for(has_destination_pack ? 'screen_step_done': 'screen_step_missing')"
+    :card_color="$root.colors.color_for(has_destination_pack ? 'screen_step_done': 'screen_step_todo')"
     />
 
   <item-detail-card
@@ -73,7 +73,7 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     :key="'batch-picking-line-detail-4'"
     :record="line"
     :options="{main: true}"
-    :card_color="$root.colors.color_for(has_destination_pack ? 'screen_step_done': 'screen_step_missing')"
+    :card_color="$root.colors.color_for(has_destination_pack ? 'screen_step_done': 'screen_step_todo')"
     >
     <template v-slot:title>
       Destination pack not selected.
