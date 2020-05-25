@@ -220,10 +220,21 @@ export var Checkout = Vue.component("checkout", {
     //     this._state_load(state);
     // },
     methods: {
-        record_by_id: function(records, _id) {
-            // TODO: double check when the process is done if this is still needed or not.
-            // `manual-select` can now buble up events w/ full record.
-            return _.first(_.filter(records, {id: _id}));
+        screen_title: function() {
+            if (_.isEmpty(this.current_doc()) || this.state_is("confirm_start"))
+                return this.menu_item.name;
+            let title = this.current_doc().record.name;
+            return title;
+        },
+        current_doc: function() {
+            const data = this.state_get_data("select_line");
+            if (_.isEmpty(data)) {
+                return null;
+            }
+            return {
+                record: data.picking,
+                identifier: data.picking.name,
+            };
         },
         select_line_manual_select_opts: function() {
             return {

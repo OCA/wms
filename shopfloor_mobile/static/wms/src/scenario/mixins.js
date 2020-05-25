@@ -84,6 +84,7 @@ export var ScenarioBaseMixin = {
             return {
                 // you can provide a different screen title
                 title: this.screen_title ? this.screen_title() : this.menu_item.name,
+                current_doc: this.current_doc ? this.current_doc() : null,
                 klass: this.usage + " " + "state-" + this.state.key,
                 user_message: this.user_message,
                 user_popup: this.user_popup,
