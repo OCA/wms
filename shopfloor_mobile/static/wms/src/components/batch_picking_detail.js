@@ -29,7 +29,7 @@ Vue.component("batch-picking-detail", {
       <detail-picking
         v-for="picking in info.pickings"
         :key="picking.id"
-        :picking="picking"
+        :record="record"
         :klass="'listed'"
         :options="{fields: picking_detail_fields()}"
         />

@@ -51,7 +51,7 @@ Vue.component("detail-transfer", {
     <div :class="$options._componentTag">
         <detail-picking
             :key="record.id"
-            :picking="record"
+            :record="record"
             :options="picking_detail_options()"
             />
 
