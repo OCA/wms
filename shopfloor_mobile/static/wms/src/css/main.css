@@ -382,3 +382,7 @@ input.my-checkbox[type="checkbox"]:checked {
 .todo .message {
     background-color: white;
 }
+
+.clickable {
+    cursor: pointer;
+}

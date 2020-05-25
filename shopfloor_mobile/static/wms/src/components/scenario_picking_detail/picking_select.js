@@ -44,7 +44,10 @@ Vue.component("picking-select-line-content", {
             <div class="item-counter">
                 <span>{{ index + 1 }} / {{ count }}</span>
             </div>
-            <span>{{ record.product.display_name }}</span>
+            <span class="clickable" @click="on_detail_action(record.product, {action_val_path: 'barcode'})">
+                {{ record.product.display_name }}
+                <btn-info-icon />
+            </span>
             <div class="lot" v-if="record.lot">
                 <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
             </div>
