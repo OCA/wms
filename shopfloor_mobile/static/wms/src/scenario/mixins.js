@@ -105,6 +105,11 @@ export var ScenarioBaseMixin = {
         },
     },
     methods: {
+        make_state_component_key: function(bits) {
+            bits.unshift(this.current_state_key);
+            bits.unshift(this.usage);
+            return this.make_component_key(bits);
+        },
         storage_key: function(state_key) {
             state_key = _.isUndefined(state_key) ? this.current_state_key : state_key;
             return this.usage + "." + state_key;
