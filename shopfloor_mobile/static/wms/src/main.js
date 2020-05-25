@@ -56,7 +56,6 @@ const app = new Vue({
             appconfig: null,
             authenticated: false,
             registry: process_registry,
-            colors: color_registry,
         };
     },
     created: function() {

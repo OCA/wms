@@ -1,5 +1,4 @@
 import {ItemDetailMixin} from "./detail_mixin.js";
-import {utils} from "../../utils.js";
 
 Vue.component("detail-transfer", {
     mixins: [ItemDetailMixin],
@@ -44,7 +43,7 @@ Vue.component("detail-transfer", {
             ];
         },
         grouped_lines() {
-            return this.utils.group_lines_by_locations(this.record.move_lines);
+            return this.utils.misc.group_lines_by_locations(this.record.move_lines);
         },
     },
     template: `
@@ -63,7 +62,7 @@ Vue.component("detail-transfer", {
                 <list
                     :records="group.records"
                     :key="'group-' + group.key"
-                    :options="{key_title: '', list_item_options: {fields: line_list_fields(), list_item_klass_maker: utils.move_line_color_klass}}"
+                    :options="{key_title: '', list_item_options: {fields: line_list_fields(), list_item_klass_maker: utils.misc.move_line_color_klass}}"
                     />
             </div>
         </div>

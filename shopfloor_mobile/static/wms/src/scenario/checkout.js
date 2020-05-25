@@ -1,6 +1,5 @@
 import {ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
-import {utils} from "../utils.js";
 import {demotools} from "../demo/demo.core.js"; // FIXME: dev only
 import {} from "../demo/demo.checkout.js"; // FIXME: dev only
 
@@ -54,7 +53,7 @@ export var Checkout = Vue.component("checkout", {
                 <detail-picking-select
                     :record="state.data.picking"
                     :select_records="state.data.picking.move_lines"
-                    :select_records_grouped="utils.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.only_one_package})"
+                    :select_records_grouped="utils.misc.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.misc.only_one_package})"
                     :select_options="select_line_manual_select_opts()"
                     :key="current_state_key + '-detail-picking-select'"
                     />
@@ -105,7 +104,7 @@ export var Checkout = Vue.component("checkout", {
             <div v-if="state_is('summary')">
                 <picking-summary
                     :record="state.data.picking"
-                    :records_grouped="utils.group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': utils.group_by_pack})"
+                    :records_grouped="utils.misc.group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': utils.misc.group_by_pack})"
                     :list_options="{list_item_options: {actions: ['action_change_pkg', 'action_cancel_line']}}"
                     :key="current_state_key + '-picking-summary'"
                     />
@@ -195,9 +194,6 @@ export var Checkout = Vue.component("checkout", {
         </Screen>
         `,
     computed: {
-        utils: function() {
-            return utils;
-        },
         // TODO: move these to methods
         manual_select_picking_fields: function() {
             return [
@@ -231,7 +227,7 @@ export var Checkout = Vue.component("checkout", {
         },
         select_line_manual_select_opts: function() {
             return {
-                group_color: this.$root.colors.color_for("screen_step_todo"),
+                group_color: this.utils.colors.color_for("screen_step_todo"),
             };
         },
         select_package_manual_select_opts: function() {
