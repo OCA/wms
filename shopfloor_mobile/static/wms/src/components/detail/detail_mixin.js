@@ -62,6 +62,8 @@ export var ItemDetailMixin = {
                     params: {identifier: identifier},
                     query: {displayOnly: 1},
                 });
+            } else {
+                console.error("Action handler found not value for", field);
             }
         },
     },
