@@ -270,8 +270,8 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
     """
 
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
         cls.batch = cls._create_picking_batch(
             [
                 [
@@ -520,8 +520,8 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
     """
 
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
         cls.batch = cls._create_picking_batch(
             [
                 [

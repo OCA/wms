@@ -64,9 +64,12 @@ class CommonCase(SavepointCase, ComponentMixin):
         cls.env = cls.env(
             context=dict(cls.env.context, tracking_disable=cls.tracking_disable)
         )
+
         cls.setUpComponent()
+        cls.setUpClassUsers()
         cls.setUpClassVars()
         cls.setUpClassBaseData()
+
         with cls.work_on_actions(cls) as work:
             cls.data = work.component(usage="data")
         with cls.work_on_actions(cls) as work:
@@ -77,72 +80,138 @@ class CommonCase(SavepointCase, ComponentMixin):
             cls.schema_detail = work.component(usage="schema_detail")
 
     @classmethod
+    def setUpClassUsers(cls):
+        Users = cls.env["res.users"].with_context(
+            {"no_reset_password": True, "mail_create_nosubscribe": True}
+        )
+        cls.stock_user = Users.create(
+            {
+                "name": "Pauline Poivraisselle",
+                "login": "pauline2",
+                "email": "p.p@example.com",
+                "notification_type": "inbox",
+                "groups_id": [(6, 0, [cls.env.ref("stock.group_stock_user").id])],
+            }
+        )
+        cls.env = cls.env(user=cls.stock_user)
+
+    @classmethod
     def setUpClassVars(cls):
         stock_location = cls.env.ref("stock.stock_location_stock")
         cls.stock_location = stock_location
         cls.customer_location = cls.env.ref("stock.stock_location_customers")
-        cls.customer_location.barcode = "CUSTOMERS"
         cls.dispatch_location = cls.env.ref("stock.location_dispatch_zone")
-        cls.dispatch_location.barcode = "DISPATCH"
         cls.packing_location = cls.env.ref("stock.location_pack_zone")
-        cls.packing_location.barcode = "PACKING"
         cls.input_location = cls.env.ref("stock.stock_location_company")
-        cls.input_location.barcode = "INPUT"
         cls.shelf1 = cls.env.ref("stock.stock_location_components")
-        cls.shelf1.barcode = "SHELF1"
         cls.shelf2 = cls.env.ref("stock.stock_location_14")
-        cls.shelf2.barcode = "SHELF2"
-        cls.customer = cls.env["res.partner"].create({"name": "Customer"})
 
     @classmethod
     def setUpClassBaseData(cls):
-        cls.product_a = cls.env["product.product"].create(
-            {
-                "name": "Product A",
-                "type": "product",
-                "default_code": "A",
-                "barcode": "A",
-                "weight": 2,
-            }
+        cls.customer = cls.env["res.partner"].sudo().create({"name": "Customer"})
+
+        cls.customer_location.sudo().barcode = "CUSTOMERS"
+        cls.dispatch_location.sudo().barcode = "DISPATCH"
+        cls.packing_location.sudo().barcode = "PACKING"
+        cls.input_location.sudo().barcode = "INPUT"
+        cls.shelf1.sudo().barcode = "SHELF1"
+        cls.shelf2.sudo().barcode = "SHELF2"
+
+        cls.product_a = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product A",
+                    "type": "product",
+                    "default_code": "A",
+                    "barcode": "A",
+                    "weight": 2,
+                }
+            )
         )
-        cls.product_a_packaging = cls.env["product.packaging"].create(
-            {"name": "Box", "product_id": cls.product_a.id, "barcode": "ProductABox"}
+        cls.product_a_packaging = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "Box",
+                    "product_id": cls.product_a.id,
+                    "barcode": "ProductABox",
+                }
+            )
         )
-        cls.product_b = cls.env["product.product"].create(
-            {
-                "name": "Product B",
-                "type": "product",
-                "default_code": "B",
-                "barcode": "B",
-                "weight": 3,
-            }
+        cls.product_b = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product B",
+                    "type": "product",
+                    "default_code": "B",
+                    "barcode": "B",
+                    "weight": 3,
+                }
+            )
         )
-        cls.product_b_packaging = cls.env["product.packaging"].create(
-            {"name": "Box", "product_id": cls.product_b.id, "barcode": "ProductBBox"}
+        cls.product_b_packaging = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "Box",
+                    "product_id": cls.product_b.id,
+                    "barcode": "ProductBBox",
+                }
+            )
         )
-        cls.product_c = cls.env["product.product"].create(
-            {
-                "name": "Product C",
-                "type": "product",
-                "default_code": "C",
-                "barcode": "C",
-                "weight": 3,
-            }
+        cls.product_c = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product C",
+                    "type": "product",
+                    "default_code": "C",
+                    "barcode": "C",
+                    "weight": 3,
+                }
+            )
         )
-        cls.product_c_packaging = cls.env["product.packaging"].create(
-            {"name": "Box", "product_id": cls.product_b.id, "barcode": "ProductCBox"}
+        cls.product_c_packaging = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "Box",
+                    "product_id": cls.product_b.id,
+                    "barcode": "ProductCBox",
+                }
+            )
         )
-        cls.product_d = cls.env["product.product"].create(
-            {
-                "name": "Product D",
-                "type": "product",
-                "default_code": "D",
-                "barcode": "D",
-                "weight": 3,
-            }
+        cls.product_d = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product D",
+                    "type": "product",
+                    "default_code": "D",
+                    "barcode": "D",
+                    "weight": 3,
+                }
+            )
         )
-        cls.product_d_packaging = cls.env["product.packaging"].create(
-            {"name": "Box", "product_id": cls.product_d.id, "barcode": "ProductDBox"}
+        cls.product_d_packaging = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "Box",
+                    "product_id": cls.product_d.id,
+                    "barcode": "ProductDBox",
+                }
+            )
         )
 
     def assert_response(
