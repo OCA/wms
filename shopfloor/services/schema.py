@@ -69,41 +69,33 @@ class BaseShopfloorSchemaResponse(Component):
             },
         }
 
-    def move_line(self, with_packaging=False):
-        return {
+    def move_line(self, with_packaging=False, qty_by_packaging=False):
+        schema = {
             "id": {"type": "integer", "required": True},
             "qty_done": {"type": "float", "required": True},
             "quantity": {"type": "float", "required": True},
-            "product": {"type": "dict", "required": True, "schema": self.product()},
-            "lot": {
-                "type": "dict",
-                "required": False,
-                "nullable": True,
-                "schema": self.lot(),
-            },
-            "package_src": {
-                "type": "dict",
-                "required": True,
-                "nullable": True,
-                "schema": self.package(with_packaging=with_packaging),
-            },
-            "package_dest": {
-                "type": "dict",
-                "required": False,
-                "nullable": True,
-                "schema": self.package(with_packaging=with_packaging),
-            },
-            "location_src": {
-                "type": "dict",
-                "required": True,
-                "schema": self.location(),
-            },
-            "location_dest": {
-                "type": "dict",
-                "required": True,
-                "schema": self.location(),
-            },
+            "product": self._schema_dict_of(self.product(), required=True),
+            "lot": self._schema_dict_of(self.lot()),
+            "package_src": self._schema_dict_of(
+                self.package(with_packaging=with_packaging), required=True
+            ),
+            "package_dest": self._schema_dict_of(
+                self.package(with_packaging=with_packaging)
+            ),
+            "location_src": self._schema_dict_of(
+                self.location(), required=True, nullable=False
+            ),
+            "location_dest": self._schema_dict_of(
+                self.location(), required=True, nullable=False
+            ),
         }
+        if qty_by_packaging:
+            schema["qty_by_packaging"] = {
+                "type": "list",
+                "nullable": True,
+                "required": False,
+            }
+        return schema
 
     def product(self):
         return {
