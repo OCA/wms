@@ -98,8 +98,8 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
     """Tests covering the /change_pack_lot endpoint"""
 
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
         cls.batch = cls._create_picking_batch(
             [[cls.BatchProduct(product=cls.product_a, quantity=10)]]
         )
@@ -172,7 +172,9 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
             line, [{"package_id": new_package.id, "result_package_id": new_package.id}]
         )
         self.assertRecordValues(line.package_level_id, [{"package_id": new_package.id}])
-        # check that reservations have been updated
+        # check that reservations have been updated, the new package is not
+        # supposed to be in shelf2 anymore, and we should have no reserved qty
+        # for the initial package anymore
         self.assert_quant_package_qty(self.shelf2, new_package, lambda: 0)
         self.assert_quant_reserved_qty(line, lambda: 0, package=initial_package)
         self.assert_quant_reserved_qty(
@@ -330,10 +332,6 @@ class ClusterPickingChangePackLotCaseSpecial(ClusterPickingChangePackLotCommon):
 
     Special cases where we use a custom batch transfer
     """
-
-    @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
 
     def _create_picking_with_package_level(self, packages):
         picking_form = Form(self.env["stock.picking"])

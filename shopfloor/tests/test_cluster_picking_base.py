@@ -3,13 +3,17 @@ from .common import CommonCase, PickingBatchMixin
 
 class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassVars(cls, *args, **kwargs):
+        super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
-        cls.wh.delivery_steps = "pick_pack_ship"
         cls.picking_type = cls.menu.picking_type_ids
+
+    @classmethod
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
+        cls.wh.sudo().delivery_steps = "pick_pack_ship"
 
     def setUp(self):
         super().setUp()
@@ -51,10 +55,10 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
 
 class ClusterPickingLineCommonCase(ClusterPickingCommonCase):
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
         # quants already existing are from demo data
-        cls.env["stock.quant"].search(
+        cls.env["stock.quant"].sudo().search(
             [("location_id", "=", cls.stock_location.id)]
         ).unlink()
         cls.batch = cls._create_picking_batch(

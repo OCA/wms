@@ -3,19 +3,26 @@ from .common import CommonCase, PickingBatchMixin
 
 class ClusterPickingBatchCase(CommonCase, PickingBatchMixin):
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
-        cls.product_a = cls.env["product.product"].create(
-            {"name": "Product A", "type": "product"}
-        )
-        cls.product_b = cls.env["product.product"].create(
-            {"name": "Product B", "type": "product"}
-        )
-        # which menu we pick should not matter for the batch picking api
+    def setUpClassVars(cls, *args, **kwargs):
+        super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
         cls.picking_type = cls.menu.picking_type_ids
+
+    @classmethod
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
+        cls.product_a = (
+            cls.env["product.product"]
+            .sudo()
+            .create({"name": "Product A", "type": "product"})
+        )
+        cls.product_b = (
+            cls.env["product.product"]
+            .sudo()
+            .create({"name": "Product B", "type": "product"})
+        )
         cls.batch1 = cls._create_picking_batch(
             [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
         )

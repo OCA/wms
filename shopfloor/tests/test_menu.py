@@ -3,8 +3,8 @@ from .common import CommonCase
 
 class MenuCase(CommonCase):
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassVars(cls, *args, **kwargs):
+        super().setUpClassVars(*args, **kwargs)
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
 
     def setUp(self):
@@ -42,7 +42,7 @@ class MenuCase(CommonCase):
     def test_menu_search_restricted(self):
         """Request /menu/search with profile attributions"""
         # Simulate the client searching menus
-        menus = self.env["shopfloor.menu"].search([])
+        menus = self.env["shopfloor.menu"].sudo().search([])
         menus_without_profile = menus[0:2]
         # these menus should now be hidden for the current profile
         other_profile = self.env.ref("shopfloor.shopfloor_profile_hb_truck_demo")
@@ -55,10 +55,12 @@ class MenuCase(CommonCase):
 
     def test_menu_search_warehouse_filter(self):
         """Request /menu/search with different warehouse on profile"""
-        menus = self.env["shopfloor.menu"].search([])
+        menus = self.env["shopfloor.menu"].sudo().search([])
         # should not be visible as the profile has another wh
         menu_different_wh = menus[0]
-        other_wh = self.env["stock.warehouse"].create({"name": "Test", "code": "test"})
+        other_wh = (
+            self.env["stock.warehouse"].sudo().create({"name": "Test", "code": "test"})
+        )
         menu_different_wh.picking_type_ids.warehouse_id = other_wh
 
         # should be visible to any profile

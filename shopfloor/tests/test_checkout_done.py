@@ -24,8 +24,8 @@ class CheckoutDoneCase(CheckoutCommonCase):
 
 class CheckoutDonePartialCase(CheckoutCommonCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
         cls.picking = picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10)]
         )
@@ -74,8 +74,8 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
 
 class CheckoutDoneRawUnpackedCase(CheckoutCommonCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
         cls.picking = picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10)]
         )
