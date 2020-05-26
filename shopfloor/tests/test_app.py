@@ -3,8 +3,8 @@ from .common import CommonCase
 
 class AppCase(CommonCase):
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassVars(cls, *args, **kwargs):
+        super().setUpClassVars(*args, **kwargs)
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_hb_truck_demo")
         cls.profile2 = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
 
@@ -61,7 +61,7 @@ class AppCase(CommonCase):
     def test_menu_by_profile(self):
         """Request /app/menu w/ a specific profile"""
         # Simulate the client asking the menu
-        menus = self.env["shopfloor.menu"].search([])
+        menus = self.env["shopfloor.menu"].sudo().search([])
         menu = menus[0]
         menu.profile_ids = self.profile
         (menus - menu).profile_ids = self.profile2

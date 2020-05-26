@@ -14,6 +14,12 @@ class InventoryAction(Component):
     _inherit = "shopfloor.process.action"
     _usage = "inventory"
 
+    @property
+    def inventory_model(self):
+        # the _sf_inventory key bypass groups checks,
+        # see comment in models/stock_inventory.py
+        return self.env["stock.inventory"].with_context(_sf_inventory=True)
+
     def create_draft_check_empty(self, location, product, ref=None):
         """Create a draft inventory for a product with a zero quantity"""
         if ref:
@@ -35,10 +41,10 @@ class InventoryAction(Component):
             domain.append(("package_id", "=", package.id))
         if lot is not None:
             domain.append(("lot_id", "=", lot.id))
-        return self.env["stock.inventory"].search_count(domain)
+        return self.inventory_model.search_count(domain)
 
     def _create_draft_inventory(self, location, product, name):
-        return self.env["stock.inventory"].create(
+        return self.inventory_model.sudo().create(
             {
                 "name": name,
                 "location_ids": [(6, 0, location.ids)],
@@ -106,7 +112,7 @@ class InventoryAction(Component):
         values = self._stock_issue_inventory_values(
             move, location, package, lot, qty_to_keep
         )
-        inventory = self.env["stock.inventory"].create(values)
+        inventory = self.inventory_model.sudo().create(values)
         inventory.action_start()
         inventory.action_validate()
         move._action_assign()

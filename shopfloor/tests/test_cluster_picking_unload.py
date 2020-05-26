@@ -3,12 +3,12 @@ from .test_cluster_picking_base import ClusterPickingCommonCase
 
 class ClusterPickingUnloadingCommonCase(ClusterPickingCommonCase):
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
 
         # activate the computation of this field, so we have a chance to
         # transition to the 'show completion info' popup.
-        cls.picking_type.display_completion_info = True
+        cls.picking_type.sudo().display_completion_info = True
 
         cls.batch = cls._create_picking_batch(
             [
@@ -22,19 +22,27 @@ class ClusterPickingUnloadingCommonCase(ClusterPickingCommonCase):
         cls._simulate_batch_selected(cls.batch)
         cls.bin1 = cls.env["stock.quant.package"].create({})
         cls.bin2 = cls.env["stock.quant.package"].create({})
-        cls.packing_a_location = cls.env["stock.location"].create(
-            {
-                "name": "Packing A",
-                "barcode": "Packing-A",
-                "location_id": cls.packing_location.id,
-            }
+        cls.packing_a_location = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Packing A",
+                    "barcode": "Packing-A",
+                    "location_id": cls.packing_location.id,
+                }
+            )
         )
-        cls.packing_b_location = cls.env["stock.location"].create(
-            {
-                "name": "Packing B",
-                "barcode": "Packing-B",
-                "location_id": cls.packing_location.id,
-            }
+        cls.packing_b_location = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Packing B",
+                    "barcode": "Packing-B",
+                    "location_id": cls.packing_location.id,
+                }
+            )
         )
 
 
@@ -334,12 +342,6 @@ class ClusterPickingUnloadSplitCase(ClusterPickingUnloadingCommonCase):
     screen even if the destinations are the same.
     """
 
-    @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
-        # this is what the /prepare_endpoint method would have set as all the
-        # destinations are the same:
-
     def test_unload_split_ok(self):
         """Call /unload_split and continue to unload single"""
         move_lines = self.batch.mapped("picking_ids.move_line_ids")
@@ -373,8 +375,8 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
     """
 
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
         cls.move_lines = cls.batch.mapped("picking_ids.move_line_ids")
         cls._set_dest_package_and_done(cls.move_lines, cls.bin1)
         cls.move_lines[:2].write({"location_dest_id": cls.packing_a_location.id})
@@ -427,8 +429,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
     """
 
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
         cls.move_lines = cls.batch.mapped("picking_ids.move_line_ids")
         cls.bin1_lines = cls.move_lines[:1]
         cls.bin2_lines = cls.move_lines[1:]
@@ -696,7 +698,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         """/unload_scan_destination that make chained picking ready"""
         picking = self.one_line_picking
         dest_location = picking.move_line_ids.location_dest_id
-        self.picking_type.display_completion_info = True
+        self.picking_type.sudo().display_completion_info = True
 
         # create a chained picking after the current one
         next_picking = picking.copy(
