@@ -29,8 +29,10 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
         cls.dest_package = cls.env["stock.quant.package"].create({})
 
     def _stock_issue(self, line, next_line_func=None):
+        batch = line.picking_id.batch_id
         response = self.service.dispatch(
-            "stock_issue", params={"move_line_id": line.id}
+            "stock_issue",
+            params={"picking_batch_id": batch.id, "move_line_id": line.id},
         )
         # use a function/lambda to delay the read of the next line,
         # when calling _stock_issue(), the move_line may not exist and

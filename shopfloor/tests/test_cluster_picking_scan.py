@@ -15,16 +15,28 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
     """
 
     def _scan_line_ok(self, line, scanned):
+        batch = line.picking_id.batch_id
         response = self.service.dispatch(
-            "scan_line", params={"move_line_id": line.id, "barcode": scanned}
+            "scan_line",
+            params={
+                "picking_batch_id": batch.id,
+                "move_line_id": line.id,
+                "barcode": scanned,
+            },
         )
         self.assert_response(
             response, next_state="scan_destination", data=self._line_data(line)
         )
 
     def _scan_line_error(self, line, scanned, message):
+        batch = line.picking_id.batch_id
         response = self.service.dispatch(
-            "scan_line", params={"move_line_id": line.id, "barcode": scanned}
+            "scan_line",
+            params={
+                "picking_batch_id": batch.id,
+                "move_line_id": line.id,
+                "barcode": scanned,
+            },
         )
         self.assert_response(
             response,
@@ -300,6 +312,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         response = self.service.dispatch(
             "scan_destination_pack",
             params={
+                "picking_batch_id": self.batch.id,
                 "move_line_id": line.id,
                 "barcode": self.bin1.name,
                 "quantity": qty_done,
@@ -335,6 +348,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         response = self.service.dispatch(
             "scan_destination_pack",
             params={
+                "picking_batch_id": self.batch.id,
                 "move_line_id": line.id,
                 "barcode": self.bin2.name,
                 "quantity": qty_done,
@@ -360,6 +374,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         response = self.service.dispatch(
             "scan_destination_pack",
             params={
+                "picking_batch_id": self.batch.id,
                 "move_line_id": line2.id,
                 # this bin is used for the same picking, should be allowed
                 "barcode": self.bin1.name,
@@ -383,6 +398,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         response = self.service.dispatch(
             "scan_destination_pack",
             params={
+                "picking_batch_id": self.batch.id,
                 "move_line_id": line.id,
                 # this bin is used for the other picking
                 "barcode": self.bin1.name,
@@ -407,6 +423,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         response = self.service.dispatch(
             "scan_destination_pack",
             params={
+                "picking_batch_id": self.batch.id,
                 "move_line_id": line.id,
                 # this bin is used for the other picking
                 "barcode": "⌿",
@@ -429,6 +446,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         response = self.service.dispatch(
             "scan_destination_pack",
             params={
+                "picking_batch_id": self.batch.id,
                 "move_line_id": line.id,
                 "barcode": self.bin1.name,
                 "quantity": line.product_uom_qty + 1,
@@ -455,6 +473,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         response = self.service.dispatch(
             "scan_destination_pack",
             params={
+                "picking_batch_id": self.batch.id,
                 "move_line_id": line.id,
                 "barcode": self.bin1.name,
                 "quantity": line.product_uom_qty - 3,
@@ -495,6 +514,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         response = self.service.dispatch(
             "scan_destination_pack",
             params={
+                "picking_batch_id": self.batch.id,
                 "move_line_id": line.id,
                 "barcode": self.bin1.name,
                 "quantity": line.product_uom_qty,
@@ -504,7 +524,11 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="zero_check",
-            data={"id": line.id, "location_src": self.data.location(line.location_id)},
+            data={
+                "id": line.id,
+                "location_src": self.data.location(line.location_id),
+                "batch": self.data.picking_batch(self.batch),
+            },
         )
 
 
@@ -546,7 +570,12 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
     def test_is_zero_is_empty(self):
         """call /is_zero confirming it's empty"""
         response = self.service.dispatch(
-            "is_zero", params={"move_line_id": self.line.id, "zero": True}
+            "is_zero",
+            params={
+                "picking_batch_id": self.batch.id,
+                "move_line_id": self.line.id,
+                "zero": True,
+            },
         )
         self.assert_response(
             response,
@@ -565,7 +594,12 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
     def test_is_zero_is_not_empty(self):
         """call /is_zero not confirming it's empty"""
         response = self.service.dispatch(
-            "is_zero", params={"move_line_id": self.line.id, "zero": False}
+            "is_zero",
+            params={
+                "picking_batch_id": self.batch.id,
+                "move_line_id": self.line.id,
+                "zero": False,
+            },
         )
         inventory = self.env["stock.inventory"].search(
             [

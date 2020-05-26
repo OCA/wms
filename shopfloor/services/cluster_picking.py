@@ -120,11 +120,12 @@ class ClusterPicking(Component):
             message=message,
         )
 
-    def _response_for_zero_check(self, move_line):
+    def _response_for_zero_check(self, batch, move_line):
         data = {
             "id": move_line.id,
             "location_src": self.data_struct.location(move_line.location_id),
         }
+        data["batch"] = self.data_struct.picking_batch(batch)
         return self._response(next_state="zero_check", data=data)
 
     def _response_for_unload_all(self, batch, message=None):
@@ -312,10 +313,10 @@ class ClusterPicking(Component):
           package
         * start: if the condition above is wrong (rare case of race condition...)
         """
-        picking_batch = self.env["stock.picking.batch"].browse(picking_batch_id)
-        if not picking_batch.exists():
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
             return self._response_batch_does_not_exist()
-        return self._pick_next_line(picking_batch)
+        return self._pick_next_line(batch)
 
     def _pick_next_line(self, batch, message=None, force_line=None):
         if force_line:
@@ -404,7 +405,7 @@ class ClusterPicking(Component):
             batch.write({"state": "draft", "user_id": False})
         return self._response_for_start()
 
-    def scan_line(self, move_line_id, barcode):
+    def scan_line(self, picking_batch_id, move_line_id, barcode):
         """Scan a location, a pack, a product or a lots
 
         There is no side-effect, it is only to check that the operator takes
@@ -427,10 +428,13 @@ class ClusterPicking(Component):
           pack meanwhile (race condition).
         * scan_destination: if the barcode matches.
         """
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
-            return self._response_for_start(
-                message=self.msg_store.unrecoverable_error()
+            return self._pick_next_line(
+                batch, message=self.msg_store.operation_not_found()
             )
 
         search = self.actions_for("search")
@@ -543,7 +547,7 @@ class ClusterPicking(Component):
 
         return self._response_for_scan_destination(move_line)
 
-    def scan_destination_pack(self, move_line_id, barcode, quantity):
+    def scan_destination_pack(self, picking_batch_id, move_line_id, barcode, quantity):
         """Scan the destination package (bin) for a move line
 
         If the quantity picked (passed to the endpoint) is < expected quantity,
@@ -563,10 +567,13 @@ class ClusterPicking(Component):
         have the same destination.
         * start_line: to pick the next line if any.
         """
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
-            return self._response_for_start(
-                message=self.msg_store.unrecoverable_error()
+            return self._pick_next_line(
+                batch, message=self.msg_store.operation_not_found()
             )
 
         # store a new line if we have split our line (not enough qty)
@@ -619,12 +626,10 @@ class ClusterPicking(Component):
             )
         move_line.write({"qty_done": quantity, "result_package_id": bin_package.id})
 
-        batch = move_line.picking_id.batch_id
-
         if self._planned_qty_in_location_is_empty(
             move_line.product_id, move_line.location_id
         ):
-            return self._response_for_zero_check(move_line)
+            return self._response_for_zero_check(batch, move_line)
 
         return self._pick_next_line(
             batch,
@@ -725,7 +730,7 @@ class ClusterPicking(Component):
         packages = self._bin_packages_to_unload(batch)
         return fields.first(packages)
 
-    def is_zero(self, move_line_id, zero):
+    def is_zero(self, picking_batch_id, move_line_id, zero):
         """Confirm or not if the source location of a move has zero qty
 
         If the user confirms there is zero quantity, it means the stock was
@@ -739,10 +744,13 @@ class ClusterPicking(Component):
         * unload_single: if all lines have a destination package and different
           destination
         """
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
-            return self._response_for_start(
-                message=self.msg_store.unrecoverable_error()
+            return self._pick_next_line(
+                batch, message=self.msg_store.operation_not_found()
             )
 
         if not zero:
@@ -753,7 +761,6 @@ class ClusterPicking(Component):
                 ref=move_line.picking_id.name,
             )
 
-        batch = move_line.picking_id.batch_id
         return self._pick_next_line(
             batch,
             message=self.msg_store.x_units_put_in_package(
@@ -761,7 +768,7 @@ class ClusterPicking(Component):
             ),
         )
 
-    def skip_line(self, move_line_id):
+    def skip_line(self, picking_batch_id, move_line_id):
         """Skip a line. The line will be processed at the end.
 
         It adds a flag on the move line, when the next line to pick
@@ -773,10 +780,13 @@ class ClusterPicking(Component):
         * start_line: with data for the next line (or itself if it's the last one,
         in such case, a helpful message is returned)
         """
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
-            return self._response_for_start(
-                message=self.msg_store.unrecoverable_error()
+            return self._pick_next_line(
+                batch, message=self.msg_store.operation_not_found()
             )
         # flag as postponed
         move_line.shopfloor_postponed = True
@@ -786,7 +796,7 @@ class ClusterPicking(Component):
         batch = move_line.picking_id.batch_id
         return self._pick_next_line(batch)
 
-    def stock_issue(self, move_line_id):
+    def stock_issue(self, picking_batch_id, move_line_id):
         """Declare a stock issue for a line
 
         After errors in the stock, the user cannot take all the products
@@ -815,12 +825,14 @@ class ClusterPicking(Component):
           and the last line has a stock issue). In this case, this method *has*
           to handle the closing of the batch to create backorders (_unload_end)
         """
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
-            return self._response(
-                next_state="start", message=self.msg_store.unrecoverable_error()
+            return self._pick_next_line(
+                batch, message=self.msg_store.operation_not_found()
             )
-        batch = move_line.picking_id.batch_id
 
         inventory = self.actions_for("inventory")
         # create a draft inventory for a user to check
@@ -876,7 +888,7 @@ class ClusterPicking(Component):
         ]
         return domain
 
-    def change_pack_lot(self, move_line_id, barcode):
+    def change_pack_lot(self, picking_batch_id, move_line_id, barcode):
         """Change the expected pack or the lot for a line
 
         If the expected lot is at the very bottom of the location or a stock
@@ -894,10 +906,13 @@ class ClusterPicking(Component):
         * scan_destination: the pack or the lot could be changed
         * change_pack_lot: any error occurred during the change
         """
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
-            return self._response(
-                next_state="start", message=self.msg_store.unrecoverable_error()
+            return self._pick_next_line(
+                batch, message=self.msg_store.operation_not_found()
             )
         search = self.actions_for("search")
         lot = search.lot_from_scan(barcode)
@@ -1316,12 +1331,14 @@ class ShopfloorClusterPickingValidator(Component):
 
     def scan_line(self):
         return {
+            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
         }
 
     def scan_destination_pack(self):
         return {
+            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
             "quantity": {"coerce": to_float, "required": True, "type": "float"},
@@ -1334,18 +1351,26 @@ class ShopfloorClusterPickingValidator(Component):
 
     def is_zero(self):
         return {
+            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
             "zero": {"coerce": to_bool, "required": True, "type": "boolean"},
         }
 
     def skip_line(self):
-        return {"move_line_id": {"coerce": to_int, "required": True, "type": "integer"}}
+        return {
+            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
 
     def stock_issue(self):
-        return {"move_line_id": {"coerce": to_int, "required": True, "type": "integer"}}
+        return {
+            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
 
     def change_pack_lot(self):
         return {
+            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
         }
@@ -1358,11 +1383,6 @@ class ShopfloorClusterPickingValidator(Component):
         }
 
     def unload_split(self):
-        return {
-            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"}
-        }
-
-    def unload_router(self):
         return {
             "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"}
         }
@@ -1527,9 +1547,6 @@ class ShopfloorClusterPickingValidatorResponse(Component):
     def unload_split(self):
         return self._response_schema(next_states={"unload_single"})
 
-    def unload_router(self):
-        return self._response_schema(next_states={"unload_single", "start_line"})
-
     def unload_scan_pack(self):
         return self._response_schema(
             next_states={
@@ -1584,6 +1601,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             "id": {"required": True, "type": "integer"},
         }
         schema["location_src"] = self.schemas._schema_dict_of(self.schemas.location())
+        schema["batch"] = self.schemas._schema_dict_of(self.schemas.picking_batch())
         return schema
 
     @property

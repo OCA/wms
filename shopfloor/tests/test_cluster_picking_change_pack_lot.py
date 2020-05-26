@@ -34,8 +34,14 @@ class ClusterPickingChangePackLotCommon(ClusterPickingCommonCase):
         )
 
     def _test_change_pack_lot(self, line, barcode, success=True, message=None):
+        batch = line.picking_id.batch_id
         response = self.service.dispatch(
-            "change_pack_lot", params={"move_line_id": line.id, "barcode": barcode},
+            "change_pack_lot",
+            params={
+                "picking_batch_id": batch.id,
+                "move_line_id": line.id,
+                "barcode": barcode,
+            },
         )
         if success:
             self.assert_response(
@@ -53,7 +59,10 @@ class ClusterPickingChangePackLotCommon(ClusterPickingCommonCase):
             )
 
     def _skip_line(self, line, next_line=None):
-        response = self.service.dispatch("skip_line", params={"move_line_id": line.id})
+        batch = line.picking_id.batch_id
+        response = self.service.dispatch(
+            "skip_line", params={"picking_batch_id": batch.id, "move_line_id": line.id}
+        )
         if next_line:
             self.assert_response(
                 response, next_state="start_line", data=self._line_data(next_line)
