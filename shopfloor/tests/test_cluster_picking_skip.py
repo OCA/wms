@@ -26,7 +26,10 @@ class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
         )
 
     def _skip_line(self, line, next_line=None):
-        response = self.service.dispatch("skip_line", params={"move_line_id": line.id})
+        response = self.service.dispatch(
+            "skip_line",
+            params={"picking_batch_id": self.batch.id, "move_line_id": line.id},
+        )
         if next_line:
             self.assert_response(
                 response, next_state="start_line", data=self._line_data(next_line)
