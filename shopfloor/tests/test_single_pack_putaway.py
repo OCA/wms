@@ -5,32 +5,42 @@ from .common import CommonCase
 
 class SinglePackPutawayCase(CommonCase):
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
-        cls.product_a = cls.env["product.product"].create(
-            {"name": "Product A", "type": "product"}
+    def setUpClassVars(cls, *args, **kwargs):
+        super().setUpClassVars(*args, **kwargs)
+        cls.menu = cls.env.ref("shopfloor.shopfloor_menu_put_away_reach_truck")
+        cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
+        cls.wh = cls.profile.warehouse_id
+
+    @classmethod
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
+        cls.product_a = (
+            cls.env["product.product"]
+            .sudo()
+            .create({"name": "Product A", "type": "product"})
         )
         cls.pack_a = cls.env["stock.quant.package"].create(
             {"location_id": cls.stock_location.id}
         )
-        cls.env["stock.putaway.rule"].create(
+        cls.env["stock.putaway.rule"].sudo().create(
             {
                 "product_id": cls.product_a.id,
                 "location_in_id": cls.stock_location.id,
                 "location_out_id": cls.shelf1.id,
             }
         )
-        cls.quant_a = cls.env["stock.quant"].create(
-            {
-                "product_id": cls.product_a.id,
-                "location_id": cls.dispatch_location.id,
-                "quantity": 1,
-                "package_id": cls.pack_a.id,
-            }
+        cls.quant_a = (
+            cls.env["stock.quant"]
+            .sudo()
+            .create(
+                {
+                    "product_id": cls.product_a.id,
+                    "location_id": cls.dispatch_location.id,
+                    "quantity": 1,
+                    "package_id": cls.pack_a.id,
+                }
+            )
         )
-        cls.menu = cls.env.ref("shopfloor.shopfloor_menu_put_away_reach_truck")
-        cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
-        cls.wh = cls.profile.warehouse_id
 
     def setUp(self):
         super().setUp()

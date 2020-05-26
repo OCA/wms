@@ -17,12 +17,16 @@ def fake_colored_image(color="#4169E1", size=(800, 500)):
 
 class ActionsDataDetailCaseBase(ActionsDataCaseBase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.package = cls.move_a.move_line_ids.package_id
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
         cls.lot = cls.env["stock.production.lot"].create(
             {"product_id": cls.product_b.id, "company_id": cls.env.company.id}
         )
+        cls.package = cls.move_a.move_line_ids.package_id
+
+    @classmethod
+    def setUpClassVars(cls):
+        super().setUpClassVars()
         cls.storage_type_pallet = cls.env.ref(
             "stock_storage_type.package_storage_type_pallets"
         )
@@ -289,16 +293,18 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
     def test_product(self):
         move_line = self.move_b.move_line_ids
         product = move_line.product_id.with_context(location=move_line.location_id.id)
-        manuf = self.env["res.partner"].create({"name": "Manuf 1"})
-        product.write(
+        Partner = self.env["res.partner"].sudo()
+        manuf = Partner.create({"name": "Manuf 1"})
+        product.sudo().write(
             {
                 "image_128": fake_colored_image(size=(128, 128)),
                 "manufacturer": manuf.id,
             }
         )
-        vendor_a = self.env["res.partner"].create({"name": "Supplier A"})
-        vendor_b = self.env["res.partner"].create({"name": "Supplier B"})
-        self.env["product.supplierinfo"].create(
+        vendor_a = Partner.create({"name": "Supplier A"})
+        vendor_b = Partner.create({"name": "Supplier B"})
+        SupplierInfo = self.env["product.supplierinfo"].sudo()
+        SupplierInfo.create(
             {
                 "name": vendor_a.id,
                 "product_tmpl_id": product.product_tmpl_id.id,
@@ -306,7 +312,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "product_code": "SUPP1",
             }
         )
-        self.env["product.supplierinfo"].create(
+        SupplierInfo.create(
             {
                 "name": vendor_b.id,
                 "product_tmpl_id": product.product_tmpl_id.id,

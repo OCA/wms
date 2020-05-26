@@ -294,14 +294,18 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         move_line2.qty_done = move_line2.product_uom_qty
         move_line3.qty_done = 0
 
-        packaging = self.env["product.packaging"].create(
-            {
-                "name": "Pallet",
-                "barcode": "PPP",
-                "height": 12,
-                "width": 13,
-                "lngth": 14,
-            }
+        packaging = (
+            self.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "Pallet",
+                    "barcode": "PPP",
+                    "height": 12,
+                    "width": 13,
+                    "lngth": 14,
+                }
+            )
         )
 
         response = self.service.dispatch(

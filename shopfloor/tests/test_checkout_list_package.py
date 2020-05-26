@@ -90,8 +90,8 @@ class CheckoutListDestPackageCase(
 
 class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
         picking = cls._create_picking(
             lines=[
                 (cls.product_a, 10),

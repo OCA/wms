@@ -3,13 +3,17 @@ from .common import CommonCase
 
 class CheckoutCommonCase(CommonCase):
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassVars(cls, *args, **kwargs):
+        super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_checkout")
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
-        cls.wh.delivery_steps = "pick_pack_ship"
         cls.picking_type = cls.menu.picking_type_ids
+
+    @classmethod
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
+        cls.wh.sudo().delivery_steps = "pick_pack_ship"
 
     def setUp(self):
         super().setUp()

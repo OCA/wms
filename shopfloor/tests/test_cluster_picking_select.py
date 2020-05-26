@@ -17,8 +17,8 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
     """
 
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
         # drop base demo data and create our own batches to work with
         cls.env["stock.picking.batch"].search([]).unlink()
         cls.batch1 = cls._create_picking_batch(
@@ -254,8 +254,8 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
     """
 
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
         cls.batch = cls._create_picking_batch(
             [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
         )

@@ -25,8 +25,8 @@ class CheckoutListStockPickingCase(CheckoutCommonCase):
 
 class CheckoutSelectCase(CheckoutCommonCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
         cls.picking = cls._create_picking()
         cls._fill_stock_for_moves(cls.picking.move_lines, in_package=True)
         cls.picking.action_assign()
@@ -52,7 +52,7 @@ class CheckoutSelectCase(CheckoutCommonCase):
 
     def test_select_error_not_found(self):
         picking = self._create_picking()
-        picking.unlink()
+        picking.sudo().unlink()
         self._test_error(picking, "This transfer does not exist anymore.")
 
     def test_select_error_not_available(self):
