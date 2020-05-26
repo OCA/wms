@@ -14,16 +14,19 @@
                 <field
                     name="shopfloor_checkout_done"
                     string="SF checkout done"
+                    optional="hide"
                     groups="base.group_no_one"
                 />
                 <field
                     name="shopfloor_unloaded"
                     string="SF unloaded"
+                    optional="hide"
                     groups="base.group_no_one"
                 />
                 <field
                     name="shopfloor_postponed"
                     string="SF postponed"
+                    optional="hide"
                     groups="base.group_no_one"
                 />
             </field>
