@@ -112,7 +112,7 @@ class DataAction(Component):
     def _lot_parser(self):
         return ["id", "name", "ref"]
 
-    def move_line(self, record, **kw):
+    def move_line(self, record, qty_by_packaging=False, **kw):
         record = record.with_context(location=record.location_id.id)
         data = self._jsonify(record, self._move_line_parser)
         if data:
@@ -128,6 +128,10 @@ class DataAction(Component):
                     ),
                 }
             )
+            if qty_by_packaging:
+                data["qty_by_packaging"] = record.product_id.product_qty_by_packaging(
+                    record.product_uom_qty
+                )
         return data
 
     def move_lines(self, records, **kw):
