@@ -135,20 +135,20 @@ ul.packaging span:first-child {
     text-align: center;
     margin: 0.5rem 0;
 }
-.number-spinner.spinner-position-right .spinner-btn {
+.number-spinner.spinner-right .spinner-btn {
     float: right;
     margin: 0.5rem 0;
 }
-.number-spinner.spinner-position-right .input-wrapper {
+.number-spinner.spinner-right .input-wrapper {
     float: left;
     width: 50%;
     margin: 0.5rem 0;
 }
-.number-spinner.spinner-position-left .spinner-btn {
+.number-spinner.spinner-left .spinner-btn {
     float: left;
     margin: 0.5rem 0;
 }
-.number-spinner.spinner-position-left .input-wrapper {
+.number-spinner.spinner-left .input-wrapper {
     float: right;
     width: 50%;
     margin: 0.5rem 0;
@@ -163,6 +163,13 @@ ul.packaging span:first-child {
     font-weight: bold;
     font-size: 1.2rem;
     color: #999;
+}
+.number-spinner.spinner-text-only input {
+    max-height: auto;
+    font-size: 180%;
+}
+.number-spinner.spinner-text-only .init-value {
+    font-size: 150%;
 }
 
 .manual-select.with-bottom-actions {

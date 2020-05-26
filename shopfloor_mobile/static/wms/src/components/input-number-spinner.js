@@ -1,8 +1,8 @@
 export var NumberSpinner = Vue.component("input-number-spinner", {
     template: `
 
-<div :class="'number-spinner spinner-position-' + spinner_position">
-    <div class="spinner-btn plus" v-on:click="increase()">
+<div :class="['number-spinner', 'spinner-' + mode]">
+    <div class="spinner-btn plus" v-on:click="increase()" v-if="mode != 'text-only'">
         <slot name="plus"><span>+</span></slot>
     </div>
     <div class="input-wrapper">
@@ -11,7 +11,7 @@ export var NumberSpinner = Vue.component("input-number-spinner", {
             <span>{{ original_value }}</span>
         </div>
     </div>
-    <div class="spinner-btn minus" v-on:click="decrease()">
+    <div class="spinner-btn minus" v-on:click="decrease()" v-if="mode != 'text-only'">
         <slot name="minus"><span>-</span></slot>
     </div>
 </div>
@@ -41,11 +41,15 @@ export var NumberSpinner = Vue.component("input-number-spinner", {
             type: Boolean,
             default: true,
         },
-        spinner_position: {
+        mode: {
             type: String,
-            default: "right",
+            default: "text-only",
         },
         show_init_value: {
+            type: Boolean,
+            default: true,
+        },
+        select_value_on_load: {
             type: Boolean,
             default: true,
         },
@@ -80,5 +84,12 @@ export var NumberSpinner = Vue.component("input-number-spinner", {
     created: function() {
         this.original_value = parseInt(this.init_value);
         this.value = parseInt(this.init_value);
+    },
+    mounted: function() {
+        if (this.$props.select_value_on_load) {
+            const input = $("input", this.$el).get(0);
+            input.focus();
+            input.select();
+        }
     },
 });
