@@ -20,7 +20,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 />
             <batch-picking-detail
                 v-if="state_is('confirm_start')"
-                :info="state.data"
+                :record="state.data"
                 v-on:confirm="state.on_confirm"
                 v-on:cancel="state.on_cancel"
                 />
@@ -111,19 +111,34 @@ export var ClusterPicking = Vue.component("cluster-picking", {
     },
     methods: {
         screen_title: function() {
-            if (_.isEmpty(this.current_doc()) || this.state_is("confirm_start"))
+            if (_.isEmpty(this.current_batch()) || this.state_is("confirm_start"))
                 return this.menu_item.name;
-            let title = this.current_doc().name;
-            // if (this.current_picking) {
-            //     title += " - " + this.current_picking.name;
-            // }
+            let title = this.current_batch().name;
+            const picking = this.current_picking();
+            if (picking) {
+                title += " > " + picking.name;
+            }
             return title;
-        },
-        current_doc: function() {
-            return this.current_batch();
         },
         current_batch: function() {
             return this.state_get_data("confirm_start");
+        },
+        current_picking: function() {
+            const data = this.state_get_data("start_line") || {};
+            if (!data.picking) {
+                return null;
+            }
+            return data.picking;
+        },
+        current_doc: function() {
+            const picking = this.current_picking();
+            if (!picking) {
+                return {};
+            }
+            return {
+                record: picking,
+                identifier: picking.name,
+            };
         },
         action_full_bin: function() {
             this.wait_call(
