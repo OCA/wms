@@ -4,8 +4,8 @@ from .test_checkout_select_package_base import CheckoutSelectPackageMixin
 
 class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
         picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10), (cls.product_c, 10)]
         )

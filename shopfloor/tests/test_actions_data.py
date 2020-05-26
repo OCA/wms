@@ -13,11 +13,15 @@ except ImportError:
 
 class ActionsDataCaseBase(CommonCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpClassVars(cls):
+        super().setUpClassVars()
         cls.wh = cls.env.ref("stock.warehouse0")
         cls.picking_type = cls.wh.out_type_id
-        cls.packaging = cls.env["product.packaging"].create({"name": "Pallet"})
+
+    @classmethod
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
+        cls.packaging = cls.env["product.packaging"].sudo().create({"name": "Pallet"})
         cls.product_b.tracking = "lot"
         cls.product_c.tracking = "lot"
         cls.picking = cls._create_picking(
@@ -230,8 +234,8 @@ class ActionsDataCase(ActionsDataCaseBase):
 
 class ActionsDataCaseBatchPicking(ActionsDataCaseBase, PickingBatchMixin):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
         cls.batch = cls._create_picking_batch(
             [
                 [

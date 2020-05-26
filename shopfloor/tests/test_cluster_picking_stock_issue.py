@@ -6,11 +6,11 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
     """
 
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
         # quants already existing are from demo data
         loc_ids = (cls.stock_location.id, cls.shelf1.id, cls.shelf2.id)
-        cls.env["stock.quant"].search([("location_id", "in", loc_ids)]).unlink()
+        cls.env["stock.quant"].sudo().search([("location_id", "in", loc_ids)]).unlink()
         cls.batch = cls._create_picking_batch(
             [
                 [cls.BatchProduct(product=cls.product_a, quantity=10)],

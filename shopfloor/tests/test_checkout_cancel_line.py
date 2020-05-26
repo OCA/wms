@@ -3,8 +3,8 @@ from .test_checkout_base import CheckoutCommonCase
 
 class CheckoutRemovePackageCase(CheckoutCommonCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
         cls.picking = picking = cls._create_picking(
             lines=[
                 (cls.product_a, 10),

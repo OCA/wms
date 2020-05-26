@@ -3,37 +3,49 @@ from .test_checkout_base import CheckoutCommonCase
 
 class CheckoutListSetPackagingCase(CheckoutCommonCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.packaging_pallet = cls.env["product.packaging"].create(
-            {
-                "sequence": 3,
-                "name": "Pallet",
-                "barcode": "PPP",
-                "height": 100,
-                "width": 100,
-                "lngth": 100,
-            }
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
+        cls.packaging_pallet = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "sequence": 3,
+                    "name": "Pallet",
+                    "barcode": "PPP",
+                    "height": 100,
+                    "width": 100,
+                    "lngth": 100,
+                }
+            )
         )
-        cls.packaging_box = cls.env["product.packaging"].create(
-            {
-                "sequence": 2,
-                "name": "Box",
-                "barcode": "BBB",
-                "height": 20,
-                "width": 20,
-                "lngth": 20,
-            }
+        cls.packaging_box = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "sequence": 2,
+                    "name": "Box",
+                    "barcode": "BBB",
+                    "height": 20,
+                    "width": 20,
+                    "lngth": 20,
+                }
+            )
         )
-        cls.packaging_inner_box = cls.env["product.packaging"].create(
-            {
-                "sequence": 1,
-                "name": "Inner Box",
-                "barcode": "III",
-                "height": 10,
-                "width": 10,
-                "lngth": 10,
-            }
+        cls.packaging_inner_box = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "sequence": 1,
+                    "name": "Inner Box",
+                    "barcode": "III",
+                    "height": 10,
+                    "width": 10,
+                    "lngth": 10,
+                }
+            )
         )
         cls.picking = cls._create_picking(lines=[(cls.product_a, 10)])
         cls._fill_stock_for_moves(cls.picking.move_lines, in_package=True)
