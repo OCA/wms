@@ -25,11 +25,29 @@ class AnyObject:
 
 
 class CommonCase(SavepointCase, ComponentMixin):
+    """Base class for writing Shopfloor tests
+
+    All tests are run as normal stock user by default, to check that all the
+    services work without manager permissions.
+
+    The consequences on writing tests:
+
+    * Records created or written in a test setup must use sudo()
+      if the user has no permission on these models.
+    * Tests setUps should not extend setUpClass but setUpClassVars
+      and setUpClassBaseData, which already have an environment using
+      the stock user.
+    * Be wary of creating records before setUpClassUsers is called, because
+      it their "env.user" would be admin and could lead to inconsistencies
+      in tests.
+
+    This class provides several helpers which are used throughout all the tests.
+    """
 
     # by default disable tracking suite-wise, it's a time saver :)
     tracking_disable = True
 
-    ANY = AnyObject()
+    ANY = AnyObject()  # allow accepting anything in assert_response()
 
     maxDiff = None
 
