@@ -171,7 +171,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
             "name": picking.name,
             "note": "read me",
             "origin": "created by test",
-            "weight": 155.0,
+            "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
             "priority": "Very Urgent",
             "operation_type": {

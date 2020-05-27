@@ -20,11 +20,11 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="cluster_picking")
 
-    def _line_data(self, move_line, qty=None, package_dest=False, **kw):
+    def _line_data(self, move_line, qty=None, package_dest=False):
         picking = move_line.picking_id
         # A package exists on the move line, because the quant created
         # by ``_simulate_batch_selected`` has a package.
-        data = self.data.move_line(move_line, **kw)
+        data = self.data.move_line(move_line)
         if not package_dest:
             data["package_dest"] = None
         if qty:
@@ -65,6 +65,6 @@ class ClusterPickingLineCommonCase(ClusterPickingCommonCase):
             [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
         )
 
-    def _line_data(self, move_line, qty=1.0, **kw):
+    def _line_data(self, move_line, qty=1.0):
         # just force qty to 1.0
-        return super()._line_data(move_line, qty=qty, **kw)
+        return super()._line_data(move_line, qty=qty)
