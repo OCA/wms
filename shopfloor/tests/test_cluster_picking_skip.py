@@ -32,7 +32,9 @@ class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
         )
         if next_line:
             self.assert_response(
-                response, next_state="start_line", data=self._line_data(next_line)
+                response,
+                next_state="start_line",
+                data=self._line_data(next_line, qty_by_packaging=True),
             )
         return response
 
