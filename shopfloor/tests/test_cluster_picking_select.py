@@ -277,7 +277,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         response = self.service.dispatch(
             "confirm_start", params={"picking_batch_id": self.batch.id}
         )
-        data = self.data.move_line(first_move_line, qty_by_packaging=True)
+        data = self.data.move_line(first_move_line)
         data["package_dest"] = None
         data["picking"] = self.data.picking(picking)
         data["batch"] = self.data.picking_batch(batch)
