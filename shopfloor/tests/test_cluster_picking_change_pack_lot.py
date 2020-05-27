@@ -48,14 +48,14 @@ class ClusterPickingChangePackLotCommon(ClusterPickingCommonCase):
                 response,
                 message=message,
                 next_state="scan_destination",
-                data=self._line_data(line),
+                data=self._line_data(line, qty_by_packaging=True),
             )
         else:
             self.assert_response(
                 response,
                 message=message,
                 next_state="change_pack_lot",
-                data=self._line_data(line),
+                data=self._line_data(line, qty_by_packaging=True),
             )
 
     def _skip_line(self, line, next_line=None):

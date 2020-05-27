@@ -25,7 +25,9 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             },
         )
         self.assert_response(
-            response, next_state="scan_destination", data=self._line_data(line)
+            response,
+            next_state="scan_destination",
+            data=self._line_data(line, qty_by_packaging=True),
         )
 
     def _scan_line_error(self, line, scanned, message):
@@ -41,7 +43,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self.assert_response(
             response,
             next_state="start_line",
-            data=self._line_data(line),
+            data=self._line_data(line, qty_by_packaging=True),
             message=message,
         )
 
@@ -324,7 +326,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="start_line",
-            data=self._line_data(next_line),
+            data=self._line_data(next_line, qty_by_packaging=True),
             message={
                 "message_type": "success",
                 "body": "{} {} put in {}".format(
@@ -385,7 +387,9 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             response,
             next_state="start_line",
             # we did not pick this line, so it should go there
-            data=self._line_data(self.one_line_picking.move_line_ids),
+            data=self._line_data(
+                self.one_line_picking.move_line_ids, qty_by_packaging=True
+            ),
             message=self.ANY,
         )
 
@@ -409,7 +413,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="scan_destination",
-            data=self._line_data(line),
+            data=self._line_data(line, qty_by_packaging=True),
             message={
                 "message_type": "error",
                 "body": "The destination bin {} is not empty,"
@@ -433,7 +437,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="scan_destination",
-            data=self._line_data(line),
+            data=self._line_data(line, qty_by_packaging=True),
             message={
                 "message_type": "error",
                 "body": "Bin {} doesn't exist".format("⌿"),
@@ -455,7 +459,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="scan_destination",
-            data=self._line_data(line),
+            data=self._line_data(line, qty_by_packaging=True),
             message={
                 "message_type": "error",
                 "body": "You must not pick more than {} units.".format(
@@ -493,7 +497,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="start_line",
-            data=self._line_data(new_line),
+            data=self._line_data(new_line, qty_by_packaging=True),
             message={
                 "message_type": "success",
                 "body": "{} {} put in {}".format(
@@ -580,7 +584,7 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="start_line",
-            data=self._line_data(self.next_line),
+            data=self._line_data(self.next_line, qty_by_packaging=True),
             message={
                 "message_type": "success",
                 "body": "{} {} put in {}".format(
@@ -616,7 +620,7 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="start_line",
-            data=self._line_data(self.next_line),
+            data=self._line_data(self.next_line, qty_by_packaging=True),
             message={
                 "message_type": "success",
                 "body": "{} {} put in {}".format(
