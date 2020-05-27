@@ -193,6 +193,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     on_scan: scanned => {
                         this.wait_call(
                             this.odoo.call("scan_line", {
+                                picking_batch_id: this.current_batch().id,
                                 move_line_id: this.state.data.id,
                                 barcode: scanned.text,
                             })
@@ -208,6 +209,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     on_action_skip_line: () => {
                         this.wait_call(
                             this.odoo.call("skip_line", {
+                                picking_batch_id: this.current_batch().id,
                                 move_line_id: this.state.data.id,
                             })
                         );
@@ -238,6 +240,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     on_scan: scanned => {
                         this.wait_call(
                             this.odoo.call("scan_destination_pack", {
+                                picking_batch_id: this.current_batch().id,
                                 move_line_id: this.state.data.id,
                                 barcode: scanned.text,
                                 quantity: this.scan_destination_qty,
@@ -255,6 +258,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     on_action_confirm_zero: () => {
                         this.wait_call(
                             this.odoo.call("is_zero", {
+                                picking_batch_id: this.current_batch().id,
                                 move_line_id: this.state.data.id,
                                 zero: true,
                             })
@@ -263,6 +267,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     on_action_confirm_not_zero: () => {
                         this.wait_call(
                             this.odoo.call("is_zero", {
+                                picking_batch_id: this.current_batch().id,
                                 move_line_id: this.state.data.id,
                                 zero: false,
                             })
@@ -326,6 +331,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     on_scan: scanned => {
                         this.wait_call(
                             this.odoo.call("unload_scan_pack", {
+                                picking_batch_id: this.current_batch().id,
                                 package_id: null, // FIXME: where does it come from? backend data?
                                 barcode: scanned.text,
                             })
@@ -340,6 +346,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     on_scan: scanned => {
                         this.wait_call(
                             this.odoo.call("unload_scan_destination", {
+                                picking_batch_id: this.current_batch().id,
                                 package_id: null, // FIXME: where does it come from? backend data?
                                 barcode: scanned.text,
                             })
@@ -354,18 +361,10 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     on_scan: scanned => {
                         this.wait_call(
                             this.odoo.call("unload_scan_destination", {
+                                picking_batch_id: this.current_batch().id,
                                 package_id: null, // FIXME: where does it come from? backend data?
                                 barcode: scanned.text,
                                 confirmation: true,
-                            })
-                        );
-                    },
-                },
-                show_completion_info: {
-                    on_confirm: () => {
-                        this.wait_call(
-                            this.odoo.call("unload_router", {
-                                picking_batch_id: this.current_batch().id,
                             })
                         );
                     },
@@ -378,6 +377,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     on_scan: scanned => {
                         this.wait_call(
                             this.odoo.call("change_pack_lot", {
+                                picking_batch_id: this.current_batch().id,
                                 move_line_id: this.state.data.id,
                                 barcode: scanned.text,
                             })
@@ -394,6 +394,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     on_confirm_stock_issue: () => {
                         this.wait_call(
                             this.odoo.call("stock_issue", {
+                                picking_batch_id: this.current_batch().id,
                                 move_line_id: this.state.data.id,
                             })
                         );
