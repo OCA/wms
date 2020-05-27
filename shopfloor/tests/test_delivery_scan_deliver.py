@@ -5,8 +5,8 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
     """Tests for /scan_deliver"""
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
         cls.product_e.tracking = "lot"
         cls.picking = picking = cls._create_picking(
             lines=[
@@ -42,7 +42,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             "scan_deliver", params={"barcode": "NO VALID BARCODE", "picking_id": None}
         )
         self.assert_response_deliver(
-            response, message={"message_type": "error", "message": "Barcode not found"}
+            response, message={"message_type": "error", "body": "Barcode not found"}
         )
 
     def test_scan_deliver_error_barcode_not_found_keep_picking(self):
@@ -55,7 +55,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             # if the client was working on a picking (it sends picking_id, then
             # send refreshed data)
             picking=self.picking,
-            message={"message_type": "error", "message": "Barcode not found"},
+            message={"message_type": "error", "body": "Barcode not found"},
         )
 
     def assert_qty_done(self, move_lines):
@@ -113,7 +113,7 @@ class DeliveryScanDeliverSpecialCase(DeliveryCommonCase):
             response,
             message={
                 "message_type": "error",
-                "message": "You cannot move this using this menu.",
+                "body": "You cannot move this using this menu.",
             },
         )
 
@@ -126,7 +126,7 @@ class DeliveryScanDeliverSpecialCase(DeliveryCommonCase):
             response,
             message={
                 "message_type": "error",
-                "message": "Transfer {} is not available.".format(picking.name),
+                "body": "Transfer {} is not available.".format(picking.name),
             },
         )
 
@@ -141,5 +141,5 @@ class DeliveryScanDeliverSpecialCase(DeliveryCommonCase):
         )
         self.assert_response_deliver(
             response,
-            message={"message_type": "info", "message": "Operation already processed."},
+            message={"message_type": "info", "body": "Operation already processed."},
         )
