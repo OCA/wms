@@ -29,7 +29,7 @@ class ActionsDataCaseBase(CommonCase):
                 (cls.product_a, 10),
                 (cls.product_b, 10),
                 (cls.product_c, 10),
-                (cls.product_d, 25),
+                (cls.product_d, 10),
             ]
         )
         # put product A in a package
@@ -228,24 +228,6 @@ class ActionsDataCase(ActionsDataCaseBase):
             "package_dest": None,
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
-        }
-        self.assertDictEqual(data, expected)
-
-    def test_data_move_line_with_qty_by_packaging(self):
-        move_line = self.move_d.move_line_ids
-        data = self.data.move_line(move_line, qty_by_packaging=True)
-        self.assert_schema(self.schema.move_line(qty_by_packaging=True), data)
-        expected = {
-            "id": move_line.id,
-            "qty_done": 0.0,
-            "quantity": move_line.product_uom_qty,
-            "product": self._expected_product(self.product_d),
-            "lot": None,
-            "package_src": None,
-            "package_dest": None,
-            "location_src": self._expected_location(move_line.location_id),
-            "location_dest": self._expected_location(move_line.location_dest_id),
-            "qty_by_packaging": [(2, "Box"), (5, "Units")],
         }
         self.assertDictEqual(data, expected)
 

@@ -138,7 +138,6 @@ class CommonCase(SavepointCase, ComponentMixin):
                     "name": "Box",
                     "product_id": cls.product_a.id,
                     "barcode": "ProductABox",
-                    "qty": 40,
                 }
             )
         )
@@ -163,7 +162,6 @@ class CommonCase(SavepointCase, ComponentMixin):
                     "name": "Box",
                     "product_id": cls.product_b.id,
                     "barcode": "ProductBBox",
-                    "qty": 30,
                 }
             )
         )
@@ -188,7 +186,6 @@ class CommonCase(SavepointCase, ComponentMixin):
                     "name": "Box",
                     "product_id": cls.product_b.id,
                     "barcode": "ProductCBox",
-                    "qty": 20,
                 }
             )
         )
@@ -213,7 +210,6 @@ class CommonCase(SavepointCase, ComponentMixin):
                     "name": "Box",
                     "product_id": cls.product_d.id,
                     "barcode": "ProductDBox",
-                    "qty": 10,
                 }
             )
         )
