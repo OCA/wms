@@ -26,8 +26,8 @@ class TestShopfloorCheckoutSync(ClusterPickingUnloadingCommonCase):
         return cls.env["stock.move"].create(move_vals)
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
 
         cls.move1, cls.move2, cls.move3 = cls.batch.mapped("picking_ids.move_lines")
         # create the destination moves in the packing zone
@@ -43,7 +43,7 @@ class TestShopfloorCheckoutSync(ClusterPickingUnloadingCommonCase):
         (cls.pack_move1 | cls.pack_move2 | cls.pack_move3)._assign_picking()
 
         # activate synchronization of checkout
-        cls.wh.pack_type_id.checkout_sync = True
+        cls.wh.pack_type_id.sudo().checkout_sync = True
 
     def test_unload_scan_destination_sync_checkout(self):
         """When a destination is set, it applies the sync"""

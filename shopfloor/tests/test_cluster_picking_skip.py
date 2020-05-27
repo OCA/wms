@@ -6,10 +6,10 @@ class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
     """
 
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
         # quants already existing are from demo data
-        cls.env["stock.quant"].search(
+        cls.env["stock.quant"].sudo().search(
             [("location_id", "=", cls.stock_location.id)]
         ).unlink()
         cls.batch = cls._create_picking_batch(
@@ -41,8 +41,8 @@ class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
         self._simulate_batch_selected(self.batch, in_package=True)
 
         # enforce names to have reliable sorting
-        self.stock_location.name = "LOC2"
-        self.shelf1.name = "LOC1"
+        self.stock_location.sudo().name = "LOC2"
+        self.shelf1.sudo().name = "LOC1"
         all_lines = self.batch.picking_ids.move_line_ids
         loc1_lines = all_lines.filtered(lambda line: (line.location_id == self.shelf1))
         loc2_lines = all_lines.filtered(

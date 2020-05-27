@@ -5,28 +5,36 @@ from .common import CommonCase
 
 class SinglePackTransferCase(CommonCase):
     @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super().setUpClass(*args, **kwargs)
-        cls.pack_a = cls.env["stock.quant.package"].create(
-            {"location_id": cls.stock_location.id}
-        )
-        cls.quant_a = cls.env["stock.quant"].create(
-            {
-                "product_id": cls.product_a.id,
-                "location_id": cls.shelf1.id,
-                "quantity": 1,
-                "package_id": cls.pack_a.id,
-            }
-        )
+    def setUpClassVars(cls, *args, **kwargs):
+        super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_single_pallet_transfer")
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
         cls.wh = cls.profile.warehouse_id
         cls.picking_type = cls.menu.picking_type_ids
+
+    @classmethod
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
+        cls.pack_a = cls.env["stock.quant.package"].create(
+            {"location_id": cls.stock_location.id}
+        )
+        cls.quant_a = (
+            cls.env["stock.quant"]
+            .sudo()
+            .create(
+                {
+                    "product_id": cls.product_a.id,
+                    "location_id": cls.shelf1.id,
+                    "quantity": 1,
+                    "package_id": cls.pack_a.id,
+                }
+            )
+        )
         cls.picking = cls._create_initial_move()
 
         # disable the completion on the picking type, we'll have specific test(s)
         # to check the behavior of this screen
-        cls.picking_type.display_completion_info = False
+        cls.picking_type.sudo().display_completion_info = False
 
     def setUp(self):
         super().setUp()
@@ -251,7 +259,7 @@ class SinglePackTransferCase(CommonCase):
         pack_b = self.env["stock.quant.package"].create(
             {"location_id": self.stock_location.id}
         )
-        self.env["stock.quant"].create(
+        self.env["stock.quant"].sudo().create(
             {
                 "product_id": self.product_a.id,
                 "location_id": self.shelf1.id,
@@ -407,7 +415,7 @@ class SinglePackTransferCase(CommonCase):
 
         # activate the computation of this field, so we have a chance to
         # transition to the 'show completion info' screen.
-        self.picking_type.display_completion_info = True
+        self.picking_type.sudo().display_completion_info = True
 
         # create a chained picking after the current one
         next_picking = self.picking.copy(
