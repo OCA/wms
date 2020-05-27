@@ -33,11 +33,35 @@ class Delivery(Component):
     _usage = "delivery"
     _description = __doc__
 
+    @property
+    def data_struct(self):
+        return self.actions_for("data")
+
+    @property
+    def msg_store(self):
+        return self.actions_for("message")
+
+    def _response_for_deliver(self, picking=None, message=None):
+        """Transition to the 'deliver' state
+
+        If no picking is passed, the screen shows an empty screen
+        """
+        return self._response(
+            next_state="deliver",
+            data={
+                "picking": self._data_for_stock_picking(picking) if picking else None
+            },
+            message=message,
+        )
+
     def _data_for_stock_picking(self, picking):
-        data_struct = self.actions_for("data")
-        data = data_struct.picking_summary(picking)
+        data = self.data_struct.picking(picking)
         data.update(
-            {"move_lines": [data_struct.move_line(ml) for ml in picking.move_line_ids]}
+            {
+                "move_lines": [
+                    self.data_struct.move_line(ml) for ml in picking.move_line_ids
+                ]
+            }
         )
         return data
 
@@ -75,18 +99,17 @@ class Delivery(Component):
         picking or no picking if the picking has been set to done
         """
         search = self.actions_for("search")
-        message = self.actions_for("message")
-        picking = search.stock_picking_from_scan(barcode)
+        picking = search.picking_from_scan(barcode)
         if picking:
             if picking.state == "done":
-                return self._response_for_deliver(message=message.already_done())
+                return self._response_for_deliver(message=self.msg_store.already_done())
             if picking.state not in ("assigned", "partially_available"):
                 return self._response_for_deliver(
-                    message=message.stock_picking_not_available(picking)
+                    message=self.msg_store.stock_picking_not_available(picking)
                 )
-            if picking.picking_type_id != self.picking_type:
+            if picking.picking_type_id not in self.picking_types:
                 return self._response_for_deliver(
-                    message=message.cannot_move_something_in_picking_type()
+                    message=self.msg_store.cannot_move_something_in_picking_type()
                 )
             return self._response_for_deliver(picking=picking)
 
@@ -108,7 +131,7 @@ class Delivery(Component):
             return self._deliver_lot(picking, lot)
 
         return self._response_for_deliver(
-            picking=picking, message=message.barcode_not_found()
+            picking=picking, message=self.msg_store.barcode_not_found()
         )
 
     def _set_lines_done(self, lines):
@@ -118,16 +141,16 @@ class Delivery(Component):
             line.qty_done = line.product_uom_qty
 
     def _deliver_package(self, picking, package):
-        message = self.actions_for("message")
         lines = package.move_line_ids
         lines = lines.filtered(
             lambda l: l.state in ("assigned", "partially_available")
-            and l.picking_id.picking_type_id == self.picking_type
+            and l.picking_id.picking_type_id in self.picking_types
         )
         if not lines:
             # TODO tests
             return self._response_for_deliver(
-                picking=picking, message=message.cannot_move_something_in_picking_type()
+                picking=picking,
+                message=self.msg_store.cannot_move_something_in_picking_type(),
             )
         # TODO add a message if any of the lines already had a qty_done > 0
         self._set_lines_done(lines)
@@ -138,7 +161,7 @@ class Delivery(Component):
         return [
             # we added auto_join for this, otherwise, the ORM would search all pickings
             # in the picking type, and then use IN (ids)
-            ("picking_id.picking_type_id", "=", self.picking_type.id),
+            ("picking_id.picking_type_id", "in", self.picking_types.ids),
             ("qty_done", "=", 0),
         ]
 
@@ -153,11 +176,10 @@ class Delivery(Component):
         )
 
     def _deliver_product(self, picking, product):
-        message = self.actions_for("message")
         if product.tracking in ("lot", "serial"):
             # TODO test
-            return self._response_deliver(
-                picking, message=message.scan_lot_on_product_tracked_by_lot()
+            return self._response_for_deliver(
+                picking, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
             )
 
         lines = self.env["stock.move.line"].search(
@@ -179,7 +201,8 @@ class Delivery(Component):
         # package.
         if packages and len({l.package_id for l in lines}) > 1:
             return self._response_for_deliver(
-                new_picking, message=message.product_multiple_packages_scan_package()
+                new_picking,
+                message=self.msg_store.product_multiple_packages_scan_package(),
             )
         elif packages:
             # we have 1 package
@@ -190,7 +213,6 @@ class Delivery(Component):
         return self._response_for_deliver(new_picking)
 
     def _deliver_lot(self, picking, lot):
-        message = self.actions_for("message")
         lines = self.env["stock.move.line"].search(self._lines_from_lot_domain(lot))
         if not lines:
             # TODO not found
@@ -209,7 +231,7 @@ class Delivery(Component):
         # package.
         if packages and len({l.package_id for l in lines}) > 1:
             return self._response_for_deliver(
-                new_picking, message=message.lot_multiple_packages_scan_package()
+                new_picking, message=self.msg_store.lot_multiple_packages_scan_package()
             )
         elif packages:
             # we have 1 package
@@ -219,19 +241,6 @@ class Delivery(Component):
 
         self._set_lines_done(lines)
         return self._response_for_deliver(new_picking)
-
-    def _response_for_deliver(self, picking=None, message=None):
-        """Transition to the 'deliver' state
-
-        If no picking is passed, the screen shows an empty screen
-        """
-        return self._response(
-            next_state="deliver",
-            data={
-                "picking": self._data_for_stock_picking(picking) if picking else None
-            },
-            message=message,
-        )
 
     def list_stock_picking(self):
         """Return the list of stock pickings for the picking type
