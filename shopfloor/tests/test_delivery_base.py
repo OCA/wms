@@ -14,6 +14,30 @@ class DeliveryCommonCase(CommonCase):
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
         cls.wh.sudo().delivery_steps = "pick_pack_ship"
+        cls.product_e = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product E",
+                    "type": "product",
+                    "default_code": "E",
+                    "barcode": "E",
+                    "weight": 3,
+                }
+            )
+        )
+        cls.product_e_packaging = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "Box",
+                    "product_id": cls.product_e.id,
+                    "barcode": "ProductEBox",
+                }
+            )
+        )
 
     def setUp(self):
         super().setUp()
