@@ -122,7 +122,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "name": self.picking.name,
             "note": "read me",
             "origin": "created by test",
-            "weight": 110.0,
+            "weight": 155.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
         }
         self.assertDictEqual(data, expected)

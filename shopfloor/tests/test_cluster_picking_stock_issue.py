@@ -41,7 +41,7 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
             self.assert_response(
                 response,
                 next_state="start_line",
-                data=self._line_data(next_line_func()),
+                data=self._line_data(next_line_func(), qty_by_packaging=True),
             )
         else:
             self.assert_response(

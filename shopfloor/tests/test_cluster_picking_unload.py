@@ -213,7 +213,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             # the remaining move line still needs to be picked
             response,
             next_state="start_line",
-            data=self._line_data(move_lines[2]),
+            data=self._line_data(move_lines[2], qty_by_packaging=True),
             message={"body": "Batch Transfer line done", "message_type": "success"},
         )
 

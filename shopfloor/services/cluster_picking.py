@@ -98,13 +98,13 @@ class ClusterPicking(Component):
     def _response_for_start_line(self, move_line, message=None, popup=None):
         return self._response(
             next_state="start_line",
-            data=self._data_move_line(move_line),
+            data=self._data_move_line(move_line, qty_by_packaging=True),
             message=message,
             popup=popup,
         )
 
     def _response_for_scan_destination(self, move_line, message=None):
-        data = self._data_move_line(move_line)
+        data = self._data_move_line(move_line, qty_by_packaging=True)
         last_picked_line = self._last_picked_line(move_line.picking_id)
         if last_picked_line:
             # suggest pack to be used for the next line
@@ -116,7 +116,7 @@ class ClusterPicking(Component):
     def _response_for_change_pack_lot(self, move_line, message=None):
         return self._response(
             next_state="change_pack_lot",
-            data=self._data_move_line(move_line),
+            data=self._data_move_line(move_line, qty_by_packaging=True),
             message=message,
         )
 
@@ -379,7 +379,7 @@ class ClusterPicking(Component):
         picking = line.picking_id
         batch = picking.batch_id
         product = line.product_id
-        data = self.data_struct.move_line(line)
+        data = self.data_struct.move_line(line, **kw)
         # additional values
         # Ensure destination pack is never proposed on the frontend.
         # This should happen only as proposal on `scan_destination`
@@ -391,7 +391,6 @@ class ClusterPicking(Component):
         data["product"]["qty_available"] = product.with_context(
             location=line.location_id.id
         ).qty_available
-        data.update(kw)
         return data
 
     def unassign(self, picking_batch_id):
@@ -1577,7 +1576,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
 
     @property
     def _schema_for_single_line_details(self):
-        schema = self.schemas.move_line()
+        schema = self.schemas.move_line(qty_by_packaging=True)
         schema["picking"] = self.schemas._schema_dict_of(self.schemas.picking())
         schema["batch"] = self.schemas._schema_dict_of(self.schemas.picking_batch())
         return schema
