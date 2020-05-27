@@ -35,9 +35,6 @@
         # TODO: used for picking.carrier_id detail info.
         # This must be an optional dep
         "delivery",
-        # TODO: used for calculating qty by packaging to pick
-        # This must be an optional dep
-        "stock_packaging_calculator",
     ],
     "data": [
         "security/ir.model.access.csv",
