@@ -15,12 +15,14 @@ class BaseShopfloorSchemaResponse(Component):
     _is_rest_service_component = False
 
     def _schema_list_of(self, schema, **kw):
-        return {
+        schema = {
             "type": "list",
             "nullable": True,
-            "required": False,
+            "required": True,
             "schema": {"type": "dict", "schema": schema},
         }
+        schema.update(kw)
+        return schema
 
     def _simple_record(self):
         return {
@@ -32,7 +34,7 @@ class BaseShopfloorSchemaResponse(Component):
         schema = {
             "type": "dict",
             "nullable": True,
-            "required": False,
+            "required": True,
             "schema": schema,
         }
         schema.update(kw)
@@ -148,7 +150,7 @@ class BaseShopfloorSchemaResponse(Component):
             "name": {"type": "string", "nullable": False, "required": True},
         }
 
-    def picking_batch(self, with_pickings=True):
+    def picking_batch(self, with_pickings=False):
         schema = {
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
