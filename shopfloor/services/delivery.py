@@ -147,7 +147,6 @@ class Delivery(Component):
             and l.picking_id.picking_type_id in self.picking_types
         )
         if not lines:
-            # TODO tests
             return self._response_for_deliver(
                 picking=picking,
                 message=self.msg_store.cannot_move_something_in_picking_type(),
@@ -165,10 +164,8 @@ class Delivery(Component):
             ("qty_done", "=", 0),
         ]
 
-    def _lines_from_lot_domain(self, product):
-        return expression.AND(
-            [self._lines_base_domain(), [("lot_id", "=", product.id)]]
-        )
+    def _lines_from_lot_domain(self, lot):
+        return expression.AND([self._lines_base_domain(), [("lot_id", "=", lot.id)]])
 
     def _lines_from_product_domain(self, product):
         return expression.AND(
@@ -177,7 +174,6 @@ class Delivery(Component):
 
     def _deliver_product(self, picking, product):
         if product.tracking in ("lot", "serial"):
-            # TODO test
             return self._response_for_deliver(
                 picking, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
             )
@@ -186,8 +182,9 @@ class Delivery(Component):
             self._lines_from_product_domain(product)
         )
         if not lines:
-            # TODO not found
-            pass
+            return self._response_for_deliver(
+                picking, message=self.msg_store.product_not_found_in_pickings()
+            )
 
         new_picking = fields.first(lines.mapped("picking_id"))
         # When products are as units outside of packages, we can select them for
@@ -206,17 +203,21 @@ class Delivery(Component):
             )
         elif packages:
             # we have 1 package
-            # TODO if the package contain more than one product, set them to moved
-            # as well or forbid it (maybe could be done in _set_lines_done)
-            pass
+            # abort the operation if the package contain more than one product
+            if len(packages.mapped("quant_ids.product_id")) > 1:
+                return self._response_for_deliver(
+                    new_picking,
+                    message=self.msg_store.product_mixed_package_scan_package(),
+                )
         self._set_lines_done(lines)
         return self._response_for_deliver(new_picking)
 
     def _deliver_lot(self, picking, lot):
         lines = self.env["stock.move.line"].search(self._lines_from_lot_domain(lot))
         if not lines:
-            # TODO not found
-            pass
+            return self._response_for_deliver(
+                picking, message=self.msg_store.lot_not_found_in_pickings()
+            )
 
         new_picking = fields.first(lines.mapped("picking_id"))
 
@@ -235,9 +236,12 @@ class Delivery(Component):
             )
         elif packages:
             # we have 1 package
-            # TODO if the package contain more than one product, set them to moved
-            # as well or forbid it (maybe could be done in _set_lines_done)
-            pass
+            # abort the operation if the package contain more than one product
+            if len(packages.quant_ids) > 1:
+                return self._response_for_deliver(
+                    new_picking,
+                    message=self.msg_store.lot_mixed_package_scan_package(),
+                )
 
         self._set_lines_done(lines)
         return self._response_for_deliver(new_picking)

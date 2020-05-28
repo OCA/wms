@@ -19,17 +19,53 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
                 (cls.product_d, 10),
                 # E as raw product with a lot
                 (cls.product_e, 10),
+                # F in two different packages
+                (cls.product_f, 10),
             ]
         )
         cls.pack1_moves = picking.move_lines[:2]
         cls.pack2_move = picking.move_lines[2]
+        cls.pack3_move = picking.move_lines[5]
         cls.raw_move = picking.move_lines[3]
         cls.raw_lot_move = picking.move_lines[4]
         cls._fill_stock_for_moves(cls.pack1_moves, in_package=True)
         cls._fill_stock_for_moves(cls.pack2_move, in_package=True)
         cls._fill_stock_for_moves(cls.raw_move)
         cls._fill_stock_for_moves(cls.raw_lot_move, in_lot=True)
+        # Set a lot for A for the mixed package (A + B)
+        cls.product_a_lot = cls.env["stock.production.lot"].create(
+            {"product_id": cls.product_a.id, "company_id": cls.env.company.id}
+        )
+        cls.product_a_quant = cls.env["stock.quant"].search(
+            [("product_id", "=", cls.product_a.id)]
+        )
+        cls.product_a_quant.sudo().lot_id = cls.product_a_lot
+        # Fill stock for F moves (two packages)
+        for __ in range(2):
+            product_f_pkg = cls.env["stock.quant.package"].create({})
+            cls._update_qty_in_location(
+                cls.pack3_move.location_id,
+                cls.pack3_move.product_id,
+                5,
+                package=product_f_pkg,
+            )
         picking.action_assign()
+        # Some records not related at all to the processed picking
+        cls.free_package = cls.env["stock.quant.package"].create(
+            {"name": "FREE_PACKAGE"}
+        )
+        cls.free_lot = cls.env["stock.production.lot"].create(
+            {
+                "name": "FREE_LOT",
+                "product_id": cls.product_a.id,
+                "company_id": cls.env.company.id,
+            }
+        )
+        cls.free_product = (
+            cls.env["product.product"]
+            .sudo()
+            .create({"name": "FREE_PRODUCT", "barcode": "FREE_PRODUCT"})
+        )
 
     def test_scan_deliver_scan_picking_ok(self):
         response = self.service.dispatch(
@@ -77,9 +113,53 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         package = move_lines.mapped("package_id")
         self._test_scan_set_done_ok(move_lines, package.name)
 
+    def test_scan_deliver_scan_package_no_move_lines(self):
+        response = self.service.dispatch(
+            "scan_deliver",
+            params={"barcode": self.free_package.name, "picking_id": self.picking.id},
+        )
+        self.assert_response_deliver(
+            response,
+            picking=self.picking,
+            message=self.service.msg_store.cannot_move_something_in_picking_type(),
+        )
+
     def test_scan_deliver_scan_product_in_package_ok(self):
         self._test_scan_set_done_ok(
             self.pack2_move.mapped("move_line_ids"), self.product_c.barcode
+        )
+
+    def test_scan_deliver_scan_product_in_multiple_packages(self):
+        response = self.service.dispatch(
+            "scan_deliver",
+            params={"barcode": self.product_f.barcode, "picking_id": self.picking.id},
+        )
+        self.assert_response_deliver(
+            response,
+            picking=self.picking,
+            message=self.service.msg_store.product_multiple_packages_scan_package(),
+        )
+
+    def test_scan_deliver_scan_product_in_mixed_package(self):
+        response = self.service.dispatch(
+            "scan_deliver",
+            params={"barcode": self.product_a.barcode, "picking_id": self.picking.id},
+        )
+        self.assert_response_deliver(
+            response,
+            picking=self.picking,
+            message=self.service.msg_store.product_mixed_package_scan_package(),
+        )
+
+    def test_scan_deliver_scan_product_tracked_by_lot(self):
+        response = self.service.dispatch(
+            "scan_deliver",
+            params={"barcode": self.product_e.barcode, "picking_id": self.picking.id},
+        )
+        self.assert_response_deliver(
+            response,
+            picking=self.picking,
+            message=self.service.msg_store.scan_lot_on_product_tracked_by_lot(),
         )
 
     def test_scan_deliver_scan_raw_product_ok(self):
@@ -87,14 +167,34 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             self.raw_move.mapped("move_line_ids"), self.product_d.barcode
         )
 
+    def test_scan_deliver_scan_product_not_found(self):
+        response = self.service.dispatch(
+            "scan_deliver", params={"barcode": self.free_product.barcode}
+        )
+        self.assert_response_deliver(
+            response, message=self.service.msg_store.product_not_found_in_pickings(),
+        )
+
     def test_scan_deliver_scan_lot_ok(self):
         move_lines = self.raw_lot_move.move_line_ids
         lot = move_lines.lot_id
         self._test_scan_set_done_ok(move_lines, lot.name)
 
-    # TODO test for product in different packages
-    # TODO test for product in one package but the package contains a product
-    # in different packages
+    def test_scan_deliver_scan_lot_not_found(self):
+        response = self.service.dispatch("scan_deliver", params={"barcode": "FREE_LOT"})
+        self.assert_response_deliver(
+            response, message=self.service.msg_store.lot_not_found_in_pickings(),
+        )
+
+    def test_scan_deliver_scan_lot_in_mixed_package(self):
+        response = self.service.dispatch(
+            "scan_deliver", params={"barcode": self.product_a_lot.name}
+        )
+        self.assert_response_deliver(
+            response,
+            picking=self.picking,
+            message=self.service.msg_store.lot_mixed_package_scan_package(),
+        )
 
 
 class DeliveryScanDeliverSpecialCase(DeliveryCommonCase):
