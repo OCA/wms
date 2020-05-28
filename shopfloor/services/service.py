@@ -1,5 +1,6 @@
-from odoo import _, exceptions
+from odoo import _, exceptions, registry
 from odoo.exceptions import MissingError
+from odoo.http import request
 from odoo.osv import expression
 
 from odoo.addons.base_rest.controllers.main import _PseudoCollection
@@ -22,6 +23,51 @@ class BaseShopfloorService(AbstractComponent):
     _collection = "shopfloor.service"
     _actions_collection_name = "shopfloor.action"
     _expose_model = None
+
+    def dispatch(self, method_name, _id=None, params=None):
+        try:
+            result = super().dispatch(method_name, _id=_id, params=params)
+        except Exception as err:
+            self.env.cr.rollback()
+            with registry(self.env.cr.dbname).cursor() as cr:
+                env = self.env(cr=cr)
+                self._log_call_in_db(env, _id, params, error=err)
+            raise
+        self._log_call_in_db(self.env, _id, params, result=result)
+        return result
+
+    @property
+    def _log_call_header_strip(self):
+        return ("Cookie", "Api-Key")
+
+    def _log_call_in_db_values(self, _id, params, result=None, error=None):
+        if not request:
+            # In tests, we have no http request
+            return
+        httprequest = request.httprequest
+        headers = dict(httprequest.headers)
+        for header_key in self._log_call_header_strip:
+            if header_key in headers:
+                headers[header_key] = "<redacted>"
+        if _id:
+            params = dict(params, _id=_id)
+        return {
+            "request_url": httprequest.url,
+            "request_method": httprequest.method,
+            "params": params,
+            "headers": headers,
+            "result": result,
+            "error": error,
+            "state": "success" if result else "failed",
+        }
+
+    def _log_call_in_db(self, env, _id, params, result=None, error=None):
+        if not env["shopfloor.log"].logging_active():
+            return
+        values = self._log_call_in_db_values(_id, params, result=result, error=error)
+        if not values:
+            return
+        env["shopfloor.log"].sudo().create(values)
 
     def _get(self, _id):
         domain = expression.normalize_domain(self._get_base_search_domain())

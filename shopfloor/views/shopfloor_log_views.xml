@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shopfloor_log_tree_view" model="ir.ui.view">
+        <field name="name">shopfloor.log tree</field>
+        <field name="model">shopfloor.log</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="state == 'failed'">
+                <field name="create_uid" />
+                <field name="create_date" />
+                <field name="request_method" />
+                <field name="request_url" />
+                <field name="state" />
+            </tree>
+        </field>
+    </record>
+    <record id="shopfloor_log_form_view" model="ir.ui.view">
+        <field name="name">shopfloor.log form</field>
+        <field name="model">shopfloor.log</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="request_url" />
+                            <field name="request_method" />
+                        </group>
+                        <group>
+                            <field name="create_uid" />
+                            <field name="create_date" />
+                        </group>
+                    </group>
+                    <group string="Parameters" name="parameters">
+                        <group>
+                            <field name="params" widget="CopyClipboardText" />
+                        </group>
+                        <group>
+                            <field name="headers" widget="CopyClipboardText" />
+                        </group>
+                    </group>
+                    <group
+                        string="Result"
+                        name="result"
+                        attrs="{'invisible': [('state', '!=', 'success')]}"
+                    >
+                        <group>
+                            <field
+                                name="result"
+                                nolabel="1"
+                                widget="CopyClipboardText"
+                            />
+                        </group>
+                    </group>
+                    <group
+                        string="Error"
+                        name="error"
+                        attrs="{'invisible': [('state', '!=', 'failed')]}"
+                    >
+                        <group>
+                            <field
+                                name="error"
+                                nolabel="1"
+                                widget="CopyClipboardText"
+                            />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="shopfloor_log_search_view" model="ir.ui.view">
+        <field name="name">shopfloor.log search</field>
+        <field name="model">shopfloor.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="state" />
+                <field name="request_url" />
+                <field name="request_method" />
+                <field name="params" />
+                <field name="headers" />
+                <filter
+                    string="Today"
+                    name="today"
+                    date="create_date"
+                    help="Logs generated today"
+                />
+                <group expand="0" string="Group By">
+                    <filter
+                        string="User"
+                        name="by_user"
+                        domain="[]"
+                        context="{'group_by': 'create_uid'}"
+                    />
+                    <filter
+                        string="Request URL"
+                        name="groupby_request_url"
+                        domain="[]"
+                        context="{'group_by': 'request_url'}"
+                    />
+                    <filter
+                        string="Status"
+                        name="status"
+                        domain="[]"
+                        context="{'group_by': 'state'}"
+                    />
+                    <filter
+                        string="Date"
+                        name="groupby_create_date"
+                        domain="[]"
+                        context="{'group_by': 'create_date'}"
+                        groups="base.group_no_one"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_shopfloor_log" model="ir.actions.act_window">
+        <field name="name">Shopfloor Logs</field>
+        <field name="res_model">shopfloor.log</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>
