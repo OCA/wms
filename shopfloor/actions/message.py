@@ -209,7 +209,35 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                "This product is part of multiple packages, please scan a package."
+                _("This product is part of multiple packages, please scan a package.")
+            ),
+        }
+
+    def product_mixed_package_scan_package(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                _(
+                    "This product is part of a package with other products, "
+                    "please scan a package."
+                )
+            ),
+        }
+
+    def product_not_found_in_pickings(self):
+        return {
+            "message_type": "warning",
+            "body": _("No product found among current transfers."),
+        }
+
+    def lot_mixed_package_scan_package(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                _(
+                    "This lot is part of a package with other products, "
+                    "please scan a package."
+                )
             ),
         }
 
@@ -217,6 +245,12 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("This lot is part of multiple packages, please scan a package."),
+        }
+
+    def lot_not_found_in_pickings(self):
+        return {
+            "message_type": "warning",
+            "body": _("No lot found among current transfers."),
         }
 
     def batch_transfer_complete(self):
