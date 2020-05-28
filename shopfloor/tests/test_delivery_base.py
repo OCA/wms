@@ -38,6 +38,30 @@ class DeliveryCommonCase(CommonCase):
                 }
             )
         )
+        cls.product_f = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product F",
+                    "type": "product",
+                    "default_code": "F",
+                    "barcode": "F",
+                    "weight": 3,
+                }
+            )
+        )
+        cls.product_f_packaging = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "Box",
+                    "product_id": cls.product_f.id,
+                    "barcode": "ProductFBox",
+                }
+            )
+        )
 
     def setUp(self):
         super().setUp()
