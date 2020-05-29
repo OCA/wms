@@ -1,24 +1,24 @@
-var userConfirmation = Vue.component("user-confirmation", {
+Vue.component("user-confirmation", {
     props: ["title", "question"],
     methods: {},
     template: `
 
-    <div class="confirm mt-4">
+    <div class="confirm">
         <v-alert type="warning" prominent tile>
-            {{ question }}
+            <p class="warning darken-2 title pa-5 mt-5">{{ question }}</p>
             <v-form class="mt-4">
-                <v-btn
-                    color="success"
-                    type="submit"
-                    value="yes"
-                    @click="$emit('user-confirmation', 'yes')">Yes</v-btn>
-
-                <v-btn
-                    class="float-right"
-                    color="error"
-                    type="reset"
-                    value="no"
-                    @click="$emit('user-confirmation', 'no')">No</v-btn>
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-action @click="$emit('user-confirmation', 'yes')">Yes</btn-action>
+                        </v-col>
+                    </v-row>
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-action action="cancel" @click="$emit('user-confirmation', 'no')">No</btn-action>
+                        </v-col>
+                    </v-row>
+                </div>
             </v-form>
         </v-alert>
     </div>
