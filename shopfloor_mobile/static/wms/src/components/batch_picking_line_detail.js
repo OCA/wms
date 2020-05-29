@@ -29,6 +29,7 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
                     {path: "package_src.name", label: "Pack"},
                     {path: "quantity", label: "Qty"},
                     {path: "product.qty_available", label: "Qty on hand"},
+                    {path: "lot.name", label: "Lot"},
                 ],
                 location_dest: [],
             };
