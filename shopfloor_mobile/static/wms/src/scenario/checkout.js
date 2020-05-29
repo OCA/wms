@@ -1,6 +1,5 @@
 import {ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
-import {utils} from "../utils.js";
 import {demotools} from "../demo/demo.core.js"; // FIXME: dev only
 import {} from "../demo/demo.checkout.js"; // FIXME: dev only
 
@@ -30,7 +29,7 @@ export var Checkout = Vue.component("checkout", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="primary" @click="state.on_manual_selection">Manual selection</v-btn>
+                            <btn-action @click="state.on_manual_selection">Manual selection</btn-action>
                         </v-col>
                     </v-row>
                 </div>
@@ -40,7 +39,7 @@ export var Checkout = Vue.component("checkout", {
                     :records="state.data.pickings"
                     :list_item_fields="manual_select_picking_fields"
                     :options="{list_item_options: {bold_title: true}}"
-                    :key="current_state_key + '-manual-select'"
+                    :key="make_state_component_key(['manual-select'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -52,15 +51,16 @@ export var Checkout = Vue.component("checkout", {
             </div>
             <div v-if="state_is('select_line')">
                 <detail-picking-select
-                    :picking="state.data.picking"
+                    :record="state.data.picking"
                     :select_records="state.data.picking.move_lines"
-                    :select_records_grouped="utils.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.only_one_package})"
-                    :key="current_state_key + '-detail-picking-select'"
+                    :select_records_grouped="utils.misc.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.misc.only_one_package})"
+                    :select_options="select_line_manual_select_opts()"
+                    :key="make_state_component_key(['detail-picking-select'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="primary" @click="$root.trigger('summary')">Summary</v-btn>
+                            <btn-action @click="$root.trigger('summary')">Summary</btn-action>
                         </v-col>
                     </v-row>
                 </div>
@@ -68,66 +68,44 @@ export var Checkout = Vue.component("checkout", {
 
             <div v-if="state_is('select_package')">
                 <detail-picking-select
-                    :picking="state.data.picking"
+                    :record="state.data.picking"
                     :select_records="state.data.selected_move_lines"
-                    :select_options="{multiple: true, initSelectAll: true, list_item_component: 'picking-select-package-content', list_item_options: {actions: ['action_qty_edit']}}"
-                    :key="current_state_key + '-detail-picking-select'"
+                    :select_options="select_package_manual_select_opts()"
+                    :key="make_state_component_key(['detail-picking-select'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="primary"
+                            <btn-action
                                    @click="state.on_existing_pack"
                                    :disabled="state.data.selected && !state.data.selected.length"
-                                   >Existing pack</v-btn>
+                                   >Existing pack</btn-action>
                         </v-col>
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="primary"
+                            <btn-action
                                    @click="state.on_new_pack"
                                    :disabled="state.data.selected && !state.data.selected.length"
-                                   >New pack</v-btn>
+                                   >New pack</btn-action>
                         </v-col>
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="primary"
+                            <btn-action
                                    @click="state.on_without_pack"
                                    :disabled="state.data.selected && !state.data.selected.length"
-                                   >Process w/o pack</v-btn>
-                        </v-col>
-                    </v-row>
-                </div>
-            </div>
-
-            <div v-if="state_is('summary')">
-                <picking-summary
-                    :picking="state.data.picking"
-                    :records_grouped="utils.group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': utils.group_by_pack})"
-                    :list_options="{list_item_options: {actions: ['action_change_pkg', 'action_cancel_line']}}"
-                    :key="current_state_key + '-picking-summary'"
-                    />
-                <div class="button-list button-vertical-list full">
-                    <v-row align="center" v-if="!state.data.all_processed">
-                        <v-col class="text-center" cols="12">
-                            <v-btn color="primary" @click="$root.trigger('continue')">Continue checkout</v-btn>
-                        </v-col>
-                    </v-row>
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <v-btn color="success" @click="$root.trigger('mark_as_done')"
-                                   :disabled="state.data.picking.move_lines.length < 1">Mark as done</v-btn>
+                                   >Process w/o pack</btn-action>
                         </v-col>
                     </v-row>
                 </div>
             </div>
             <div v-if="state_is('select_dest_package')">
                 <detail-picking-select
-                    :picking="state.data.picking"
+                    :record="state.data.picking"
                     :select_records="state.data.packages"
                     :select_options="{list_item_fields: existing_package_select_fields, list_item_component: 'list-item'}"
-                    :key="current_state_key + '-detail-picking-select'"
+                    :key="make_state_component_key(['detail-picking-select'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -138,18 +116,24 @@ export var Checkout = Vue.component("checkout", {
                 </div>
             </div>
             <div v-if="state_is('change_quantity')">
-                <detail-picking :picking="state.data.picking" />
-                <div class="qty">
-                    <input-number-spinner
-                        v-on:input="state.on_qty_update"
-                        :init_value="state.data.record.qty_done"
-                        class="mb-2"
-                        />
-                </div>
+                <detail-picking :record="state.data.picking" />
+                <item-detail-card :card_color="utils.colors.color_for('screen_step_done')"
+                    :key="make_state_component_key(['location_src'])"
+                    :record="state.data.line"
+                    :options="{main: true, key_title: 'location_src.name', title_action_field: {action_val_path: 'location_src.barcode'}}"
+                    />
+                <item-detail-card :card_color="utils.colors.color_for('screen_step_done')"
+                    :key="make_state_component_key(['product'])"
+                    :record="state.data.line"
+                    :options="utils.misc.move_line_product_detail_options(state.data.line)"
+                    />
+                <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
+                    <packaging-qty-picker :options="utils.misc.move_line_qty_picker_options(state.data.line)" />
+                </v-card>
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="primary" @click="$root.trigger('qty_change_confirm')">Confirm</v-btn>
+                            <btn-action @click="$root.trigger('qty_change_confirm')">Confirm</btn-action>
                         </v-col>
                     </v-row>
                     <v-row align="center">
@@ -161,10 +145,10 @@ export var Checkout = Vue.component("checkout", {
             </div>
             <div v-if="state_is('change_packaging')">
                 <detail-picking-select
-                    :picking="state.data.picking"
-                    :select_records="state.data.packagings"
+                    :record="state.data.picking"
+                    :select_records="state.data.packaging"
                     :select_options="{list_item_component: 'list-item'}"
-                    :key="current_state_key + '-detail-picking-select'"
+                    :key="make_state_component_key(['detail-picking-select'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -174,17 +158,39 @@ export var Checkout = Vue.component("checkout", {
                     </v-row>
                 </div>
             </div>
-            <div v-if="state_is('confirm_done')">
-                <detail-picking :picking="state.data.picking" />
+            <div v-if="state_is('summary')">
+                <picking-summary
+                    :record="state.data.picking"
+                    :records_grouped="utils.misc.group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': utils.misc.group_by_pack})"
+                    :list_options="{list_item_options: {actions: ['action_change_pkg', 'action_cancel_line']}}"
+                    :key="make_state_component_key(['picking-summary'])"
+                    />
                 <div class="button-list button-vertical-list full">
-                    <v-row align="center">
+                    <v-row align="center" v-if="!state.data.all_processed">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="success" @click="state.on_confirm">Confirm</v-btn>
+                            <btn-action @click="$root.trigger('continue')">Continue checkout</btn-action>
                         </v-col>
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="default" @click="state.on_back">Back</v-btn>
+                            <btn-action :action="'complete'"
+                                @click="$root.trigger('mark_as_done')"
+                                :disabled="state.data.picking.move_lines.length < 1">Mark as done</btn-action>
+                        </v-col>
+                    </v-row>
+                </div>
+            </div>
+            <div v-if="state_is('confirm_done')">
+                <detail-picking :record="state.data.picking" />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-action :action="'complete'" @click="state.on_confirm">Confirm</btn-action>
+                        </v-col>
+                    </v-row>
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-action color="default" @click="state.on_back">Back</btn-action>
                         </v-col>
                     </v-row>
                 </div>
@@ -192,9 +198,6 @@ export var Checkout = Vue.component("checkout", {
         </Screen>
         `,
     computed: {
-        utils: function() {
-            return utils;
-        },
         // TODO: move these to methods
         manual_select_picking_fields: function() {
             return [
@@ -221,10 +224,34 @@ export var Checkout = Vue.component("checkout", {
     //     this._state_load(state);
     // },
     methods: {
-        record_by_id: function(records, _id) {
-            // TODO: double check when the process is done if this is still needed or not.
-            // `manual-select` can now buble up events w/ full record.
-            return _.first(_.filter(records, {id: _id}));
+        screen_title: function() {
+            if (_.isEmpty(this.current_doc()) || this.state_is("confirm_start"))
+                return this.menu_item.name;
+            let title = this.current_doc().record.name;
+            return title;
+        },
+        current_doc: function() {
+            const data = this.state_get_data("select_line");
+            if (_.isEmpty(data)) {
+                return null;
+            }
+            return {
+                record: data.picking,
+                identifier: data.picking.name,
+            };
+        },
+        select_line_manual_select_opts: function() {
+            return {
+                group_color: this.utils.colors.color_for("screen_step_todo"),
+            };
+        },
+        select_package_manual_select_opts: function() {
+            return {
+                multiple: true,
+                initSelectAll: true,
+                list_item_component: "picking-select-package-content",
+                list_item_options: {actions: ["action_qty_edit"]},
+            };
         },
     },
     data: function() {
@@ -368,6 +395,11 @@ export var Checkout = Vue.component("checkout", {
                             console.log("unselected", unselected);
                             this.wait_call(
                                 this.odoo.call("reset_line_qty", {
+                                    picking_id: this.state.data.picking.id,
+                                    selected_line_ids: _.map(
+                                        this.state.data.selected,
+                                        _.property("id")
+                                    ),
                                     move_line_id: unselected.id,
                                 })
                             );
@@ -377,7 +409,7 @@ export var Checkout = Vue.component("checkout", {
                         this.state_set_data(
                             {
                                 picking: this.state.data.picking,
-                                record: record,
+                                line: record,
                                 selected_line_ids: _.map(
                                     this.state.data.selected,
                                     _.property("id")
@@ -431,6 +463,7 @@ export var Checkout = Vue.component("checkout", {
                     },
                     events: {
                         qty_change_confirm: "on_confirm",
+                        qty_edit: "on_qty_update",
                     },
                     on_back: () => {
                         this.state_to("select_package");
@@ -445,7 +478,7 @@ export var Checkout = Vue.component("checkout", {
                             this.odoo.call("set_custom_qty", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_ids: this.state.data.selected_line_ids,
-                                move_line_id: this.state.data.record.id,
+                                move_line_id: this.state.data.line.id,
                                 qty_done: this.state.data.qty,
                             })
                         );

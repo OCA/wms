@@ -39,7 +39,7 @@ Vue.component("detail-package", {
                 <detail-picking
                     v-for="picking in record.pickings"
                     :key="picking.id"
-                    :picking="picking"
+                    :record="record"
                     />
             </div>
         </div>

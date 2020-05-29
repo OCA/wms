@@ -20,7 +20,7 @@ export class DemoTools {
             this.makeLocation({}, {name_prefix: "LOC-DST"}),
             this.makeLocation({}, {name_prefix: "LOC-DST"}),
         ];
-        this.packagings = [
+        this.packaging = [
             this.makePackaging({
                 name: "Little Box",
                 qty: 10,
@@ -226,7 +226,6 @@ export class DemoTools {
             0
         );
     }
-
     makeProduct(defaults = {}, options = {}) {
         _.defaults(options, {
             name_prefix: "Prod " + this.getRandomInt(),
@@ -237,6 +236,7 @@ export class DemoTools {
             default_code: default_code,
             barcode: default_code,
             qty_available: this.getRandomInt(200),
+            packaging: this.randomSetFromArray(this.packaging, 4),
         });
         const rec = this.makeSimpleRecord(defaults, options);
         _.extend(rec, {
@@ -252,7 +252,6 @@ export class DemoTools {
             qty_available: this.getRandomInt(),
             qty_reserved: this.getRandomInt(),
             expiry_date: "2020-12-01",
-            packagings: this.randomSetFromArray(this.packagings, 4),
             // TODO: load some random images
             image: null,
             manufacturer: this.makeSimpleRecord({

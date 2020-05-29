@@ -187,7 +187,7 @@ const DEMO_CHECKOUT = {
             change_packaging: {
                 picking: select_pack_picking,
                 package: demotools.makePack(),
-                packagings: _.sampleSize(
+                packaging: _.sampleSize(
                     [
                         demotools.makePackaging(),
                         demotools.makePackaging(),

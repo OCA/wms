@@ -1,41 +1,31 @@
 export var PickingDetailMixin = {
     props: {
         // TODO: rename to `record`
-        picking: Object,
+        record: Object,
         options: Object,
-        clickable: {
-            type: Boolean,
-            // TODO: this must be false when showing picking screen (eg: scan anything)
-            default: true,
-        },
-    },
-    methods: {
-        on_title_action() {
-            // TODO: we should probably delegate this to a global event
-            this.$router.push({
-                name: "scananything",
-                params: {identifier: this.picking.name},
-                query: {displayOnly: 1},
-            });
-        },
+        // clickable: {
+        //     type: Boolean,
+        //     // TODO: this must be false when showing record screen (eg: scan anything)
+        //     default: true,
+        // },
     },
     computed: {
         opts() {
             const opts = _.defaults({}, this.$props.options, {
-                on_title_action: this.$props.clickable ? this.on_title_action : null,
+                title_action_field: {path: "name", action_val_path: "name"},
             });
             return opts;
         },
     },
     template: `
-  <item-detail-card :record="picking" :options="opts">
+  <item-detail-card :record="record" :options="opts">
     <template v-slot:subtitle>
-      <span class="origin" v-if="picking.origin">
-          <span>{{ picking.origin }}</span>
+      <span class="origin" v-if="record.origin">
+          <span>{{ record.origin }}</span>
       </span>
-      <span v-if="picking.origin && picking.partner"> - </span>
-      <span class="partner" v-if="picking.partner">
-          <span>{{ picking.partner.name }}</span>
+      <span v-if="record.origin && record.partner"> - </span>
+      <span class="partner" v-if="record.partner">
+          <span>{{ record.partner.name }}</span>
       </span>
     </template>
   </item-detail-card>

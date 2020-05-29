@@ -1,3 +1,5 @@
+import {utils} from "./utils.js";
+import {color_registry} from "./services/color_registry.js";
 export var GlobalMixin = {
     methods: {
         /*
@@ -10,6 +12,17 @@ export var GlobalMixin = {
             if (parent_key) bits.unshift(parent_key + "-");
             bits.unshift(this.$options._componentTag);
             return bits.join("-");
+        },
+    },
+    computed: {
+        /*
+        Provide utils to all components
+        */
+        utils: function() {
+            return {
+                misc: utils,
+                colors: color_registry,
+            };
         },
     },
 };

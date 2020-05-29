@@ -84,6 +84,7 @@ export var ScenarioBaseMixin = {
             return {
                 // you can provide a different screen title
                 title: this.screen_title ? this.screen_title() : this.menu_item.name,
+                current_doc: this.current_doc ? this.current_doc() : null,
                 klass: this.usage + " " + "state-" + this.state.key,
                 user_message: this.user_message,
                 user_popup: this.user_popup,
@@ -104,6 +105,11 @@ export var ScenarioBaseMixin = {
         },
     },
     methods: {
+        make_state_component_key: function(bits) {
+            bits.unshift(this.current_state_key);
+            bits.unshift(this.usage);
+            return this.make_component_key(bits);
+        },
         storage_key: function(state_key) {
             state_key = _.isUndefined(state_key) ? this.current_state_key : state_key;
             return this.usage + "." + state_key;
@@ -321,10 +327,10 @@ export var ScenarioBaseMixin = {
                 _.each(self.state.events, function(handler, name) {
                     if (typeof handler == "string") handler = self.state[handler];
                     const event_name = self.state.key + ":" + name;
-                    // Wipe old handlers
-                    // TODO: any way to register them just once?
-                    self.$root.event_hub.$off(event_name, handler);
-                    self.$root.event_hub.$on(event_name, handler);
+                    const existing = self.$root.event_hub._events[event_name];
+                    if (handler && _.isEmpty(existing)) {
+                        self.$root.event_hub.$on(event_name, handler);
+                    }
                 });
             }
         },

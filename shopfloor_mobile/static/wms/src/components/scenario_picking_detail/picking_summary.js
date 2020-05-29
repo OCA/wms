@@ -88,7 +88,7 @@ Vue.component("picking-summary-content", {
                     {{ record.title }}
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <strong class="pkg-type-name">{{ pkg_type.title }}</strong>
+                    <strong class="pkg-type-name mb-2">{{ pkg_type.title }}</strong>
                     <picking-summary-product-detail
                         v-for="(prod, i) in pkg_type.records"
                         :record="prod"

@@ -1,6 +1,7 @@
 /* eslint-disable strict */
 /* eslint-disable no-implicit-globals */
 import {PickingDetailSelectMixin} from "./mixins.js";
+import {ItemDetailMixin} from "../detail/detail_mixin.js";
 
 Vue.component("detail-picking-select", {
     mixins: [PickingDetailSelectMixin],
@@ -26,9 +27,8 @@ Vue.component("detail-picking-select", {
 });
 
 Vue.component("picking-select-line-content", {
+    mixins: [ItemDetailMixin],
     props: {
-        record: Object,
-        options: Object,
         index: Number,
         count: Number,
     },
@@ -38,13 +38,19 @@ Vue.component("picking-select-line-content", {
             <div class="item-counter">
                 <span>{{ index + 1 }} / {{ count }}</span>
             </div>
-            <span>{{ record.package_dest.name }}</span>
+            <span class="clickable" @click="on_detail_action(record.package_dest, {action_val_path: 'name'})">
+                <btn-info-icon />
+                {{ record.package_dest.name }}
+            </span>
         </div>
         <div class="no_pack" v-if="!record.package_dest">
             <div class="item-counter">
                 <span>{{ index + 1 }} / {{ count }}</span>
             </div>
-            <span>{{ record.product.display_name }}</span>
+            <span class="clickable" @click="on_detail_action(record.product, {action_val_path: 'barcode'})">
+                <btn-info-icon />
+                {{ record.product.display_name }}
+            </span>
             <div class="lot" v-if="record.lot">
                 <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
             </div>

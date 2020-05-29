@@ -122,7 +122,7 @@ class Checkout(Component):
                 "package": self.data_struct.package(
                     package, picking=picking, with_packaging=True
                 ),
-                "packagings": self.data_struct.packagings(packaging_list.sorted()),
+                "packaging": self.data_struct.packaging_list(packaging_list.sorted()),
             },
         )
 
@@ -1229,7 +1229,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
                 "type": "dict",
                 "schema": self.schemas.package(with_packaging=True),
             },
-            "packagings": {
+            "packaging": {
                 "type": "list",
                 "schema": {"type": "dict", "schema": self.schemas.packaging()},
             },

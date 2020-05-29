@@ -135,20 +135,20 @@ ul.packaging span:first-child {
     text-align: center;
     margin: 0.5rem 0;
 }
-.number-spinner.spinner-position-right .spinner-btn {
+.number-spinner.spinner-right .spinner-btn {
     float: right;
     margin: 0.5rem 0;
 }
-.number-spinner.spinner-position-right .input-wrapper {
+.number-spinner.spinner-right .input-wrapper {
     float: left;
     width: 50%;
     margin: 0.5rem 0;
 }
-.number-spinner.spinner-position-left .spinner-btn {
+.number-spinner.spinner-left .spinner-btn {
     float: left;
     margin: 0.5rem 0;
 }
-.number-spinner.spinner-position-left .input-wrapper {
+.number-spinner.spinner-left .input-wrapper {
     float: right;
     width: 50%;
     margin: 0.5rem 0;
@@ -163,6 +163,13 @@ ul.packaging span:first-child {
     font-weight: bold;
     font-size: 1.2rem;
     color: #999;
+}
+.number-spinner.spinner-text-only input {
+    max-height: auto;
+    font-size: 180%;
+}
+.number-spinner.spinner-text-only .init-value {
+    font-size: 150%;
 }
 
 .manual-select.with-bottom-actions {
@@ -186,9 +193,11 @@ ul.packaging span:first-child {
     height: 3.5rem;
     width: 100%;
 }
-
+.manual-select[class*="with-group_color"] .v-card {
+    border: 5px solid;
+}
 .manual-select.with-groups .v-card__title {
-    padding: 0.5rem 1rem 1rem 1rem;
+    padding: 0.5rem 1rem 0.5rem 1rem;
 }
 .manual-select.with-groups .v-card.select-group:not(:last-child) {
     margin-bottom: 1.2rem;
@@ -233,9 +242,6 @@ ul.packaging span:first-child {
     padding: 0;
 }
 
-.list-item-wrapper.active {
-    background-color: lightgreen;
-}
 .list-item-wrapper .action-edit {
     display: none;
 }
@@ -244,17 +250,13 @@ ul.packaging span:first-child {
     display: block;
 }
 
-.my-checkbox {
+.sf-checkbox {
     -webkit-appearance: none;
     width: 30px;
     height: 30px;
     background: white;
     border-radius: 5px;
     border: 2px solid #555;
-}
-
-input.my-checkbox[type="checkbox"]:checked {
-    background: green;
 }
 
 .summary-content {
@@ -381,4 +383,111 @@ input.my-checkbox[type="checkbox"]:checked {
 }
 .todo .message {
     background-color: white;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.packaging-qty-picker * {
+    text-align: center;
+}
+.packaging-qty-picker .unit-value input {
+    font-size: 130%;
+}
+.packaging-qty-picker .unit-value .col {
+    padding-bottom: 0;
+}
+.packaging-qty-picker .packaging-value .col {
+    padding-top: 0;
+    padding-bottom: 5px;
+}
+.packaging-qty-picker .packaging-value .col:not(:last-child) {
+    padding-right: 0;
+}
+.packaging-qty-picker .pkg-qty {
+    font-size: 80%;
+}
+.packaging-qty-picker input.pkg-value {
+    max-width: 60px;
+    padding: 0.5rem 0.5rem 0;
+    font-size: 130%;
+    border-bottom: 1px solid;
+}
+.packaging-qty-picker .inner-wrapper {
+    padding-bottom: 8px;
+}
+.packaging-qty-picker .input-wrapper {
+    margin-bottom: 8px;
+}
+
+.shake-it {
+    -webkit-animation: kf_shake 0.4s 1 linear;
+    -moz-animation: kf_shake 0.4s 1 linear;
+    -o-animation: kf_shake 0.4s 1 linear;
+}
+@-webkit-keyframes kf_shake {
+    0% {
+        -webkit-transform: translate(10px);
+    }
+    20% {
+        -webkit-transform: translate(-10px);
+    }
+    40% {
+        -webkit-transform: translate(15px);
+    }
+    60% {
+        -webkit-transform: translate(-15px);
+    }
+    80% {
+        -webkit-transform: translate(8px);
+    }
+    100% {
+        -webkit-transform: translate(0px);
+    }
+}
+@-moz-keyframes kf_shake {
+    0% {
+        -moz-transform: translate(10px);
+    }
+    20% {
+        -moz-transform: translate(-10px);
+    }
+    40% {
+        -moz-transform: translate(15px);
+    }
+    60% {
+        -moz-transform: translate(-15px);
+    }
+    80% {
+        -moz-transform: translate(8px);
+    }
+    100% {
+        -moz-transform: translate(0px);
+    }
+}
+@-o-keyframes kf_shake {
+    0% {
+        -o-transform: translate(10px);
+    }
+    20% {
+        -o-transform: translate(-10px);
+    }
+    40% {
+        -o-transform: translate(15px);
+    }
+    60% {
+        -o-transform: translate(-15px);
+    }
+    80% {
+        -o-transform: translate(8px);
+    }
+    100% {
+        -o-origin-transform: translate(0px);
+    }
+}
+
+.v-card .v-card__title {
+    font-size: 1.1rem;
+    line-height: 1.1rem;
 }
