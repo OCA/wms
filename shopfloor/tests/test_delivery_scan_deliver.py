@@ -94,15 +94,6 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             message={"message_type": "error", "body": "Barcode not found"},
         )
 
-    def assert_qty_done(self, move_lines):
-        self.assertRecordValues(
-            move_lines, [{"qty_done": line.product_uom_qty} for line in move_lines]
-        )
-        package_level = move_lines.package_level_id
-        if package_level:
-            # we have a package level only when there is a package
-            self.assertRecordValues(package_level, [{"is_done": True}])
-
     def _test_scan_set_done_ok(self, move_lines, barcode):
         response = self.service.dispatch("scan_deliver", params={"barcode": barcode})
         self.assert_qty_done(move_lines)
