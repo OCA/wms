@@ -234,9 +234,9 @@ ul.packaging span:first-child {
 .list .v-expansion-panel-content .v-expansion-panel-content__wrap {
     padding: 0 6px 10px;
 }
-.list .list-item-wrapper:not(:last-child) .v-list-item__content {
+/* .list .list-item-wrapper:not(:last-child) .v-list-item__content {
     border-bottom: 1px solid #ccc;
-}
+} */
 .list .list-group:not(:last-child) {
     border-bottom: 2px solid #ccc;
 }
@@ -278,7 +278,7 @@ ul.packaging span:first-child {
     margin-bottom: 0.4em;
     padding-bottom: 0.4em;
 }
-.summary-content .summary-content-item:not(:last-child) {
+.summary-content .v-expansion-panel-content .summary-content-item:not(:last-child) {
     border-bottom: 1px dotted #ccc;
 }
 .separator-title {
@@ -335,10 +335,10 @@ ul.packaging span:first-child {
 .v-application--is-ltr .v-list-item__icon:last-of-type:not(:only-child) {
     margin-left: 0;
 }
-
+/*
 .list-item-wrapper:not(:last-child) {
     border-bottom: 1px solid #ccc;
-}
+} */
 
 .list-item-wrapper .extra {
     padding: 0 16px;
@@ -500,4 +500,9 @@ I tested only w/ checkout/select_package for now
  */
 .detail-picking-select .manual-select .v-list-item .v-list-item__action--stack {
     flex-direction: column-reverse;
+}
+
+/* TODO: likely to be applied to all */
+.list .v-list-item {
+    border-bottom: 1px solid #ccc;
 }
