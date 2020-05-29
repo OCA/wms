@@ -81,15 +81,14 @@ Vue.component("list", {
     },
     template: `
     <div :class="klass">
-        <v-card>
+        <v-card class="list-group" :color="opts.group_color" v-for="(group, gindex) in listable" :key="make_component_key([$options._componentTag, 'group', gindex])">
+            <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
             <v-list v-if="has_records">
-                <div class="list-group" v-for="group in listable" :key="make_component_key(['group', group.key])">
-                    <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
-                    <div class="list-items-wrapper">
-                        <v-list-item
-                                v-for="(rec, index) in group.records" :key="make_component_key(['group', group.key, index])"
-                                @click="opts.list_item_on_click ? opts.list_item_on_click(rec) : undefined"
-                                :class="list_item_options.list_item_klass_maker ? list_item_options.list_item_klass_maker(rec) : ''">
+                <div class="list-item-wrapper" v-for="(rec, index) in group.records">
+                    <v-list-item :key="make_component_key(['group-rec', gindex, index, rec.id])"
+                                 :class="list_item_options.list_item_klass_maker ? list_item_options.list_item_klass_maker(rec) : ''"
+                                 @click="opts.list_item_on_click ? opts.list_item_on_click(rec) : undefined">
+                        <v-list-item-content>
                             <component
                                 :is="opts.list_item_component"
                                 :options="list_item_options"
@@ -98,25 +97,29 @@ Vue.component("list", {
                                 :count="group.records.length"
                                 :key="make_component_key([opts.list_item_component, 'list', index, rec.id])"
                                 />
-                            <v-list-item-action v-if="opts.list_item_actions.length">
-                                <component
-                                    v-for="action in opts.list_item_actions"
-                                    :is="action.comp_name"
-                                    v-if="action.enabled(rec, action)"
-                                    :options="_.merge({}, list_item_options, action.options)"
-                                    :record="action.get_record(rec, action)"
-                                    :index="index"
-                                    :count="group.records.length"
-                                    :key="make_component_key([action.comp_name, 'list', index, action.get_record(rec, action).id])"
-                                    />
-                            </v-list-item-action>
-                        </v-list-item>
-                    </div>
+                        </v-list-item-content>
+                        <v-list-item-action v-if="opts.list_item_actions.length">
+                            <component
+                                v-for="action in opts.list_item_actions"
+                                :is="action.comp_name"
+                                v-if="action.enabled(rec, action)"
+                                :options="_.merge({}, list_item_options, action.options)"
+                                :record="action.get_record(rec, action)"
+                                :index="index"
+                                :count="group.records.length"
+                                :key="make_component_key([action.comp_name, 'list', index, action.get_record(rec, action).id])"
+                                />
+                        </v-list-item-action>
+                    </v-list-item>
                 </div>
             </v-list>
-            <div class="no-record pa-2" v-if="!has_records">
-                <p class="text--secondary">No item to list.</p>
-            </div>
+            <v-list v-if="!has_records">
+                <v-list-item>
+                    <v-list-item-content>
+                        <p class="text--secondary">No item to list.</p>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list>
         </v-card>
     </div>
   `,
