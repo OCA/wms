@@ -1,35 +1,6 @@
-export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
+export var PackagingQtyPickerMixin = {
     props: {
-        input_type: {
-            type: String,
-            default: "text", // Avoid default browser spinner
-        },
-        init_value: {
-            type: Number,
-            default: 0,
-        },
-        min: {
-            type: Number,
-            default: 0,
-        },
-        max: {
-            type: Number,
-            default: undefined,
-        },
-        mode: {
-            type: String,
-            default: "",
-        },
-        available_packaging: {
-            type: Array,
-            default: function() {
-                return [];
-            },
-        },
-        show_pkg_size: {
-            type: Boolean,
-            default: true,
-        },
+        options: Object,
     },
     data: function() {
         return {
@@ -70,11 +41,8 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
             // Set new orig value
             $(input).data("origvalue", new_qty);
         },
-        sorted_packaging: function() {
-            return _.reverse(_.sortBy(this.available_packaging, _.property("qty")));
-        },
         packaging_by_id: function(id) {
-            return _.find(this.available_packaging, ["id", parseInt(id, 10)]);
+            return _.find(this.opts.available_packaging, ["id", parseInt(id, 10)]);
         },
         /**
          *
@@ -92,7 +60,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
                    Default: to UoM unit.
         */
         product_qty_by_packaging: function() {
-            return this._product_qty_by_packaging(this.sorted_packaging(), this.value);
+            return this._product_qty_by_packaging(this.sorted_packaging, this.value);
         },
         /**
          * Produce a list of tuple of packaging qty and packaging name.
@@ -149,8 +117,8 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
         },
     },
     created: function() {
-        this.original_value = parseInt(this.init_value, 10);
-        this.value = parseInt(this.init_value, 10);
+        this.original_value = parseInt(this.opts.init_value, 10);
+        this.value = parseInt(this.opts.init_value, 10);
     },
     mounted: function() {
         const self = this;
@@ -162,6 +130,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
             {deep: true}
         );
         this.qty_by_pkg = this.product_qty_by_packaging();
+        this.orig_qty_by_pkg = this.qty_by_pkg;
         // hooking via `v-on:change` we don't get the full event but only the qty :/
         // And forget about using v-text-field because it loses the full event object
         $(".pkg-value", this.$el).change(this.on_change_pkg_qty);
@@ -170,6 +139,23 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
         });
     },
     computed: {
+        opts() {
+            const opts = _.defaults({}, this.$props.options, {
+                input_type: "text",
+                init_value: 0,
+                mode: "",
+                available_packaging: [],
+            });
+            return opts;
+        },
+        /**
+         *
+         */
+        sorted_packaging: function() {
+            return _.reverse(
+                _.sortBy(this.opts.available_packaging, _.property("qty"))
+            );
+        },
         /**
          * Collect qty of contained packaging inside bigger packaging.
          * Eg: "1 Pallet" contains "4 Big boxes".
@@ -177,7 +163,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
         contained_packaging: function() {
             const self = this;
             let res = {};
-            const packaging = this.sorted_packaging();
+            const packaging = this.sorted_packaging;
             _.forEach(packaging, function(pkg, i) {
                 if (packaging[i + 1]) {
                     const next_pkg = packaging[i + 1];
@@ -190,22 +176,27 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
             return res;
         },
     },
+};
+
+export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
+    mixins: [PackagingQtyPickerMixin],
     template: `
-<div :class="[$options._componentTag, mode ? 'mode-' + mode: '']">
+<div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode: '']">
     <v-row class="unit-value">
         <v-col class="current-value">
-            <v-text-field :type="input_type" v-model="value" readonly="readonly" />
+            <v-text-field :type="opts.input_type" v-model="value" readonly="readonly" />
         </v-col>
         <v-col class="init-value">
-            <v-text-field :type="input_type" v-model="original_value" readonly="readonly" disabled="disabled" />
+            <v-text-field :type="opts.input_type" v-model="original_value" readonly="readonly" disabled="disabled" />
         </v-col>
     </v-row>
     <v-row class="packaging-value">
-        <v-col class="packaging" v-for="pkg in sorted_packaging()">
+        <v-col class="packaging" v-for="pkg in sorted_packaging">
             <div class="inner-wrapper">
                 <div class="input-wrapper">
                     <input type="text" class="pkg-value"
                         :value="qty_by_pkg[pkg.id] || 0"
+                        :data-origvalue="orig_qty_by_pkg[pkg.id] || 0"
                         :data-pkg="JSON.stringify(pkg)"
                         />
                 </div>
@@ -214,6 +205,18 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
             </div>
         </v-col>
     </v-row>
+</div>
+`,
+});
+
+export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-display", {
+    mixins: [PackagingQtyPickerMixin],
+    template: `
+<div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode: '', 'd-inline']">
+    <span class="packaging" v-for="(pkg, index) in sorted_packaging">
+        <span class="pkg-qty" v-text="qty_by_pkg[pkg.id] || 0" />
+        <span class="pkg-name" v-text="pkg.name" /><span class="sep" v-if="index != Object.keys(sorted_packaging).length - 1">, </span>
+    </span>
 </div>
 `,
 });

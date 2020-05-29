@@ -26,7 +26,17 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
                 location_src: [],
                 product: [
                     {path: "package_src.name", label: "Pack"},
-                    {path: "quantity", label: "Qty"},
+                    {
+                        path: "quantity",
+                        label: "Qty",
+                        render_component: "packaging-qty-picker-display",
+                        render_options: function(record) {
+                            return {
+                                init_value: record.quantity,
+                                available_packaging: record.product.packaging,
+                            };
+                        },
+                    },
                     {path: "product.qty_available", label: "Qty on hand"},
                     {path: "lot.name", label: "Lot"},
                 ],
@@ -69,13 +79,7 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     />
 
   <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')" v-if="showQtyPicker">
-    <packaging-qty-picker
-        :init_value="line.quantity" :available_packaging='[
-        {id: 1, name: "Pallet", qty: 500},
-        {id: 2, name: "Big Box", qty: 200},
-        {id: 3, name: "Box", qty: 100},
-        {id: 4, name: "Unit", qty: 1},
-    ]' />
+    <packaging-qty-picker :options="{init_value: line.quantity, available_packaging: line.product.packaging}" />
   </v-card>
 
   <item-detail-card
