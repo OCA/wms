@@ -193,7 +193,8 @@ ul.packaging span:first-child {
     height: 3.5rem;
     width: 100%;
 }
-.manual-select[class*="with-group_color"] .v-card {
+.manual-select[class*="with-group_color"] .v-card,
+.list[class*="with-group_color"] .v-card {
     border: 5px solid;
 }
 .manual-select.with-groups .v-card__title {
@@ -202,6 +203,7 @@ ul.packaging span:first-child {
 .manual-select.with-groups .v-card.select-group:not(:last-child) {
     margin-bottom: 1.2rem;
 }
+.list .v-list,
 .manual-select .v-list {
     padding: 0;
 }
