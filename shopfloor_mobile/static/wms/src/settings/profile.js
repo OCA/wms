@@ -33,7 +33,7 @@ export var Profile = Vue.component("profile", {
                 <!-- FIXME: maybe not a good place here -->
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-action :action="warn" @click="reset_data()">Reload config and menu</btn-action>
+                        <btn-action action="warn" @click="reset_data()">Reload config and menu</btn-action>
                     </v-col>
                 </v-row>
                 <v-row align="center">
