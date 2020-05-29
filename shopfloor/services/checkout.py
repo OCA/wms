@@ -867,7 +867,7 @@ class Checkout(Component):
                 "package": data_struct.package(
                     package, picking=picking, with_packaging=True
                 ),
-                "packagings": data_struct.packagings(packaging_list.sorted()),
+                "packagings": data_struct.packaging_list(packaging_list.sorted()),
             },
         )
 
