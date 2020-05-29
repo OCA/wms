@@ -65,6 +65,26 @@ class Delivery(Component):
         )
         return data
 
+    def _check_picking_status(self, picking):
+        """Check if `picking` can be processed.
+
+        If the picking is already done, canceled or didn't belong to the
+        expected picking type, a response is returned.
+
+        Transitions:
+        * deliver: always return here with updated data
+        """
+        if picking.state == "done":
+            return self._response_for_deliver(message=self.msg_store.already_done())
+        if picking.state not in ("assigned", "partially_available"):
+            return self._response_for_deliver(
+                message=self.msg_store.stock_picking_not_available(picking)
+            )
+        if picking.picking_type_id not in self.picking_types:
+            return self._response_for_deliver(
+                message=self.msg_store.cannot_move_something_in_picking_type()
+            )
+
     def scan_deliver(self, barcode, picking_id=None):
         """Scan a stock picking or a package/product/lot
 
@@ -101,16 +121,9 @@ class Delivery(Component):
         search = self.actions_for("search")
         picking = search.picking_from_scan(barcode)
         if picking:
-            if picking.state == "done":
-                return self._response_for_deliver(message=self.msg_store.already_done())
-            if picking.state not in ("assigned", "partially_available"):
-                return self._response_for_deliver(
-                    message=self.msg_store.stock_picking_not_available(picking)
-                )
-            if picking.picking_type_id not in self.picking_types:
-                return self._response_for_deliver(
-                    message=self.msg_store.cannot_move_something_in_picking_type()
-                )
+            response = self._check_picking_status(picking)
+            if response:
+                return response
             return self._response_for_deliver(picking=picking)
 
         # We should have only a picking_id because the client was working
@@ -246,6 +259,19 @@ class Delivery(Component):
         self._set_lines_done(lines)
         return self._response_for_deliver(new_picking)
 
+    def _action_picking_done(self, picking):
+        """Try to validate the stock picking if all its lines have been processed.
+
+        Return `True` if the picking has been validated successfully.
+        """
+        move_lines_done = all(
+            [line.qty_done >= line.product_uom_qty for line in picking.move_line_ids]
+        )
+        if move_lines_done:
+            picking.action_done()
+            return True
+        return False
+
     def list_stock_picking(self):
         """Return the list of stock pickings for the picking type
 
@@ -276,7 +302,23 @@ class Delivery(Component):
         Transitions:
         * deliver: always return here with updated data
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id).exists()
+        if picking:
+            response = self._check_picking_status(picking)
+            if response:
+                return response
+        else:
+            return self._response_for_deliver(
+                message=self.msg_store.stock_picking_not_found()
+            )
+        package = self.env["stock.quant.package"].browse(package_id).exists()
+        if package:
+            response = self._deliver_package(picking, package)
+            self._action_picking_done(picking)
+            return response
+        return self._response_for_deliver(
+            picking=picking, message=self.msg_store.package_not_found()
+        )
 
     def set_qty_done_line(self, picking_id, line_id):
         """Set a move line to "Done"

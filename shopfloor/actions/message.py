@@ -75,6 +75,12 @@ class MessageAction(Component):
             "body": _("This transfer does not exist anymore."),
         }
 
+    def package_not_found(self):
+        return {
+            "message_type": "error",
+            "body": _("This package does not exist anymore."),
+        }
+
     def record_not_found(self):
         return {
             "message_type": "error",
