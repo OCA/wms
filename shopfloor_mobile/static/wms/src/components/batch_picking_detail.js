@@ -21,17 +21,18 @@ Vue.component("batch-picking-detail", {
 
     <div class="review">
 
-      <item-detail-card :record="record" :options="{main: true, loud: true, fields: detail_fields()}" />
+      <item-detail-card :card_color="utils.colors.color_for('screen_step_todo')"
+                        :record="record" :options="{main: true, loud: true, fields: detail_fields()}" />
 
       <div class="button-list button-vertical-list full">
         <v-row align="center">
           <v-col class="text-center" cols="12">
-            <v-btn color="primary" @click="$emit('confirm')">Start</v-btn>
+            <btn-action @click="$emit('confirm')">Start</btn-action>
           </v-col>
         </v-row>
         <v-row align="center">
           <v-col class="text-center" cols="12">
-            <v-btn color="error" @click="$emit('cancel')">Cancel</v-btn>
+            <btn-action :action="'cancel'" @click="$emit('cancel')">Cancel</btn-action>
           </v-col>
         </v-row>
       </div>

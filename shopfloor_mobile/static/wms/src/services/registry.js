@@ -21,26 +21,26 @@ export class Registry {
 }
 
 export class ColorRegistry {
-    constructor(theme, _default = "default") {
-        this.themes = [];
-        this.colors = {};
+    constructor(theme, _default = "light") {
+        this.themes = {};
         this.default_theme = _default;
     }
 
     add_theme(colors, theme) {
         if (_.isUndefined(theme)) theme = this.default_theme;
-        if (!this.themes.includes(theme)) {
-            this.themes.push(theme);
-        }
-        this.colors[theme] = colors;
+        this.themes[theme] = colors;
     }
 
     color_for(key, theme) {
         if (_.isUndefined(theme)) theme = this.default_theme;
-        if (!this.themes.includes(theme)) {
-            console.log("Theme", theme, "not registeed.");
+        if (!this.themes[theme]) {
+            console.log("Theme", theme, "not registered.");
             return null;
         }
-        return this.colors[theme][key];
+        return this.themes[theme][key];
+    }
+
+    get_themes() {
+        return this.themes;
     }
 }

@@ -114,7 +114,7 @@ Vue.component("manual-select", {
             this._updateValue(val, elem.checked);
             $(elem)
                 .closest(".list-item-wrapper")
-                .toggleClass("active", elem.checked);
+                .toggleClass(this.selected_color_klass(), elem.checked);
             if (!this.opts.showActions) {
                 this._emitSelected(this._getSelected());
             }
@@ -134,6 +134,12 @@ Vue.component("manual-select", {
             return this.opts.multiple
                 ? this.selected.includes(rec.id)
                 : this.selected === rec.id;
+        },
+        selected_color_klass(modifier) {
+            return (
+                this.utils.colors.color_for("item_selected") +
+                (modifier ? " " + modifier : "")
+            );
         },
     },
     computed: {
@@ -205,7 +211,7 @@ Vue.component("manual-select", {
         <v-card class="select-group" :color="opts.group_color" v-for="(group, gindex) in selectable" :key="make_component_key([$options._componentTag, 'group', gindex])">
             <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
             <v-list v-if="has_records">
-                <div :class="'list-item-wrapper' + (is_selected(rec) ? ' active' : '')" v-for="(rec, index) in group.records"">
+                <div :class="['list-item-wrapper', is_selected(rec) ? selected_color_klass() : '']" v-for="(rec, index) in group.records"">
                     <v-list-item :key="make_component_key(['group-rec', gindex, index, rec.id])">
                         <v-list-item-content>
                             <component
@@ -230,7 +236,7 @@ Vue.component("manual-select", {
                                 />
                             <div class="action action-select">
                                 <input
-                                    class="my-checkbox"
+                                    :class="['sf-checkbox', is_selected(rec) ? selected_color_klass('darken-3') : '']"
                                     type="checkbox"
                                     :input-value="rec.id"
                                     :true-value="rec.id"
