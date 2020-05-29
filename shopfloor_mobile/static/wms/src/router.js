@@ -38,6 +38,7 @@ const router = new VueRouter({
     routes: routes,
 });
 router.beforeEach(async (to, from, next) => {
+    // TODO: if we switch from one scenario to another we should flush the storage of the previous one
     await Vue.nextTick();
     if (!router.app.authenticated && to.name != "login" && !router.app.demo_mode) {
         next("login");
