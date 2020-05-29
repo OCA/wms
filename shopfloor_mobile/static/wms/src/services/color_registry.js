@@ -13,7 +13,7 @@ color_registry.add_theme(
         error: "#c22a4a",
         info: "#5e60ab",
         success: "#8fbf44",
-        warning: "amber",
+        warning: "#FFC107",
         /**
          * app specific
          */
@@ -28,8 +28,9 @@ color_registry.add_theme(
          */
         btn_action: "primary lighten-2",
         btn_action_cancel: "error",
-        btn_action_warn: "amber",
+        btn_action_warn: "warning",
         btn_action_complete: "success",
+        btn_action_back: "info lighten-1",
         /**
          * selection
          */
