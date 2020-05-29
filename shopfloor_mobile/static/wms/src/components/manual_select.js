@@ -269,8 +269,15 @@ Vue.component("manual-select", {
                 </div>
             </v-list>
         </v-card>
-        <v-card class="no-record pa-2" v-if="!has_records">
-            <p class="text--secondary">No item to select.</p>
+        <v-card :color="opts.group_color" class="no-record pa-2" v-if="!has_records">
+            <!-- Use v-list to have the same look and feel of the record list -->
+            <v-list>
+                <v-list-item>
+                    <v-list-item-content>
+                        <p class="text--secondary">No item to select.</p>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list>
         </v-card>
         <v-row class="actions bottom-actions" v-if="has_records && opts.showActions">
             <v-col>
