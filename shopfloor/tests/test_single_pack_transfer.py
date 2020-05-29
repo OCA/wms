@@ -69,32 +69,10 @@ class SinglePackTransferCase(CommonCase):
         return {
             "id": package_level.id,
             "name": package_level.package_id.name,
-            "location_src": {
-                "id": self.shelf1.id,
-                "name": self.shelf1.name,
-                "barcode": self.shelf1.barcode,
-            },
-            "location_dest": {
-                "id": self.shelf2.id,
-                "name": self.shelf2.name,
-                "barcode": self.shelf2.barcode,
-            },
-            "picking": {
-                "id": self.picking.id,
-                "name": self.picking.name,
-                "note": None,
-                "origin": None,
-                "partner": None,
-                "move_line_count": len(self.picking.move_line_ids),
-                "weight": 2.0,
-            },
-            "product": {
-                "id": self.product_a.id,
-                "name": self.product_a.name,
-                "default_code": self.product_a.default_code,
-                "barcode": self.product_a.barcode,
-                "display_name": self.product_a.display_name,
-            },
+            "location_src": self.data.location(self.shelf1),
+            "location_dest": self.data.location(self.shelf2),
+            "picking": self.data.picking(self.picking),
+            "product": self.data.product(self.product_a),
         }
 
     def test_start(self):
