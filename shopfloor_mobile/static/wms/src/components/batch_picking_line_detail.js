@@ -21,29 +21,6 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
         },
     },
     methods: {
-        detail_fields(key) {
-            const mapping = {
-                location_src: [],
-                product: [
-                    {path: "package_src.name", label: "Pack"},
-                    {
-                        path: "quantity",
-                        label: "Qty",
-                        render_component: "packaging-qty-picker-display",
-                        render_options: function(record) {
-                            return {
-                                init_value: record.quantity,
-                                available_packaging: record.product.packaging,
-                            };
-                        },
-                    },
-                    {path: "product.qty_available", label: "Qty on hand"},
-                    {path: "lot.name", label: "Lot"},
-                ],
-                location_dest: [],
-            };
-            return mapping[key];
-        },
         full_detail_fields() {
             return [
                 {path: "batch.name", label: "Batch"},
@@ -60,13 +37,13 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
   <item-detail-card
     :key="'batch-picking-line-detail-1'"
     :record="line"
-    :options="{main: true, key_title: 'location_src.name', fields: detail_fields('location_src'), title_action_field: {action_val_path: 'location_src.barcode'}}"
+    :options="{main: true, key_title: 'location_src.name', title_action_field: {action_val_path: 'location_src.barcode'}}"
     :card_color="utils.colors.color_for('screen_step_done')"
     />
   <item-detail-card
     :key="'batch-picking-line-detail-2'"
     :record="line"
-    :options="{main: true, key_title: 'product.display_name', fields: detail_fields('product'), title_action_field:  {action_val_path: 'product.barcode'}}"
+    :options="utils.misc.move_line_product_detail_options()"
     :card_color="utils.colors.color_for(articleScanned ? 'screen_step_done': 'screen_step_todo')"
     />
 
@@ -79,7 +56,7 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     />
 
   <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')" v-if="showQtyPicker">
-    <packaging-qty-picker :options="{init_value: line.quantity, available_packaging: line.product.packaging}" />
+    <packaging-qty-picker :options="utils.misc.move_line_qty_picker_options(line)" />
   </v-card>
 
   <item-detail-card

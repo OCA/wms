@@ -146,6 +146,8 @@ export class Utils {
         return _.reverse(ordered);
     }
 
+    // DIsplay utils: TODO: split them to their own place
+
     format_date_display(date_string, options = {}) {
         _.defaults(options, {
             locale: navigator ? navigator.language : "en-US",
@@ -173,6 +175,48 @@ export class Utils {
             klass = "not-done";
         }
         return "move-line-" + klass;
+    }
+
+    /**
+     * Provide display options for rendering move line product's info.
+     *
+     * TODO: @simahawk this is a first attempt to stop creating a specific widget of each case
+     * whereas you have to handle different options.
+     * The aim is to be able to re-use detail-card and alike by passing options only.
+     *
+     * @param {*} line The move line
+     */
+    move_line_product_detail_options(line, override = {}) {
+        const fields = [
+            {path: "package_src.name", label: "Pack"},
+            {
+                path: "quantity",
+                label: "Qty",
+                render_component: "packaging-qty-picker-display",
+                render_options: function(record) {
+                    return {
+                        init_value: record.quantity,
+                        available_packaging: record.product.packaging,
+                    };
+                },
+            },
+            {path: "product.qty_available", label: "Qty on hand"},
+            {path: "lot.name", label: "Lot"},
+        ];
+        let opts = {
+            main: true,
+            key_title: "product.display_name",
+            fields: fields,
+            title_action_field: {action_val_path: "product.barcode"},
+        };
+        return _.extend(opts, override || {});
+    }
+    move_line_qty_picker_options(line, override = {}) {
+        let opts = {
+            init_value: line.quantity,
+            available_packaging: line.product.packaging,
+        };
+        return _.extend(opts, override || {});
     }
 }
 
