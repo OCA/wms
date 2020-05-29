@@ -164,6 +164,7 @@ Vue.component("manual-select", {
                 list_item_extra_component: "",
                 selected_event: "select",
                 group_color: "",
+                group_title_default: "",
             });
             return opts;
         },
@@ -180,7 +181,13 @@ Vue.component("manual-select", {
         selectable() {
             if (!this.grouped_records.length) {
                 // Simulate grouping (allows to keep template the same)
-                return [{key: "no-group", title: "", records: this.records}];
+                return [
+                    {
+                        key: "no-group",
+                        title: this.opts.group_title_default,
+                        records: this.records,
+                    },
+                ];
             }
             return this.grouped_records;
         },
