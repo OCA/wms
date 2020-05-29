@@ -601,7 +601,12 @@ class ClusterPicking(Component):
             # contained less items than expected)
             remaining = move_line.product_uom_qty - quantity
             new_line = move_line.copy({"product_uom_qty": remaining, "qty_done": 0})
-            move_line.product_uom_qty = quantity
+            # if we didn't bypass reservation update, the quant reservation
+            # would be reduced as much as the deduced quantity, which is wrong
+            # as we only moved the quantity to a new move line
+            move_line.with_context(
+                bypass_reservation_update=True
+            ).product_uom_qty = quantity
 
         search = self.actions_for("search")
         bin_package = search.package_from_scan(barcode)
