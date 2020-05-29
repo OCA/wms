@@ -78,3 +78,26 @@ class DeliveryCommonCase(CommonCase):
             data={"picking": self._stock_picking_data(picking) if picking else None},
             message=message,
         )
+
+    def assert_qty_done(self, move_lines, qties=None):
+        """Ensure that the quantities done are the expected ones.
+
+        If `qties` is not defined, the expected qties are `product_uom_qty`
+        of the move lines.
+        `qties` parameter is a list of move lines qty (same order).
+        """
+        if qties:
+            assert len(move_lines) == len(qties), "'qties' doesn't match 'move_lines'"
+            expected_qties = []
+            for qty in qties:
+                expected_qties.append({"qty_done": qty})
+        else:
+            expected_qties = [{"qty_done": line.product_uom_qty} for line in move_lines]
+        self.assertRecordValues(move_lines, expected_qties)
+        package_level = move_lines.package_level_id
+        if package_level:
+            values = [{"is_done": True}]
+            if qties:
+                values = [{"is_done": bool(qty)} for qty in qties]
+            # we have a package level only when there is a package
+            self.assertRecordValues(package_level, values)
