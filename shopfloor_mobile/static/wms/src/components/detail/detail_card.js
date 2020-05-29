@@ -24,7 +24,17 @@ Vue.component("item-detail-card", {
                 <v-card-text class="details" v-if="opts.fields.length">
                     <div v-for="(field, index) in opts.fields" :class="'field-detail ' + field.path.replace('.', '-') + ' ' + (field.klass || '')">
                         <div v-if="raw_value(record, field) || field.display_no_value">
-                            <span v-if="field.label" class="label">{{ field.label }}:</span> {{ render_field_value(record, field) }}
+                            <span v-if="field.label" class="label">{{ field.label }}:</span>
+                            <component
+                                v-if="field.render_component"
+                                :is="field.render_component"
+                                :options="field.render_options ? field.render_options(record) : {}"
+                                :record="record"
+                                :key="make_component_key([field.render_component, 'list', index, record.id])"
+                                />
+                            <span v-else>
+                                {{ render_field_value(record, field) }}
+                            </span>
                             <v-btn icon class="detail-action"
                                     v-if="has_detail_action(record, field)"
                                     @click="on_detail_action(record, field, opts)">
