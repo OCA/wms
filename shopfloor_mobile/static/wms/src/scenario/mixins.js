@@ -38,15 +38,15 @@ export var ScenarioBaseMixin = {
         */
         this._state_load(this.$route.params.state);
     },
-    mounted: function() {
-        const odoo_params = {
-            process_menu_id: this.menu_item.id,
-            profile_id: this.$root.profile.id,
-            usage: this.usage,
-        };
-        this.odoo = this.$root.getOdoo(odoo_params);
-    },
     computed: {
+        odoo: function() {
+            const odoo_params = {
+                process_menu_id: this.menu_item.id,
+                profile_id: this.$root.profile.id,
+                usage: this.usage,
+            };
+            return this.$root.getOdoo(odoo_params);
+        },
         menu_item: function() {
             const self = this;
             return _.head(
