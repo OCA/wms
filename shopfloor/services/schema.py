@@ -112,6 +112,7 @@ class BaseShopfloorSchemaResponse(Component):
             "display_name": {"type": "string", "nullable": False, "required": True},
             "default_code": {"type": "string", "nullable": False, "required": True},
             "barcode": {"type": "string", "nullable": True, "required": False},
+            "packaging": self._schema_list_of(self.packaging()),
         }
 
     def package(self, with_packaging=False):
@@ -122,12 +123,7 @@ class BaseShopfloorSchemaResponse(Component):
             "move_line_count": {"required": False, "nullable": True, "type": "integer"},
         }
         if with_packaging:
-            schema["packaging"] = {
-                "type": "dict",
-                "required": True,
-                "nullable": True,
-                "schema": self.packaging(),
-            }
+            schema["packaging"] = self._schema_dict_of(self.packaging())
         return schema
 
     def lot(self):
@@ -148,6 +144,7 @@ class BaseShopfloorSchemaResponse(Component):
         return {
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
+            "qty": {"type": "float", "required": True},
         }
 
     def picking_batch(self, with_pickings=False):

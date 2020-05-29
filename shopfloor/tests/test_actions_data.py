@@ -64,6 +64,14 @@ class ActionsDataCaseBase(CommonCase):
             "display_name": record.display_name,
             "default_code": record.default_code,
             "barcode": record.barcode,
+            "packaging": [self._expected_packaging(x) for x in record.packaging_ids],
+        }
+
+    def _expected_packaging(self, record, **kw):
+        return {
+            "id": record.id,
+            "name": record.name,
+            "qty": record.qty,
         }
 
 
@@ -71,8 +79,7 @@ class ActionsDataCase(ActionsDataCaseBase):
     def test_data_packaging(self):
         data = self.data.packaging(self.packaging)
         self.assert_schema(self.schema.packaging(), data)
-        expected = {"id": self.packaging.id, "name": self.packaging.name}
-        self.assertDictEqual(data, expected)
+        self.assertDictEqual(data, self._expected_packaging(self.packaging))
 
     def test_data_location(self):
         location = self.stock_location
@@ -107,8 +114,8 @@ class ActionsDataCase(ActionsDataCaseBase):
             "id": package.id,
             "name": package.name,
             "move_line_count": 1,
-            "packaging": self.data.packaging(package.product_packaging_id),
-            "weight": 0,
+            "packaging": self._expected_packaging(package.product_packaging_id),
+            "weight": 0.0,
         }
         self.assertDictEqual(data, expected)
 

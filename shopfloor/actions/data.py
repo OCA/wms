@@ -18,6 +18,9 @@ class DataAction(Component):
             return res[0] if res else None
         return res
 
+    def _simple_record_parser(self):
+        return ["id", "name"]
+
     def partner(self, record, **kw):
         return self._jsonify(record, self._partner_parser, **kw)
 
@@ -26,7 +29,7 @@ class DataAction(Component):
 
     @property
     def _partner_parser(self):
-        return ["id", "name"]
+        return self._simple_record_parser()
 
     def location(self, record, **kw):
         return self._jsonify(
@@ -95,12 +98,12 @@ class DataAction(Component):
     def packaging(self, record, **kw):
         return self._jsonify(record, self._packaging_parser, **kw)
 
-    def packagings(self, record, **kw):
+    def packaging_list(self, record, **kw):
         return self.packaging(record, multi=True)
 
     @property
     def _packaging_parser(self):
-        return ["id", "name"]
+        return self._simple_record_parser() + ["qty"]
 
     def lot(self, record, **kw):
         return self._jsonify(record, self._lot_parser, **kw)
@@ -110,7 +113,7 @@ class DataAction(Component):
 
     @property
     def _lot_parser(self):
-        return ["id", "name", "ref"]
+        return self._simple_record_parser() + ["ref"]
 
     def move_line(self, record, **kw):
         record = record.with_context(location=record.location_id.id)
@@ -153,7 +156,14 @@ class DataAction(Component):
 
     @property
     def _product_parser(self):
-        return ["id", "name", "display_name", "default_code", "barcode"]
+        return [
+            "id",
+            "name",
+            "display_name",
+            "default_code",
+            "barcode",
+            ("packaging_ids:packaging", self._packaging_parser),
+        ]
 
     def picking_batch(self, record, with_pickings=False, **kw):
         parser = self._picking_batch_parser
