@@ -13,9 +13,9 @@ export var PackagingQtyPickerMixin = {
     methods: {
         on_change_pkg_qty: function(event) {
             const input = event.target;
-            let new_qty = parseInt(input.value, 10);
+            let new_qty = parseInt(input.value || 0, 10);
             const data = $(input).data();
-            const origvalue = data.origvalue || 0;
+            const origvalue = parseInt(data.origvalue || 0, 10);
             // Check max qty reached
             const future_qty = this.value + data.pkg.qty * (new_qty - origvalue);
             if (new_qty && future_qty > this.original_value) {
