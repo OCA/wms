@@ -117,14 +117,19 @@ export var Checkout = Vue.component("checkout", {
             </div>
             <div v-if="state_is('change_quantity')">
                 <detail-picking :record="state.data.picking" />
-                <div class="qty">
-                    <input-number-spinner
-                        v-on:input="state.on_qty_update"
-                        :init_value="state.data.record.qty_done"
-                        class="mb-2"
-                        />
-                </div>
-                <qty-by-packaging :line="state.data" />
+                <item-detail-card :card_color="utils.colors.color_for('screen_step_done')"
+                    :key="make_state_component_key(['location_src'])"
+                    :record="state.data.line"
+                    :options="{main: true, key_title: 'location_src.name', title_action_field: {action_val_path: 'location_src.barcode'}}"
+                    />
+                <item-detail-card :card_color="utils.colors.color_for('screen_step_done')"
+                    :key="make_state_component_key(['product'])"
+                    :record="state.data.line"
+                    :options="utils.misc.move_line_product_detail_options(state.data.line)"
+                    />
+                <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
+                    <packaging-qty-picker :options="utils.misc.move_line_qty_picker_options(state.data.line)" />
+                </v-card>
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
@@ -390,6 +395,11 @@ export var Checkout = Vue.component("checkout", {
                             console.log("unselected", unselected);
                             this.wait_call(
                                 this.odoo.call("reset_line_qty", {
+                                    picking_id: this.state.data.picking.id,
+                                    selected_line_ids: _.map(
+                                        this.state.data.selected,
+                                        _.property("id")
+                                    ),
                                     move_line_id: unselected.id,
                                 })
                             );
@@ -399,7 +409,7 @@ export var Checkout = Vue.component("checkout", {
                         this.state_set_data(
                             {
                                 picking: this.state.data.picking,
-                                record: record,
+                                line: record,
                                 selected_line_ids: _.map(
                                     this.state.data.selected,
                                     _.property("id")
@@ -453,6 +463,7 @@ export var Checkout = Vue.component("checkout", {
                     },
                     events: {
                         qty_change_confirm: "on_confirm",
+                        qty_edit: "on_qty_update",
                     },
                     on_back: () => {
                         this.state_to("select_package");
@@ -467,7 +478,7 @@ export var Checkout = Vue.component("checkout", {
                             this.odoo.call("set_custom_qty", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_ids: this.state.data.selected_line_ids,
-                                move_line_id: this.state.data.record.id,
+                                move_line_id: this.state.data.line.id,
                                 qty_done: this.state.data.qty,
                             })
                         );
