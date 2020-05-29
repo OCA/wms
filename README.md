@@ -87,7 +87,8 @@ Handle proper attributes and report for dangerous goods handling in respect to E
 
  - Draft of the requirements: https://docs.google.com/document/d/1mct6bFFWJqW01wGFcjc-uQNEjyCxvh6Y9TuFdRhe-b0/edit#heading=h.k0bwq3398e7m
  - OCA Days 2019 presentation: https://docs.google.com/presentation/d/1wTbnkjvbId3lZHTCB-VfNr8pDqAFKC4N4UnoIAQEpbo/edit#slide=id.g61dc817660_0_25
-
+ - Barcode draft RFC document : https://docs.google.com/document/d/1acxlz8W7j4Ljhr2KvcJEUYDInejwjRMq2U9Q91gmEEU/edit
+ - Barcode Requirements: https://docs.google.com/presentation/d/1A5TVJXryqod7IwVIl03mDUJIUGzqJ-T2FzSWA90zAvw/edit?disco=AAAAGUSCd54&ts=5e749d4d
 
 
 
