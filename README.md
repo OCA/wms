@@ -25,10 +25,11 @@ To better manage the product packaging we need to have them properly defined for
 
 It is a basic requirement for improved reservation rules, efficient barcode operation and usage of measurement machines such as Cubiscan for example.
 
-## Put away based on storage type and constraints (height, weight,..)
+## Put away based on storage type, ABC class and constraints (height, weight,..)
 
 Define storage type on location and attribute storage type on PACK. Storage type can also be define on product packaging to help filling up the info while receiving products.
-The idea is that anything getting in the warehouse is given a unique PACK ID with proper storage type and attributes (height, weight, etc..). Put away will then compute the proper location based on those information.
+The idea is that anything getting in the warehouse is given a unique PACK ID with proper storage type and attributes (height, weight, etc..). Product are classified in A,B,C Class as well as location depending on their accessibility for optimized chaotic storage.
+Put away will then compute the proper location based on those information.
 
 ## Reservation rules by packaging and location
 
