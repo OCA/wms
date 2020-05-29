@@ -242,9 +242,6 @@ ul.packaging span:first-child {
     padding: 0;
 }
 
-.list-item-wrapper.active {
-    background-color: lightgreen;
-}
 .list-item-wrapper .action-edit {
     display: none;
 }
@@ -253,17 +250,13 @@ ul.packaging span:first-child {
     display: block;
 }
 
-.my-checkbox {
+.sf-checkbox {
     -webkit-appearance: none;
     width: 30px;
     height: 30px;
     background: white;
     border-radius: 5px;
     border: 2px solid #555;
-}
-
-input.my-checkbox[type="checkbox"]:checked {
-    background: green;
 }
 
 .summary-content {

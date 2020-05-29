@@ -51,9 +51,9 @@ Vue.component("last-operation", {
 Vue.component("get-work", {
     template: `
     <div class="get-work fullscreen-buttons fullscreen-buttons-50">
-      <v-btn id="btn-get-work" color="success" @click="$emit('get_work')">
+      <btn-action id="btn-get-work" color="success" @click="$emit('get_work')">
           Get work
-      </v-btn>
+      </btn-action>
       <v-btn id="btn-manual" color="default" @click="$emit('manual_selection')">
           Manual selection
       </v-btn>
@@ -208,5 +208,20 @@ Vue.component("btn-info-icon", {
     },
     template: `
     <v-icon :color="color || utils.colors.color_for('info_icon')">mdi-information</v-icon>
+`,
+});
+
+// TODO: move to separated file
+Vue.component("btn-action", {
+    props: {
+        action: {
+            type: String,
+            default: "",
+        },
+    },
+    template: `
+  <v-btn x-large v-bind="$attrs" v-on="$listeners" :color="utils.colors.color_for(action ? 'btn_action_' + action : 'btn_action')">
+    <slot></slot>
+  </v-btn>
 `,
 });

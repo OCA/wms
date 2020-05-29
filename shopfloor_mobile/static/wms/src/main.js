@@ -20,19 +20,6 @@ Vue.use(Vuetify);
 
 var EventHub = new Vue();
 
-// TODO: move to color registry
-const vuetify_themes = {
-    light: {
-        primary: "#491966",
-        secondary: "#424242",
-        accent: "#82B1FF",
-        error: "#FF5252",
-        info: "#2196F3",
-        success: "#4CAF50",
-        warning: "#FFC107",
-    },
-};
-
 Vue.mixin(GlobalMixin);
 
 const app = new Vue({
@@ -40,7 +27,7 @@ const app = new Vue({
     router: router,
     vuetify: new Vuetify({
         theme: {
-            themes: vuetify_themes,
+            themes: color_registry.get_themes(),
         },
     }),
     data: function() {
