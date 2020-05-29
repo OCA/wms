@@ -39,9 +39,9 @@ It supports several removal strategies: default FIFO/FEFO prefer packaging or em
 
 ## Virtual reservation and release of operations
 
-Make the final stock reservation when needed, decoupled from the order confirmation while respecting the order of arrival through virtual reservation. Thus also help to create internal operations such as pick or ship when required only. 
+Make the final stock reservation when needed, decoupled from the order confirmation while respecting the order of arrival through virtual reservation. Thus also helps to create internal operations such as pick or ship when required only. 
 
-When operation release occurs, only create moves for the goods we have in stocks. This will avoid having backorder in internal warehouse operations (only the delivery order will have ones),
+When operation release occurs, only create moves for the goods we have in stocks. This will avoid having backorder in internal warehouse operations (only the delivery order will have one).
 
 ## Delivery windows, weekly delivery and cut-off time
 
@@ -57,7 +57,7 @@ Re-allocate your needs for stocks to drive your replenishment operations within 
 
 ## Advanced barcode scanner
 
-Decouple transnational Odoo documents and flows toward an efficient shop-floor process. Do not rely on finding the proper operation to process, but scan location and package to deduce what to do with it. Proceed with operation by machine type or zone rather than Odoo document. Get optimized path computed properly.
+Decouple transactional Odoo documents and flows toward an efficient shop-floor process. Do not rely on finding the proper operation to process, but scan location and package to deduce what to do with it. Proceed with operation by machine type or zone rather than Odoo document. Get optimized path computed properly.
 
 Configure your barcode menu, chose which scanning process to apply to each operation, allow to process several operation type within a same barcode menu.
 
