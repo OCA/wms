@@ -467,6 +467,15 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
     def test_scan_destination_pack_quantity_less(self):
         """Pick less units than expected"""
         line = self.one_line_picking.move_line_ids
+        quant = self.env["stock.quant"].search(
+            [
+                ("location_id", "=", line.location_id.id),
+                ("product_id", "=", line.product_id.id),
+            ]
+        )
+        quant.ensure_one()
+        self.assertRecordValues(quant, [{"quantity": 40.0, "reserved_quantity": 20.0}])
+
         # when we pick less quantity than expected, the line is split
         # and the user is proposed to pick the next line for the remaining
         # quantity
@@ -479,16 +488,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "quantity": line.product_uom_qty - 3,
             },
         )
-
-        self.assertRecordValues(
-            line,
-            [{"qty_done": 7, "result_package_id": self.bin1.id, "product_uom_qty": 7}],
-        )
         new_line = self.one_line_picking.move_line_ids - line
-        self.assertRecordValues(
-            new_line,
-            [{"qty_done": 0, "result_package_id": False, "product_uom_qty": 3}],
-        )
 
         self.assert_response(
             response,
@@ -501,6 +501,17 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 ),
             },
         )
+
+        self.assertRecordValues(
+            line,
+            [{"qty_done": 7, "result_package_id": self.bin1.id, "product_uom_qty": 7}],
+        )
+        self.assertRecordValues(
+            new_line,
+            [{"qty_done": 0, "result_package_id": False, "product_uom_qty": 3}],
+        )
+        # the reserved quantity on the quant must stay the same
+        self.assertRecordValues(quant, [{"quantity": 40.0, "reserved_quantity": 20.0}])
 
     def test_scan_destination_pack_zero_check(self):
         """Location will be emptied, have to go to zero check"""
