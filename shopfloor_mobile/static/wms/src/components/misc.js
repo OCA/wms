@@ -117,12 +117,6 @@ Vue.component("edit-action", {
 `,
 });
 
-Vue.component("btn-back", {
-    template: `
-  <v-btn x-large color="default" v-on:click="$router.back()">{{ $t("btn.back.title") }}</v-btn>
-  `,
-});
-
 Vue.component("separator-title", {
     template: `
   <h3 class="separator-title"><slot></slot></h3>
@@ -218,10 +212,39 @@ Vue.component("btn-action", {
             type: String,
             default: "",
         },
+        color: {
+            type: String,
+            default: "",
+        },
+    },
+    computed: {
+        btn_color() {
+            let color = this.color;
+            if (!color) {
+                color = this.utils.colors.color_for(
+                    this.action ? "btn_action_" + this.action : "btn_action"
+                );
+            }
+            return color;
+        },
     },
     template: `
-  <v-btn x-large v-bind="$attrs" v-on="$listeners" :color="utils.colors.color_for(action ? 'btn_action_' + action : 'btn_action')">
+  <v-btn x-large v-bind="$attrs" v-on="$listeners" :color="btn_color">
     <slot></slot>
   </v-btn>
+`,
+});
+
+Vue.component("btn-back", {
+    methods: {
+        on_back: function() {
+            this.$root.trigger("go_back");
+            this.$router.back();
+        },
+    },
+    template: `
+<btn-action v-bind="$attrs" action="back" v-on:click="on_back">
+  <v-icon>mdi-keyboard-backspace</v-icon>{{ $t("btn.back.title") }}
+</btn-action>
 `,
 });
