@@ -25,9 +25,10 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 v-on:cancel="state.on_cancel"
                 />
             <batch-picking-line-detail
-                v-if="state_in(['start_line', 'scan_destination'])"
+                v-if="state_in(['start_line', 'scan_destination', 'change_pack_lot'])"
                 :line="state.data"
                 :article-scanned="state_is('scan_destination')"
+                :show-qty-picker="state_is('scan_destination')"
                 />
             <batch-picking-line-actions
                 v-if="state_is('start_line')"
@@ -35,9 +36,6 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 :line="state_get_data('start_line')"
                 />
             <div v-if="state_is('scan_destination')">
-                <div class="qty">
-                    <input-number-spinner v-on:input="state.on_qty_update" :init_value="scan_destination_qty" class="mb-2"/>
-                </div>
                 <div class="button-list button-vertical-list full mt-10">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
@@ -246,13 +244,16 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                         title: "Check qty and scan a destination bin",
                         scan_placeholder: "Scan destination bin",
                     },
+                    events: {
+                        qty_edit: "on_qty_edit",
+                    },
                     enter: () => {
                         // TODO: shalle we hook v-model for qty input straight to the state data?
                         this.scan_destination_qty = this.state_get_data(
                             "start_line"
                         ).quantity;
                     },
-                    on_qty_update: qty => {
+                    on_qty_edit: qty => {
                         this.scan_destination_qty = parseInt(qty);
                     },
                     on_scan: scanned => {

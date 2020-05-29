@@ -1,12 +1,11 @@
 export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     props: {
         line: Object,
-        // TODO: not sure this is still needed
-        showFullInfo: {
-            type: Boolean,
-            default: true,
-        },
         articleScanned: {
+            type: Boolean,
+            default: false,
+        },
+        showQtyPicker: {
             type: Boolean,
             default: false,
         },
@@ -69,6 +68,16 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     :card_color="utils.colors.color_for(has_destination_pack ? 'screen_step_done': 'screen_step_todo')"
     />
 
+  <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')" v-if="showQtyPicker">
+    <packaging-qty-picker
+        :init_value="line.quantity" :available_packaging='[
+        {id: 1, name: "Pallet", qty: 500},
+        {id: 2, name: "Big Box", qty: 200},
+        {id: 3, name: "Box", qty: 100},
+        {id: 4, name: "Unit", qty: 1},
+    ]' />
+  </v-card>
+
   <item-detail-card
     v-if="articleScanned && !has_destination_pack"
     :key="'batch-picking-line-detail-4'"
@@ -95,8 +104,6 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     </v-expansion-panel>
   </v-expansion-panels>
   -->
-
-  <todo>Missing package qty widget</todo>
 
 </div>
 `,
