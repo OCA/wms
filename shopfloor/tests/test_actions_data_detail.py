@@ -97,8 +97,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
     def test_data_packaging(self):
         data = self.data_detail.packaging(self.packaging)
         self.assert_schema(self.schema_detail.packaging(), data)
-        expected = {"id": self.packaging.id, "name": self.packaging.name}
-        self.assertDictEqual(data, expected)
+        self.assertDictEqual(data, self._expected_packaging(self.packaging))
 
     def test_data_lot(self):
         lot = self.env["stock.production.lot"].create(
