@@ -65,7 +65,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             data={
                 "picking": self._picking_summary_data(self.picking),
                 "package": self._package_data(self.package, self.picking),
-                "packagings": [
+                "packaging": [
                     self._packaging_data(packaging)
                     for packaging in self.packaging_inner_box
                     + self.packaging_box
