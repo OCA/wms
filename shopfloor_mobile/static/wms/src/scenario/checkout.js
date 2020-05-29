@@ -141,7 +141,7 @@ export var Checkout = Vue.component("checkout", {
             <div v-if="state_is('change_packaging')">
                 <detail-picking-select
                     :record="state.data.picking"
-                    :select_records="state.data.packagings"
+                    :select_records="state.data.packaging"
                     :select_options="{list_item_component: 'list-item'}"
                     :key="make_state_component_key(['detail-picking-select'])"
                     />

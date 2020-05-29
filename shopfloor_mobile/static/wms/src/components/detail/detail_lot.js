@@ -46,10 +46,10 @@ Vue.component("detail-lot", {
                 :record="supp"
                 :options="{no_title: true, fields: supplier_detail_fields()}" />
         </div>
-        // TODO packagings
-        <list class="packagings pb-2"
-            v-if="opts.full_detail && record.packagings"
-            :records="record.packagings"
+        // TODO packaging
+        <list class="packaging pb-2"
+            v-if="opts.full_detail && record.packaging"
+            :records="record.packaging"
             :options="{key_title: 'display_name', list_item_fields: packaging_detail_fields()}"
             />
     </div>

@@ -32,9 +32,9 @@ Vue.component("detail-product", {
   <div :class="$options._componentTag">
       <item-detail-card v-bind="$props" :options="{main: true, fields: product_detail_fields(), key_title: 'display_name'}" />
 
-      <list class="packagings pb-2"
-          v-if="opts.full_detail && record.packagings"
-          :records="record.packagings"
+      <list class="packaging pb-2"
+          v-if="opts.full_detail && record.packaging"
+          :records="record.packaging"
           :options="{key_title: 'display_name', list_item_fields: packaging_detail_fields()}"
           />
   </div>
