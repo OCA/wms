@@ -189,6 +189,7 @@ export class Utils {
     move_line_product_detail_options(line, override = {}) {
         const fields = [
             {path: "package_src.name", label: "Pack"},
+            {path: "lot.name", label: "Lot"},
             {
                 path: "quantity",
                 label: "Qty",
@@ -201,7 +202,6 @@ export class Utils {
                 },
             },
             {path: "product.qty_available", label: "Qty on hand"},
-            {path: "lot.name", label: "Lot"},
         ];
         let opts = {
             main: true,

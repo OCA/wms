@@ -137,6 +137,7 @@ Vue.component("manual-select", {
         },
         selected_color_klass(modifier) {
             return (
+                "active " +
                 this.utils.colors.color_for("item_selected") +
                 (modifier ? " " + modifier : "")
             );
