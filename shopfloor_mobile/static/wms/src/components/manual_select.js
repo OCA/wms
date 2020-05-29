@@ -231,7 +231,7 @@ Vue.component("manual-select", {
                                 :key="make_component_key([opts.list_item_component, index, rec.id])"
                                 />
                         </v-list-item-content>
-                        <v-list-item-action  :class="{'d-flex align-stretch': opts.list_item_actions.length}">
+                        <v-list-item-action>
                             <component
                                 v-for="(action, action_index) in opts.list_item_actions"
                                 :is="action.comp_name"
@@ -243,16 +243,18 @@ Vue.component("manual-select", {
                                 :key="make_component_key([action.comp_name, index, action_index, rec.id])"
                                 />
                             <div class="action action-select">
-                                <input
-                                    :class="['sf-checkbox', is_selected(rec) ? selected_color_klass('darken-3') : '']"
-                                    type="checkbox"
-                                    :input-value="rec.id"
-                                    :true-value="rec.id"
-                                    :value="rec.id"
-                                    :checked="is_selected(rec)"
-                                    :key="make_component_key(['list-checkbox', index, rec.id])"
-                                    @click="handleSelect(rec, $event)"
-                                    />
+                                <v-btn icon x-large rounded>
+                                    <input
+                                        :class="['sf-checkbox', is_selected(rec) ? selected_color_klass('darken-3') : '']"
+                                        type="checkbox"
+                                        :input-value="rec.id"
+                                        :true-value="rec.id"
+                                        :value="rec.id"
+                                        :checked="is_selected(rec)"
+                                        :key="make_component_key(['list-checkbox', index, rec.id])"
+                                        @click="handleSelect(rec, $event)"
+                                        />
+                                </v-btn>
                             </div>
                         </v-list-item-action>
                     </v-list-item>
