@@ -124,7 +124,7 @@ export var Checkout = Vue.component("checkout", {
                         class="mb-2"
                         />
                 </div>
-                TODO: pkging widget
+                <qty-by-packaging :line="state.data" />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">

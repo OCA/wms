@@ -388,3 +388,106 @@ ul.packaging span:first-child {
 .clickable {
     cursor: pointer;
 }
+
+.packaging-qty-picker * {
+    text-align: center;
+}
+.packaging-qty-picker .unit-value input {
+    font-size: 130%;
+}
+.packaging-qty-picker .unit-value .col {
+    padding-bottom: 0;
+}
+.packaging-qty-picker .packaging-value .col {
+    padding-top: 0;
+    padding-bottom: 5px;
+}
+.packaging-qty-picker .packaging-value .col:not(:last-child) {
+    padding-right: 0;
+}
+.packaging-qty-picker .pkg-qty {
+    font-size: 80%;
+}
+.packaging-qty-picker input.pkg-value {
+    max-width: 60px;
+    padding: 0.5rem 0.5rem 0;
+    font-size: 130%;
+    border-bottom: 1px solid;
+}
+.packaging-qty-picker .inner-wrapper {
+    padding-bottom: 8px;
+}
+.packaging-qty-picker .input-wrapper {
+    margin-bottom: 8px;
+}
+
+.shake-it {
+    -webkit-animation: kf_shake 0.4s 1 linear;
+    -moz-animation: kf_shake 0.4s 1 linear;
+    -o-animation: kf_shake 0.4s 1 linear;
+}
+@-webkit-keyframes kf_shake {
+    0% {
+        -webkit-transform: translate(10px);
+    }
+    20% {
+        -webkit-transform: translate(-10px);
+    }
+    40% {
+        -webkit-transform: translate(15px);
+    }
+    60% {
+        -webkit-transform: translate(-15px);
+    }
+    80% {
+        -webkit-transform: translate(8px);
+    }
+    100% {
+        -webkit-transform: translate(0px);
+    }
+}
+@-moz-keyframes kf_shake {
+    0% {
+        -moz-transform: translate(10px);
+    }
+    20% {
+        -moz-transform: translate(-10px);
+    }
+    40% {
+        -moz-transform: translate(15px);
+    }
+    60% {
+        -moz-transform: translate(-15px);
+    }
+    80% {
+        -moz-transform: translate(8px);
+    }
+    100% {
+        -moz-transform: translate(0px);
+    }
+}
+@-o-keyframes kf_shake {
+    0% {
+        -o-transform: translate(10px);
+    }
+    20% {
+        -o-transform: translate(-10px);
+    }
+    40% {
+        -o-transform: translate(15px);
+    }
+    60% {
+        -o-transform: translate(-15px);
+    }
+    80% {
+        -o-transform: translate(8px);
+    }
+    100% {
+        -o-origin-transform: translate(0px);
+    }
+}
+
+.v-card .v-card__title {
+    font-size: 1.1rem;
+    line-height: 1.1rem;
+}
