@@ -217,6 +217,8 @@ export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-displ
         <span class="pkg-qty" v-text="qty_by_pkg[pkg.id] || 0" />
         <span class="pkg-name" v-text="pkg.name" /><span class="sep" v-if="index != Object.keys(sorted_packaging).length - 1">, </span>
     </span>
+    <!-- TOOO: use product uom -->
+    <span class="min-unit">({{ opts.init_value }} Units)</span>
 </div>
 `,
 });
