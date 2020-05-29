@@ -79,13 +79,24 @@ export class Utils {
             }),
             "id"
         );
-        const grouped = _.groupBy(lines, "package_dest.id");
+        const grouped = _.groupBy(lines, function(l) {
+            const pack_id = _.result(l, "package_dest.id");
+            if (pack_id) {
+                return "pack-" + pack_id;
+            }
+            return "raw-" + l.id + l.product.id;
+        });
         let counter = 0;
-        _.forEach(grouped, function(products, pack_id) {
+        _.forEach(grouped, function(products, key) {
             counter++;
-            const pack = _.first(_.filter(packs, {id: parseInt(pack_id)}));
+            let pack = null;
+            if (key.startsWith("pack")) {
+                pack = _.first(
+                    _.filter(packs, {id: parseInt(key.split("-").slice(-1)[0])})
+                );
+            }
             res.push({
-                key: pack ? pack_id : products[0].id + "-" + counter,
+                key: key + "--" + counter,
                 // No pack, just display the product name
                 title: pack ? pack.name : products[0].display_name,
                 pack: pack,

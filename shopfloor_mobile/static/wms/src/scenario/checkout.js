@@ -37,14 +37,13 @@ export var Checkout = Vue.component("checkout", {
             <div v-if="state_is('manual_selection')">
                 <manual-select
                     :records="state.data.pickings"
-                    :list_item_fields="manual_select_picking_fields"
-                    :options="{list_item_options: {bold_title: true}}"
+                    :options="manual_selection_manual_select_options()"
                     :key="make_state_component_key(['manual-select'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="default" @click="state.on_back">Back</v-btn>
+                            <btn-back />
                         </v-col>
                     </v-row>
                 </div>
@@ -116,7 +115,6 @@ export var Checkout = Vue.component("checkout", {
                 </div>
             </div>
             <div v-if="state_is('change_quantity')">
-                <detail-picking :record="state.data.picking" />
                 <item-detail-card :card_color="utils.colors.color_for('screen_step_done')"
                     :key="make_state_component_key(['location_src'])"
                     :record="state.data.line"
@@ -173,7 +171,7 @@ export var Checkout = Vue.component("checkout", {
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action :action="'complete'"
+                            <btn-action action="todo"
                                 @click="$root.trigger('mark_as_done')"
                                 :disabled="state.data.picking.move_lines.length < 1">Mark as done</btn-action>
                         </v-col>
@@ -181,16 +179,15 @@ export var Checkout = Vue.component("checkout", {
                 </div>
             </div>
             <div v-if="state_is('confirm_done')">
-                <detail-picking :record="state.data.picking" />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action :action="'complete'" @click="state.on_confirm">Confirm</btn-action>
+                            <btn-action action="todo" @click="state.on_confirm">Confirm</btn-action>
                         </v-col>
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action color="default" @click="state.on_back">Back</btn-action>
+                            <btn-back />
                         </v-col>
                     </v-row>
                 </div>
@@ -198,14 +195,6 @@ export var Checkout = Vue.component("checkout", {
         </Screen>
         `,
     computed: {
-        // TODO: move these to methods
-        manual_select_picking_fields: function() {
-            return [
-                {path: "partner.name"},
-                {path: "origin"},
-                {path: "move_line_count", label: "Lines"},
-            ];
-        },
         existing_package_select_fields: function() {
             return [
                 {path: "weight"},
@@ -238,6 +227,20 @@ export var Checkout = Vue.component("checkout", {
             return {
                 record: data.picking,
                 identifier: data.picking.name,
+            };
+        },
+        manual_selection_manual_select_options: function() {
+            return {
+                group_title_default: "Pickings to process",
+                group_color: this.utils.colors.color_for("screen_step_todo"),
+                list_item_options: {
+                    bold_title: true,
+                    fields: [
+                        {path: "partner.name"},
+                        {path: "origin"},
+                        {path: "move_line_count", label: "Lines"},
+                    ],
+                },
             };
         },
         select_line_manual_select_opts: function() {
@@ -282,9 +285,10 @@ export var Checkout = Vue.component("checkout", {
                     },
                     events: {
                         select: "on_select",
+                        go_back: "on_back",
                     },
                     on_back: () => {
-                        this.state_to("start");
+                        this.state_to("init");
                         this.reset_notification();
                     },
                     on_select: selected => {
@@ -600,6 +604,9 @@ export var Checkout = Vue.component("checkout", {
                 confirm_done: {
                     display_info: {
                         title: "Confirm done",
+                    },
+                    events: {
+                        go_back: "on_back",
                     },
                     on_confirm: () => {
                         this.wait_call(
