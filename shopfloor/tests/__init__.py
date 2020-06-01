@@ -31,3 +31,4 @@ from . import test_checkout_done
 from . import test_delivery_base
 from . import test_delivery_scan_deliver
 from . import test_delivery_set_qty_done_pack
+from . import test_delivery_set_qty_done_line
