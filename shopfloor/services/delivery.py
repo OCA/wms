@@ -35,7 +35,7 @@ class Delivery(Component):
 
     @property
     def data_struct(self):
-        return self.actions_for("data")
+        return self.actions_for("data_detail")
 
     @property
     def msg_store(self):
@@ -49,21 +49,25 @@ class Delivery(Component):
         return self._response(
             next_state="deliver",
             data={
-                "picking": self._data_for_stock_picking(picking) if picking else None
+                "picking": self.data_struct.picking_detail(picking) if picking else None
             },
             message=message,
         )
 
-    def _data_for_stock_picking(self, picking):
-        data = self.data_struct.picking(picking)
-        data.update(
-            {
-                "move_lines": [
-                    self.data_struct.move_line(ml) for ml in picking.move_line_ids
-                ]
-            }
+    def _response_for_manual_selection(self, pickings, message=None):
+        """Transition to the 'manual_selection' state
+
+        If no picking is passed, the screen shows an empty screen
+        """
+        return self._response(
+            next_state="manual_selection",
+            data={
+                "pickings": [
+                    self.data_struct.picking_detail(picking) for picking in pickings
+                ],
+            },
+            message=message,
         )
-        return data
 
     def _check_picking_status(self, picking):
         """Check if `picking` can be processed.
@@ -273,14 +277,21 @@ class Delivery(Component):
         return False
 
     def list_stock_picking(self):
-        """Return the list of stock pickings for the picking type
+        """Return the list of stock pickings for the picking types
 
         It returns only stock picking available or partially available.
 
         Transitions:
         * manual_selection: next state to show the list of stock pickings
         """
-        return self._response()
+        pickings = self.env["stock.picking"].search(self._pickings_domain(), order="id")
+        return self._response_for_manual_selection(pickings)
+
+    def _pickings_domain(self):
+        return [
+            ("picking_type_id", "in", self.picking_types.ids),
+            ("state", "not in", ["cancel", "done", "waiting", "draft"]),
+        ]
 
     def select(self, picking_id):
         """Select a stock picking from its ID (found using /list_stock_picking)
@@ -462,24 +473,14 @@ class ShopfloorDeliveryValidatorResponse(Component):
 
     @property
     def _schema_deliver(self):
-        schema = self.schemas.picking()
-        schema.update(
-            {
-                "move_lines": {
-                    "type": "list",
-                    "schema": {"type": "dict", "schema": self.schemas.move_line()},
-                }
-            }
-        )
+        schema = self.schemas_detail.picking_detail()
         return {"picking": {"type": "dict", "nullable": True, "schema": schema}}
 
     @property
     def _schema_selection_list(self):
+        schema = self.schemas_detail.picking_detail()
         return {
-            "pickings": {
-                "type": "list",
-                "schema": {"type": "dict", "schema": self.schemas.picking()},
-            }
+            "pickings": {"type": "list", "schema": {"type": "dict", "schema": schema}}
         }
 
     def scan_deliver(self):
