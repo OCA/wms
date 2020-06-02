@@ -45,7 +45,10 @@ export var PackagingQtyPickerMixin = {
                 });
         },
         packaging_by_id: function(id) {
-            return _.find(this.opts.available_packaging, ["id", parseInt(id, 10)]);
+            // Special case for UOM ids as they can clash w/ pkg ids
+            // we prefix it w/ "uom-"
+            id = id.startsWith("uom-") ? id : parseInt(id, 10);
+            return _.find(this.packaging, ["id", id]);
         },
         /**
          *
@@ -95,7 +98,7 @@ export var PackagingQtyPickerMixin = {
          * @param {*} qty
          */
         _qty_by_pkg: function(pkg_qty, qty) {
-            const precision = 3; // TODO: get it from product UoM
+            const precision = this.unit_uom.rounding || 3;
             let qty_per_pkg = 0;
             // TODO: anything better to do like `float_compare`?
             while (_.round(qty - pkg_qty, precision) >= 0.0) {
@@ -149,16 +152,36 @@ export var PackagingQtyPickerMixin = {
                 init_value: 0,
                 mode: "",
                 available_packaging: [],
+                uom: {},
             });
             return opts;
+        },
+        unit_uom: function() {
+            let unit = {};
+            if (!_.isEmpty(this.opts.uom)) {
+                // Create an object like the packaging
+                // to be used seamlessly in the widget.
+                unit = {
+                    id: "uom-" + this.opts.uom.id,
+                    name: this.opts.uom.name,
+                    qty: this.opts.uom.factor,
+                    rounding: this.opts.uom.rounding,
+                };
+            }
+            return unit;
+        },
+        packaging: function() {
+            let unit = [];
+            if (!_.isEmpty(this.unit_uom)) {
+                unit = [this.unit_uom];
+            }
+            return _.extend([], this.opts.available_packaging, unit);
         },
         /**
          *
          */
         sorted_packaging: function() {
-            return _.reverse(
-                _.sortBy(this.opts.available_packaging, _.property("qty"))
-            );
+            return _.reverse(_.sortBy(this.packaging, _.property("qty")));
         },
         /**
          * Collect qty of contained packaging inside bigger packaging.

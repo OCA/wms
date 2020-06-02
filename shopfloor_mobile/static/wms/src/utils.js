@@ -198,6 +198,7 @@ export class Utils {
      * @param {*} line The move line
      */
     move_line_product_detail_options(line, override = {}) {
+        const self = this;
         const fields = [
             {path: "package_src.name", label: "Pack"},
             {path: "lot.name", label: "Lot"},
@@ -206,10 +207,7 @@ export class Utils {
                 label: "Qty",
                 render_component: "packaging-qty-picker-display",
                 render_options: function(record) {
-                    return {
-                        init_value: record.quantity,
-                        available_packaging: record.product.packaging,
-                    };
+                    return self.move_line_qty_picker_options(record);
                 },
             },
             {path: "product.qty_available", label: "Qty on hand"},
@@ -226,6 +224,7 @@ export class Utils {
         let opts = {
             init_value: line.quantity,
             available_packaging: line.product.packaging,
+            uom: line.product.uom,
         };
         return _.extend(opts, override || {});
     }

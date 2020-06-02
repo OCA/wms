@@ -411,7 +411,7 @@ ul.packaging span:first-child {
     font-size: 80%;
 }
 .packaging-qty-picker input.pkg-value {
-    max-width: 60px;
+    max-width: 90px;
     padding: 0.5rem 0.5rem 0;
     font-size: 130%;
     border-bottom: 1px solid;
