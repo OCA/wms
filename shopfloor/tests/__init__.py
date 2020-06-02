@@ -33,3 +33,4 @@ from . import test_delivery_scan_deliver
 from . import test_delivery_set_qty_done_pack
 from . import test_delivery_set_qty_done_line
 from . import test_delivery_list_stock_picking
+from . import test_delivery_select
