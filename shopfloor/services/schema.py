@@ -24,11 +24,13 @@ class BaseShopfloorSchemaResponse(Component):
         schema.update(kw)
         return schema
 
-    def _simple_record(self):
-        return {
+    def _simple_record(self, **kw):
+        schema = {
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
         }
+        schema.update(kw)
+        return schema
 
     def _schema_dict_of(self, schema, **kw):
         schema = {
@@ -113,6 +115,12 @@ class BaseShopfloorSchemaResponse(Component):
             "default_code": {"type": "string", "nullable": False, "required": True},
             "barcode": {"type": "string", "nullable": True, "required": False},
             "packaging": self._schema_list_of(self.packaging()),
+            "uom": self._schema_dict_of(
+                self._simple_record(
+                    factor={"required": True, "nullable": True, "type": "float"},
+                    rounding={"required": True, "nullable": True, "type": "float"},
+                )
+            ),
         }
 
     def package(self, with_packaging=False):
