@@ -23,28 +23,40 @@ class BaseShopfloorService(AbstractComponent):
     _collection = "shopfloor.service"
     _actions_collection_name = "shopfloor.action"
     _expose_model = None
+    # can be overridden to disable logging of requests to DB
+    _log_calls_in_db = True
 
     def dispatch(self, method_name, _id=None, params=None):
+        if not self._db_logging_active():
+            return super().dispatch(method_name, _id=_id, params=params)
+        return self._dispatch_with_db_logging(method_name, _id=_id, params=params)
+
+    def _db_logging_active(self):
+        return (
+            request
+            and self._log_calls_in_db
+            and self.env["shopfloor.log"].logging_active()
+        )
+
+    # TODO logging to DB should be an extra module for base_rest
+    def _dispatch_with_db_logging(self, method_name, _id=None, params=None):
         try:
             result = super().dispatch(method_name, _id=_id, params=params)
         except Exception as err:
             self.env.cr.rollback()
             with registry(self.env.cr.dbname).cursor() as cr:
                 env = self.env(cr=cr)
-                self._log_call_in_db(env, _id, params, error=err)
+                self._log_call_in_db(env, request, _id, params, error=err)
             raise
-        self._log_call_in_db(self.env, _id, params, result=result)
+        self._log_call_in_db(self.env, request, _id, params, result=result)
         return result
 
     @property
     def _log_call_header_strip(self):
         return ("Cookie", "Api-Key")
 
-    def _log_call_in_db_values(self, _id, params, result=None, error=None):
-        if not request:
-            # In tests, we have no http request
-            return
-        httprequest = request.httprequest
+    def _log_call_in_db_values(self, _request, _id, params, result=None, error=None):
+        httprequest = _request.httprequest
         headers = dict(httprequest.headers)
         for header_key in self._log_call_header_strip:
             if header_key in headers:
@@ -61,10 +73,10 @@ class BaseShopfloorService(AbstractComponent):
             "state": "success" if result else "failed",
         }
 
-    def _log_call_in_db(self, env, _id, params, result=None, error=None):
-        if not env["shopfloor.log"].logging_active():
-            return
-        values = self._log_call_in_db_values(_id, params, result=result, error=error)
+    def _log_call_in_db(self, env, _request, _id, params, result=None, error=None):
+        values = self._log_call_in_db_values(
+            _request, _id, params, result=result, error=error
+        )
         if not values:
             return
         env["shopfloor.log"].sudo().create(values)
