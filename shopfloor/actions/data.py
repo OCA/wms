@@ -163,6 +163,7 @@ class DataAction(Component):
             "default_code",
             "barcode",
             ("packaging_ids:packaging", self._packaging_parser),
+            ("uom_id:uom", self._simple_record_parser() + ["factor", "rounding"]),
         ]
 
     def picking_batch(self, record, with_pickings=False, **kw):
