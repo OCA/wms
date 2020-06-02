@@ -12,6 +12,7 @@ Vue.component("picking-summary", {
                 {
                     showCounters: true,
                     list_item_component: "picking-summary-content",
+                    group_color: this.utils.colors.color_for("screen_step_done"),
                 }
             );
             return opts;
@@ -22,11 +23,17 @@ Vue.component("picking-summary", {
                 action_change_pkg: {
                     comp_name: "edit-action",
                     get_record: function(rec, action) {
-                        if (rec.pack) {
-                            // lines grouped, get real line
-                            return rec.pack;
-                        }
-                        return rec.package_dest;
+                        /**
+                         * Here we always records grouped.
+                         * If lines have a dest package or not
+                         * we don't care for a simple reason:
+                         * if the pack is there then all grouped lines
+                         * have the same package.
+                         * The edit action will check by itself
+                         * if the pkg is there or not and pick the right record.
+                         * Hence -> always return the move line.
+                         */
+                        return rec.records[0];
                     },
                     options: {
                         click_event: "pkg_change_type",
@@ -78,7 +85,7 @@ Vue.component("picking-summary-content", {
         },
     },
     template: `
-    <v-list-item-content :class="'summary-content ' + (record.key == 'no-pack'? 'no-pack' : 'has-pack' )">
+    <div :class="['summary-content', record.key.startsWith('raw') ? 'no-pack' : 'has-pack']">
         <v-expansion-panels v-if="record.key != 'no-pack' && record.records_by_pkg_type" flat v-model="panel">
             <v-expansion-panel v-for="pkg_type in record.records_by_pkg_type" :key="make_component_key(['pkg', index])">
                 <v-expansion-panel-header>
@@ -101,7 +108,7 @@ Vue.component("picking-summary-content", {
         <div v-else v-for="(subrec, i) in record.records">
             <picking-summary-product-detail :record="subrec" :index="index" :count="count" :key="make_component_key(['bare', subrec.id])" />
         </div>
-    </v-list-item-content>
+    </div>
     `,
 });
 
