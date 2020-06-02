@@ -112,35 +112,32 @@ export var PackagingQtyPickerMixin = {
         compute_qty: function(newVal, oldVal) {
             this.value = this._compute_qty();
         },
-    },
-    watch: {
-        value: {
-            handler: function(newVal, oldVal) {
-                this.$root.trigger("qty_edit", this.value);
-            },
+        _init_editable() {
+            const self = this;
+            this.$watch(
+                "qty_by_pkg",
+                function() {
+                    self.compute_qty();
+                },
+                {deep: true}
+            );
+            this.qty_by_pkg = this.product_qty_by_packaging();
+            this.orig_qty_by_pkg = this.qty_by_pkg;
+            // hooking via `v-on:change` we don't get the full event but only the qty :/
+            // And forget about using v-text-field because it loses the full event object
+            $(".pkg-value", this.$el).change(this.on_change_pkg_qty);
+            $(".pkg-value", this.$el).on("focus click", function() {
+                $(this).select();
+            });
+        },
+        _init_readonly() {
+            this.qty_by_pkg = this.product_qty_by_packaging();
+            this.compute_qty();
         },
     },
     created: function() {
         this.original_value = parseInt(this.opts.init_value, 10);
         this.value = parseInt(this.opts.init_value, 10);
-    },
-    mounted: function() {
-        const self = this;
-        this.$watch(
-            "qty_by_pkg",
-            function() {
-                self.compute_qty();
-            },
-            {deep: true}
-        );
-        this.qty_by_pkg = this.product_qty_by_packaging();
-        this.orig_qty_by_pkg = this.qty_by_pkg;
-        // hooking via `v-on:change` we don't get the full event but only the qty :/
-        // And forget about using v-text-field because it loses the full event object
-        $(".pkg-value", this.$el).change(this.on_change_pkg_qty);
-        $(".pkg-value", this.$el).on("focus click", function() {
-            $(this).select();
-        });
     },
     computed: {
         opts() {
@@ -184,6 +181,16 @@ export var PackagingQtyPickerMixin = {
 
 export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
     mixins: [PackagingQtyPickerMixin],
+    watch: {
+        value: {
+            handler: function(newVal, oldVal) {
+                this.$root.trigger("qty_edit", this.value);
+            },
+        },
+    },
+    mounted: function() {
+        this._init_editable();
+    },
     template: `
 <div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode: '']">
     <v-row class="unit-value">
@@ -215,6 +222,9 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
 
 export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-display", {
     mixins: [PackagingQtyPickerMixin],
+    mounted: function() {
+        this._init_readonly();
+    },
     template: `
 <div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode: '', 'd-inline']">
     <span class="packaging" v-for="(pkg, index) in sorted_packaging">
