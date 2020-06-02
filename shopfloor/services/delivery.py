@@ -157,6 +157,12 @@ class Delivery(Component):
             # the qty_done is full
             line.qty_done = line.product_uom_qty
 
+    def _reset_lines(self, lines):
+        for line in lines:
+            # note: the package level "is_done" field is automatically unset
+            # when the qty_done is not full
+            line.qty_done = 0
+
     def _deliver_package(self, picking, package):
         lines = package.move_line_ids
         lines = lines.filtered(
@@ -173,20 +179,29 @@ class Delivery(Component):
         new_picking = fields.first(lines.mapped("picking_id"))
         return self._response_for_deliver(picking=new_picking)
 
-    def _lines_base_domain(self):
-        return [
+    def _lines_base_domain(self, no_qty_done=True):
+        domain = [
             # we added auto_join for this, otherwise, the ORM would search all pickings
             # in the picking type, and then use IN (ids)
             ("picking_id.picking_type_id", "in", self.picking_types.ids),
-            ("qty_done", "=", 0),
         ]
+        if no_qty_done:
+            domain.append(("qty_done", "=", 0))
+        return domain
 
-    def _lines_from_lot_domain(self, lot):
-        return expression.AND([self._lines_base_domain(), [("lot_id", "=", lot.id)]])
-
-    def _lines_from_product_domain(self, product):
+    def _lines_from_lot_domain(self, lot, no_qty_done=True):
         return expression.AND(
-            [self._lines_base_domain(), [("product_id", "=", product.id)]]
+            [self._lines_base_domain(no_qty_done), [("lot_id", "=", lot.id)]]
+        )
+
+    def _lines_from_product_domain(self, product, no_qty_done=True):
+        return expression.AND(
+            [self._lines_base_domain(no_qty_done), [("product_id", "=", product.id)]]
+        )
+
+    def _lines_from_package_domain(self, package, no_qty_done=True):
+        return expression.AND(
+            [self._lines_base_domain(no_qty_done), [("package_id", "=", package.id)]]
         )
 
     def _deliver_product(self, picking, product):
@@ -381,7 +396,32 @@ class Delivery(Component):
         Transitions:
         * deliver: always return here with updated data
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id).exists()
+        if picking:
+            response = self._check_picking_status(picking)
+            if response:
+                return response
+        else:
+            return self._response_for_deliver(
+                message=self.msg_store.stock_picking_not_found()
+            )
+        package = self.env["stock.quant.package"].browse(package_id).exists()
+        if package:
+            lines = self.env["stock.move.line"].search(
+                self._lines_from_package_domain(package, no_qty_done=False)
+            )
+            if not lines:
+                return self._response_for_deliver(
+                    picking,
+                    message=self.msg_store.package_not_available_in_picking(
+                        package, picking
+                    ),
+                )
+            self._reset_lines(lines)
+            return self._response_for_deliver(picking)
+        return self._response_for_deliver(
+            picking=picking, message=self.msg_store.package_not_found()
+        )
 
     def reset_qty_done_line(self, picking_id, line_id):
         """Remove "Done" on a move line
