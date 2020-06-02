@@ -21,25 +21,28 @@ export var PackagingQtyPickerMixin = {
             if (new_qty && future_qty > this.original_value) {
                 // restore qty just in case we can get here
                 new_qty = origvalue;
-                event.preventDefault();
-                // Make it red and shake it
-                $(input)
-                    .closest(".inner-wrapper")
-                    .addClass("error shake-it")
-                    .delay(800)
-                    .queue(function() {
-                        // End animation
-                        $(this)
-                            .removeClass("error shake-it", 2000, "easeInOutQuad")
-                            .dequeue();
-                        // Restore value
-                        $(input).val(new_qty);
-                    });
+                this._handle_qty_error(event, input, new_qty);
             }
             // Trigger update
             this.$set(this.qty_by_pkg, data.pkg.id, new_qty);
             // Set new orig value
             $(input).data("origvalue", new_qty);
+        },
+        _handle_qty_error(event, input, new_qty) {
+            event.preventDefault();
+            // Make it red and shake it
+            $(input)
+                .closest(".inner-wrapper")
+                .addClass("error shake-it")
+                .delay(800)
+                .queue(function() {
+                    // End animation
+                    $(this)
+                        .removeClass("error shake-it", 2000, "easeInOutQuad")
+                        .dequeue();
+                    // Restore value
+                    $(input).val(new_qty);
+                });
         },
         packaging_by_id: function(id) {
             return _.find(this.opts.available_packaging, ["id", parseInt(id, 10)]);
