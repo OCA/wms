@@ -81,6 +81,14 @@ class MessageAction(Component):
             "body": _("This package does not exist anymore."),
         }
 
+    def package_not_available_in_picking(self, package, picking):
+        return {
+            "message_type": "warning",
+            "body": _("Package {} is not available in transfer {}.").format(
+                package.name, picking.name
+            ),
+        }
+
     def record_not_found(self):
         return {
             "message_type": "error",
