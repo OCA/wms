@@ -42,29 +42,17 @@ const DEMO_CLUSTER_PICKING_1 = {
     scan_line: {
         next_state: "scan_destination",
         data: {
-            scan_destination: {},
+            scan_destination: demotools.makeBatchPickingLine(),
         },
     },
     scan_destination_pack: {
-        ok: {
-            next_state: "start_line",
-            message: {
-                message_type: "success",
-                body: "Product 5 put in bin #2",
-            },
-            data: {
-                start_line: demotools.makeBatchPickingLine(),
-            },
+        next_state: "start_line",
+        message: {
+            message_type: "success",
+            body: "Product 5 put in bin #2",
         },
-        ko: {
-            next_state: "zero_check",
-            message: {
-                message_type: "info",
-                body: "Stock check required",
-            },
-            data: {
-                zero_check: {},
-            },
+        data: {
+            start_line: demotools.makeBatchPickingLine(),
         },
     },
     stock_is_zero: {
