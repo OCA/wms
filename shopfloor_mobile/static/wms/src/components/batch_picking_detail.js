@@ -11,9 +11,21 @@ Vue.component("batch-picking-detail", {
         },
         picking_detail_fields() {
             return [
+                {path: "name", klass: "loud", action_val_path: "name"},
                 {path: "move_line_count", label: "Lines"},
                 {path: "weight", label: "Weight"},
             ];
+        },
+        picking_list_options() {
+            return {
+                group_title_default: "Pickings list",
+                group_color: this.utils.colors.color_for("screen_step_todo"),
+                list_item_options: {
+                    key_title: "name",
+                    bold_title: true,
+                    fields: this.picking_detail_fields(),
+                },
+            };
         },
     },
     template: `
@@ -40,13 +52,10 @@ Vue.component("batch-picking-detail", {
     </div>
 
     <div class="pickings">
-      <separator-title>Pickings list</separator-title>
-      <detail-picking
-        v-for="picking in record.pickings"
-        :key="picking.id"
-        :record="picking"
-        :options="{fields: picking_detail_fields()}"
-        />
+      <list
+          :records="record.pickings"
+          :options="picking_list_options()"
+          />
     </div>
 
 </div>
