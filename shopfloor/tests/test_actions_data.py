@@ -65,6 +65,12 @@ class ActionsDataCaseBase(CommonCase):
             "default_code": record.default_code,
             "barcode": record.barcode,
             "packaging": [self._expected_packaging(x) for x in record.packaging_ids],
+            "uom": {
+                "factor": record.uom_id.factor,
+                "id": record.uom_id.id,
+                "name": record.uom_id.name,
+                "rounding": record.uom_id.rounding,
+            },
         }
 
     def _expected_packaging(self, record, **kw):
