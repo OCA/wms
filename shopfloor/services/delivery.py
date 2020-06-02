@@ -302,7 +302,13 @@ class Delivery(Component):
         * manual_selection: the selected stock picking is no longer valid
         * deliver: with information about the stock.picking
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id).exists()
+        if picking:
+            return self._response_for_deliver(picking)
+        response = self.list_stock_picking()
+        return self._response(
+            response, message=self.msg_store.stock_picking_not_found()
+        )
 
     def set_qty_done_pack(self, picking_id, package_id):
         """Set a package to "Done"
@@ -490,7 +496,7 @@ class ShopfloorDeliveryValidatorResponse(Component):
         return self._response_schema(next_states={"manual_selection"})
 
     def select(self):
-        return self._response_schema(next_states={"deliver"})
+        return self._response_schema(next_states={"deliver", "manual_selection"})
 
     def set_qty_done_pack(self):
         return self._response_schema(next_states={"deliver"})
