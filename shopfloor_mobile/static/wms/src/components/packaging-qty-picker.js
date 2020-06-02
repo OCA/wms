@@ -75,6 +75,10 @@ export var PackagingQtyPickerMixin = {
             // const min_unit = _.last(pkg_by_qty);
             pkg_by_qty.forEach(function(pkg) {
                 let qty_per_pkg = 0;
+                if (!pkg.qty) {
+                    console.error("Packaging with no quantity: skipping", pkg);
+                    return {};
+                }
                 [qty_per_pkg, qty] = self._qty_by_pkg(pkg.qty, qty);
                 if (qty_per_pkg) res[pkg.id] = qty_per_pkg;
                 if (!qty) return;
