@@ -89,6 +89,14 @@ class MessageAction(Component):
             ),
         }
 
+    def line_not_available_in_picking(self, picking):
+        return {
+            "message_type": "warning",
+            "body": _("This line is not available in transfer {}.").format(
+                picking.name
+            ),
+        }
+
     def record_not_found(self):
         return {
             "message_type": "error",
@@ -217,6 +225,12 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Transfer {} is not available.").format(picking.name),
+        }
+
+    def line_has_package_scan_package(self):
+        return {
+            "message_type": "warning",
+            "body": _("This line has a package, please select the package instead."),
         }
 
     def product_multiple_packages_scan_package(self):
