@@ -51,12 +51,12 @@ Vue.component("last-operation", {
 Vue.component("get-work", {
     template: `
     <div class="get-work fullscreen-buttons fullscreen-buttons-50">
-      <btn-action id="btn-get-work" color="success" @click="$emit('get_work')">
+      <btn-action id="btn-get-work" @click="$emit('get_work')">
           Get work
       </btn-action>
-      <v-btn id="btn-manual" color="default" @click="$emit('manual_selection')">
+      <btn-action id="btn-manual" color="default" @click="$emit('manual_selection')">
           Manual selection
-      </v-btn>
+      </btn-action>
     </div>
     `,
 });
