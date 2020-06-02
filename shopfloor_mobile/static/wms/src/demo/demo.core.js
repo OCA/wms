@@ -23,24 +23,25 @@ export class DemoTools {
         this.packaging = [
             this.makePackaging({
                 name: "Little Box",
-                qty: 10,
-                qty_unit: "Unit",
+                qty: 50,
             }),
             this.makePackaging({
                 name: "Box",
-                qty: 20,
-                qty_unit: "Unit",
+                qty: 100,
             }),
             this.makePackaging({
                 name: "Big Box",
-                qty: 30,
-                qty_unit: "Box",
+                qty: 500,
             }),
             this.makePackaging({
                 name: "Pallette",
-                qty: 50,
-                qty_unit: "Big Box",
+                qty: 5000,
             }),
+        ];
+        this.uoms = [
+            {id: this.getRandomInt(), name: "Units", factor: 1.0, rounding: 3},
+            {id: this.getRandomInt(), name: "Dozen", factor: 12.0, rounding: 3},
+            {id: this.getRandomInt(), name: "Pair", factor: 2.0, rounding: 1},
         ];
     }
 
@@ -237,6 +238,7 @@ export class DemoTools {
             barcode: default_code,
             qty_available: this.getRandomInt(200),
             packaging: this.randomSetFromArray(this.packaging, 4),
+            uom: this.randomItemFromArray(this.uoms),
         });
         const rec = this.makeSimpleRecord(defaults, options);
         _.extend(rec, {
