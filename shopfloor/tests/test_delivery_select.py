@@ -4,8 +4,8 @@
 from .test_delivery_base import DeliveryCommonCase
 
 
-class DeliveryListStockPickingCase(DeliveryCommonCase):
-    """Tests for /list_stock_picking"""
+class DeliverySelectCase(DeliveryCommonCase):
+    """Tests for /select"""
 
     @classmethod
     def setUpClassBaseData(cls):
@@ -17,9 +17,17 @@ class DeliveryListStockPickingCase(DeliveryCommonCase):
             lines=[(cls.product_a, 10), (cls.product_b, 10)]
         )
 
-    def test_list_stock_picking_ok(self):
+    def test_select_ok(self):
+        response = self.service.dispatch(
+            "select", params={"picking_id": self.picking1.id}
+        )
+        self.assert_response_deliver(response, picking=self.picking1)
+
+    def test_select_not_found(self):
         pickings = self.picking1 | self.picking2
-        response = self.service.dispatch("list_stock_picking", params={})
+        response = self.service.dispatch("select", params={"picking_id": -1})
         self.assert_response_manual_selection(
-            response, pickings=pickings,
+            response,
+            pickings=pickings,
+            message=self.service.msg_store.stock_picking_not_found(),
         )

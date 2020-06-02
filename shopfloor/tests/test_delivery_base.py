@@ -79,6 +79,16 @@ class DeliveryCommonCase(CommonCase):
             message=message,
         )
 
+    def assert_response_manual_selection(self, response, pickings=None, message=None):
+        self.assert_response(
+            response,
+            next_state="manual_selection",
+            data={
+                "pickings": [self._stock_picking_data(picking) for picking in pickings]
+            },
+            message=message,
+        )
+
     def assert_qty_done(self, move_lines, qties=None):
         """Ensure that the quantities done are the expected ones.
 
