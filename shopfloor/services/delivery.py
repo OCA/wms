@@ -1,4 +1,4 @@
-from odoo import _, fields
+from odoo import fields
 from odoo.osv import expression
 
 from odoo.addons.base_rest.components.service import to_int
@@ -376,13 +376,10 @@ class Delivery(Component):
         line = self.env["stock.move.line"].browse(move_line_id).exists()
         if line:
             if line.package_id:
-                msg = {
-                    "message_type": "warning",
-                    "body": _(
-                        "This line has a package, please select the package instead."
-                    ),
-                }
-                return self._response_for_deliver(picking=picking, message=msg)
+                return self._response_for_deliver(
+                    picking=picking,
+                    message=self.msg_store.line_has_package_scan_package(),
+                )
             self._set_lines_done(line)
             self._action_picking_done(picking)
             return self._response_for_deliver(picking)
@@ -423,7 +420,7 @@ class Delivery(Component):
             picking=picking, message=self.msg_store.package_not_found()
         )
 
-    def reset_qty_done_line(self, picking_id, line_id):
+    def reset_qty_done_line(self, picking_id, move_line_id):
         """Remove "Done" on a move line
 
         Should be called only for lines of raw products, /set_qty_done_pack
@@ -432,7 +429,32 @@ class Delivery(Component):
         Transitions:
         * deliver: always return here with updated data
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id).exists()
+        if picking:
+            response = self._check_picking_status(picking)
+            if response:
+                return response
+        else:
+            return self._response_for_deliver(
+                message=self.msg_store.stock_picking_not_found()
+            )
+        line = self.env["stock.move.line"].browse(move_line_id).exists()
+        if line:
+            if line.picking_id != picking:
+                return self._response_for_deliver(
+                    picking=picking,
+                    message=self.msg_store.line_not_available_in_picking(picking),
+                )
+            if line.package_id:
+                return self._response_for_deliver(
+                    picking=picking,
+                    message=self.msg_store.line_has_package_scan_package(),
+                )
+            self._reset_lines(line)
+            return self._response_for_deliver(picking)
+        return self._response_for_deliver(
+            picking=picking, message=self.msg_store.record_not_found(),
+        )
 
     def done(self, picking_id):
         """Set the stock picking to done
