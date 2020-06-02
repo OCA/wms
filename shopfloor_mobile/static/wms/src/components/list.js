@@ -36,7 +36,14 @@ Vue.component("list", {
         listable() {
             if (!this.grouped_records.length) {
                 // Simulate grouping (allows to keep template the same)
-                return [{key: "no-group", title: "", records: this.records}];
+                return [
+                    {
+                        key: "no-group",
+                        title: this.opts.group_title_default,
+
+                        records: this.records,
+                    },
+                ];
             }
             return this.grouped_records;
         },
@@ -52,6 +59,7 @@ Vue.component("list", {
                 list_item_actions: [],
                 list_item_on_click: null,
                 list_item_options: {},
+                group_title_default: "",
             });
             return opts;
         },
