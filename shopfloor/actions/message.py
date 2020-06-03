@@ -292,3 +292,26 @@ class MessageAction(Component):
             "message_type": "success",
             "body": _("Batch Transfer line done"),
         }
+
+    def transfer_complete(self, picking):
+        return {
+            "message_type": "success",
+            "body": _("Transfer {} complete").format(picking.name),
+        }
+
+    def transfer_confirm_done(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "Not all lines have been processed, do you want to "
+                "confirm partial operation ?"
+            ),
+        }
+
+    def transfer_no_qty_done(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "No quantity has been processed, unable to complete the transfer."
+            ),
+        }
