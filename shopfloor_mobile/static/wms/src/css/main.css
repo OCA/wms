@@ -239,6 +239,7 @@ ul.packaging span:first-child {
 } */
 .list .list-group:not(:last-child) {
     border-bottom: 2px solid #ccc;
+    margin-bottom: 1em;
 }
 .list .v-list-item__content.has-pack {
     padding: 0;
@@ -289,20 +290,6 @@ ul.packaging span:first-child {
 
 .v-list-item__title {
     white-space: normal;
-}
-
-/* TODO: adapt colors */
-.move-line-done .details {
-    border-left: 5px solid lightgreen;
-    padding-left: 5px;
-}
-.move-line-partial .details {
-    border-left: 5px solid #ffbf30;
-    padding-left: 5px;
-}
-.move-line-not-done .details {
-    border-left: 5px solid green;
-    padding-left: 5px;
 }
 
 .action {

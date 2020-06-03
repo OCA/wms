@@ -28,9 +28,9 @@ export var Delivery = Vue.component("checkout", {
             <div v-if="state_is('deliver')">
                 <picking-summary
                     :record="state.data.picking"
-                    :records_grouped="utils.misc.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.misc.group_by_pack})"
-                    :list_options="deliver_move_line_list_options()"
-                    :key="current_state_key + '-detail-picking-' + state.data.picking.id"
+                    :records_grouped="deliver_picking_summary_records_grouped(state.data.picking)"
+                    :list_options="deliver_move_line_list_options(state.data.picking)"
+                    :key="make_state_component_key(['manual-select', 'detail-picking', state.data.picking.id])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -44,9 +44,8 @@ export var Delivery = Vue.component("checkout", {
                 <manual-select
                     class="with-progress-bar"
                     :records="state.visible_records(this.state.data.pickings)"
-                    :options="{show_title: false, showActions: false, list_item_extra_component: 'picking-list-item-progress-bar'}"
-                    :list_item_fields="manual_select_picking_fields()"
-                    :key="current_state_key + '-manual-select'"
+                    :options="manual_select_options()"
+                    :key="make_state_component_key(['manual-select'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -68,7 +67,18 @@ export var Delivery = Vue.component("checkout", {
     //     this._state_load(state);
     // },
     methods: {
-        deliver_move_line_list_options: function() {
+        deliver_picking_summary_records_grouped(picking) {
+            const self = this;
+            return this.utils.misc.group_lines_by_location(picking.move_lines, {
+                prepare_records: this.utils.misc.group_by_pack,
+                group_color_maker: function(lines) {
+                    return self.utils.misc.move_lines_completeness(lines) == 100
+                        ? "screen_step_done"
+                        : "screen_step_todo";
+                },
+            });
+        },
+        deliver_move_line_list_options: function(picking) {
             return {
                 list_item_options: {
                     actions: ["action_cancel_line"],
@@ -79,6 +89,16 @@ export var Delivery = Vue.component("checkout", {
         },
         move_line_detail_fields: function() {
             return [{path: "package_src.name", klass: "loud"}];
+        },
+        manual_select_options: function() {
+            return {
+                show_title: false,
+                showActions: false,
+                list_item_extra_component: "picking-list-item-progress-bar",
+                list_item_options: {
+                    fields: this.manual_select_picking_fields(),
+                },
+            };
         },
         manual_select_picking_fields: function() {
             const self = this;
@@ -91,7 +111,7 @@ export var Delivery = Vue.component("checkout", {
                     label: "Lines",
                     renderer: function(rec, field) {
                         return (
-                            self.utils.misc.picking_completed_lines(rec) +
+                            self.utils.misc.completed_move_lines(rec.move_lines) +
                             " / " +
                             rec.move_lines.length
                         );
