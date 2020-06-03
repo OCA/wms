@@ -10,6 +10,9 @@ export class Utils {
             prepare_records: function(recs) {
                 return recs;
             },
+            group_color_maker: function(recs) {
+                return "";
+            },
         });
         const res = [];
         const locations = _.uniqBy(
@@ -27,6 +30,7 @@ export class Utils {
             res.push({
                 key: loc_id,
                 title: title,
+                group_color: options.group_color_maker(value),
                 records: options.prepare_records.call(self, value),
             });
         });
