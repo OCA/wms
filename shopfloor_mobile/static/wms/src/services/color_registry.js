@@ -18,7 +18,7 @@ color_registry.add_theme(
         /**
          * app specific
          */
-        screen_step_done: "success",
+        screen_step_done: "#8fbf44",
         screen_step_todo: "#FFE3AC",
         /**
          * icons

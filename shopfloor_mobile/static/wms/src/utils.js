@@ -28,6 +28,7 @@ export class Utils {
                 ? options.name_prefix + ": " + location.name
                 : location.name;
             res.push({
+                _is_group: true,
                 key: loc_id,
                 title: title,
                 group_color: options.group_color_maker(value),
@@ -65,6 +66,7 @@ export class Utils {
             const src_loc = _.first(_.filter(locations, {id: parseInt(src_id)}));
             const dest_loc = _.first(_.filter(locations, {id: parseInt(dest_id)}));
             res.push({
+                _is_group: true,
                 key: loc_ids,
                 location_src: src_loc,
                 location_dest: dest_loc,
@@ -100,6 +102,7 @@ export class Utils {
                 );
             }
             res.push({
+                _is_group: true,
                 key: key + "--" + counter,
                 // No pack, just display the product name
                 title: pack ? pack.name : products[0].display_name,
@@ -116,6 +119,7 @@ export class Utils {
         const grouped = _.groupBy(lines, "package_dest.packaging.name");
         _.forEach(grouped, function(products, packaging_name) {
             res.push({
+                _is_group: true,
                 // groupBy gives undefined as string
                 key: packaging_name == "undefined" ? "no-packaging" : packaging_name,
                 title: packaging_name == "undefined" ? "" : packaging_name,
@@ -143,14 +147,21 @@ export class Utils {
         return res;
     }
 
-    picking_completed_lines(record) {
-        return _.filter(record.move_lines, function(l) {
+    completed_move_lines(move_lines) {
+        return _.filter(move_lines, function(l) {
             return l.qty_done > 0;
         }).length;
     }
 
-    picking_completeness(record) {
-        return (this.picking_completed_lines(record) / record.move_lines.length) * 100;
+    move_lines_completeness(move_lines) {
+        return (this.completed_move_lines(move_lines) / move_lines.length) * 100;
+    }
+
+    picking_completeness(record, filtered_move_lines) {
+        const move_lines = filtered_move_lines
+            ? filtered_move_lines
+            : record.move_lines;
+        return this.move_lines_completeness(move_lines);
     }
 
     order_picking_by_completeness(pickings) {
@@ -180,14 +191,18 @@ export class Utils {
         );
     }
 
-    move_line_color_klass(line) {
+    move_line_color_klass(rec) {
+        let line = rec;
+        if (line._is_group) {
+            line = line.records[0];
+        }
         let klass = "";
         if (line.qty_done == line.quantity) {
-            klass = "done";
+            klass = "done screen_step_done lighten-1";
         } else if (line.qty_done && line.qty_done < line.quantity) {
-            klass = "partial";
+            klass = "partial screen_step_todo lighten-2";
         } else if (line.qty_done == 0) {
-            klass = "not-done";
+            klass = "not-done screen_step_todo lighten-1";
         }
         return "move-line-" + klass;
     }
