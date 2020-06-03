@@ -1,7 +1,8 @@
 from odoo import fields
 from odoo.osv import expression
+from odoo.tools.float_utils import float_is_zero
 
-from odoo.addons.base_rest.components.service import to_int
+from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
 
 
@@ -65,6 +66,16 @@ class Delivery(Component):
                 "pickings": [
                     self.data_struct.picking_detail(picking) for picking in pickings
                 ],
+            },
+            message=message,
+        )
+
+    def _response_for_confirm_done(self, picking, message=None):
+        """Transition to the 'confirm_done' state."""
+        return self._response(
+            next_state="confirm_done",
+            data={
+                "picking": self.data_struct.picking_detail(picking) if picking else None
             },
             message=message,
         )
@@ -456,14 +467,47 @@ class Delivery(Component):
             picking=picking, message=self.msg_store.record_not_found(),
         )
 
-    def done(self, picking_id):
+    def done(self, picking_id, confirm=False):
         """Set the stock picking to done
 
         Transitions:
         * deliver: error during action
         * confirm_done: when not all lines of the stock.picking are done
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id).exists()
+        if picking:
+            response = self._check_picking_status(picking)
+            if response:
+                return response
+        else:
+            return self._response_for_deliver(
+                message=self.msg_store.stock_picking_not_found()
+            )
+        if self._action_picking_done(picking):
+            return self._response_for_deliver(
+                message=self.msg_store.transfer_complete(picking)
+            )
+        if confirm:
+            precision_digits = self.env["decimal.precision"].precision_get(
+                "Product Unit of Measure"
+            )
+            no_quantities_done = all(
+                float_is_zero(move_line.qty_done, precision_digits=precision_digits)
+                for move_line in picking.move_line_ids.filtered(
+                    lambda m: m.state not in ("done", "cancel")
+                )
+            )
+            if no_quantities_done:
+                return self._response_for_deliver(
+                    message=self.msg_store.transfer_no_qty_done()
+                )
+            picking.action_done()
+            return self._response_for_deliver(
+                message=self.msg_store.transfer_complete(picking)
+            )
+        return self._response_for_confirm_done(
+            picking, message=self.msg_store.transfer_confirm_done(),
+        )
 
 
 class ShopfloorDeliveryValidator(Component):
@@ -515,7 +559,10 @@ class ShopfloorDeliveryValidator(Component):
         }
 
     def done(self):
-        return {"picking_id": {"coerce": to_int, "required": True, "type": "integer"}}
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "confirm": {"coerce": to_bool, "required": False, "type": "boolean"},
+        }
 
 
 class ShopfloorDeliveryValidatorResponse(Component):
