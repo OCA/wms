@@ -216,7 +216,10 @@ Vue.component("manual-select", {
     },
     template: `
     <div :class="klass">
-        <v-card class="select-group" :color="opts.group_color" v-for="(group, gindex) in selectable" :key="make_component_key([$options._componentTag, 'group', gindex])">
+        <v-card class="select-group"
+            :color="group.group_color || opts.group_color"
+            v-for="(group, gindex) in selectable"
+            :key="make_component_key([$options._componentTag, 'group', gindex])">
             <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
             <v-list v-if="has_records">
                 <div :class="['list-item-wrapper', is_selected(rec) ? selected_color_klass() : '']" v-for="(rec, index) in group.records"">

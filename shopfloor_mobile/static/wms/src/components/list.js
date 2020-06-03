@@ -89,7 +89,9 @@ Vue.component("list", {
     },
     template: `
     <div :class="klass">
-        <v-card class="list-group" :color="opts.group_color" v-for="(group, gindex) in listable" :key="make_component_key([$options._componentTag, 'group', gindex])">
+        <v-card class="list-group"
+                v-for="(group, gindex) in listable" :key="make_component_key([$options._componentTag, 'group', gindex])"
+                :color="group.group_color || opts.group_color">
             <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
             <v-list v-if="has_records">
                 <div class="list-item-wrapper" v-for="(rec, index) in group.records">
