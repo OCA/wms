@@ -102,7 +102,9 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
     def test_scan_deliver_scan_package_ok(self):
         move_lines = self.pack1_moves.mapped("move_line_ids")
         package = move_lines.mapped("package_id")
+        self.assertEqual(self.picking.state, "assigned")
         self._test_scan_set_done_ok(move_lines, package.name)
+        self.assertEqual(self.picking.state, "assigned")
 
     def test_scan_deliver_scan_package_no_move_lines(self):
         response = self.service.dispatch(
@@ -185,6 +187,51 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             response,
             picking=self.picking,
             message=self.service.msg_store.lot_mixed_package_scan_package(),
+        )
+
+    def test_scan_deliver_picking_done(self):
+        # Set qty done for all lines (packages/raw product/lot...), picking is
+        # automatically set to done when the last line is completed
+        package1 = self.pack1_moves.mapped("move_line_ids").mapped("package_id")
+        package2 = self.pack2_move.mapped("move_line_ids").mapped("package_id")
+        self.service.dispatch(
+            "set_qty_done_pack",
+            params={"package_id": package1.id, "picking_id": self.picking.id},
+        )
+        self.assertEqual(self.picking.state, "assigned")
+        self.service.dispatch(
+            "set_qty_done_pack",
+            params={"package_id": package2.id, "picking_id": self.picking.id},
+        )
+        self.assertEqual(self.picking.state, "assigned")
+        self.service.dispatch(
+            "scan_deliver",
+            params={
+                "barcode": self.raw_move.product_id.barcode,
+                "picking_id": self.picking.id,
+            },
+        )
+        self.assertEqual(self.picking.state, "assigned")
+        lot = self.raw_lot_move.move_line_ids.lot_id
+        response = self.service.dispatch(
+            "scan_deliver", params={"barcode": lot.name, "picking_id": self.picking.id},
+        )
+        self.assertEqual(self.picking.state, "assigned")
+        packages_f = self.pack3_move.move_line_ids.mapped("package_id")
+        # While all lines are not processed, response still returns the picking
+        self.assert_response_deliver(
+            response, picking=self.picking,
+        )
+        response = None
+        # Once all lines are processed, the last response has no picking returned
+        for package in packages_f:
+            response = self.service.dispatch(
+                "set_qty_done_pack",
+                params={"package_id": package.id, "picking_id": self.picking.id},
+            )
+        self.assertEqual(self.picking.state, "done")
+        self.assert_response_deliver(
+            response, message=self.service.msg_store.transfer_complete(self.picking),
         )
 
 
