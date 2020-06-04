@@ -163,10 +163,18 @@ class Delivery(Component):
         )
 
     def _set_lines_done(self, lines):
+        """Set done quantities on `lines`.
+
+        Once all lines of a picking have been processed, the picking will be
+        validated automatically.
+        Return `True` if the related picking has been validated.
+        """
         for line in lines:
             # note: the package level is automatically set to "is_done" when
             # the qty_done is full
             line.qty_done = line.product_uom_qty
+        picking = fields.first(lines.mapped("picking_id"))
+        return self._action_picking_done(picking)
 
     def _reset_lines(self, lines):
         for line in lines:
@@ -186,8 +194,11 @@ class Delivery(Component):
                 message=self.msg_store.cannot_move_something_in_picking_type(),
             )
         # TODO add a message if any of the lines already had a qty_done > 0
-        self._set_lines_done(lines)
         new_picking = fields.first(lines.mapped("picking_id"))
+        if self._set_lines_done(lines):
+            return self._response_for_deliver(
+                message=self.msg_store.transfer_complete(new_picking)
+            )
         return self._response_for_deliver(picking=new_picking)
 
     def _lines_base_domain(self, no_qty_done=True):
@@ -252,7 +263,10 @@ class Delivery(Component):
                     new_picking,
                     message=self.msg_store.product_mixed_package_scan_package(),
                 )
-        self._set_lines_done(lines)
+        if self._set_lines_done(lines):
+            return self._response_for_deliver(
+                message=self.msg_store.transfer_complete(new_picking)
+            )
         return self._response_for_deliver(new_picking)
 
     def _deliver_lot(self, picking, lot):
@@ -286,7 +300,10 @@ class Delivery(Component):
                     message=self.msg_store.lot_mixed_package_scan_package(),
                 )
 
-        self._set_lines_done(lines)
+        if self._set_lines_done(lines):
+            return self._response_for_deliver(
+                message=self.msg_store.transfer_complete(new_picking)
+            )
         return self._response_for_deliver(new_picking)
 
     def _action_picking_done(self, picking):
@@ -391,8 +408,10 @@ class Delivery(Component):
                     picking=picking,
                     message=self.msg_store.line_has_package_scan_package(),
                 )
-            self._set_lines_done(line)
-            self._action_picking_done(picking)
+            if self._set_lines_done(line):
+                return self._response_for_deliver(
+                    message=self.msg_store.transfer_complete(picking)
+                )
             return self._response_for_deliver(picking)
         return self._response_for_deliver(
             picking=picking, message=self.msg_store.record_not_found(),
