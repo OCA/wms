@@ -9,6 +9,8 @@ class TestStorageType(SavepointCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
+
+        cls.stock_location = cls.env.ref("stock.stock_location_stock")
         cls.pallets_location_storage_type = cls.env.ref(
             "stock_storage_type.location_storage_type_pallets"
         )
@@ -91,3 +93,17 @@ class TestStorageType(SavepointCase):
         self.pallets_location_storage_type.only_empty = False
         self.pallets_location_storage_type.do_not_mix_products = True
         self.pallets_location_storage_type.do_not_mix_lots = True
+
+    def test_location_leaf_locations(self):
+        cardboxes_leaves = self.env["stock.location"].search(
+            [("id", "child_of", self.cardboxes_stock.id), ("child_ids", "=", False)]
+        )
+
+        self.assertEqual(self.cardboxes_stock.leaf_location_ids, cardboxes_leaves)
+        all_stock_leaves = self.env["stock.location"].search(
+            [("id", "child_of", self.stock_location.id), ("child_ids", "=", False)]
+        )
+        self.assertEqual(self.stock_location.leaf_location_ids, all_stock_leaves)
+
+    def test_location_leaf_locations_on_leaf(self):
+        self.assertEqual(self.cardboxes_bin_3.leaf_location_ids, self.cardboxes_bin_3)
