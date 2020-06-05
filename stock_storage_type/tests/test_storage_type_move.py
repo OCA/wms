@@ -164,7 +164,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
                     ).ids,
                 ),
                 ("location_id", "child_of", int_picking.location_dest_id.id),
-                ("id", "in", package_type_locations.mapped("children_ids").ids),
+                ("id", "in", package_type_locations.mapped("leaf_location_ids").ids),
             ]
         )
         only_empty_possible_locations = possible_locations.filtered(
@@ -299,7 +299,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         def _get_possible_locations(package_level):
             storage_type = package_level.package_id.package_storage_type_id
             package_type_locations = storage_type.storage_location_sequence_ids.mapped(
-                "location_id.children_ids"
+                "location_id.leaf_location_ids"
             )
             possible_locations = self.env["stock.location"].search(
                 [
