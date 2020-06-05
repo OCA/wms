@@ -29,6 +29,7 @@ export var Delivery = Vue.component("checkout", {
                 <picking-summary
                     :record="state.data.picking"
                     :records_grouped="deliver_picking_summary_records_grouped(state.data.picking)"
+                    :action_cancel_package_key="'package_src'"
                     :list_options="deliver_move_line_list_options(state.data.picking)"
                     :key="make_state_component_key(['manual-select', 'detail-picking', state.data.picking.id])"
                     />

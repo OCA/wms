@@ -4,6 +4,14 @@ import {PickingDetailListMixin} from "./mixins.js";
 
 Vue.component("picking-summary", {
     mixins: [PickingDetailListMixin],
+    props: {
+        // Take control of which package key (source or destination) is used
+        // to cancel the line when cancel line action is available.
+        action_cancel_package_key: {
+            type: String,
+            default: "package_dest",
+        },
+    },
     methods: {
         list_opts() {
             const opts = _.defaults(

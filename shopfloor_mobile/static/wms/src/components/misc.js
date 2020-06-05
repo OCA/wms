@@ -124,7 +124,21 @@ Vue.component("separator-title", {
 });
 
 Vue.component("cancel-move-line-action", {
-    props: ["record"],
+    props: {
+        record: {
+            type: Object,
+        },
+        options: {
+            type: Object,
+            default: function() {
+                // Take control of which package key (source or destination) is used
+                // to cancel the line when cancel line action is available.
+                return {
+                    package_cancel_key: "package_dest",
+                };
+            },
+        },
+    },
     data() {
         return {
             dialog: false,
@@ -135,8 +149,8 @@ Vue.component("cancel-move-line-action", {
             this.dialog = false;
             if (answer === "yes") {
                 let data = {};
-                if (this.record.package_dest) {
-                    data = {package_id: this.record.package_dest.id};
+                if (this.the_package) {
+                    data = {package_id: this.the_package.id};
                 } else {
                     data = {line_id: this.record.id};
                 }
@@ -145,9 +159,13 @@ Vue.component("cancel-move-line-action", {
         },
     },
     computed: {
+        // `package` is a reserved identifier!
+        the_package: function() {
+            return _.result(this.record, this.$props.options.package_cancel_key);
+        },
         message: function() {
-            const item = this.record.package_dest
-                ? this.record.package_dest.name
+            const item = this.the_package
+                ? this.the_package.name
                 : this.record.product.name;
             return "Please confirm cancellation for " + item;
         },
