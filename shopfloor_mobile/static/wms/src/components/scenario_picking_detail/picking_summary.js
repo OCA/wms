@@ -19,12 +19,13 @@ Vue.component("picking-summary", {
         },
         _get_available_list_item_actions() {
             // TODO: we should probably make the 1st class citizens w/ their own object class.
+            const self = this;
             return {
                 action_change_pkg: {
                     comp_name: "edit-action",
                     get_record: function(rec, action) {
                         /**
-                         * Here we always records grouped.
+                         * Here we can get records grouped.
                          * If lines have a dest package or not
                          * we don't care for a simple reason:
                          * if the pack is there then all grouped lines
@@ -33,10 +34,13 @@ Vue.component("picking-summary", {
                          * if the pkg is there or not and pick the right record.
                          * Hence -> always return the move line.
                          */
-                        return rec.records[0];
+                        if (rec.records) {
+                            return rec.records[0];
+                        }
+                        return rec;
                     },
-                    options: {
-                        click_event: "pkg_change_type",
+                    get_options: function(rec, action) {
+                        return {click_event: "pkg_change_type"};
                     },
                     enabled: function(rec, action) {
                         // Exclude for non-packaged records.
@@ -47,7 +51,11 @@ Vue.component("picking-summary", {
                 },
                 action_cancel_line: {
                     comp_name: "cancel-move-line-action",
-                    options: {},
+                    get_options: function(rec, action) {
+                        return {
+                            package_cancel_key: self.$props.action_cancel_package_key,
+                        };
+                    },
                     get_record: function(rec, action) {
                         if (rec.records) {
                             // lines grouped, get real line
