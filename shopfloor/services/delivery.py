@@ -34,14 +34,6 @@ class Delivery(Component):
     _usage = "delivery"
     _description = __doc__
 
-    @property
-    def data_struct(self):
-        return self.actions_for("data_detail")
-
-    @property
-    def msg_store(self):
-        return self.actions_for("message")
-
     def _response_for_deliver(self, picking=None, message=None):
         """Transition to the 'deliver' state
 
@@ -50,7 +42,7 @@ class Delivery(Component):
         return self._response(
             next_state="deliver",
             data={
-                "picking": self.data_struct.picking_detail(picking) if picking else None
+                "picking": self.data_detail.picking_detail(picking) if picking else None
             },
             message=message,
         )
@@ -64,7 +56,7 @@ class Delivery(Component):
             next_state="manual_selection",
             data={
                 "pickings": [
-                    self.data_struct.picking_detail(picking) for picking in pickings
+                    self.data_detail.picking_detail(picking) for picking in pickings
                 ],
             },
             message=message,
@@ -75,7 +67,7 @@ class Delivery(Component):
         return self._response(
             next_state="confirm_done",
             data={
-                "picking": self.data_struct.picking_detail(picking) if picking else None
+                "picking": self.data_detail.picking_detail(picking) if picking else None
             },
             message=message,
         )

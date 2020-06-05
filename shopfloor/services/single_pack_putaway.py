@@ -232,7 +232,7 @@ class SinglePackPutaway(Component):
     def _response_for_location_not_found(self):
         return self._response(
             next_state="scan_location",
-            message=message.no_location_found(),
+            message=self.msg_store.no_location_found(),
             data=self._data_after_package_scanned(move_line, pack),
         )
 
@@ -301,13 +301,11 @@ class SinglePackPutaway(Component):
         return self._response_for_validate_success()
 
     def _response_for_move_already_processed(self):
-        message = self.actions_for("message")
-        return self._response(next_state="start", message=message.already_done())
+        return self._response(next_state="start", message=self.msg_store.already_done())
 
     def _response_for_confirm_move_cancellation(self):
-        message = self.actions_for("message")
         return self._response(
-            next_state="start", message=message.confirm_canceled_scan_next_pack()
+            next_state="start", message=self.msg_store.confirm_canceled_scan_next_pack()
         )
 
     def cancel(self, package_level_id):

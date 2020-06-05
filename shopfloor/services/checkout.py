@@ -34,14 +34,6 @@ class Checkout(Component):
     _usage = "checkout"
     _description = __doc__
 
-    @property
-    def data_struct(self):
-        return self.actions_for("data")
-
-    @property
-    def msg_store(self):
-        return self.actions_for("message")
-
     def _response_for_select_line(self, picking, message=None):
         if all(line.shopfloor_checkout_done for line in picking.move_line_ids):
             return self._response_for_summary(picking, message=message)
@@ -69,7 +61,7 @@ class Checkout(Component):
             self._domain_for_list_stock_picking(),
             order=self._order_for_list_stock_picking(),
         )
-        data = {"pickings": self.data_struct.pickings(pickings)}
+        data = {"pickings": self.data.pickings(pickings)}
         return self._response(next_state="manual_selection", data=data, message=message)
 
     def _response_for_select_package(self, lines, message=None):
@@ -78,7 +70,7 @@ class Checkout(Component):
             next_state="select_package",
             data={
                 "selected_move_lines": self._data_for_move_lines(lines.sorted()),
-                "picking": self.data_struct.picking(picking),
+                "picking": self.data.picking(picking),
             },
             message=message,
         )
@@ -95,8 +87,8 @@ class Checkout(Component):
                     "body": _("No valid package to select."),
                 },
             )
-        picking_data = self.data_struct.picking(picking)
-        packages_data = self.data_struct.packages(
+        picking_data = self.data.picking(picking)
+        packages_data = self.data.packages(
             packages.sorted(), picking=picking, with_packaging=True
         )
         return self._response(
@@ -118,11 +110,11 @@ class Checkout(Component):
         return self._response(
             next_state="change_packaging",
             data={
-                "picking": self.data_struct.picking(picking),
-                "package": self.data_struct.package(
+                "picking": self.data.picking(picking),
+                "package": self.data.package(
                     package, picking=picking, with_packaging=True
                 ),
-                "packagings": self.data_struct.packagings(packaging_list.sorted()),
+                "packaging": self.data.packaging_list(packaging_list.sorted()),
             },
         )
 
@@ -221,10 +213,10 @@ class Checkout(Component):
         return self._response_for_select_line(picking)
 
     def _data_for_move_lines(self, lines, **kw):
-        return self.data_struct.move_lines(lines, **kw)
+        return self.data.move_lines(lines, **kw)
 
     def _data_for_stock_picking(self, picking, done=False):
-        data = self.data_struct.picking(picking)
+        data = self.data.picking(picking)
         line_picker = self._lines_checkout_done if done else self._lines_to_pack
         data.update(
             {

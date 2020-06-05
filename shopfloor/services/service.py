@@ -277,6 +277,18 @@ class BaseShopfloorService(AbstractComponent):
             return False
         return super()._is_public_api_method(method_name)
 
+    @property
+    def data(self):
+        return self.actions_for("data")
+
+    @property
+    def data_detail(self):
+        return self.actions_for("data_detail")
+
+    @property
+    def msg_store(self):
+        return self.actions_for("message")
+
 
 class BaseShopfloorProcess(AbstractComponent):
     """Base class for process rest service"""
