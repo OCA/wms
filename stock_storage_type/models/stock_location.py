@@ -94,6 +94,39 @@ class StockLocation(models.Model):
         "the location, either now or in pending operations",
     )
 
+    leaf_location_ids = fields.Many2many(
+        "stock.location",
+        compute="_compute_leaf_location_ids",
+        help="technical field: all the leaves sub-locations",
+    )
+
+    @api.depends("child_ids.leaf_location_ids")
+    def _compute_leaf_location_ids(self):
+        query = """
+            SELECT parent.id, ARRAY_AGG(sub.id) AS leaves
+            FROM stock_location parent
+            INNER JOIN stock_location sub
+            ON sub.parent_path LIKE parent.parent_path || '%%'
+            AND sub.id != parent.id
+            LEFT JOIN stock_location subsub
+            ON subsub.location_id = sub.id
+            WHERE
+            -- exclude any location which has children so we keep only leaves
+            subsub.id IS NULL
+            AND parent.id = %s
+            GROUP BY parent.id;
+        """
+        self.env.cr.execute(query, (tuple(self.ids),))
+        rows = dict(self.env.cr.fetchall())
+        for loc in self:
+            leave_ids = rows.get(loc.id)
+            if not leave_ids:
+                # if we have no sub-location, we are a leaf
+                loc.leaf_location_ids = loc
+                continue
+            leaves = self.search([("id", "in", leave_ids)])
+            loc.leaf_location_ids = leaves
+
     @api.depends("quant_ids", "in_move_ids", "in_move_line_ids")
     def _compute_location_will_contain_product_ids(self):
         for rec in self:
@@ -224,7 +257,7 @@ class StockLocation(models.Model):
         if self.pack_putaway_strategy == "none":
             locations = self
         elif self.pack_putaway_strategy == "ordered_locations":
-            locations = self._get_ordered_children_locations()
+            locations = self._get_ordered_leaf_locations()
         return locations
 
     def select_first_allowed_location(self, package_storage_type, quants, products):
@@ -272,7 +305,6 @@ class StockLocation(models.Model):
     def select_allowed_locations(
         self, package_storage_type, quants, products, limit=None
     ):
-        # TODO merge with select_first_allowed_location ?
         # We have package who may be placed in a stock.location
         #
         # 1. On the stock.location there are location_storage_type and on the
@@ -331,6 +363,12 @@ class StockLocation(models.Model):
         )
         return valid_locations
 
-    def _get_ordered_children_locations(self):
+    def _get_ordered_leaf_locations(self):
+        """Return ordered leaf sub-locations
+
+        The locations are candidate locations that will be evaluated one per
+        one in order to find the first available location. They must be leaf
+        locations where we can actually put goods.
+        """
         # Call sorted() to ensure the _order is respected
-        return self.children_ids.sorted()
+        return self.leaf_location_ids.sorted()
