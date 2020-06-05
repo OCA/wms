@@ -277,8 +277,9 @@ class StockLocation(models.Model):
         # There can be multiple location storage types for a given
         # location, so we need to filter on the ones relative to the package
         # we consider.
-        compatible_location_storage_types = self.mapped(
-            "allowed_location_storage_type_ids"
+        LocStorageType = self.env["stock.location.storage.type"]
+        compatible_location_storage_types = LocStorageType.search(
+            [("location_ids", "in", self.ids)]
         )
 
         pertinent_loc_storagetype_domain = [

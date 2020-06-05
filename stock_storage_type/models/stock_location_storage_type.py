@@ -16,11 +16,15 @@ class StockLocationStorageType(models.Model):
     _description = "Location storage type"
 
     name = fields.Char(required=True)
+    # reverse of StockLocation.allowed_location_storage_type_ids
+    # to be able to search the storage types for a location
     location_ids = fields.Many2many(
         "stock.location",
-        "stock_location_stock_location_storage_type_rel",
-        "stock_location_storage_type_id",
-        "stock_location_id",
+        "stock_location_allowed_location_storage_type_rel",
+        "location_storage_type_id",
+        "location_id",
+        copy=False,
+        readonly=True,
     )
 
     package_storage_type_ids = Many2manyCustom(
