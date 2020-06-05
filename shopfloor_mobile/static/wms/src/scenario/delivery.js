@@ -14,32 +14,15 @@ export var Delivery = Vue.component("checkout", {
                 v-if="state.on_scan"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
-                :reset_on_submit="false"
                 />
-            <div v-if="state_is(initial_state_key)">
-                <div class="button-list button-vertical-list full">
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <v-btn color="primary" @click="state.on_manual_selection">Manual selection</v-btn>
-                        </v-col>
-                    </v-row>
-                </div>
-            </div>
-            <div v-if="state_is('deliver') && state.data.picking">
+            <div v-if="state_in(['deliver', 'confirm_done']) && has_picking()">
                 <picking-summary
                     :record="state.data.picking"
                     :records_grouped="deliver_picking_summary_records_grouped(state.data.picking)"
                     :action_cancel_package_key="'package_src'"
                     :list_options="deliver_move_line_list_options(state.data.picking)"
-                    :key="make_state_component_key(['manual-select', 'detail-picking', _.result(state.data, 'picking.id')])"
+                    :key="make_state_component_key(['manual-select', 'detail-picking', current_picking().id])"
                     />
-                <div class="button-list button-vertical-list full">
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <v-btn color="primary" @click="state.on_manual_selection">Manual selection</v-btn>
-                        </v-col>
-                    </v-row>
-                </div>
             </div>
             <div v-if="state_is('manual_selection')">
                 <manual-select
@@ -48,13 +31,28 @@ export var Delivery = Vue.component("checkout", {
                     :options="manual_select_options()"
                     :key="make_state_component_key(['manual-select'])"
                     />
-                <div class="button-list button-vertical-list full">
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <v-btn color="default" @click="state.on_back">Back</v-btn>
-                        </v-col>
-                    </v-row>
-                </div>
+            </div>
+            <div class="button-list button-vertical-list full">
+                <v-row align="center" v-if="state_is('deliver') && has_picking()">
+                    <v-col class="text-center" cols="12">
+                        <btn-action @click="state.on_mark_as_done">Mark as done</btn-action>
+                    </v-col>
+                </v-row>
+                <v-row align="center" v-if="state_in([initial_state_key, 'deliver'])">
+                    <v-col class="text-center" cols="12">
+                        <btn-action @click="state.on_manual_selection">Manual selection</btn-action>
+                    </v-col>
+                </v-row>
+                <v-row align="center" v-if="state_is('confirm_done')">
+                    <v-col class="text-center" cols="12">
+                        <btn-action action="todo" @click="state.on_confirm">Confirm</btn-action>
+                    </v-col>
+                </v-row>
+                <v-row align="center" v-if="state_in(['confirm_done'])">
+                    <v-col class="text-center" cols="12">
+                        <btn-back />
+                    </v-col>
+                </v-row>
             </div>
         </Screen>
         `,
@@ -87,6 +85,9 @@ export var Delivery = Vue.component("checkout", {
             }
             return data.picking;
         },
+        has_picking: function() {
+            return !_.isEmpty(this.current_picking());
+        },
         deliver_picking_summary_records_grouped(picking) {
             const self = this;
             return this.utils.misc.group_lines_by_location(picking.move_lines, {
@@ -114,6 +115,8 @@ export var Delivery = Vue.component("checkout", {
             return {
                 show_title: false,
                 showActions: false,
+                group_title_default: "Pickings to process",
+                group_color: this.utils.colors.color_for("screen_step_todo"),
                 list_item_extra_component: "picking-list-item-progress-bar",
                 list_item_options: {
                     fields: this.manual_select_picking_fields(),
@@ -152,6 +155,7 @@ export var Delivery = Vue.component("checkout", {
             usage: "delivery",
             initial_state_key: "select_document",
             states: {
+                // TODO: likely we can trash this state and merge it w/ "deliver" (as "confirm_done")
                 select_document: {
                     display_info: {
                         title: "Start by scanning something",
@@ -206,13 +210,22 @@ export var Delivery = Vue.component("checkout", {
                         }
                         this.wait_call(this.odoo.call(endpoint, endpoint_data));
                     },
+                    on_mark_as_done: () => {
+                        this.wait_call(
+                            this.odoo.call("done", {
+                                picking_id: this.current_picking().id,
+                            })
+                        );
+                    },
                 },
                 manual_selection: {
                     display_info: {
-                        title: "Select a picking and start",
+                        title: "Scan a document or select it",
+                        scan_placeholder: "Filter this list by name search",
                     },
                     events: {
                         select: "on_select",
+                        go_back: "on_back",
                     },
                     on_scan: scanned => {
                         this.state_set_data({filtered: scanned.text});
@@ -237,6 +250,26 @@ export var Delivery = Vue.component("checkout", {
                             });
                         }
                         return visible_records;
+                    },
+                },
+                // TODO: likely we don't need this state as we could handle this in "deliver"
+                confirm_done: {
+                    display_info: {
+                        title: "Confirm done",
+                    },
+                    events: {
+                        go_back: "on_back",
+                    },
+                    on_confirm: () => {
+                        this.wait_call(
+                            this.odoo.call("done", {
+                                picking_id: this.current_picking().id,
+                                confirm: true,
+                            })
+                        );
+                    },
+                    on_back: () => {
+                        this.reset_notification();
                     },
                 },
             },
