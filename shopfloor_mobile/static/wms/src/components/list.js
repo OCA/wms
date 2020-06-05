@@ -113,7 +113,7 @@ Vue.component("list", {
                                 v-for="action in opts.list_item_actions"
                                 :is="action.comp_name"
                                 v-if="action.enabled(rec, action)"
-                                :options="_.merge({}, list_item_options, action.options)"
+                                :options="_.merge({}, list_item_options, action.get_options(rec, action))"
                                 :record="action.get_record(rec, action)"
                                 :index="index"
                                 :count="group.records.length"

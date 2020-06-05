@@ -14,8 +14,8 @@ Vue.component("detail-picking-select", {
                     get_record: function(rec, action) {
                         return rec;
                     },
-                    options: {
-                        click_event: "qty_edit",
+                    get_options: function(rec, action) {
+                        return {click_event: "qty_edit"};
                     },
                     enabled: function(rec, action) {
                         return true;
