@@ -20,7 +20,7 @@ export var Profile = Vue.component("profile", {
             </template>
             <manual-select
                 :records="$root.profiles"
-                :options="{initValue: current_profile_id}"
+                :options="{initValue: current_profile_id, showActions: false}"
                 v-on:select="on_select"
                 />
 
