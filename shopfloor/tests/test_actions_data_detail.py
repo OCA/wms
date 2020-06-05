@@ -178,7 +178,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "name": picking.picking_type_id.name,
             },
             "carrier": {"id": carrier.id, "name": carrier.name},
-            "lines": self.data_detail.move_lines(picking.move_line_ids),
+            "move_lines": self.data_detail.move_lines(picking.move_line_ids),
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-05-13")
         self.maxDiff = None

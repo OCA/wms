@@ -46,7 +46,7 @@ class DataDetailAction(Component):
             ("picking_type_id:operation_type", ["id", "name"]),
             ("carrier_id:carrier", ["id", "name"]),
             (
-                "move_line_ids:lines",
+                "move_line_ids:move_lines",
                 lambda record, fname: self.move_lines(record[fname]),
             ),
         ]
