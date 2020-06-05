@@ -10,24 +10,16 @@ class SinglePackTransfer(Component):
     _usage = "single_pack_transfer"
     _description = __doc__
 
-    @property
-    def msg_store(self):
-        return self.actions_for("message")
-
-    @property
-    def data_struct(self):
-        return self.actions_for("data")
-
     def _data_after_package_scanned(self, package_level):
         move_line = package_level.move_line_ids[0]
         package = package_level.package_id
         return {
             "id": package_level.id,
             "name": package.name,
-            "location_src": self.data_struct.location(move_line.location_id),
-            "location_dest": self.data_struct.location(package_level.location_dest_id),
-            "product": self.data_struct.product(move_line.product_id),
-            "picking": self.data_struct.picking(move_line.picking_id),
+            "location_src": self.data.location(move_line.location_id),
+            "location_dest": self.data.location(package_level.location_dest_id),
+            "product": self.data.product(move_line.product_id),
+            "picking": self.data.picking(move_line.picking_id),
         }
 
     def _response_for_start(self, message=None, popup=None):
@@ -193,10 +185,11 @@ class SinglePackTransfer(Component):
         move._action_done()
 
     def cancel(self, package_level_id):
-        message = self.actions_for("message")
         package_level = self.env["stock.package_level"].browse(package_level_id)
         if not package_level.exists():
-            return self._response_for_start(message=message.operation_not_found())
+            return self._response_for_start(
+                message=self.msg_store.operation_not_found()
+            )
         # package.move_ids may be empty, it seems
         move = package_level.move_line_ids.move_id
         if move.state == "done":
