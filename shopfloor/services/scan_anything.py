@@ -71,32 +71,36 @@ class ShopfloorScanAnything(Component):
 
         """
         search = self.actions_for("search")
-        data = self.actions_for("data_detail")
         schema = self.component(usage="schema_detail")
         return (
             (
                 "location",
                 search.location_from_scan,
-                data.location_detail,
+                self.data_detail.location_detail,
                 schema.location_detail,
             ),
             (
                 "package",
                 search.package_from_scan,
-                data.package_detail,
+                self.data_detail.package_detail,
                 schema.package_detail,
             ),
             (
                 "product",
                 search.product_from_scan,
-                data.product_detail,
+                self.data_detail.product_detail,
                 schema.product_detail,
             ),
-            ("lot", search.lot_from_scan, data.lot_detail, schema.lot_detail),
+            (
+                "lot",
+                search.lot_from_scan,
+                self.data_detail.lot_detail,
+                schema.lot_detail,
+            ),
             (
                 "transfer",
                 search.picking_from_scan,
-                data.picking_detail,
+                self.data_detail.picking_detail,
                 schema.picking_detail,
             ),
         )

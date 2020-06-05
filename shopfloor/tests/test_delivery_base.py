@@ -69,7 +69,7 @@ class DeliveryCommonCase(CommonCase):
             self.service = work.component(usage="delivery")
 
     def _stock_picking_data(self, picking):
-        return self.service.data_struct.picking_detail(picking)
+        return self.service.data_detail.picking_detail(picking)
 
     def assert_response_deliver(self, response, picking=None, message=None):
         self.assert_response(

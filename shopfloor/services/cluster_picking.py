@@ -71,26 +71,18 @@ class ClusterPicking(Component):
     _usage = "cluster_picking"
     _description = __doc__
 
-    @property
-    def data_struct(self):
-        return self.actions_for("data")
-
-    @property
-    def msg_store(self):
-        return self.actions_for("message")
-
     def _response_for_start(self, message=None, popup=None):
         return self._response(next_state="start", message=message, popup=popup)
 
     def _response_for_confirm_start(self, batch):
         return self._response(
             next_state="confirm_start",
-            data=self.data_struct.picking_batch(batch, with_pickings=True),
+            data=self.data.picking_batch(batch, with_pickings=True),
         )
 
     def _response_for_manual_selection(self, batches, message=None):
         data = {
-            "records": self.data_struct.picking_batches(batches),
+            "records": self.data.picking_batches(batches),
             "size": len(batches),
         }
         return self._response(next_state="manual_selection", data=data, message=message)
@@ -108,9 +100,7 @@ class ClusterPicking(Component):
         last_picked_line = self._last_picked_line(move_line.picking_id)
         if last_picked_line:
             # suggest pack to be used for the next line
-            data["package_dest"] = self.data_struct.package(
-                last_picked_line.result_package_id
-            )
+            data["package_dest"] = self.data.package(last_picked_line.result_package_id)
         return self._response(next_state="scan_destination", data=data, message=message)
 
     def _response_for_change_pack_lot(self, move_line, message=None):
@@ -123,9 +113,9 @@ class ClusterPicking(Component):
     def _response_for_zero_check(self, batch, move_line):
         data = {
             "id": move_line.id,
-            "location_src": self.data_struct.location(move_line.location_id),
+            "location_src": self.data.location(move_line.location_id),
         }
-        data["batch"] = self.data_struct.picking_batch(batch)
+        data["batch"] = self.data.picking_batch(batch)
         return self._response(next_state="zero_check", data=data)
 
     def _response_for_unload_all(self, batch, message=None):
@@ -379,14 +369,14 @@ class ClusterPicking(Component):
         picking = line.picking_id
         batch = picking.batch_id
         product = line.product_id
-        data = self.data_struct.move_line(line)
+        data = self.data.move_line(line)
         # additional values
         # Ensure destination pack is never proposed on the frontend.
         # This should happen only as proposal on `scan_destination`
         # where we set the last used package.
         data["package_dest"] = None
-        data["batch"] = self.data_struct.picking_batch(batch)
-        data["picking"] = self.data_struct.picking(picking)
+        data["batch"] = self.data.picking_batch(batch)
+        data["picking"] = self.data.picking(picking)
         data["postponed"] = line.shopfloor_postponed
         data["product"]["qty_available"] = product.with_context(
             location=line.location_id.id
@@ -696,21 +686,19 @@ class ClusterPicking(Component):
         # all the lines destinations are the same here, it looks
         # only for the first one
         first_line = fields.first(lines)
-        data = self.data_struct.picking_batch(batch)
-        data.update(
-            {"location_dest": self.data_struct.location(first_line.location_dest_id)}
-        )
+        data = self.data.picking_batch(batch)
+        data.update({"location_dest": self.data.location(first_line.location_dest_id)})
         return data
 
     def _data_for_unload_single(self, batch, package):
         line = fields.first(
             package.planned_move_line_ids.filtered(self._filter_for_unload)
         )
-        data = self.data_struct.picking_batch(batch)
+        data = self.data.picking_batch(batch)
         data.update(
             {
-                "package": self.data_struct.package(package),
-                "location_dest": self.data_struct.location(line.location_dest_id),
+                "package": self.data.package(package),
+                "location_dest": self.data.location(line.location_dest_id),
             }
         )
         return data
