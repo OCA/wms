@@ -11,11 +11,7 @@
     "license": "AGPL-3",
     "application": False,
     "installable": True,
-    "depends": [
-        "base_m2m_custom_field",
-        "stock_location_children",
-        "stock_quant_package_dimension",
-    ],
+    "depends": ["base_m2m_custom_field", "stock_quant_package_dimension"],
     "data": [
         "security/ir.model.access.csv",
         "views/product_packaging.xml",
