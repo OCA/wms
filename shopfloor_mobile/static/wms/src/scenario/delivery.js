@@ -25,13 +25,13 @@ export var Delivery = Vue.component("checkout", {
                     </v-row>
                 </div>
             </div>
-            <div v-if="state_is('deliver')">
+            <div v-if="state_is('deliver') && state.data.picking">
                 <picking-summary
                     :record="state.data.picking"
                     :records_grouped="deliver_picking_summary_records_grouped(state.data.picking)"
                     :action_cancel_package_key="'package_src'"
                     :list_options="deliver_move_line_list_options(state.data.picking)"
-                    :key="make_state_component_key(['manual-select', 'detail-picking', state.data.picking.id])"
+                    :key="make_state_component_key(['manual-select', 'detail-picking', _.result(state.data, 'picking.id')])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -68,6 +68,25 @@ export var Delivery = Vue.component("checkout", {
     //     this._state_load(state);
     // },
     methods: {
+        screen_title: function() {
+            if (_.isEmpty(this.current_doc()) || this.state_is(this.initial_state_key))
+                return this.menu_item().name;
+            return this.current_picking().name;
+        },
+        current_doc: function() {
+            const picking = this.current_picking();
+            return {
+                record: picking,
+                identifier: picking.name,
+            };
+        },
+        current_picking: function() {
+            const data = this.state_get_data("deliver");
+            if (_.isEmpty(data) || _.isEmpty(data.picking)) {
+                return {};
+            }
+            return data.picking;
+        },
         deliver_picking_summary_records_grouped(picking) {
             const self = this;
             return this.utils.misc.group_lines_by_location(picking.move_lines, {
@@ -160,7 +179,10 @@ export var Delivery = Vue.component("checkout", {
                     },
                     on_scan: scanned => {
                         this.wait_call(
-                            this.odoo.call("scan_deliver", {barcode: scanned.text})
+                            this.odoo.call("scan_deliver", {
+                                barcode: scanned.text,
+                                picking_id: this.current_picking().id,
+                            })
                         );
                     },
                     on_manual_selection: evt => {
@@ -173,11 +195,13 @@ export var Delivery = Vue.component("checkout", {
                             endpoint = "reset_qty_done_pack";
                             endpoint_data = {
                                 package_id: data.package_id,
+                                picking_id: this.current_picking().id,
                             };
                         } else {
                             endpoint = "reset_qty_done_line";
                             endpoint_data = {
-                                line_id: data.line_id,
+                                move_line_id: data.line_id,
+                                picking_id: this.current_picking().id,
                             };
                         }
                         this.wait_call(this.odoo.call(endpoint, endpoint_data));
