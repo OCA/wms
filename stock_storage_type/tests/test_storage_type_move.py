@@ -1,6 +1,7 @@
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo.exceptions import ValidationError
+from odoo.tools.safe_eval import const_eval
 
 from .common import TestStorageTypeCommon
 
@@ -39,6 +40,13 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             "procure_method": "make_to_stock",
         }
         return cls.env["stock.move"].create(move_vals)
+
+    def assert_package_level_domain(self, json_domain, expected_locations):
+        domain = const_eval(json_domain)
+        self.assertEqual(len(domain), 1)
+        self.assertEqual(domain[0][0], "id")
+        self.assertEqual(domain[0][1], "in")
+        self.assertEqual(sorted(domain[0][2]), sorted(expected_locations.ids))
 
     def _test_confirmed_move(self, product=None):
         confirmed_move = self._create_single_move(product or self.product)
@@ -170,10 +178,18 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         only_empty_possible_locations = possible_locations.filtered(
             lambda l: not l.quant_ids
         )
-        self.assertEqual(
-            int_picking.package_level_ids.mapped("allowed_location_dest_ids"),
-            only_empty_possible_locations,
-        )
+
+        for level in int_picking.package_level_ids:
+            self.assert_package_level_domain(
+                level.allowed_location_dest_domain,
+                only_empty_possible_locations
+                - (
+                    # remove the destination of other levels but keep the current one
+                    int_picking.package_level_ids.mapped("location_dest_id")
+                )
+                | level.location_dest_id,
+            )
+
         # Update qty in a bin to ensure it's not in possible locations anymore
         self.env["stock.quant"]._update_available_quantity(
             self.product, self.pallets_bin_3_location, 1.0
@@ -185,18 +201,33 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             only_empty_possible_locations,
             only_empty_possible_locations_2 | self.pallets_bin_3_location,
         )
-        self.assertEqual(
-            int_picking.package_level_ids.mapped("allowed_location_dest_ids"),
-            only_empty_possible_locations_2,
-        )
+
+        for level in int_picking.package_level_ids:
+            self.assert_package_level_domain(
+                level.allowed_location_dest_domain,
+                only_empty_possible_locations_2
+                - (
+                    # remove the destination of other levels but keep the current one
+                    int_picking.package_level_ids.mapped("location_dest_id")
+                )
+                | level.location_dest_id,
+            )
+
         # Creating a new possible location must be reflected in domain
         pallets_bin_4_location = self.env["stock.location"].create(
             {"name": "Pallets bin 4", "location_id": self.pallets_location.id}
         )
-        self.assertEqual(
-            int_picking.package_level_ids.mapped("allowed_location_dest_ids"),
-            (only_empty_possible_locations_2 | pallets_bin_4_location),
-        )
+
+        for level in int_picking.package_level_ids:
+            self.assert_package_level_domain(
+                level.allowed_location_dest_domain,
+                (only_empty_possible_locations_2 | pallets_bin_4_location)
+                - (
+                    # remove the destination of other levels but keep the current one
+                    int_picking.package_level_ids.mapped("location_dest_id")
+                )
+                | level.location_dest_id,
+            )
 
     def test_package_level_location_dest_domain_mixed(self):
         # Mark picking to allow creation and use of existing lots in order
@@ -359,10 +390,11 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             first_level | second_level | third_level | fourth_fifth_levels
         ):
             # Check domain
-            self.assertEqual(
-                pack_level.allowed_location_dest_ids,
+            self.assert_package_level_domain(
+                pack_level.allowed_location_dest_domain,
                 _get_possible_locations(pack_level),
             )
+
             # Set the quantities done in order to avoid immediate transfer wizard
             for move_line in pack_level.move_line_ids:
                 move_line.qty_done = move_line.product_uom_qty
