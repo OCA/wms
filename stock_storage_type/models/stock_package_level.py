@@ -1,5 +1,7 @@
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
+import json
+
 from odoo import api, fields, models
 
 
@@ -7,10 +9,13 @@ class StockPackageLevel(models.Model):
 
     _inherit = "stock.package_level"
 
-    allowed_location_dest_ids = fields.Many2many(
-        "stock.location",
-        compute="_compute_allowed_location_dest_ids",
-        string="Allowed destinations",
+    # We use a domain with the module 'web_domain_field', because if we use a
+    # many2many with a domain in the view, the onchange updating the many2many
+    # client side blocks the browser for several seconds if we have thousands
+    # of locations.
+    allowed_location_dest_domain = fields.Char(
+        string="Allowed Destinations Domain",
+        compute="_compute_allowed_location_dest_domain",
     )
 
     @api.depends(
@@ -25,7 +30,7 @@ class StockPackageLevel(models.Model):
         "picking_id.location_dest_id",
         "picking_id.package_level_ids.location_dest_id",
     )
-    def _compute_allowed_location_dest_ids(self):
+    def _compute_allowed_location_dest_domain(self):
         # TODO Add some JS to refresh the domain after changing on a line ?
         for pack_level in self:
             picking_child_location_dest_ids = self.env["stock.location"].search(
@@ -46,14 +51,16 @@ class StockPackageLevel(models.Model):
                 # Add the pack_level actual location_dest since it is actually
                 # excluded by the check on incoming stock moves
                 intersect_locations |= pack_level.location_dest_id
-                pack_level.allowed_location_dest_ids = intersect_locations.ids
+                pack_level.allowed_location_dest_domain = json.dumps(
+                    [("id", "in", intersect_locations.ids)]
+                )
             elif isinstance(pack_level.id, models.NewId):
-                pack_level.allowed_location_dest_ids = (
-                    pack_level.picking_id.location_dest_id.ids
+                pack_level.allowed_location_dest_domain = json.dumps(
+                    [("id", "in", pack_level.picking_id.location_dest_id.ids)]
                 )
             else:
-                pack_level.allowed_location_dest_ids = (
-                    picking_child_location_dest_ids.ids
+                pack_level.allowed_location_dest_domain = json.dumps(
+                    [("id", "in", picking_child_location_dest_ids.ids)]
                 )
 
     def _get_allowed_location_dest_ids(self):
