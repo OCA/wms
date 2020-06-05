@@ -39,21 +39,16 @@ export var ScenarioBaseMixin = {
         this._state_load(this.$route.params.state);
     },
     computed: {
+        menu_item_id: function() {
+            return parseInt(this.$route.params.menu_id, 10);
+        },
         odoo: function() {
             const odoo_params = {
-                process_menu_id: this.menu_item.id,
+                process_menu_id: this.menu_item_id,
                 profile_id: this.$root.profile.id,
                 usage: this.usage,
             };
             return this.$root.getOdoo(odoo_params);
-        },
-        menu_item: function() {
-            const self = this;
-            return _.head(
-                _.filter(this.$root.appmenu.menus, function(m) {
-                    return m.id === parseInt(self.$route.params.menu_id, 10);
-                })
-            );
         },
         /*
         Full object of current state.
@@ -83,7 +78,7 @@ export var ScenarioBaseMixin = {
         screen_info: function() {
             return {
                 // you can provide a different screen title
-                title: this.screen_title ? this.screen_title() : this.menu_item.name,
+                title: this.screen_title ? this.screen_title() : this.menu_item().name,
                 current_doc: this.current_doc ? this.current_doc() : null,
                 klass: this.usage + " " + "state-" + this.state.key,
                 user_message: this.user_message,
@@ -105,6 +100,14 @@ export var ScenarioBaseMixin = {
         },
     },
     methods: {
+        menu_item: function() {
+            const self = this;
+            return _.head(
+                _.filter(this.$root.appmenu.menus, function(m) {
+                    return m.id === self.menu_item_id;
+                })
+            );
+        },
         make_state_component_key: function(bits) {
             bits.unshift(this.current_state_key);
             bits.unshift(this.usage);
@@ -123,7 +126,7 @@ export var ScenarioBaseMixin = {
                 .push({
                     name: this.usage,
                     params: {
-                        menu_id: this.menu_item.id,
+                        menu_id: this.menu_item_id,
                         state: state_key,
                     },
                 })
