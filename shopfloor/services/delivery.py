@@ -1,4 +1,8 @@
-from odoo.addons.base_rest.components.service import to_int
+from odoo import fields
+from odoo.osv import expression
+from odoo.tools.float_utils import float_is_zero
+
+from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
 
 
@@ -30,7 +34,65 @@ class Delivery(Component):
     _usage = "delivery"
     _description = __doc__
 
-    def scan_deliver(self, barcode):
+    def _response_for_deliver(self, picking=None, message=None):
+        """Transition to the 'deliver' state
+
+        If no picking is passed, the screen shows an empty screen
+        """
+        return self._response(
+            next_state="deliver",
+            data={
+                "picking": self.data_detail.picking_detail(picking) if picking else None
+            },
+            message=message,
+        )
+
+    def _response_for_manual_selection(self, pickings, message=None):
+        """Transition to the 'manual_selection' state
+
+        If no picking is passed, the screen shows an empty screen
+        """
+        return self._response(
+            next_state="manual_selection",
+            data={
+                "pickings": [
+                    self.data_detail.picking_detail(picking) for picking in pickings
+                ],
+            },
+            message=message,
+        )
+
+    def _response_for_confirm_done(self, picking, message=None):
+        """Transition to the 'confirm_done' state."""
+        return self._response(
+            next_state="confirm_done",
+            data={
+                "picking": self.data_detail.picking_detail(picking) if picking else None
+            },
+            message=message,
+        )
+
+    def _check_picking_status(self, picking):
+        """Check if `picking` can be processed.
+
+        If the picking is already done, canceled or didn't belong to the
+        expected picking type, a response is returned.
+
+        Transitions:
+        * deliver: always return here with updated data
+        """
+        if picking.state == "done":
+            return self._response_for_deliver(message=self.msg_store.already_done())
+        if picking.state not in ("assigned", "partially_available"):
+            return self._response_for_deliver(
+                message=self.msg_store.stock_picking_not_available(picking)
+            )
+        if picking.picking_type_id not in self.picking_types:
+            return self._response_for_deliver(
+                message=self.msg_store.cannot_move_something_in_picking_type()
+            )
+
+    def scan_deliver(self, barcode, picking_id=None):
         """Scan a stock picking or a package/product/lot
 
         When a stock picking is scanned and is partially or fully available, it
@@ -54,21 +116,217 @@ class Delivery(Component):
         When all the available move lines of the stock picking are done, the
         stock picking is set to done.
 
+        The ``picking_id`` parameter is used to be stateless: if the client
+        sends a wrong barcode, it allows to stay on the last picking with
+        updated data (and we really want to refresh data because several
+        users may work on the same transfer).
+
         Transitions:
-        * deliver: always return here with the data for the last touched picking
-        or no picking if the picking has been set to done
+        * deliver: always return here with the data for the last touched
+        picking or no picking if the picking has been set to done
         """
-        return self._response()
+        search = self.actions_for("search")
+        picking = search.picking_from_scan(barcode)
+        if picking:
+            response = self._check_picking_status(picking)
+            if response:
+                return response
+            return self._response_for_deliver(picking=picking)
+
+        # We should have only a picking_id because the client was working
+        # on it already, so no need to validate the picking type
+        if picking_id:
+            picking = self.env["stock.picking"].browse(picking_id).exists()
+
+        package = search.package_from_scan(barcode)
+        if package:
+            return self._deliver_package(picking, package)
+
+        product = search.product_from_scan(barcode)
+        if product:
+            return self._deliver_product(picking, product)
+
+        lot = search.lot_from_scan(barcode)
+        if lot:
+            return self._deliver_lot(picking, lot)
+
+        return self._response_for_deliver(
+            picking=picking, message=self.msg_store.barcode_not_found()
+        )
+
+    def _set_lines_done(self, lines):
+        """Set done quantities on `lines`.
+
+        Once all lines of a picking have been processed, the picking will be
+        validated automatically.
+        Return `True` if the related picking has been validated.
+        """
+        for line in lines:
+            # note: the package level is automatically set to "is_done" when
+            # the qty_done is full
+            line.qty_done = line.product_uom_qty
+        picking = fields.first(lines.mapped("picking_id"))
+        return self._action_picking_done(picking)
+
+    def _reset_lines(self, lines):
+        for line in lines:
+            # note: the package level "is_done" field is automatically unset
+            # when the qty_done is not full
+            line.qty_done = 0
+
+    def _deliver_package(self, picking, package):
+        lines = package.move_line_ids
+        lines = lines.filtered(
+            lambda l: l.state in ("assigned", "partially_available")
+            and l.picking_id.picking_type_id in self.picking_types
+        )
+        if not lines:
+            return self._response_for_deliver(
+                picking=picking,
+                message=self.msg_store.cannot_move_something_in_picking_type(),
+            )
+        # TODO add a message if any of the lines already had a qty_done > 0
+        new_picking = fields.first(lines.mapped("picking_id"))
+        if self._set_lines_done(lines):
+            return self._response_for_deliver(
+                message=self.msg_store.transfer_complete(new_picking)
+            )
+        return self._response_for_deliver(picking=new_picking)
+
+    def _lines_base_domain(self, no_qty_done=True):
+        domain = [
+            # we added auto_join for this, otherwise, the ORM would search all pickings
+            # in the picking type, and then use IN (ids)
+            ("picking_id.picking_type_id", "in", self.picking_types.ids),
+        ]
+        if no_qty_done:
+            domain.append(("qty_done", "=", 0))
+        return domain
+
+    def _lines_from_lot_domain(self, lot, no_qty_done=True):
+        return expression.AND(
+            [self._lines_base_domain(no_qty_done), [("lot_id", "=", lot.id)]]
+        )
+
+    def _lines_from_product_domain(self, product, no_qty_done=True):
+        return expression.AND(
+            [self._lines_base_domain(no_qty_done), [("product_id", "=", product.id)]]
+        )
+
+    def _lines_from_package_domain(self, package, no_qty_done=True):
+        return expression.AND(
+            [self._lines_base_domain(no_qty_done), [("package_id", "=", package.id)]]
+        )
+
+    def _deliver_product(self, picking, product):
+        if product.tracking in ("lot", "serial"):
+            return self._response_for_deliver(
+                picking, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
+            )
+
+        lines = self.env["stock.move.line"].search(
+            self._lines_from_product_domain(product)
+        )
+        if not lines:
+            return self._response_for_deliver(
+                picking, message=self.msg_store.product_not_found_in_pickings()
+            )
+
+        new_picking = fields.first(lines.mapped("picking_id"))
+        # When products are as units outside of packages, we can select them for
+        # packing, but if they are in a package, we want the user to scan the packages.
+        # If the product is only in one package though, scanning the product selects
+        # the package.
+        packages = lines.mapped("package_id")
+        # Do not use mapped here: we want to see if we have more than one package,
+        # but also if we have one product as a package and the same product as
+        # a unit in another line. In both cases, we want the user to scan the
+        # package.
+        if packages and len({l.package_id for l in lines}) > 1:
+            return self._response_for_deliver(
+                new_picking,
+                message=self.msg_store.product_multiple_packages_scan_package(),
+            )
+        elif packages:
+            # we have 1 package
+            # abort the operation if the package contain more than one product
+            if len(packages.mapped("quant_ids.product_id")) > 1:
+                return self._response_for_deliver(
+                    new_picking,
+                    message=self.msg_store.product_mixed_package_scan_package(),
+                )
+        if self._set_lines_done(lines):
+            return self._response_for_deliver(
+                message=self.msg_store.transfer_complete(new_picking)
+            )
+        return self._response_for_deliver(new_picking)
+
+    def _deliver_lot(self, picking, lot):
+        lines = self.env["stock.move.line"].search(self._lines_from_lot_domain(lot))
+        if not lines:
+            return self._response_for_deliver(
+                picking, message=self.msg_store.lot_not_found_in_pickings()
+            )
+
+        new_picking = fields.first(lines.mapped("picking_id"))
+
+        # When lots are as units outside of packages, we can select them for
+        # packing, but if they are in a package, we want the user to scan the packages.
+        # If the product is only in one package though, scanning the lot selects
+        # the package.
+        packages = lines.mapped("package_id")
+        # Do not use mapped here: we want to see if we have more than one
+        # package, but also if we have one lot as a package and the same lot as
+        # a unit in another line. In both cases, we want the user to scan the
+        # package.
+        if packages and len({l.package_id for l in lines}) > 1:
+            return self._response_for_deliver(
+                new_picking, message=self.msg_store.lot_multiple_packages_scan_package()
+            )
+        elif packages:
+            # we have 1 package
+            # abort the operation if the package contain more than one product
+            if len(packages.quant_ids) > 1:
+                return self._response_for_deliver(
+                    new_picking,
+                    message=self.msg_store.lot_mixed_package_scan_package(),
+                )
+
+        if self._set_lines_done(lines):
+            return self._response_for_deliver(
+                message=self.msg_store.transfer_complete(new_picking)
+            )
+        return self._response_for_deliver(new_picking)
+
+    def _action_picking_done(self, picking):
+        """Try to validate the stock picking if all its lines have been processed.
+
+        Return `True` if the picking has been validated successfully.
+        """
+        move_lines_done = all(
+            [line.qty_done >= line.product_uom_qty for line in picking.move_line_ids]
+        )
+        if move_lines_done:
+            picking.action_done()
+            return True
+        return False
 
     def list_stock_picking(self):
-        """Return the list of stock pickings for the picking type
+        """Return the list of stock pickings for the picking types
 
         It returns only stock picking available or partially available.
 
         Transitions:
         * manual_selection: next state to show the list of stock pickings
         """
-        return self._response()
+        pickings = self.env["stock.picking"].search(self._pickings_domain(), order="id")
+        return self._response_for_manual_selection(pickings)
+
+    def _pickings_domain(self):
+        return [
+            ("picking_type_id", "in", self.picking_types.ids),
+            ("state", "not in", ["cancel", "done", "waiting", "draft"]),
+        ]
 
     def select(self, picking_id):
         """Select a stock picking from its ID (found using /list_stock_picking)
@@ -79,7 +337,13 @@ class Delivery(Component):
         * manual_selection: the selected stock picking is no longer valid
         * deliver: with information about the stock.picking
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id).exists()
+        if picking:
+            return self._response_for_deliver(picking)
+        response = self.list_stock_picking()
+        return self._response(
+            response, message=self.msg_store.stock_picking_not_found()
+        )
 
     def set_qty_done_pack(self, picking_id, package_id):
         """Set a package to "Done"
@@ -90,9 +354,25 @@ class Delivery(Component):
         Transitions:
         * deliver: always return here with updated data
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id).exists()
+        if picking:
+            response = self._check_picking_status(picking)
+            if response:
+                return response
+        else:
+            return self._response_for_deliver(
+                message=self.msg_store.stock_picking_not_found()
+            )
+        package = self.env["stock.quant.package"].browse(package_id).exists()
+        if package:
+            response = self._deliver_package(picking, package)
+            self._action_picking_done(picking)
+            return response
+        return self._response_for_deliver(
+            picking=picking, message=self.msg_store.package_not_found()
+        )
 
-    def set_qty_done_line(self, picking_id, line_id):
+    def set_qty_done_line(self, picking_id, move_line_id):
         """Set a move line to "Done"
 
         Should be called only for lines of raw products, /set_qty_done_pack
@@ -104,7 +384,30 @@ class Delivery(Component):
         Transitions:
         * deliver: always return here with updated data
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id).exists()
+        if picking:
+            response = self._check_picking_status(picking)
+            if response:
+                return response
+        else:
+            return self._response_for_deliver(
+                message=self.msg_store.stock_picking_not_found()
+            )
+        line = self.env["stock.move.line"].browse(move_line_id).exists()
+        if line:
+            if line.package_id:
+                return self._response_for_deliver(
+                    picking=picking,
+                    message=self.msg_store.line_has_package_scan_package(),
+                )
+            if self._set_lines_done(line):
+                return self._response_for_deliver(
+                    message=self.msg_store.transfer_complete(picking)
+                )
+            return self._response_for_deliver(picking)
+        return self._response_for_deliver(
+            picking=picking, message=self.msg_store.record_not_found(),
+        )
 
     def reset_qty_done_pack(self, picking_id, package_id):
         """Remove "Done" on a package
@@ -112,9 +415,34 @@ class Delivery(Component):
         Transitions:
         * deliver: always return here with updated data
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id).exists()
+        if picking:
+            response = self._check_picking_status(picking)
+            if response:
+                return response
+        else:
+            return self._response_for_deliver(
+                message=self.msg_store.stock_picking_not_found()
+            )
+        package = self.env["stock.quant.package"].browse(package_id).exists()
+        if package:
+            lines = self.env["stock.move.line"].search(
+                self._lines_from_package_domain(package, no_qty_done=False)
+            )
+            if not lines:
+                return self._response_for_deliver(
+                    picking,
+                    message=self.msg_store.package_not_available_in_picking(
+                        package, picking
+                    ),
+                )
+            self._reset_lines(lines)
+            return self._response_for_deliver(picking)
+        return self._response_for_deliver(
+            picking=picking, message=self.msg_store.package_not_found()
+        )
 
-    def reset_qty_done_line(self, picking_id, line_id):
+    def reset_qty_done_line(self, picking_id, move_line_id):
         """Remove "Done" on a move line
 
         Should be called only for lines of raw products, /set_qty_done_pack
@@ -123,16 +451,74 @@ class Delivery(Component):
         Transitions:
         * deliver: always return here with updated data
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id).exists()
+        if picking:
+            response = self._check_picking_status(picking)
+            if response:
+                return response
+        else:
+            return self._response_for_deliver(
+                message=self.msg_store.stock_picking_not_found()
+            )
+        line = self.env["stock.move.line"].browse(move_line_id).exists()
+        if line:
+            if line.picking_id != picking:
+                return self._response_for_deliver(
+                    picking=picking,
+                    message=self.msg_store.line_not_available_in_picking(picking),
+                )
+            if line.package_id:
+                return self._response_for_deliver(
+                    picking=picking,
+                    message=self.msg_store.line_has_package_scan_package(),
+                )
+            self._reset_lines(line)
+            return self._response_for_deliver(picking)
+        return self._response_for_deliver(
+            picking=picking, message=self.msg_store.record_not_found(),
+        )
 
-    def done(self, picking_id):
+    def done(self, picking_id, confirm=False):
         """Set the stock picking to done
 
         Transitions:
         * deliver: error during action
         * confirm_done: when not all lines of the stock.picking are done
         """
-        return self._response()
+        picking = self.env["stock.picking"].browse(picking_id).exists()
+        if picking:
+            response = self._check_picking_status(picking)
+            if response:
+                return response
+        else:
+            return self._response_for_deliver(
+                message=self.msg_store.stock_picking_not_found()
+            )
+        if self._action_picking_done(picking):
+            return self._response_for_deliver(
+                message=self.msg_store.transfer_complete(picking)
+            )
+        if confirm:
+            precision_digits = self.env["decimal.precision"].precision_get(
+                "Product Unit of Measure"
+            )
+            no_quantities_done = all(
+                float_is_zero(move_line.qty_done, precision_digits=precision_digits)
+                for move_line in picking.move_line_ids.filtered(
+                    lambda m: m.state not in ("done", "cancel")
+                )
+            )
+            if no_quantities_done:
+                return self._response_for_deliver(
+                    message=self.msg_store.transfer_no_qty_done()
+                )
+            picking.action_done()
+            return self._response_for_deliver(
+                message=self.msg_store.transfer_complete(picking)
+            )
+        return self._response_for_confirm_done(
+            picking, message=self.msg_store.transfer_confirm_done(),
+        )
 
 
 class ShopfloorDeliveryValidator(Component):
@@ -143,7 +529,15 @@ class ShopfloorDeliveryValidator(Component):
     _usage = "delivery.validator"
 
     def scan_deliver(self):
-        return {"barcode": {"required": True, "type": "string"}}
+        return {
+            "barcode": {"required": True, "type": "string"},
+            "picking_id": {
+                "coerce": to_int,
+                "required": False,
+                "nullable": True,
+                "type": "integer",
+            },
+        }
 
     def list_stock_picking(self):
         return {}
@@ -176,7 +570,10 @@ class ShopfloorDeliveryValidator(Component):
         }
 
     def done(self):
-        return {"picking_id": {"coerce": to_int, "required": True, "type": "integer"}}
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "confirm": {"coerce": to_bool, "required": False, "type": "boolean"},
+        }
 
 
 class ShopfloorDeliveryValidatorResponse(Component):
@@ -202,24 +599,14 @@ class ShopfloorDeliveryValidatorResponse(Component):
 
     @property
     def _schema_deliver(self):
-        schema = self.schemas.picking()
-        schema.update(
-            {
-                "move_lines": {
-                    "type": "list",
-                    "schema": {"type": "dict", "schema": self.schemas.move_line()},
-                }
-            }
-        )
-        return {"picking": {"type": "dict", "required": False, "schema": schema}}
+        schema = self.schemas_detail.picking_detail()
+        return {"picking": {"type": "dict", "nullable": True, "schema": schema}}
 
     @property
     def _schema_selection_list(self):
+        schema = self.schemas_detail.picking_detail()
         return {
-            "pickings": {
-                "type": "list",
-                "schema": {"type": "dict", "schema": self.schemas.picking()},
-            }
+            "pickings": {"type": "list", "schema": {"type": "dict", "schema": schema}}
         }
 
     def scan_deliver(self):
@@ -229,7 +616,7 @@ class ShopfloorDeliveryValidatorResponse(Component):
         return self._response_schema(next_states={"manual_selection"})
 
     def select(self):
-        return self._response_schema(next_states={"deliver"})
+        return self._response_schema(next_states={"deliver", "manual_selection"})
 
     def set_qty_done_pack(self):
         return self._response_schema(next_states={"deliver"})

@@ -75,6 +75,28 @@ class MessageAction(Component):
             "body": _("This transfer does not exist anymore."),
         }
 
+    def package_not_found(self):
+        return {
+            "message_type": "error",
+            "body": _("This package does not exist anymore."),
+        }
+
+    def package_not_available_in_picking(self, package, picking):
+        return {
+            "message_type": "warning",
+            "body": _("Package {} is not available in transfer {}.").format(
+                package.name, picking.name
+            ),
+        }
+
+    def line_not_available_in_picking(self, picking):
+        return {
+            "message_type": "warning",
+            "body": _("This line is not available in transfer {}.").format(
+                picking.name
+            ),
+        }
+
     def record_not_found(self):
         return {
             "message_type": "error",
@@ -205,11 +227,45 @@ class MessageAction(Component):
             "body": _("Transfer {} is not available.").format(picking.name),
         }
 
+    def line_has_package_scan_package(self):
+        return {
+            "message_type": "warning",
+            "body": _("This line has a package, please select the package instead."),
+        }
+
     def product_multiple_packages_scan_package(self):
         return {
             "message_type": "warning",
             "body": _(
-                "This product is part of multiple packages, please scan a package."
+                _("This product is part of multiple packages, please scan a package.")
+            ),
+        }
+
+    def product_mixed_package_scan_package(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                _(
+                    "This product is part of a package with other products, "
+                    "please scan a package."
+                )
+            ),
+        }
+
+    def product_not_found_in_pickings(self):
+        return {
+            "message_type": "warning",
+            "body": _("No product found among current transfers."),
+        }
+
+    def lot_mixed_package_scan_package(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                _(
+                    "This lot is part of a package with other products, "
+                    "please scan a package."
+                )
             ),
         }
 
@@ -217,6 +273,12 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("This lot is part of multiple packages, please scan a package."),
+        }
+
+    def lot_not_found_in_pickings(self):
+        return {
+            "message_type": "warning",
+            "body": _("No lot found among current transfers."),
         }
 
     def batch_transfer_complete(self):
@@ -229,4 +291,27 @@ class MessageAction(Component):
         return {
             "message_type": "success",
             "body": _("Batch Transfer line done"),
+        }
+
+    def transfer_complete(self, picking):
+        return {
+            "message_type": "success",
+            "body": _("Transfer {} complete").format(picking.name),
+        }
+
+    def transfer_confirm_done(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "Not all lines have been processed, do you want to "
+                "confirm partial operation ?"
+            ),
+        }
+
+    def transfer_no_qty_done(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "No quantity has been processed, unable to complete the transfer."
+            ),
         }
