@@ -18,26 +18,27 @@ class SinglePackPutaway(Component):
     # TODO think about not sending back the state when we already
     # come from the same state
     def _response_for_no_picking_type(self):
-        message = self.actions_for("message")
-        return self._response(next_state="start", message=message.no_picking_type())
+        return self._response(
+            next_state="start", message=self.msg_store.no_picking_type()
+        )
 
     def _response_for_several_picking_types(self):
-        message = self.actions_for("message")
         return self._response(
-            next_state="start", message=message.several_picking_types()
+            next_state="start", message=self.msg_store.several_picking_types()
         )
 
     def _response_for_package_not_found(self, barcode):
-        message = self.actions_for("message")
         return self._response(
-            next_state="start", message=message.package_not_found_for_barcode(barcode)
+            next_state="start",
+            message=self.msg_store.package_not_found_for_barcode(barcode),
         )
 
     def _response_for_forbidden_package(self, barcode, picking_type):
-        message = self.actions_for("message")
         return self._response(
             next_state="start",
-            message=message.package_not_allowed_in_src_location(barcode, picking_type),
+            message=self.msg_store.package_not_allowed_in_src_location(
+                barcode, picking_type
+            ),
         )
 
     def _response_for_forbidden_start(self, existing_operations):
@@ -71,18 +72,16 @@ class SinglePackPutaway(Component):
         }
 
     def _response_for_start_to_confirm(self, move_line, pack):
-        message = self.actions_for("message")
         return self._response(
             data=self._data_after_package_scanned(move_line, pack),
             next_state="confirm_start",
-            message=message.already_running_ask_confirmation(),
+            message=self.msg_store.already_running_ask_confirmation(),
         )
 
     def _response_for_start_success(self, move_line, pack):
-        message = self.actions_for("message")
         return self._response(
             next_state="scan_location",
-            message=message.scan_destination(),
+            message=self.msg_store.scan_destination(),
             data=self._data_after_package_scanned(move_line, pack),
         )
 
@@ -173,44 +172,43 @@ class SinglePackPutaway(Component):
         )
 
     def _response_for_package_level_not_found(self):
-        message = self.actions_for("message")
-        return self._response(next_state="start", message=message.operation_not_found())
+        return self._response(
+            next_state="start", message=self.msg_store.operation_not_found()
+        )
 
     def _response_for_move_canceled_elsewhere(self):
-        message = self.actions_for("message")
         return self._response(
-            next_state="start", message=message.operation_has_been_canceled_elsewhere()
+            next_state="start",
+            message=self.msg_store.operation_has_been_canceled_elsewhere(),
         )
 
     def _response_for_location_not_found(self, move_line, pack):
-        message = self.actions_for("message")
         return self._response(
             next_state="scan_location",
-            message=message.no_location_found(),
+            message=self.msg_store.no_location_found(),
             data=self._data_after_package_scanned(move_line, pack),
         )
 
     def _response_for_forbidden_location(self, move_line, pack):
-        message = self.actions_for("message")
         return self._response(
             next_state="scan_location",
-            message=message.dest_location_not_allowed(),
+            message=self.msg_store.dest_location_not_allowed(),
             data=self._data_after_package_scanned(move_line, pack),
         )
 
     def _response_for_location_need_confirm(self, move_line, pack, to_location):
-        message = self.actions_for("message")
         return self._response(
             next_state="confirm_location",
-            message=message.confirm_location_changed(
+            message=self.msg_store.confirm_location_changed(
                 move_line.location_dest_id, to_location
             ),
             data=self._data_after_package_scanned(move_line, pack),
         )
 
     def _response_for_validate_success(self):
-        message = self.actions_for("message")
-        return self._response(next_state="start", message=message.confirm_pack_moved())
+        return self._response(
+            next_state="start", message=self.msg_store.confirm_pack_moved()
+        )
 
     def validate(self, package_level_id, location_barcode, confirmation=False):
         """Validate the transfer"""
@@ -247,13 +245,11 @@ class SinglePackPutaway(Component):
         return self._response_for_validate_success()
 
     def _response_for_move_already_processed(self):
-        message = self.actions_for("message")
-        return self._response(next_state="start", message=message.already_done())
+        return self._response(next_state="start", message=self.msg_store.already_done())
 
     def _response_for_confirm_move_cancellation(self):
-        message = self.actions_for("message")
         return self._response(
-            next_state="start", message=message.confirm_canceled_scan_next_pack()
+            next_state="start", message=self.msg_store.confirm_canceled_scan_next_pack()
         )
 
     def cancel(self, package_level_id):
