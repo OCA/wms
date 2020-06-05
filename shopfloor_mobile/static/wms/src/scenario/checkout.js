@@ -215,7 +215,7 @@ export var Checkout = Vue.component("checkout", {
     methods: {
         screen_title: function() {
             if (_.isEmpty(this.current_doc()) || this.state_is("confirm_start"))
-                return this.menu_item.name;
+                return this.menu_item().name;
             let title = this.current_doc().record.name;
             return title;
         },

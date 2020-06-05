@@ -110,7 +110,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
     methods: {
         screen_title: function() {
             if (_.isEmpty(this.current_batch()) || this.state_is("confirm_start"))
-                return this.menu_item.name;
+                return this.menu_item().name;
             let title = this.current_batch().name;
             const picking = this.current_picking();
             if (picking) {
