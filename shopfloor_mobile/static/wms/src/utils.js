@@ -76,17 +76,17 @@ export class Utils {
         return res;
     }
 
-    group_by_pack(lines) {
+    group_by_pack(lines, package_key = "package_dest") {
         let self = this;
         const res = [];
         const packs = _.uniqBy(
             _.map(lines, function(x) {
-                return x.package_dest;
+                return _.result(x, package_key);
             }),
             "id"
         );
         const grouped = _.groupBy(lines, function(l) {
-            const pack_id = _.result(l, "package_dest.id");
+            const pack_id = _.result(l, package_key + ".id");
             if (pack_id) {
                 return "pack-" + pack_id;
             }

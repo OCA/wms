@@ -91,7 +91,10 @@ export var Delivery = Vue.component("checkout", {
         deliver_picking_summary_records_grouped(picking) {
             const self = this;
             return this.utils.misc.group_lines_by_location(picking.move_lines, {
-                prepare_records: this.utils.misc.group_by_pack,
+                prepare_records: _.partialRight(
+                    this.utils.misc.group_by_pack,
+                    "package_src"
+                ),
                 group_color_maker: function(lines) {
                     return self.utils.misc.move_lines_completeness(lines) == 100
                         ? "screen_step_done"
