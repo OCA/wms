@@ -81,6 +81,7 @@ class StockReceptionScreen(models.Model):
     picking_partner_id = fields.Many2one(related="picking_id.partner_id")
     picking_state = fields.Selection(related="picking_id.state")
     picking_move_lines = fields.One2many(related="picking_id.move_lines")
+    picking_location_dest_id = fields.Many2one(related="picking_id.location_dest_id")
     picking_filtered_move_lines = fields.One2many(
         comodel_name="stock.move", compute="_compute_picking_filtered_move_lines"
     )

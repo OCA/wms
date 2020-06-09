@@ -64,6 +64,7 @@
         </div>
 
         <field name="current_step" invisible="1"/>
+        <field name="picking_location_dest_id" invisible="1"/>
         <field name="current_move_id" invisible="1"/>
         <field name="current_move_product_id" invisible="1"/>
         <field name="current_move_line_id" invisible="1"/>
@@ -120,7 +121,8 @@
                       'required': [('current_step', '=', 'set_location')],
                       'readonly': [('current_step', '!=', 'set_location')],
                     }"
-                    options="{'no_open': True, 'no_create_edit': True}"/>
+                    options="{'no_open': True, 'no_create_edit': True}"
+                    domain="[('id', 'child_of', picking_location_dest_id)]"/>
                 </div>
                 <label for="current_move_line_pid"/>
                 <div>
