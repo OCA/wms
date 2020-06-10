@@ -162,9 +162,16 @@ class DataAction(Component):
             "display_name",
             "default_code",
             "barcode",
-            ("packaging_ids:packaging", self._packaging_parser),
+            ("packaging_ids:packaging", self._product_packaging),
             ("uom_id:uom", self._simple_record_parser() + ["factor", "rounding"]),
         ]
+
+    def _product_packaging(self, rec, field):
+        return self._jsonify(
+            rec.packaging_ids.filtered(lambda x: x.qty),
+            self._packaging_parser,
+            multi=True,
+        )
 
     def picking_batch(self, record, with_pickings=False, **kw):
         parser = self._picking_batch_parser
