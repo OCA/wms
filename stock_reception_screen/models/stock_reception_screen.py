@@ -138,6 +138,12 @@ class StockReceptionScreen(models.Model):
         domain="[('product_id', '=', current_move_product_id)]",
         readonly=False,
     )
+    current_move_line_product_packaging_type_is_pallet = fields.Boolean(
+        related=(
+            "current_move_line_id.result_package_id."
+            "product_packaging_id.type_is_pallet"
+        ),
+    )
     current_move_line_storage_type = fields.Many2one(
         related=("current_move_line_id.result_package_id." "package_storage_type_id"),
         readonly=False,
@@ -225,6 +231,14 @@ class StockReceptionScreen(models.Model):
                 continue
             vals = {"name": pid}
             move_line.result_package_id = package_model.create(vals)
+
+    @api.onchange("current_move_line_product_packaging_id")
+    def onchange_product_packaging_id(self):
+        # NOTE: this onchange is required as the related field
+        # doesn't seem to work well on such screen
+        self.current_move_line_product_packaging_type_is_pallet = (
+            self.current_move_line_product_packaging_id.type_is_pallet
+        )
 
     def get_reception_screen_steps(self):
         """Aim to be overloaded to update the reception steps."""
@@ -499,7 +513,10 @@ class StockReceptionScreen(models.Model):
             msg = _("The storage type is mandatory before going further.")
             self.env.user.notify_warning(message="", title=msg)
             return False
-        if not self.current_move_line_height:
+        if (
+            self.current_move_line_product_packaging_type_is_pallet
+            and not self.current_move_line_height
+        ):
             msg = _("The height is mandatory before going further.")
             self.env.user.notify_warning(message="", title=msg)
             return False

@@ -13,6 +13,7 @@
         "product_expiry",
         # OCA/product-attribute
         "product_packaging_dimension",
+        "product_packaging_type_pallet",
         # OCA/stock-logistics-workflow
         "stock_quant_package_dimension",
         # OCA/wms
