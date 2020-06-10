@@ -115,9 +115,9 @@ class StockReceptionScreen(models.Model):
         related="current_move_line_id.lot_id", string="Lot NumBer"
     )
     current_move_line_lot_life_date = fields.Datetime(
-        related="current_move_line_id.lot_id.life_date",
+        # NOTE: Not a related as we want to check the user input before storing
+        # the date in the related lot
         string="End of Life Date",
-        readonly=False,
     )
     current_move_line_qty_done = fields.Float(
         related="current_move_line_id.qty_done", string="Quantity", readonly=False
@@ -461,11 +461,30 @@ class StockReceptionScreen(models.Model):
 
     def process_set_expiry_date(self):
         """Set the lot life date on a move line."""
-        if not self.current_move_line_id.lot_id.life_date:
+        if not self.current_move_line_lot_life_date:
             self.env.user.notify_warning(
                 message="", title=_("You have to set an expiry date.")
             )
             return
+        if (
+            self.current_move_line_lot_id.life_date
+            and self.current_move_line_lot_life_date
+            < self.current_move_line_lot_id.life_date
+        ):
+            lang = self.env["res.lang"]._lang_get(self.env.user.lang)
+            previous_life_date_str = self.current_move_line_lot_id.life_date.strftime(
+                lang.date_format
+            )
+            self.env.user.notify_warning(
+                message="",
+                title=_(
+                    "You cannot set a date prior to previous one ({})".format(
+                        previous_life_date_str
+                    )
+                ),
+            )
+            return
+        self.current_move_line_lot_id.life_date = self.current_move_line_lot_life_date
         self.next_step()
 
     def process_set_quantity(self):
