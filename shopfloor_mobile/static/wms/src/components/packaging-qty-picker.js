@@ -81,10 +81,6 @@ export var PackagingQtyPickerMixin = {
             // const min_unit = _.last(pkg_by_qty);
             pkg_by_qty.forEach(function(pkg) {
                 let qty_per_pkg = 0;
-                if (!pkg.qty) {
-                    console.error("Packaging with no quantity: skipping", pkg);
-                    return {};
-                }
                 [qty_per_pkg, qty] = self._qty_by_pkg(pkg.qty, qty);
                 if (qty_per_pkg) res[pkg.id] = qty_per_pkg;
                 if (!qty) return;
@@ -178,10 +174,12 @@ export var PackagingQtyPickerMixin = {
             return _.extend([], this.opts.available_packaging, unit);
         },
         /**
-         *
+         * Sort packaging by qty and exclude the ones w/ qty = 0
          */
         sorted_packaging: function() {
-            return _.reverse(_.sortBy(this.packaging, _.property("qty")));
+            return _.reverse(
+                _.sortBy(_.filter(this.packaging, _.property("qty")), _.property("qty"))
+            );
         },
         /**
          * Collect qty of contained packaging inside bigger packaging.
