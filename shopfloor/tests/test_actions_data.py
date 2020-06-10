@@ -51,20 +51,24 @@ class ActionsDataCaseBase(CommonCase):
         self.assertTrue(validator.validate(data), validator.errors)
 
     def _expected_location(self, record, **kw):
-        return {
+        data = {
             "id": record.id,
             "name": record.name,
             "barcode": record.barcode,
         }
+        data.update(kw)
+        return data
 
     def _expected_product(self, record, **kw):
-        return {
+        data = {
             "id": record.id,
             "name": record.name,
             "display_name": record.display_name,
             "default_code": record.default_code,
             "barcode": record.barcode,
-            "packaging": [self._expected_packaging(x) for x in record.packaging_ids],
+            "packaging": [
+                self._expected_packaging(x) for x in record.packaging_ids if x.qty
+            ],
             "uom": {
                 "factor": record.uom_id.factor,
                 "id": record.uom_id.id,
@@ -72,13 +76,17 @@ class ActionsDataCaseBase(CommonCase):
                 "rounding": record.uom_id.rounding,
             },
         }
+        data.update(kw)
+        return data
 
     def _expected_packaging(self, record, **kw):
-        return {
+        data = {
             "id": record.id,
             "name": record.name,
             "qty": record.qty,
         }
+        data.update(kw)
+        return data
 
 
 class ActionsDataCase(ActionsDataCaseBase):
@@ -138,6 +146,31 @@ class ActionsDataCase(ActionsDataCaseBase):
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
         }
+        self.assertDictEqual(data, expected)
+
+    def test_data_product(self):
+        (
+            self.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "Box 2",
+                    "product_id": self.product_a.id,
+                    "barcode": "ProductABox2",
+                }
+            )
+        )
+        self.product_a.packaging_ids.write({"qty": 0})
+        data = self.data.product(self.product_a)
+        self.assert_schema(self.schema.product(), data)
+        # No packaging expected as all qties are zero
+        expected = self._expected_product(self.product_a)
+        self.assertDictEqual(data, expected)
+        # packaging w/ no zero qty are included
+        self.product_a.packaging_ids[0].write({"qty": 100})
+        self.product_a.packaging_ids[1].write({"qty": 20})
+        data = self.data.product(self.product_a)
+        expected = self._expected_product(self.product_a)
         self.assertDictEqual(data, expected)
 
     def test_data_move_line_package(self):
