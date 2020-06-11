@@ -86,7 +86,7 @@
                 <field name="current_move_line_id" invisible="1" />
                 <field
                     name="current_move_line_product_packaging_type_is_pallet"
-                    invisible="0"
+                    invisible="1"
                 />
                 <div class="o_screen_data">
                     <div class="o_screen_data_content" name="data">

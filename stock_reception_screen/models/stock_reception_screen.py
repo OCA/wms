@@ -408,8 +408,13 @@ class StockReceptionScreen(models.Model):
             # backorder when validating the move (see _action_done() method in
             # stock/models/stock_move.py).
             self.current_move_id.with_context(is_scrap=True)._action_done()
-            if self.picking_id.state == "confirmed":
-                self.picking_id.action_assign()
+            # A new move is automatically created if we made a partial receipt
+            # and we have to update it to the 'assigned' state to generate the
+            # related 'stock.move.line' (required if we want to process it)
+            confirmed_moves = self.picking_id.move_lines.filtered(
+                lambda o: o.state == "confirmed"
+            )
+            confirmed_moves._action_assign()
 
     def _before_set_location_to_select_move(self):
         """Check if there is remaining moves to process for the
@@ -532,9 +537,19 @@ class StockReceptionScreen(models.Model):
             msg = _("The storage type is mandatory before going further.")
             self.env.user.notify_warning(message="", title=msg)
             return False
-        if self.current_move_line_product_packaging_id and (
-            not self.current_move_line_product_packaging_id.volume
-            or not self.current_move_line_product_packaging_id.max_weight
+        if (
+            self.current_move_line_product_packaging_id
+            and not self.current_move_line_product_packaging_type_is_pallet
+            and (
+                # NOTE: we are not checking the 'volume' field as it is rounded
+                # to 0 with small dimensions and produces false positive results
+                not (
+                    self.current_move_line_product_packaging_id.lngth
+                    and self.current_move_line_product_packaging_id.width
+                    and self.current_move_line_product_packaging_id.height
+                )
+                or not self.current_move_line_product_packaging_id.max_weight
+            )
         ):
             msg = _("Product packaging info are missing. Please use the CUBISCAN.")
             self.env.user.notify_warning(message="", title=msg)
