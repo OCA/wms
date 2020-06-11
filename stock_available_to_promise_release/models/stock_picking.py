@@ -1,7 +1,7 @@
 # Copyright 2019 Camptocamp (https://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 
 
 class StockPicking(models.Model):
@@ -25,3 +25,13 @@ class StockPicking(models.Model):
             if not key.startswith("default_")
         }
         self.mapped("move_lines").with_context(context).release_available_to_promise()
+
+    def _release_link_backorder(self, origin_picking):
+        self.backorder_id = origin_picking
+        origin_picking.message_post(
+            body=_(
+                "The backorder <a href=# data-oe-model=stock.picking"
+                " data-oe-id=%d>%s</a> has been created."
+            )
+            % (self.id, self.name)
+        )
