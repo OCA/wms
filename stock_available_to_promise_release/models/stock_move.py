@@ -149,6 +149,7 @@ class StockMove(models.Model):
         )
         procurement_requests = []
         pulled_moves = self.env["stock.move"]
+        backorder_links = {}
         for move in self:
             if not move.need_release:
                 continue
@@ -168,9 +169,10 @@ class StockMove(models.Model):
                     # we don't want to deliver unless we can deliver all at
                     # once
                     continue
-                move.with_context(release_available_to_promise=True)._release_split(
-                    remaining
-                )
+                new_move = move.with_context(
+                    release_available_to_promise=True
+                )._release_split(remaining)
+                backorder_links[new_move.picking_id] = move.picking_id
 
             if not move.picking_id.printed:
                 # Make sure the flag is set even if no split happens.
@@ -190,6 +192,9 @@ class StockMove(models.Model):
                 )
             )
             pulled_moves |= move
+
+        for backorder, origin in backorder_links.items():
+            backorder._release_link_backorder(origin)
 
         self.env["procurement.group"].run_defer(procurement_requests)
 
