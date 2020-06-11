@@ -24,7 +24,10 @@ class TestReceptionScreen(SavepointCase):
                 "product_id": cls.product.id,
                 "qty": 4,
                 "package_storage_type_id": cls.storage_type_pallet.id,
-                "height": 10,
+                "height": 200,
+                "width": 500,
+                "lngth": 500,
+                "max_weight": 10,
             }
         )
         cls.location_dest = cls.env.ref("stock.stock_location_stock")

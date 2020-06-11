@@ -532,6 +532,13 @@ class StockReceptionScreen(models.Model):
             msg = _("The storage type is mandatory before going further.")
             self.env.user.notify_warning(message="", title=msg)
             return False
+        if self.current_move_line_product_packaging_id and (
+            not self.current_move_line_product_packaging_id.volume
+            or not self.current_move_line_product_packaging_id.max_weight
+        ):
+            msg = _("Product packaging info are missing. Please use the CUBISCAN.")
+            self.env.user.notify_warning(message="", title=msg)
+            return False
         if (
             self.current_move_line_product_packaging_type_is_pallet
             and not self.current_move_line_height
