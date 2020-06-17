@@ -34,3 +34,4 @@ from . import test_delivery_set_qty_done_line
 from . import test_delivery_list_stock_picking
 from . import test_delivery_select
 from . import test_location_content_transfer_base
+from . import test_location_content_transfer_start

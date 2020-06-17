@@ -299,6 +299,14 @@ class MessageAction(Component):
             "body": _("Transfer {} complete").format(picking.name),
         }
 
+    def location_content_transfer_complete(self, location):
+        return {
+            "message_type": "success",
+            "body": _("Location Content Transfer from {} complete").format(
+                location.name
+            ),
+        }
+
     def transfer_confirm_done(self):
         return {
             "message_type": "warning",
@@ -314,4 +322,10 @@ class MessageAction(Component):
             "body": _(
                 "No quantity has been processed, unable to complete the transfer."
             ),
+        }
+
+    def recovered_previous_session(self):
+        return {
+            "message_type": "info",
+            "body": _("Recovered previous session."),
         }

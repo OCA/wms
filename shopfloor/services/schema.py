@@ -170,9 +170,8 @@ class BaseShopfloorSchemaResponse(Component):
     def package_level(self):
         return {
             "id": {"required": True, "type": "integer"},
-            "name": {"type": "string", "nullable": False, "required": True},
+            "is_done": {"type": "boolean", "nullable": False, "required": True},
+            "package": {"type": "dict", "schema": self.package()},
             "location_src": {"type": "dict", "schema": self.location()},
             "location_dest": {"type": "dict", "schema": self.location()},
-            "product": {"type": "dict", "schema": self.product()},
-            "picking": {"type": "dict", "schema": self.picking()},
         }

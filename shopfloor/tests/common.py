@@ -288,13 +288,15 @@ class CommonCase(SavepointCase, ComponentMixin):
         )
 
     @classmethod
-    def _fill_stock_for_moves(cls, moves, in_package=False, in_lot=False):
+    def _fill_stock_for_moves(
+        cls, moves, in_package=False, in_lot=False, location=False
+    ):
         product_locations = {}
         package = None
         if in_package:
             package = cls.env["stock.quant.package"].create({})
         for move in moves:
-            key = (move.product_id, move.location_id)
+            key = (move.product_id, location or move.location_id)
             product_locations.setdefault(key, 0)
             product_locations[key] += move.product_qty
         for (product, location), qty in product_locations.items():
