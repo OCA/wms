@@ -66,11 +66,8 @@ export var ScenarioBaseMixin = {
             return state;
         },
         search_input_placeholder: function() {
-            if (this.state.scan_placeholder) {
-                // TMP backward compat
-                return this.state.scan_placeholder;
-            }
-            return this.state.display_info.scan_placeholder;
+            const placeholder = this.state.display_info.scan_placeholder;
+            return _.isFunction(placeholder) ? placeholder.call(this) : placeholder;
         },
         show_cancel_button: function() {
             return this.state.display_info.show_cancel_button;
