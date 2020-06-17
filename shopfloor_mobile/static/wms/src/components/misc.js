@@ -88,10 +88,15 @@ Vue.component("state-display-info", {
     props: {
         info: Object,
     },
+    computed: {
+        title: function() {
+            return _.isFunction(this.info.title) ? this.info.title() : this.info.title;
+        },
+    },
     template: `
-  <div class="state-display-info" v-if="info.title">
+  <div class="state-display-info" v-if="title">
     <v-alert tile dense type="info" :icon="false">
-      <div class="state-title">{{ info.title }}</div>
+      <div class="state-title">{{ title }}</div>
     </v-alert>
   </div>
 `,
