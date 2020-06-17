@@ -13,6 +13,7 @@ class SinglePackTransfer(Component):
     def _data_after_package_scanned(self, package_level):
         move_line = package_level.move_line_ids[0]
         package = package_level.package_id
+        # TODO use data.package_level (but the "name" moves in "package.name")
         return {
             "id": package_level.id,
             "name": package.name,
@@ -288,4 +289,12 @@ class SinglePackTransferValidatorResponse(Component):
 
     @property
     def _schema_for_package_level_details(self):
-        return self.schemas.package_level()
+        # TODO use schemas.package_level (but the "name" moves in "package.name")
+        return {
+            "id": {"required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+            "location_src": {"type": "dict", "schema": self.schemas.location()},
+            "location_dest": {"type": "dict", "schema": self.schemas.location()},
+            "product": {"type": "dict", "schema": self.schemas.product()},
+            "picking": {"type": "dict", "schema": self.schemas.picking()},
+        }

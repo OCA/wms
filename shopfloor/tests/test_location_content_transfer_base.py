@@ -13,8 +13,64 @@ class LocationContentTransferCommonCase(CommonCase):
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
+        cls.content_loc = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Content Location",
+                    "barcode": "Content",
+                    "location_id": cls.picking_type.default_location_src_id.id,
+                }
+            )
+        )
 
     def setUp(self):
         super().setUp()
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="location_content_transfer")
+
+    def _simulate_pickings_selected(self, pickings):
+        """Create a state as if pickings has been selected
+
+        ... during a Location content transfer.
+
+        It means a user scanned the location with the pickings. They are:
+
+        * assigned to the user
+        * the qty_done of all their move lines is set to they reserved qty
+
+        """
+        pickings.user_id = self.env.uid
+        for line in pickings.mapped("move_line_ids"):
+            line.qty_done = line.product_uom_qty
+
+    def assert_response_start(self, response, message=None):
+        self.assert_response(response, next_state="start", message=message)
+
+    def assert_response_scan_destination_all(self, response, pickings, message=None):
+        # this code is repeated from the implementation, not great, but we
+        # mostly want to ensure the selection of pickings is right, and the
+        # data methods have their own tests
+        lines = pickings.move_line_ids.filtered(lambda line: not line.package_level_id)
+        package_levels = pickings.package_level_ids
+        self.assert_response(
+            response,
+            next_state="scan_destination_all",
+            data={
+                "move_lines": self.data.move_lines(lines),
+                "package_levels": self.data.package_levels(package_levels),
+            },
+            message=message,
+        )
+
+    def assert_response_start_single(self, response, pickings, message=None):
+        sorter = self.service.actions_for("location_content_transfer.sorter")
+        sorter.feed_pickings(pickings)
+        location = pickings.mapped("location_id")
+        self.assert_response(
+            response,
+            next_state="start_single",
+            data=self.service._data_content_line_for_location(location, next(sorter)),
+            message=message,
+        )

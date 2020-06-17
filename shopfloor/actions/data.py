@@ -148,6 +148,31 @@ class DataAction(Component):
             ("location_dest_id:location_dest", self._location_parser),
         ]
 
+    def package_level(self, record, **kw):
+        data = self._jsonify(record, self._package_level_parser)
+        if data:
+            data.update(
+                {
+                    # cannot use sub-parser here
+                    # because location_id of the package level may be
+                    # empty, we have to go get the picking's one
+                    "location_src": self.location(record.picking_id.location_id, **kw),
+                }
+            )
+        return data
+
+    def package_levels(self, records, **kw):
+        return [self.package_level(rec, **kw) for rec in records]
+
+    @property
+    def _package_level_parser(self):
+        return [
+            "id",
+            "is_done",
+            ("package_id:package", self._package_parser),
+            ("location_dest_id:location_dest", self._location_parser),
+        ]
+
     def product(self, record, **kw):
         return self._jsonify(record, self._product_parser, **kw)
 
