@@ -1,3 +1,5 @@
+from odoo import _
+
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
@@ -46,7 +48,7 @@ class LocationContentTransfer(Component):
         """Transition to the 'start' state"""
         return self._response(next_state="start", message=message)
 
-    def _response_for_scan_destination_all(self, location, message=None):
+    def _response_for_scan_destination_all(self, location, pickings=None, message=None):
         """Transition to the 'scan_destination_all' state
 
         The client screen shows a summary of all the lines and packages
@@ -54,48 +56,94 @@ class LocationContentTransfer(Component):
         """
         return self._response(
             next_state="scan_destination_all",
-            data=self._data_content_all_for_location(location),
+            data=self._data_content_all_for_location(location, pickings=pickings),
             message=message,
         )
 
-    def _response_for_start_single(
-        self, location, package_level=None, line=None, message=None
-    ):
+    def _response_for_start_single(self, location, next_content, message=None):
         """Transition to the 'start_single' state
 
         The client screen shows details of the package level or move line to move.
         """
-        assert package_level or line
         return self._response(
             next_state="start_single",
-            data=self._data_content_line_for_location(
-                location, package_level=package_level, line=line
-            ),
+            data=self._data_content_line_for_location(location, next_content),
             message=message,
         )
 
-    def _response_for_scan_destination(
-        self, location, package_level=None, line=None, message=None
-    ):
+    def _response_for_scan_destination(self, location, next_content, message=None):
         """Transition to the 'start_single' state
 
         The client screen shows details of the package level or move line to move.
         """
-        assert package_level or line
         return self._response(
             next_state="scan_destination",
-            data=self._data_content_line_for_location(
-                location, package_level=package_level, line=line
-            ),
+            data=self._data_content_line_for_location(location, next_content),
             message=message,
         )
 
-    def _data_content_all_for_location(self, location):
-        return {}
+    def _data_content_all_for_location(self, location, pickings=None):
+        if not pickings:
+            # TODO get pickings from location
+            raise NotImplementedError("to do: get pickings from location")
+        sorter = self.actions_for("location_content_transfer.sorter")
+        sorter.feed_pickings(pickings)
+        lines = sorter.move_lines()
+        package_levels = sorter.package_levels()
+        return {
+            "move_lines": self.data.move_lines(lines),
+            "package_levels": self.data.package_levels(package_levels),
+        }
 
-    def _data_content_line_for_location(self, location, package_level=None, line=None):
-        assert package_level or line
-        return {}
+    def _data_content_line_for_location(self, location, next_content):
+        assert next_content._name in ("stock.move.line", "stock.package_level")
+        line_data = (
+            self.data.move_line(next_content)
+            if next_content._name == "stock.move.line"
+            else None
+        )
+        level_data = (
+            self.data.package_level(next_content)
+            if next_content._name == "stock.package_level"
+            else None
+        )
+        return {"move_line": line_data, "package_level": level_data}
+
+    def _router_single_or_all_destination(self, pickings, message=None):
+        location = pickings.mapped("location_id")
+        if len(pickings.mapped("move_line_ids.location_dest_id")) == 1:
+            return self._response_for_scan_destination_all(
+                location, pickings=pickings, message=message
+            )
+        else:
+            sorter = self.actions_for("location_content_transfer.sorter")
+            sorter.feed_pickings(pickings)
+            try:
+                next_content = next(sorter)
+            except StopIteration:
+                # TODO test
+                return self._response_for_start(
+                    message=self.msg_store.location_content_transfer_complete(location)
+                )
+            return self._response_for_start_single(
+                location, next_content, message=message
+            )
+
+    def _domain_recover_pickings(self):
+        return [
+            ("user_id", "=", self.env.uid),
+            ("state", "in", ("assigned", "partially_available")),
+            ("picking_type_id", "in", self.picking_types.ids),
+        ]
+
+    def _search_recover_pickings(self):
+        candidate_pickings = self.env["stock.picking"].search(
+            self._domain_recover_pickings()
+        )
+        started_pickings = candidate_pickings.filtered(
+            lambda picking: any(line.qty_done for line in picking.move_line_ids)
+        )
+        return started_pickings
 
     def start_or_recover(self):
         """Start a new session or recover an existing one
@@ -104,10 +152,23 @@ class LocationContentTransfer(Component):
         and reopen the menu, we want to directly reopen the screens to choose
         destinations. Otherwise, we go to the "start" state.
         """
-        # TODO if we find any stock.picking != done with current user as user id
-        # and with move lines having a qty_done > 0, in the current picking types,
-        # reach start_single or scan_destination_all
+        started_pickings = self._search_recover_pickings()
+        if started_pickings:
+            return self._router_single_or_all_destination(
+                started_pickings, message=self.msg_store.recovered_previous_session()
+            )
         return self._response_for_start()
+
+    def _find_location_move_lines_domain(self, location):
+        return [
+            ("location_id", "=", location.id),
+            ("qty_done", "=", 0),
+        ]
+
+    def _find_location_move_lines(self, location):
+        return self.env["stock.move.line"].search(
+            self._find_location_move_lines_domain(location)
+        )
 
     def scan_location(self, barcode):
         """Scan start location
@@ -126,7 +187,34 @@ class LocationContentTransfer(Component):
         levels have the same destination
         * start_single: if any line or package level has a different destination
         """
-        return self._response()
+        location = self.actions_for("search").location_from_scan(barcode)
+        if not location:
+            return self._response_for_start(message=self.msg_store.barcode_not_found())
+        move_lines = self._find_location_move_lines(location)
+        pickings = move_lines.mapped("picking_id")
+        picking_types = pickings.mapped("picking_type_id")
+
+        if len(picking_types) > 1:
+            return self._response_for_start(
+                message={
+                    "message_type": "error",
+                    "body": _("This location content can't be moved at once."),
+                }
+            )
+        if picking_types - self.picking_types:
+            return self._response_for_start(
+                message={
+                    "message_type": "error",
+                    "body": _("This location content can't be moved using this menu."),
+                }
+            )
+
+        for line in move_lines:
+            line.qty_done = line.product_uom_qty
+
+        pickings.user_id = self.env.uid
+
+        return self._router_single_or_all_destination(pickings)
 
     def set_destination_all(self, location_id, barcode):
         """Scan destination location for all the moves of the location
@@ -374,12 +462,12 @@ class ShopfloorLocationContentTransferValidatorResponse(Component):
 
     @property
     def _schema_all(self):
-        package_schema = self.schemas.package()
+        package_level_schema = self.schemas.package_level()
         move_line_schema = self.schemas.move_line()
         return {
             # we'll display all the packages and move lines *without package
             # levels*
-            "packages": self.schemas._schema_list_of(package_schema),
+            "package_levels": self.schemas._schema_list_of(package_level_schema),
             "move_lines": self.schemas._schema_list_of(move_line_schema),
         }
 
