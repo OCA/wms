@@ -20,6 +20,7 @@ from . import base_action
 from . import data
 from . import data_detail
 from . import completion_info
+from . import location_content_transfer_sorter
 from . import message
 from . import search
 from . import inventory
