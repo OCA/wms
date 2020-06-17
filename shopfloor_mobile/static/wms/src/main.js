@@ -174,6 +174,13 @@ const app = new Vue({
                 profile_id: this.profile.id,
             });
             return odoo.call("menu").then(function(result) {
+                // TODO: just for dev purpose w/ new scenario
+                result.data.menus.push({
+                    id: 99999,
+                    name: "Location content transfer",
+                    picking_types: [{id: 9999, name: "Fake picking type"}],
+                    scenario: "location_content_transfer",
+                });
                 self.appmenu = result.data;
                 self.loading = false;
             });

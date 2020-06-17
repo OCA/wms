@@ -1,9 +1,5 @@
 import {demotools} from "./demo.core.js";
 
-const deliver_data = {
-    picking: demotools.makePicking({}, {lines_count: 5, line_random_pack: true}),
-};
-
 let pickings = [];
 const count = 8;
 
