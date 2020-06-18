@@ -49,7 +49,6 @@ Vue.component("Screen", {
         },
         show_profile_not_ready() {
             return (
-                !this.$root.demo_mode &&
                 !this.$root.has_profile &&
                 this.$route.name != "profile" &&
                 this.$route.name != "settings"

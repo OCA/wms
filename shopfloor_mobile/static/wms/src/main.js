@@ -80,9 +80,6 @@ const app = new Vue({
                 this.$storage.set("profile", v);
             },
         },
-        // TODO: demo mode is half working now because
-        // if we don't load real menu/profiles 1st
-        // we don't have any menu nor profile to play with.
         profiles: function() {
             return this.appconfig ? this.appconfig.profiles || [] : [];
         },
@@ -175,13 +172,6 @@ const app = new Vue({
                 profile_id: this.profile.id,
             });
             return odoo.call("menu").then(function(result) {
-                // TODO: just for dev purpose w/ new scenario
-                result.data.menus.push({
-                    id: 99999,
-                    name: "Location content transfer",
-                    picking_types: [{id: 9999, name: "Fake picking type"}],
-                    scenario: "location_content_transfer",
-                });
                 self.appmenu = result.data;
                 self.loading = false;
             });

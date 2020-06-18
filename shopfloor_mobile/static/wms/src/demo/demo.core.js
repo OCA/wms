@@ -3,7 +3,10 @@ import {process_registry} from "../services/process_registry.js";
 export class DemoTools {
     constructor(demo_cases) {
         this.demo_cases = demo_cases.length ? demo_cases : {};
-        // used to search w/ scan anything
+        // Used to collect fake menu entries
+        this.app_menus_by_id = {};
+        this.app_menus = [];
+        // Used to search w/ scan anything
         this.indexed = {};
         this.locations = [
             this.makeLocation(),
@@ -448,19 +451,55 @@ export class DemoTools {
         ];
     }
 
-    makeAppMenu() {
-        let menu;
-        _.forEach(process_registry.all(), function(component, key) {
-            menu.push({
-                id: key,
-                process: {
-                    id: key,
-                    code: key,
-                },
-            });
-        });
-        return menu;
+    makeAppConfig() {
+        return {
+            profiles: this.makeProfiles(),
+        };
     }
+    makeProfiles() {
+        const profiles = [
+            {id: 1, name: "SCH Transport", warehouse: {id: 1, name: "Schlieren"}},
+            {id: 2, name: "SCH Pick", warehouse: {id: 1, name: "Schlieren"}},
+        ];
+        return profiles;
+    }
+    getAppMenus() {
+        return this.app_menus;
+    }
+    /**
+     *
+     * @param {*} new_item
+     *
+     *  id: 123,
+     *  name: "Menu 1",
+     *  scenario: "scenario_usage_key",
+     *  picking_types: [{"id": 27, "name": "Random type"}]
+     */
+    addAppMenu(new_item) {
+        // Generate a unique ID to be used in demo data
+        let menu_id = this.getRandomInt();
+        while (menu_id in this.app_menus_by_id) {
+            menu_id = this.getRandomInt();
+        }
+        new_item.id = menu_id;
+        this.app_menus_by_id[menu_id] = new_item;
+
+        // Find insert index to keep items w/ same scenario grouped
+        let index = 0;
+        this.app_menus.every(function(item, i) {
+            if (item.scenario == new_item.scenario) {
+                index = i;
+                return false;
+            }
+        });
+        if (_.isUndefined(new_item.picking_types)) {
+            new_item.picking_types = [{id: 99999999, name: "Fake type"}];
+        }
+        this.app_menus.splice(index, 0, new_item);
+        // Return the unique id
+        return menu_id;
+    }
+
     /*
     Detect cyclic references between objects.
 

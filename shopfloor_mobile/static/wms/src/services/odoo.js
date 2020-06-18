@@ -130,6 +130,12 @@ export class OdooMocked extends OdooMixin {
         console.dir("CALL RETURN data:", result);
         return Promise.resolve(result);
     }
+    user_config(params) {
+        return Promise.resolve({data: demotools.makeAppConfig()});
+    }
+    menu(params) {
+        return Promise.resolve({data: {menus: demotools.getAppMenus()}});
+    }
     scan(params) {
         let result = {};
         const data = demotools.get_indexed(params.identifier);
