@@ -216,28 +216,31 @@ export class Utils {
      *
      * @param {*} line The move line
      */
-    move_line_product_detail_options(line, override = {}) {
+    move_line_product_detail_options(line, options = {}) {
         const self = this;
-        const fields = [
-            {path: "package_src.name", label: "Pack"},
-            {path: "lot.name", label: "Lot"},
-            {
-                path: "quantity",
-                label: "Qty",
-                render_component: "packaging-qty-picker-display",
-                render_options: function(record) {
-                    return self.move_line_qty_picker_options(record);
-                },
-            },
-            {path: "product.qty_available", label: "Qty on hand"},
-        ];
-        let opts = {
+        options = _.defaults({}, options, {
             main: true,
             key_title: "product.display_name",
-            fields: fields,
             title_action_field: {action_val_path: "product.barcode"},
-        };
-        return _.extend(opts, override || {});
+            fields: [
+                {path: "package_src.name", label: "Pack"},
+                {path: "lot.name", label: "Lot"},
+                {
+                    path: "quantity",
+                    label: "Qty",
+                    render_component: "packaging-qty-picker-display",
+                    render_options: function(record) {
+                        return self.move_line_qty_picker_options(record);
+                    },
+                },
+                {path: "product.qty_available", label: "Qty on hand"},
+            ],
+            fields_blacklist: [],
+        });
+        options.fields = _.filter(options.fields, function(field) {
+            return !options.fields_blacklist.includes(field.path);
+        });
+        return options;
     }
     move_line_qty_picker_options(line, override = {}) {
         let opts = {
