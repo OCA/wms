@@ -1,7 +1,6 @@
 import {router} from "./router.js";
 import {i18n} from "./i18n.js";
 import {GlobalMixin} from "./mixin.js";
-import {Config} from "./services/config.js";
 import {process_registry} from "./services/process_registry.js";
 import {color_registry} from "./services/color_registry.js";
 import {Odoo, OdooMocked} from "./services/odoo.js";
@@ -145,13 +144,15 @@ const app = new Vue({
             const self = this;
             self.loading = true;
             const odoo = self.getOdoo({usage: "app"});
-            const config = new Config(odoo);
-            return config.load().then(function() {
-                if (config.authenticated) {
-                    self.appconfig = config.data;
-                    self.authenticated = config.authenticated;
+            return odoo.call("user_config").then(function(result) {
+                if (!_.isUndefined(result.data)) {
+                    self.appconfig = result.data;
+                    self.authenticated = true;
                     self.$storage.set("appconfig", self.appconfig);
                     self.loading = false;
+                } else {
+                    // TODO: any better thing to do here?
+                    console.log(result);
                 }
             });
         },
