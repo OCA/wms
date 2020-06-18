@@ -398,6 +398,16 @@ export class DemoTools {
         return _.head(this.makePickingLines({}, {picking_auto: true, lines_count: 1}));
     }
 
+    makePackageLevel(defaults = {}, options = {}) {
+        _.defaults(defaults, {
+            is_done: false,
+            package: this.makePack(),
+            location: this.makeLocation(),
+        });
+        const rec = this.makeSimpleRecord(defaults, options);
+        return rec;
+    }
+
     partnerNames() {
         return [
             "Edith Sanchez",
