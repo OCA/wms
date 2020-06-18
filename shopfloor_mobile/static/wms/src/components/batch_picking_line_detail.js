@@ -20,17 +20,6 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
             return _.result(this.line, "package_dest.id");
         },
     },
-    methods: {
-        full_detail_fields() {
-            return [
-                {path: "batch.name", label: "Batch"},
-                {path: "picking.name", label: "Picking"},
-                {path: "picking.origin", label: "Origin"},
-                {path: "picking.partner.name", label: "Customer"},
-                {path: "location_dest.name", label: "Destination"},
-            ];
-        },
-    },
     template: `
 <div v-if="!_.isEmpty(line)" :class="'detail batch-picking-line-detail ' + (line.postponed ? 'line-postponed' : '')">
 
@@ -70,21 +59,6 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
       Destination pack not selected.
     </template>
   </item-detail-card>
-
-  <!--
-  <v-expansion-panels>
-    <v-expansion-panel class="with-card">
-      <v-expansion-panel-header>Full details</v-expansion-panel-header>
-      <v-expansion-panel-content>
-        <item-detail-card
-          :key="'batch-picking-line-detail-4'"
-          :record="line"
-          :options="{no_title: true, loud_labels: true, no_outline: true, fields: full_detail_fields()}"
-          />
-      </v-expansion-panel-content>
-    </v-expansion-panel>
-  </v-expansion-panels>
-  -->
 
 </div>
 `,
