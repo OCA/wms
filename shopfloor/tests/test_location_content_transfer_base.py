@@ -89,3 +89,26 @@ class LocationContentTransferCommonCase(CommonCase):
             data=self.service._data_content_line_for_location(location, next(sorter)),
             message=message,
         )
+
+    def _assert_response_scan_destination(
+        self, state, response, next_content, message=None
+    ):
+        location = next_content.location_id
+        self.assert_response(
+            response,
+            next_state=state,
+            data=self.service._data_content_line_for_location(location, next_content),
+            message=message,
+        )
+
+    def assert_response_scan_destination(self, response, next_content, message=None):
+        self._assert_response_scan_destination(
+            "scan_destination", response, next_content, message=message
+        )
+
+    def assert_response_confirm_scan_destination(
+        self, response, next_content, message=None
+    ):
+        self._assert_response_scan_destination(
+            "confirm_scan_destination", response, next_content, message=message
+        )

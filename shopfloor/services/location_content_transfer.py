@@ -342,7 +342,57 @@ class LocationContentTransfer(Component):
         * start_single: barcode not found, ...
         * scan_destination: the barcode matches
         """
-        return self._response()
+        location = self.env["stock.location"].browse(location_id)
+        if not location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        package_level = self.env["stock.package_level"].browse(package_level_id)
+        if not package_level.exists():
+            move_lines = self._find_transfer_move_lines(location)
+            return self._response_for_start_single(
+                move_lines.mapped("picking_id"),
+                message=self.msg_store.record_not_found(),
+            )
+
+        search = self.actions_for("search")
+        package = search.package_from_scan(barcode)
+        if package and package_level.package_id == package:
+            return self._response_for_scan_destination(location, package_level)
+
+        move_lines = self._find_transfer_move_lines(location)
+        package_move_lines = package_level.move_line_ids
+        other_move_lines = move_lines - package_move_lines
+
+        product = search.product_from_scan(barcode)
+        # Normally the user scan the barcode of the package. But if they scan the
+        # product and we can be sure it's the correct package, it's tolerated.
+        if product and product in package_move_lines.mapped("product_id"):
+            if product in other_move_lines.mapped("product_id") or product.tracking in (
+                "lot",
+                "serial",
+            ):
+                # When the product exists in other move lines as raw products
+                # or part of another package, we can't be sure they scanned
+                # the correct package, so ask to scan the package.
+                return self._response_for_start_single(
+                    move_lines.mapped("picking_id"),
+                    message={"message_type": "error", "body": _("Scan the package")},
+                )
+            else:
+                return self._response_for_scan_destination(location, package_level)
+
+        lot = search.lot_from_scan(barcode)
+        if lot and lot in package_move_lines.mapped("lot_id"):
+            if lot in other_move_lines.mapped("lot_id"):
+                return self._response_for_start_single(
+                    move_lines.mapped("picking_id"),
+                    message={"message_type": "error", "body": _("Scan the package")},
+                )
+            else:
+                return self._response_for_scan_destination(location, package_level)
+
+        return self._response_for_start_single(
+            move_lines.mapped("picking_id"), message=self.msg_store.barcode_not_found()
+        )
 
     def scan_line(self, location_id, move_line_id, barcode):
         """Scan a move line to move
