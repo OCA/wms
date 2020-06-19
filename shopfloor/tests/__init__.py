@@ -35,3 +35,4 @@ from . import test_delivery_list_stock_picking
 from . import test_delivery_select
 from . import test_location_content_transfer_base
 from . import test_location_content_transfer_start
+from . import test_location_content_transfer_set_destination_all

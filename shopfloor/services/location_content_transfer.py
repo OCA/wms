@@ -9,6 +9,9 @@ from .service import to_float
 # picking" scenario
 
 
+# TODO add picking and package content in package level?
+
+
 class LocationContentTransfer(Component):
     """
     Methods for the Location Content Transfer Process
@@ -48,7 +51,7 @@ class LocationContentTransfer(Component):
         """Transition to the 'start' state"""
         return self._response(next_state="start", message=message)
 
-    def _response_for_scan_destination_all(self, location, pickings=None, message=None):
+    def _response_for_scan_destination_all(self, pickings, message=None):
         """Transition to the 'scan_destination_all' state
 
         The client screen shows a summary of all the lines and packages
@@ -56,7 +59,20 @@ class LocationContentTransfer(Component):
         """
         return self._response(
             next_state="scan_destination_all",
-            data=self._data_content_all_for_location(location, pickings=pickings),
+            data=self._data_content_all_for_location(pickings=pickings),
+            message=message,
+        )
+
+    def _response_for_confirm_scan_destination_all(self, pickings, message=None):
+        """Transition to the 'confirm_scan_destination_all' state
+
+        The client screen shows a summary of all the lines and packages
+        to move to a single destination. The user has to scan the destination
+        location a second time to validate the destination.
+        """
+        return self._response(
+            next_state="confirm_scan_destination_all",
+            data=self._data_content_all_for_location(pickings=pickings),
             message=message,
         )
 
@@ -72,7 +88,7 @@ class LocationContentTransfer(Component):
         )
 
     def _response_for_scan_destination(self, location, next_content, message=None):
-        """Transition to the 'start_single' state
+        """Transition to the 'scan_destination' state
 
         The client screen shows details of the package level or move line to move.
         """
@@ -82,7 +98,22 @@ class LocationContentTransfer(Component):
             message=message,
         )
 
-    def _data_content_all_for_location(self, location, pickings=None):
+    def _response_for_confirm_scan_destination(
+        self, location, next_content, message=None
+    ):
+        """Transition to the 'confirm_scan_destination' state
+
+        The client screen shows details of the package level or move line to
+        move. The user has to scan the destination location a second time to
+        validate the destination.
+        """
+        return self._response(
+            next_state="confirm_scan_destination",
+            data=self._data_content_line_for_location(location, next_content),
+            message=message,
+        )
+
+    def _data_content_all_for_location(self, pickings):
         if not pickings:
             # TODO get pickings from location
             raise NotImplementedError("to do: get pickings from location")
@@ -109,19 +140,24 @@ class LocationContentTransfer(Component):
         )
         return {"move_line": line_data, "package_level": level_data}
 
+    def _next_content(self, pickings):
+        sorter = self.actions_for("location_content_transfer.sorter")
+        sorter.feed_pickings(pickings)
+        try:
+            next_content = next(sorter)
+        except StopIteration:
+            # TODO set picking to done
+            return None
+        return next_content
+
     def _router_single_or_all_destination(self, pickings, message=None):
         location = pickings.mapped("location_id")
         if len(pickings.mapped("move_line_ids.location_dest_id")) == 1:
-            return self._response_for_scan_destination_all(
-                location, pickings=pickings, message=message
-            )
+            return self._response_for_scan_destination_all(pickings, message=message)
         else:
-            sorter = self.actions_for("location_content_transfer.sorter")
-            sorter.feed_pickings(pickings)
-            try:
-                next_content = next(sorter)
-            except StopIteration:
-                # TODO test
+            next_content = self._next_content(pickings)
+            if not next_content:
+                # TODO test (no more lines)
                 return self._response_for_start(
                     message=self.msg_store.location_content_transfer_complete(location)
                 )
@@ -163,9 +199,11 @@ class LocationContentTransfer(Component):
         return [
             ("location_id", "=", location.id),
             ("qty_done", "=", 0),
+            ("state", "in", ("assigned", "partially_available")),
         ]
 
     def _find_location_move_lines(self, location):
+        """Find lines that potentially are to move in the location"""
         return self.env["stock.move.line"].search(
             self._find_location_move_lines_domain(location)
         )
@@ -216,7 +254,28 @@ class LocationContentTransfer(Component):
 
         return self._router_single_or_all_destination(pickings)
 
-    def set_destination_all(self, location_id, barcode):
+    def _find_transfer_move_lines_domain(self, location):
+        return [
+            ("location_id", "=", location.id),
+            ("state", "in", ("assigned", "partially_available")),
+            ("qty_done", ">", 0),
+            # TODO check generated SQL
+            ("picking_id.user_id", "=", self.env.uid),
+        ]
+
+    def _find_transfer_move_lines(self, location):
+        """Find move lines currently being moved by the user"""
+        lines = self.env["stock.move.line"].search(
+            self._find_transfer_move_lines_domain(location)
+        )
+        return lines
+
+    def _set_destination_lines(self, pickings, move_lines, dest_location):
+        move_lines.location_dest_id = dest_location
+        move_lines.package_level_id.location_dest_id = dest_location
+        pickings.action_done()
+
+    def set_destination_all(self, location_id, barcode, confirmation=False):
         """Scan destination location for all the moves of the location
 
         barcode is a stock.location for the destination
@@ -225,7 +284,38 @@ class LocationContentTransfer(Component):
         * scan_destination_all: invalid destination or could not set moves to done
         * start: moves are done
         """
-        return self._response()
+        location = self.env["stock.location"].browse(location_id)
+        if not location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        move_lines = self._find_transfer_move_lines(location)
+        pickings = move_lines.mapped("picking_id")
+        scanned_location = self.actions_for("search").location_from_scan(barcode)
+        if not scanned_location:
+            return self._response_for_scan_destination_all(
+                pickings, message=self.msg_store.barcode_not_found()
+            )
+
+        if not scanned_location.is_sublocation_of(
+            self.picking_types.mapped("default_location_dest_id")
+        ):
+            return self._response_for_scan_destination_all(
+                pickings, message=self.msg_store.dest_location_not_allowed()
+            )
+        if not confirmation and not scanned_location.is_sublocation_of(
+            move_lines.mapped("location_dest_id")
+        ):
+            # the scanned location is valid (child of picking type's destination)
+            # but not the expected one: ask for confirmation
+            return self._response_for_confirm_scan_destination_all(pickings)
+
+        self._set_destination_lines(pickings, move_lines, scanned_location)
+
+        return self._response_for_start(
+            message={
+                "message_type": "success",
+                "body": _("Content transferred from {}.").format(location.name),
+            }
+        )
 
     def go_to_single(self, location_id):
         """Ask the first move line or package level
@@ -264,7 +354,9 @@ class LocationContentTransfer(Component):
         """
         return self._response()
 
-    def set_destination_package(self, location_id, package_level_id, barcode):
+    def set_destination_package(
+        self, location_id, package_level_id, barcode, confirmation=False
+    ):
         """Scan destination location for package level
 
         If the move has other move lines / package levels it has to be split
@@ -285,7 +377,9 @@ class LocationContentTransfer(Component):
         """
         return self._response()
 
-    def set_destination_line(self, location_id, move_line_id, quantity, barcode):
+    def set_destination_line(
+        self, location_id, move_line_id, quantity, barcode, confirmation=False
+    ):
         """Scan destination location for move line
 
         If the quantity < qty of the line, split the move and reserve it.
@@ -381,6 +475,7 @@ class ShopfloorLocationContentTransferValidator(Component):
         return {
             "location_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
+            "confirmation": {"type": "boolean", "nullable": True, "required": False},
         }
 
     def go_to_single(self):
@@ -405,6 +500,7 @@ class ShopfloorLocationContentTransferValidator(Component):
             "location_id": {"coerce": to_int, "required": True, "type": "integer"},
             "package_level_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
+            "confirmation": {"type": "boolean", "nullable": True, "required": False},
         }
 
     def set_destination_line(self):
@@ -413,6 +509,7 @@ class ShopfloorLocationContentTransferValidator(Component):
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
             "quantity": {"coerce": to_float, "required": True, "type": "float"},
             "barcode": {"required": True, "type": "string"},
+            "confirmation": {"type": "boolean", "nullable": True, "required": False},
         }
 
     def postpone_package(self):
@@ -456,8 +553,10 @@ class ShopfloorLocationContentTransferValidatorResponse(Component):
         return {
             "start": {},
             "scan_destination_all": self._schema_all,
+            "confirm_scan_destination_all": self._schema_all,
             "start_single": self._schema_single,
             "scan_destination": self._schema_single,
+            "confirm_scan_destination": self._schema_single,
         }
 
     @property
@@ -493,7 +592,13 @@ class ShopfloorLocationContentTransferValidatorResponse(Component):
         )
 
     def set_destination_all(self):
-        return self._response_schema(next_states={"start", "scan_destination_all"})
+        return self._response_schema(
+            next_states={
+                "start",
+                "scan_destination_all",
+                "confirm_scan_destination_all",
+            }
+        )
 
     def go_to_single(self):
         return self._response_schema(next_states={"start", "start_single"})
@@ -509,10 +614,14 @@ class ShopfloorLocationContentTransferValidatorResponse(Component):
         )
 
     def set_destination_package(self):
-        return self._response_schema(next_states={"start_single", "scan_destination"})
+        return self._response_schema(
+            next_states={"start_single", "scan_destination", "confirm_scan_destination"}
+        )
 
     def set_destination_line(self):
-        return self._response_schema(next_states={"start_single", "scan_destination"})
+        return self._response_schema(
+            next_states={"start_single", "scan_destination", "confirm_scan_destination"}
+        )
 
     def postpone_package(self):
         return self._response_schema(next_states={"start_single"})
