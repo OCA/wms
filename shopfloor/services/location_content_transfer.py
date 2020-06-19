@@ -76,11 +76,18 @@ class LocationContentTransfer(Component):
             message=message,
         )
 
-    def _response_for_start_single(self, location, next_content, message=None):
+    def _response_for_start_single(self, pickings, message=None):
         """Transition to the 'start_single' state
 
         The client screen shows details of the package level or move line to move.
         """
+        location = pickings.mapped("location_id")
+        next_content = self._next_content(pickings)
+        if not next_content:
+            # TODO test (no more lines)
+            return self._response_for_start(
+                message=self.msg_store.location_content_transfer_complete(location)
+            )
         return self._response(
             next_state="start_single",
             data=self._data_content_line_for_location(location, next_content),
@@ -151,19 +158,10 @@ class LocationContentTransfer(Component):
         return next_content
 
     def _router_single_or_all_destination(self, pickings, message=None):
-        location = pickings.mapped("location_id")
         if len(pickings.mapped("move_line_ids.location_dest_id")) == 1:
             return self._response_for_scan_destination_all(pickings, message=message)
         else:
-            next_content = self._next_content(pickings)
-            if not next_content:
-                # TODO test (no more lines)
-                return self._response_for_start(
-                    message=self.msg_store.location_content_transfer_complete(location)
-                )
-            return self._response_for_start_single(
-                location, next_content, message=message
-            )
+            return self._response_for_start_single(pickings, message=message)
 
     def _domain_recover_pickings(self):
         return [
@@ -328,7 +326,11 @@ class LocationContentTransfer(Component):
         * start: no remaining lines in the location
         * start_single: if any line or package level has a different destination
         """
-        return self._response()
+        location = self.env["stock.location"].browse(location_id)
+        if not location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        move_lines = self._find_transfer_move_lines(location)
+        return self._response_for_start_single(move_lines.mapped("picking_id"))
 
     def scan_package(self, location_id, package_level_id, barcode):
         """Scan a package level to move
