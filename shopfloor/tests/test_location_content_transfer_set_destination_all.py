@@ -2,7 +2,12 @@ from .test_location_content_transfer_base import LocationContentTransferCommonCa
 
 
 class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommonCase):
-    """Tests for endpoint /set_destination_all"""
+    """Tests for endpoint used from scan_destination_all
+
+    * /set_destination_all
+    * /go_to_single
+
+    """
 
     # TODO see what can be common
     @classmethod
@@ -140,3 +145,10 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
             self.pickings,
             message=self.service.msg_store.dest_location_not_allowed(),
         )
+
+    def test_go_to_single(self):
+        """User used to 'split by lines' button to process line per line"""
+        response = self.service.dispatch(
+            "go_to_single", params={"location_id": self.content_loc.id}
+        )
+        self.assert_response_start_single(response, self.pickings)
