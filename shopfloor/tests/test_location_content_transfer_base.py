@@ -30,7 +30,8 @@ class LocationContentTransferCommonCase(CommonCase):
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="location_content_transfer")
 
-    def _simulate_pickings_selected(self, pickings):
+    @classmethod
+    def _simulate_pickings_selected(cls, pickings):
         """Create a state as if pickings has been selected
 
         ... during a Location content transfer.
@@ -41,14 +42,16 @@ class LocationContentTransferCommonCase(CommonCase):
         * the qty_done of all their move lines is set to they reserved qty
 
         """
-        pickings.user_id = self.env.uid
+        pickings.user_id = cls.env.uid
         for line in pickings.mapped("move_line_ids"):
             line.qty_done = line.product_uom_qty
 
     def assert_response_start(self, response, message=None):
         self.assert_response(response, next_state="start", message=message)
 
-    def assert_response_scan_destination_all(self, response, pickings, message=None):
+    def _assert_response_scan_destination_all(
+        self, state, response, pickings, message=None
+    ):
         # this code is repeated from the implementation, not great, but we
         # mostly want to ensure the selection of pickings is right, and the
         # data methods have their own tests
@@ -56,12 +59,24 @@ class LocationContentTransferCommonCase(CommonCase):
         package_levels = pickings.package_level_ids
         self.assert_response(
             response,
-            next_state="scan_destination_all",
+            next_state=state,
             data={
                 "move_lines": self.data.move_lines(lines),
                 "package_levels": self.data.package_levels(package_levels),
             },
             message=message,
+        )
+
+    def assert_response_scan_destination_all(self, response, pickings, message=None):
+        self._assert_response_scan_destination_all(
+            "scan_destination_all", response, pickings, message=message
+        )
+
+    def assert_response_confirm_scan_destination_all(
+        self, response, pickings, message=None
+    ):
+        self._assert_response_scan_destination_all(
+            "confirm_scan_destination_all", response, pickings, message=message
         )
 
     def assert_response_start_single(self, response, pickings, message=None):
