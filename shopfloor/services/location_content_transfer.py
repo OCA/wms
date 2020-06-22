@@ -404,7 +404,37 @@ class LocationContentTransfer(Component):
         * start_single: barcode not found, ...
         * scan_destination: the barcode matches
         """
-        return self._response()
+        location = self.env["stock.location"].browse(location_id)
+        if not location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        if not move_line.exists():
+            move_lines = self._find_transfer_move_lines(location)
+            return self._response_for_start_single(
+                move_lines.mapped("picking_id"),
+                message=self.msg_store.record_not_found(),
+            )
+
+        search = self.actions_for("search")
+        product = search.product_from_scan(barcode)
+        if product and product == move_line.product_id:
+            if product.tracking in ("lot", "serial"):
+                move_lines = self._find_transfer_move_lines(location)
+                return self._response_for_start_single(
+                    move_lines.mapped("picking_id"),
+                    message=self.msg_store.scan_lot_on_product_tracked_by_lot(),
+                )
+            else:
+                return self._response_for_scan_destination(location, move_line)
+
+        lot = search.lot_from_scan(barcode)
+        if lot and lot == move_line.lot_id:
+            return self._response_for_scan_destination(location, move_line)
+
+        move_lines = self._find_transfer_move_lines(location)
+        return self._response_for_start_single(
+            move_lines.mapped("picking_id"), message=self.msg_store.barcode_not_found()
+        )
 
     def set_destination_package(
         self, location_id, package_level_id, barcode, confirmation=False
