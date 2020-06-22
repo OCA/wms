@@ -102,7 +102,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
             params={
                 "location_id": self.content_loc.id,
                 "package_level_id": package_level.id,
-                "barcode": self.product_a.barcode,
+                "barcode": barcode,
             },
         )
         self.assert_response_start_single(response, pickings, message=message)
@@ -200,4 +200,76 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         )
         self.assert_response_start_single(
             response, self.pickings, message=self.service.msg_store.record_not_found()
+        )
+
+    def _test_scan_line_ok(self, move_line, barcode):
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "location_id": self.content_loc.id,
+                "move_line_id": move_line.id,
+                "barcode": barcode,
+            },
+        )
+        self.assert_response_scan_destination(response, move_line)
+
+    def test_scan_line_product_ok(self):
+        move_line = self.picking2.move_line_ids[0]
+        # check we selected the good line
+        self.assertEqual(move_line.product_id, self.product_c)
+        self._test_scan_line_ok(move_line, self.product_c.barcode)
+
+    def test_scan_line_product_packaging_ok(self):
+        move_line = self.picking2.move_line_ids[0]
+        # check we selected the good line
+        self.assertEqual(move_line.product_id, self.product_c)
+        self._test_scan_line_ok(move_line, self.product_c.packaging_ids[0].barcode)
+
+    def test_scan_line_lot_ok(self):
+        move_line = self.picking2.move_line_ids[1]
+        # check we selected the good line (the one with a lot)
+        self.assertEqual(move_line.product_id, self.product_d)
+        self._test_scan_line_ok(move_line, self.product_d_lot.name)
+
+    def _test_scan_line_nok(self, pickings, move_line_id, barcode, message):
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "location_id": self.content_loc.id,
+                "move_line_id": move_line_id,
+                "barcode": barcode,
+            },
+        )
+        self.assert_response_start_single(response, pickings, message=message)
+
+    def test_scan_line_product_nok_product_tracked(self):
+        # we scan product_d's barcode but it's tracked by lot
+        move_line = self.picking2.move_line_ids[1]
+        # check we selected the good line (the one with a lot)
+        self.assertEqual(move_line.product_id, self.product_d)
+        self._test_scan_line_nok(
+            self.pickings,
+            move_line.id,
+            self.product_d.barcode,
+            self.service.msg_store.scan_lot_on_product_tracked_by_lot(),
+        )
+
+    def test_scan_line_barcode_not_found(self):
+        move_line = self.picking2.move_line_ids[0]
+        self._test_scan_line_nok(
+            self.pickings,
+            move_line.id,
+            "NOT_FOUND",
+            self.service.msg_store.barcode_not_found(),
+        )
+
+    def test_scan_line_move_line_not_exists(self):
+        move_line = self.picking2.move_line_ids[0]
+        move_line_id = move_line.id
+        move_line.unlink()
+        self._test_scan_line_nok(
+            self.pickings,
+            move_line_id,
+            "NOT_FOUND",
+            self.service.msg_store.record_not_found(),
         )
