@@ -202,7 +202,7 @@ class CommonCase(SavepointCase, ComponentMixin):
             .create(
                 {
                     "name": "Box",
-                    "product_id": cls.product_b.id,
+                    "product_id": cls.product_c.id,
                     "barcode": "ProductCBox",
                 }
             )
