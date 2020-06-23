@@ -18,6 +18,11 @@
                     widget="many2many_tags"
                     options="{'no_create': 1}"
                 />
+                <field name="move_create_is_possible" invisible="1" />
+                <field
+                    name="allow_move_create"
+                    attrs="{'invisible': [('move_create_is_possible', '=', False)]}"
+                />
             </tree>
         </field>
     </record>
