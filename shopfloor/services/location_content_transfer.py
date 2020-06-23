@@ -214,6 +214,12 @@ class LocationContentTransfer(Component):
 
         All the move lines and package levels must have the same picking type.
 
+        If the scanned location has no move lines, new move lines to move the
+        whole content of the location are created if:
+
+        * the menu has the option "Allow to create move(s)"
+        * the menu is linked to only one picking type.
+
         When move lines and package levels have different destinations, the
         first line without package level or package level is sent to the client.
 
