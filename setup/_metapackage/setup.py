@@ -10,6 +10,7 @@ setuptools.setup(
     install_requires=[
         'odoo13-addon-sale_stock_available_to_promise_release',
         'odoo13-addon-stock_available_to_promise_release',
+        'odoo13-addon-stock_dynamic_routing',
         'odoo13-addon-stock_picking_type_shipping_policy',
     ],
     classifiers=[
