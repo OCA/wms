@@ -174,22 +174,6 @@ class StockLocation(models.Model):
                     (6, 0, parent.allowed_location_storage_type_ids.ids)
                 ]
 
-    @api.constrains("pack_putaway_strategy", "storage_location_sequence_ids")
-    def _check_pack_putaway_strategy(self):
-        for location in self:
-            if (
-                location.pack_putaway_strategy == "none"
-                and location.storage_location_sequence_ids
-            ):
-                raise ValidationError(
-                    _(
-                        "Changing Packs storage strategy to 'None' is not "
-                        "allowed as the location %s is used in a Storage "
-                        "locations for package storage type."
-                    )
-                    % location.name
-                )
-
     def _get_putaway_strategy(self, product):
         putaway_location = super()._get_putaway_strategy(product)
         quant = self.env.context.get("storage_quant")
