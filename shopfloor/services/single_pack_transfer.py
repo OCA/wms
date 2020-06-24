@@ -85,25 +85,56 @@ class SinglePackTransfer(Component):
                 )
             )
 
-        move_lines = self.env["stock.move.line"].search(
+        package_level = self.env["stock.package_level"].search(
             [
                 ("package_id", "=", package.id),
-                ("state", "not in", ("cancel", "done")),
                 ("picking_id.picking_type_id", "in", picking_types.ids),
             ]
         )
-        if not move_lines:
+        # State is computed, can't use it in the domain. And it's probably faster
+        # to filter here rather than using a domain on "picking_id.state" that would
+        # use a sub-search on stock.picking: we shouldn't have dozens of package levels
+        # for a package.
+        package_level = package_level.filtered(
+            lambda pl: pl.state not in ("cancel", "done")
+        )
+        if not package_level:
+            if self.work.menu.allow_move_create:
+                package_level = self._create_package_level(package)
+
+        if not package_level:
             return self._response_for_start(
                 message=self.msg_store.no_pending_operation_for_pack(package)
             )
-        if move_lines[0].package_level_id.is_done:
+
+        if package_level.is_done:
             return self._response_for_confirm_start(
-                move_lines[0].package_level_id,
-                message=self.msg_store.already_running_ask_confirmation(),
+                package_level, message=self.msg_store.already_running_ask_confirmation()
             )
 
-        move_lines[0].package_level_id.is_done = True
-        return self._response_for_scan_location(move_lines[0].package_level_id)
+        package_level.is_done = True
+        return self._response_for_scan_location(package_level)
+
+    def _create_package_level(self, package):
+        # this method can be called only if we have one picking type
+        # (allow_move_create==True on menu)
+        assert self.picking_types.ensure_one()
+        StockPicking = self.env["stock.picking"].with_context(
+            default_picking_type_id=self.picking_types.id
+        )
+        picking = StockPicking.create({})
+        package_level = self.env["stock.package_level"].create(
+            {
+                "picking_id": picking.id,
+                "package_id": package.id,
+                "location_dest_id": picking.location_dest_id.id,
+                "company_id": self.env.company.id,
+            }
+        )
+        package_level._generate_moves()
+        picking.action_confirm()
+        picking.action_assign()
+        return package_level
 
     def _is_move_state_valid(self, move):
         return move.state != "cancel"
