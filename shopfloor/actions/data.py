@@ -215,3 +215,14 @@ class DataAction(Component):
     @property
     def _picking_batch_parser(self):
         return ["id", "name", "picking_count", "move_line_count", "total_weight:weight"]
+
+    def picking_type(self, record, **kw):
+        parser = self._picking_type_parser
+        return self._jsonify(record, parser, **kw)
+
+    def picking_types(self, record, **kw):
+        return self.picking_type(record, multi=True)
+
+    @property
+    def _picking_type_parser(self):
+        return ["id", "name"]

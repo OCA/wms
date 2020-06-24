@@ -38,6 +38,7 @@ class ShopfloorMenu(models.Model):
         return [
             # these must match a REST service's '_usage'
             ("single_pack_transfer", "Single Pack Transfer"),
+            ("zone_picking", "Zone Picking"),
             ("cluster_picking", "Cluster Picking"),
             ("checkout", "Checkout/Packing"),
             ("delivery", "Delivery"),

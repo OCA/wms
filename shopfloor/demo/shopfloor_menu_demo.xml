@@ -9,6 +9,15 @@
             eval="[(4, ref('shopfloor.picking_type_single_pallet_transfer_demo'))]"
         />
     </record>
+    <record id="shopfloor_menu_zone_picking" model="shopfloor.menu">
+        <field name="name">Zone Picking</field>
+        <field name="sequence">35</field>
+        <field name="scenario">zone_picking</field>
+        <field
+            name="picking_type_ids"
+            eval="[(4, ref('shopfloor.picking_type_zone_picking_demo'))]"
+        />
+    </record>
     <record id="shopfloor_menu_cluster_picking" model="shopfloor.menu">
         <field name="name">Cluster Picking</field>
         <field name="sequence">30</field>

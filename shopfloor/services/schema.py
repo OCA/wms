@@ -164,3 +164,6 @@ class BaseShopfloorSchemaResponse(Component):
             "product": self._schema_dict_of(self.product()),
             "quantity": {"type": "float", "required": True},
         }
+
+    def picking_type(self):
+        return self._simple_record()
