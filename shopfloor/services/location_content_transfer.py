@@ -233,6 +233,9 @@ class LocationContentTransfer(Component):
         if not location:
             return self._response_for_start(message=self.msg_store.barcode_not_found())
         move_lines = self._find_location_move_lines(location)
+        # TODO: Add creation of move lines and package levels when empty, see
+        # single_pack_transfer.py for creation of package levels (but quants
+        # without packs need to be created as move lines too here)
         pickings = move_lines.mapped("picking_id")
         picking_types = pickings.mapped("picking_type_id")
 
