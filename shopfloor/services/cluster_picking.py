@@ -666,9 +666,8 @@ class ClusterPicking(Component):
     def prepare_unload(self, picking_batch_id):
         """Initiate the unloading phase of the scenario
 
-        If the destination of all the move lines still to unload is the same,
-        Everytime this method is called, it resets the flag according to the
-        condition above.
+        It goes to different screens depending if all the move lines have
+        the same destination or not.
 
         Transitions:
         * unload_all: when all lines go to the same destination
