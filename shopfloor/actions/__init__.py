@@ -21,6 +21,5 @@ from . import data
 from . import data_detail
 from . import completion_info
 from . import message
-from . import pack_transfer_validate
 from . import search
 from . import inventory
