@@ -12,6 +12,7 @@ from . import scan_anything
 
 # process services
 from . import checkout
+from . import zone_picking
 from . import cluster_picking
 from . import delivery
 from . import location_content_transfer

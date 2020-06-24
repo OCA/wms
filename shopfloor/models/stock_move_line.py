@@ -13,6 +13,7 @@ class StockMoveLine(models.Model):
         "Indicates if a the move has been postponed in a barcode scenario.",
     )
     shopfloor_checkout_done = fields.Boolean(default=False)
+    shopfloor_user_id = fields.Many2one(comodel_name="res.users", index=True)
 
     # we search lines based on their location in some workflows
     location_id = fields.Many2one(index=True)
