@@ -1,16 +1,8 @@
 <odoo noupdate="1">
-    <record id="shopfloor_menu_put_away_reach_truck" model="shopfloor.menu">
-        <field name="name">Put-Away Reach Truck</field>
-        <field name="sequence">10</field>
-        <field name="scenario">single_pack_putaway</field>
-        <field
-            name="picking_type_ids"
-            eval="[(4, ref('shopfloor.picking_type_putaway_reach_truck_demo'))]"
-        />
-    </record>
     <record id="shopfloor_menu_single_pallet_transfer" model="shopfloor.menu">
         <field name="name">Single Pallet Transfer</field>
         <field name="sequence">20</field>
+        <field name="allow_move_create" eval="1" />
         <field name="scenario">single_pack_transfer</field>
         <field
             name="picking_type_ids"
