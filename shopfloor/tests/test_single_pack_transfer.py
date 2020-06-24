@@ -15,6 +15,8 @@ class SinglePackTransferCase(CommonCase):
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
+        # we activate the move creation in tests when needed
+        cls.menu.sudo().allow_move_create = False
         cls.pack_a = cls.env["stock.quant.package"].create(
             {"location_id": cls.stock_location.id}
         )
@@ -138,6 +140,52 @@ class SinglePackTransferCase(CommonCase):
                 "message_type": "error",
                 "body": "No pending operation for package {}.".format(self.pack_a.name),
             },
+        )
+
+    def test_start_no_operation_create(self):
+        """Test /start when there is no operation to move the pack, it is created
+
+        The pre-conditions:
+
+        * The option "Allow Move Creation" is turned on on the menu
+        * A Pack exists in Stock/Shelf1.
+        * No stock picking exists to move the Pack from Stock/Shelf1 to
+          Stock/Shelf2, or the state is not assigned.
+
+        Expected result:
+
+        * Create a stock.picking, move, package level and continue with the
+          workflow
+        """
+        self.menu.sudo().allow_move_create = True
+        barcode = self.pack_a.name
+        params = {"barcode": barcode}
+        self.picking.do_unreserve()
+
+        # Simulate the client scanning a package's barcode, which
+        # in turns should start the operation in odoo
+        response = self.service.dispatch("start", params=params)
+
+        move_line = self.env["stock.move.line"].search(
+            [("package_id", "=", self.pack_a.id)]
+        )
+        package_level = move_line.package_level_id
+
+        self.assertTrue(package_level.is_done)
+
+        expected_data = {
+            "id": package_level.id,
+            "name": package_level.package_id.name,
+            "location_src": self.data.location(self.shelf1),
+            "location_dest": self.data.location(
+                self.picking_type.default_location_dest_id
+            ),
+            "picking": self.data.picking(package_level.picking_id),
+            "product": self.data.product(self.product_a),
+        }
+
+        self.assert_response(
+            response, next_state="scan_location", data=expected_data,
         )
 
     def test_start_barcode_not_known(self):
