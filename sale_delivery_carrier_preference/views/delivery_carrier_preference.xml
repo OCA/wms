@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="sale_delivery_carrier_preference_tree_view" model="ir.ui.view">
+        <field name="name">sale.delivery.carrier.preference.tree.view</field>
+        <field name="model">sale.delivery.carrier.preference</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="preference" />
+                <field
+                    name="carrier_id"
+                    attrs="{'required': [('preference', '=', 'carrier')]}"
+                />
+                <field name="sale_order_max_weight" />
+                <field name="company_id" groups="base.group_multi_company" />
+            </tree>
+        </field>
+    </record>
+    <record id="sale_delivery_carrier_preference_form_view" model="ir.ui.view">
+        <field name="name">sale.delivery.carrier.preference.form.view</field>
+        <field name="model">sale.delivery.carrier.preference</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title" name="title">
+                        <label for="name" string="Name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="preference" />
+                            <field
+                                name="carrier_id"
+                                attrs="{'required': [('preference', '=', 'carrier')], 'invisible': [('preference', '=', 'partner')]}"
+                            />
+                        </group>
+                        <group>
+                            <field name="sequence" />
+                            <field name="sale_order_max_weight" />
+                            <field
+                                name="company_id"
+                                groups="base.group_multi_company"
+                            />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record
+        id="action_sale_delivery_carrier_preference_view"
+        model="ir.actions.act_window"
+    >
+        <field name="name">Preferred Shipping Methods</field>
+        <field name="res_model">sale.delivery.carrier.preference</field>
+    </record>
+    <menuitem
+        id="menu_sale_delivery_carrier_preference"
+        name="Preferred Shipping Methods"
+        parent="sale.menu_sales_config"
+        action="action_sale_delivery_carrier_preference_view"
+        groups="sales_team.group_sale_manager"
+    />
+</odoo>
