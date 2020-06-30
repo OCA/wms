@@ -404,8 +404,11 @@ export class DemoTools {
     makePackageLevel(defaults = {}, options = {}) {
         _.defaults(defaults, {
             is_done: false,
+            picking: this.makePicking(),
             package: this.makePack(),
+            product: this.makeProduct(),
             location: this.makeLocation(),
+            // TODO: shall we add move lines to be able to show product details?
         });
         const rec = this.makeSimpleRecord(defaults, options);
         return rec;
