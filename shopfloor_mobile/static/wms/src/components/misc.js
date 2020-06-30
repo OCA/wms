@@ -271,3 +271,22 @@ Vue.component("btn-back", {
 </btn-action>
 `,
 });
+
+Vue.component("btn-reset-config", {
+    props: {
+        redirect: {
+            type: Object,
+            default: function() {
+                return {name: "home"};
+            },
+        },
+    },
+    methods: {
+        reset_data: function() {
+            this.$root._clearConfig();
+            this.$root._loadMenu();
+            this.$root.$router.push(this.$props.redirect);
+        },
+    },
+    template: `<btn-action action="warn" @click="reset_data()">Reload config and menu</btn-action>`,
+});
