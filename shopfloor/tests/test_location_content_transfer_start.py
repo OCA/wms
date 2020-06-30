@@ -172,3 +172,54 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
                 "body": "This location content can't be moved using this menu.",
             },
         )
+
+    def test_scan_location_create_moves(self):
+        """The scanned location has no move lines but has some quants to move."""
+        picking_type = self.menu.picking_type_ids
+        # product_a alone
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_a, self.content_loc, 10,
+        )
+        # product_b in a package
+        package = self.env["stock.quant.package"].create({})
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_b, self.content_loc, 10, package_id=package
+        )
+        # product_c & product_d in a package
+        package2 = self.env["stock.quant.package"].create({})
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_c, self.content_loc, 5, package_id=package2
+        )
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_d, self.content_loc, 5, package_id=package2
+        )
+        response = self.service.dispatch(
+            "scan_location", params={"barcode": self.content_loc.barcode}
+        )
+        picking = self.env["stock.picking"].search(
+            [("picking_type_id", "=", picking_type.id)]
+        )
+        self.assertEqual(len(picking), 1)
+        self.assert_response_scan_destination_all(response, picking)
+        move_line_id = response["data"]["scan_destination_all"]["move_lines"][0]["id"]
+        package_levels = response["data"]["scan_destination_all"]["package_levels"]
+        self.assertIn(move_line_id, picking.move_line_ids.ids)
+        self.assertEqual(package_levels[0]["id"], picking.package_level_ids[0].id)
+        self.assertEqual(package_levels[0]["package"]["id"], package.id)
+        self.assertEqual(package_levels[1]["id"], picking.package_level_ids[1].id)
+        self.assertEqual(package_levels[1]["package"]["id"], package2.id)
+        # product_a in a move line without package
+        self.assertEqual(
+            picking.move_line_ids_without_package.mapped("product_id"), self.product_a
+        )
+        # all other products are in package levels
+        self.assertEqual(
+            picking.package_level_ids.mapped("package_id.quant_ids.product_id"),
+            self.product_b | self.product_c | self.product_d,
+        )
+        # all products are in move lines
+        self.assertEqual(
+            picking.move_line_ids.mapped("product_id"),
+            self.product_a | self.product_b | self.product_c | self.product_d,
+        )
+        self.assertEqual(picking.state, "assigned")
