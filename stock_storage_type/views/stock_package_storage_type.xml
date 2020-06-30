@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="package_storage_type_tree_view" model="ir.ui.view">
+        <field name="name">package.storage.type.tree.view</field>
+        <field name="model">stock.package.storage.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="location_storage_type_ids" widget="many2many_tags" />
+            </tree>
+        </field>
+    </record>
+    <record id="package_storage_type_form_view" model="ir.ui.view">
+        <field name="name">package.storage.type.form.view</field>
+        <field name="model">stock.package.storage.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button
+                            string="Put-Away sequence"
+                            class="oe_stat_button"
+                            icon="fa-location-arrow"
+                            name="action_view_storage_locations"
+                            type="object"
+                        />
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group name="main">
+                        <group name="location_storage_types">
+                            <field
+                                name="location_storage_type_ids"
+                                widget="many2many_tags"
+                            />
+                        </group>
+                        <group name="msg">
+                            <div colspan="2">
+                                <label for="storage_type_message" invisible="1" />
+                                <div>
+                                    <field name="storage_type_message" readonly="1" />
+                                </div>
+                            </div>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="package_storage_type_action" model="ir.actions.act_window">
+        <field name="name">Package Storage Types</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.package.storage.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

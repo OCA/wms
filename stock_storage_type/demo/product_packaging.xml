@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo noupdate="1">
+    <record id="product_product_9_packaging_single_bag" model="product.packaging">
+        <field name="name">Single bag</field>
+        <field name="qty">1</field>
+        <field name="product_id" ref="product.product_product_9" />
+    </record>
+    <record id="product_product_9_packaging_4_cardbox" model="product.packaging">
+        <field name="name">4 units cardbox</field>
+        <field name="qty">4</field>
+        <field name="product_id" ref="product.product_product_9" />
+        <field name="package_storage_type_id" ref="package_storage_type_cardboxes" />
+    </record>
+    <record id="product_product_9_packaging_48_pallet" model="product.packaging">
+        <field name="name">48 units pallet</field>
+        <field name="qty">48</field>
+        <field name="product_id" ref="product.product_product_9" />
+        <field name="package_storage_type_id" ref="package_storage_type_pallets" />
+        <field name="lngth">1200</field>
+        <field name="width">800</field>
+        <field name="height">1500</field>
+        <field name="max_weight">60</field>
+    </record>
+</odoo>
