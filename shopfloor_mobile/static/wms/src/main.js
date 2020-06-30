@@ -122,8 +122,8 @@ const app = new Vue({
             }
             return new OdooClass(params);
         },
-        loadConfig: function() {
-            if (this.appconfig) {
+        loadConfig: function(force) {
+            if (this.appconfig && !force) {
                 return this.appconfig;
             }
             // TODO: we can do this via watcher
@@ -175,6 +175,10 @@ const app = new Vue({
                 self.appmenu = result.data;
                 self.loading = false;
             });
+        },
+        _clearConfig: function() {
+            this.$storage.remove("appconfig");
+            return this._loadConfig();
         },
         logout: function() {
             this.apikey = "";
