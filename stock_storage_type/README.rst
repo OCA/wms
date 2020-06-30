@@ -14,13 +14,13 @@ Stock Storage Type
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fwms-lightgray.png?logo=github
-    :target: https://github.com/OCA/wms/tree/12.0/stock_storage_type
+    :target: https://github.com/OCA/wms/tree/13.0/stock_storage_type
     :alt: OCA/wms
 .. |badge4| image:: https://img.shields.io/badge/weblate-Translate%20me-F47D42.png
-    :target: https://translation.odoo-community.org/projects/wms-12-0/wms-12-0-stock_storage_type
+    :target: https://translation.odoo-community.org/projects/wms-13-0/wms-13-0-stock_storage_type
     :alt: Translate me on Weblate
 .. |badge5| image:: https://img.shields.io/badge/runbot-Try%20me-875A7B.png
-    :target: https://runbot.odoo-community.org/runbot/285/12.0
+    :target: https://runbot.odoo-community.org/runbot/285/13.0
     :alt: Try me on Runbot
 
 |badge1| |badge2| |badge3| |badge4| |badge5| 
@@ -41,6 +41,32 @@ This module introduces two new models in order to manage stock moves with
 Therefore a Stock location storage type can include different Stock package
 storage type in order to validate the destination of a move with package into a
 stock location.
+Moreover Stock location storage type can include product, size or lot
+restrictions for the stock locations it's defined on, so that a move with
+package will only be allowed if it doesn't violate the restrictions defined
+(cf stock_location_storage_type_strategy).
+
+Moreover, this module implements "storage type put-away strategy" in order to compute a
+put-away location using storage types.
+
+The standard put-away strategy is applied *before* the storage type put-away
+strategy as the former relies on product or product category and the latter
+relies on stock packages.
+
+In other words, when a move is assigned, Odoo standard put-away strategy will be
+applied to compute a new destination on the stock move lines, according to the
+product.
+After this first "put-away computation", the "storage type" put-away strategy
+is applied, if the reserved quant is linked to a package defining a package
+storage type.
+
+Storage locations linked to the package storage are processed sequentially, if
+said storage location is a child of the move line's destination location (i.e
+either the put-away location or the move's destination location), then it will
+be searched in order to find a children location that is allowed according to
+the restrictions defined on the stock location storage types.
+If no suitable location is found, the next location in the sequence will be
+searched and so on.
 
 .. IMPORTANT::
    This is an alpha version, the data model and design can change at any time without warning.
@@ -55,9 +81,26 @@ stock location.
 Known issues / Roadmap
 ======================
 
-* Move constraints from `stock_putaway_storage_type_strategy` here, to compute
-  a domain on `location_dest_id` fields from `stock.move.line` and
-  `stock.package_level` according to storage types.
+Currently, the module supports only strategies applied on packages (``stock.quant.package``).
+For implementations that do not use packages, it would be possible to add
+compatibility with product packaging.
+
+The information needed from a package are:
+
+* the storage type, to know which strategy is applied
+* the dimensions and weight, to apply constraints
+
+If we want to support product packaging, we would need to:
+
+* guess the product packaging of a move line based on the product and quantities
+  (multiple of a packaging quantity, for instance 8000 would be a pallet if the pallet
+  has 2000 units, 1900 would be Box if the Box has 100 units)
+* from the product packaging, we know the storage type and dimensions
+
+Everywhere the module is using ``package_id``, we would have to check this:
+
+* use the package if a package is set
+* else, use the computed packaging
 
 Bug Tracker
 ===========
@@ -65,7 +108,7 @@ Bug Tracker
 Bugs are tracked on `GitHub Issues <https://github.com/OCA/wms/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us smashing it by providing a detailed and welcomed
-`feedback <https://github.com/OCA/wms/issues/new?body=module:%20stock_storage_type%0Aversion:%2012.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/OCA/wms/issues/new?body=module:%20stock_storage_type%0Aversion:%2013.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -95,6 +138,6 @@ OCA, or the Odoo Community Association, is a nonprofit organization whose
 mission is to support the collaborative development of Odoo features and
 promote its widespread use.
 
-This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/12.0/stock_storage_type>`_ project on GitHub.
+This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/13.0/stock_storage_type>`_ project on GitHub.
 
 You are welcome to contribute. To learn how please visit https://odoo-community.org/page/Contribute.
