@@ -3,7 +3,7 @@ import {process_registry} from "../services/process_registry.js";
 import {demotools} from "../demo/demo.core.js"; // FIXME: dev only
 import {} from "../demo/demo.delivery.js"; // FIXME: dev only
 
-export var LocationContentTransfer = Vue.component("checkout", {
+export var LocationContentTransfer = Vue.component("location-content-transfer", {
     mixins: [ScenarioBaseMixin],
     template: `
         <Screen :screen_info="screen_info">
@@ -15,16 +15,38 @@ export var LocationContentTransfer = Vue.component("checkout", {
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
                 />
-            <div v-if="state_is('start_recovered') && has_picking()">
-                <detail-picking
+            <div v-if="state_in(['start_single', 'scan_destination']) && current_context().has_records">
+                <!-- TODO: no picking on pkg level yet -->
+                <!--detail-picking
                     :key="make_state_component_key(['picking'])"
                     :record="state.data.move_line.picking"
                     :options="{main: true}"
+                    /--->
+
+                <div v-for="rec in current_context().records">
+                    <batch-picking-line-detail
+                        :line="rec"
+                        :key="make_state_component_key(['detail-move-line', rec.id])"
+                        :article-scanned="state_is('scan_destination')"
+                        :show-qty-picker="state_is('scan_destination')"
+                        :default-destination-key="'location_dest'"
+                        />
+                </div>
+            </div>
+            <div v-if="state_is('scan_destination_all')">
+                <item-detail-card
+                    v-for="rec in current_context().records"
+                    :key="make_state_component_key(['detail-move-line', rec.id])"
+                    :record="rec"
+                    :options="move_line_detail_list_options(rec)"
                     />
-                <batch-picking-line-detail
-                    :line="state.data.move_line"
-                    :show-qty-picker="true"
-                    />
+            </div>
+            <div class="button-list button-vertical-list full">
+                <v-row align="center" v-if="state_is('scan_destination_all')">
+                    <v-col class="text-center" cols="12">
+                        <btn-action @click="state.on_split_by_line">Split by line</btn-action>
+                    </v-col>
+                </v-row>
             </div>
         </Screen>
         `,
@@ -39,10 +61,10 @@ export var LocationContentTransfer = Vue.component("checkout", {
     // },
     methods: {
         screen_title: function() {
-            if (_.isEmpty(this.current_doc()) || this.state_is(this.initial_state_key))
-                return this.menu_item().name;
+            if (!this.has_picking()) return this.menu_item().name;
             return this.current_picking().name;
         },
+        // TODO: if we have this working we can remove the picking detail?
         current_doc: function() {
             const picking = this.current_picking();
             return {
@@ -51,7 +73,7 @@ export var LocationContentTransfer = Vue.component("checkout", {
             };
         },
         current_picking: function() {
-            const data = this.state_get_data("start_recovered");
+            const data = this.state_get_data("start");
             if (_.isEmpty(data) || _.isEmpty(data.move_line.picking)) {
                 return {};
             }
@@ -60,35 +82,53 @@ export var LocationContentTransfer = Vue.component("checkout", {
         has_picking: function() {
             return !_.isEmpty(this.current_picking());
         },
+        /**
+         * As we can get `move_line` or `package_level` for single items
+         * and `move_lines` or `package_levels` for multiple items,
+         * this function tries to make such data homogenous.
+         * We'll work alway with multiple records and loop on them.
+         */
+        current_context: function() {
+            const data = this.state.data;
+            let res = {
+                has_records: true,
+                records: _.result(data, "move_lines"),
+                _multi: true,
+                _type: "move_line",
+            };
+            if (_.isEmpty(res.records) && data.move_line) {
+                res.records = [data.move_line];
+                res._multi = false;
+            }
+            if (_.isEmpty(res.records) && data.package_levels) {
+                res.records = data.package_levels;
+                res._type = "pkg_level";
+            }
+            if (_.isEmpty(res.records) && data.package_level) {
+                res.records = [data.package_level];
+                res._type = "pkg_level";
+            }
+            res.has_records = res.records.length > 0;
+            return res;
+        },
+        move_line_detail_list_options: function(move_line) {
+            return this.utils.misc.move_line_product_detail_options(move_line, {
+                loud_labels: true,
+                fields_blacklist: ["product.qty_available"],
+                fields: [{path: "location_src.name", label: "From"}],
+            });
+        },
     },
     data: function() {
         const self = this;
         return {
             usage: "location_content_transfer",
-            initial_state_key: "start",
+            initial_state_key: "scan_location",
             states: {
-                start: {
+                init: {
                     enter: () => {
                         this.state_reset_data();
                         this.wait_call(this.odoo.call("start_or_recover"));
-                    },
-                    on_scan: scanned => {
-                        this.wait_call(this.odoo.call("TODO", {barcode: scanned.text}));
-                    },
-                },
-                /**
-                 * TODO: this state could be useless
-                as we should use only one state to start
-                but we cannot use "start"
-                as it's aliased as the initial state automatically.
-
-                */
-                start_recovered: {
-                    display_info: {
-                        scan_placeholder: "Scan pack / product / lot",
-                    },
-                    on_scan: scanned => {
-                        this.wait_call(this.odoo.call("TODO", {barcode: scanned.text}));
                     },
                 },
                 scan_location: {
@@ -97,7 +137,102 @@ export var LocationContentTransfer = Vue.component("checkout", {
                         scan_placeholder: "Scan location",
                     },
                     on_scan: scanned => {
-                        this.wait_call(this.odoo.call("TODO", {barcode: scanned.text}));
+                        this.wait_call(
+                            this.odoo.call("scan_location", {barcode: scanned.text})
+                        );
+                    },
+                },
+                scan_destination_all: {
+                    display_info: {
+                        title: "Scan destination location for all items",
+                        scan_placeholder: "Scan location",
+                    },
+                    on_scan: scanned => {
+                        const data = this.state.data;
+                        this.wait_call(
+                            this.odoo.call("set_destination_all", {
+                                location_id: data.location.id,
+                                barcode: scanned.text,
+                                confirmation: data.confirmation_required,
+                            })
+                        );
+                    },
+                    on_split_by_line: () => {
+                        const location = this.state.data.location;
+                        this.wait_call(
+                            this.odoo.call("go_to_single", {location_id: location.id})
+                        );
+                    },
+                },
+                start_single: {
+                    display_info: {
+                        scan_placeholder: "Scan pack / product / lot",
+                    },
+                    on_scan: scanned => {
+                        let endpoint, endpoint_data;
+                        const data = this.state.data;
+                        if (data.package_level) {
+                            endpoint = "scan_package";
+                            endpoint_data = {
+                                package_level_id: data.package_level.id,
+                                location_id: data.package_level.location_src.id,
+                                barcode: scanned.text,
+                            };
+                        } else {
+                            endpoint = "scan_line";
+                            endpoint_data = {
+                                move_line_id: data.move_line.id,
+                                location_id: data.move_line.location_src.id,
+                                barcode: scanned.text,
+                            };
+                        }
+                        this.wait_call(this.odoo.call(endpoint, endpoint_data));
+                    },
+                },
+                scan_destination: {
+                    enter: () => {
+                        this.reset_notification();
+                    },
+                    display_info: {
+                        title: "Set a qty and scan destination location",
+                        scan_placeholder: "Scan location",
+                    },
+                    events: {
+                        qty_edit: "on_qty_update",
+                    },
+                    on_qty_update: qty => {
+                        this.state.data.destination_qty = qty;
+                    },
+                    on_scan: scanned => {
+                        let endpoint, endpoint_data;
+                        const data = this.state.data;
+                        if (data.package_level) {
+                            endpoint = "set_destination_package";
+                            endpoint_data = {
+                                package_level_id: data.package_level.id,
+                                location_id: data.package_level.location_src.id,
+                                barcode: scanned.text,
+                                confirmation: data.confirmation_required,
+                            };
+                        } else {
+                            endpoint = "set_destination_line";
+                            endpoint_data = {
+                                move_line_id: data.move_line.id,
+                                location_id: data.move_line.location_src.id,
+                                barcode: scanned.text,
+                                confirmation: data.confirmation_required,
+                                quantity:
+                                    this.state.data.destination_qty ||
+                                    data.move_line.quantity,
+                            };
+                        }
+                        this.wait_call(this.odoo.call(endpoint, endpoint_data));
+                    },
+                    on_split_by_line: () => {
+                        const location = this.state.data.move_lines[0].location_src;
+                        this.wait_call(
+                            this.odoo.call("go_to_single", {location_id: location.id})
+                        );
                     },
                 },
             },
