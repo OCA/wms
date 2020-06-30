@@ -95,5 +95,7 @@ class SaleDeliveryCarrierPreference(models.Model):
             if cp.preference == "carrier":
                 carriers_ids.append(cp.carrier_id.id)
             else:
-                carriers_ids.append(order.partner_id.property_delivery_carrier_id.id)
+                carriers_ids.append(
+                    order.partner_shipping_id.property_delivery_carrier_id.id
+                )
         return self.env["delivery.carrier"].browse(carriers_ids)

@@ -12,6 +12,16 @@ class SaleOrder(models.Model):
         string="Shipping weight (kg)", compute="_compute_shipping_weight",
     )
 
+    def action_confirm(self):
+        """Automatically add delivery.carrier on sale order confirmation"""
+        for order in self:
+            if (
+                any([line.product_id.type != "service" for line in order.order_line])
+                and not order.carrier_id
+            ):
+                order.carrier_id = order.get_preferred_carrier()
+        return super().action_confirm()
+
     @api.depends("order_line", "order_line.shipping_weight")
     def _compute_shipping_weight(self):
         for order in self:
@@ -22,6 +32,13 @@ class SaleOrder(models.Model):
         return fields.first(
             self.env["sale.delivery.carrier.preference"].get_preferred_carriers(self)
         )
+
+    def action_open_delivery_wizard(self):
+        res = super().action_open_delivery_wizard()
+        if not self.env.context.get("carrier_recompute"):
+            carrier = self.get_preferred_carrier()
+            res["context"]["default_carrier_id"] = carrier.id
+        return res
 
 
 class SaleOrderLine(models.Model):
