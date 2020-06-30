@@ -79,6 +79,21 @@ class SaleDeliveryCarrierPreference(models.Model):
     @api.model
     def get_preferred_carriers(self, order):
         wiz = self.env["choose.delivery.carrier"].new({"order_id": order.id})
-        # FIXME: Keep the order according to sequence on
-        #  sale.delivery.carrier.preference
-        return self.env["delivery.carrier"].browse(wiz.available_carrier_ids.ids)
+        carrier_preferences = self.env["sale.delivery.carrier.preference"].search(
+            [
+                "&",
+                "|",
+                ("sale_order_max_weight", ">=", order.shipping_weight,),
+                ("sale_order_max_weight", "=", 0.0,),
+                "|",
+                ("carrier_id", "in", wiz.available_carrier_ids.ids),
+                ("carrier_id", "=", False),
+            ]
+        )
+        carriers_ids = list()
+        for cp in carrier_preferences:
+            if cp.preference == "carrier":
+                carriers_ids.append(cp.carrier_id.id)
+            else:
+                carriers_ids.append(order.partner_id.property_delivery_carrier_id.id)
+        return self.env["delivery.carrier"].browse(carriers_ids)
