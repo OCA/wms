@@ -13,10 +13,9 @@ class StockStorageLocationSequence(models.Model):
         "stock.package.storage.type", required=True
     )
     sequence = fields.Integer(required=True)
-    location_id = fields.Many2one(
-        "stock.location",
-        required=True,
-        domain="[('pack_putaway_strategy', '!=', 'none')]",
+    location_id = fields.Many2one("stock.location", required=True,)
+    location_putaway_strategy = fields.Selection(
+        related="location_id.pack_putaway_strategy"
     )
 
     def _format_package_storage_type_message(self, last=False):

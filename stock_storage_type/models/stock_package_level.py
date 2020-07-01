@@ -86,3 +86,13 @@ class StockPackageLevel(models.Model):
             )
             all_allowed_locations.update(allowed_locations.ids)
         return self.env["stock.location"].browse(all_allowed_locations)
+
+    def recompute_pack_putaway(self):
+        for level in self:
+            if not level.package_id.quant_ids:
+                continue
+            level.location_dest_id = level.location_dest_id._get_pack_putaway_strategy(
+                level.location_dest_id,
+                level.package_id.quant_ids,
+                level.mapped("move_line_ids.product_id"),
+            )
