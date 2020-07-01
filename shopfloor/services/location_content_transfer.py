@@ -512,8 +512,52 @@ class LocationContentTransfer(Component):
         Transitions:
         * scan_destination: invalid destination or could not
         * start_single: continue with the next package level / line
+        * start: if there is no more package level / line to process
         """
-        return self._response()
+        location = self.env["stock.location"].browse(location_id)
+        if not location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        package_level = self.env["stock.package_level"].browse(package_level_id)
+        if not package_level.exists():
+            move_lines = self._find_transfer_move_lines(location)
+            return self._response_for_start_single(move_lines.mapped("picking_id"))
+        search = self.actions_for("search")
+        scanned_location = search.location_from_scan(barcode)
+        if not scanned_location:
+            return self._response_for_scan_destination(
+                location, package_level, message=self.msg_store.no_location_found()
+            )
+        if not scanned_location.is_sublocation_of(
+            package_level.picking_id.picking_type_id.default_location_dest_id
+        ):
+            return self._response_for_scan_destination(
+                location,
+                package_level,
+                message=self.msg_store.dest_location_not_allowed(),
+            )
+        if not scanned_location.is_sublocation_of(package_level.location_dest_id):
+            if not confirmation:
+                return self._response_for_confirm_scan_destination(
+                    location, package_level
+                )
+        package_move_lines = package_level.move_line_ids
+        package_moves = package_move_lines.mapped("move_id")
+        for package_move in package_moves:
+            # Check if there is no other lines linked to the move others than
+            # the lines related to the package itself. In such case we have to
+            # split the move to process only the lines related to the package.
+            other_move_lines = package_move.move_line_ids - package_move_lines
+            if other_move_lines:
+                qty_to_split = sum(other_move_lines.mapped("product_uom_qty"))
+                backorder_move_id = package_move._split(qty_to_split)
+                backorder_move = self.env["stock.move"].browse(backorder_move_id)
+                backorder_move.move_line_ids = other_move_lines
+                backorder_move._action_assign()
+        if package_move_lines == package_moves.mapped("move_line_ids"):
+            package_level.location_dest_id = scanned_location
+            package_moves.with_context(_sf_no_backorder=True)._action_done()
+        move_lines = self._find_transfer_move_lines(location)
+        return self._response_for_start_single(move_lines.mapped("picking_id"))
 
     def set_destination_line(
         self, location_id, move_line_id, quantity, barcode, confirmation=False
@@ -536,8 +580,55 @@ class LocationContentTransfer(Component):
         Transitions:
         * scan_destination: invalid destination or could not
         * start_single: continue with the next package level / line
+        * start: if there is no more package level / line to process
         """
-        return self._response()
+        location = self.env["stock.location"].browse(location_id)
+        if not location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        if not move_line.exists():
+            move_lines = self._find_transfer_move_lines(location)
+            return self._response_for_start_single(move_lines.mapped("picking_id"))
+        search = self.actions_for("search")
+        scanned_location = search.location_from_scan(barcode)
+        if not scanned_location:
+            return self._response_for_scan_destination(
+                location, move_line, message=self.msg_store.no_location_found()
+            )
+        if not scanned_location.is_sublocation_of(
+            move_line.picking_id.picking_type_id.default_location_dest_id
+        ):
+            return self._response_for_scan_destination(
+                location, move_line, message=self.msg_store.dest_location_not_allowed()
+            )
+        if not scanned_location.is_sublocation_of(move_line.location_dest_id):
+            if not confirmation:
+                return self._response_for_confirm_scan_destination(location, move_line)
+        if quantity < move_line.product_uom_qty:
+            # Update the current move line quantity and
+            # put the scanned qty (the move line) in its own move
+            # (by splitting the current one)
+            move_line.product_uom_qty = move_line.qty_done = quantity
+            current_move = move_line.move_id
+            new_move_id = current_move._split(quantity)
+            new_move = self.env["stock.move"].browse(new_move_id)
+            new_move.move_line_ids = move_line
+            # Ensure that the remaining qty to process is reserved as before
+            current_move._recompute_state()
+            (new_move | current_move)._action_assign()
+            for remaining_move_line in current_move.move_line_ids:
+                remaining_move_line.qty_done = remaining_move_line.product_uom_qty
+        other_move_lines = move_line.move_id.move_line_ids - move_line
+        if other_move_lines:
+            qty_to_split = sum(other_move_lines.mapped("product_uom_qty"))
+            backorder_move_id = move_line.move_id._split(qty_to_split)
+            backorder_move = self.env["stock.move"].browse(backorder_move_id)
+            backorder_move.move_line_ids = other_move_lines
+            backorder_move._action_assign()
+        move_line.location_dest_id = scanned_location
+        move_line.move_id.with_context(_sf_no_backorder=True)._action_done()
+        move_lines = self._find_transfer_move_lines(location)
+        return self._response_for_start_single(move_lines.mapped("picking_id"))
 
     def postpone_package(self, location_id, package_level_id):
         """Mark a package level as postponed and return the next level/line
