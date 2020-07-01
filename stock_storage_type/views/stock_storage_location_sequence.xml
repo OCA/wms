@@ -12,6 +12,7 @@
                     force_save="1"
                 />
                 <field name="location_id" />
+                <field name="location_putaway_strategy" />
             </tree>
         </field>
     </record>
