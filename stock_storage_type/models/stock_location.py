@@ -203,7 +203,8 @@ class StockLocation(models.Model):
         if not package_locations:
             return dest_location
 
-        for pref_loc in package_locations.mapped("location_id"):
+        for package_sequence in package_locations:
+            pref_loc = package_sequence.location_id
             if (
                 pref_loc.pack_putaway_strategy == "none"
                 and pref_loc.select_allowed_locations(
