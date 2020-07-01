@@ -12,35 +12,6 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         super().setUpClass()
         cls.areas.write({"pack_putaway_strategy": "ordered_locations"})
 
-    @classmethod
-    def _update_qty_in_location(
-        cls, location, product, quantity, package=None, lot=None
-    ):
-        quants = cls.env["stock.quant"]._gather(
-            product, location, lot_id=lot, package_id=package, strict=True
-        )
-        # this method adds the quantity to the current quantity, so remove it
-        quantity -= sum(quants.mapped("quantity"))
-        cls.env["stock.quant"]._update_available_quantity(
-            product, location, quantity, package_id=package, lot_id=lot
-        )
-
-    @classmethod
-    def _create_single_move(cls, product):
-        picking_type = cls.warehouse.int_type_id
-        move_vals = {
-            "name": product.name,
-            "picking_type_id": picking_type.id,
-            "product_id": product.id,
-            "product_uom_qty": 2.0,
-            "product_uom": product.uom_id.id,
-            "location_id": cls.input_location.id,
-            "location_dest_id": picking_type.default_location_dest_id.id,
-            "state": "confirmed",
-            "procure_method": "make_to_stock",
-        }
-        return cls.env["stock.move"].create(move_vals)
-
     def assert_package_level_domain(self, json_domain, expected_locations):
         domain = const_eval(json_domain)
         self.assertEqual(len(domain), 1)
