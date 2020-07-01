@@ -382,6 +382,10 @@ class LocationContentTransfer(Component):
         if not location.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
         move_lines = self._find_transfer_move_lines(location)
+        if not move_lines:
+            return self._response_for_start(
+                message=self.msg_store.no_lines_to_process()
+            )
         return self._response_for_start_single(move_lines.mapped("picking_id"))
 
     def scan_package(self, location_id, package_level_id, barcode):

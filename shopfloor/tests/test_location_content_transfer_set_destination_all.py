@@ -152,3 +152,25 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
             "go_to_single", params={"location_id": self.content_loc.id}
         )
         self.assert_response_start_single(response, self.pickings)
+
+
+class LocationContentTransferSetDestinationAllSpecialCase(
+    LocationContentTransferCommonCase
+):
+    """Tests for endpoint used from scan_destination_all (special cases without setup)
+
+    * /set_destination_all
+    * /go_to_single
+
+    """
+
+    def test_go_to_single_no_lines_to_process(self):
+        """User used to 'split by lines' button to process line per line,
+        but no lines to process.
+        """
+        response = self.service.dispatch(
+            "go_to_single", params={"location_id": self.content_loc.id}
+        )
+        self.assert_response_start(
+            response, message=self.service.msg_store.no_lines_to_process()
+        )
