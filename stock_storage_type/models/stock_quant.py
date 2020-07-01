@@ -36,6 +36,7 @@ class StockQuant(models.Model):
                 [
                     ("location_id", "=", location.id),
                     ("id", "not in", package_quants.ids),
+                    ("quantity", ">", 0),
                 ]
             )
             products_in_location = other_quants_in_location.mapped("product_id")
@@ -47,7 +48,7 @@ class StockQuant(models.Model):
                     lst_fails.append(
                         _(
                             "Location storage type %s is flagged 'only empty'"
-                            " with other quants in location." % loc_storage_type
+                            " with other quants in location." % loc_storage_type.name
                         )
                     )
                     continue
@@ -60,7 +61,7 @@ class StockQuant(models.Model):
                         _(
                             "Location storage type %s is flagged 'do not mix"
                             " products' but there are other products in "
-                            "location." % loc_storage_type
+                            "location." % loc_storage_type.name
                         )
                     )
                     continue
@@ -73,7 +74,7 @@ class StockQuant(models.Model):
                         _(
                             "Location storage type %s is flagged 'do not mix"
                             " lots' but there are other lots in "
-                            "location." % loc_storage_type
+                            "location." % loc_storage_type.name
                         )
                     )
                     continue
@@ -87,7 +88,7 @@ class StockQuant(models.Model):
                             "Location storage type %s defines max height of %s"
                             " but the package is bigger: %s."
                             % (
-                                loc_storage_type,
+                                loc_storage_type.name,
                                 loc_storage_type.max_height,
                                 quant.package_id.height,
                             )
@@ -103,7 +104,7 @@ class StockQuant(models.Model):
                             "Location storage type %s defines max weight of %s"
                             " but the package is heavier: %s."
                             % (
-                                loc_storage_type,
+                                loc_storage_type.name,
                                 loc_storage_type.max_weight,
                                 quant.package_id.pack_weight,
                             )
