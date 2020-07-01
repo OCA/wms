@@ -56,6 +56,19 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         )
         self.assert_response_scan_destination(response, package_level)
 
+    def test_scan_package_location_not_found(self):
+        response = self.service.dispatch(
+            "scan_package",
+            params={
+                "location_id": 1234567890,  # Doesn't exist
+                "package_level_id": 42,
+                "barcode": "TEST",
+            },
+        )
+        self.assert_response_start(
+            response, message=self.service.msg_store.record_not_found()
+        )
+
     def test_scan_package_package_ok(self):
         package_level = self.picking1.move_line_ids.package_level_id
         self._test_scan_package_ok(package_level.package_id.name)
