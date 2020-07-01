@@ -295,3 +295,69 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             product_lot_mls.mapped("location_dest_id"),
             self.cardboxes_bin_3_location | self.cardboxes_bin_4_location,
         )
+
+    def test_storage_strategy_none_in_sequence(self):
+        """When a location has a strategy 'none' in sequence, stop
+
+        We can use it to stop computing the put-away when the destination
+        location match, for instance to use a setup with a sequence:
+
+        1. Stock: None
+        2. Stock/Cardboxes Reserve: ordered locations
+
+        If a move is created with destination 'Cardboxes Reserve', the put-away
+        rule stops at the rule 1. so the move stays in 'Cardboxes Reserve.
+        Then, the destination is changed to 'Stock/Cardboxes Reserve' and
+        a recomputation is done, the put-away for Bin 1 is applied.
+
+        """
+        move = self._create_single_move(self.product)
+        # move.location_dest_id = self.cardboxes_location.id
+        move._assign_picking()
+        package = self.env["stock.quant.package"].create(
+            {"product_packaging_id": self.product_lot_cardbox_product_packaging.id}
+        )
+        self._update_qty_in_location(
+            move.location_id, move.product_id, move.product_qty, package=package
+        )
+
+        # configure a new sequence with none in the parent location
+        self.cardboxes_package_storage_type.storage_location_sequence_ids.unlink()
+        self.warehouse.lot_stock_id.pack_putaway_strategy = "none"
+        self.warehouse.lot_stock_id.location_storage_type_ids = (
+            self.cardboxes_location_storage_type
+        )
+        self.env["stock.storage.location.sequence"].create(
+            {
+                "package_storage_type_id": self.cardboxes_package_storage_type.id,
+                "location_id": self.warehouse.lot_stock_id.id,
+                "sequence": 1,
+            }
+        )
+        self.env["stock.storage.location.sequence"].create(
+            {
+                "package_storage_type_id": self.cardboxes_package_storage_type.id,
+                "location_id": self.cardboxes_location.id,
+                "sequence": 2,
+            }
+        )
+
+        move._action_assign()
+        move_line = move.move_line_ids
+        package_level = move_line.package_level_id
+
+        self.assertEqual(
+            package_level.location_dest_id,
+            self.warehouse.lot_stock_id,
+            "the move line's destination must stay in Stock as we have"
+            " a 'none' strategy on it and it is in the sequence",
+        )
+
+        package_level.location_dest_id = self.cardboxes_location
+        # if we reapply the strategy, it should now apply the ordered
+        # location of the cardbox location
+        package_level.recompute_pack_putaway()
+
+        self.assertTrue(
+            package_level.location_dest_id in self.cardboxes_location.child_ids
+        )
