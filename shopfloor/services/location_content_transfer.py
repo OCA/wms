@@ -633,24 +633,32 @@ class LocationContentTransfer(Component):
     def postpone_package(self, location_id, package_level_id):
         """Mark a package level as postponed and return the next level/line
 
-        NOTE for implementation: Use the field "shopfloor_postponed", which has
-        to be included in the sort to get the next lines.
-
         Transitions:
         * start_single: continue with the next package level / line
         """
-        return self._response()
+        location = self.env["stock.location"].browse(location_id)
+        package_level = self.env["stock.package_level"].browse(package_level_id)
+        if not location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        if package_level.exists():
+            package_level.shopfloor_postponed = True
+        move_lines = self._find_transfer_move_lines(location)
+        return self._response_for_start_single(move_lines.mapped("picking_id"))
 
     def postpone_line(self, location_id, move_line_id):
         """Mark a move line as postponed and return the next level/line
 
-        NOTE for implementation: Use the field "shopfloor_postponed", which has
-        to be included in the sort to get the next lines.
-
         Transitions:
         * start_single: continue with the next package level / line
         """
-        return self._response()
+        location = self.env["stock.location"].browse(location_id)
+        if not location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        if move_line.exists():
+            move_line.shopfloor_postponed = True
+        move_lines = self._find_transfer_move_lines(location)
+        return self._response_for_start_single(move_lines.mapped("picking_id"))
 
     def stock_out_package(self, location_id, package_level_id):
         """Declare a stock out on a package level
