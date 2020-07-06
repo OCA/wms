@@ -24,6 +24,14 @@
             <field name="location_dest_id" position="attributes">
                 <attribute name="domain">allowed_location_dest_domain</attribute>
             </field>
+            <field name="location_dest_id" position="after">
+                <button
+                    name="recompute_pack_putaway"
+                    type="object"
+                    icon="fa-arrow-circle-o-down"
+                    string="Recompute Putaway"
+                />
+            </field>
         </field>
     </record>
 </odoo>

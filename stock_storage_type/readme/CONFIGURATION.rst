@@ -25,3 +25,7 @@ location (according to restrictions) will be used to put away.
 A good practice here, is to set a location accepting this storage type without
 any restriction as the last location in the sequence, to act as a fallback
 if no other location could be found before.
+
+If a location with a 'none' strategy is set in the sequence and matches with the
+move line's destination, it will stop evaluating the next locations in the
+sequence.
