@@ -19,7 +19,7 @@ class SaleDeliveryCarrierPreference(models.Model):
     )
     carrier_id = fields.Many2one("delivery.carrier", ondelete="cascade")
     sale_order_max_weight = fields.Float(
-        "Sale order max weight (kg)", help="Leave empty for no limit",
+        "Sale order max weight (kg)", help="Leave empty for no limit"
     )
     company_id = fields.Many2one(
         "res.company", required=True, default=lambda self: self.env.company
@@ -83,8 +83,8 @@ class SaleDeliveryCarrierPreference(models.Model):
             [
                 "&",
                 "|",
-                ("sale_order_max_weight", ">=", order.shipping_weight,),
-                ("sale_order_max_weight", "=", 0.0,),
+                ("sale_order_max_weight", ">=", order.shipping_weight),
+                ("sale_order_max_weight", "=", 0.0),
                 "|",
                 ("carrier_id", "in", wiz.available_carrier_ids.ids),
                 ("carrier_id", "=", False),
@@ -95,7 +95,11 @@ class SaleDeliveryCarrierPreference(models.Model):
             if cp.preference == "carrier":
                 carriers_ids.append(cp.carrier_id.id)
             else:
-                carriers_ids.append(
-                    order.partner_shipping_id.property_delivery_carrier_id.id
-                )
-        return self.env["delivery.carrier"].browse(carriers_ids)
+                partner_carrier = order.partner_shipping_id.property_delivery_carrier_id
+                if partner_carrier:
+                    carriers_ids.append(partner_carrier.id)
+        return (
+            self.env["delivery.carrier"]
+            .browse(carriers_ids)
+            .available_carriers(order.partner_shipping_id)
+        )
