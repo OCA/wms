@@ -6,6 +6,8 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
 
     * /scan_package
     * /scan_line
+    * /postpone_package
+    * /postpone_line
 
     """
 
@@ -285,4 +287,102 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
             move_line_id,
             "NOT_FOUND",
             self.service.msg_store.record_not_found(),
+        )
+
+    def test_postpone_package_wrong_parameters(self):
+        """Wrong 'location_id' and 'package_level_id' parameters, redirect the
+        user to the 'start' screen.
+        """
+        package_level = self.picking1.move_line_ids.package_level_id
+        response = self.service.dispatch(
+            "postpone_package",
+            params={
+                "location_id": 1234567890,  # Doesn't exist
+                "package_level_id": package_level.id,
+            },
+        )
+        self.assert_response_start(
+            response, message=self.service.msg_store.record_not_found()
+        )
+        response = self.service.dispatch(
+            "postpone_package",
+            params={
+                "location_id": self.content_loc.id,
+                "package_level_id": 1234567890,  # Doesn't exist
+            },
+        )
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        self.assert_response_start_single(
+            response, move_lines.mapped("picking_id"),
+        )
+
+    def test_postpone_package_ok(self):
+        package_level = self.picking1.move_line_ids.package_level_id
+        self.assertFalse(package_level.shopfloor_postponed)
+        response = self.service.dispatch(
+            "postpone_package",
+            params={
+                "location_id": self.content_loc.id,
+                "package_level_id": package_level.id,
+            },
+        )
+        self.assertTrue(package_level.shopfloor_postponed)
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        self.assert_response_start_single(
+            response, move_lines.mapped("picking_id"),
+        )
+
+    def test_postpone_sorter(self):
+        move_line = self.picking2.move_line_ids[0]
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        pickings = move_lines.mapped("picking_id")
+        sorter = self.service.actions_for("location_content_transfer.sorter")
+        sorter.feed_pickings(pickings)
+        content_sorted1 = list(sorter)
+        self.service.dispatch(
+            "postpone_line",
+            params={"location_id": self.content_loc.id, "move_line_id": move_line.id},
+        )
+        sorter.sort()
+        content_sorted2 = list(sorter)
+        self.assertTrue(content_sorted1 != content_sorted2)
+
+    def test_postpone_line_wrong_parameters(self):
+        """Wrong 'location_id' and 'move_line_id' parameters, redirect the
+        user to the 'start' screen.
+        """
+        move_line = self.picking2.move_line_ids[0]
+        response = self.service.dispatch(
+            "postpone_line",
+            params={
+                "location_id": 1234567890,  # Doesn't exist
+                "move_line_id": move_line.id,
+            },
+        )
+        self.assert_response_start(
+            response, message=self.service.msg_store.record_not_found()
+        )
+        response = self.service.dispatch(
+            "postpone_line",
+            params={
+                "location_id": self.content_loc.id,
+                "move_line_id": 1234567890,  # Doesn't exist
+            },
+        )
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        self.assert_response_start_single(
+            response, move_lines.mapped("picking_id"),
+        )
+
+    def test_postpone_line_ok(self):
+        move_line = self.picking2.move_line_ids[0]
+        self.assertFalse(move_line.shopfloor_postponed)
+        response = self.service.dispatch(
+            "postpone_line",
+            params={"location_id": self.content_loc.id, "move_line_id": move_line.id},
+        )
+        self.assertTrue(move_line.shopfloor_postponed)
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        self.assert_response_start_single(
+            response, move_lines.mapped("picking_id"),
         )

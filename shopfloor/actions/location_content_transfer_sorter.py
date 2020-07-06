@@ -32,7 +32,8 @@ class LocationContentTransferSorter(Component):
         # content can be either a move line, either a package
         # level
         return (
-            # TODO add postponed (need to be added to package_level)
+            # postponed content after other contents
+            int(content.shopfloor_postponed),
             # sort by similar destination
             content.location_dest_id.complete_name,
             # lines before packages (if we have raw products and packages, raw
