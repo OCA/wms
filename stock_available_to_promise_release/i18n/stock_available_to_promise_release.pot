@@ -183,6 +183,14 @@ msgid "Stock reservation"
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
+#, python-format
+msgid ""
+"The backorder <a href=# data-oe-model=stock.picking data-oe-id=%d>%s</a> has"
+" been created."
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_move_release_form
 msgid "The selected stock moves will be released."
 msgstr ""
