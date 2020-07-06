@@ -12,6 +12,8 @@ setuptools.setup(
         'odoo13-addon-sale_stock_available_to_promise_release',
         'odoo13-addon-stock_available_to_promise_release',
         'odoo13-addon-stock_dynamic_routing',
+        'odoo13-addon-stock_move_source_relocate',
+        'odoo13-addon-stock_move_source_relocate_dynamic_routing',
         'odoo13-addon-stock_picking_type_shipping_policy',
         'odoo13-addon-stock_picking_type_shipping_policy_group_by',
         'odoo13-addon-stock_storage_type',
