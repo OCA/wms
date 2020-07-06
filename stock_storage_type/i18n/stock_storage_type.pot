@@ -370,6 +370,7 @@ msgstr ""
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__pack_putaway_strategy
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__location_putaway_strategy
 msgid "Packs Put-Away Strategy"
 msgstr ""
 
@@ -394,6 +395,11 @@ msgstr ""
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_quant
 msgid "Quants"
+msgstr ""
+
+#. module: stock_storage_type
+#: model_terms:ir.ui.view,arch_db:stock_storage_type.package_level_tree_view_picking_inherit
+msgid "Recompute Putaway"
 msgstr ""
 
 #. module: stock_storage_type
@@ -456,6 +462,7 @@ msgstr ""
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__pack_putaway_strategy
+#: model:ir.model.fields,help:stock_storage_type.field_stock_storage_location_sequence__location_putaway_strategy
 msgid ""
 "This defines the storage strategy to use when packs are put away in this location.\n"
 "None: when a pack is moved to this location, it will not be put away any further.\n"
