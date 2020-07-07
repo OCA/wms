@@ -4,6 +4,11 @@ from odoo import fields, models
 class StockLocation(models.Model):
     _inherit = "stock.location"
 
+    shopfloor_picking_sequence = fields.Integer(
+        string="Shopfloor Picking Sequence",
+        default=0,
+        help="The picking done in Shopfloor scenarios will respect this order.",
+    )
     source_move_line_ids = fields.One2many(
         comodel_name="stock.move.line", inverse_name="location_id", readonly=True
     )
