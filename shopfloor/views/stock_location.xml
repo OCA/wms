@@ -10,6 +10,11 @@
                 <label for="barcode" />
                 <field name="barcode" />
             </xpath>
+            <xpath expr="//group[@name='additional_info']/.." position="inside">
+                <group string="Shopfloor">
+                    <field name="shopfloor_picking_sequence" />
+                </group>
+            </xpath>
         </field>
     </record>
 </odoo>
