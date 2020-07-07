@@ -622,7 +622,8 @@ class ClusterPicking(Component):
             )
         move_line.write({"qty_done": quantity, "result_package_id": bin_package.id})
 
-        if self._planned_qty_in_location_is_empty(
+        zero_check = move_line.picking_id.picking_type_id.shopfloor_zero_check
+        if zero_check and self._planned_qty_in_location_is_empty(
             move_line.product_id, move_line.location_id
         ):
             return self._response_for_zero_check(batch, move_line)
