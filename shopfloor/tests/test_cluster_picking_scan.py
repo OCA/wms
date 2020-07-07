@@ -513,9 +513,11 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         # the reserved quantity on the quant must stay the same
         self.assertRecordValues(quant, [{"quantity": 40.0, "reserved_quantity": 20.0}])
 
-    def test_scan_destination_pack_zero_check(self):
+    def test_scan_destination_pack_zero_check_activated(self):
         """Location will be emptied, have to go to zero check"""
         line = self.one_line_picking.move_line_ids
+        # ensure we have activated the zero check
+        self.one_line_picking.picking_type_id.sudo().shopfloor_zero_check = True
         # Update the quantity in the location to be equal to the line's
         # so when scan_destination_pack sets the qty_done, the planned
         # qty should be zero and trigger a zero check
@@ -539,6 +541,41 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "id": line.id,
                 "location_src": self.data.location(line.location_id),
                 "batch": self.data.picking_batch(self.batch),
+            },
+        )
+
+    def test_scan_destination_pack_zero_check_disabled(self):
+        """Location will be emptied, no zero check, continue"""
+        line = self.one_line_picking.move_line_ids
+        # ensure we have deactivated the zero check
+        self.one_line_picking.picking_type_id.sudo().shopfloor_zero_check = False
+        # Update the quantity in the location to be equal to the line's
+        # so when scan_destination_pack sets the qty_done, the planned
+        # qty should be zero and trigger a zero check
+        self._update_qty_in_location(
+            line.location_id, line.product_id, line.product_uom_qty
+        )
+        response = self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "move_line_id": line.id,
+                "barcode": self.bin1.name,
+                "quantity": line.product_uom_qty,
+            },
+        )
+
+        next_line = self.batch.picking_ids.move_line_ids[1]
+        # continue to the next one, no zero check
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=self._line_data(next_line),
+            message={
+                "message_type": "success",
+                "body": "{} {} put in {}".format(
+                    line.qty_done, line.product_id.display_name, self.bin1.name
+                ),
             },
         )
 
