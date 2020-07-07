@@ -284,10 +284,11 @@ class ZonePicking(Component):
 
         Transitions:
         * select_line: destination has been set, showing the next lines to pick
-        * zero_check: if the quantity of product moved is 0 in the source
-          location after the move (beware: at this point the product we put in
-          the buffer is still considered to be in the source location, so we
-          have to compute the source location's quantity - qty_done).
+        * zero_check: if the option is active and if the quantity of product
+          moved is 0 in the source location after the move (beware: at this
+          point the product we put in the buffer is still considered to be in
+          the source location, so we have to compute the source location's
+          quantity - qty_done).
         * set_line_destination: the scanned location is invalid, user has to
           scan another one
         * confirm_set_line_destination: the scanned location is not in the
@@ -295,6 +296,9 @@ class ZonePicking(Component):
         """
         # TODO on _action_done, use ``_sf_no_backorder`` in the
         # context to disable backorders (see override in stock_picking.py).
+        # NOTE for the implementation: zero_check is active only if the option
+        # is active on the picking_type (maybe shopfloor.menu), check in
+        # cluster picking how it's done
         return self._response()
 
     def is_zero(self, zone_location_id, picking_type_id, move_line_id, zero):
