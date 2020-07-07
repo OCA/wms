@@ -98,7 +98,9 @@ class StockReceptionScreen(models.Model):
         compute="_compute_current_move_location_dest_id",
         inverse="_inverse_current_move_location_dest_id",
     )
-    current_move_product_id = fields.Many2one(related="current_move_id.product_id")
+    current_move_product_id = fields.Many2one(
+        related="current_move_id.product_id", string="Move's product"
+    )
     current_move_product_display_name = fields.Char(
         related="current_move_id.product_id.display_name", string="Product"
     )
