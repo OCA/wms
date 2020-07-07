@@ -386,3 +386,232 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self.assert_response_start_single(
             response, move_lines.mapped("picking_id"),
         )
+
+    def test_stock_out_package_wrong_parameters(self):
+        """Wrong 'location_id' and 'package_level_id' parameters, redirect the
+        user to the 'start' screen.
+        """
+        package_level = self.picking1.move_line_ids.package_level_id
+        response = self.service.dispatch(
+            "stock_out_package",
+            params={
+                "location_id": 1234567890,  # Doesn't exist
+                "package_level_id": package_level.id,
+            },
+        )
+        self.assert_response_start(
+            response, message=self.service.msg_store.record_not_found()
+        )
+        response = self.service.dispatch(
+            "stock_out_package",
+            params={
+                "location_id": self.content_loc.id,
+                "package_level_id": 1234567890,  # Doesn't exist
+            },
+        )
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        self.assert_response_start_single(
+            response, move_lines.mapped("picking_id"),
+        )
+
+    def test_stock_out_package_ok(self):
+        """Declare a stock out on a package_level."""
+        package_level = self.picking1.move_line_ids.package_level_id
+        response = self.service.dispatch(
+            "stock_out_package",
+            params={
+                "location_id": self.content_loc.id,
+                "package_level_id": package_level.id,
+            },
+        )
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        self.assert_response_start_single(
+            response, move_lines.mapped("picking_id"),
+        )
+
+    def test_stock_out_line_wrong_parameters(self):
+        """Wrong 'location_id' and 'move_line_id' parameters, redirect the
+        user to the 'start' screen.
+        """
+        move_line = self.picking2.move_line_ids[0]
+        response = self.service.dispatch(
+            "stock_out_line",
+            params={
+                "location_id": 1234567890,  # Doesn't exist
+                "move_line_id": move_line.id,
+            },
+        )
+        self.assert_response_start(
+            response, message=self.service.msg_store.record_not_found()
+        )
+        response = self.service.dispatch(
+            "stock_out_line",
+            params={
+                "location_id": self.content_loc.id,
+                "move_line_id": 1234567890,  # Doesn't exist
+            },
+        )
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        self.assert_response_start_single(
+            response, move_lines.mapped("picking_id"),
+        )
+
+
+class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase):
+    """Tests for endpoint used from state start_single (special cases)
+
+    * /stock_out_package
+    * /stock_out_line
+
+    """
+
+    @classmethod
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
+        products = cls.product_a | cls.product_b
+        for product in products:
+            cls.env["stock.putaway.rule"].sudo().create(
+                {
+                    "product_id": product.id,
+                    "location_in_id": cls.stock_location.id,
+                    "location_out_id": cls.shelf1.id,
+                }
+            )
+
+        cls.picking = cls._create_picking(
+            lines=[(cls.product_a, 10), (cls.product_b, 10)]
+        )
+        cls.move_product_a = cls.picking.move_lines.filtered(
+            lambda m: m.product_id == cls.product_a
+        )
+        cls.move_product_b = cls.picking.move_lines.filtered(
+            lambda m: m.product_id == cls.product_b
+        )
+        # Change the initial demand of product_a to get two move lines for
+        # reserved qties:
+        #   - 10 from the package
+        #   - 5 from the qty without package
+        cls._fill_stock_for_moves(
+            cls.move_product_a, in_package=True, location=cls.content_loc
+        )
+        cls.move_product_a.product_uom_qty = 15
+        cls._update_qty_in_location(
+            cls.content_loc, cls.product_a, 5,
+        )
+        # Put product_b quantities in two different source locations to get
+        # two stock move lines (6 and 4 to satisfy 10 qties)
+        cls._update_qty_in_location(cls.picking.location_id, cls.product_b, 6)
+        cls._update_qty_in_location(cls.content_loc, cls.product_b, 4)
+        # Reserve quantities
+        cls.picking.action_assign()
+        cls._simulate_pickings_selected(cls.picking)
+
+    def test_stock_out_package_split_move(self):
+        """Declare a stock out on a package_level related to moves containing
+        other unrelated move lines.
+        """
+        package_level = self.picking.move_line_ids.package_level_id
+        self.assertEqual(self.product_a.qty_available, 15)
+        response = self.service.dispatch(
+            "stock_out_package",
+            params={
+                "location_id": self.content_loc.id,
+                "package_level_id": package_level.id,
+            },
+        )
+        # Check the picking data
+        self.assertFalse(package_level.exists())
+        moves_product_a = self.picking.move_lines.filtered(
+            lambda m: m.product_id == self.product_a
+        )
+        self.assertEqual(len(moves_product_a), 2)
+        move_product_a = moves_product_a.filtered(
+            lambda m: m.state not in ("cancel", "done")
+        )
+        self.assertEqual(len(move_product_a), 1)
+        self.assertEqual(move_product_a.state, "assigned")
+        self.assertEqual(len(move_product_a.move_line_ids), 1)
+        # Check the inventories
+        stock_issue_inventory = self.env["stock.inventory"].search(
+            [
+                ("line_ids.location_id", "=", self.content_loc.id),
+                ("line_ids.product_id", "=", self.product_a.id),
+                ("state", "=", "done"),
+            ]
+        )
+        self.assertTrue(stock_issue_inventory)
+        stock_issue_inventory_line = stock_issue_inventory.line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        #   5/15 remaining
+        self.assertEqual(stock_issue_inventory_line.product_qty, 0)
+        self.assertEqual(self.product_a.qty_available, 5)
+        control_inventory = self.env["stock.inventory"].search(
+            [
+                ("location_ids", "in", self.content_loc.id),
+                ("product_ids", "in", self.product_a.id),
+                ("state", "in", ("draft", "confirm")),
+            ]
+        )
+        self.assertTrue(control_inventory)
+        # Check the response
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        self.assert_response_start_single(
+            response, move_lines.mapped("picking_id"),
+        )
+
+    def test_stock_out_line_split_move(self):
+        """Declare a stock out on a move line related to moves containing
+        other move lines.
+        """
+        self.assertEqual(len(self.picking.move_lines), 2)
+        self.assertEqual(len(self.move_product_b.move_line_ids), 2)
+        move_line = self.move_product_b.move_line_ids.filtered(
+            lambda ml: ml.product_uom_qty == 4  # 4/10 to stock out
+        )
+        self.assertEqual(self.product_b.qty_available, 10)
+        response = self.service.dispatch(
+            "stock_out_line",
+            params={"location_id": self.content_loc.id, "move_line_id": move_line.id},
+        )
+        # Check the picking data
+        self.assertFalse(move_line.exists())
+        moves_product_b = self.picking.move_lines.filtered(
+            lambda m: m.product_id == self.product_b
+        )
+        self.assertEqual(len(moves_product_b), 2)
+        move_product_b = moves_product_b.filtered(
+            lambda m: m.state not in ("cancel", "done")
+        )
+        self.assertEqual(len(move_product_b), 1)
+        self.assertEqual(move_product_b.state, "assigned")
+        self.assertEqual(len(move_product_b.move_line_ids), 1)
+        # Check the inventories
+        stock_issue_inventory = self.env["stock.inventory"].search(
+            [
+                ("line_ids.location_id", "=", self.content_loc.id),
+                ("line_ids.product_id", "=", self.product_b.id),
+                ("state", "=", "done"),
+            ]
+        )
+        self.assertTrue(stock_issue_inventory)
+        stock_issue_inventory_line = stock_issue_inventory.line_ids.filtered(
+            lambda l: l.product_id == self.product_b
+        )
+        #   0/4 remaining in the move line's source location
+        self.assertEqual(stock_issue_inventory_line.product_qty, 0)
+        #   6/10 remaining elsewhere in the stock
+        self.assertEqual(self.product_b.qty_available, 6)
+        control_inventory = self.env["stock.inventory"].search(
+            [
+                ("location_ids", "in", self.content_loc.id),
+                ("product_ids", "in", self.product_b.id),
+                ("state", "in", ("draft", "confirm")),
+            ]
+        )
+        self.assertTrue(control_inventory)
+        # Check the response
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        self.assert_response_start_single(
+            response, move_lines.mapped("picking_id"),
+        )

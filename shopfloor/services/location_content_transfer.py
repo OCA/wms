@@ -325,6 +325,20 @@ class LocationContentTransfer(Component):
         move_lines.package_level_id.location_dest_id = dest_location
         pickings.action_done()
 
+    def _split_other_move_lines(self, move, move_lines):
+        """Substract `move_lines` from `move.move_line_ids` and put the result
+        in a new move.
+        """
+        other_move_lines = move.move_line_ids - move_lines
+        if other_move_lines:
+            qty_to_split = sum(other_move_lines.mapped("product_uom_qty"))
+            backorder_move_id = move._split(qty_to_split)
+            backorder_move = self.env["stock.move"].browse(backorder_move_id)
+            backorder_move.move_line_ids = other_move_lines
+            backorder_move._action_assign()
+            return backorder_move
+        return False
+
     def set_destination_all(self, location_id, barcode, confirmation=False):
         """Scan destination location for all the moves of the location
 
@@ -546,16 +560,9 @@ class LocationContentTransfer(Component):
             # Check if there is no other lines linked to the move others than
             # the lines related to the package itself. In such case we have to
             # split the move to process only the lines related to the package.
-            other_move_lines = package_move.move_line_ids - package_move_lines
-            if other_move_lines:
-                qty_to_split = sum(other_move_lines.mapped("product_uom_qty"))
-                backorder_move_id = package_move._split(qty_to_split)
-                backorder_move = self.env["stock.move"].browse(backorder_move_id)
-                backorder_move.move_line_ids = other_move_lines
-                backorder_move._action_assign()
-        if package_move_lines == package_moves.mapped("move_line_ids"):
-            package_level.location_dest_id = scanned_location
-            package_moves.with_context(_sf_no_backorder=True)._action_done()
+            self._split_other_move_lines(package_move, package_move_lines)
+        package_level.location_dest_id = scanned_location
+        package_moves.with_context(_sf_no_backorder=True)._action_done()
         move_lines = self._find_transfer_move_lines(location)
         return self._response_for_start_single(move_lines.mapped("picking_id"))
 
@@ -618,13 +625,7 @@ class LocationContentTransfer(Component):
             (new_move | current_move)._action_assign()
             for remaining_move_line in current_move.move_line_ids:
                 remaining_move_line.qty_done = remaining_move_line.product_uom_qty
-        other_move_lines = move_line.move_id.move_line_ids - move_line
-        if other_move_lines:
-            qty_to_split = sum(other_move_lines.mapped("product_uom_qty"))
-            backorder_move_id = move_line.move_id._split(qty_to_split)
-            backorder_move = self.env["stock.move"].browse(backorder_move_id)
-            backorder_move.move_line_ids = other_move_lines
-            backorder_move._action_assign()
+        self._split_other_move_lines(move_line.move_id, move_line)
         move_line.location_dest_id = scanned_location
         move_line.move_id.with_context(_sf_no_backorder=True)._action_done()
         move_lines = self._find_transfer_move_lines(location)
@@ -675,7 +676,48 @@ class LocationContentTransfer(Component):
         * start: no more content to move
         * start_single: continue with the next package level / line
         """
-        return self._response()
+        location = self.env["stock.location"].browse(location_id)
+        if not location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        package_level = self.env["stock.package_level"].browse(package_level_id)
+        if not package_level.exists():
+            move_lines = self._find_transfer_move_lines(location)
+            return self._response_for_start_single(move_lines.mapped("picking_id"))
+        inventory = self.actions_for("inventory")
+        package_move_lines = package_level.move_line_ids
+        package_moves = package_move_lines.mapped("move_id")
+        for package_move in package_moves:
+            # Check if there is no other lines linked to the move others than
+            # the lines related to the package itself. In such case we have to
+            # split the move to process only the lines related to the package.
+            self._split_other_move_lines(package_move, package_move_lines)
+            lot = package_move.move_line_ids.lot_id
+            package_move._do_unreserve()
+            package_move._recompute_state()
+            # Create an inventory at 0 in the move's source location
+            inventory.create_stock_issue(
+                package_move, location, package_level.package_id, lot
+            )
+            # Create a draft inventory to control stock
+            inventory.create_control_stock(
+                location, package_move.product_id, package_level.package_id, lot
+            )
+            package_move._action_cancel()
+        # remove the package level (this is what does the `picking.do_unreserve()`
+        # method, but here we want to unreserve+unlink this package alone)
+        assert package_level.state == "draft", "Package level has to be in draft"
+        if package_level.state != "draft":
+            move_lines = self._find_transfer_move_lines(location)
+            return self._response_for_start_single(
+                move_lines.mapped("picking_id"),
+                message={
+                    "message_type": "error",
+                    "body": _("Package level has to be in draft"),
+                },
+            )
+        package_level.unlink()
+        move_lines = self._find_transfer_move_lines(location)
+        return self._response_for_start_single(move_lines.mapped("picking_id"))
 
     def stock_out_line(self, location_id, move_line_id):
         """Declare a stock out on a move line
@@ -692,7 +734,30 @@ class LocationContentTransfer(Component):
         * start: no more content to move
         * start_single: continue with the next package level / line
         """
-        return self._response()
+        location = self.env["stock.location"].browse(location_id)
+        if not location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        if not move_line.exists():
+            move_lines = self._find_transfer_move_lines(location)
+            return self._response_for_start_single(move_lines.mapped("picking_id"))
+        inventory = self.actions_for("inventory")
+        self._split_other_move_lines(move_line.move_id, move_line)
+        move_line_src_location = move_line.location_id
+        move = move_line.move_id
+        package = move_line.package_id
+        lot = move_line.lot_id
+        move._do_unreserve()
+        move._recompute_state()
+        # Create an inventory at 0 in the move's source location
+        inventory.create_stock_issue(move, move_line_src_location, package, lot)
+        # Create a draft inventory to control stock
+        inventory.create_control_stock(
+            move_line_src_location, move.product_id, package, lot
+        )
+        move._action_cancel()
+        move_lines = self._find_transfer_move_lines(location)
+        return self._response_for_start_single(move_lines.mapped("picking_id"))
 
 
 class ShopfloorLocationContentTransferValidator(Component):
