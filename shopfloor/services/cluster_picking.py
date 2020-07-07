@@ -321,6 +321,7 @@ class ClusterPicking(Component):
     def _sort_key_lines(line):
         return (
             line.shopfloor_postponed,
+            line.location_id.shopfloor_picking_sequence,
             line.location_id.name,
             line.move_id.sequence,
             line.move_id.id,
