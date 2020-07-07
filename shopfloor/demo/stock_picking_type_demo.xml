@@ -28,6 +28,7 @@
         <field name="code">internal</field>
         <field name="show_operations" eval="1" />
         <field name="display_completion_info" eval="1" />
+        <field name="shopfloor_zero_check" eval="1" />
     </record>
     <record id="picking_type_checkout_demo" model="stock.picking.type">
         <field name="name">Checkout</field>
