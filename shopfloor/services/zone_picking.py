@@ -197,6 +197,7 @@ class ZonePicking(Component):
             "zone_location": self.data.location(zone_location),
             "picking_type": self.data.picking_type(picking_type),
             # TODO sorting, ... (but maybe the lines are already sorted when passed)
+            # also, check https://github.com/camptocamp/wms/pull/29
             "move_lines": self.data.move_lines(move_lines),
         }
 
