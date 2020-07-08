@@ -56,6 +56,13 @@ msgid "Display Name"
 msgstr ""
 
 #. module: sale_delivery_carrier_preference
+#: code:addons/sale_delivery_carrier_preference/models/sale_order.py:0
+#, python-format
+msgid ""
+"Error when adding shipping on {}. Try adding shipping manually. Message: {}"
+msgstr ""
+
+#. module: sale_delivery_carrier_preference
 #: model:ir.model.fields,field_description:sale_delivery_carrier_preference.field_sale_delivery_carrier_preference__id
 msgid "ID"
 msgstr ""
