@@ -3,7 +3,7 @@
 {
     "name": "Sale Delivery Carrier Preference",
     "summary": "Select preferred shipping methods for a sale order",
-    "version": "13.0.1.1.0",
+    "version": "13.0.1.2.0",
     "category": "Operations/Inventory/Delivery",
     "website": "https://github.com/OCA/delivery-carrier",
     "author": "Camptocamp, Odoo Community Association (OCA)",
