@@ -339,6 +339,12 @@ class StockLocation(models.Model):
     def select_allowed_locations(
         self, package_storage_type, quants, products, limit=None
     ):
+        """Filter allowed locations for a storage type
+
+        ``self`` contains locations already ordered according to the
+        putaway strategy, so beware of the return that must keep the
+        same order
+        """
         # We have package who may be placed in a stock.location
         #
         # 1. On the stock.location there are location_storage_type and on the
