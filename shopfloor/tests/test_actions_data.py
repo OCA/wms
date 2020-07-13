@@ -88,6 +88,15 @@ class ActionsDataCaseBase(CommonCase):
         data.update(kw)
         return data
 
+    def _expected_package(self, record, **kw):
+        data = {
+            "id": record.id,
+            "name": record.name,
+            "weight": record.pack_weight,
+        }
+        data.update(kw)
+        return data
+
 
 class ActionsDataCase(ActionsDataCaseBase):
     def test_data_packaging(self):
@@ -130,6 +139,25 @@ class ActionsDataCase(ActionsDataCaseBase):
             "move_line_count": 1,
             "packaging": self._expected_packaging(package.product_packaging_id),
             "weight": 0.0,
+        }
+        self.assertDictEqual(data, expected)
+
+    def test_data_package_level(self):
+        package_level = self.picking.package_level_ids[0]
+        data = self.data.package_level(package_level)
+        self.assert_schema(self.schema.package_level(), data)
+        expected = {
+            "id": package_level.id,
+            "is_done": False,
+            "package_src": self._expected_package(package_level.package_id),
+            "location_dest": self._expected_location(package_level.location_dest_id),
+            "location_src": self._expected_location(
+                package_level.picking_id.location_id
+            ),
+            "product": self._expected_product(
+                package_level.package_id.single_product_id
+            ),
+            "quantity": package_level.package_id.single_product_qty,
         }
         self.assertDictEqual(data, expected)
 
