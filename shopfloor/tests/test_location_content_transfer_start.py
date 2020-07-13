@@ -205,9 +205,9 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
         package_levels = response["data"]["scan_destination_all"]["package_levels"]
         self.assertIn(move_line_id, picking.move_line_ids.ids)
         self.assertEqual(package_levels[0]["id"], picking.package_level_ids[0].id)
-        self.assertEqual(package_levels[0]["package"]["id"], package.id)
+        self.assertEqual(package_levels[0]["package_src"]["id"], package.id)
         self.assertEqual(package_levels[1]["id"], picking.package_level_ids[1].id)
-        self.assertEqual(package_levels[1]["package"]["id"], package2.id)
+        self.assertEqual(package_levels[1]["package_src"]["id"], package2.id)
         # product_a in a move line without package
         self.assertEqual(
             picking.move_line_ids_without_package.mapped("product_id"), self.product_a
