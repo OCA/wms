@@ -76,35 +76,21 @@ class BaseShopfloorSchemaResponse(Component):
             "id": {"type": "integer", "required": True},
             "qty_done": {"type": "float", "required": True},
             "quantity": {"type": "float", "required": True},
-            "product": {"type": "dict", "required": True, "schema": self.product()},
+            "product": self._schema_dict_of(self.product()),
             "lot": {
                 "type": "dict",
                 "required": False,
                 "nullable": True,
                 "schema": self.lot(),
             },
-            "package_src": {
-                "type": "dict",
-                "required": True,
-                "nullable": True,
-                "schema": self.package(with_packaging=with_packaging),
-            },
-            "package_dest": {
-                "type": "dict",
-                "required": False,
-                "nullable": True,
-                "schema": self.package(with_packaging=with_packaging),
-            },
-            "location_src": {
-                "type": "dict",
-                "required": True,
-                "schema": self.location(),
-            },
-            "location_dest": {
-                "type": "dict",
-                "required": True,
-                "schema": self.location(),
-            },
+            "package_src": self._schema_dict_of(
+                self.package(with_packaging=with_packaging)
+            ),
+            "package_dest": self._schema_dict_of(
+                self.package(with_packaging=with_packaging), required=False
+            ),
+            "location_src": self._schema_dict_of(self.location()),
+            "location_dest": self._schema_dict_of(self.location()),
         }
 
     def product(self):
@@ -171,7 +157,9 @@ class BaseShopfloorSchemaResponse(Component):
         return {
             "id": {"required": True, "type": "integer"},
             "is_done": {"type": "boolean", "nullable": False, "required": True},
-            "package": {"type": "dict", "schema": self.package()},
-            "location_src": {"type": "dict", "schema": self.location()},
-            "location_dest": {"type": "dict", "schema": self.location()},
+            "package_src": self._schema_dict_of(self.package()),
+            "location_src": self._schema_dict_of(self.location()),
+            "location_dest": self._schema_dict_of(self.location()),
+            "product": self._schema_dict_of(self.product()),
+            "quantity": {"type": "float", "required": True},
         }
