@@ -48,7 +48,6 @@ class TestShopfloorCheckoutSync(ClusterPickingUnloadingCommonCase):
     def test_unload_scan_destination_sync_checkout(self):
         """When a destination is set, it applies the sync"""
         self._set_dest_package_and_done(self.move1.move_line_ids, self.bin1)
-
         self.service.dispatch(
             "unload_scan_destination",
             params={
