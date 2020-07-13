@@ -1139,12 +1139,12 @@ class ClusterPicking(Component):
             if not confirmation:
                 return self._response_for_confirm_unload_all(batch)
 
-        self._unload_set_destination_on_lines(lines, scanned_location)
+        self._unload_write_destination_on_lines(lines, scanned_location)
         completion_info = self.actions_for("completion.info")
         completion_info_popup = completion_info.popup(lines)
         return self._unload_end(batch, completion_info_popup=completion_info_popup)
 
-    def _unload_set_destination_on_lines(self, lines, location):
+    def _unload_write_destination_on_lines(self, lines, location):
         lines.write({"shopfloor_unloaded": True, "location_dest_id": location.id})
         for line in lines:
             # We set the picking to done only when the last line is
@@ -1259,6 +1259,20 @@ class ClusterPicking(Component):
         if not lines:
             return self._unload_end(batch)
 
+        return self._unload_scan_destination_lines(
+            batch, package, lines, barcode, confirmation=confirmation
+        )
+
+    def _unload_scan_destination_lock_lines(self, lines):
+        """Lock move lines"""
+        sql = "SELECT id FROM %s WHERE ID IN %%s FOR UPDATE" % lines._table
+        self.env.cr.execute(sql, (tuple(lines.ids),), log_exceptions=False)
+
+    def _unload_scan_destination_lines(
+        self, batch, package, lines, barcode, confirmation=False
+    ):
+        # Lock move lines that will be updated
+        self._unload_scan_destination_lock_lines(lines)
         first_line = fields.first(lines)
         picking_type = fields.first(batch.picking_ids).picking_type_id
         scanned_location = self.actions_for("search").location_from_scan(barcode)
@@ -1277,7 +1291,7 @@ class ClusterPicking(Component):
             if not confirmation:
                 return self._response_for_confirm_unload_set_destination(batch, package)
 
-        self._unload_set_destination_on_lines(lines, scanned_location)
+        self._unload_write_destination_on_lines(lines, scanned_location)
 
         completion_info = self.actions_for("completion.info")
         completion_info_popup = completion_info.popup(lines)
