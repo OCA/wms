@@ -878,7 +878,6 @@ class ShopfloorLocationContentTransferValidatorResponse(Component):
         schema_move_line = self.schemas.move_line()
         return {
             # we'll have one or the other...
-            # TODO add the package in the package_level
             "package_level": self.schemas._schema_dict_of(schema_package_level),
             "move_line": self.schemas._schema_dict_of(schema_move_line),
         }
