@@ -137,7 +137,11 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         )
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
+            message=self.service.msg_store.location_content_transfer_item_complete(
+                self.dest_location
+            ),
         )
         for move in package_level.move_line_ids.mapped("move_id"):
             self.assertEqual(move.state, "done")
@@ -235,7 +239,11 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         )
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
+            message=self.service.msg_store.location_content_transfer_item_complete(
+                self.dest_location
+            ),
         )
         self.assertEqual(move_line.move_id.state, "done")
         self.assertEqual(move_line.picking_id.state, "assigned")
@@ -276,7 +284,11 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         # Check the response
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
+            message=self.service.msg_store.location_content_transfer_item_complete(
+                self.dest_location
+            ),
         )
         self.assertEqual(move_line_c.move_id.state, "done")
         # Scan remaining qty (4/10)
@@ -421,15 +433,12 @@ class LocationContentTransferSetDestinationXSpecialCase(
         # Check the response
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
+            message=self.service.msg_store.location_content_transfer_item_complete(
+                self.dest_location
+            ),
         )
-        # self.assert_response_start(
-        #     response,
-        #     # FIXME: message needs to be refactored to avoid "False" as location name
-        #     message=self.service.msg_store.location_content_transfer_complete(
-        #         self.env["stock.location"]
-        #     ),
-        # )
 
     def test_set_destination_line_split_move(self):
         """Scanned destination location valid for a move line, but related moves
@@ -477,7 +486,13 @@ class LocationContentTransferSetDestinationXSpecialCase(
         self.assertEqual(remaining_move.move_line_ids.qty_done, 4)
         # Check the response
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
-        self.assert_response_start_single(response, move_lines.mapped("picking_id"))
+        self.assert_response_start_single(
+            response,
+            move_lines.mapped("picking_id"),
+            message=self.service.msg_store.location_content_transfer_item_complete(
+                self.dest_location
+            ),
+        )
         # Process the other move lines (lines w/o package + package levels)
         # to check the picking state
         remaining_move_lines = self.picking.move_line_ids_without_package.filtered(
