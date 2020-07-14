@@ -564,7 +564,12 @@ class LocationContentTransfer(Component):
         package_level.location_dest_id = scanned_location
         package_moves.with_context(_sf_no_backorder=True)._action_done()
         move_lines = self._find_transfer_move_lines(location)
-        return self._response_for_start_single(move_lines.mapped("picking_id"))
+        message = self.msg_store.location_content_transfer_item_complete(
+            scanned_location
+        )
+        return self._response_for_start_single(
+            move_lines.mapped("picking_id"), message=message
+        )
 
     def set_destination_line(
         self, location_id, move_line_id, quantity, barcode, confirmation=False
@@ -629,7 +634,12 @@ class LocationContentTransfer(Component):
         move_line.location_dest_id = scanned_location
         move_line.move_id.with_context(_sf_no_backorder=True)._action_done()
         move_lines = self._find_transfer_move_lines(location)
-        return self._response_for_start_single(move_lines.mapped("picking_id"))
+        message = self.msg_store.location_content_transfer_item_complete(
+            scanned_location
+        )
+        return self._response_for_start_single(
+            move_lines.mapped("picking_id"), message=message
+        )
 
     def postpone_package(self, location_id, package_level_id):
         """Mark a package level as postponed and return the next level/line
