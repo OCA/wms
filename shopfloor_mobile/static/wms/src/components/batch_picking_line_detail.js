@@ -9,6 +9,10 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
             type: Boolean,
             default: false,
         },
+        defaultDestinationKey: {
+            type: String,
+            default: "package_dest",
+        },
     },
     data() {
         return {
@@ -16,8 +20,8 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
         };
     },
     computed: {
-        has_destination_pack() {
-            return _.result(this.line, "package_dest.id");
+        destination() {
+            return _.result(this.line, this.$props.defaultDestinationKey);
         },
     },
     template: `
@@ -37,11 +41,11 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     />
 
   <item-detail-card
-    v-if="articleScanned && has_destination_pack"
+    v-if="articleScanned && destination"
     :key="'batch-picking-line-detail-3'"
     :record="line"
-    :options="{main: true, key_title: 'package_dest.name', title_action_field:  {action_val_path: 'package_dest.name'}}"
-    :card_color="utils.colors.color_for(has_destination_pack ? 'screen_step_done': 'screen_step_todo')"
+    :options="{main: true, key_title: defaultDestinationKey + '.name', title_action_field:  {action_val_path: defaultDestinationKey + '.name'}}"
+    :card_color="utils.colors.color_for(destination ? 'screen_step_done': 'screen_step_todo')"
     />
 
   <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')" v-if="showQtyPicker">
@@ -49,14 +53,14 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
   </v-card>
 
   <item-detail-card
-    v-if="articleScanned && !has_destination_pack"
+    v-if="articleScanned && !destination"
     :key="'batch-picking-line-detail-4'"
     :record="line"
     :options="{main: true, title_action_field:  {action_val_path: 'name'}}"
-    :card_color="utils.colors.color_for(has_destination_pack ? 'screen_step_done': 'screen_step_todo')"
+    :card_color="utils.colors.color_for(destination ? 'screen_step_done': 'screen_step_todo')"
     >
     <template v-slot:title>
-      Destination pack not selected.
+      Destination not selected.
     </template>
   </item-detail-card>
 
