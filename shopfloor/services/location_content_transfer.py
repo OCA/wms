@@ -125,7 +125,10 @@ class LocationContentTransfer(Component):
         sorter.feed_pickings(pickings)
         lines = sorter.move_lines()
         package_levels = sorter.package_levels()
+        location = pickings.mapped("move_line_ids.location_id")
+        assert len(location) == 1, "There should be only one src location at this stage"
         return {
+            "location": self.data.location(location),
             "move_lines": self.data.move_lines(lines),
             "package_levels": self.data.package_levels(package_levels),
         }
@@ -876,6 +879,7 @@ class ShopfloorLocationContentTransferValidatorResponse(Component):
         package_level_schema = self.schemas.package_level()
         move_line_schema = self.schemas.move_line()
         return {
+            "location": self.schemas._schema_dict_of(self.schemas.location()),
             # we'll display all the packages and move lines *without package
             # levels*
             "package_levels": self.schemas._schema_list_of(package_level_schema),

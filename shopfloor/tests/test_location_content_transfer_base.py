@@ -57,12 +57,14 @@ class LocationContentTransferCommonCase(CommonCase):
         # data methods have their own tests
         lines = pickings.move_line_ids.filtered(lambda line: not line.package_level_id)
         package_levels = pickings.package_level_ids
+        location = lines.mapped("location_id")
         self.assert_response(
             response,
             next_state=state,
             data={
                 "move_lines": self.data.move_lines(lines),
                 "package_levels": self.data.package_levels(package_levels),
+                "location": self.data.location(location),
             },
             message=message,
         )
