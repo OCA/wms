@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="choose_delivery_carrier_view_form_inherit" model="ir.ui.view">
+        <field name="name">choose.delivery.carrier.form.inherit</field>
+        <field name="model">choose.delivery.carrier</field>
+        <field name="inherit_id" ref="delivery.choose_delivery_carrier_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//footer" position="before">
+                <div
+                    role="alert"
+                    class="alert alert-warning"
+                    attrs="{'invisible': [('dangerous_goods_message', '=', False)]}"
+                >
+                    <field name="dangerous_goods_message" nolabel="1" />
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
