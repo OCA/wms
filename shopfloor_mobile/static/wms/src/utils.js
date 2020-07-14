@@ -218,25 +218,29 @@ export class Utils {
      */
     move_line_product_detail_options(line, options = {}) {
         const self = this;
+        const default_fields = [
+            {path: "package_src.name", label: "Pack"},
+            {path: "lot.name", label: "Lot"},
+            {
+                path: "quantity",
+                label: "Qty",
+                render_component: "packaging-qty-picker-display",
+                render_options: function(record) {
+                    return self.move_line_qty_picker_options(record);
+                },
+            },
+            {path: "product.qty_available", label: "Qty on hand"},
+        ];
         options = _.defaults({}, options, {
             main: true,
             key_title: "product.display_name",
             title_action_field: {action_val_path: "product.barcode"},
-            fields: [
-                {path: "package_src.name", label: "Pack"},
-                {path: "lot.name", label: "Lot"},
-                {
-                    path: "quantity",
-                    label: "Qty",
-                    render_component: "packaging-qty-picker-display",
-                    render_options: function(record) {
-                        return self.move_line_qty_picker_options(record);
-                    },
-                },
-                {path: "product.qty_available", label: "Qty on hand"},
-            ],
             fields_blacklist: [],
+            fields_extend_default: true,
         });
+        options.fields = options.fields_extend_default
+            ? default_fields.concat(options.fields || [])
+            : options.fields || [];
         options.fields = _.filter(options.fields, function(field) {
             return !options.fields_blacklist.includes(field.path);
         });
