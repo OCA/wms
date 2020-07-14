@@ -104,7 +104,12 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
                 "barcode": self.shelf2.barcode,
             },
         )
-        self.assert_response_confirm_scan_destination_all(response, self.pickings)
+        self.assert_response_scan_destination_all(
+            response,
+            self.pickings,
+            message=self.service.msg_store.need_confirmation(),
+            confirmation_required=True,
+        )
 
     def test_set_destination_all_dest_location_confirmation(self):
         """Scanned dest. location != child but in picking type location: confirm
