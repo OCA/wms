@@ -292,6 +292,14 @@ class LocationContentTransfer(Component):
             new_moves = self._create_moves_from_location(location)
             new_moves._action_confirm(merge=False)
             new_moves._action_assign()
+            if not all([x.state == "assigned" for x in new_moves]):
+                new_moves._action_cancel()
+                return self._response_for_start(
+                    message={
+                        "message_type": "error",
+                        "body": _("New move lines cannot be assigned: canceled."),
+                    }
+                )
             pickings = new_moves.mapped("picking_id")
             move_lines = new_moves.move_line_ids
 
