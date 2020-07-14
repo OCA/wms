@@ -50,7 +50,7 @@ class LocationContentTransferCommonCase(CommonCase):
         self.assert_response(response, next_state="start", message=message)
 
     def _assert_response_scan_destination_all(
-        self, state, response, pickings, message=None
+        self, state, response, pickings, message=None, confirmation_required=False
     ):
         # this code is repeated from the implementation, not great, but we
         # mostly want to ensure the selection of pickings is right, and the
@@ -65,20 +65,20 @@ class LocationContentTransferCommonCase(CommonCase):
                 "move_lines": self.data.move_lines(lines),
                 "package_levels": self.data.package_levels(package_levels),
                 "location": self.data.location(location),
+                "confirmation_required": confirmation_required,
             },
             message=message,
         )
 
-    def assert_response_scan_destination_all(self, response, pickings, message=None):
-        self._assert_response_scan_destination_all(
-            "scan_destination_all", response, pickings, message=message
-        )
-
-    def assert_response_confirm_scan_destination_all(
-        self, response, pickings, message=None
+    def assert_response_scan_destination_all(
+        self, response, pickings, message=None, confirmation_required=False
     ):
         self._assert_response_scan_destination_all(
-            "confirm_scan_destination_all", response, pickings, message=message
+            "scan_destination_all",
+            response,
+            pickings,
+            message=message,
+            confirmation_required=confirmation_required,
         )
 
     def assert_response_start_single(self, response, pickings, message=None):
@@ -93,24 +93,22 @@ class LocationContentTransferCommonCase(CommonCase):
         )
 
     def _assert_response_scan_destination(
-        self, state, response, next_content, message=None
+        self, state, response, next_content, message=None, confirmation_required=False
     ):
         location = next_content.location_id
+        data = self.service._data_content_line_for_location(location, next_content)
+        data["confirmation_required"] = confirmation_required
         self.assert_response(
-            response,
-            next_state=state,
-            data=self.service._data_content_line_for_location(location, next_content),
-            message=message,
+            response, next_state=state, data=data, message=message,
         )
 
-    def assert_response_scan_destination(self, response, next_content, message=None):
-        self._assert_response_scan_destination(
-            "scan_destination", response, next_content, message=message
-        )
-
-    def assert_response_confirm_scan_destination(
-        self, response, next_content, message=None
+    def assert_response_scan_destination(
+        self, response, next_content, message=None, confirmation_required=False
     ):
         self._assert_response_scan_destination(
-            "confirm_scan_destination", response, next_content, message=message
+            "scan_destination",
+            response,
+            next_content,
+            message=message,
+            confirmation_required=confirmation_required,
         )

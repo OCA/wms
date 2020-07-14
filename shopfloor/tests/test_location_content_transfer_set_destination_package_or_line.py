@@ -120,8 +120,11 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
                 "barcode": self.env.ref("stock.stock_location_14").barcode,
             },
         )
-        self.assert_response_confirm_scan_destination(
-            response, package_level,
+        self.assert_response_scan_destination(
+            response,
+            package_level,
+            message=self.service.msg_store.need_confirmation(),
+            confirmation_required=True,
         )
 
     def test_set_destination_package_dest_location_ok(self):
@@ -223,7 +226,12 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
                 "barcode": self.env.ref("stock.stock_location_14").barcode,
             },
         )
-        self.assert_response_confirm_scan_destination(response, move_line)
+        self.assert_response_scan_destination(
+            response,
+            move_line,
+            message=self.service.msg_store.need_confirmation(),
+            confirmation_required=True,
+        )
 
     def test_set_destination_line_dest_location_ok(self):
         """Scanned destination location valid, moves set to done."""
