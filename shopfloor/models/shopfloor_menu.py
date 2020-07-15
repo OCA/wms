@@ -32,6 +32,7 @@ class ShopfloorMenu(models.Model):
         " scanned and no move already exists. Any new move is created in the"
         " selected operation type, so it can be active only when one type is selected.",
     )
+    active = fields.Boolean(default=True)
 
     def _selection_scenario(self):
         return [
