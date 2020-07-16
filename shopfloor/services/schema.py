@@ -157,6 +157,7 @@ class BaseShopfloorSchemaResponse(Component):
         return {
             "id": {"required": True, "type": "integer"},
             "is_done": {"type": "boolean", "nullable": False, "required": True},
+            "picking": self._schema_dict_of(self._simple_record()),
             "package_src": self._schema_dict_of(self.package()),
             "location_src": self._schema_dict_of(self.location()),
             "location_dest": self._schema_dict_of(self.location()),
