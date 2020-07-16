@@ -41,7 +41,7 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                     <item-detail-card
                         :key="make_state_component_key(['detail-move-line-product', rec.id])"
                         :record="rec"
-                        :options="utils.misc.move_line_product_detail_options()"
+                        :options="utils.misc.move_line_product_detail_options(rec, {fields: [{path: 'picking.name', label: 'Picking'}]})"
                         :card_color="utils.colors.color_for(state_is('scan_destination') ? 'screen_step_done': 'screen_step_todo')"
                         />
 
