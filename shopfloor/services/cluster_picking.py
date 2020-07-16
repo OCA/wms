@@ -239,7 +239,6 @@ class ClusterPicking(Component):
             "cancel",
         )
 
-    # TODO this may be used in other scenarios? if so, extract
     def _select_a_picking_batch(self, batches):
         # look for in progress + assigned to self first
         candidates = batches.filtered(
