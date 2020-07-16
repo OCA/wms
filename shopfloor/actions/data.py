@@ -159,6 +159,7 @@ class DataAction(Component):
         return [
             "id",
             "is_done",
+            ("picking_id:picking", self._simple_record_parser()),
             ("package_id:package_src", self._package_parser),
             ("location_dest_id:location_dest", self._location_parser),
             (
