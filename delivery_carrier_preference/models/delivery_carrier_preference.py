@@ -2,11 +2,12 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
+from odoo.tools import float_compare
 
 
-class SaleDeliveryCarrierPreference(models.Model):
+class DeliveryCarrierPreference(models.Model):
 
-    _name = "sale.delivery.carrier.preference"
+    _name = "delivery.carrier.preference"
     _description = "Preferred Shipping Methods"
     _order = "sequence, id"
 
@@ -18,11 +19,25 @@ class SaleDeliveryCarrierPreference(models.Model):
         default="carrier",
     )
     carrier_id = fields.Many2one("delivery.carrier", ondelete="cascade")
-    sale_order_max_weight = fields.Float(
-        "Sale order max weight (kg)", help="Leave empty for no limit"
+    max_weight = fields.Float("Max weight", help="Leave empty for no limit")
+    max_weight_uom_id = fields.Many2one(
+        "uom.uom",
+        compute="_compute_max_weight_uom_id",
+        readonly=True,
+        default=lambda p: p._default_max_weight_uom_id(),
+    )
+    max_weight_uom_name = fields.Char(
+        string="Max weight UOM",
+        related="max_weight_uom_id.display_name",
+        readonly=True,
     )
     company_id = fields.Many2one(
         "res.company", required=True, default=lambda self: self.env.company
+    )
+    picking_domain = fields.Char(
+        default="[]",
+        help="Domain to restrict application of this preference "
+        "for carrier selection on pickings",
     )
 
     @api.constrains("preference", "carrier_id")
@@ -46,15 +61,19 @@ class SaleDeliveryCarrierPreference(models.Model):
                 )
             )
 
-    @api.constrains("sale_order_max_weight")
-    def _check_sale_order_max_weight(self):
+    @api.constrains("max_weight")
+    def _check_max_weight(self):
         for pref in self:
-            if pref.sale_order_max_weight < 0:
+            if (
+                float_compare(
+                    pref.max_weight,
+                    0,
+                    precision_rounding=pref.max_weight_uom_id.rounding,
+                )
+                < 0
+            ):
                 raise ValidationError(
-                    _(
-                        "Sale order max weight (kg) must have a positive or "
-                        "null value."
-                    )
+                    _("Max weight must have a positive or null value.")
                 )
 
     @api.onchange("preference")
@@ -63,7 +82,7 @@ class SaleDeliveryCarrierPreference(models.Model):
         if self.preference == "partner" and self.carrier_id:
             self.carrier_id = False
 
-    @api.depends("preference", "carrier_id", "sale_order_max_weight")
+    @api.depends("preference", "carrier_id", "max_weight")
     def _compute_name(self):
         pref_descr = {
             k: v for k, v in self._fields["preference"]._description_selection(self.env)
@@ -72,34 +91,19 @@ class SaleDeliveryCarrierPreference(models.Model):
             name = pref_descr.get(pref.preference)
             if pref.carrier_id:
                 name = _("%s: %s") % (name, pref.carrier_id.name)
-            if pref.sale_order_max_weight:
-                name = _("%s (Max weight %s kg)") % (name, pref.sale_order_max_weight)
+            if pref.max_weight:
+                name = _("%s (Max weight %s %s)") % (
+                    name,
+                    pref.max_weight,
+                    pref.max_weight_uom_id.display_name,
+                )
             pref.name = name
 
-    @api.model
-    def get_preferred_carriers(self, order):
-        wiz = self.env["choose.delivery.carrier"].new({"order_id": order.id})
-        carrier_preferences = self.env["sale.delivery.carrier.preference"].search(
-            [
-                "&",
-                "|",
-                ("sale_order_max_weight", ">=", order.shipping_weight),
-                ("sale_order_max_weight", "=", 0.0),
-                "|",
-                ("carrier_id", "in", wiz.available_carrier_ids.ids),
-                ("carrier_id", "=", False),
-            ]
-        )
-        carriers_ids = list()
-        for cp in carrier_preferences:
-            if cp.preference == "carrier":
-                carriers_ids.append(cp.carrier_id.id)
-            else:
-                partner_carrier = order.partner_shipping_id.property_delivery_carrier_id
-                if partner_carrier:
-                    carriers_ids.append(partner_carrier.id)
-        return (
-            self.env["delivery.carrier"]
-            .browse(carriers_ids)
-            .available_carriers(order.partner_shipping_id)
-        )
+    def _default_max_weight_uom_id(self):
+        return self.env[
+            "product.template"
+        ]._get_weight_uom_id_from_ir_config_parameter()
+
+    def _compute_max_weight_uom_id(self):
+        for pref in self:
+            pref.max_weight_uom_id = self._default_max_weight_uom_id().id
