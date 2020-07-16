@@ -1,7 +1,6 @@
 import {ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
 import {demotools} from "../demo/demo.core.js"; // FIXME: dev only
-import {} from "../demo/demo.delivery.js"; // FIXME: dev only
 
 export var LocationContentTransfer = Vue.component("location-content-transfer", {
     mixins: [ScenarioBaseMixin],
@@ -15,7 +14,7 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
                 />
-            <div v-if="state_in(['start_single', 'scan_destination']) && current_context().has_records">
+            <div v-if="state_in(['start_single', 'scan_destination']) && wrapped_context().has_records">
                 <!-- TODO: no picking on pkg level yet -->
                 <!--detail-picking
                     :key="make_state_component_key(['picking'])"
@@ -23,7 +22,7 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                     :options="{main: true}"
                     /--->
 
-                <div v-for="rec in current_context().records">
+                <div v-for="rec in wrapped_context().records">
                     <batch-picking-line-detail
                         :line="rec"
                         :key="make_state_component_key(['detail-move-line', rec.id])"
@@ -31,11 +30,24 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                         :show-qty-picker="state_is('scan_destination')"
                         :default-destination-key="'location_dest'"
                         />
+                    <line-actions-popup
+                        :line="rec"
+                        :actions="[
+                            {name: 'Postpone line', event_name: 'action_postpone'},
+                            {name: 'Declare stock out', event_name: 'action_stock_out'},
+                        ]"
+                        :key="make_state_component_key(['line-actions', rec.id])"
+                        v-on:action="on_line_action"
+                        />
                 </div>
             </div>
+            <line-stock-out
+                v-if="state_is('stock_issue')"
+                v-on:confirm_stock_issue="state.on_confirm_stock_issue"
+                />
             <div v-if="state_is('scan_destination_all')">
                 <item-detail-card
-                    v-for="rec in current_context().records"
+                    v-for="rec in wrapped_context().records"
                     :key="make_state_component_key(['detail-move-line', rec.id])"
                     :record="rec"
                     :options="move_line_detail_list_options(rec)"
@@ -72,6 +84,7 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                 identifier: picking.name,
             };
         },
+        // TODO: ask Joél if this is needed
         current_picking: function() {
             const data = this.state_get_data("start");
             if (_.isEmpty(data) || _.isEmpty(data.move_line.picking)) {
@@ -88,11 +101,11 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
          * this function tries to make such data homogenous.
          * We'll work alway with multiple records and loop on them.
          */
-        current_context: function() {
+        wrapped_context: function() {
             const data = this.state.data;
             let res = {
                 has_records: true,
-                records: _.result(data, "move_lines"),
+                records: data.move_lines,
                 _multi: true,
                 _type: "move_line",
             };
@@ -117,6 +130,32 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                 fields_blacklist: ["product.qty_available"],
                 fields: [{path: "location_src.name", label: "From"}],
             });
+        },
+        // Common actions
+        on_line_action: function(action) {
+            this["on_" + action.event_name].call(this);
+        },
+        on_action_postpone: function() {
+            let endpoint, endpoint_data;
+            const data = this.state.data;
+            if (data.package_level) {
+                endpoint = "postpone_package";
+                endpoint_data = {
+                    package_level_id: data.package_level.id,
+                    location_id: data.package_level.location_src.id,
+                };
+            } else {
+                endpoint = "postpone_line";
+                endpoint_data = {
+                    move_line_id: data.move_line.id,
+                    location_id: data.move_line.location_src.id,
+                };
+            }
+            this.wait_call(this.odoo.call(endpoint, endpoint_data));
+        },
+        on_action_stock_out: function() {
+            this.state_set_data(this.state.data, "stock_issue");
+            this.state_to("stock_issue");
         },
     },
     data: function() {
@@ -233,6 +272,29 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                         this.wait_call(
                             this.odoo.call("go_to_single", {location_id: location.id})
                         );
+                    },
+                },
+                stock_issue: {
+                    enter: () => {
+                        this.reset_notification();
+                    },
+                    on_confirm_stock_issue: () => {
+                        let endpoint, endpoint_data;
+                        const data = this.state.data;
+                        if (data.package_level) {
+                            endpoint = "stock_out_package";
+                            endpoint_data = {
+                                package_level_id: data.package_level.id,
+                                location_id: data.package_level.location_src.id,
+                            };
+                        } else {
+                            endpoint = "stock_out_line";
+                            endpoint_data = {
+                                move_line_id: data.move_line.id,
+                                location_id: data.move_line.location_src.id,
+                            };
+                        }
+                        this.wait_call(this.odoo.call(endpoint, endpoint_data));
                     },
                 },
             },

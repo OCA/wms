@@ -1,3 +1,4 @@
+// TODO: rename as we used this not only for batch picking
 export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     props: {
         line: Object,
@@ -68,6 +69,7 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
 `,
 });
 
+// TODO: use `misc.line-actions-popup` instead
 export var batch_picking_line_actions = Vue.component("batch-picking-line-actions", {
     props: ["line"],
     data() {
@@ -127,32 +129,3 @@ export var batch_picking_line_actions = Vue.component("batch-picking-line-action
   </div>
 `,
 });
-
-export var batch_picking_line_stock_out = Vue.component(
-    "batch-picking-line-stock-out",
-    {
-        props: ["line"],
-        methods: {
-            handle_action(action) {
-                this.$emit("action", action);
-            },
-        },
-        template: `
-    <div class="batch-picking-line-stock-out">
-      <batch-picking-line-detail :line="line" />
-      <div class="button-list button-vertical-list full">
-        <v-row align="center">
-          <v-col class="text-center" cols="12">
-            <btn-action @click="handle_action('confirm_stock_issue')">Confirm stock = 0</btn-action>
-          </v-col>
-        </v-row>
-        <v-row align="center">
-          <v-col class="text-center" cols="12">
-            <v-btn x-large color="default" @click="handle_action('back')">back</v-btn>
-          </v-col>
-        </v-row>
-      </div>
-    </div>
-`,
-    }
-);
