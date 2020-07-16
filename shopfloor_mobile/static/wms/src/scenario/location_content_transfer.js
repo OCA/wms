@@ -14,22 +14,48 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
                 />
-            <div v-if="state_in(['start_single', 'scan_destination']) && wrapped_context().has_records">
-                <!-- TODO: no picking on pkg level yet -->
-                <!--detail-picking
-                    :key="make_state_component_key(['picking'])"
-                    :record="state.data.move_line.picking"
-                    :options="{main: true}"
-                    /--->
+            <div v-if="state_in(['start_single', 'scan_destination', 'scan_destination_all']) && wrapped_context().has_records">
+
 
                 <div v-for="rec in wrapped_context().records">
-                    <batch-picking-line-detail
+
+                    <!--batch-picking-line-detail
                         :line="rec"
                         :key="make_state_component_key(['detail-move-line', rec.id])"
                         :article-scanned="state_is('scan_destination')"
                         :show-qty-picker="state_is('scan_destination')"
                         :default-destination-key="'location_dest'"
+                        /-->
+                    <!--
+                    TODO: "batch-picking-line-detail" has some limitations which would require more tweaking on options.
+                    No time ATM to do that but the big TODO is: rename picking-line-detail to generic name and make it a bit more configurable
+                    eg: display source location or destination location, control colors by step, etc.
+                    Hence for now, we copy paste its code here and customize it for this case.
+                    -->
+                    <item-detail-card
+                        :key="make_state_component_key(['detail-move-line-loc-src', rec.id])"
+                        :record="rec"
+                        :options="{main: true, key_title: 'location_src.name', title_action_field: {action_val_path: 'location_src.barcode'}}"
+                        :card_color="utils.colors.color_for(state_in(['start_single', 'scan_destination']) ? 'screen_step_done': 'screen_step_todo')"
                         />
+                    <item-detail-card
+                        :key="make_state_component_key(['detail-move-line-product', rec.id])"
+                        :record="rec"
+                        :options="utils.misc.move_line_product_detail_options()"
+                        :card_color="utils.colors.color_for(state_is('scan_destination') ? 'screen_step_done': 'screen_step_todo')"
+                        />
+
+                    <item-detail-card
+                        :key="make_state_component_key(['detail-move-line-loc-dest', rec.id])"
+                        :record="rec"
+                        :options="{main: true, key_title: 'location_dest.name', title_action_field:  {action_val_path: 'location_dest.name'}}"
+                        :card_color="utils.colors.color_for(state_in(['start_single', 'scan_destination']) ? 'screen_step_todo': 'screen_step_done')"
+                        />
+
+                    <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
+                        <packaging-qty-picker :options="utils.misc.move_line_qty_picker_options(rec)" />
+                    </v-card>
+
                     <line-actions-popup
                         :line="rec"
                         :actions="[
@@ -45,14 +71,6 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                 v-if="state_is('stock_issue')"
                 v-on:confirm_stock_issue="state.on_confirm_stock_issue"
                 />
-            <div v-if="state_is('scan_destination_all')">
-                <item-detail-card
-                    v-for="rec in wrapped_context().records"
-                    :key="make_state_component_key(['detail-move-line', rec.id])"
-                    :record="rec"
-                    :options="move_line_detail_list_options(rec)"
-                    />
-            </div>
             <div class="button-list button-vertical-list full">
                 <v-row align="center" v-if="state_is('scan_destination_all')">
                     <v-col class="text-center" cols="12">
