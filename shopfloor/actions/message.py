@@ -299,6 +299,20 @@ class MessageAction(Component):
             "body": _("Transfer {} complete").format(picking.name),
         }
 
+    def location_content_transfer_item_complete(self, location_dest):
+        return {
+            "message_type": "success",
+            "body": _("Content transfer to {} completed").format(location_dest.name),
+        }
+
+    def location_content_transfer_complete(self, location):
+        return {
+            "message_type": "success",
+            "body": _("Location Content Transfer from {} complete").format(
+                location.name
+            ),
+        }
+
     def transfer_confirm_done(self):
         return {
             "message_type": "warning",
@@ -314,4 +328,22 @@ class MessageAction(Component):
             "body": _(
                 "No quantity has been processed, unable to complete the transfer."
             ),
+        }
+
+    def recovered_previous_session(self):
+        return {
+            "message_type": "info",
+            "body": _("Recovered previous session."),
+        }
+
+    def no_lines_to_process(self):
+        return {
+            "message_type": "info",
+            "body": _("No lines to process."),
+        }
+
+    def location_empty(self, location):
+        return {
+            "message_type": "info",
+            "body": _("Location {} empty").format(location.name),
         }

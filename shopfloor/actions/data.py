@@ -148,6 +148,35 @@ class DataAction(Component):
             ("location_dest_id:location_dest", self._location_parser),
         ]
 
+    def package_level(self, record, **kw):
+        return self._jsonify(record, self._package_level_parser)
+
+    def package_levels(self, records, **kw):
+        return [self.package_level(rec, **kw) for rec in records]
+
+    @property
+    def _package_level_parser(self):
+        return [
+            "id",
+            "is_done",
+            ("package_id:package_src", self._package_parser),
+            ("location_dest_id:location_dest", self._location_parser),
+            (
+                "location_id:location_src",
+                lambda rec, fname: self.location(rec.picking_id.location_id),
+            ),
+            # tnx to stock_quant_package_product_packaging
+            (
+                "package_id:product",
+                lambda rec, fname: self.product(rec.package_id.single_product_id),
+            ),
+            # TODO: allow to pass mapped path to base_jsonify
+            (
+                "package_id:quantity",
+                lambda rec, fname: rec.package_id.single_product_qty,
+            ),
+        ]
+
     def product(self, record, **kw):
         return self._jsonify(record, self._product_parser, **kw)
 

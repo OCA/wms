@@ -6,7 +6,10 @@ class ShopfloorMenu(models.Model):
     _description = "Menu displayed in the scanner application"
     _order = "sequence"
 
-    _scenario_allowing_create_moves = ("single_pack_transfer",)
+    _scenario_allowing_create_moves = (
+        "single_pack_transfer",
+        "location_content_transfer",
+    )
 
     name = fields.Char(translate=True)
     sequence = fields.Integer()
@@ -37,6 +40,7 @@ class ShopfloorMenu(models.Model):
             ("cluster_picking", "Cluster Picking"),
             ("checkout", "Checkout/Packing"),
             ("delivery", "Delivery"),
+            ("location_content_transfer", "Location Content Transfer"),
         ]
 
     @api.depends("scenario", "picking_type_ids")
