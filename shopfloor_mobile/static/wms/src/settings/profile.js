@@ -10,7 +10,7 @@ export var Profile = Vue.component("profile", {
         };
     },
     template: `
-        <Screen :title="$t('screen.settings.profile.title')" :klass="'settings settings-profile'">
+        <Screen :screen_info="{title: $t('screen.settings.profile.title'), klass: 'settings settings-profile'}">
             <template v-slot:header>
                 <!-- TODO: rely on global notification -->
                 <user-information
