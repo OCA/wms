@@ -16,12 +16,7 @@ class TestDeliveryCarrierDangerousGoods(SavepointCase):
         cls.the_poste_carrier = cls.env.ref("delivery.delivery_carrier")
         cls.free_delivery_carrier = cls.env.ref("delivery.free_delivery_carrier")
         cls.the_poste_carrier.write(
-            {
-                "dangerous_goods_warning": True,
-                "dangerous_goods_limited_amount_ids": [
-                    (4, cls.dangerous_limited_amount.id)
-                ],
-            }
+            {"adr_limited_amount_ids": [(4, cls.dangerous_limited_amount.id)]}
         )
         cls.product.limited_amount_id = cls.dangerous_limited_amount.id
 

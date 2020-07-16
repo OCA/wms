@@ -8,20 +8,14 @@ class DeliveryCarrier(models.Model):
 
     _inherit = "delivery.carrier"
 
-    dangerous_goods_warning = fields.Boolean(
-        string="Raise warning with dangerous goods",
-        help="Check this box to raise a warning when this shipping method is "
-        "selected on a document having a product matching this shipping "
-        "method dangerous goods.",
-    )
-    dangerous_goods_limited_amount_ids = fields.Many2many(
+    adr_limited_amount_ids = fields.Many2many(
         "limited.amount",
-        string="Warns according to limited amount",
+        string="Warns according to ADR limited amount",
         help="Raise warning when following limited amount are defined on "
         "any product in the document.",
     )
 
-    def _prepare_dangerous_goods_warning(self, warnings, checked_object):
+    def _prepare_adr_warning(self, warnings, checked_object):
         """Prepare warning dictionnary to be displayed according to warnings
 
         :param warnings: Dict of {item: warning_record} where:
@@ -49,8 +43,8 @@ class DeliveryCarrier(models.Model):
             single_object_str = _("Order line")
             checked_object_str = _("order lines")
         base_warning_msg = _(
-            "Following %s contain dangerous goods that might not be accepted"
-            " according to carrier %s configuration:\n"
+            "Following %s contain products having ADR settings that might not "
+            "be accepted according to carrier %s ADR configuration:\n"
         ) % (checked_object_str, self.name)
         moves_warning_messages = [base_warning_msg]
         for item, warning_record in warnings.items():
@@ -65,7 +59,7 @@ class DeliveryCarrier(models.Model):
             )
         return {
             "warning": {
-                "title": _("Dangerous goods warning"),
+                "title": _("ADR warning"),
                 "message": "\n".join(moves_warning_messages),
             }
         }

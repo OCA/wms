@@ -1,8 +1,8 @@
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 {
-    "name": "Delivery Carrier Dangerous Goods Warning",
-    "summary": "Raise warning when delivery carriers are selected with dangerous goods",
+    "name": "l10n_eu product ADR delivery carrier",
+    "summary": "Raise warning according to delivery carrier ADR settings",
     "version": "13.0.1.1.0",
     "development_status": "Alpha",
     "category": "Warehouse Management",

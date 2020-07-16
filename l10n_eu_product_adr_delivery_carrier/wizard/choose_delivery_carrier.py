@@ -6,24 +6,24 @@ from odoo import api, fields, models
 class ChooseDeliveryCarrier(models.TransientModel):
     _inherit = "choose.delivery.carrier"
 
-    dangerous_goods_message = fields.Text(readonly=True)
+    adr_message = fields.Text(readonly=True)
 
     @api.onchange("carrier_id")
     def _onchange_carrier_id(self):
         res = super()._onchange_carrier_id()
-        self._set_dangerous_good_warning()
+        self._set_adr_warning()
         return res
 
     @api.onchange("order_id")
     def _onchange_order_id(self):
         res = super()._onchange_carrier_id()
-        self._set_dangerous_good_warning()
+        self._set_adr_warning()
         return res
 
-    def _set_dangerous_good_warning(self):
+    def _set_adr_warning(self):
         """Sets a warning if any sale order line has a good defined as
             dangerous and if this same dangerosity is defined on the carrier"""
         self.ensure_one()
-        warning = self.order_id._check_dangerous_good(carrier=self.carrier_id)
+        warning = self.order_id._check_adr(carrier=self.carrier_id)
         if warning:
-            self.dangerous_goods_message = warning.get("warning").get("message")
+            self.adr_message = warning.get("warning").get("message")

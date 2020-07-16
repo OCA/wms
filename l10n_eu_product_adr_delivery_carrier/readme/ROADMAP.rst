@@ -1,4 +1,4 @@
-* Define more dangerous goods models used in l10n_eu_product_adr such as:
+* Define more ADR models used in l10n_eu_product_adr such as:
 
   - great.class
   - storage.class
