@@ -2,6 +2,9 @@ export const messages = {
     // {{ $t('message.hello') }}
     "en-US": {
         screen: {
+            home: {
+                title: "Barcode scanner",
+            },
             scan_anything: {
                 title: "Scan {what}",
             },
@@ -41,6 +44,9 @@ export const messages = {
     },
     "fr-FR": {
         screen: {
+            home: {
+                title: "Barcode scanner",
+            },
             scan_anything: {
                 name: "Scanner",
                 title: "Scanner {what}",
@@ -81,6 +87,9 @@ export const messages = {
     },
     "de-DE": {
         screen: {
+            home: {
+                title: "Barcode scanner",
+            },
             scan_anything: {
                 name: "Gescannt",
                 title: "Gescannt {what}",

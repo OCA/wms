@@ -17,11 +17,7 @@ export var HomePage = Vue.component("home-page", {
     },
     props: ["routes"],
     template: `
-        <Screen
-            title="Barcode scanner"
-            klass="home"
-            :show-menu="false"
-            >
+        <Screen :screen_info="{title: $t('screen.home.title'), klass: 'home'}" :show-menu="false">
             <v-list v-if="$root.has_profile">
                 <nav-items :navigation="navigation"/>
             </v-list>
