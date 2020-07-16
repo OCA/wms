@@ -57,11 +57,13 @@
                         />
                     </group>
                     <group name="options" string="Scenario Options">
-                        <field name="move_create_is_possible" invisible="1" />
-                        <field
-                            name="allow_move_create"
+                        <group
+                            name="move_create"
                             attrs="{'invisible': [('move_create_is_possible', '=', False)]}"
-                        />
+                        >
+                            <field name="move_create_is_possible" invisible="1" />
+                            <field name="allow_move_create" />
+                        </group>
                     </group>
                 </sheet>
             </form>
