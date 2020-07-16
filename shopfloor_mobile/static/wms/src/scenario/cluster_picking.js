@@ -25,7 +25,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 v-on:cancel="state.on_cancel"
                 />
             <batch-picking-line-detail
-                v-if="state_in(['start_line', 'scan_destination', 'change_pack_lot'])"
+                v-if="state_in(['start_line', 'scan_destination', 'change_pack_lot', 'stock_issue'])"
                 :line="state.data"
                 :article-scanned="state_is('scan_destination')"
                 :show-qty-picker="state_is('scan_destination')"
@@ -50,10 +50,10 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                 v-if="state_is('zero_check')"
                 v-on:action="state.on_action"
                 />
-            <batch-picking-line-stock-out
+
+            <line-stock-out
                 v-if="state_is('stock_issue')"
                 v-on:action="state.on_action"
-                :line="state.data"
                 />
 
             <div v-if="state_is('manual_selection')">

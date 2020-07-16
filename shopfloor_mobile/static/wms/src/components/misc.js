@@ -290,3 +290,81 @@ Vue.component("btn-reset-config", {
     },
     template: `<btn-action action="warn" @click="reset_data()">Reload config and menu</btn-action>`,
 });
+
+Vue.component("line-actions-popup", {
+    props: {
+        line: {
+            type: Object,
+        },
+        actions: {
+            type: Array,
+            default: function() {
+                return [];
+            },
+        },
+    },
+    data() {
+        return {
+            dialog: false,
+        };
+    },
+    methods: {
+        handle_action(action) {
+            this.dialog = false;
+            this.$emit("action", action);
+        },
+    },
+    template: `
+  <div :class="$options._componentTag">
+    <v-dialog v-model="dialog" fullscreen tile class="actions fullscreen text-center">
+      <template v-slot:activator="{ on }">
+        <div class="button-list button-vertical-list full">
+          <v-row class="actions bottom-actions">
+            <v-col class="text-center" cols="12">
+              <btn-action v-on="on">Action</btn-action>
+            </v-col>
+          </v-row>
+        </div>
+      </template>
+      <v-card>
+        <div class="button-list button-vertical-list full">
+          <v-row align="center" v-for="action in actions">
+            <v-col class="text-center" cols="12">
+              <btn-action @click="handle_action(action)">{{ action.name }}</btn-action>
+            </v-col>
+          </v-row>
+          <v-row align="center">
+            <v-col class="text-center" cols="12">
+              <v-btn x-large @click="dialog = false">Back</v-btn>
+            </v-col>
+          </v-row>
+        </div>
+      </v-card>
+    </v-dialog>
+  </div>
+`,
+});
+
+Vue.component("line-stock-out", {
+    methods: {
+        handle_action(action) {
+            this.$emit(action);
+        },
+    },
+    template: `
+  <div :class="$options._componentTag">
+    <div class="button-list button-vertical-list full">
+      <v-row align="center">
+        <v-col class="text-center" cols="12">
+          <btn-action @click="handle_action('confirm_stock_issue')">Confirm stock = 0</btn-action>
+        </v-col>
+      </v-row>
+      <v-row align="center">
+        <v-col class="text-center" cols="12">
+          <btn-back />
+        </v-col>
+      </v-row>
+    </div>
+  </div>
+`,
+});
