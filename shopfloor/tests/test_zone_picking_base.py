@@ -91,3 +91,44 @@ class ZonePickingCommonCase(CommonCase):
             picking_types,
             message=message,
         )
+
+    def _assert_response_select_line(
+        self,
+        state,
+        response,
+        zone_location,
+        picking_type,
+        move_lines,
+        message=None,
+        popup=None,
+    ):
+        self.assert_response(
+            response,
+            next_state=state,
+            data={
+                "zone_location": self.data.location(zone_location),
+                "picking_type": self.data.picking_type(picking_type),
+                "move_lines": self.data.move_lines(move_lines),
+            },
+            message=message,
+            popup=popup,
+        )
+
+    def assert_response_select_line(
+        self,
+        response,
+        zone_location,
+        picking_type,
+        move_lines,
+        message=None,
+        popup=None,
+    ):
+        self._assert_response_select_line(
+            "select_line",
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=message,
+            popup=popup,
+        )
