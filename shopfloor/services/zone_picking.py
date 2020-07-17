@@ -181,7 +181,6 @@ class ZonePicking(Component):
         return {
             "zone_location": self.data.location(zone_location),
             # available picking types to choose from
-            # TODO add lines count and priority lines count in the data
             "picking_types": self.data.picking_types(picking_types),
         }
 
@@ -201,17 +200,46 @@ class ZonePicking(Component):
             "move_lines": self.data.move_lines(move_lines),
         }
 
+    def _find_location_move_lines_domain(self, location):
+        return [
+            ("location_id", "child_of", location.id),
+            ("qty_done", "=", 0),
+            ("state", "in", ("assigned", "partially_available")),
+        ]
+
+    def _find_location_move_lines(self, location):
+        """Find lines that potentially are to move in the location"""
+        return self.env["stock.move.line"].search(
+            self._find_location_move_lines_domain(location)
+        )
+
     def scan_location(self, barcode):
         """Scan the zone location where the picking should occur
 
         The location must be a sub-location of one of the picking types'
-        default destination locations of the menu.
+        default source locations of the menu.
 
         Transitions:
         * start: invalid barcode
         * select_picking_type: the location is valid, user has to choose a picking type
         """
-        return self._response()
+        search = self.actions_for("search")
+        zone_location = search.location_from_scan(barcode)
+        if not zone_location:
+            return self._response_for_start(message=self.msg_store.no_location_found())
+        if not zone_location.is_sublocation_of(
+            self.work.menu.picking_type_ids.mapped("default_location_src_id")
+        ):
+            return self._response_for_start(
+                message=self.msg_store.location_not_allowed()
+            )
+        move_lines = self._find_location_move_lines(zone_location)
+        if not move_lines:
+            return self._response_for_start(
+                message=self.msg_store.no_lines_to_process()
+            )
+        picking_types = move_lines.picking_id.picking_type_id
+        return self._response_for_select_picking_type(zone_location, picking_types)
 
     def list_move_lines(self, zone_location_id, picking_type_id, order="priority"):
         """List all move lines to pick, sorted
