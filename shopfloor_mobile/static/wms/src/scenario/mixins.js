@@ -66,11 +66,8 @@ export var ScenarioBaseMixin = {
             return state;
         },
         search_input_placeholder: function() {
-            if (this.state.scan_placeholder) {
-                // TMP backward compat
-                return this.state.scan_placeholder;
-            }
-            return this.state.display_info.scan_placeholder;
+            const placeholder = this.state.display_info.scan_placeholder;
+            return _.isFunction(placeholder) ? placeholder.call(this) : placeholder;
         },
         show_cancel_button: function() {
             return this.state.display_info.show_cancel_button;
@@ -182,10 +179,21 @@ export var ScenarioBaseMixin = {
                 /*
                 Alias "init" to the initial state
                 and erase all existing data if any.
-                Used when we enter from a menu or to enforce data cleanup.
+                Used when we enter from a menu or to enforce data cleanup
+                or any other case where you want to erase all data on demand.
                 */
                 this.state_reset_data_all();
-                state_key = this.initial_state_key;
+                /**
+                 * Special case: if `init` is defined as state
+                 * you can use it do particular initialization.
+                 * Eg: call the server to preload some data.
+                 * In this case the state is responsible
+                 * for handline the transition to another state
+                 * or delegate it to server result via `next_state` key.
+                 */
+                if (!"init" in this.states) {
+                    state_key = this.initial_state_key;
+                }
             }
             state_key = state_key || "start";
             if (state_key == "start") {
@@ -235,10 +243,6 @@ export var ScenarioBaseMixin = {
                     ? this.initial_state_key
                     : result.next_state;
             if (!_.isUndefined(result.data)) {
-                // TODO: we should find a way to reset the whole scenario data
-                // as soon as we start w/ the scenario by clicking the menu item
-                // and not just when you go to /start because you could get back
-                // to it from another state.
                 this.state_reset_data(state_key);
                 this.state_set_data(result.data[state_key], state_key);
             }

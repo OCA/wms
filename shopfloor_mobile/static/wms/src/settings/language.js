@@ -1,9 +1,9 @@
 export var Language = Vue.component("language", {
     template: `
-        <Screen :title="$t('screen.settings.language.title')" :klass="'settings settings-language'">
+        <Screen :screen_info="{title: $t('screen.settings.language.title'), klass: 'settings settings-language'}">
             <manual-select
                 :records="available_languages"
-                :options="{initValue: current_language_code}"
+                :options="{initValue: current_language_code, showActions: false}"
                 v-on:select="on_select"
                 />
 

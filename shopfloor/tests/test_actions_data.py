@@ -149,6 +149,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         expected = {
             "id": package_level.id,
             "is_done": False,
+            "picking": self.picking.jsonify(["id", "name"])[0],
             "package_src": self._expected_package(package_level.package_id),
             "location_dest": self._expected_location(package_level.location_dest_id),
             "location_src": self._expected_location(

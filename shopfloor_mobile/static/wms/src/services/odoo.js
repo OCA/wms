@@ -99,13 +99,18 @@ export class OdooMocked extends OdooMixin {
         const barcode = data
             ? data.barcode || data.identifier || data.location_barcode
             : null;
-        if (_.has(this.demo_data, barcode)) {
-            // Pick a specific case for this barcode
-            result = this.demo_data[barcode];
+        let demo_data = this.demo_data;
+        if (demo_data.by_menu_id && _.has(demo_data.by_menu_id, this.process_menu_id)) {
+            // Load subset of responses by menu id
+            demo_data = demo_data.by_menu_id[this.process_menu_id];
         }
-        if (_.has(this.demo_data, path)) {
+        if (_.has(demo_data, barcode)) {
+            // Pick a specific case for this barcode
+            result = demo_data[barcode];
+        }
+        if (_.has(demo_data, path)) {
             // Pick general case for this path
-            result = this.demo_data[path];
+            result = demo_data[path];
         }
         if (_.has(result, barcode)) {
             // Pick specific barcode case inside path case
@@ -124,6 +129,12 @@ export class OdooMocked extends OdooMixin {
         }
         console.dir("CALL RETURN data:", result);
         return Promise.resolve(result);
+    }
+    user_config(params) {
+        return Promise.resolve({data: demotools.makeAppConfig()});
+    }
+    menu(params) {
+        return Promise.resolve({data: {menus: demotools.getAppMenus()}});
     }
     scan(params) {
         let result = {};

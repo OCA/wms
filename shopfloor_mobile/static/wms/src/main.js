@@ -1,7 +1,6 @@
 import {router} from "./router.js";
 import {i18n} from "./i18n.js";
 import {GlobalMixin} from "./mixin.js";
-import {Config} from "./services/config.js";
 import {process_registry} from "./services/process_registry.js";
 import {color_registry} from "./services/color_registry.js";
 import {Odoo, OdooMocked} from "./services/odoo.js";
@@ -81,9 +80,6 @@ const app = new Vue({
                 this.$storage.set("profile", v);
             },
         },
-        // TODO: demo mode is half working now because
-        // if we don't load real menu/profiles 1st
-        // we don't have any menu nor profile to play with.
         profiles: function() {
             return this.appconfig ? this.appconfig.profiles || [] : [];
         },
@@ -126,8 +122,8 @@ const app = new Vue({
             }
             return new OdooClass(params);
         },
-        loadConfig: function() {
-            if (this.appconfig) {
+        loadConfig: function(force) {
+            if (this.appconfig && !force) {
                 return this.appconfig;
             }
             // TODO: we can do this via watcher
@@ -145,13 +141,15 @@ const app = new Vue({
             const self = this;
             self.loading = true;
             const odoo = self.getOdoo({usage: "app"});
-            const config = new Config(odoo);
-            return config.load().then(function() {
-                if (config.authenticated) {
-                    self.appconfig = config.data;
-                    self.authenticated = config.authenticated;
+            return odoo.call("user_config").then(function(result) {
+                if (!_.isUndefined(result.data)) {
+                    self.appconfig = result.data;
+                    self.authenticated = true;
                     self.$storage.set("appconfig", self.appconfig);
                     self.loading = false;
+                } else {
+                    // TODO: any better thing to do here?
+                    console.log(result);
                 }
             });
         },
@@ -177,6 +175,10 @@ const app = new Vue({
                 self.appmenu = result.data;
                 self.loading = false;
             });
+        },
+        _clearConfig: function() {
+            this.$storage.remove("appconfig");
+            return this._loadConfig();
         },
         logout: function() {
             this.apikey = "";

@@ -216,9 +216,9 @@ export class Utils {
      *
      * @param {*} line The move line
      */
-    move_line_product_detail_options(line, override = {}) {
+    move_line_product_detail_options(line, options = {}) {
         const self = this;
-        const fields = [
+        const default_fields = [
             {path: "package_src.name", label: "Pack"},
             {path: "lot.name", label: "Lot"},
             {
@@ -231,13 +231,20 @@ export class Utils {
             },
             {path: "product.qty_available", label: "Qty on hand"},
         ];
-        let opts = {
+        options = _.defaults({}, options, {
             main: true,
             key_title: "product.display_name",
-            fields: fields,
             title_action_field: {action_val_path: "product.barcode"},
-        };
-        return _.extend(opts, override || {});
+            fields_blacklist: [],
+            fields_extend_default: true,
+        });
+        options.fields = options.fields_extend_default
+            ? default_fields.concat(options.fields || [])
+            : options.fields || [];
+        options.fields = _.filter(options.fields, function(field) {
+            return !options.fields_blacklist.includes(field.path);
+        });
+        return options;
     }
     move_line_qty_picker_options(line, override = {}) {
         let opts = {

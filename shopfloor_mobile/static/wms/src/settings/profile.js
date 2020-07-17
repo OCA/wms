@@ -10,7 +10,7 @@ export var Profile = Vue.component("profile", {
         };
     },
     template: `
-        <Screen :title="$t('screen.settings.profile.title')" :klass="'settings settings-profile'">
+        <Screen :screen_info="{title: $t('screen.settings.profile.title'), klass: 'settings settings-profile'}">
             <template v-slot:header>
                 <!-- TODO: rely on global notification -->
                 <user-information
@@ -33,7 +33,7 @@ export var Profile = Vue.component("profile", {
                 <!-- FIXME: maybe not a good place here -->
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-action action="warn" @click="reset_data()">Reload config and menu</btn-action>
+                        <btn-reset-config />
                     </v-col>
                 </v-row>
                 <v-row align="center">
@@ -52,11 +52,6 @@ export var Profile = Vue.component("profile", {
         },
         logout: function() {
             this.$root.logout();
-        },
-        reset_data: function() {
-            this.$root._clearConfig();
-            this.$root._loadMenu();
-            this.$root.$router.push({name: "home"});
         },
     },
 });

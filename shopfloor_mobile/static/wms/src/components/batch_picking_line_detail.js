@@ -1,3 +1,4 @@
+// TODO: rename as we used this not only for batch picking
 export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     props: {
         line: Object,
@@ -9,6 +10,10 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
             type: Boolean,
             default: false,
         },
+        defaultDestinationKey: {
+            type: String,
+            default: "package_dest",
+        },
     },
     data() {
         return {
@@ -16,19 +21,8 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
         };
     },
     computed: {
-        has_destination_pack() {
-            return _.result(this.line, "package_dest.id");
-        },
-    },
-    methods: {
-        full_detail_fields() {
-            return [
-                {path: "batch.name", label: "Batch"},
-                {path: "picking.name", label: "Picking"},
-                {path: "picking.origin", label: "Origin"},
-                {path: "picking.partner.name", label: "Customer"},
-                {path: "location_dest.name", label: "Destination"},
-            ];
+        destination() {
+            return _.result(this.line, this.$props.defaultDestinationKey);
         },
     },
     template: `
@@ -48,11 +42,11 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     />
 
   <item-detail-card
-    v-if="articleScanned && has_destination_pack"
+    v-if="articleScanned && destination"
     :key="'batch-picking-line-detail-3'"
     :record="line"
-    :options="{main: true, key_title: 'package_dest.name', title_action_field:  {action_val_path: 'package_dest.name'}}"
-    :card_color="utils.colors.color_for(has_destination_pack ? 'screen_step_done': 'screen_step_todo')"
+    :options="{main: true, key_title: defaultDestinationKey + '.name', title_action_field:  {action_val_path: defaultDestinationKey + '.name'}}"
+    :card_color="utils.colors.color_for(destination ? 'screen_step_done': 'screen_step_todo')"
     />
 
   <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')" v-if="showQtyPicker">
@@ -60,36 +54,22 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
   </v-card>
 
   <item-detail-card
-    v-if="articleScanned && !has_destination_pack"
+    v-if="articleScanned && !destination"
     :key="'batch-picking-line-detail-4'"
     :record="line"
     :options="{main: true, title_action_field:  {action_val_path: 'name'}}"
-    :card_color="utils.colors.color_for(has_destination_pack ? 'screen_step_done': 'screen_step_todo')"
+    :card_color="utils.colors.color_for(destination ? 'screen_step_done': 'screen_step_todo')"
     >
     <template v-slot:title>
-      Destination pack not selected.
+      Destination not selected.
     </template>
   </item-detail-card>
-
-  <!--
-  <v-expansion-panels>
-    <v-expansion-panel class="with-card">
-      <v-expansion-panel-header>Full details</v-expansion-panel-header>
-      <v-expansion-panel-content>
-        <item-detail-card
-          :key="'batch-picking-line-detail-4'"
-          :record="line"
-          :options="{no_title: true, loud_labels: true, no_outline: true, fields: full_detail_fields()}"
-          />
-      </v-expansion-panel-content>
-    </v-expansion-panel>
-  </v-expansion-panels>
-  -->
 
 </div>
 `,
 });
 
+// TODO: use `misc.line-actions-popup` instead
 export var batch_picking_line_actions = Vue.component("batch-picking-line-actions", {
     props: ["line"],
     data() {
@@ -149,32 +129,3 @@ export var batch_picking_line_actions = Vue.component("batch-picking-line-action
   </div>
 `,
 });
-
-export var batch_picking_line_stock_out = Vue.component(
-    "batch-picking-line-stock-out",
-    {
-        props: ["line"],
-        methods: {
-            handle_action(action) {
-                this.$emit("action", action);
-            },
-        },
-        template: `
-    <div class="batch-picking-line-stock-out">
-      <batch-picking-line-detail :line="line" />
-      <div class="button-list button-vertical-list full">
-        <v-row align="center">
-          <v-col class="text-center" cols="12">
-            <btn-action @click="handle_action('confirm_stock_issue')">Confirm stock = 0</btn-action>
-          </v-col>
-        </v-row>
-        <v-row align="center">
-          <v-col class="text-center" cols="12">
-            <v-btn x-large color="default" @click="handle_action('back')">back</v-btn>
-          </v-col>
-        </v-row>
-      </div>
-    </div>
-`,
-    }
-);

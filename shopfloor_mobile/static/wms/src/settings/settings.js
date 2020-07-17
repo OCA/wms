@@ -3,7 +3,7 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
         return {};
     },
     template: `
-        <Screen :title="$t('screen.settings.home.title')" :klass="'settings settings-control-panel'">
+        <Screen :screen_info="{title: $t('screen.settings.home.title'), klass: 'settings settings-control-panel'}">
             <div class="button-list button-vertical-list full">
                 <v-row align="center">
                     <v-col class="text-center" cols="12">

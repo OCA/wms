@@ -3,12 +3,12 @@ Vue.component("user-information", {
     props: ["message"],
     template: `
     <v-alert :type="alert_type" tile>
-        {{ message.body }}
+        {{ _.result(message, "body") }}
     </v-alert>
     `,
     computed: {
         alert_type: function() {
-            return this.message.message_type || "info";
+            return _.result(this.message, "message_type", "info");
         },
     },
 });
