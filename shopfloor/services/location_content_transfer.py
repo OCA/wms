@@ -79,9 +79,7 @@ class LocationContentTransfer(Component):
         next_content = self._next_content(pickings)
         if not next_content:
             # TODO test (no more lines)
-            return self._response_for_start(
-                message=self.msg_store.location_content_transfer_complete(location)
-            )
+            return self._response_for_start(message=message)
         return self._response(
             next_state="start_single",
             data=self._data_content_line_for_location(location, next_content),
@@ -373,7 +371,9 @@ class LocationContentTransfer(Component):
         return self._response_for_start(
             message={
                 "message_type": "success",
-                "body": _("Content transferred from {}.").format(location.name),
+                "body": _("Content transferred from {} to {}.").format(
+                    location.name, scanned_location.name
+                ),
             }
         )
 
