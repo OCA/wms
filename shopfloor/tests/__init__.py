@@ -40,3 +40,4 @@ from . import test_location_content_transfer_single
 from . import test_location_content_transfer_set_destination_package_or_line
 from . import test_zone_picking_base
 from . import test_zone_picking_start
+from . import test_zone_picking_select_picking_type
