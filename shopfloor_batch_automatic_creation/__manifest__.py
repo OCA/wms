@@ -14,7 +14,7 @@
     "depends": [
         "shopfloor",
         "stock_packaging_calculator",  # OCA/stock-logistics-warehouse
-        "product_packaging_dimension",  # OCA/stock-logistics-warehouse
+        "product_packaging_dimension",  # OCA/product-attribute
         "product_total_weight_from_packaging",  # OCA/product-attribute
     ],
     "data": ["views/shopfloor_menu_views.xml"],
