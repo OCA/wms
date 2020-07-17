@@ -200,17 +200,20 @@ class ZonePicking(Component):
             "move_lines": self.data.move_lines(move_lines),
         }
 
-    def _find_location_move_lines_domain(self, location):
-        return [
+    def _find_location_move_lines_domain(self, location, picking_type=None):
+        domain = [
             ("location_id", "child_of", location.id),
             ("qty_done", "=", 0),
             ("state", "in", ("assigned", "partially_available")),
         ]
+        if picking_type:
+            domain += [("picking_id.picking_type_id", "=", picking_type.id)]
+        return domain
 
-    def _find_location_move_lines(self, location):
+    def _find_location_move_lines(self, location, picking_type=None):
         """Find lines that potentially are to move in the location"""
         return self.env["stock.move.line"].search(
-            self._find_location_move_lines_domain(location)
+            self._find_location_move_lines_domain(location, picking_type)
         )
 
     def scan_location(self, barcode):
@@ -247,7 +250,14 @@ class ZonePicking(Component):
         Transitions:
         * select_line: show the list of move lines
         """
-        return self._response()
+        zone_location = self.env["stock.location"].browse(zone_location_id)
+        if not zone_location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        picking_type = self.env["stock.picking.type"].browse(picking_type_id)
+        if not picking_type.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        move_lines = self._find_location_move_lines(zone_location, picking_type)
+        return self._response_for_select_line(zone_location, picking_type, move_lines)
 
     def scan_source(self, zone_location_id, picking_type_id, barcode, order="priority"):
         """Select a move line or narrow the list of move lines
