@@ -166,4 +166,11 @@ class BaseShopfloorSchemaResponse(Component):
         }
 
     def picking_type(self):
-        return self._simple_record()
+        return {
+            "id": {"required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+            "lines_count": {"type": "float", "required": True},
+            "picking_count": {"type": "float", "required": True},
+            "priority_lines_count": {"type": "float", "required": True},
+            "priority_picking_count": {"type": "float", "required": True},
+        }
