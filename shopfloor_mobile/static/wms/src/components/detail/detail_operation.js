@@ -1,6 +1,7 @@
 import {ItemDetailMixin} from "./detail_mixin.js";
 
 // TODO: this should probably trashed in favour of detail-transfer
+// ATM is used only by single pack transfer to display package level info.
 Vue.component("detail-operation", {
     mixins: [ItemDetailMixin],
     methods: {
