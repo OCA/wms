@@ -16,6 +16,13 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                 />
             <div v-if="state_in(['start_single', 'scan_destination', 'scan_destination_all']) && wrapped_context().has_records">
 
+                <item-detail-card
+                    v-if="wrapped_context().location_src"
+                    :key="make_state_component_key(['detail-move-line-loc-src', wrapped_context().location_src.id])"
+                    :record="wrapped_context().location_src"
+                    :options="{main: true, key_title: 'name', title_action_field: {action_val_path: 'barcode'}}"
+                    :card_color="utils.colors.color_for(state_in(['start_single', 'scan_destination', 'scan_destination_all']) ? 'screen_step_done': 'screen_step_todo')"
+                    />
 
                 <div v-for="rec in wrapped_context().records">
 
@@ -33,23 +40,10 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                     Hence for now, we copy paste its code here and customize it for this case.
                     -->
                     <item-detail-card
-                        :key="make_state_component_key(['detail-move-line-loc-src', rec.id])"
-                        :record="rec"
-                        :options="{main: true, key_title: 'location_src.name', title_action_field: {action_val_path: 'location_src.barcode'}}"
-                        :card_color="utils.colors.color_for(state_in(['start_single', 'scan_destination']) ? 'screen_step_done': 'screen_step_todo')"
-                        />
-                    <item-detail-card
                         :key="make_state_component_key(['detail-move-line-product', rec.id])"
                         :record="rec"
                         :options="utils.misc.move_line_product_detail_options(rec, {fields: [{path: 'picking.name', label: 'Picking'}]})"
-                        :card_color="utils.colors.color_for(state_is('scan_destination') ? 'screen_step_done': 'screen_step_todo')"
-                        />
-
-                    <item-detail-card
-                        :key="make_state_component_key(['detail-move-line-loc-dest', rec.id])"
-                        :record="rec"
-                        :options="{main: true, key_title: 'location_dest.name', title_action_field:  {action_val_path: 'location_dest.name'}}"
-                        :card_color="utils.colors.color_for(state_in(['start_single', 'scan_destination']) ? 'screen_step_todo': 'screen_step_done')"
+                        :card_color="utils.colors.color_for(state_in(['scan_destination', 'scan_destination_all']) ? 'screen_step_done': 'screen_step_todo')"
                         />
 
                     <v-card v-if="wrapped_context()._type == 'move_line'"
@@ -58,6 +52,7 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                     </v-card>
 
                     <line-actions-popup
+                        v-if="!wrapped_context()._multi"
                         :line="rec"
                         :actions="[
                             {name: 'Postpone line', event_name: 'action_postpone'},
@@ -67,6 +62,15 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                         v-on:action="on_line_action"
                         />
                 </div>
+
+                <item-detail-card
+                    v-if="wrapped_context().location_dest"
+                    :key="make_state_component_key(['detail-move-line-loc-src', wrapped_context().location_dest.id])"
+                    :record="wrapped_context().location_dest"
+                    :options="{main: true, key_title: 'name', title_action_field: {action_val_path: 'barcode'}}"
+                    :card_color="utils.colors.color_for('screen_step_todo')"
+                    />
+
             </div>
             <line-stock-out
                 v-if="state_is('stock_issue')"
@@ -119,12 +123,15 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
          * and `move_lines` or `package_levels` for multiple items,
          * this function tries to make such data homogenous.
          * We'll work alway with multiple records and loop on them.
+         * TODO: this should be computed to be cached.
          */
         wrapped_context: function() {
             const data = this.state.data;
             let res = {
                 has_records: true,
                 records: data.move_lines,
+                location_src: null,
+                location_dest: null,
                 _multi: true,
                 _type: "move_line",
             };
@@ -141,6 +148,8 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                 res._type = "pkg_level";
             }
             res.has_records = res.records.length > 0;
+            res.location_src = res.has_records ? res.records[0].location_src : null;
+            res.location_dest = res.has_records ? res.records[0].location_dest : null;
             return res;
         },
         move_line_detail_list_options: function(move_line) {
