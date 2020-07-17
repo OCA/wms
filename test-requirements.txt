@@ -1,10 +1,6 @@
-odoo13-addon-stock_quant_package_product_packaging @ git+https://github.com/OCA/stock-logistics-workflow@refs/pull/607/head#subdirectory=setup/stock_quant_package_product_packaging
-odoo13-addon-stock_quant_package_dimension @ git+https://github.com/OCA/stock-logistics-workflow@refs/pull/608/head#subdirectory=setup/stock_quant_package_dimension
-odoo13-addon-stock_move_common_dest @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/808/head#subdirectory=setup/stock_move_common_dest
-odoo13-addon-stock_picking_completion_info @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/808/head#subdirectory=setup/stock_picking_completion_info
 odoo13-addon-stock_location_children @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/855/head#subdirectory=setup/stock_location_children
 odoo13-addon-stock_checkout_sync @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/907/head#subdirectory=setup/stock_checkout_sync
-odoo13-addon-stock_storage_type @ git+https://github.com/OCA/wms@refs/pull/12/head#subdirectory=setup/stock_storage_type
-odoo13-addon-base_jsonify @ git+https://github.com/OCA/server-tools@refs/pull/1829/head#subdirectory=setup/base_jsonify
+odoo13-addon-stock_packaging_calculator @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/939/head#subdirectory=setup/stock_packaging_calculator
+odoo13-addon-product_total_weight_from_packaging @ git+https://github.com/OCA/product-attribute@refs/pull/651/head#subdirectory=setup/product_total_weight_from_packaging
 
 freezegun
