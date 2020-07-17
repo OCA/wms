@@ -52,7 +52,8 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                         :card_color="utils.colors.color_for(state_in(['start_single', 'scan_destination']) ? 'screen_step_todo': 'screen_step_done')"
                         />
 
-                    <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
+                    <v-card v-if="wrapped_context()._type == 'move_line'"
+                            class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
                         <packaging-qty-picker :options="utils.misc.move_line_qty_picker_options(rec)" />
                     </v-card>
 
