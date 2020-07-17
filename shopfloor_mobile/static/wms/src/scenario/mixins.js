@@ -191,7 +191,7 @@ export var ScenarioBaseMixin = {
                  * for handline the transition to another state
                  * or delegate it to server result via `next_state` key.
                  */
-                if (!"init" in this.states) {
+                if (!("init" in this.states)) {
                     state_key = this.initial_state_key;
                 }
             }
