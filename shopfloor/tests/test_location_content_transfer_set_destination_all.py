@@ -72,10 +72,9 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         )
         self.assert_response_start(
             response,
-            message={
-                "message_type": "success",
-                "body": "Content transferred from {}.".format(self.content_loc.name),
-            },
+            message=self.service.msg_store.location_content_transfer_complete(
+                self.content_loc, sub_shelf1
+            ),
         )
         self.assert_all_done(sub_shelf1)
 
@@ -129,10 +128,9 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         )
         self.assert_response_start(
             response,
-            message={
-                "message_type": "success",
-                "body": "Content transferred from {}.".format(self.content_loc.name),
-            },
+            message=self.service.msg_store.location_content_transfer_complete(
+                self.content_loc, self.shelf2
+            ),
         )
         self.assert_all_done(self.shelf2)
 

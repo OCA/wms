@@ -369,12 +369,9 @@ class LocationContentTransfer(Component):
         self._set_destination_lines(pickings, move_lines, scanned_location)
 
         return self._response_for_start(
-            message={
-                "message_type": "success",
-                "body": _("Content transferred from {} to {}.").format(
-                    location.name, scanned_location.name
-                ),
-            }
+            message=self.msg_store.location_content_transfer_complete(
+                location, scanned_location
+            )
         )
 
     def go_to_single(self, location_id):
