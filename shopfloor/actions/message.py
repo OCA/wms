@@ -152,7 +152,13 @@ class MessageAction(Component):
     def no_pack_in_location(self, location):
         return {
             "message_type": "error",
-            "body": _("Location %s doesn't contain any package." % location.name),
+            "body": _("Location %s doesn't contain any package.") % location.name,
+        }
+
+    def several_lines_in_location(self, location):
+        return {
+            "message_type": "warning",
+            "body": _("Several lines found in %s, please scan one.") % location.name,
         }
 
     def several_packs_in_location(self, location):
@@ -252,6 +258,12 @@ class MessageAction(Component):
             ),
         }
 
+    def product_not_found(self):
+        return {
+            "message_type": "error",
+            "body": _("This product does not exist anymore."),
+        }
+
     def product_not_found_in_pickings(self):
         return {
             "message_type": "warning",
@@ -273,6 +285,12 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("This lot is part of multiple packages, please scan a package."),
+        }
+
+    def lot_not_found(self):
+        return {
+            "message_type": "error",
+            "body": _("This lot does not exist anymore."),
         }
 
     def lot_not_found_in_pickings(self):

@@ -26,14 +26,25 @@ class ZonePickingCommonCase(CommonCase):
                 }
             )
         )
-        cls.zone_sublocation = (
+        cls.zone_sublocation1 = (
             cls.env["stock.location"]
             .sudo()
             .create(
                 {
-                    "name": "Zone sub-location",
+                    "name": "Zone sub-location 1",
                     "location_id": cls.zone_location.id,
-                    "barcode": "ZONE_SUBLOCATION",
+                    "barcode": "ZONE_SUBLOCATION_1",
+                }
+            )
+        )
+        cls.zone_sublocation2 = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Zone sub-location 2",
+                    "location_id": cls.zone_location.id,
+                    "barcode": "ZONE_SUBLOCATION_2",
                 }
             )
         )
@@ -47,18 +58,34 @@ class ZonePickingCommonCase(CommonCase):
                 }
             )
 
-        cls.picking1 = picking1 = cls._create_picking(
-            lines=[(cls.product_a, 10), (cls.product_b, 10)]
-        )
+        cls.picking1 = picking1 = cls._create_picking(lines=[(cls.product_a, 10)])
         cls.picking2 = picking2 = cls._create_picking(
-            lines=[(cls.product_c, 10), (cls.product_d, 10)]
+            lines=[(cls.product_b, 10), (cls.product_c, 10)]
         )
         cls.pickings = picking1 | picking2
         cls._fill_stock_for_moves(
-            picking1.move_lines, in_package=True, location=cls.zone_sublocation
+            picking1.move_lines, in_package=True, location=cls.zone_sublocation1
         )
-        cls._fill_stock_for_moves(picking2.move_lines, location=cls.zone_sublocation)
+        cls._fill_stock_for_moves(
+            picking2.move_lines, in_lot=True, location=cls.zone_sublocation2
+        )
         cls.pickings.action_assign()
+        # Some records not related at all to the processed move lines
+        cls.free_package = cls.env["stock.quant.package"].create(
+            {"name": "FREE_PACKAGE"}
+        )
+        cls.free_lot = cls.env["stock.production.lot"].create(
+            {
+                "name": "FREE_LOT",
+                "product_id": cls.product_a.id,
+                "company_id": cls.env.company.id,
+            }
+        )
+        cls.free_product = (
+            cls.env["product.product"]
+            .sudo()
+            .create({"name": "FREE_PRODUCT", "barcode": "FREE_PRODUCT"})
+        )
 
     def setUp(self):
         super().setUp()
@@ -131,4 +158,30 @@ class ZonePickingCommonCase(CommonCase):
             move_lines,
             message=message,
             popup=popup,
+        )
+
+    def _assert_response_set_line_destination(
+        self, state, response, zone_location, picking_type, move_line, message=None,
+    ):
+        self.assert_response(
+            response,
+            next_state=state,
+            data={
+                "zone_location": self.data.location(zone_location),
+                "picking_type": self.data.picking_type(picking_type),
+                "move_line": self.data.move_line(move_line),
+            },
+            message=message,
+        )
+
+    def assert_response_set_line_destination(
+        self, response, zone_location, picking_type, move_line, message=None,
+    ):
+        self._assert_response_set_line_destination(
+            "set_line_destination",
+            response,
+            zone_location,
+            picking_type,
+            move_line,
+            message=message,
         )
