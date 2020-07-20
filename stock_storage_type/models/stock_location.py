@@ -173,8 +173,11 @@ class StockLocation(models.Model):
                     (6, 0, parent.allowed_location_storage_type_ids.ids)
                 ]
 
-    def _get_putaway_strategy(self, product):
-        putaway_location = super()._get_putaway_strategy(product)
+    # method provided by "stock_putaway_hook"
+    def _putaway_strategy_finalizer(self, putaway_location, product):
+        putaway_location = super()._putaway_strategy_finalizer(
+            putaway_location, product
+        )
         quant = self.env.context.get("storage_quant")
         return self._get_pack_putaway_strategy(putaway_location, quant, product)
 
