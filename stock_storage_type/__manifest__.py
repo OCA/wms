@@ -12,6 +12,7 @@
     "application": False,
     "installable": True,
     "depends": [
+        "stock_putaway_hook",
         "base_m2m_custom_field",
         "stock_quant_package_dimension",
         "web_domain_field",
