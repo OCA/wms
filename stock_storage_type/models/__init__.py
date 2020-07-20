@@ -1,4 +1,5 @@
 from . import product_packaging
+from . import product_template
 from . import stock_location
 from . import stock_location_package_storage_type_rel
 from . import stock_location_storage_type
