@@ -317,20 +317,6 @@ class LocationContentTransfer(Component):
         move_lines.package_level_id.location_dest_id = dest_location
         pickings.action_done()
 
-    def _split_other_move_lines(self, move, move_lines):
-        """Substract `move_lines` from `move.move_line_ids` and put the result
-        in a new move.
-        """
-        other_move_lines = move.move_line_ids - move_lines
-        if other_move_lines:
-            qty_to_split = sum(other_move_lines.mapped("product_uom_qty"))
-            backorder_move_id = move._split(qty_to_split)
-            backorder_move = self.env["stock.move"].browse(backorder_move_id)
-            backorder_move.move_line_ids = other_move_lines
-            backorder_move._action_assign()
-            return backorder_move
-        return False
-
     def set_destination_all(self, location_id, barcode, confirmation=False):
         """Scan destination location for all the moves of the location
 
@@ -553,7 +539,7 @@ class LocationContentTransfer(Component):
             # Check if there is no other lines linked to the move others than
             # the lines related to the package itself. In such case we have to
             # split the move to process only the lines related to the package.
-            self._split_other_move_lines(package_move, package_move_lines)
+            package_move.split_other_move_lines(package_move_lines)
         package_level.location_dest_id = scanned_location
         package_moves.with_context(_sf_no_backorder=True)._action_done()
         move_lines = self._find_transfer_move_lines(location)
@@ -625,7 +611,7 @@ class LocationContentTransfer(Component):
             (new_move | current_move)._action_assign()
             for remaining_move_line in current_move.move_line_ids:
                 remaining_move_line.qty_done = remaining_move_line.product_uom_qty
-        self._split_other_move_lines(move_line.move_id, move_line)
+        move_line.move_id.split_other_move_lines(move_line)
         move_line.location_dest_id = scanned_location
         move_line.move_id.with_context(_sf_no_backorder=True)._action_done()
         move_lines = self._find_transfer_move_lines(location)
@@ -695,7 +681,7 @@ class LocationContentTransfer(Component):
             # Check if there is no other lines linked to the move others than
             # the lines related to the package itself. In such case we have to
             # split the move to process only the lines related to the package.
-            self._split_other_move_lines(package_move, package_move_lines)
+            package_move.split_other_move_lines(package_move_lines)
             lot = package_move.move_line_ids.lot_id
             package_move._do_unreserve()
             package_move._recompute_state()
@@ -747,7 +733,7 @@ class LocationContentTransfer(Component):
             move_lines = self._find_transfer_move_lines(location)
             return self._response_for_start_single(move_lines.mapped("picking_id"))
         inventory = self.actions_for("inventory")
-        self._split_other_move_lines(move_line.move_id, move_line)
+        move_line.move_id.split_other_move_lines(move_line)
         move_line_src_location = move_line.location_id
         move = move_line.move_id
         package = move_line.package_id

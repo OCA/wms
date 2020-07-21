@@ -1,4 +1,5 @@
 from odoo.fields import first
+from odoo.tools.float_utils import float_compare
 
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
@@ -99,21 +100,19 @@ class ZonePicking(Component):
         )
 
     def _response_for_set_line_destination(
-        self, zone_location, picking_type, move_line, message=None
+        self,
+        zone_location,
+        picking_type,
+        move_line,
+        message=None,
+        confirmation_required=False,
     ):
+        if confirmation_required and not message:
+            message = self.msg_store.need_confirmation()
+        data = self._data_for_move_line(zone_location, picking_type, move_line)
+        data["confirmation_required"] = confirmation_required
         return self._response(
-            next_state="set_line_destination",
-            data=self._data_for_move_line(zone_location, picking_type, move_line),
-            message=message,
-        )
-
-    def _response_for_confirm_set_line_destination(
-        self, zone_location, picking_type, move_line, message=None
-    ):
-        return self._response(
-            next_state="confirm_set_line_destination",
-            data=self._data_for_move_line(zone_location, picking_type, move_line),
-            message=message,
+            next_state="set_line_destination", data=data, message=message,
         )
 
     def _response_for_zero_check(
@@ -121,7 +120,7 @@ class ZonePicking(Component):
     ):
         return self._response(
             next_state="zero_check",
-            data=self._data_for_move_line(zone_location, picking_type, location),
+            data=self._data_for_location(zone_location, picking_type, location),
             message=message,
         )
 
@@ -198,6 +197,13 @@ class ZonePicking(Component):
             "zone_location": self.data.location(zone_location),
             "picking_type": self.data.picking_type(picking_type),
             "move_lines": self.data.move_lines(move_lines),
+        }
+
+    def _data_for_location(self, zone_location, picking_type, location):
+        return {
+            "zone_location": self.data.location(zone_location),
+            "picking_type": self.data.picking_type(picking_type),
+            "location": self.data.location(location),
         }
 
     def _find_location_move_lines_domain(
@@ -421,6 +427,133 @@ class ZonePicking(Component):
             zone_location, picking_type, move_line
         )
 
+    def _set_destination_location(
+        self, zone_location, picking_type, move_line, quantity, confirmation, location
+    ):
+        # Ask confirmation to the user if the scanned location is not in the
+        # expected ones but is valid (in picking type's default destination)
+        if not location.is_sublocation_of(move_line.location_dest_id) and (
+            not confirmation
+            and location.is_sublocation_of(picking_type.default_location_dest_id)
+        ):
+            return self._response_for_set_line_destination(
+                zone_location,
+                picking_type,
+                move_line,
+                message=self.msg_store.confirm_location_changed(
+                    move_line.location_dest_id, location
+                ),
+                confirmation_required=True,
+            )
+        # A valid location is a sub-location of the original destination, or a
+        # sub-location of the picking type's default destination location if
+        # `confirmation is True
+        if not location.is_sublocation_of(move_line.location_dest_id) and (
+            confirmation
+            and not location.is_sublocation_of(picking_type.default_location_dest_id)
+        ):
+            return self._response_for_set_line_destination(
+                zone_location,
+                picking_type,
+                move_line,
+                message=self.msg_store.dest_location_not_allowed(),
+            )
+        # If no destination package
+        if not move_line.result_package_id:
+            return self._response_for_set_line_destination(
+                zone_location,
+                picking_type,
+                move_line,
+                message=self.msg_store.dest_package_required(),
+            )
+        # destination location set to the scanned one
+        move_line.location_dest_id = location
+        # the quantity done is set to the passed quantity
+        move_line.qty_done = quantity
+        # if the move has other move lines, it is split to have only this move line
+        move_line.move_id.split_other_move_lines(move_line)
+        # set to done (without backorder)
+        move_line.move_id.with_context(_sf_no_backorder=True)._action_done()
+        # try to re-assign any split move (in case of partial qty)
+        if "confirmed" in move_line.picking_id.move_lines.mapped("state"):
+            move_line.picking_id.action_assign()
+        # Zero check
+        zero_check = picking_type.shopfloor_zero_check
+        if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
+            return self._response_for_zero_check(
+                zone_location, picking_type, move_line.location_id
+            )
+
+    def _is_package_empty(self, package):
+        return not bool(package.quant_ids)
+
+    def _is_package_already_used(self, package):
+        return bool(
+            self.env["stock.move.line"].search_count(
+                [
+                    ("state", "not in", ("done", "cancel")),
+                    ("result_package_id", "=", package.id),
+                ]
+            )
+        )
+
+    def _set_destination_package(
+        self, zone_location, picking_type, move_line, quantity, package
+    ):
+        # A valid package is:
+        # * an empty package
+        # * not used as destination for another move line
+        if not self._is_package_empty(package):
+            return self._response_for_set_line_destination(
+                zone_location,
+                picking_type,
+                move_line,
+                message=self.msg_store.package_not_empty(package),
+            )
+        if self._is_package_already_used(package):
+            return self._response_for_set_line_destination(
+                zone_location,
+                picking_type,
+                move_line,
+                message=self.msg_store.package_already_used(package),
+            )
+        # the quantity done is set to the passed quantity
+        # but if we move a partial qty, we need to split the move line
+        rounding = move_line.product_uom_id.rounding
+        compare = float_compare(
+            quantity, move_line.product_uom_qty, precision_rounding=rounding
+        )
+        qty_lesser = compare == -1
+        qty_greater = compare == 1
+        if qty_greater:
+            return self._response_for_set_line_destination(
+                zone_location,
+                picking_type,
+                move_line,
+                message=self.msg_store.unable_to_pick_more(move_line.product_uom_qty),
+            )
+        elif qty_lesser:
+            # split the move line which will be processed later
+            remaining = move_line.product_uom_qty - quantity
+            move_line.copy({"product_uom_qty": remaining, "qty_done": 0})
+            # if we didn't bypass reservation update, the quant reservation
+            # would be reduced as much as the deduced quantity, which is wrong
+            # as we only moved the quantity to a new move line
+            move_line.with_context(
+                bypass_reservation_update=True
+            ).product_uom_qty = quantity
+        move_line.qty_done = quantity
+        # destination package is set to the scanned one
+        move_line.result_package_id = package
+        # the field ``shopfloor_user_id`` is updated with the current user
+        move_line.shopfloor_user_id = self.env.user
+        # Zero check
+        zero_check = picking_type.shopfloor_zero_check
+        if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
+            return self._response_for_zero_check(
+                zone_location, picking_type, move_line.location_id
+            )
+
     def set_destination(
         self,
         zone_location_id,
@@ -429,6 +562,7 @@ class ZonePicking(Component):
         barcode,
         quantity,
         confirmation=False,
+        order="priority",
     ):
         """Set a destination location (and done) or a destination package (in buffer)
 
@@ -473,12 +607,35 @@ class ZonePicking(Component):
         * confirm_set_line_destination: the scanned location is not in the
           expected one but is valid (in picking type's default destination)
         """
-        # TODO on _action_done, use ``_sf_no_backorder`` in the
-        # context to disable backorders (see override in stock_picking.py).
-        # NOTE for the implementation: zero_check is active only if the option
-        # is active on the picking_type (maybe shopfloor.menu), check in
-        # cluster picking how it's done
-        return self._response()
+        zone_location = self.env["stock.location"].browse(zone_location_id)
+        if not zone_location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        picking_type = self.env["stock.picking.type"].browse(picking_type_id)
+        if not picking_type.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        if not move_line.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        search = self.actions_for("search")
+        # When the barcode is a location
+        location = search.location_from_scan(barcode)
+        if location:
+            response = self._set_destination_location(
+                zone_location, picking_type, move_line, quantity, confirmation, location
+            )
+            if response:
+                return response
+        # When the barcode is a package
+        package = search.package_from_scan(barcode)
+        if package:
+            location = move_line.location_dest_id
+            response = self._set_destination_package(
+                zone_location, picking_type, move_line, quantity, package
+            )
+            if response:
+                return response
+        # Process the next line
+        return self.list_move_lines(zone_location.id, picking_type.id)
 
     def is_zero(self, zone_location_id, picking_type_id, move_line_id, zero):
         """Confirm or not if the source location of a move has zero qty
@@ -695,6 +852,7 @@ class ShopfloorZonePickingValidator(Component):
         return {
             "zone_location_id": {"coerce": to_int, "required": True, "type": "integer"},
             "picking_type_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": False, "nullable": True, "type": "string"},
             "order": {
                 "required": False,
@@ -783,8 +941,7 @@ class ShopfloorZonePickingValidatorResponse(Component):
             "select_picking_type": self._schema_for_select_picking_type,
             "select_line": self._schema_for_move_lines,
             "set_line_destination": self._schema_for_move_line,
-            "confirm_set_line_destination": self._schema_for_move_line,
-            "zero_check": self._schema_for_move_line,
+            "zero_check": self._schema_for_zero_check,
             "change_pack_lot": self._schema_for_move_line,
             "unload_all": self._schema_for_move_lines,
             "confirm_unload_all": self._schema_for_move_lines,
@@ -806,12 +963,7 @@ class ShopfloorZonePickingValidatorResponse(Component):
 
     def set_destination(self):
         return self._response_schema(
-            next_states={
-                "select_line",
-                "set_line_destination",
-                "confirm_set_line_destination",
-                "zero_check",
-            }
+            next_states={"select_line", "set_line_destination", "zero_check"}
         )
 
     def is_zero(self):
@@ -876,6 +1028,11 @@ class ShopfloorZonePickingValidatorResponse(Component):
             "zone_location": self.schemas._schema_dict_of(self.schemas.location()),
             "picking_type": self.schemas._schema_dict_of(self.schemas.picking_type()),
             "move_line": self.schemas._schema_dict_of(self.schemas.move_line()),
+            "confirmation_required": {
+                "type": "boolean",
+                "nullable": True,
+                "required": False,
+            },
         }
         return schema
 
@@ -885,5 +1042,14 @@ class ShopfloorZonePickingValidatorResponse(Component):
             "zone_location": self.schemas._schema_dict_of(self.schemas.location()),
             "picking_type": self.schemas._schema_dict_of(self.schemas.picking_type()),
             "move_lines": self.schemas._schema_list_of(self.schemas.move_line()),
+        }
+        return schema
+
+    @property
+    def _schema_for_zero_check(self):
+        schema = {
+            "zone_location": self.schemas._schema_dict_of(self.schemas.location()),
+            "picking_type": self.schemas._schema_dict_of(self.schemas.picking_type()),
+            "location": self.schemas._schema_dict_of(self.schemas.location()),
         }
         return schema
