@@ -89,6 +89,24 @@ class MessageAction(Component):
             ),
         }
 
+    def package_not_empty(self, package):
+        return {
+            "message_type": "warning",
+            "body": _("Package {} is not empty.").format(package.name),
+        }
+
+    def package_already_used(self, package):
+        return {
+            "message_type": "warning",
+            "body": _("Package {} is already used.").format(package.name),
+        }
+
+    def dest_package_required(self):
+        return {
+            "message_type": "warning",
+            "body": _("A destination package is required."),
+        }
+
     def line_not_available_in_picking(self, picking):
         return {
             "message_type": "warning",
@@ -364,4 +382,10 @@ class MessageAction(Component):
         return {
             "message_type": "info",
             "body": _("Location {} empty").format(location.name),
+        }
+
+    def unable_to_pick_more(self, quantity):
+        return {
+            "message_type": "error",
+            "body": _("You must not pick more than {} units.").format(quantity),
         }

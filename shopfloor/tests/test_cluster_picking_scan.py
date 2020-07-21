@@ -515,15 +515,36 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
 
     def test_scan_destination_pack_zero_check_activated(self):
         """Location will be emptied, have to go to zero check"""
+        # ensure that the location used for the test will contain only what we want
+        self.zero_check_location = (
+            self.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "ZeroCheck",
+                    "location_id": self.stock_location.id,
+                    "barcode": "ZEROCHECK",
+                }
+            )
+        )
         line = self.one_line_picking.move_line_ids
+        location, product, qty = (
+            self.zero_check_location,
+            line.product_id,
+            line.product_uom_qty,
+        )
+        self.one_line_picking.do_unreserve()
+
         # ensure we have activated the zero check
         self.one_line_picking.picking_type_id.sudo().shopfloor_zero_check = True
         # Update the quantity in the location to be equal to the line's
         # so when scan_destination_pack sets the qty_done, the planned
         # qty should be zero and trigger a zero check
-        self._update_qty_in_location(
-            line.location_id, line.product_id, line.product_uom_qty
-        )
+        self._update_qty_in_location(location, product, qty)
+        # Reserve goods (now the move line has the expected source location)
+        self.one_line_picking.move_lines.location_id = location
+        self.one_line_picking.action_assign()
+        line = self.one_line_picking.move_line_ids
         response = self.service.dispatch(
             "scan_destination_pack",
             params={

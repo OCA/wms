@@ -579,12 +579,7 @@ class ClusterPicking(Component):
         if qty_greater:
             return self._response_for_scan_destination(
                 move_line,
-                message={
-                    "message_type": "error",
-                    "body": _("You must not pick more than {} units.").format(
-                        move_line.product_uom_qty
-                    ),
-                },
+                message=self.msg_store.unable_to_pick_more(move_line.product_uom_qty),
             )
         elif qty_lesser:
             # split the move line which will be processed later (maybe the user
@@ -623,9 +618,7 @@ class ClusterPicking(Component):
         move_line.write({"qty_done": quantity, "result_package_id": bin_package.id})
 
         zero_check = move_line.picking_id.picking_type_id.shopfloor_zero_check
-        if zero_check and self._planned_qty_in_location_is_empty(
-            move_line.product_id, move_line.location_id
-        ):
+        if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
             return self._response_for_zero_check(batch, move_line)
 
         return self._pick_next_line(
@@ -637,27 +630,6 @@ class ClusterPicking(Component):
             # split right now
             force_line=new_line,
         )
-
-    def _planned_qty_in_location_is_empty(self, product, location):
-        """Return if a location will be empty when move lines will be confirmed
-
-        Used for the "zero check". We need to know if a location is empty, but since
-        we set the move lines to "done" only at the end of the unload workflow, we
-        have to look at the qty_done of the move lines from this location.
-        """
-        remaining = product.with_context(location=location.id).qty_available
-        lines_in_loc = self.env["stock.move.line"].search(
-            # TODO do we care about lots here?
-            [
-                ("state", "!=", "done"),
-                ("location_id", "=", location.id),
-                ("product_id", "=", product.id),
-            ]
-        )
-        planned = remaining - sum(lines_in_loc.mapped("qty_done"))
-        rounding = product.uom_id.rounding
-        compare = float_compare(planned, 0, precision_rounding=rounding)
-        return compare <= 0
 
     def _are_all_dest_location_same(self, batch):
         lines_to_unload = self._lines_to_unload(batch)
