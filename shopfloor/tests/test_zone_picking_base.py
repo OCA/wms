@@ -13,6 +13,7 @@ class ZonePickingCommonCase(CommonCase):
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
+        cls.packing_location.sudo().active = True
         # We want to limit the tests to a dedicated location in Stock/ to not
         # be bothered with pickings brought by demo data
         cls.zone_location = (
@@ -48,7 +49,48 @@ class ZonePickingCommonCase(CommonCase):
                 }
             )
         )
-        products = cls.product_a + cls.product_b + cls.product_c + cls.product_d
+        cls.zone_sublocation3 = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Zone sub-location 3",
+                    "location_id": cls.zone_location.id,
+                    "barcode": "ZONE_SUBLOCATION_3",
+                }
+            )
+        )
+        cls.zone_sublocation4 = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Zone sub-location 4",
+                    "location_id": cls.zone_location.id,
+                    "barcode": "ZONE_SUBLOCATION_4",
+                }
+            )
+        )
+        cls.product_e = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product E",
+                    "type": "product",
+                    "default_code": "E",
+                    "barcode": "E",
+                    "weight": 3,
+                }
+            )
+        )
+        products = (
+            cls.product_a
+            + cls.product_b
+            + cls.product_c
+            + cls.product_d
+            + cls.product_e
+        )
         for product in products:
             cls.env["stock.putaway.rule"].sudo().create(
                 {
@@ -62,13 +104,21 @@ class ZonePickingCommonCase(CommonCase):
         cls.picking2 = picking2 = cls._create_picking(
             lines=[(cls.product_b, 10), (cls.product_c, 10)]
         )
-        cls.pickings = picking1 | picking2
+        cls.picking3 = picking3 = cls._create_picking(lines=[(cls.product_d, 10)])
+        cls.picking4 = picking4 = cls._create_picking(lines=[(cls.product_e, 10)])
+        cls.pickings = picking1 | picking2 | picking3 | picking4
         cls._fill_stock_for_moves(
             picking1.move_lines, in_package=True, location=cls.zone_sublocation1
         )
         cls._fill_stock_for_moves(
             picking2.move_lines, in_lot=True, location=cls.zone_sublocation2
         )
+        cls._fill_stock_for_moves(picking3.move_lines, location=cls.zone_sublocation3)
+        # Put product_e quantities in two different source locations to get
+        # two stock move lines (6 and 4 to satisfy 10 qties)
+        cls._update_qty_in_location(cls.zone_sublocation3, cls.product_e, 6)
+        cls._update_qty_in_location(cls.zone_sublocation4, cls.product_e, 4)
+        # cls._fill_stock_for_moves(picking4.move_lines, location=cls.zone_sublocation3)
         cls.pickings.action_assign()
         # Some records not related at all to the processed move lines
         cls.free_package = cls.env["stock.quant.package"].create(
@@ -161,7 +211,14 @@ class ZonePickingCommonCase(CommonCase):
         )
 
     def _assert_response_set_line_destination(
-        self, state, response, zone_location, picking_type, move_line, message=None,
+        self,
+        state,
+        response,
+        zone_location,
+        picking_type,
+        move_line,
+        message=None,
+        confirmation_required=False,
     ):
         self.assert_response(
             response,
@@ -170,12 +227,19 @@ class ZonePickingCommonCase(CommonCase):
                 "zone_location": self.data.location(zone_location),
                 "picking_type": self.data.picking_type(picking_type),
                 "move_line": self.data.move_line(move_line),
+                "confirmation_required": confirmation_required,
             },
             message=message,
         )
 
     def assert_response_set_line_destination(
-        self, response, zone_location, picking_type, move_line, message=None,
+        self,
+        response,
+        zone_location,
+        picking_type,
+        move_line,
+        message=None,
+        confirmation_required=False,
     ):
         self._assert_response_set_line_destination(
             "set_line_destination",
@@ -183,5 +247,32 @@ class ZonePickingCommonCase(CommonCase):
             zone_location,
             picking_type,
             move_line,
+            message=message,
+            confirmation_required=confirmation_required,
+        )
+
+    def _assert_response_zero_check(
+        self, state, response, zone_location, picking_type, location, message=None,
+    ):
+        self.assert_response(
+            response,
+            next_state=state,
+            data={
+                "zone_location": self.data.location(zone_location),
+                "picking_type": self.data.picking_type(picking_type),
+                "location": self.data.location(location),
+            },
+            message=message,
+        )
+
+    def assert_response_zero_check(
+        self, response, zone_location, picking_type, location, message=None,
+    ):
+        self._assert_response_zero_check(
+            "zero_check",
+            response,
+            zone_location,
+            picking_type,
+            location,
             message=message,
         )
