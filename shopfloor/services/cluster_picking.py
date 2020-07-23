@@ -322,6 +322,7 @@ class ClusterPicking(Component):
             line.shopfloor_postponed,
             line.location_id.shopfloor_picking_sequence,
             line.location_id.name,
+            -int(line.move_id.priority or 1),
             line.move_id.sequence,
             line.move_id.id,
             line.id,
