@@ -4,10 +4,13 @@ from odoo import fields, models
 class StockLocation(models.Model):
     _inherit = "stock.location"
 
-    shopfloor_picking_sequence = fields.Integer(
+    shopfloor_picking_sequence = fields.Char(
         string="Shopfloor Picking Sequence",
-        default=0,
-        help="The picking done in Shopfloor scenarios will respect this order.",
+        help="The picking done in Shopfloor scenarios will respect this order. "
+        "The sequence is a char so it can be composed of fields such as "
+        "'corridor-rack-side-level'. Pay attention to the padding "
+        "('09' is before '19', '9' is not). It is recommended to use an"
+        " Export then an Import to populate this field using a spreadsheet.",
     )
     source_move_line_ids = fields.One2many(
         comodel_name="stock.move.line", inverse_name="location_id", readonly=True
