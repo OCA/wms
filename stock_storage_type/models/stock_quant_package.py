@@ -20,8 +20,9 @@ class StockQuantPackage(models.Model):
     @api.depends(
         "product_packaging_id",
         "product_packaging_id.package_storage_type_id",
-        "single_product_id",
-        "single_product_id.product_package_storage_type_id",
+        "quant_ids",
+        "quant_ids.product_id",
+        "quant_ids.product_id.product_package_storage_type_id",
     )
     def _compute_package_storage_type_id(self):
         for pack in self:
