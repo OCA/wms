@@ -56,7 +56,7 @@ export var ItemDetailMixin = {
             if (identifier) {
                 // TODO: we should probably delegate this to a global event
                 this.$router.push({
-                    name: "scananything",
+                    name: "scan_anything",
                     params: {identifier: identifier},
                     query: {displayOnly: 1},
                 });

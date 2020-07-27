@@ -107,7 +107,7 @@ Vue.component("Screen", {
             </v-toolbar-title>
 
             <v-spacer></v-spacer>
-            <v-btn icon v-if="info.current_doc_identifier" @click="$router.push({'name': 'scananything', params: {identifier: info.current_doc_identifier}, query: {displayOnly: 1}})">
+            <v-btn icon v-if="info.current_doc_identifier" @click="$router.push({'name': 'scan_anything', params: {identifier: info.current_doc_identifier}, query: {displayOnly: 1}})">
                 <btn-info-icon color="'#fff'" />
             </v-btn>
             <app-bar-actions />
@@ -240,7 +240,7 @@ Vue.component("nav-items-extra", {
 Vue.component("app-bar-actions", {
     template: `
     <div>
-        <v-btn icon @click="$router.push({'name': 'scananything'})" :disabled="this.$route.name=='scananything'">
+        <v-btn icon @click="$router.push({'name': 'scan_anything'})" :disabled="this.$route.name=='scan_anything'">
             <v-icon >mdi-magnify</v-icon>
         </v-btn>
     </div>
