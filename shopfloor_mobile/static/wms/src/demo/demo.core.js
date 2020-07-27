@@ -415,6 +415,15 @@ export class DemoTools {
         return rec;
     }
 
+    makePickingType(defaults = {}, options = {}) {
+        _.defaults(options, {name_prefix: "Type"});
+        _.defaults(defaults, {
+            code: this.randomItemFromArray(["outgoing", "incoming", "internal"]),
+        });
+        const rec = this.makeSimpleRecord(defaults, options);
+        return rec;
+    }
+
     partnerNames() {
         return [
             "Edith Sanchez",
