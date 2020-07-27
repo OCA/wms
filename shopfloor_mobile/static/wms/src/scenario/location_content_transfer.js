@@ -330,4 +330,6 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
     },
 });
 
-process_registry.add("location_content_transfer", LocationContentTransfer);
+process_registry.add("location_content_transfer", LocationContentTransfer, {
+    demo_src: "demo/demo.location_content_transfer.js",
+});
