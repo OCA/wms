@@ -671,6 +671,26 @@ class ZonePicking(Component):
         move_lines = self._find_location_move_lines(zone_location, picking_type)
         return self._response_for_select_line(zone_location, picking_type, move_lines)
 
+    def _domain_stock_issue_unlink_lines(self, move_line):
+        # Since we have not enough stock, delete the move lines, which will
+        # in turn unreserve the moves. The moves lines we delete are those
+        # in the same location, and not yet started.
+        # The goal is to prevent the same operator to declare twice the same
+        # stock issue for the same product/lot/package.
+        move = move_line.move_id
+        lot = move_line.lot_id
+        package = move_line.package_id
+        location = move_line.location_id
+        domain = [
+            ("location_id", "=", location.id),
+            ("product_id", "=", move.product_id.id),
+            ("package_id", "=", package.id),
+            ("lot_id", "=", lot.id),
+            ("state", "not in", ("cancel", "done")),
+            ("qty_done", "=", 0),
+        ]
+        return domain
+
     def stock_issue(self, zone_location_id, picking_type_id, move_line_id):
         """Declare a stock issue for a line
 
@@ -699,8 +719,50 @@ class ZonePicking(Component):
         * set_line_destination: something could be reserved instead of the original
           move line
         """
-        # TODO look in cluster_picking.py, similar function exists
-        return self._response()
+        zone_location = self.env["stock.location"].browse(zone_location_id)
+        if not zone_location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        picking_type = self.env["stock.picking.type"].browse(picking_type_id)
+        if not picking_type.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        if not move_line.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        inventory = self.actions_for("inventory")
+        # create a draft inventory for a user to check
+        inventory.create_control_stock(
+            move_line.location_id,
+            move_line.product_id,
+            move_line.package_id,
+            move_line.lot_id,
+        )
+        move = move_line.move_id
+        lot = move_line.lot_id
+        package = move_line.package_id
+        location = move_line.location_id
+
+        # unreserve every lines for the same product/lot in the same location and
+        # not done yet, so the same user doesn't have to declare 2 times the
+        # stock issue for the same thing!
+        domain = self._domain_stock_issue_unlink_lines(move_line)
+        unreserve_move_lines = move_line | self.env["stock.move.line"].search(domain)
+        unreserve_moves = unreserve_move_lines.mapped("move_id").sorted()
+        unreserve_move_lines.unlink()
+
+        # Then, create an inventory with just enough qty so the other assigned
+        # move lines for the same product in other batches and the other move lines
+        # already picked stay assigned.
+        inventory.create_stock_issue(move, location, package, lot)
+
+        # try to reassign the moves in case we have stock in another location
+        unreserve_moves._action_assign()
+
+        if move.move_line_ids:
+            return self._response_for_set_line_destination(
+                zone_location, picking_type, move.move_line_ids[0]
+            )
+        move_lines = self._find_location_move_lines(zone_location, picking_type)
+        return self._response_for_select_line(zone_location, picking_type, move_lines)
 
     def change_pack_lot(self, zone_location_id, picking_type_id, move_line_id, barcode):
         """Change the source package or the lot of a move line
