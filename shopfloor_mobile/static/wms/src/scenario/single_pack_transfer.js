@@ -32,4 +32,6 @@ export var SinglePackTransfer = Vue.component("single-pack-transfer", {
         };
     },
 });
-process_registry.add("single_pack_transfer", SinglePackTransfer);
+process_registry.add("single_pack_transfer", SinglePackTransfer, {
+    demo_src: "demo/demo.single_pack_transfer.js",
+});

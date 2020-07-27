@@ -47,7 +47,7 @@ const app = new Vue({
     created: function() {
         this.demo_mode = window.location.pathname.includes("demo");
         if (this.demo_mode) {
-            this.loadJS("src/demo/demo.core.js", "demo_core");
+            this._loadDemoResources();
         }
         this.loadConfig();
     },
@@ -187,13 +187,27 @@ const app = new Vue({
         },
         loadJS: function(url, script_id) {
             if (script_id && !document.getElementById(script_id)) {
-                console.log("Load JS", url);
+                console.debug("Load JS", url);
                 var script = document.createElement("script");
                 script.setAttribute("src", url);
                 script.setAttribute("type", "module");
                 script.setAttribute("id", script_id);
                 document.getElementsByTagName("head")[0].appendChild(script);
             }
+        },
+        _loadDemoResources: function() {
+            const self = this;
+            this.loadJS("src/demo/demo.core.js", "demo_core");
+            let registered = [];
+            _.forEach(this.registry.all(), function(process, key) {
+                if (process.metadata.demo_src) {
+                    // FIXME: find a way to not pass relative path
+                    self.loadJS("src/" + process.metadata.demo_src, "demo_" + key);
+                    registered.push(key);
+                }
+            });
+            if (registered.length)
+                console.log("Registered demo resources for:", registered.join(", "));
         },
         /*
         Trigger and event on the event hub.

@@ -7,15 +7,21 @@ export class Registry {
         return this._data[key];
     }
 
-    add(key, item) {
-        this._data[key] = item;
+    add(key, component, metadata) {
+        const meta = metadata || {};
+        this._data[key] = {
+            key: key,
+            component: component,
+            metadata: meta,
+            path: meta.path || this.make_path(key),
+        };
     }
 
     all() {
         return this._data;
     }
 
-    make_route(code) {
+    make_path(code) {
         return _.template("/${ code }/:menu_id/:state?")({code: code});
     }
 }

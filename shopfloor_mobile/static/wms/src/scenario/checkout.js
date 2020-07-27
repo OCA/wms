@@ -626,4 +626,4 @@ export var Checkout = Vue.component("checkout", {
     },
 });
 
-process_registry.add("checkout", Checkout);
+process_registry.add("checkout", Checkout, {demo_src: "demo/demo.cluster_picking.js"});

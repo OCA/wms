@@ -14,20 +14,15 @@ let routes = [
     {path: "/settings", component: SettingsControlPanel, name: "settings"},
     {path: "/profile", component: Profile, name: "profile"},
     {path: "/language", component: Language, name: "language"},
-    {
-        path: "/scananything/:identifier?",
-        component: ScanAnything,
-        name: "scananything",
-    },
     // TODO Fix this it needs to be the last route, but I think it is not anymore with the dynamic one added.
     // { path: '*', component: NotFound },
 ];
 let registered = [];
-_.forEach(process_registry.all(), function(component, key) {
+_.forEach(process_registry.all(), function(process, key) {
     routes.push({
-        name: key,
-        path: process_registry.make_route(key),
-        component: component,
+        name: process.key,
+        path: process.path,
+        component: process.component,
     });
     registered.push(key);
 });

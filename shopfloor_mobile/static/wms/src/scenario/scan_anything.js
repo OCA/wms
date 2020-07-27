@@ -1,3 +1,5 @@
+import {process_registry} from "../services/process_registry.js";
+
 export var ScanAnything = Vue.component("scan-anything", {
     template: `
         <Screen :screen_info="screen_info">
@@ -122,4 +124,9 @@ export var ScanAnything = Vue.component("scan-anything", {
             return !_.isEmpty(this.scan_data);
         },
     },
+});
+
+process_registry.add("scan_anything", ScanAnything, {
+    path: "/scan_anything/:identifier?",
+    demo_src: "demo/demo.scan_anything.js",
 });
