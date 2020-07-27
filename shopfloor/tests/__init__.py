@@ -44,3 +44,4 @@ from . import test_zone_picking_select_picking_type
 from . import test_zone_picking_select_line
 from . import test_zone_picking_set_line_destination
 from . import test_zone_picking_zero_check
+from . import test_zone_picking_stock_issue
