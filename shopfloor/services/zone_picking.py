@@ -648,8 +648,28 @@ class ZonePicking(Component):
         * select_line: whether the user confirms or not the location is empty,
           go back to the picking of lines
         """
-        # TODO look in cluster_picking.py, same function exists
-        return self._response()
+        zone_location = self.env["stock.location"].browse(zone_location_id)
+        if not zone_location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        picking_type = self.env["stock.picking.type"].browse(picking_type_id)
+        if not picking_type.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        if not move_line.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        if not zero:
+            inventory = self.actions_for("inventory")
+            inventory.create_draft_check_empty(
+                move_line.location_id,
+                # FIXME as zero_check is done on the whole location, we should
+                # create an inventory on it without the product critera
+                # => the same applies on "Cluster Picking" scenario
+                # move_line.product_id,
+                move_line.product_id.browse(),  # HACK send an empty recordset
+                ref=picking_type.name,
+            )
+        move_lines = self._find_location_move_lines(zone_location, picking_type)
+        return self._response_for_select_line(zone_location, picking_type, move_lines)
 
     def stock_issue(self, zone_location_id, picking_type_id, move_line_id):
         """Declare a stock issue for a line
