@@ -187,10 +187,16 @@ class MessageAction(Component):
             ),
         }
 
+    def no_package_or_lot_for_barcode(self, barcode):
+        return {
+            "message_type": "error",
+            "body": _("No package or lot found for barcode {}.").format(barcode),
+        }
+
     def no_lot_for_barcode(self, barcode):
         return {
             "message_type": "error",
-            "body": _("No lot found for {}".format(barcode)),
+            "body": _("No lot found for {}").format(barcode),
         }
 
     def lot_on_wrong_product(self, barcode):
@@ -202,7 +208,7 @@ class MessageAction(Component):
     def several_lots_in_location(self, location):
         return {
             "message_type": "warning",
-            "body": _("Several lots found in %s, please scan a lot." % location.name),
+            "body": _("Several lots found in %s, please scan a lot.") % location.name,
         }
 
     def several_products_in_location(self, location):
@@ -216,7 +222,7 @@ class MessageAction(Component):
     def no_pending_operation_for_pack(self, pack):
         return {
             "message_type": "error",
-            "body": _("No pending operation for package %s." % pack.name),
+            "body": _("No pending operation for package %s.") % pack.name,
         }
 
     def unrecoverable_error(self):
@@ -388,4 +394,32 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("You must not pick more than {} units.").format(quantity),
+        }
+
+    def lot_replaced_by_lot(self, old_lot, new_lot):
+        return {
+            "message_type": "success",
+            "body": _("Lot {} replaced by lot {}.").format(old_lot.name, new_lot.name),
+        }
+
+    def package_replaced_by_package(self, old_package, new_package):
+        return {
+            "message_type": "success",
+            "body": _("Package {} replaced by package {}.").format(
+                old_package.name, new_package.name
+            ),
+        }
+
+    def package_already_picked_by(self, package, picking):
+        return {
+            "message_type": "error",
+            "body": _(
+                _("Package {} cannot be picked, already moved by transfer {}.")
+            ).format(package.name, picking.name),
+        }
+
+    def lot_is_not_a_package(self, lot):
+        return {
+            "message_type": "error",
+            "body": _("Lot {} is not a package.").format(lot.name),
         }
