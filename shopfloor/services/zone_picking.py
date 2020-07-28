@@ -1,13 +1,16 @@
+import functools
+
 from odoo.fields import first
 from odoo.tools.float_utils import float_compare
 
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
 
+from .change_pack_lot_mixin import ChangePackLotMixin
 from .service import to_float
 
 
-class ZonePicking(Component):
+class ZonePicking(Component, ChangePackLotMixin):
     """
     Methods for the Zone Picking Process
 
@@ -780,8 +783,53 @@ class ZonePicking(Component):
           moved to destination now
         * select_line: if the move line does not exist anymore
         """
-        # TODO look in cluster_picking.py, similar function exists
-        return self._response()
+        zone_location = self.env["stock.location"].browse(zone_location_id)
+        if not zone_location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        picking_type = self.env["stock.picking.type"].browse(picking_type_id)
+        if not picking_type.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        if not move_line.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        search = self.actions_for("search")
+        # pre-configured callable used to generate the response as 'ChangePackLotMixin'
+        # is not aware of the needed response type and related parameters for
+        # zone picking scenario
+        response_ok_func = functools.partial(
+            self._response_for_set_line_destination, zone_location, picking_type
+        )
+        response_error_func = functools.partial(
+            self._response_for_change_pack_lot, zone_location, picking_type
+        )
+        response = None
+        # handle lot
+        lot = search.lot_from_scan(barcode)
+        if lot:
+            response = self._change_lot(
+                move_line, lot, response_ok_func, response_error_func
+            )
+        # handle package
+        package = search.package_from_scan(barcode)
+        if package:
+            response = self._change_pack_lot_change_package(
+                move_line, package, response_ok_func, response_error_func
+            )
+        # if the response is not an error, we check the move_line status
+        # to adapt the response ('set_line_destination' or 'select_line')
+        # TODO not sure to understand how 'move_line' could not exist here?
+        if response and response["message"]["message_type"] == "success":
+            # TODO adapt the response based on the move_line.exists()
+            if move_line.exists():
+                return response
+            return response
+
+        return self._response_for_change_pack_lot(
+            zone_location,
+            picking_type,
+            move_line,
+            message=self.msg_store.no_package_or_lot_for_barcode(barcode),
+        )
 
     def prepare_unload(self, zone_location_id, picking_type_id):
         """Initiate the unloading of the buffer

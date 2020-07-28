@@ -129,12 +129,9 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
             line,
             new_package.name,
             success=True,
-            message={
-                "message_type": "success",
-                "body": "Package {} replaced by package {}".format(
-                    initial_package.name, new_package.name
-                ),
-            },
+            message=self.service.msg_store.package_replaced_by_package(
+                initial_package, new_package
+            ),
         )
 
         self.assertRecordValues(
@@ -169,12 +166,9 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
             line,
             new_package.name,
             success=True,
-            message={
-                "message_type": "success",
-                "body": "Package {} replaced by package {}".format(
-                    initial_package.name, new_package.name
-                ),
-            },
+            message=self.service.msg_store.package_replaced_by_package(
+                initial_package, new_package
+            ),
         )
 
         self.assertRecordValues(
@@ -207,12 +201,9 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
             line,
             new_lot.name,
             success=True,
-            message={
-                "message_type": "success",
-                "body": "Package {} replaced by package {}".format(
-                    initial_package.name, new_package.name
-                ),
-            },
+            message=self.service.msg_store.package_replaced_by_package(
+                initial_package, new_package
+            ),
         )
 
         self.assertRecordValues(
@@ -252,11 +243,7 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
             line,
             new_lot.name,
             success=False,
-            message={
-                "message_type": "warning",
-                "body": "Several packages found in {},"
-                " please scan a package.".format(self.shelf1.name),
-            },
+            message=self.service.msg_store.several_packs_in_location(self.shelf1),
         )
 
     def test_change_pack_lot_change_lot_from_package_error(self):
@@ -277,10 +264,7 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
             line,
             new_lot.name,
             success=False,
-            message={
-                "message_type": "error",
-                "body": "Lot {} is not a package.".format(new_lot.name),
-            },
+            message=self.service.msg_store.lot_is_not_a_package(new_lot),
         )
 
     def test_change_pack_lot_change_lot_ok(self):
@@ -296,12 +280,7 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
             line,
             new_lot.name,
             success=True,
-            message={
-                "message_type": "success",
-                "body": "Lot {} replaced by lot {}.".format(
-                    initial_lot.name, new_lot.name
-                ),
-            },
+            message=self.service.msg_store.lot_replaced_by_lot(initial_lot, new_lot),
         )
 
         self.assertRecordValues(line, [{"lot_id": new_lot.id}])
@@ -318,15 +297,10 @@ class ClusterPickingChangePackLotCase(ClusterPickingChangePackLotCommon):
         new_lot = self._create_lot(self.product_a)
         # ensure we have our new package in a different location
         self._update_qty_in_location(self.shelf2, line.product_id, 10, lot=new_lot)
+        message = self.service.msg_store.lot_replaced_by_lot(initial_lot, new_lot)
+        message["body"] += " A draft inventory has been created for control."
         self._test_change_pack_lot(
-            line,
-            new_lot.name,
-            success=True,
-            message={
-                "message_type": "success",
-                "body": "Lot {} replaced by lot {}. A draft inventory has"
-                " been created for control.".format(initial_lot.name, new_lot.name),
-            },
+            line, new_lot.name, success=True, message=message,
         )
 
         self.assertRecordValues(line, [{"lot_id": new_lot.id}])
@@ -394,10 +368,7 @@ class ClusterPickingChangePackLotCaseSpecial(ClusterPickingChangePackLotCommon):
             lines[0],
             new_package.name,
             success=False,
-            message={
-                "message_type": "error",
-                "body": "Package {} has a different content.".format(new_package.name),
-            },
+            message=self.service.msg_store.package_different_content(new_package),
         )
 
     def test_change_pack_lot_change_pack_multi_content_with_lot(self):
@@ -438,12 +409,9 @@ class ClusterPickingChangePackLotCaseSpecial(ClusterPickingChangePackLotCommon):
             lines[0],
             new_package.name,
             success=True,
-            message={
-                "message_type": "success",
-                "body": "Package {} replaced by package {}".format(
-                    initial_package.name, new_package.name
-                ),
-            },
+            message=self.service.msg_store.package_replaced_by_package(
+                initial_package, new_package
+            ),
         )
 
         self.assertRecordValues(
@@ -493,12 +461,9 @@ class ClusterPickingChangePackLotCaseSpecial(ClusterPickingChangePackLotCommon):
             line,
             package2.name,
             success=True,
-            message={
-                "message_type": "success",
-                "body": "Package {} replaced by package {}".format(
-                    package1.name, package2.name
-                ),
-            },
+            message=self.service.msg_store.package_replaced_by_package(
+                package1, package2
+            ),
         )
 
         self.assertRecordValues(

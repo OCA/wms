@@ -276,3 +276,29 @@ class ZonePickingCommonCase(CommonCase):
             location,
             message=message,
         )
+
+    def _assert_response_change_pack_lot(
+        self, state, response, zone_location, picking_type, move_line, message=None,
+    ):
+        self.assert_response(
+            response,
+            next_state=state,
+            data={
+                "zone_location": self.data.location(zone_location),
+                "picking_type": self.data.picking_type(picking_type),
+                "move_line": self.data.move_line(move_line),
+            },
+            message=message,
+        )
+
+    def assert_response_change_pack_lot(
+        self, response, zone_location, picking_type, move_line, message=None,
+    ):
+        self._assert_response_change_pack_lot(
+            "change_pack_lot",
+            response,
+            zone_location,
+            picking_type,
+            move_line,
+            message=message,
+        )
