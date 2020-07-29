@@ -138,7 +138,7 @@ Vue.component("list", {
 Vue.component("list-item", {
     mixins: [ItemDetailMixin],
     template: `
-    <v-list-item-content>
+    <div class="list-item">
         <v-list-item-title v-if="opts.show_title" :class="{'font-weight-bold': opts.bold_title}" v-text="_.result(record, opts.key_title)"></v-list-item-title>
         <div class="details">
             <div v-for="(field, index) in options.fields" :class="'field-detail ' + field.path.replace('.', '-') + ' ' + (field.klass || '')">
@@ -152,6 +152,6 @@ Vue.component("list-item", {
                 </v-btn>
             </div>
         </div>
-    </v-list-item-content>
+    </div>
   `,
 });
