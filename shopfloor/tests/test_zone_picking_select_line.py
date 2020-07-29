@@ -6,6 +6,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
 
     * /list_move_lines (to change order)
     * /scan_source
+    * /prepare_unload
 
     """
 
@@ -23,8 +24,9 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
                 "order": "location",
             },
         )
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
-        move_lines = move_lines.sorted(lambda l: l.location_id.name)
+        move_lines = self.service._find_location_move_lines(
+            zone_location, picking_type, order="location"
+        )
         self.assert_response_select_line(
             response, zone_location, picking_type, move_lines,
         )
@@ -281,11 +283,116 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             },
         )
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_lines=move_lines,
             message=self.service.msg_store.barcode_not_found(),
+        )
+
+    def test_prepare_unload_wrong_parameters(self):
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        response = self.service.dispatch(
+            "prepare_unload",
+            params={
+                "zone_location_id": 1234567890,
+                "picking_type_id": picking_type.id,
+            },
+        )
+        self.assert_response_start(
+            response, message=self.service.msg_store.record_not_found(),
+        )
+        response = self.service.dispatch(
+            "prepare_unload",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": 1234567890,
+            },
+        )
+        self.assert_response_start(
+            response, message=self.service.msg_store.record_not_found(),
+        )
+
+    def test_prepare_unload_buffer_empty(self):
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        # unload goods
+        response = self.service.dispatch(
+            "prepare_unload",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+            },
+        )
+        # check response
+        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        self.assert_response_select_line(
+            response, zone_location, picking_type, move_lines,
+        )
+
+    def test_prepare_unload_buffer_one_line(self):
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        # scan a destination package to get something in the buffer
+        move_line = self.picking1.move_line_ids
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "move_line_id": move_line.id,
+                "barcode": self.free_package.name,
+                "quantity": move_line.product_uom_qty,
+            },
+        )
+        # unload goods
+        response = self.service.dispatch(
+            "prepare_unload",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+            },
+        )
+        # check response
+        self.assert_response_unload_set_destination(
+            response, zone_location, picking_type, move_line,
+        )
+
+    def test_prepare_unload_buffer_multi_line_same_destination(self):
+        zone_location = self.zone_location
+        picking_type = self.picking5.picking_type_id
+        # scan a destination package for some move lines
+        # to get several lines in the buffer (which have the same destination)
+        self.another_package = self.env["stock.quant.package"].create(
+            {"name": "ANOTHER_PACKAGE"}
+        )
+        self.assertEqual(
+            self.picking5.move_line_ids.location_dest_id, self.packing_location
+        )
+        for move_line, package_dest in zip(
+            self.picking5.move_line_ids, self.free_package | self.another_package
+        ):
+            self.service.dispatch(
+                "set_destination",
+                params={
+                    "zone_location_id": zone_location.id,
+                    "picking_type_id": picking_type.id,
+                    "move_line_id": move_line.id,
+                    "barcode": package_dest.name,
+                    "quantity": move_line.product_uom_qty,
+                },
+            )
+        # unload goods
+        response = self.service.dispatch(
+            "prepare_unload",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+            },
+        )
+        # check response
+        self.assert_response_unload_all(
+            response, zone_location, picking_type, self.picking5.move_line_ids,
         )
