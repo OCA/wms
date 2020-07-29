@@ -478,11 +478,13 @@ export class DemoTools {
      *  scenario: "scenario_usage_key",
      *  picking_types: [{"id": 27, "name": "Random type"}]
      */
-    addAppMenu(new_item) {
-        // Generate a unique ID to be used in demo data
-        let menu_id = this.getRandomInt();
-        while (menu_id in this.app_menus_by_id) {
+    addAppMenu(new_item, menu_id = null) {
+        if (!menu_id) {
+            // Generate a unique ID to be used in demo data
             menu_id = this.getRandomInt();
+            while (menu_id in this.app_menus_by_id) {
+                menu_id = this.getRandomInt();
+            }
         }
         new_item.id = menu_id;
         this.app_menus_by_id[menu_id] = new_item;
