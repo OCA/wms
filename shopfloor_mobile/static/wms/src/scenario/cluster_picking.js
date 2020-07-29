@@ -53,7 +53,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
 
             <line-stock-out
                 v-if="state_is('stock_issue')"
-                v-on:action="state.on_action"
+                v-on:confirm_stock_issue="state.on_confirm_stock_issue"
                 />
 
             <div v-if="state_is('manual_selection')">
@@ -407,9 +407,6 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                     enter: () => {
                         this.reset_notification();
                     },
-                    on_action: action => {
-                        this.state["on_" + action].call(this);
-                    },
                     on_confirm_stock_issue: () => {
                         this.wait_call(
                             this.odoo.call("stock_issue", {
@@ -417,11 +414,6 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                                 move_line_id: this.state.data.id,
                             })
                         );
-                    },
-                    on_back: () => {
-                        this.state_set_data({});
-                        this.reset_notification();
-                        this.state_to("start_line");
                     },
                 },
             },
