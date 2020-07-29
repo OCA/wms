@@ -35,7 +35,15 @@ export var ScenarioBaseMixin = {
     },
     computed: {
         menu_item_id: function() {
-            return parseInt(this.$route.params.menu_id, 10);
+            const menu_id = this.$route.params.menu_id;
+            /*
+            It's very handy for demo data to reference always the same menu id.
+            Since the menu id is included in the URL
+            it allows to reload the page w/out having to refresh menu items.
+            This way you can define multiple scenario w/ different menu items
+            and you can tag them with the same reusable label (eg: case_1).
+             */
+            return typeof menu_id == "number" ? parseInt(menu_id, 10) : menu_id;
         },
         odoo: function() {
             const odoo_params = {
