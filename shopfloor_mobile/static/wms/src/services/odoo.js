@@ -128,6 +128,9 @@ export class OdooMocked extends OdooMixin {
             // Pick the case were the 1st step is decide by the barcode
             result = result[path];
         }
+        if (typeof result == "function") {
+            result = result(data);
+        }
         if (_.has(result, "ok")) {
             // Pick the case were you have good or bad result
             result = result.ok;
