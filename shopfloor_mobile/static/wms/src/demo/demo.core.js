@@ -306,6 +306,7 @@ export class DemoTools {
                     package_dest: pack,
                     location_src: this.randomItemFromArray(this.locations_src),
                     location_dest: loc_dest,
+                    priority: this.getRandomInt(3).toString(),
                 }),
                 defaults
             );
