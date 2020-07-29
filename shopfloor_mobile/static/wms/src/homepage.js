@@ -1,3 +1,5 @@
+import {demotools} from "./demo/demo.core.js";
+
 export var HomePage = Vue.component("home-page", {
     computed: {
         navigation() {
@@ -6,10 +8,13 @@ export var HomePage = Vue.component("home-page", {
     },
     methods: {
         nuke_data_and_reload: function() {
+            if (!this.$root.demo_mode) {
+                return;
+            }
             // Force reload config (loads profiles)
-            this.$root.loadConfig(true);
+            this.$root._clearConfig();
             // Enforce 1st profile
-            const selected_profile = _.head(this.$root.appconfig.profiles);
+            const selected_profile = _.head(demotools.makeProfiles());
             this.$root.trigger("profile:selected", selected_profile, true);
             // Reload page
             location.reload();
