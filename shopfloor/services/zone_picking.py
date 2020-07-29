@@ -260,6 +260,29 @@ class ZonePicking(Component, ChangePackLotMixin):
                 False,
             )
 
+    def _find_buffer_move_lines_domain(self, zone_location, picking_type):
+        return [
+            ("location_id", "child_of", zone_location.id),
+            ("qty_done", ">", 0),
+            ("state", "not in", ("cancel", "done")),
+            ("result_package_id", "!=", False),
+            ("shopfloor_user_id", "=", self.env.user.id),
+        ]
+
+    def _find_buffer_move_lines(self, zone_location, picking_type):
+        """Find lines that belongs to the operator's buffer and return them
+        grouped by destination package.
+        """
+        domain = self._find_buffer_move_lines_domain(zone_location, picking_type)
+        return self.env["stock.move.line"].search(domain)
+
+    def _group_buffer_move_lines_by_package(self, move_lines):
+        data = {}
+        for move_line in move_lines:
+            data.setdefault(move_line.result_package_id, move_line.browse())
+            data[move_line.result_package_id] |= move_line
+        return data
+
     def scan_location(self, barcode):
         """Scan the zone location where the picking should occur
 
@@ -858,7 +881,28 @@ class ZonePicking(Component, ChangePackLotMixin):
           destination location
         * select_line: no remaining move lines in buffer
         """
-        return self._response()
+        zone_location = self.env["stock.location"].browse(zone_location_id)
+        if not zone_location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        picking_type = self.env["stock.picking.type"].browse(picking_type_id)
+        if not picking_type.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        move_lines = self._find_buffer_move_lines(zone_location, picking_type)
+        location_dest = move_lines.mapped("location_dest_id")
+        if len(move_lines) == 1:
+            return self._response_for_unload_set_destination(
+                zone_location, picking_type, move_lines
+            )
+        elif len(move_lines) > 1 and len(location_dest) == 1:
+            return self._response_for_unload_all(
+                zone_location, picking_type, move_lines
+            )
+        elif len(move_lines) > 1 and len(location_dest) > 1:
+            return self._response_for_unload_single(
+                zone_location, picking_type, first(move_lines)
+            )
+        move_lines = self._find_location_move_lines(zone_location, picking_type,)
+        return self._response_for_select_line(zone_location, picking_type, move_lines)
 
     def set_destination_all(
         self, zone_location_id, picking_type_id, barcode, confirmation=False

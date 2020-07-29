@@ -84,12 +84,26 @@ class ZonePickingCommonCase(CommonCase):
                 }
             )
         )
+        cls.product_f = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product F",
+                    "type": "product",
+                    "default_code": "F",
+                    "barcode": "F",
+                    "weight": 3,
+                }
+            )
+        )
         products = (
             cls.product_a
             + cls.product_b
             + cls.product_c
             + cls.product_d
             + cls.product_e
+            + cls.product_f
         )
         for product in products:
             cls.env["stock.putaway.rule"].sudo().create(
@@ -106,7 +120,10 @@ class ZonePickingCommonCase(CommonCase):
         )
         cls.picking3 = picking3 = cls._create_picking(lines=[(cls.product_d, 10)])
         cls.picking4 = picking4 = cls._create_picking(lines=[(cls.product_e, 10)])
-        cls.pickings = picking1 | picking2 | picking3 | picking4
+        cls.picking5 = picking5 = cls._create_picking(
+            lines=[(cls.product_b, 10), (cls.product_f, 10)]
+        )
+        cls.pickings = picking1 | picking2 | picking3 | picking4 | picking5
         cls._fill_stock_for_moves(
             picking1.move_lines, in_package=True, location=cls.zone_sublocation1
         )
@@ -114,6 +131,9 @@ class ZonePickingCommonCase(CommonCase):
             picking2.move_lines, in_lot=True, location=cls.zone_sublocation2
         )
         cls._fill_stock_for_moves(picking3.move_lines, location=cls.zone_sublocation3)
+        cls._fill_stock_for_moves(
+            picking5.move_lines, in_package=True, location=cls.zone_sublocation4
+        )
         # Put product_e quantities in two different source locations to get
         # two stock move lines (6 and 4 to satisfy 10 qties)
         cls._update_qty_in_location(cls.zone_sublocation3, cls.product_e, 6)
@@ -296,6 +316,84 @@ class ZonePickingCommonCase(CommonCase):
     ):
         self._assert_response_change_pack_lot(
             "change_pack_lot",
+            response,
+            zone_location,
+            picking_type,
+            move_line,
+            message=message,
+        )
+
+    def _assert_response_unload_set_destination(
+        self, state, response, zone_location, picking_type, move_line, message=None,
+    ):
+        self.assert_response(
+            response,
+            next_state=state,
+            data={
+                "zone_location": self.data.location(zone_location),
+                "picking_type": self.data.picking_type(picking_type),
+                "move_line": self.data.move_line(move_line),
+            },
+            message=message,
+        )
+
+    def assert_response_unload_set_destination(
+        self, response, zone_location, picking_type, move_line, message=None,
+    ):
+        self._assert_response_unload_set_destination(
+            "unload_set_destination",
+            response,
+            zone_location,
+            picking_type,
+            move_line,
+            message=message,
+        )
+
+    def _assert_response_unload_all(
+        self, state, response, zone_location, picking_type, move_lines, message=None,
+    ):
+        self.assert_response(
+            response,
+            next_state=state,
+            data={
+                "zone_location": self.data.location(zone_location),
+                "picking_type": self.data.picking_type(picking_type),
+                "move_lines": self.data.move_lines(move_lines),
+            },
+            message=message,
+        )
+
+    def assert_response_unload_all(
+        self, response, zone_location, picking_type, move_lines, message=None,
+    ):
+        self._assert_response_unload_all(
+            "unload_all",
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=message,
+        )
+
+    def _assert_response_unload_single(
+        self, state, response, zone_location, picking_type, move_line, message=None,
+    ):
+        self.assert_response(
+            response,
+            next_state=state,
+            data={
+                "zone_location": self.data.location(zone_location),
+                "picking_type": self.data.picking_type(picking_type),
+                "move_line": self.data.move_line(move_line),
+            },
+            message=message,
+        )
+
+    def assert_response_unload_single(
+        self, response, zone_location, picking_type, move_line, message=None,
+    ):
+        self._assert_response_unload_single(
+            "unload_single",
             response,
             zone_location,
             picking_type,
