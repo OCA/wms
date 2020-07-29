@@ -78,6 +78,14 @@ export class OdooMixin {
     }
 }
 
+/**
+ * The real class to initialize to talk w/ Odoo.
+ */
+export class Odoo extends OdooMixin {}
+
+/**
+ * Mocked Odoo class to use demo data only, no interaction w/ Odoo instance.
+ */
 // TODO: move this to its on file in demo folder
 export class OdooMocked extends OdooMixin {
     _set_demo_data() {
@@ -148,26 +156,5 @@ export class OdooMocked extends OdooMixin {
             };
         }
         return Promise.resolve(result);
-    }
-    // TODO: check if still needed.
-    cluster_picking_set_destination_all(data) {
-        let result = this.demo_data.set_destination_all;
-        if (data.confirmation) {
-            result = result.OK;
-        } else {
-            result = result.KO;
-        }
-        return Promise.resolve(result);
-    }
-}
-
-export class Odoo extends OdooMixin {
-    // TODO: review and drop very specific methods, move calls to specific components
-    start(barcode) {
-        return this.call("start", "POST", {barcode: barcode});
-    }
-    scan_anything(barcode) {
-        console.log("Scan anything", barcode, this.usage);
-        throw "NOT IMPLEMENTED!";
     }
 }
