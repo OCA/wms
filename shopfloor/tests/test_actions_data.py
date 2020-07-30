@@ -17,6 +17,9 @@ class ActionsDataCaseBase(CommonCase):
         super().setUpClassVars()
         cls.wh = cls.env.ref("stock.warehouse0")
         cls.picking_type = cls.wh.out_type_id
+        cls.storage_type_pallet = cls.env.ref(
+            "stock_storage_type.package_storage_type_pallets"
+        )
 
     @classmethod
     def setUpClassBaseData(cls):
@@ -88,11 +91,20 @@ class ActionsDataCaseBase(CommonCase):
         data.update(kw)
         return data
 
+    def _expected_storage_type(self, record, **kw):
+        data = {
+            "id": record.id,
+            "name": record.name,
+        }
+        data.update(kw)
+        return data
+
     def _expected_package(self, record, **kw):
         data = {
             "id": record.id,
             "name": record.name,
             "weight": record.pack_weight,
+            "storage_type": None,
         }
         data.update(kw)
         return data
@@ -131,6 +143,7 @@ class ActionsDataCase(ActionsDataCaseBase):
     def test_data_package(self):
         package = self.move_a.move_line_ids.package_id
         package.product_packaging_id = self.packaging.id
+        package.package_storage_type_id = self.storage_type_pallet
         data = self.data.package(package, picking=self.picking, with_packaging=True)
         self.assert_schema(self.schema.package(with_packaging=True), data)
         expected = {
@@ -138,6 +151,9 @@ class ActionsDataCase(ActionsDataCaseBase):
             "name": package.name,
             "move_line_count": 1,
             "packaging": self._expected_packaging(package.product_packaging_id),
+            "storage_type": self._expected_storage_type(
+                package.package_storage_type_id
+            ),
             "weight": 0.0,
         }
         self.assertDictEqual(data, expected)
@@ -222,6 +238,7 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "move_line_count": 1,
                 # TODO
                 "weight": 0.0,
+                "storage_type": None,
             },
             "package_dest": {
                 "id": result_package.id,
@@ -229,6 +246,7 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "move_line_count": 0,
                 # TODO
                 "weight": 0.0,
+                "storage_type": None,
             },
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
@@ -276,6 +294,7 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "move_line_count": 1,
                 # TODO
                 "weight": 0,
+                "storage_type": None,
             },
             "package_dest": {
                 "id": move_line.result_package_id.id,
@@ -283,6 +302,7 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "move_line_count": 1,
                 # TODO
                 "weight": 0,
+                "storage_type": None,
             },
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
