@@ -50,6 +50,16 @@ export var ListActionsConsumerMixin = {
 export var PickingDetailSelectMixin = {
     mixins: [PickingDetailMixin, ListActionsConsumerMixin],
     props: {
+        /**
+         * TODO: this flag seems not to be used anymore, shall we get rid of it?
+         * And since the value is always false, probably we don't need the picking at all.
+         * We can always use detail-picking explicitily.
+         * As a consequence, maybe, "picking" should be remove from the name
+         * and we should have something like `MoveLineDetailSelect|List`
+         * (which is what we need for zone picking for instance).
+         *
+         * */
+
         show_picking_info: {
             type: Boolean,
             default: false,
