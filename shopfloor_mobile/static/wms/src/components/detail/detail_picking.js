@@ -18,7 +18,7 @@ export var PickingDetailMixin = {
         },
     },
     template: `
-  <item-detail-card :record="record" :options="opts">
+  <item-detail-card :record="record" :options="opts" v-bind="$attrs">
     <template v-slot:subtitle>
       <span class="origin" v-if="record.origin">
           <span>{{ record.origin }}</span>
