@@ -157,6 +157,7 @@ class ZonePicking(Component, ChangePackLotMixin):
     def _response_for_unload_single(
         self, zone_location, picking_type, move_line, message=None, popup=None
     ):
+        # TODO add picking completion_info
         return self._response(
             next_state="unload_single",
             data=self._data_for_move_line(zone_location, picking_type, move_line),
@@ -260,20 +261,27 @@ class ZonePicking(Component, ChangePackLotMixin):
                 False,
             )
 
-    def _find_buffer_move_lines_domain(self, zone_location, picking_type):
-        return [
+    def _find_buffer_move_lines_domain(
+        self, zone_location, picking_type, dest_package=None
+    ):
+        domain = [
             ("location_id", "child_of", zone_location.id),
             ("qty_done", ">", 0),
             ("state", "not in", ("cancel", "done")),
             ("result_package_id", "!=", False),
             ("shopfloor_user_id", "=", self.env.user.id),
         ]
+        if dest_package:
+            domain.append(("result_package_id", "=", dest_package.id))
+        return domain
 
-    def _find_buffer_move_lines(self, zone_location, picking_type):
+    def _find_buffer_move_lines(self, zone_location, picking_type, dest_package=None):
         """Find lines that belongs to the operator's buffer and return them
         grouped by destination package.
         """
-        domain = self._find_buffer_move_lines_domain(zone_location, picking_type)
+        domain = self._find_buffer_move_lines_domain(
+            zone_location, picking_type, dest_package
+        )
         return self.env["stock.move.line"].search(domain)
 
     def _group_buffer_move_lines_by_package(self, move_lines):
@@ -944,6 +952,33 @@ class ZonePicking(Component, ChangePackLotMixin):
         """
         return self._response()
 
+    def _unload_response(self, zone_location, picking_type, unload_single_message=None):
+        """Prepare the right response depending on the move lines to process."""
+        # if there are still move lines to process from the buffer
+        move_lines = self._find_buffer_move_lines(zone_location, picking_type)
+        if move_lines:
+            return self._response_for_unload_single(
+                zone_location,
+                picking_type,
+                first(move_lines),
+                message=unload_single_message,
+            )
+        # if there are still move lines to process from the picking type
+        #   => buffer complete!
+        move_lines = self._find_location_move_lines(zone_location, picking_type)
+        if move_lines:
+            return self._response_for_select_line(
+                zone_location,
+                picking_type,
+                move_lines,
+                message=self.msg_store.buffer_complete(),
+            )
+        # no more move lines to process from the current picking type
+        #   => picking type complete!
+        return self._response_for_start(
+            message=self.msg_store.picking_type_complete(picking_type)
+        )
+
     def unload_scan_pack(self, zone_location_id, picking_type_id, package_id, barcode):
         """Scan the destination package to check user moves the good one
 
@@ -954,11 +989,38 @@ class ZonePicking(Component, ChangePackLotMixin):
         Transitions:
         * unload_single: the scanned barcode does not match the package
         * unload_set_destination: the scanned barcode matches the package
-        * confirm_unload_set_destination: the scanned location is not in the
-          expected one but is valid (in picking type's default destination)
         * select_line: no remaining move lines in buffer
+        * start: no remaining move lines in picking type
         """
-        return self._response()
+        zone_location = self.env["stock.location"].browse(zone_location_id)
+        if not zone_location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        picking_type = self.env["stock.picking.type"].browse(picking_type_id)
+        if not picking_type.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        package = self.env["stock.quant.package"].browse(package_id)
+        if not package.exists():
+            return self._unload_response(
+                zone_location,
+                picking_type,
+                unload_single_message=self.msg_store.record_not_found(),
+            )
+        search = self.actions_for("search")
+        scanned_package = search.package_from_scan(barcode)
+        # the scanned barcode matches the package
+        if scanned_package == package:
+            move_lines = self._find_buffer_move_lines(
+                zone_location, picking_type, dest_package=scanned_package
+            )
+            if move_lines:
+                return self._response_for_unload_set_destination(
+                    zone_location, picking_type, first(move_lines)
+                )
+        return self._unload_response(
+            zone_location,
+            picking_type,
+            unload_single_message=self.msg_store.barcode_no_match(package.name),
+        )
 
     def unload_set_destination(
         self, zone_location_id, picking_type_id, package_id, barcode, confirmation=False
@@ -1085,6 +1147,7 @@ class ShopfloorZonePickingValidator(Component):
             "zone_location_id": {"coerce": to_int, "required": True, "type": "integer"},
             "picking_type_id": {"coerce": to_int, "required": True, "type": "integer"},
             "package_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "barcode": {"required": False, "nullable": True, "type": "string"},
         }
 
     def unload_set_destination(self):
@@ -1175,7 +1238,12 @@ class ShopfloorZonePickingValidatorResponse(Component):
 
     def unload_scan_pack(self):
         return self._response_schema(
-            next_states={"unload_single", "unload_set_destination", "select_line"}
+            next_states={
+                "unload_single",
+                "unload_set_destination",
+                "select_line",
+                "start",
+            }
         )
 
     def unload_set_destination(self):
