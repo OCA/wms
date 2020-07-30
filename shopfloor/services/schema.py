@@ -115,6 +115,7 @@ class BaseShopfloorSchemaResponse(Component):
             "name": {"type": "string", "nullable": False, "required": True},
             "weight": {"required": True, "nullable": True, "type": "float"},
             "move_line_count": {"required": False, "nullable": True, "type": "integer"},
+            "storage_type": self._schema_dict_of(self._simple_record()),
         }
         if with_packaging:
             schema["packaging"] = self._schema_dict_of(self.packaging())

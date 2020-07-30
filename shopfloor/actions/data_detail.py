@@ -71,7 +71,6 @@ class DataDetailAction(Component):
                 "reserved_move_line_ids:move_lines",
                 lambda record, fname: self.move_lines(record[fname]),
             ),
-            ("package_storage_type_id:storage_type", ["id", "name"]),
         ]
 
     def lot_detail(self, record, **kw):

@@ -48,7 +48,6 @@ class ShopfloorSchemaDetailResponse(Component):
         schema.update(
             {
                 "pickings": self._schema_list_of(self.picking()),
-                "storage_type": self._schema_dict_of(self._simple_record()),
                 "move_lines": self._schema_list_of(self.move_line()),
             }
         )
