@@ -46,3 +46,4 @@ from . import test_zone_picking_set_line_destination
 from . import test_zone_picking_zero_check
 from . import test_zone_picking_stock_issue
 from . import test_zone_picking_change_pack_lot
+from . import test_zone_picking_unload_single

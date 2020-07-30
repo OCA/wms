@@ -423,3 +423,21 @@ class MessageAction(Component):
             "message_type": "error",
             "body": _("Lot {} is not a package.").format(lot.name),
         }
+
+    def buffer_complete(self):
+        return {
+            "message_type": "success",
+            "body": _("Scanned destination packages processed."),
+        }
+
+    def picking_type_complete(self, picking_type):
+        return {
+            "message_type": "success",
+            "body": _("Picking type {} complete.").format(picking_type.name),
+        }
+
+    def barcode_no_match(self, barcode):
+        return {
+            "message_type": "warning",
+            "body": _("Barcode does not match with {}.").format(barcode),
+        }
