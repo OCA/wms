@@ -441,3 +441,9 @@ class MessageAction(Component):
             "message_type": "warning",
             "body": _("Barcode does not match with {}.").format(barcode),
         }
+
+    def lines_different_dest_location(self):
+        return {
+            "message_type": "error",
+            "body": _("Lines have different destination location."),
+        }
