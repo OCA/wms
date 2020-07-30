@@ -87,6 +87,7 @@ class DataAction(Component):
             "id",
             "name",
             "pack_weight:weight",
+            ("package_storage_type_id:storage_type", ["id", "name"]),
         ]
 
     @property
