@@ -162,20 +162,19 @@ class ZonePicking(Component, ChangePackLotMixin):
         )
 
     def _response_for_unload_set_destination(
-        self, zone_location, picking_type, move_line, message=None
+        self,
+        zone_location,
+        picking_type,
+        move_line,
+        message=None,
+        confirmation_required=False,
     ):
+        if confirmation_required and not message:
+            message = self.msg_store.need_confirmation()
+        data = self._data_for_move_line(zone_location, picking_type, move_line)
+        data["confirmation_required"] = confirmation_required
         return self._response(
-            next_state="unload_set_destination",
-            data=self._data_for_move_line(zone_location, picking_type, move_line),
-            message=message,
-        )
-
-    def _response_for_confirm_unload_set_destination(
-        self, zone_location, picking_type, move_line
-    ):
-        return self._response(
-            next_state="confirm_unload_set_destination",
-            data=self._data_for_move_line(zone_location, picking_type, move_line),
+            next_state="unload_set_destination", data=data, message=message,
         )
 
     def _data_for_select_picking_type(self, zone_location, picking_types):
@@ -1102,6 +1101,11 @@ class ZonePicking(Component, ChangePackLotMixin):
             unload_single_message=self.msg_store.barcode_no_match(package.name),
         )
 
+    def _unload_set_destination_lock_lines(self, lines):
+        """Lock move lines"""
+        sql = "SELECT id FROM %s WHERE ID IN %%s FOR UPDATE" % lines._table
+        self.env.cr.execute(sql, (tuple(lines.ids),), log_exceptions=False)
+
     def unload_set_destination(
         self, zone_location_id, picking_type_id, package_id, barcode, confirmation=False
     ):
@@ -1119,15 +1123,78 @@ class ZonePicking(Component, ChangePackLotMixin):
         * unload_single: buffer still contains move lines, unload the next package
         * unload_set_destination: the scanned location is invalid, user has to
           scan another one
-        * confirm_unload_set_destination: the scanned location is not in the
-          expected one but is valid (in picking type's default destination)
+        * unload_set_destination+confirmation_required: the scanned location is not
+          in the expected one but is valid (in picking type's default destination)
         * select_line: no remaining move lines in buffer
+        * start: no remaining move lines to process in the picking type
         """
-        # TODO on _action_done, use ``_sf_no_backorder`` in the
-        # context to disable backorders (see override in stock_picking.py).
-        # TODO return a popup with completion info alongside the response,
-        # see in cluster_picking.py how it's done
-        return self._response()
+        zone_location = self.env["stock.location"].browse(zone_location_id)
+        if not zone_location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        picking_type = self.env["stock.picking.type"].browse(picking_type_id)
+        if not picking_type.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        package = self.env["stock.quant.package"].browse(package_id)
+        if not package.exists():
+            move_lines = self._find_location_move_lines(zone_location, picking_type)
+            return self._response_for_select_line(
+                zone_location,
+                picking_type,
+                move_lines,
+                message=self.msg_store.record_not_found(),
+            )
+        buffer_lines = self._find_buffer_move_lines(
+            zone_location, picking_type, dest_package=package
+        )
+        search = self.actions_for("search")
+        location = search.location_from_scan(barcode)
+        if location:
+            if not location.is_sublocation_of(picking_type.default_location_dest_id):
+                return self._response_for_unload_set_destination(
+                    zone_location,
+                    picking_type,
+                    first(buffer_lines),
+                    message=self.msg_store.dest_location_not_allowed(),
+                )
+            if location != picking_type.default_location_dest_id:
+                if not confirmation:
+                    return self._response_for_unload_set_destination(
+                        zone_location,
+                        picking_type,
+                        first(buffer_lines),
+                        message=self.msg_store.confirm_location_changed(
+                            picking_type.default_location_dest_id, location
+                        ),
+                        confirmation_required=True,
+                    )
+                # the scanned location is valid, use it
+                self._unload_set_destination_lock_lines(buffer_lines)
+                buffer_lines.location_dest_id = location
+            # set lines to done + refresh buffer lines (should be empty)
+            moves = buffer_lines.mapped("move_id")
+            moves.with_context(_sf_no_backorder=True)._action_done()
+            buffer_lines = self._find_buffer_move_lines(zone_location, picking_type)
+            if buffer_lines:
+                return self._response_for_unload_single(
+                    zone_location, picking_type, first(buffer_lines),
+                )
+            move_lines = self._find_location_move_lines(zone_location, picking_type)
+            if move_lines:
+                return self._response_for_select_line(
+                    zone_location,
+                    picking_type,
+                    move_lines,
+                    message=self.msg_store.buffer_complete(),
+                )
+            return self._response_for_start(
+                message=self.msg_store.picking_type_complete(picking_type)
+            )
+        return self._response_for_unload_set_destination(
+            zone_location,
+            picking_type,
+            first(buffer_lines),
+            message=self.msg_store.no_location_found(),
+        )
 
 
 class ShopfloorZonePickingValidator(Component):
@@ -1263,7 +1330,6 @@ class ShopfloorZonePickingValidatorResponse(Component):
             "unload_all": self._schema_for_move_lines,
             "unload_single": self._schema_for_move_line,
             "unload_set_destination": self._schema_for_move_line,
-            "confirm_unload_set_destination": self._schema_for_move_line,
         }
 
     def scan_location(self):
@@ -1325,12 +1391,7 @@ class ShopfloorZonePickingValidatorResponse(Component):
 
     def unload_set_destination(self):
         return self._response_schema(
-            next_states={
-                "unload_single",
-                "unload_set_destination",
-                "confirm_unload_set_destination",
-                "select_line",
-            }
+            next_states={"unload_single", "unload_set_destination", "select_line"}
         )
 
     @property
