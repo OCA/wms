@@ -406,7 +406,14 @@ class ZonePickingCommonCase(CommonCase):
         )
 
     def _assert_response_unload_single(
-        self, state, response, zone_location, picking_type, move_line, message=None,
+        self,
+        state,
+        response,
+        zone_location,
+        picking_type,
+        move_line,
+        message=None,
+        popup=None,
     ):
         self.assert_response(
             response,
@@ -417,10 +424,11 @@ class ZonePickingCommonCase(CommonCase):
                 "move_line": self.data.move_line(move_line),
             },
             message=message,
+            popup=popup,
         )
 
     def assert_response_unload_single(
-        self, response, zone_location, picking_type, move_line, message=None,
+        self, response, zone_location, picking_type, move_line, message=None, popup=None
     ):
         self._assert_response_unload_single(
             "unload_single",
@@ -429,4 +437,5 @@ class ZonePickingCommonCase(CommonCase):
             picking_type,
             move_line,
             message=message,
+            popup=popup,
         )

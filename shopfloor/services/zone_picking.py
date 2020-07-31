@@ -153,12 +153,14 @@ class ZonePicking(Component, ChangePackLotMixin):
     def _response_for_unload_single(
         self, zone_location, picking_type, move_line, message=None, popup=None
     ):
-        # TODO add picking completion_info
+        buffer_lines = self._find_buffer_move_lines(zone_location, picking_type)
+        completion_info = self.actions_for("completion.info")
+        completion_info_popup = completion_info.popup(buffer_lines)
         return self._response(
             next_state="unload_single",
             data=self._data_for_move_line(zone_location, picking_type, move_line),
             message=message,
-            popup=popup,
+            popup=popup or completion_info_popup,
         )
 
     def _response_for_unload_set_destination(
