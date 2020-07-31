@@ -314,6 +314,12 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         )
         # check response
         buffer_lines = self.service._find_buffer_move_lines(zone_location, picking_type)
+        completion_info = self.service.actions_for("completion.info")
+        completion_info_popup = completion_info.popup(buffer_lines)
         self.assert_response_unload_single(
-            response, zone_location, picking_type, buffer_lines[0],
+            response,
+            zone_location,
+            picking_type,
+            buffer_lines[0],
+            popup=completion_info_popup,
         )
