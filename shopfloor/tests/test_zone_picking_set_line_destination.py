@@ -122,7 +122,11 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines,
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.service.msg_store.confirm_pack_moved(),
         )
 
     def test_set_destination_location_no_other_move_line_full_qty(self):
@@ -165,7 +169,11 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.service.msg_store.confirm_pack_moved(),
         )
 
     def test_set_destination_location_no_other_move_line_partial_qty(self):
@@ -218,7 +226,11 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.service.msg_store.confirm_pack_moved(),
         )
 
     def test_set_destination_location_several_move_line_full_qty(self):
@@ -275,7 +287,11 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.service.msg_store.confirm_pack_moved(),
         )
 
     def test_set_destination_location_several_move_line_partial_qty(self):
@@ -337,7 +353,11 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.service.msg_store.confirm_pack_moved(),
         )
 
     def test_set_destination_location_zero_check(self):
@@ -418,7 +438,11 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.service.msg_store.confirm_pack_moved(),
         )
 
     def test_set_destination_package_partial_qty(self):
@@ -485,7 +509,11 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.service.msg_store.confirm_pack_moved(),
         )
 
     def test_set_destination_package_zero_check(self):

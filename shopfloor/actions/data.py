@@ -59,6 +59,7 @@ class DataAction(Component):
             ("partner_id:partner", self._partner_parser),
             "move_line_count",
             "total_weight:weight",
+            "scheduled_date",
         ]
 
     def package(self, record, picking=None, with_packaging=False, **kw):
@@ -116,9 +117,12 @@ class DataAction(Component):
     def _lot_parser(self):
         return self._simple_record_parser() + ["ref"]
 
-    def move_line(self, record, **kw):
+    def move_line(self, record, with_picking=False, **kw):
         record = record.with_context(location=record.location_id.id)
-        data = self._jsonify(record, self._move_line_parser)
+        parser = self._move_line_parser
+        if with_picking:
+            parser += [("picking_id:picking", self._picking_parser)]
+        data = self._jsonify(record, parser)
         if data:
             data.update(
                 {
@@ -147,6 +151,7 @@ class DataAction(Component):
             ("lot_id:lot", self._lot_parser),
             ("location_id:location_src", self._location_parser),
             ("location_dest_id:location_dest", self._location_parser),
+            ("move_id:priority", lambda rec, fname: rec.move_id.priority or "",),
         ]
 
     def package_level(self, record, **kw):

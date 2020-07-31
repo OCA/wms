@@ -31,11 +31,6 @@ class ShopfloorSchemaDetailResponse(Component):
         schema.update(
             {
                 "priority": {"type": "string", "nullable": True, "required": False},
-                "scheduled_date": {
-                    "type": "string",
-                    "nullable": False,
-                    "required": True,
-                },
                 "operation_type": self._schema_dict_of(self._simple_record()),
                 "carrier": self._schema_dict_of(self._simple_record()),
                 "move_lines": self._schema_list_of(self.move_line()),
