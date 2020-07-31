@@ -191,6 +191,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
         }
+        self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-08-03")
         self.assertDictEqual(data, expected)
 
     def test_data_product(self):
@@ -250,6 +251,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             },
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
+            "priority": "1",
         }
         self.assertDictEqual(data, expected)
 
@@ -271,6 +273,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "package_dest": None,
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
+            "priority": "1",
         }
         self.assertDictEqual(data, expected)
 
@@ -306,6 +309,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             },
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
+            "priority": "1",
         }
         self.assertDictEqual(data, expected)
 
@@ -323,6 +327,26 @@ class ActionsDataCase(ActionsDataCaseBase):
             "package_dest": None,
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
+            "priority": "1",
+        }
+        self.assertDictEqual(data, expected)
+
+    def test_data_move_line_with_picking(self):
+        move_line = self.move_d.move_line_ids
+        data = self.data.move_line(move_line, with_picking=True)
+        self.assert_schema(self.schema.move_line(with_picking=True), data)
+        expected = {
+            "id": move_line.id,
+            "qty_done": 0.0,
+            "quantity": move_line.product_uom_qty,
+            "product": self._expected_product(self.product_d),
+            "lot": None,
+            "package_src": None,
+            "package_dest": None,
+            "location_src": self._expected_location(move_line.location_id),
+            "location_dest": self._expected_location(move_line.location_dest_id),
+            "picking": self.data.picking(move_line.picking_id),
+            "priority": "1",
         }
         self.assertDictEqual(data, expected)
 

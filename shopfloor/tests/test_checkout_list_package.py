@@ -18,6 +18,7 @@ class SelectDestPackageMixin:
                     "weight": 110.0,
                     "move_line_count": len(picking.move_line_ids),
                     "partner": {"id": self.customer.id, "name": self.customer.name},
+                    "scheduled_date": picking.scheduled_date.isoformat() + "+00:00",
                 },
                 "packages": [
                     self._package_data(package, picking) for package in packages
