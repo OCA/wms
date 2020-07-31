@@ -181,7 +181,6 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
             "move_lines": self.data_detail.move_lines(picking.move_line_ids),
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-05-13")
-        self.maxDiff = None
         self.assertDictEqual(data, expected)
 
     def test_data_move_line_package(self):
@@ -215,6 +214,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
             },
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
+            "priority": "1",
         }
         self.assertDictEqual(data, expected)
 
@@ -237,11 +237,11 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
             "package_dest": None,
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
+            "priority": "1",
         }
         self.assertDictEqual(data, expected)
 
     def test_data_move_line_package_lot(self):
-        self.maxDiff = None
         move_line = self.move_c.move_line_ids
         data = self.data_detail.move_line(move_line)
         self.assert_schema(self.schema_detail.move_line(), data)
@@ -272,6 +272,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
             },
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
+            "priority": "1",
         }
         self.assertDictEqual(data, expected)
 
@@ -290,6 +291,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
             "package_dest": None,
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
+            "priority": "1",
         }
         self.assertDictEqual(data, expected)
 
