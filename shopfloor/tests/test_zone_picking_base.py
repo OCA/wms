@@ -324,7 +324,14 @@ class ZonePickingCommonCase(CommonCase):
         )
 
     def _assert_response_unload_set_destination(
-        self, state, response, zone_location, picking_type, move_line, message=None,
+        self,
+        state,
+        response,
+        zone_location,
+        picking_type,
+        move_line,
+        message=None,
+        confirmation_required=False,
     ):
         self.assert_response(
             response,
@@ -333,12 +340,19 @@ class ZonePickingCommonCase(CommonCase):
                 "zone_location": self.data.location(zone_location),
                 "picking_type": self.data.picking_type(picking_type),
                 "move_line": self.data.move_line(move_line),
+                "confirmation_required": confirmation_required,
             },
             message=message,
         )
 
     def assert_response_unload_set_destination(
-        self, response, zone_location, picking_type, move_line, message=None,
+        self,
+        response,
+        zone_location,
+        picking_type,
+        move_line,
+        message=None,
+        confirmation_required=False,
     ):
         self._assert_response_unload_set_destination(
             "unload_set_destination",
@@ -347,6 +361,7 @@ class ZonePickingCommonCase(CommonCase):
             picking_type,
             move_line,
             message=message,
+            confirmation_required=confirmation_required,
         )
 
     def _assert_response_unload_all(
