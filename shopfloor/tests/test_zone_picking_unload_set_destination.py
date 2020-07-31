@@ -237,10 +237,12 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         self.assertEqual(move_line.move_id.state, "done")
         # check response
         buffer_line = self.service._find_buffer_move_lines(zone_location, picking_type)
+        completion_info = self.service.actions_for("completion.info")
+        completion_info_popup = completion_info.popup(buffer_line)
         self.assert_response_unload_single(
             response,
             zone_location,
             picking_type,
             buffer_line,
-            # TODO check completion_info
+            popup=completion_info_popup,
         )

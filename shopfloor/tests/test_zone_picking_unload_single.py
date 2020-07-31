@@ -55,12 +55,15 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
                 "barcode": "UNKNOWN",
             },
         )
+        completion_info = self.service.actions_for("completion.info")
+        completion_info_popup = completion_info.popup(move_line)
         self.assert_response_unload_single(
             response,
             zone_location,
             picking_type,
             move_line,
             message=self.service.msg_store.record_not_found(),
+            popup=completion_info_popup,
         )
         # wrong package ID, and there is no more move line to unload from the buffer
         # => get back on 'select_line' screen
