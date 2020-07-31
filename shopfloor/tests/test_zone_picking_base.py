@@ -205,7 +205,7 @@ class ZonePickingCommonCase(CommonCase):
             data={
                 "zone_location": self.data.location(zone_location),
                 "picking_type": self.data.picking_type(picking_type),
-                "move_lines": self.data.move_lines(move_lines),
+                "move_lines": self.data.move_lines(move_lines, with_picking=True),
             },
             message=message,
             popup=popup,
@@ -246,7 +246,7 @@ class ZonePickingCommonCase(CommonCase):
             data={
                 "zone_location": self.data.location(zone_location),
                 "picking_type": self.data.picking_type(picking_type),
-                "move_line": self.data.move_line(move_line),
+                "move_line": self.data.move_line(move_line, with_picking=True),
                 "confirmation_required": confirmation_required,
             },
             message=message,
@@ -306,7 +306,7 @@ class ZonePickingCommonCase(CommonCase):
             data={
                 "zone_location": self.data.location(zone_location),
                 "picking_type": self.data.picking_type(picking_type),
-                "move_line": self.data.move_line(move_line),
+                "move_line": self.data.move_line(move_line, with_picking=True),
             },
             message=message,
         )
@@ -339,7 +339,7 @@ class ZonePickingCommonCase(CommonCase):
             data={
                 "zone_location": self.data.location(zone_location),
                 "picking_type": self.data.picking_type(picking_type),
-                "move_line": self.data.move_line(move_line),
+                "move_line": self.data.move_line(move_line, with_picking=True),
                 "confirmation_required": confirmation_required,
             },
             message=message,
@@ -380,7 +380,7 @@ class ZonePickingCommonCase(CommonCase):
             data={
                 "zone_location": self.data.location(zone_location),
                 "picking_type": self.data.picking_type(picking_type),
-                "move_lines": self.data.move_lines(move_lines),
+                "move_lines": self.data.move_lines(move_lines, with_picking=True),
                 "confirmation_required": confirmation_required,
             },
             message=message,
@@ -421,7 +421,7 @@ class ZonePickingCommonCase(CommonCase):
             data={
                 "zone_location": self.data.location(zone_location),
                 "picking_type": self.data.picking_type(picking_type),
-                "move_line": self.data.move_line(move_line),
+                "move_line": self.data.move_line(move_line, with_picking=True),
             },
             message=message,
             popup=popup,

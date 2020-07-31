@@ -190,14 +190,14 @@ class ZonePicking(Component, ChangePackLotMixin):
         return {
             "zone_location": self.data.location(zone_location),
             "picking_type": self.data.picking_type(picking_type),
-            "move_line": self.data.move_line(move_line),
+            "move_line": self.data.move_line(move_line, with_picking=True),
         }
 
     def _data_for_move_lines(self, zone_location, picking_type, move_lines):
         return {
             "zone_location": self.data.location(zone_location),
             "picking_type": self.data.picking_type(picking_type),
-            "move_lines": self.data.move_lines(move_lines),
+            "move_lines": self.data.move_lines(move_lines, with_picking=True),
         }
 
     def _data_for_location(self, zone_location, picking_type, location):
@@ -666,7 +666,10 @@ class ZonePicking(Component, ChangePackLotMixin):
             if response:
                 return response
         # Process the next line
-        return self.list_move_lines(zone_location.id, picking_type.id)
+        response = self.list_move_lines(zone_location.id, picking_type.id)
+        return self._response(
+            base_response=response, message=self.msg_store.confirm_pack_moved(),
+        )
 
     def is_zero(self, zone_location_id, picking_type_id, move_line_id, zero):
         """Confirm or not if the source location of a move has zero qty
@@ -1409,7 +1412,9 @@ class ShopfloorZonePickingValidatorResponse(Component):
         schema = {
             "zone_location": self.schemas._schema_dict_of(self.schemas.location()),
             "picking_type": self.schemas._schema_dict_of(self.schemas.picking_type()),
-            "move_line": self.schemas._schema_dict_of(self.schemas.move_line()),
+            "move_line": self.schemas._schema_dict_of(
+                self.schemas.move_line(with_picking=True)
+            ),
             "confirmation_required": {
                 "type": "boolean",
                 "nullable": True,
@@ -1423,7 +1428,9 @@ class ShopfloorZonePickingValidatorResponse(Component):
         schema = {
             "zone_location": self.schemas._schema_dict_of(self.schemas.location()),
             "picking_type": self.schemas._schema_dict_of(self.schemas.picking_type()),
-            "move_lines": self.schemas._schema_list_of(self.schemas.move_line()),
+            "move_lines": self.schemas._schema_list_of(
+                self.schemas.move_line(with_picking=True)
+            ),
             "confirmation_required": {
                 "type": "boolean",
                 "nullable": True,
