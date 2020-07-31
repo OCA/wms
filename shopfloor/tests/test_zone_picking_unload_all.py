@@ -5,6 +5,7 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
     """Tests for endpoint used from unload_all
 
     * /set_destination_all
+    * /unload_split
 
     """
 
@@ -239,4 +240,80 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             picking_type,
             buffer_lines,
             message=self.service.msg_store.no_location_found(),
+        )
+
+    def test_unload_split_buffer_empty(self):
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        response = self.service.dispatch(
+            "unload_split",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+            },
+        )
+        # check response
+        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        self.assert_response_select_line(
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.service.msg_store.buffer_complete(),
+        )
+
+    def test_unload_split_buffer_one_line(self):
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        move_line = self.picking1.move_line_ids
+        # put one line in the buffer
+        self.service._set_destination_package(
+            zone_location,
+            picking_type,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
+        )
+        response = self.service.dispatch(
+            "unload_split",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+            },
+        )
+        # check response
+        buffer_lines = self.service._find_buffer_move_lines(zone_location, picking_type)
+        self.assert_response_unload_set_destination(
+            response, zone_location, picking_type, buffer_lines,
+        )
+
+    def test_unload_split_buffer_multi_lines(self):
+        zone_location = self.zone_location
+        picking_type = self.picking5.picking_type_id
+        move_line = self.picking5.move_line_ids
+        # put several lines in the buffer
+        self.another_package = self.env["stock.quant.package"].create(
+            {"name": "ANOTHER_PACKAGE"}
+        )
+        for move_line, package_dest in zip(
+            self.picking5.move_line_ids, self.free_package | self.another_package
+        ):
+            self.service._set_destination_package(
+                zone_location,
+                picking_type,
+                move_line,
+                move_line.product_uom_qty,
+                package_dest,
+            )
+        response = self.service.dispatch(
+            "unload_split",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+            },
+        )
+        # check response
+        buffer_lines = self.service._find_buffer_move_lines(zone_location, picking_type)
+        self.assert_response_unload_single(
+            response, zone_location, picking_type, buffer_lines[0],
         )
