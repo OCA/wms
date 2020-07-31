@@ -1006,7 +1006,31 @@ class ZonePicking(Component, ChangePackLotMixin):
         * unload_set_destination: there is only one remaining line in the buffer
         * select_line: no remaining move lines in buffer
         """
-        return self._response()
+        zone_location = self.env["stock.location"].browse(zone_location_id)
+        if not zone_location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        picking_type = self.env["stock.picking.type"].browse(picking_type_id)
+        if not picking_type.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        buffer_lines = self._find_buffer_move_lines(zone_location, picking_type)
+        # more than one remaining move line in the buffer
+        if len(buffer_lines) > 1:
+            return self._response_for_unload_single(
+                zone_location, picking_type, first(buffer_lines),
+            )
+        # only one move line to process in the buffer
+        elif len(buffer_lines) == 1:
+            return self._response_for_unload_set_destination(
+                zone_location, picking_type, first(buffer_lines)
+            )
+        # no remaining move lines in buffer
+        move_lines = self._find_location_move_lines(zone_location, picking_type)
+        return self._response_for_select_line(
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.msg_store.buffer_complete(),
+        )
 
     def _unload_response(self, zone_location, picking_type, unload_single_message=None):
         """Prepare the right response depending on the move lines to process."""
