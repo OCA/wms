@@ -35,7 +35,7 @@ const scan_location_picking_types = _.sampleSize(
 
 const move_lines = demotools.makePickingLines(
     {},
-    {lines_count: 4, line_random_pack: true, picking_auto: true}
+    {lines_count: 30, line_random_pack: true, picking_auto: true}
 );
 const select_line_move_lines = _.orderBy(move_lines, ["priority"], ["desc"]);
 
@@ -230,42 +230,6 @@ const DEMO_CASE_1 = {
             };
         }
     },
-
-    // unassign: {
-    //     next_state: "start",
-    // },
-    // scan_line: {
-    //     next_state: "scan_destination",
-    //     data: {
-    //         scan_destination: demotools.makeBatchPickingLine(),
-    //     },
-    // },
-    // scan_destination_pack: {
-    //     next_state: "start_line",
-    //     message: {
-    //         message_type: "success",
-    //         body: "Product 5 put in bin #2",
-    //     },
-    //     data: {
-    //         start_line: demotools.makeBatchPickingLine(),
-    //     },
-    // },
-    // skip_line: {
-    //     next_state: "start_line",
-    //     message: {
-    //         message_type: "success",
-    //         body: "Previous line postponed",
-    //     },
-    //     data: {
-    //         // Next line to process
-    //         start_line: demotools.makeBatchPickingLine(),
-    //     },
-    // },
-    // unload_router: {},
-    // // TODO
-    // popup: {
-    //     body: "Last operation of transfer XYZ. Next operation ABC is ready to proceed.",
-    // },
 };
 
 DEMO_CASE.by_menu_id[zone_picking_menu_case1] = DEMO_CASE_1;
