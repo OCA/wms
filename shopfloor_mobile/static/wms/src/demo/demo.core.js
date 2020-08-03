@@ -81,7 +81,8 @@ export class DemoTools {
         days = days ? days : this.getRandomInt(30);
         const start = new Date();
         let stop = new Date();
-        return stop.setDate(start.getDate() + days);
+        stop.setDate(start.getDate() + days);
+        return stop;
     }
 
     batchList(count = 5) {
@@ -186,6 +187,7 @@ export class DemoTools {
             weight: this.getRandomInt(100) + " Kg",
             packaging: this.makePackaging(),
             move_line_count: this.getRandomInt(10),
+            package_type: this.makeSimpleRecord({}, {name_prefix: "PKGTYPE"}),
         });
         const rec = this.makeSimpleRecord(defaults, options);
         this.index_record("name", rec, "package");
@@ -210,8 +212,7 @@ export class DemoTools {
         }
         _.defaults(defaults, {
             location_src: _.sample(this.locations_src),
-            storage_type: {id: 1, name: "Storage type XXX"},
-            package_type: {id: 1, name: "Package type XXX"},
+            storage_type: this.makeSimpleRecord({}, {name_prefix: "STORTYPE"}),
             move_lines: move_lines,
             move_line_count: move_lines.length,
             pickings: pickings,
@@ -232,7 +233,8 @@ export class DemoTools {
     }
     makeProduct(defaults = {}, options = {}) {
         _.defaults(options, {
-            name_prefix: "Prod " + this.getRandomInt(),
+            name_prefix:
+                "Prod with very long name and even more " + this.getRandomInt(),
             padding: 0,
         });
         const default_code = this.makeProductCode();
@@ -302,10 +304,11 @@ export class DemoTools {
             let line = _.defaults(
                 this.makeMoveLine({
                     id: i,
-                    product: options.productFactory({name: "Prod " + i}),
+                    product: options.productFactory(),
                     package_dest: pack,
                     location_src: this.randomItemFromArray(this.locations_src),
                     location_dest: loc_dest,
+                    priority: this.getRandomInt(3).toString(),
                 }),
                 defaults
             );
@@ -323,10 +326,10 @@ export class DemoTools {
                 name: this.randomItemFromArray(this.partnerNames()),
             }),
             note: this.randomItemFromArray([null, "demo picking note"]),
+            scheduled_date: this.randomFutureDate(),
         });
         if (options.full_detail) {
             _.defaults(defaults, {
-                schedule_date: this.randomFutureDate(),
                 operation_type: "An operation type",
                 location_dest: _.sample(this.locations_dest),
                 carrier: this.makeSimpleRecord({
@@ -414,6 +417,15 @@ export class DemoTools {
         return rec;
     }
 
+    makePickingType(defaults = {}, options = {}) {
+        _.defaults(options, {name_prefix: "Type"});
+        _.defaults(defaults, {
+            code: this.randomItemFromArray(["outgoing", "incoming", "internal"]),
+        });
+        const rec = this.makeSimpleRecord(defaults, options);
+        return rec;
+    }
+
     partnerNames() {
         return [
             "Edith Sanchez",
@@ -478,11 +490,13 @@ export class DemoTools {
      *  scenario: "scenario_usage_key",
      *  picking_types: [{"id": 27, "name": "Random type"}]
      */
-    addAppMenu(new_item) {
-        // Generate a unique ID to be used in demo data
-        let menu_id = this.getRandomInt();
-        while (menu_id in this.app_menus_by_id) {
+    addAppMenu(new_item, menu_id = null) {
+        if (!menu_id) {
+            // Generate a unique ID to be used in demo data
             menu_id = this.getRandomInt();
+            while (menu_id in this.app_menus_by_id) {
+                menu_id = this.getRandomInt();
+            }
         }
         new_item.id = menu_id;
         this.app_menus_by_id[menu_id] = new_item;

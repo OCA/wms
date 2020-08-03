@@ -9,7 +9,7 @@ Vue.component("detail-transfer", {
                     path: "scheduled_date",
                     label: "Scheduled on",
                     klass: "loud-label",
-                    renderer: this._render_date,
+                    renderer: this.utils.misc.render_field_date,
                 },
                 {
                     path: "operation_type.name",

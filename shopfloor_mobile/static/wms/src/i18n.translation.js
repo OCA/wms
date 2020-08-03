@@ -41,6 +41,15 @@ export const messages = {
                 title: "Ok",
             },
         },
+        picking_type: {
+            lines_count: "{lines_count} lines (over {picking_count} operations).",
+            priority_lines_count:
+                "{priority_lines_count} priority lines (over {priority_picking_count} operations).",
+        },
+        order_lines_by: {
+            priority: "Order by priority",
+            location: "Order by location",
+        },
     },
     "fr-FR": {
         screen: {

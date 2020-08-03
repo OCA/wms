@@ -6,6 +6,7 @@ export class Utils {
         // {'key': 'no-group', 'title': '', 'records': []}
         options = _.defaults(options || {}, {
             group_key: "location_src",
+            group_no_title: false,
             name_prefix: "Location",
             prepare_records: function(recs) {
                 return recs;
@@ -24,7 +25,9 @@ export class Utils {
         const grouped = _.groupBy(lines, options.group_key + ".id");
         _.forEach(grouped, function(value, loc_id) {
             const location = _.first(_.filter(locations, {id: parseInt(loc_id)}));
-            const title = options.name_prefix
+            const title = options.group_no_title
+                ? ""
+                : options.name_prefix
                 ? options.name_prefix + ": " + location.name
                 : location.name;
             res.push({
@@ -172,7 +175,7 @@ export class Utils {
         return _.reverse(ordered);
     }
 
-    // DIsplay utils: TODO: split them to their own place
+    // Display utils: TODO: split them to their own place
 
     format_date_display(date_string, options = {}) {
         _.defaults(options, {
@@ -189,6 +192,10 @@ export class Utils {
             options.locale,
             options.format
         );
+    }
+
+    render_field_date(record, field) {
+        return this.format_date_display(_.result(record, field.path));
     }
 
     move_line_color_klass(rec) {

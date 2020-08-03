@@ -1,3 +1,5 @@
+import {process_registry} from "../services/process_registry.js";
+
 export var ScanAnything = Vue.component("scan-anything", {
     template: `
         <Screen :screen_info="screen_info">
@@ -54,7 +56,7 @@ export var ScanAnything = Vue.component("scan-anything", {
     methods: {
         on_reset: function(e) {
             this.scan_data = {};
-            this.$router.push({name: "scananything", params: {identifier: undefined}});
+            this.$router.push({name: "scan_anything", params: {identifier: undefined}});
         },
         // TODO: this was used to handle click on details inside detail components.
         // It's probably useless now since we handle the event in detail mixin.
@@ -65,7 +67,7 @@ export var ScanAnything = Vue.component("scan-anything", {
                 query.childOf = this.$route.params.identifier;
             }
             this.$router.push({
-                name: "scananything",
+                name: "scan_anything",
                 params: {identifier: identifier},
                 query: query,
             });
@@ -79,7 +81,7 @@ export var ScanAnything = Vue.component("scan-anything", {
         },
         on_scan: function(scanned) {
             this.$router.push({
-                name: "scananything",
+                name: "scan_anything",
                 params: {identifier: scanned.text},
             });
         },
@@ -122,4 +124,9 @@ export var ScanAnything = Vue.component("scan-anything", {
             return !_.isEmpty(this.scan_data);
         },
     },
+});
+
+process_registry.add("scan_anything", ScanAnything, {
+    path: "/scan_anything/:identifier?",
+    demo_src: "demo/demo.scan_anything.js",
 });

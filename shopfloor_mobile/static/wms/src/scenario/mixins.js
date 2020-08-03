@@ -24,11 +24,6 @@ export var ScenarioBaseMixin = {
         next();
     },
     beforeMount: function() {
-        if (this.$root.demo_mode) {
-            this.$root.loadJS("src/demo/demo." + this.usage + ".js", this.usage);
-            // this should be always loaded
-            this.$root.loadJS("src/demo/demo.scan_anything.js", "scan_anything");
-        }
         /*
         Ensure initial state is set.
         beforeRouteUpdate` runs only if the route has changed,
@@ -40,7 +35,15 @@ export var ScenarioBaseMixin = {
     },
     computed: {
         menu_item_id: function() {
-            return parseInt(this.$route.params.menu_id, 10);
+            const menu_id = this.$route.params.menu_id;
+            /*
+            It's very handy for demo data to reference always the same menu id.
+            Since the menu id is included in the URL
+            it allows to reload the page w/out having to refresh menu items.
+            This way you can define multiple scenario w/ different menu items
+            and you can tag them with the same reusable label (eg: case_1).
+             */
+            return typeof menu_id == "number" ? parseInt(menu_id, 10) : menu_id;
         },
         odoo: function() {
             const odoo_params = {
@@ -77,7 +80,7 @@ export var ScenarioBaseMixin = {
                 // you can provide a different screen title
                 title: this.screen_title ? this.screen_title() : this.menu_item().name,
                 current_doc: this.current_doc ? this.current_doc() : null,
-                klass: this.usage + " " + "state-" + this.state.key,
+                klass: this.screen_klass(),
                 user_message: this.user_message,
                 user_popup: this.user_popup,
                 noUserMessage: this.need_confirmation,
@@ -97,6 +100,9 @@ export var ScenarioBaseMixin = {
         },
     },
     methods: {
+        screen_klass: function() {
+            return this.usage + " " + "state-" + this.state.key;
+        },
         menu_item: function() {
             const self = this;
             return _.head(
