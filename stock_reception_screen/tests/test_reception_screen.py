@@ -78,10 +78,10 @@ class TestReceptionScreen(SavepointCase):
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_location")
         self.assertTrue(self.screen.current_move_location_dest_id)
-        # Set a package (PID)
+        # Set a package
         self.screen.button_save_step()
-        self.assertEqual(self.screen.current_step, "set_pid")
-        self.screen.current_move_line_pid = "PID-TEST-1"
+        self.assertEqual(self.screen.current_step, "set_package")
+        self.screen.current_move_line_package = "PID-TEST-1"
         self.assertEqual(
             self.screen.current_move_line_id.result_package_id.name, "PID-TEST-1"
         )
@@ -123,10 +123,10 @@ class TestReceptionScreen(SavepointCase):
         self.assertEqual(self.screen.current_move_line_qty_status, "eq")
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_location")
-        # Set a package (PID)
+        # Set a package
         self.screen.button_save_step()
-        self.assertEqual(self.screen.current_step, "set_pid")
-        self.screen.current_move_line_pid = "PID-TEST-2"
+        self.assertEqual(self.screen.current_step, "set_package")
+        self.screen.current_move_line_package = "PID-TEST-2"
         self.assertEqual(
             self.screen.current_move_line_id.result_package_id.name, "PID-TEST-2"
         )

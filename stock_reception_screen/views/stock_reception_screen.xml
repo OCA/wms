@@ -176,13 +176,13 @@
                                         domain="[('id', 'child_of', picking_location_dest_id)]"
                                     />
                                 </div>
-                                <label for="current_move_line_pid" />
+                                <label for="current_move_line_package" />
                                 <div>
                                     <field
-                                        name="current_move_line_pid"
+                                        name="current_move_line_package"
                                         class="mr8"
                                         style="width: 15em;"
-                                        attrs="{'readonly': [('current_step', '!=', 'set_pid')]}"
+                                        attrs="{'readonly': [('current_step', '!=', 'set_package')]}"
                                     />
                                 </div>
                                 <label for="current_move_line_product_packaging_id" />

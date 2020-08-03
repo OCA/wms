@@ -40,13 +40,13 @@ class StockReceptionScreen(models.Model):
         },
         "set_location": {
             "label": _("Set Destination"),
-            "next_steps": [{"next": "set_pid"}],
+            "next_steps": [{"next": "set_package"}],
         },
-        "set_pid": {
-            "label": _("Set PID"),
+        "set_package": {
+            "label": _("Set Package"),
             "next_steps": [
                 {
-                    "before": "_before_set_pid_to_select_packaging",
+                    "before": "_before_set_package_to_select_packaging",
                     "next": "select_packaging",
                 }
             ],
@@ -130,10 +130,10 @@ class StockReceptionScreen(models.Model):
     current_move_line_qty_status = fields.Char(
         string="Qty Status", compute="_compute_current_move_line_qty_status"
     )
-    current_move_line_pid = fields.Char(
-        compute="_compute_current_move_line_pid",
-        inverse="_inverse_current_move_line_pid",
-        string="PID",
+    current_move_line_package = fields.Char(
+        compute="_compute_current_move_line_package",
+        inverse="_inverse_current_move_line_package",
+        string="Package N°",
     )
     current_move_line_product_packaging_id = fields.Many2one(
         related="current_move_line_id.result_package_id.product_packaging_id",
@@ -217,21 +217,21 @@ class StockReceptionScreen(models.Model):
                 wiz.current_move_line_qty_status = "eq"
 
     @api.depends("current_move_line_id.result_package_id.package_storage_type_id")
-    def _compute_current_move_line_pid(self):
+    def _compute_current_move_line_package(self):
         for wiz in self:
-            self.current_move_line_pid = False
+            self.current_move_line_package = False
             if wiz.current_move_line_id.result_package_id:
                 package = wiz.current_move_line_id.result_package_id
-                self.current_move_line_pid = package.name
+                self.current_move_line_package = package.name
 
-    def _inverse_current_move_line_pid(self):
+    def _inverse_current_move_line_package(self):
         package_model = self.env["stock.quant.package"]
         for wiz in self:
             move_line = wiz.current_move_line_id
-            pid = wiz.current_move_line_pid
-            if not move_line or not pid or move_line.result_package_id:
+            package = wiz.current_move_line_package
+            if not move_line or not package or move_line.result_package_id:
                 continue
-            vals = {"name": pid}
+            vals = {"name": package}
             move_line.result_package_id = package_model.create(vals)
 
     @api.onchange("current_move_line_product_packaging_id")
@@ -370,9 +370,9 @@ class StockReceptionScreen(models.Model):
         self.current_move_line_id.lot_id = lot
         self.process_set_lot_number()
 
-    def on_barcode_scanned_set_pid(self, barcode):
-        """Set the PID on the move line."""
-        self.current_move_line_pid = barcode
+    def on_barcode_scanned_set_package(self, barcode):
+        """Set the package on the move line."""
+        self.current_move_line_package = barcode
 
     def on_barcode_scanned_select_packaging(self, barcode):
         """Set the packaging on the move."""
@@ -510,10 +510,10 @@ class StockReceptionScreen(models.Model):
             return
         self.next_step()
 
-    def process_set_pid(self):
+    def process_set_package(self):
         self.next_step()
 
-    def _before_set_pid_to_select_packaging(self):
+    def _before_set_package_to_select_packaging(self):
         """Set the product packaging matching the qty (if there is one)
         and the related package storage type.
         """
