@@ -8,11 +8,17 @@
         <field name="inherit_id" ref="stock.vpicktree" />
         <field name="arch" type="xml">
             <field name="picking_type_id" position="after">
+                <field name="picking_type_code" invisible="1" />
                 <button
                     name="action_reception_screen_open"
                     type="object"
                     string="Reception"
                     class="oe_highlight"
+                    attrs="{'invisible': [
+                      '|',
+                      ('picking_type_code', '!=', 'incoming'),
+                      ('state', 'in', ('cancel', 'done')),
+                    ]}"
                 />
             </field>
         </field>
