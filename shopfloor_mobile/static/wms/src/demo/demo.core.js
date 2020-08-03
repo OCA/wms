@@ -187,6 +187,7 @@ export class DemoTools {
             weight: this.getRandomInt(100) + " Kg",
             packaging: this.makePackaging(),
             move_line_count: this.getRandomInt(10),
+            package_type: this.makeSimpleRecord({}, {name_prefix: "PKGTYPE"}),
         });
         const rec = this.makeSimpleRecord(defaults, options);
         this.index_record("name", rec, "package");
@@ -211,8 +212,7 @@ export class DemoTools {
         }
         _.defaults(defaults, {
             location_src: _.sample(this.locations_src),
-            storage_type: {id: 1, name: "Storage type XXX"},
-            package_type: {id: 1, name: "Package type XXX"},
+            storage_type: this.makeSimpleRecord({}, {name_prefix: "STORTYPE"}),
             move_lines: move_lines,
             move_line_count: move_lines.length,
             pickings: pickings,
