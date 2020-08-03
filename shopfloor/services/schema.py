@@ -69,10 +69,11 @@ class BaseShopfloorSchemaResponse(Component):
                     "name": {"type": "string", "nullable": False, "required": True},
                 },
             },
+            "scheduled_date": {"type": "string", "nullable": False, "required": True},
         }
 
-    def move_line(self, with_packaging=False):
-        return {
+    def move_line(self, with_packaging=False, with_picking=False):
+        schema = {
             "id": {"type": "integer", "required": True},
             "qty_done": {"type": "float", "required": True},
             "quantity": {"type": "float", "required": True},
@@ -91,6 +92,16 @@ class BaseShopfloorSchemaResponse(Component):
             ),
             "location_src": self._schema_dict_of(self.location()),
             "location_dest": self._schema_dict_of(self.location()),
+            "priority": {"type": "string", "nullable": True, "required": False},
+        }
+        if with_picking:
+            schema["picking"] = self._schema_dict_of(self.picking())
+        return schema
+
+    def move(self):
+        return {
+            "id": {"required": True, "type": "integer"},
+            "priority": {"type": "string", "required": False, "nullable": True},
         }
 
     def product(self):
@@ -115,6 +126,7 @@ class BaseShopfloorSchemaResponse(Component):
             "name": {"type": "string", "nullable": False, "required": True},
             "weight": {"required": True, "nullable": True, "type": "float"},
             "move_line_count": {"required": False, "nullable": True, "type": "integer"},
+            "storage_type": self._schema_dict_of(self._simple_record()),
         }
         if with_packaging:
             schema["packaging"] = self._schema_dict_of(self.packaging())
@@ -163,4 +175,14 @@ class BaseShopfloorSchemaResponse(Component):
             "location_dest": self._schema_dict_of(self.location()),
             "product": self._schema_dict_of(self.product()),
             "quantity": {"type": "float", "required": True},
+        }
+
+    def picking_type(self):
+        return {
+            "id": {"required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+            "lines_count": {"type": "float", "required": True},
+            "picking_count": {"type": "float", "required": True},
+            "priority_lines_count": {"type": "float", "required": True},
+            "priority_picking_count": {"type": "float", "required": True},
         }

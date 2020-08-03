@@ -59,6 +59,7 @@ class DataAction(Component):
             ("partner_id:partner", self._partner_parser),
             "move_line_count",
             "total_weight:weight",
+            "scheduled_date",
         ]
 
     def package(self, record, picking=None, with_packaging=False, **kw):
@@ -87,6 +88,7 @@ class DataAction(Component):
             "id",
             "name",
             "pack_weight:weight",
+            ("package_storage_type_id:storage_type", ["id", "name"]),
         ]
 
     @property
@@ -115,9 +117,12 @@ class DataAction(Component):
     def _lot_parser(self):
         return self._simple_record_parser() + ["ref"]
 
-    def move_line(self, record, **kw):
+    def move_line(self, record, with_picking=False, **kw):
         record = record.with_context(location=record.location_id.id)
-        data = self._jsonify(record, self._move_line_parser)
+        parser = self._move_line_parser
+        if with_picking:
+            parser += [("picking_id:picking", self._picking_parser)]
+        data = self._jsonify(record, parser)
         if data:
             data.update(
                 {
@@ -146,6 +151,7 @@ class DataAction(Component):
             ("lot_id:lot", self._lot_parser),
             ("location_id:location_src", self._location_parser),
             ("location_dest_id:location_dest", self._location_parser),
+            ("move_id:priority", lambda rec, fname: rec.move_id.priority or "",),
         ]
 
     def package_level(self, record, **kw):
@@ -215,3 +221,54 @@ class DataAction(Component):
     @property
     def _picking_batch_parser(self):
         return ["id", "name", "picking_count", "move_line_count", "total_weight:weight"]
+
+    def picking_type(self, record, **kw):
+        parser = self._picking_type_parser
+        return self._jsonify(record, parser, **kw)
+
+    def picking_types(self, record, **kw):
+        return self.picking_type(record, multi=True)
+
+    @property
+    def _picking_type_parser(self):
+        return [
+            "id",
+            "name",
+            ("lines_count", self._picking_type_lines_count),
+            ("picking_count", self._picking_type_picking_count),
+            ("priority_lines_count", self._picking_type_priority_lines_count),
+            ("priority_picking_count", self._picking_type_priority_picking_count),
+        ]
+
+    def _picking_type_lines_count(self, rec, field):
+        return self.env["stock.move.line"].search_count(
+            [
+                ("picking_id.picking_type_id", "=", rec.id),
+                ("qty_done", "=", 0),
+                ("state", "in", ("assigned", "partially_available")),
+            ]
+        )
+
+    def _picking_type_priority_lines_count(self, rec, field):
+        return self.env["stock.move.line"].search_count(
+            [
+                ("picking_id.picking_type_id", "=", rec.id),
+                ("qty_done", "=", 0),
+                ("state", "in", ("assigned", "partially_available")),
+                ("picking_id.priority", "in", ["2", "3"]),
+            ]
+        )
+
+    def _picking_type_picking_count(self, rec, field):
+        return self.env["stock.picking"].search_count(
+            [("picking_type_id", "=", rec.id), ("state", "not in", ("cancel", "done"))]
+        )
+
+    def _picking_type_priority_picking_count(self, rec, field):
+        return self.env["stock.picking"].search_count(
+            [
+                ("picking_type_id", "=", rec.id),
+                ("state", "not in", ("cancel", "done")),
+                ("priority", "in", ["2", "3"]),
+            ]
+        )
