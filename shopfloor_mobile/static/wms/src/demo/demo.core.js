@@ -233,7 +233,8 @@ export class DemoTools {
     }
     makeProduct(defaults = {}, options = {}) {
         _.defaults(options, {
-            name_prefix: "Prod " + this.getRandomInt(),
+            name_prefix:
+                "Prod with very long name and even more " + this.getRandomInt(),
             padding: 0,
         });
         const default_code = this.makeProductCode();
@@ -303,7 +304,7 @@ export class DemoTools {
             let line = _.defaults(
                 this.makeMoveLine({
                     id: i,
-                    product: options.productFactory({name: "Prod " + i}),
+                    product: options.productFactory(),
                     package_dest: pack,
                     location_src: this.randomItemFromArray(this.locations_src),
                     location_dest: loc_dest,
