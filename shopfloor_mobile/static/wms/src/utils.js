@@ -172,7 +172,7 @@ export class Utils {
         return _.reverse(ordered);
     }
 
-    // DIsplay utils: TODO: split them to their own place
+    // Display utils: TODO: split them to their own place
 
     format_date_display(date_string, options = {}) {
         _.defaults(options, {
@@ -189,6 +189,10 @@ export class Utils {
             options.locale,
             options.format
         );
+    }
+
+    render_field_date(record, field) {
+        return this.format_date_display(_.result(record, field.path));
     }
 
     move_line_color_klass(rec) {

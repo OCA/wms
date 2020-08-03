@@ -8,12 +8,12 @@ Vue.component("detail-lot", {
                 {
                     path: "expire_date",
                     label: "Expiry date",
-                    renderer: this._render_date,
+                    renderer: this.utils.misc.render_field_date,
                 },
                 {
                     path: "removal_date",
                     label: "Removal date",
-                    renderer: this._render_date,
+                    renderer: this.utils.misc.render_field_date,
                 },
             ];
         },
