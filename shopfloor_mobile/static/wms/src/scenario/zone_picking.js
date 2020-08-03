@@ -1,148 +1,177 @@
 import {ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
 
-export var ZonePicking = Vue.component("zone-picking", {
-    mixins: [ScenarioBaseMixin],
-    template: `
-        <Screen :screen_info="screen_info">
-            <template v-slot:header>
-                <state-display-info :info="state.display_info" v-if="state.display_info"/>
-            </template>
-            <searchbar
-                v-if="state.on_scan"
-                v-on:found="on_scan"
-                :input_placeholder="search_input_placeholder"
+const template_mobile = `
+    <Screen :screen_info="screen_info">
+        <template v-slot:header>
+            <state-display-info :info="state.display_info" v-if="state.display_info"/>
+        </template>
+        <searchbar
+            v-if="state.on_scan"
+            v-on:found="on_scan"
+            :input_placeholder="search_input_placeholder"
+            />
+        <div v-if="state_is('select_picking_type')">
+            <manual-select
+                v-on:select="state.on_select"
+                :records="state.data.picking_types"
+                :list_item_fields="manual_select_picking_type_fields()"
+                :options="{showActions: false}"
                 />
-            <div v-if="state_is('select_picking_type')">
-                <manual-select
-                    v-on:select="state.on_select"
-                    :records="state.data.picking_types"
-                    :list_item_fields="manual_select_picking_type_fields()"
-                    :options="{showActions: false}"
-                    />
-                <div class="button-list button-vertical-list full">
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <btn-back />
-                        </v-col>
-                    </v-row>
-                </div>
+            <div class="button-list button-vertical-list full">
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <btn-back />
+                    </v-col>
+                </v-row>
             </div>
+        </div>
 
-            <div v-if="state_is('select_line')">
-                <manual-select
-                    :records="state.data.move_lines"
-                    :options="select_line_move_line_detail_options()"
-                    :key="make_state_component_key(['manual-select'])"
-                    />
-                <div class="button-list button-vertical-list full">
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <btn-action @click="toggle_sort_lines_by()">{{ sort_lines_by_btn_label }}</btn-action>
-                        </v-col>
-                    </v-row>
-                    <!-- TODO: this btn should be available only if there are lines already processed -->
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <btn-action @click="state.on_unload_at_destination()">Unload at destination</btn-action>
-                        </v-col>
-                    </v-row>
-                </div>
+        <div v-if="state_is('select_line')">
+            <manual-select
+                v-if="device_mode == 'mobile'"
+                :records="state.data.move_lines"
+                :options="select_line_move_line_detail_options()"
+                :key="make_state_component_key(['manual-select'])"
+                />
+
+            <v-data-table
+                v-if="device_mode == 'desktop'"
+                :headers="select_line_table_headers()"
+                :items="select_line_table_items()"
+                :key="make_state_component_key(['data-table'])"
+                class="elevation-1">
+            </v-data-table>
+
+            <div class="button-list button-vertical-list full">
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <btn-action @click="toggle_sort_lines_by()">{{ sort_lines_by_btn_label }}</btn-action>
+                    </v-col>
+                </v-row>
+                <!-- TODO: this btn should be available only if there are lines already processed -->
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <btn-action @click="state.on_unload_at_destination()">Unload at destination</btn-action>
+                    </v-col>
+                </v-row>
             </div>
+        </div>
 
-            <detail-picking
-                v-if="state_is('set_line_destination')"
+        <detail-picking
+            v-if="state_is('set_line_destination')"
+            :record="state.data.move_line.picking"
+            :card_color="utils.colors.color_for('screen_step_done')"
+            />
+        <item-detail-card
+            v-if="state_in(['set_line_destination', 'change_pack_lot'])"
+            :key="make_state_component_key(['detail-move-line-loc', state.data.move_line.id])"
+            :record="state.data.move_line"
+            :options="{main: true, key_title: 'location_src.name', title_action_field: {action_val_path: 'location_src.barcode'}}"
+            :card_color="utils.colors.color_for('screen_step_done')"
+            />
+        <item-detail-card
+            v-if="state_in(['set_line_destination', 'stock_issue', 'change_pack_lot'])"
+            :key="make_state_component_key(['detail-move-line-product', state.data.move_line.id])"
+            :record="state.data.move_line"
+            :options="utils.misc.move_line_product_detail_options(state.data.move_line, {fields: [{path: 'picking.name', label: 'Picking'}]})"
+            :card_color="utils.colors.color_for(state_in(['set_line_destination']) ? 'screen_step_done': 'screen_step_todo')"
+            />
+        <item-detail-card
+            v-if="state_in(['set_line_destination'])"
+            :key="make_state_component_key(['detail-move-line-loc-dest', state.data.move_line.id])"
+            :record="state.data.move_line"
+            :options="{main: true, key_title: 'location_dest.name', title_action_field: {action_val_path: 'location_dest.barcode'}}"
+            :card_color="utils.colors.color_for('screen_step_todo')"
+            />
+        <v-card v-if="state_in(['set_line_destination', 'change_pack_lot'])"
+                class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
+            <packaging-qty-picker :options="utils.misc.move_line_qty_picker_options(state.data.move_line)" />
+        </v-card>
+        <item-detail-card
+            v-if="state_in(['change_pack_lot'])"
+            :key="make_state_component_key(['detail-move-line-dest-pack', state.data.move_line.id])"
+            :record="state.data.move_line"
+            :options="{main: true, key_title: 'package_dest.name'}"
+            :card_color="utils.colors.color_for('screen_step_todo')"
+            />
+        <div v-if="state_is('set_line_destination')">
+            <line-actions-popup
+                :line="state.data.move_line"
+                :actions="[
+                    {name: 'Declare stock out', event_name: 'action_stock_out'},
+                    {name: 'Change pack or lot', event_name: 'action_change_pack_lot'},
+                ]"
+                :key="make_state_component_key(['line-actions', state.data.move_line.id])"
+                v-on:action="state.on_action"
+                />
+        </div>
+
+        <div v-if="state_in(['unload_all'])">
+            <picking-summary
+                :record="state.data.move_lines[0].picking"
+                :records="state.data.move_lines"
+                :records_grouped="picking_summary_records_grouped(state.data.move_lines)"
+                :list_options="picking_summary_move_line_list_options(state.data.move_lines)"
+                :key="make_state_component_key(['picking-summary'])"
+                />
+            <div class="button-list button-vertical-list full">
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <btn-action @click="state.on_action_split()">Split</btn-action>
+                    </v-col>
+                </v-row>
+            </div>
+        </div>
+
+        <div v-if="state_in(['unload_single', 'unload_set_destination'])">
+            <user-information
+                v-if="state.data.full_order_picking"
+                :message="{body: 'Full order picking, no more operation.'}"
+                />
+            <picking-summary
                 :record="state.data.move_line.picking"
-                :card_color="utils.colors.color_for('screen_step_done')"
+                :records="[state.data.move_line]"
+                :records_grouped="picking_summary_records_grouped([state.data.move_line])"
+                :list_options="picking_summary_move_line_list_options([state.data.move_line])"
+                :key="make_state_component_key(['picking-summary'])"
                 />
             <item-detail-card
-                v-if="state_in(['set_line_destination', 'change_pack_lot'])"
-                :key="make_state_component_key(['detail-move-line-loc', state.data.move_line.id])"
-                :record="state.data.move_line"
-                :options="{main: true, key_title: 'location_src.name', title_action_field: {action_val_path: 'location_src.barcode'}}"
-                :card_color="utils.colors.color_for('screen_step_done')"
-                />
-            <item-detail-card
-                v-if="state_in(['set_line_destination', 'stock_issue', 'change_pack_lot'])"
-                :key="make_state_component_key(['detail-move-line-product', state.data.move_line.id])"
-                :record="state.data.move_line"
-                :options="utils.misc.move_line_product_detail_options(state.data.move_line, {fields: [{path: 'picking.name', label: 'Picking'}]})"
-                :card_color="utils.colors.color_for(state_in(['set_line_destination']) ? 'screen_step_done': 'screen_step_todo')"
-                />
-            <v-card v-if="state_in(['set_line_destination', 'change_pack_lot'])"
-                    class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
-                <packaging-qty-picker :options="utils.misc.move_line_qty_picker_options(state.data.move_line)" />
-            </v-card>
-            <item-detail-card
-                v-if="state_in(['change_pack_lot'])"
                 :key="make_state_component_key(['detail-move-line-dest-pack', state.data.move_line.id])"
                 :record="state.data.move_line"
                 :options="{main: true, key_title: 'package_dest.name'}"
                 :card_color="utils.colors.color_for('screen_step_todo')"
+                class="mt-2"
                 />
-            <div v-if="state_is('set_line_destination')">
-                <line-actions-popup
-                    :line="state.data.move_line"
-                    :actions="[
-                        {name: 'Declare stock out', event_name: 'action_stock_out'},
-                        {name: 'Change pack or lot', event_name: 'action_change_pack_lot'},
-                    ]"
-                    :key="make_state_component_key(['line-actions', state.data.move_line.id])"
-                    v-on:action="state.on_action"
-                    />
-            </div>
+        </div>
 
-            <div v-if="state_in(['unload_all'])">
-                <picking-summary
-                    :record="state.data.move_lines[0].picking"
-                    :records="state.data.move_lines"
-                    :records_grouped="picking_summary_records_grouped(state.data.move_lines)"
-                    :list_options="picking_summary_move_line_list_options(state.data.move_lines)"
-                    :key="make_state_component_key(['picking-summary'])"
-                    />
-                <div class="button-list button-vertical-list full">
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <btn-action @click="state.on_action_split()">Split</btn-action>
-                        </v-col>
-                    </v-row>
-                </div>
-            </div>
+        <stock-zero-check
+            v-if="state_is('zero_check')"
+            v-on:action="state.on_action"
+            />
 
-            <div v-if="state_in(['unload_single', 'unload_set_destination'])">
-                <user-information
-                    v-if="state.data.full_order_picking"
-                    :message="{body: 'Full order picking, no more operation.'}"
-                    />
-                <picking-summary
-                    :record="state.data.move_line.picking"
-                    :records="[state.data.move_line]"
-                    :records_grouped="picking_summary_records_grouped([state.data.move_line])"
-                    :list_options="picking_summary_move_line_list_options([state.data.move_line])"
-                    :key="make_state_component_key(['picking-summary'])"
-                    />
-                <item-detail-card
-                    :key="make_state_component_key(['detail-move-line-dest-pack', state.data.move_line.id])"
-                    :record="state.data.move_line"
-                    :options="{main: true, key_title: 'package_dest.name'}"
-                    :card_color="utils.colors.color_for('screen_step_todo')"
-                    class="mt-2"
-                    />
-            </div>
+        <line-stock-out
+            v-if="state_is('stock_issue')"
+            v-on:confirm_stock_issue="state.on_confirm_stock_issue"
+            />
+    </Screen>
+`;
 
-            <stock-zero-check
-                v-if="state_is('zero_check')"
-                v-on:action="state.on_action"
-                />
+const TEMPLATES = {
+    mobile: Vue.compile(template_mobile),
+    desktop: Vue.compile(template_mobile),
+};
 
-            <line-stock-out
-                v-if="state_is('stock_issue')"
-                v-on:confirm_stock_issue="state.on_confirm_stock_issue"
-                />
-
-        </Screen>
-        `,
+export var ZonePicking = Vue.component("zone-picking", {
+    mixins: [ScenarioBaseMixin],
     methods: {
+        screen_klass: function() {
+            return (
+                this.$super(ScenarioBaseMixin).screen_klass() +
+                " device-mode-" +
+                this.device_mode
+            );
+        },
         screen_title: function() {
             const record = this.current_picking_type();
             if (!record) return this.menu_item().name;
@@ -194,6 +223,33 @@ export var ZonePicking = Vue.component("zone-picking", {
         render_priority_lines_count(record, field) {
             return this.$t("picking_type.priority_lines_count", record);
         },
+        select_line_table_headers: function() {
+            // Convert to v-data-table keys
+            let headers = _.map(this.move_line_list_fields(true), function(field) {
+                return {
+                    text: field.label,
+                    value: field.path,
+                    // sorting delegated to button
+                    sortable: false,
+                };
+            });
+            return headers;
+        },
+        select_line_table_items: function() {
+            const self = this;
+            // Convert to v-data-table keys
+            let items = _.map(this.state.data.move_lines, function(record) {
+                let item_data = {};
+                _.forEach(self.move_line_list_fields(true), function(field) {
+                    item_data[field.path] = _.result(record, field.path);
+                    if (field.renderer) {
+                        item_data[field.path] = field.renderer(record, field);
+                    }
+                });
+                return item_data;
+            });
+            return items;
+        },
         select_line_move_line_detail_options: function() {
             let options = {
                 key_title: "location_src.name",
@@ -202,21 +258,38 @@ export var ZonePicking = Vue.component("zone-picking", {
                 showActions: false,
                 list_item_options: {
                     bold_title: true,
-                    fields: [
-                        {path: "product.display_name"},
-                        {path: "package_src.name", label: "Pack"},
-                        {path: "lot.name", label: "Lot"},
-                        {
-                            path: "priority",
-                            render_component: "priority-widget",
-                            render_options: function(record) {
-                                return {priority: parseInt(record.priority || "0", 10)};
-                            },
-                        },
-                    ],
+                    fields: this.move_line_list_fields(),
                 },
             };
             return options;
+        },
+        move_line_list_fields: function(table_mode = false) {
+            const self = this;
+            let fields = [
+                {path: "product.display_name", label: table_mode ? "Product" : null},
+                {path: "package_src.name", label: "Pack"},
+                {path: "lot.name", label: "Lot"},
+                {path: "package_src.weight", label: "Weight"},
+                {
+                    path: "picking.scheduled_date",
+                    label: "Date",
+                    renderer: function(rec, field) {
+                        return self.utils.misc.render_field_date(rec, field);
+                    },
+                },
+                {
+                    path: "priority",
+                    label: table_mode ? "Priority" : null,
+                    render_component: "priority-widget",
+                    render_options: function(record) {
+                        return {priority: parseInt(record.priority || "0", 10)};
+                    },
+                },
+            ];
+            if (table_mode) {
+                fields.unshift({path: "location_src.name", label: "Location"});
+            }
+            return fields;
         },
         select_line_move_line_records_grouped(move_lines) {
             return this.utils.misc.group_lines_by_location(move_lines, {});
@@ -277,6 +350,15 @@ export var ZonePicking = Vue.component("zone-picking", {
                 ? this.$t("order_lines_by.location")
                 : this.$t("order_lines_by.priority");
         },
+        device_mode() {
+            let _mode = "mobile";
+            _.forEach(this.media_queries, function(mode, query) {
+                if (window.matchMedia(query).matches) {
+                    _mode = mode;
+                }
+            });
+            return _mode;
+        },
     },
     data: function() {
         return {
@@ -315,7 +397,17 @@ export var ZonePicking = Vue.component("zone-picking", {
                         this.scan_source(scanned.text);
                     },
                     on_select: selected => {
-                        this.scan_source(selected.barcode || selected.name);
+                        let path = "package_src.name";
+                        let barcode = _.result(selected, path);
+                        while (!barcode) {
+                            _.forEach(
+                                ["lot.name", "product.barcode", "location_src.barcode"],
+                                function(path) {
+                                    barcode = _.result(selected, path);
+                                }
+                            );
+                        }
+                        this.scan_source(barcode);
                     },
                     on_unload_at_destination: () => {
                         this.wait_call(
@@ -331,14 +423,22 @@ export var ZonePicking = Vue.component("zone-picking", {
                         title: "Set destination",
                         scan_placeholder: "Scan location or package",
                     },
+                    events: {
+                        qty_edit: "on_qty_update",
+                    },
+                    on_qty_update: qty => {
+                        this.state.data.destination_qty = qty;
+                    },
                     on_scan: scanned => {
                         const data = this.state.data;
                         this.wait_call(
                             this.odoo.call("set_destination", {
                                 zone_location_id: this.current_zone_location().id,
                                 picking_type_id: this.current_picking_type().id,
-                                move_line_id: data.id,
+                                move_line_id: data.move_line.id,
                                 barcode: scanned.text,
+                                quantity:
+                                    data.destination_qty || data.move_line.quantity,
                                 confirmation: data.confirmation_required,
                             })
                         );
@@ -425,7 +525,7 @@ export var ZonePicking = Vue.component("zone-picking", {
                             this.odoo.call("change_pack_lot", {
                                 zone_location_id: this.current_zone_location().id,
                                 picking_type_id: this.current_picking_type().id,
-                                move_line_id: this.state.data.id,
+                                move_line_id: this.state.data.move_line.id,
                                 barcode: scanned.text,
                             })
                         );
@@ -443,7 +543,7 @@ export var ZonePicking = Vue.component("zone-picking", {
                             this.odoo.call("stock_issue", {
                                 zone_location_id: this.current_zone_location().id,
                                 picking_type_id: this.current_picking_type().id,
-                                move_line_id: this.state.data.id,
+                                move_line_id: this.state.data.move_line.id,
                             })
                         );
                     },
@@ -462,7 +562,7 @@ export var ZonePicking = Vue.component("zone-picking", {
                             this.odoo.call("is_zero", {
                                 zone_location_id: this.current_zone_location().id,
                                 picking_type_id: this.current_picking_type().id,
-                                move_line_id: this.state.data.id,
+                                move_line_id: this.state.data.move_line.id,
                                 zero: zero_flag,
                             })
                         );
@@ -476,6 +576,31 @@ export var ZonePicking = Vue.component("zone-picking", {
                 },
             },
         };
+    },
+    // TODO: move this lovely feature to a mixin or provide it to all components.
+    props: {
+        default_template: {
+            type: String,
+            default: "mobile",
+        },
+        media_queries: {
+            type: Object,
+            default: function() {
+                return {
+                    "(min-width: 500px)": "desktop",
+                };
+            },
+        },
+        compiled_templates: {
+            type: Object,
+            default: function() {
+                return TEMPLATES;
+            },
+        },
+    },
+    render(createElement) {
+        const tmpl = this.compiled_templates[this.device_mode];
+        return tmpl.render.call(this, createElement);
     },
 });
 

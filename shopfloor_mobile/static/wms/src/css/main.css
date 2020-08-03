@@ -33,15 +33,28 @@ main.v-content > .v-content__wrap > .header .container {
     z-index: 9999;
 }
 
-.v-data-table th,
-.v-data-table td {
+.device-mode-mobile .v-data-table th,
+.device-mode-mobile .v-data-table td {
     font-size: 1.2rem;
 }
-.v-data-table tbody tr:not(:last-child) td:last-child,
-.v-data-table tbody tr:not(:last-child) th:last-child,
-.v-data-table tbody tr:not(:last-child) th:not(.v-data-table__mobile-row),
-.v-data-table tbody tr:not(:last-child) td:not(.v-data-table__mobile-row) {
+.device-mode-mobile .v-data-table tbody tr:not(:last-child) td:last-child,
+.device-mode-mobile .v-data-table tbody tr:not(:last-child) th:last-child,
+.device-mode-mobile
+    .v-data-table
+    tbody
+    tr:not(:last-child)
+    th:not(.v-data-table__mobile-row),
+.device-mode-mobile
+    .v-data-table
+    tbody
+    tr:not(:last-child)
+    td:not(.v-data-table__mobile-row) {
     border-bottom: 2px solid white !important;
+}
+
+.device-mode-mobile .v-data-table th,
+.device-mode-mobile .v-data-table td {
+    font-size: 1.2rem;
 }
 
 .screen-home .v-list-item:not(:last-child) {
@@ -493,3 +506,13 @@ I tested only w/ checkout/select_package for now
 .list .v-list-item {
     border-bottom: 1px solid #ccc;
 }
+
+/* .select-group.v-card {
+    overflow: hidden;
+}
+.list-item-wrapper {
+    float: left;
+    overflow: hidden;
+    border: 1px solid;
+    margin: 20px;
+} */
