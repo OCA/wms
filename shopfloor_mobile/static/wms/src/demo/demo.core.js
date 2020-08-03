@@ -81,7 +81,8 @@ export class DemoTools {
         days = days ? days : this.getRandomInt(30);
         const start = new Date();
         let stop = new Date();
-        return stop.setDate(start.getDate() + days);
+        stop.setDate(start.getDate() + days);
+        return stop;
     }
 
     batchList(count = 5) {
@@ -324,10 +325,10 @@ export class DemoTools {
                 name: this.randomItemFromArray(this.partnerNames()),
             }),
             note: this.randomItemFromArray([null, "demo picking note"]),
+            scheduled_date: this.randomFutureDate(),
         });
         if (options.full_detail) {
             _.defaults(defaults, {
-                schedule_date: this.randomFutureDate(),
                 operation_type: "An operation type",
                 location_dest: _.sample(this.locations_dest),
                 carrier: this.makeSimpleRecord({
