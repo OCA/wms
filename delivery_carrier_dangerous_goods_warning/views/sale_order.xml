@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <group name="sales_person" position="inside">
+                <field name="contains_dangerous_goods" groups="base.group_no_one" />
+            </group>
+            <field name="payment_term_id" position="after">
+                <field name="display_dangerous_goods_carrier_warning" invisible="1" />
+                <div
+                    role="alert"
+                    class="alert alert-warning"
+                    attrs="{'invisible': [('display_dangerous_goods_carrier_warning', '=', False)]}"
+                    colspan="2"
+                >
+                    <field name="dangerous_goods_carrier_warning" nolabel="1" />
+                </div>
+            </field>
+        </field>
+    </record>
+</odoo>

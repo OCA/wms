@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_delivery_carrier_form_inherit" model="ir.ui.view">
+        <field name="name">delivery.carrier.form</field>
+        <field name="model">delivery.carrier</field>
+        <field name="inherit_id" ref="delivery.view_delivery_carrier_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="dangerous_goods" string="Dangerous goods">
+                    <p
+                    >Dangerous goods warning allows to display a warning when this delivery carrier is used on a document (sale order or stock picking) with a product being flagged as 'Is dangerous goods'.</p>
+                    <group name="dangerous_goods_group">
+                        <group name="dangerous_goods_warning">
+                            <field name="dangerous_goods_warning" />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

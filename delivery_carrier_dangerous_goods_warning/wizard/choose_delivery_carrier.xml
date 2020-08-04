@@ -9,9 +9,9 @@
                 <div
                     role="alert"
                     class="alert alert-warning"
-                    attrs="{'invisible': [('adr_message', '=', False)]}"
+                    attrs="{'invisible': [('dangerous_goods_warning', '=', '')]}"
                 >
-                    <field name="adr_message" nolabel="1" />
+                    <field name="dangerous_goods_warning" nolabel="1" />
                 </div>
             </xpath>
         </field>
