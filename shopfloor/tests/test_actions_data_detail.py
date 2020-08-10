@@ -125,7 +125,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
 
     def test_data_package(self):
         package = self.move_a.move_line_ids.package_id
-        package.product_packaging_id = self.packaging.id
+        package.packaging_id = self.packaging.id
         package.package_storage_type_id = self.storage_type_pallet
         # package.invalidate_cache()
         data = self.data_detail.package_detail(package, picking=self.picking)
@@ -139,7 +139,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
             "id": package.id,
             "name": package.name,
             "move_line_count": 1,
-            "packaging": self.data_detail.packaging(package.product_packaging_id),
+            "packaging": self.data_detail.packaging(package.packaging_id),
             "weight": 0,
             "pickings": self.data_detail.pickings(pickings),
             "move_lines": self.data_detail.move_lines(lines),
@@ -186,7 +186,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
     def test_data_move_line_package(self):
         move_line = self.move_a.move_line_ids
         result_package = self.env["stock.quant.package"].create(
-            {"product_packaging_id": self.packaging.id}
+            {"packaging_id": self.packaging.id}
         )
         move_line.write({"qty_done": 3.0, "result_package_id": result_package.id})
         data = self.data_detail.move_line(move_line)
