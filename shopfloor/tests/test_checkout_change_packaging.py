@@ -51,7 +51,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
         cls._fill_stock_for_moves(cls.picking.move_lines, in_package=True)
         cls.picking.action_assign()
         cls.package = cls.picking.move_line_ids.result_package_id
-        cls.package.product_packaging_id = cls.packaging_pallet
+        cls.package.packaging_id = cls.packaging_pallet
 
     def test_list_packaging_ok(self):
         response = self.service.dispatch(
@@ -101,7 +101,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             },
         )
         self.assertRecordValues(
-            self.package, [{"product_packaging_id": self.packaging_inner_box.id}]
+            self.package, [{"packaging_id": self.packaging_inner_box.id}]
         )
         self.assert_response(
             response,

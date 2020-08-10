@@ -94,7 +94,7 @@ class DataAction(Component):
     @property
     def _package_packaging_parser(self):
         return [
-            ("product_packaging_id:packaging", self._packaging_parser),
+            ("packaging_id:packaging", self._packaging_parser),
         ]
 
     def packaging(self, record, **kw):
