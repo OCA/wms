@@ -35,6 +35,7 @@ class ActionsDataCaseBase(CommonCase):
                 (cls.product_d, 10),
             ]
         )
+        cls.picking.scheduled_date = "2020-08-03"
         # put product A in a package
         cls.move_a = cls.picking.move_lines[0]
         cls._fill_stock_for_moves(cls.move_a, in_package=True)
