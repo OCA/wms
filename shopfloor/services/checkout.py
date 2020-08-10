@@ -625,7 +625,7 @@ class Checkout(Component):
 
     def _prepare_vals_package_from_packaging(self, packaging):
         return {
-            "product_packaging_id": packaging.id,
+            "packaging_id": packaging.id,
             "lngth": packaging.lngth,
             "width": packaging.width,
             "height": packaging.height,
@@ -895,7 +895,7 @@ class Checkout(Component):
             return self._response_for_summary(
                 picking, message=self.msg_store.record_not_found()
             )
-        package.product_packaging_id = packaging
+        package.packaging_id = packaging
         return self._response_for_summary(
             picking,
             message={
