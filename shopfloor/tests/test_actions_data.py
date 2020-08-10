@@ -35,6 +35,7 @@ class ActionsDataCaseBase(CommonCase):
                 (cls.product_d, 10),
             ]
         )
+        cls.picking.scheduled_date = "2020-08-03"
         # put product A in a package
         cls.move_a = cls.picking.move_lines[0]
         cls._fill_stock_for_moves(cls.move_a, in_package=True)
@@ -142,7 +143,7 @@ class ActionsDataCase(ActionsDataCaseBase):
 
     def test_data_package(self):
         package = self.move_a.move_line_ids.package_id
-        package.product_packaging_id = self.packaging.id
+        package.packaging_id = self.packaging.id
         package.package_storage_type_id = self.storage_type_pallet
         data = self.data.package(package, picking=self.picking, with_packaging=True)
         self.assert_schema(self.schema.package(with_packaging=True), data)
@@ -150,7 +151,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "id": package.id,
             "name": package.name,
             "move_line_count": 1,
-            "packaging": self._expected_packaging(package.product_packaging_id),
+            "packaging": self._expected_packaging(package.packaging_id),
             "storage_type": self._expected_storage_type(
                 package.package_storage_type_id
             ),
@@ -222,7 +223,7 @@ class ActionsDataCase(ActionsDataCaseBase):
     def test_data_move_line_package(self):
         move_line = self.move_a.move_line_ids
         result_package = self.env["stock.quant.package"].create(
-            {"product_packaging_id": self.packaging.id}
+            {"packaging_id": self.packaging.id}
         )
         move_line.write({"qty_done": 3.0, "result_package_id": result_package.id})
         data = self.data.move_line(move_line)
