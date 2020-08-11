@@ -8,17 +8,17 @@
             <group name="sales_person" position="inside">
                 <field name="contains_dangerous_goods" groups="base.group_no_one" />
             </group>
-            <field name="payment_term_id" position="after">
+            <header position="after">
                 <field name="display_dangerous_goods_carrier_warning" invisible="1" />
                 <div
                     role="alert"
                     class="alert alert-warning"
                     attrs="{'invisible': [('display_dangerous_goods_carrier_warning', '=', False)]}"
-                    colspan="2"
+                    style="margin-bottom:0px;"
                 >
                     <field name="dangerous_goods_carrier_warning" nolabel="1" />
                 </div>
-            </field>
+            </header>
         </field>
     </record>
 </odoo>

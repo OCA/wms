@@ -32,7 +32,7 @@ class DangerousGoodCarrierWarningMixin(models.AbstractModel):
     def _search_contains_dangerous_goods(self, operator, value):
         if operator not in ["=", "!="] or not isinstance(value, bool):
             raise UserError(_("Operation not supported"))
-        line_model = self[self.line_field_name]._name
+        line_model = self[self._line_field_name]._name
         dangerous_goods_lines = self.env[line_model].search(
             [("product_id.is_dangerous_good", "=", True)]
         )
@@ -40,7 +40,7 @@ class DangerousGoodCarrierWarningMixin(models.AbstractModel):
             (
                 "id",
                 "in" if value else "not in",
-                dangerous_goods_lines.mapped(self.line_doc_m2o_field_name).ids,
+                dangerous_goods_lines.mapped(self._line_doc_m2o_field_name).ids,
             )
         ]
 
