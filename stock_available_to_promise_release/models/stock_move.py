@@ -174,10 +174,6 @@ class StockMove(models.Model):
                 )._release_split(remaining)
                 backorder_links[new_move.picking_id] = move.picking_id
 
-            if not move.picking_id.printed:
-                # Make sure the flag is set even if no split happens.
-                move.picking_id.printed = True
-
             values = move._prepare_procurement_values()
             procurement_requests.append(
                 self.env["procurement.group"].Procurement(
@@ -198,11 +194,26 @@ class StockMove(models.Model):
 
         self.env["procurement.group"].run_defer(procurement_requests)
 
-        while pulled_moves:
-            pulled_moves._action_assign()
-            pulled_moves = pulled_moves.mapped("move_orig_ids")
+        # Set all transfers released to "printed", consider the work has
+        # been planned and started and another "release" of moves should
+        # (for instance) merge new pickings with this "round of release".
+        self._release_set_printed(pulled_moves)
+        self._release_assign_moves(pulled_moves)
 
         return True
+
+    def _release_set_printed(self, moves):
+        picking_ids = set()
+        while moves:
+            picking_ids.update(moves.mapped("picking_id").ids)
+            moves = moves.mapped("move_orig_ids")
+        pickings = self.env["stock.picking"].browse(picking_ids)
+        pickings.filtered(lambda p: not p.printed).printed = True
+
+    def _release_assign_moves(self, moves):
+        while moves:
+            moves._action_assign()
+            moves = moves.mapped("move_orig_ids")
 
     def _release_split(self, remaining_qty):
         """Split move and create a new picking for it.
