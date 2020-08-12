@@ -123,7 +123,7 @@ Vue.component("picking-summary-content", {
             </v-expansion-panel>
         </v-expansion-panels>
         <div v-else v-for="(subrec, i) in record.records">
-            <picking-summary-product-detail :record="subrec" :index="index" :count="count" :key="make_component_key(['raw', subrec.id, i])" />
+            <picking-summary-product-detail :record="subrec" :index="index" :count="count" :key="make_component_key(['raw', index, subrec.id, i])" />
         </div>
     </div>
     `,
