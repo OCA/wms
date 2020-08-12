@@ -4,16 +4,21 @@ Vue.component("detail-lot", {
     mixins: [ItemDetailMixin],
     methods: {
         lot_detail_fields() {
+            const self = this;
             return [
                 {
                     path: "expire_date",
                     label: "Expiry date",
-                    renderer: this.utils.misc.render_field_date,
+                    renderer: function(rec, field) {
+                        return self.utils.misc.render_field_date(rec, field);
+                    },
                 },
                 {
                     path: "removal_date",
                     label: "Removal date",
-                    renderer: this.utils.misc.render_field_date,
+                    renderer: function(rec, field) {
+                        return self.utils.misc.render_field_date(rec, field);
+                    },
                 },
             ];
         },
