@@ -337,6 +337,7 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
                     "state": "waiting",
                     "location_id": self.wh.wh_output_stock_loc_id.id,
                     "location_dest_id": self.loc_customer.id,
+                    "printed": False,
                 }
             ],
         )
@@ -358,9 +359,12 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
                     "state": "assigned",
                     "location_id": self.wh.lot_stock_id.id,
                     "location_dest_id": self.wh.wh_output_stock_loc_id.id,
+                    "printed": True,
                 }
             ],
         )
+        # the released customer picking is set to "printed"
+        self.assertRecordValues(cust_picking, [{"printed": True}])
         # the split once stays in the original location
         self.assertRecordValues(
             split_cust_picking,
@@ -369,6 +373,7 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
                     "state": "waiting",
                     "location_id": self.wh.wh_output_stock_loc_id.id,
                     "location_dest_id": self.loc_customer.id,
+                    "printed": False,
                 }
             ],
         )
