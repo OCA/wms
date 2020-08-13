@@ -1,3 +1,4 @@
+from . import res_partner
 from . import shopfloor_menu
 from . import shopfloor_log
 from . import stock_picking_type
