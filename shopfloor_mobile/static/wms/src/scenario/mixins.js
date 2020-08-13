@@ -35,15 +35,18 @@ export var ScenarioBaseMixin = {
     },
     computed: {
         menu_item_id: function() {
-            const menu_id = this.$route.params.menu_id;
-            /*
-            It's very handy for demo data to reference always the same menu id.
-            Since the menu id is included in the URL
-            it allows to reload the page w/out having to refresh menu items.
-            This way you can define multiple scenario w/ different menu items
-            and you can tag them with the same reusable label (eg: case_1).
-             */
-            return typeof menu_id == "number" ? parseInt(menu_id, 10) : menu_id;
+            const menu_id = Number.parseInt(this.$route.params.menu_id, 10);
+            if (Number.isNaN(menu_id)) {
+                /*
+                It's very handy for demo data to reference always the same menu id.
+                Since the menu id is included in the URL
+                it allows to reload the page w/out having to refresh menu items.
+                This way you can define multiple scenario w/ different menu items
+                and you can tag them with the same reusable label (eg: case_1).
+                */
+                return this.$route.params.menu_id;
+            }
+            return menu_id;
         },
         odoo: function() {
             const odoo_params = {
@@ -219,7 +222,10 @@ export var ScenarioBaseMixin = {
             this._state_bind_events();
             // notify root
             // TODO: maybe not needed after introducing routing
-            this.$root.$emit("state:change", state_key);
+            this.$root.$emit("state:change", this._global_state_key(state_key));
+        },
+        _global_state_key: function(state_key) {
+            return this.usage + "/" + state_key;
         },
         // TODO: refactor all transitions to state `wait_call` with this call
         wait_call: function(promise, callback) {
@@ -339,7 +345,8 @@ export var ScenarioBaseMixin = {
                 const self = this;
                 _.each(self.state.events, function(handler, name) {
                     if (typeof handler == "string") handler = self.state[handler];
-                    const event_name = self.state.key + ":" + name;
+                    const event_name =
+                        self._global_state_key(self.state.key) + ":" + name;
                     const existing = self.$root.event_hub._events[event_name];
                     if (handler && _.isEmpty(existing)) {
                         self.$root.event_hub.$on(event_name, handler);
@@ -347,134 +354,5 @@ export var ScenarioBaseMixin = {
                 });
             }
         },
-    },
-};
-
-// TODO: move it back it the transfer scenario when we get rid of
-// the putaway scenario
-export var SinglePackStatesMixin = {
-    data: function() {
-        return {
-            states: {
-                // Generic state for when to start w/ scanning a pack
-                start_scan_pack: {
-                    display_info: {
-                        title: "Start by scanning a pack",
-                        scan_placeholder: "Scan pack",
-                    },
-                    enter: () => {
-                        this.state_reset_data();
-                    },
-                    on_scan: scanned => {
-                        this.wait_call(
-                            this.odoo.call("start", {barcode: scanned.text})
-                        );
-                    },
-                },
-                // Generic state for when to start w/ scanning a pack or loc
-                start_scan_pack_or_location: {
-                    display_info: {
-                        title: "Start by scanning a pack or a location",
-                        scan_placeholder: "Scan pack",
-                    },
-                    enter: () => {
-                        this.state_reset_data();
-                    },
-                    on_scan: scanned => {
-                        this.wait_call(
-                            this.odoo.call("start", {barcode: scanned.text})
-                        );
-                    },
-                },
-                // TODO: these states should be splitted out to a specific mixin
-                // for putaway and pack transfer
-                scan_location: {
-                    display_info: {
-                        title: "Set a location",
-                        scan_placeholder: "Scan location",
-                        show_cancel_button: true,
-                    },
-                    on_scan: (scanned, confirmation = false) => {
-                        this.state_set_data({location_barcode: scanned.text});
-                        this.wait_call(
-                            this.odoo.call("validate", {
-                                package_level_id: this.state.data.id,
-                                location_barcode: scanned.text,
-                                confirmation: confirmation,
-                            })
-                        );
-                    },
-                    on_cancel: () => {
-                        this.wait_call(
-                            this.odoo.call("cancel", {
-                                package_level_id: this.state.data.id,
-                            })
-                        );
-                    },
-                },
-                confirm_location: {
-                    display_info: {
-                        scan_placeholder: "Scan location",
-                    },
-                    enter: () => {
-                        this.need_confirmation = true;
-                    },
-                    exit: () => {
-                        this.need_confirmation = false;
-                    },
-                    on_user_confirm: answer => {
-                        if (answer == "yes") {
-                            // Reuse data from scan_location and
-                            // simulate the event that on_scan expects
-                            const scan_data = this.state_get_data("scan_location");
-                            this.state.on_scan(
-                                {
-                                    text: scan_data.location_barcode,
-                                },
-                                true
-                            );
-                        } else {
-                            this.state_to("scan_location");
-                        }
-                    },
-                    on_scan: (scanned, confirmation = true) => {
-                        this.on_state_exit();
-                        // FIXME: use state_load
-                        this.current_state_key = "scan_location";
-                        this.state.on_scan(scanned, confirmation);
-                    },
-                },
-                confirm_start: {
-                    display_info: {
-                        title: "Confirm start and select a location",
-                        scan_placeholder: "Scan location",
-                    },
-                    enter: () => {
-                        this.need_confirmation = true;
-                    },
-                    exit: () => {
-                        this.need_confirmation = false;
-                    },
-                    on_user_confirm: answer => {
-                        if (answer == "yes") {
-                            // Keep the data received from previous state but not the question answered
-                            const state_data = this.state_get_data(
-                                this.current_state_key
-                            );
-                            state_data.message = {};
-                            this.state_set_data(state_data, "scan_location");
-                            this.state_to("scan_location");
-                        } else {
-                            this.state_to("start");
-                        }
-                    },
-                    on_scan: scanned => {
-                        this.on_state_exit();
-                        this.current_state_key = "scan_location";
-                        this.state.on_scan(scanned);
-                    },
-                },
-            },
-        };
     },
 };

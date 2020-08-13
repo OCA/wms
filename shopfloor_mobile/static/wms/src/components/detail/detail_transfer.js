@@ -4,12 +4,15 @@ Vue.component("detail-transfer", {
     mixins: [ItemDetailMixin],
     methods: {
         detail_fields() {
+            const self = this;
             return [
                 {
                     path: "scheduled_date",
                     label: "Scheduled on",
                     klass: "loud-label",
-                    renderer: this.utils.misc.render_field_date,
+                    renderer: function(rec, field) {
+                        return self.utils.misc.render_field_date(rec, field);
+                    },
                 },
                 {
                     path: "operation_type.name",

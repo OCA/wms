@@ -20,7 +20,7 @@ export var Profile = Vue.component("profile", {
             </template>
             <manual-select
                 :records="$root.profiles"
-                :options="{initValue: current_profile_id, showActions: false}"
+                :options="{initValue: current_profile_id, showActions: false, required: true}"
                 v-on:select="on_select"
                 />
 
@@ -46,9 +46,10 @@ export var Profile = Vue.component("profile", {
     `,
     methods: {
         on_select: function(selected) {
-            const self = this;
-            this.$root.trigger("profile:selected", selected, true);
-            self.$root.$router.push({name: "home"});
+            if (!_.isEmpty(selected)) {
+                this.$root.trigger("profile:selected", selected, true);
+                this.$root.$router.push({name: "home"});
+            }
         },
         logout: function() {
             this.$root.logout();
