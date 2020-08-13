@@ -135,6 +135,15 @@ Vue.component("manual-select", {
                 ? this.selected.includes(rec.id)
                 : this.selected === rec.id;
         },
+        is_disabled(rec) {
+            // If value is required and there's no btn to confirm block unselecting the checkbox
+            return (
+                !this.opts.multiple &&
+                !this.opts.showActions &&
+                this.opts.required &&
+                this.is_selected(rec)
+            );
+        },
         selected_color_klass(modifier) {
             return (
                 "active " +
@@ -158,6 +167,7 @@ Vue.component("manual-select", {
                 initSelectAll: false,
                 initValue: null,
                 multiple: false,
+                required: false,
                 showCounters: false,
                 list_item_component: "list-item",
                 list_item_actions: [],
@@ -253,7 +263,8 @@ Vue.component("manual-select", {
                                         :input-value="rec.id"
                                         :true-value="rec.id"
                                         :value="rec.id"
-                                        :checked="is_selected(rec)"
+                                        :checked="is_selected(rec) ? 'checked' : null"
+                                        :disabled="is_disabled(rec) ? 'disabled' : null"
                                         :key="make_component_key(['list-checkbox', index, rec.id])"
                                         @click="handleSelect(rec, $event)"
                                         />
