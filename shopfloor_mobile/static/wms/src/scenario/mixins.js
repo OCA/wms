@@ -222,7 +222,10 @@ export var ScenarioBaseMixin = {
             this._state_bind_events();
             // notify root
             // TODO: maybe not needed after introducing routing
-            this.$root.$emit("state:change", state_key);
+            this.$root.$emit("state:change", this._global_state_key(state_key));
+        },
+        _global_state_key: function(state_key) {
+            return this.usage + "/" + state_key;
         },
         // TODO: refactor all transitions to state `wait_call` with this call
         wait_call: function(promise, callback) {
@@ -342,7 +345,8 @@ export var ScenarioBaseMixin = {
                 const self = this;
                 _.each(self.state.events, function(handler, name) {
                     if (typeof handler == "string") handler = self.state[handler];
-                    const event_name = self.state.key + ":" + name;
+                    const event_name =
+                        self._global_state_key(self.state.key) + ":" + name;
                     const existing = self.$root.event_hub._events[event_name];
                     if (handler && _.isEmpty(existing)) {
                         self.$root.event_hub.$on(event_name, handler);
