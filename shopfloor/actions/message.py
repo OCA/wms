@@ -427,7 +427,7 @@ class MessageAction(Component):
     def buffer_complete(self):
         return {
             "message_type": "success",
-            "body": _("Scanned destination packages processed."),
+            "body": _("All packages processed."),
         }
 
     def picking_type_complete(self, picking_type):
