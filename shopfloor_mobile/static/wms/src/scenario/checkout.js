@@ -66,6 +66,9 @@ export var Checkout = Vue.component("checkout", {
             </div>
 
             <div v-if="state_is('select_package')">
+                <v-alert type="info" tile v-if="state.data.packing_info" class="packing-info">
+                    <p v-text="state.data.packing_info" />
+                </v-alert>
                 <detail-picking-select
                     :record="state.data.picking"
                     :select_records="state.data.selected_move_lines"
