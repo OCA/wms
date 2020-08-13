@@ -1,5 +1,7 @@
 class CheckoutSelectPackageMixin:
-    def _assert_selected_response(self, response, selected_lines, message=None):
+    def _assert_selected_response(
+        self, response, selected_lines, message=None, packing_info=False
+    ):
         picking = selected_lines.mapped("picking_id")
         self.assert_response(
             response,
@@ -9,12 +11,18 @@ class CheckoutSelectPackageMixin:
                     self._move_line_data(ml) for ml in selected_lines
                 ],
                 "picking": self._picking_summary_data(picking),
+                "packing_info": picking.shopfloor_packing_info if packing_info else "",
             },
             message=message,
         )
 
     def _assert_selected_qties(
-        self, response, selected_lines, lines_quantities, message=None
+        self,
+        response,
+        selected_lines,
+        lines_quantities,
+        message=None,
+        packing_info=False,
     ):
         picking = selected_lines.mapped("picking_id")
         deselected_lines = picking.move_line_ids - selected_lines
@@ -23,9 +31,13 @@ class CheckoutSelectPackageMixin:
             self.assertEqual(line.qty_done, quantity)
         for line in deselected_lines:
             self.assertEqual(line.qty_done, 0, "Lines deselected must have no qty done")
-        self._assert_selected_response(response, selected_lines, message=message)
+        self._assert_selected_response(
+            response, selected_lines, message=message, packing_info=packing_info
+        )
 
-    def _assert_selected(self, response, selected_lines, message=None):
+    def _assert_selected(
+        self, response, selected_lines, message=None, packing_info=False
+    ):
         picking = selected_lines.mapped("picking_id")
         unselected_lines = picking.move_line_ids - selected_lines
         for line in selected_lines:
@@ -36,4 +48,6 @@ class CheckoutSelectPackageMixin:
             )
         for line in unselected_lines:
             self.assertEqual(line.qty_done, 0)
-        self._assert_selected_response(response, selected_lines, message=message)
+        self._assert_selected_response(
+            response, selected_lines, message=message, packing_info=packing_info
+        )
