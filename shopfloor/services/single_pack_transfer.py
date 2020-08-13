@@ -27,30 +27,21 @@ class SinglePackTransfer(Component):
         return self._response(next_state="start", message=message, popup=popup)
 
     def _response_for_confirm_start(self, package_level, message=None):
-        return self._response(
-            next_state="confirm_start",
-            data=self._data_after_package_scanned(package_level),
-            message=message,
-        )
+        data = self._data_after_package_scanned(package_level)
+        data["confirmation_required"] = True
+        return self._response(next_state="start", data=data, message=message,)
 
-    def _response_for_scan_location(self, package_level, message=None):
-        return self._response(
-            next_state="scan_location",
-            data=self._data_after_package_scanned(package_level),
-            message=message,
-        )
-
-    def _response_for_confirm_location(self, package_level, message=None):
-        return self._response(
-            next_state="confirm_location",
-            data=self._data_after_package_scanned(package_level),
-            message=message,
-        )
+    def _response_for_scan_location(
+        self, package_level, message=None, confirmation_required=False
+    ):
+        data = self._data_after_package_scanned(package_level)
+        data["confirmation_required"] = confirmation_required
+        return self._response(next_state="scan_location", data=data, message=message,)
 
     def _response_for_show_completion_info(self, message=None):
         return self._response(next_state="show_completion_info", message=message)
 
-    def start(self, barcode):
+    def start(self, barcode, confirmation=False):
         search = self.actions_for("search")
         picking_types = self.picking_types
         location = search.location_from_scan(barcode)
@@ -107,8 +98,7 @@ class SinglePackTransfer(Component):
             return self._response_for_start(
                 message=self.msg_store.no_pending_operation_for_pack(package)
             )
-
-        if package_level.is_done:
+        if package_level.is_done and not confirmation:
             return self._response_for_confirm_start(
                 package_level, message=self.msg_store.already_running_ask_confirmation()
             )
@@ -188,8 +178,9 @@ class SinglePackTransfer(Component):
                 if not scanned_location.is_sublocation_of(move.location_dest_id):
                     move.location_dest_id = scanned_location.id
             else:
-                return self._response_for_confirm_location(
+                return self._response_for_scan_location(
                     package_level,
+                    confirmation_required=True,
                     message=self.msg_store.confirm_location_changed(
                         move_line.location_dest_id, scanned_location
                     ),
@@ -241,7 +232,10 @@ class SinglePackTransferValidator(Component):
     _usage = "single_pack_transfer.validator"
 
     def start(self):
-        return {"barcode": {"type": "string", "nullable": False, "required": True}}
+        return {
+            "barcode": {"type": "string", "nullable": False, "required": True},
+            "confirmation": {"type": "boolean", "required": False},
+        }
 
     def cancel(self):
         return {
@@ -269,32 +263,40 @@ class SinglePackTransferValidatorResponse(Component):
         With the schema of the data send to the client to transition
         to the next state.
         """
+        schema_for_start = self._schema_for_package_level_details()
+        schema_for_start.update(self._schema_confirmation_required())
+        schema_for_scan_location = self._schema_for_package_level_details(required=True)
+        schema_for_scan_location.update(self._schema_confirmation_required())
         return {
-            "start": {},
-            "confirm_start": self._schema_for_package_level_details,
-            "scan_location": self._schema_for_package_level_details,
-            "confirm_location": self._schema_for_package_level_details,
+            "start": schema_for_start,
+            "scan_location": schema_for_scan_location,
         }
 
     def start(self):
-        return self._response_schema(next_states={"confirm_start", "scan_location"})
+        return self._response_schema(next_states={"start", "scan_location"})
 
     def cancel(self):
         return self._response_schema(next_states={"start"})
 
     def validate(self):
-        return self._response_schema(
-            next_states={"scan_location", "start", "confirm_location"}
-        )
+        return self._response_schema(next_states={"scan_location", "start"})
 
-    @property
-    def _schema_for_package_level_details(self):
+    def _schema_for_package_level_details(self, required=False):
         # TODO use schemas.package_level (but the "name" moves in "package.name")
         return {
-            "id": {"required": True, "type": "integer"},
-            "name": {"type": "string", "nullable": False, "required": True},
+            "id": {"required": required, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": required},
             "location_src": {"type": "dict", "schema": self.schemas.location()},
             "location_dest": {"type": "dict", "schema": self.schemas.location()},
             "product": {"type": "dict", "schema": self.schemas.product()},
             "picking": {"type": "dict", "schema": self.schemas.picking()},
+        }
+
+    def _schema_confirmation_required(self):
+        return {
+            "confirmation_required": {
+                "type": "boolean",
+                "nullable": True,
+                "required": False,
+            },
         }
