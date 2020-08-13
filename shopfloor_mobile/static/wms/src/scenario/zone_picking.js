@@ -505,7 +505,7 @@ export var ZonePicking = Vue.component("zone-picking", {
                     },
                     on_scan: scanned => {
                         this.wait_call(
-                            this.odoo.call("unload_scan_destination", {
+                            this.odoo.call("unload_set_destination", {
                                 zone_location_id: this.current_zone_location().id,
                                 picking_type_id: this.current_picking_type().id,
                                 package_id: this.state.data.move_line.package_src.id,
