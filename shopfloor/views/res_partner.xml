@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_partner_shopfloor_form" model="ir.ui.view">
+        <field name="name">partner.shopfloor.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']/group" position="inside">
+                <group string="Shopfloor" name="shopfloor">
+                    <field name="shopfloor_packing_info" />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
