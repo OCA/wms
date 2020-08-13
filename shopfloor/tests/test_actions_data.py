@@ -48,6 +48,7 @@ class ActionsDataCaseBase(CommonCase):
         # product D is raw
         cls.move_d = cls.picking.move_lines[3]
         cls._fill_stock_for_moves(cls.move_d)
+        (cls.move_a + cls.move_b + cls.move_c + cls.move_d).write({"priority": "1"})
         cls.picking.action_assign()
 
     def assert_schema(self, schema, data):
