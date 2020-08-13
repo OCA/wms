@@ -102,8 +102,8 @@ class SinglePackTransfer(Component):
             return self._response_for_confirm_start(
                 package_level, message=self.msg_store.already_running_ask_confirmation()
             )
-
-        package_level.is_done = True
+        if not package_level.is_done:
+            package_level.is_done = True
         return self._response_for_scan_location(package_level)
 
     def _create_package_level(self, package):
