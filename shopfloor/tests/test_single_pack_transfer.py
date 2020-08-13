@@ -109,7 +109,10 @@ class SinglePackTransferCase(CommonCase):
         self.assert_response(
             response,
             next_state="scan_location",
-            data=self._response_package_level_data(package_level),
+            data=dict(
+                self._response_package_level_data(package_level),
+                confirmation_required=False,
+            ),
         )
 
     def test_start_no_operation(self):
@@ -182,6 +185,7 @@ class SinglePackTransferCase(CommonCase):
             ),
             "picking": self.data.picking(package_level.picking_id),
             "product": self.data.product(self.product_a),
+            "confirmation_required": False,
         }
 
         self.assert_response(
@@ -363,13 +367,16 @@ class SinglePackTransferCase(CommonCase):
 
         self.assert_response(
             response,
-            next_state="confirm_start",
+            next_state="start",
             message={
                 "message_type": "warning",
                 "body": "Operation's already running."
                 " Would you like to take it over?",
             },
-            data=self._response_package_level_data(package_level),
+            data=dict(
+                self._response_package_level_data(package_level),
+                confirmation_required=True,
+            ),
         )
 
     def test_validate(self):
@@ -601,9 +608,12 @@ class SinglePackTransferCase(CommonCase):
         )
         self.assert_response(
             response,
-            next_state="confirm_location",
+            next_state="scan_location",
             message=message,
-            data=self._response_package_level_data(package_level),
+            data=dict(
+                self._response_package_level_data(package_level),
+                confirmation_required=True,
+            ),
         )
 
     def test_validate_location_with_confirm(self):
