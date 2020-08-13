@@ -71,9 +71,15 @@ class Checkout(Component):
             data={
                 "selected_move_lines": self._data_for_move_lines(lines.sorted()),
                 "picking": self.data.picking(picking),
+                "packing_info": self._data_for_packing_info(picking),
             },
             message=message,
         )
+
+    def _data_for_packing_info(self, picking):
+        if picking.picking_type_id.shopfloor_display_packing_info:
+            return picking.shopfloor_packing_info or ""
+        return ""
 
     def _response_for_select_dest_package(self, picking, move_lines, message=None):
         packages = picking.mapped("move_line_ids.package_id") | picking.mapped(
@@ -1181,7 +1187,10 @@ class ShopfloorCheckoutValidatorResponse(Component):
             "select_document": {},
             "manual_selection": self._schema_selection_list,
             "select_line": self._schema_stock_picking_details,
-            "select_package": self._schema_selected_lines,
+            "select_package": dict(
+                self._schema_selected_lines,
+                packing_info={"type": "string", "nullable": True},
+            ),
             "change_quantity": self._schema_selected_lines,
             "select_dest_package": self._schema_select_package,
             "summary": self._schema_summary,
