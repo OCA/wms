@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class StockPickingType(models.Model):
@@ -13,3 +13,10 @@ class StockPickingType(models.Model):
         " Discrete order Picking), the zero check step will be activated when"
         " a location becomes empty after a move.",
     )
+
+    @api.constrains("show_entire_packs")
+    def _check_move_entire_packages(self):
+        menu_items = self.env["shopfloor.menu"].search(
+            [("picking_type_ids", "in", self.ids)]
+        )
+        menu_items._check_move_entire_packages()

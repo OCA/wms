@@ -64,3 +64,29 @@ class ShopfloorMenu(models.Model):
                 raise exceptions.ValidationError(
                     _("Creation of moves is not allowed for menu {}.").format(menu.name)
                 )
+
+    # ATM the goal is to block using single_pack_transfer (SPT)
+    # w/out moving the full pkg.
+    # Is not optimal, but is mandatory as long as SPT does not work w/ moves
+    # but only w/ package levels.
+    # TODO: add tests.
+    _move_entire_packs_scenario = "single_pack_transfer"
+
+    @api.constrains("scenario", "picking_type_ids")
+    def _check_move_entire_packages(self):
+        _get_scenario_name = self._fields["scenario"].convert_to_export
+        for menu in self:
+            # TODO: these kind of checks should be provided by the scenario itself.
+            bad_picking_types = [
+                x.name for x in menu.picking_type_ids if not x.show_entire_packs
+            ]
+            if menu.scenario in self._move_entire_packs_scenario and bad_picking_types:
+                scenario_name = _get_scenario_name(menu["scenario"], menu)
+                raise exceptions.ValidationError(
+                    _(
+                        "Scenario `{}` require(s) "
+                        "'Move Entire Packages' to be enabled.\n"
+                        "These type(s) do not satisfy this constraint: \n{}.\n"
+                        "Please, adjust your configuration."
+                    ).format(scenario_name, "\n- ".join(bad_picking_types))
+                )
