@@ -248,11 +248,11 @@ class ZonePicking(Component, ChangePackLotMixin):
     def _sort_key_move_lines(order):
         """Return a `(sort_keys_func, reverse)` tuple for move lines."""
         if order == "priority":
-            return lambda line: line.move_id.priority, True
+            return lambda line: line.move_id.priority or "", True
         elif order == "location":
             return (
                 lambda line: (
-                    line.location_id.shopfloor_picking_sequence,
+                    line.location_id.shopfloor_picking_sequence or "",
                     line.location_id.name,
                 ),
                 False,
