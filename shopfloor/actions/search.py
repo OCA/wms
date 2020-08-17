@@ -13,6 +13,8 @@ class SearchAction(Component):
     _usage = "search"
 
     def location_from_scan(self, barcode):
+        if not barcode:
+            return self.env["stock.location"].browse()
         return self.env["stock.location"].search([("barcode", "=", barcode)])
 
     def package_from_scan(self, barcode):
