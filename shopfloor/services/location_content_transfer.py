@@ -179,6 +179,7 @@ class LocationContentTransfer(Component):
             ("location_id", "=", location.id),
             ("qty_done", "=", 0),
             ("state", "in", ("assigned", "partially_available")),
+            ("shopfloor_user_id", "=", False),
         ]
 
     def _find_location_move_lines(self, location):
@@ -227,6 +228,10 @@ class LocationContentTransfer(Component):
 
         When move lines and package levels have different destinations, the
         first line without package level or package level is sent to the client.
+
+        The selected move lines to process are bound to the current operator,
+        this will allow another operator to find unprocessed lines in parallel
+        and not overlap with current ones.
 
         Transitions:
         * start: location not found, ...
@@ -291,6 +296,7 @@ class LocationContentTransfer(Component):
 
         for line in move_lines:
             line.qty_done = line.product_uom_qty
+            line.shopfloor_user_id = self.env.uid
 
         pickings.user_id = self.env.uid
 
