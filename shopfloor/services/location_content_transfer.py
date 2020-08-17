@@ -139,7 +139,9 @@ class LocationContentTransfer(Component):
         return next_content
 
     def _router_single_or_all_destination(self, pickings, message=None):
-        if len(pickings.mapped("move_line_ids.location_dest_id")) == 1:
+        location_dest = pickings.mapped("move_line_ids.location_dest_id")
+        location_src = pickings.mapped("move_line_ids.location_id")
+        if len(location_dest) == len(location_src) == 1:
             return self._response_for_scan_destination_all(pickings, message=message)
         else:
             return self._response_for_start_single(pickings, message=message)
