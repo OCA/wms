@@ -243,7 +243,7 @@ class LocationContentTransfer(Component):
         if not location:
             return self._response_for_start(message=self.msg_store.barcode_not_found())
         move_lines = self._find_location_move_lines(location)
-        pickings = move_lines.mapped("picking_id")
+        pickings = move_lines.picking_id
         picking_types = pickings.mapped("picking_type_id")
 
         if len(picking_types) > 1:
@@ -260,6 +260,13 @@ class LocationContentTransfer(Component):
                     "body": _("This location content can't be moved using this menu."),
                 }
             )
+        # Ensure we process move lines related to pickings having only one source
+        # location among all their move lines. If there are different source
+        # locations, we put the move lines we are interested in in a separate picking.
+        # This is required as we can only deal within this scenario with pickings
+        # that share the same source location.
+        pickings = move_lines._split_pickings_from_source_location()
+
         # If the following criteria are met:
         #   - no move lines have been found
         #   - the menu is configured to allow the creation of moves
@@ -276,15 +283,16 @@ class LocationContentTransfer(Component):
             )
         ):
             new_moves = self._create_moves_from_location(location)
+            if not new_moves:
+                return self._response_for_start(
+                    message=self.msg_store.no_pack_in_location(location)
+                )
             new_moves._action_confirm(merge=False)
             new_moves._action_assign()
             if not all([x.state == "assigned" for x in new_moves]):
                 new_moves._action_cancel()
                 return self._response_for_start(
-                    message={
-                        "message_type": "error",
-                        "body": _("New move lines cannot be assigned: canceled."),
-                    }
+                    message=self.msg_store.new_move_lines_not_assigned()
                 )
             pickings = new_moves.mapped("picking_id")
             move_lines = new_moves.move_line_ids
