@@ -52,9 +52,9 @@ class CommonCase(SavepointCase, ComponentMixin):
     maxDiff = None
 
     @contextmanager
-    def work_on_services(self, **params):
+    def work_on_services(self, env=None, **params):
         params = params or {}
-        collection = _PseudoCollection("shopfloor.service", self.env)
+        collection = _PseudoCollection("shopfloor.service", env or self.env)
         yield WorkContext(
             model_name="rest.service.registration", collection=collection, **params
         )
