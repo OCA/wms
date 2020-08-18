@@ -447,3 +447,9 @@ class MessageAction(Component):
             "message_type": "error",
             "body": _("Lines have different destination location."),
         }
+
+    def new_move_lines_not_assigned(self):
+        return {
+            "message_type": "error",
+            "body": _("New move lines cannot be assigned: canceled."),
+        }
