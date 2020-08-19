@@ -70,7 +70,7 @@ class ShopfloorMenu(models.Model):
     # Is not optimal, but is mandatory as long as SPT does not work w/ moves
     # but only w/ package levels.
     # TODO: add tests.
-    _move_entire_packs_scenario = "single_pack_transfer"
+    _move_entire_packs_scenario = ("single_pack_transfer", "delivery")
 
     @api.constrains("scenario", "picking_type_ids")
     def _check_move_entire_packages(self):
