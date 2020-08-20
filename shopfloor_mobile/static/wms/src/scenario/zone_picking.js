@@ -86,7 +86,10 @@ const template_mobile = `
             />
         <v-card v-if="state_in(['set_line_destination', 'change_pack_lot'])"
                 class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
-            <packaging-qty-picker :options="utils.misc.move_line_qty_picker_options(state.data.move_line)" />
+            <packaging-qty-picker
+                :key="make_state_component_key(['packaging-qty-picker', state.data.move_line.id])"
+                :options="utils.misc.move_line_qty_picker_options(state.data.move_line)"
+                />
         </v-card>
         <item-detail-card
             v-if="state_in(['change_pack_lot'])"
