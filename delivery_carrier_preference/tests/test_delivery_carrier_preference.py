@@ -2,16 +2,15 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo.tests.common import Form
 
-from odoo.addons.stock_available_to_promise_release.tests.test_reservation import (
-    TestAvailableToPromiseRelease,
+from odoo.addons.stock_available_to_promise_release.tests.common import (
+    PromiseReleaseCommonCase,
 )
 
 
-class TestSaleDeliveryCarrierPreference(TestAvailableToPromiseRelease):
+class TestSaleDeliveryCarrierPreference(PromiseReleaseCommonCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
         ref = cls.env.ref
         cls.partner = ref("base.res_partner_12")
         cls.product = ref("product.product_product_20")
@@ -60,11 +59,13 @@ class TestSaleDeliveryCarrierPreference(TestAvailableToPromiseRelease):
                 "max_weight": 0.0,
             }
         )
-        cls.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
-        cls.outgoing_pick_type = cls.wh.out_type_id
-        cls.outgoing_pick_type.write(
-            {"force_recompute_preferred_carrier_on_release": True}
+        cls.wh.delivery_route_id.write(
+            {
+                "available_to_promise_defer_pull": True,
+                "force_recompute_preferred_carrier_on_release": True,
+            }
         )
+        cls.outgoing_pick_type = cls.wh.out_type_id
 
     @classmethod
     def _create_sale_order(cls):
@@ -130,8 +131,12 @@ class TestSaleDeliveryCarrierPreference(TestAvailableToPromiseRelease):
         self.assertAlmostEqual(delivery_pick.estimated_shipping_weight, 20.0)
         delivery_pick.release_available_to_promise()
         self.assertEqual(delivery_pick.carrier_id, self.normal_delivery_carrier)
+        self.assertEqual(
+            delivery_pick.group_id.carrier_id, self.normal_delivery_carrier
+        )
         backorder = delivery_pick.backorder_ids
         self.assertEqual(backorder.carrier_id, self.super_fast_carrier)
+        self.assertEqual(backorder.group_id.carrier_id, self.super_fast_carrier)
 
     def test_delivery_add_preferred_carrier_picking_domain(self):
         """
