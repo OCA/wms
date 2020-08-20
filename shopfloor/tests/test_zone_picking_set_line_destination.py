@@ -188,13 +188,12 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
 
         Then the operator move 6 qty on 10, we get:
 
-            move qty 6 (done):
-                -> move_line qty 6 from location X
-            move qty 4 (assigned):
-                -> move_line qty 4 from location Y (remaining)
+            an error because we can move only full qty by location
+            and only a package barcode is allowed on scan.
         """
         zone_location = self.zone_location
         picking_type = self.picking3.picking_type_id
+        barcode = self.packing_location.barcode
         moves_before = self.picking3.move_lines
         self.assertEqual(len(moves_before), 1)
         self.assertEqual(len(moves_before.move_line_ids), 1)
@@ -207,30 +206,17 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "zone_location_id": zone_location.id,
                 "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
-                "barcode": self.packing_location.barcode,
+                "barcode": barcode,
                 "quantity": 6,
                 "confirmation": False,
             },
         )
-        # Check picking data (move has been split in two, 6 done and 4 remaining)
-        moves_after = self.picking3.move_lines
-        self.assertEqual(len(moves_after), 2)
-        self.assertEqual(moves_after[0].product_uom_qty, 6)
-        self.assertEqual(moves_after[0].state, "done")
-        self.assertEqual(moves_after[0].move_line_ids.product_uom_qty, 0)
-        self.assertEqual(moves_after[1].product_uom_qty, 4)
-        self.assertEqual(moves_after[1].state, "assigned")
-        self.assertEqual(moves_after[1].move_line_ids.product_uom_qty, 4)
-        self.assertEqual(move_line.qty_done, 6)
-        # Check response
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
-        self.assert_response_select_line(
+        self.assert_response_set_line_destination(
             response,
             zone_location,
             picking_type,
-            move_lines,
-            message=self.service.msg_store.confirm_pack_moved(),
+            move_line,
+            message=self.service.msg_store.package_not_found_for_barcode(barcode),
         )
 
     def test_set_destination_location_several_move_line_full_qty(self):
@@ -308,56 +294,35 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
 
         Then the operator move 4 qty on 6 (from the first move line), we get:
 
-            move qty 4 (done):
-                -> move_line qty 4 from location X
-            move qty 2 (assigned):
-                -> move_line qty 2 from location X (remaining)
-            move qty 4 (assigned):
-                -> move_line qty 4 from location Y (untouched)
+            an error because we can move only full qty by location
+            and only a package barcode is allowed on scan.
         """
         zone_location = self.zone_location
         picking_type = self.picking4.picking_type_id
+        barcode = self.packing_location.barcode
         moves_before = self.picking4.move_lines
         self.assertEqual(len(moves_before), 1)  # 10 qty
         self.assertEqual(len(moves_before.move_line_ids), 2)  # 6+4 qty
         move_line = moves_before.move_line_ids[0]
         # we need a destination package if we want to scan a destination location
         move_line.result_package_id = self.free_package
-        other_move_line = moves_before.move_line_ids[1]
         response = self.service.dispatch(
             "set_destination",
             params={
                 "zone_location_id": zone_location.id,
                 "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
-                "barcode": self.packing_location.barcode,
+                "barcode": barcode,
                 "quantity": 4,  # 4/6 qty
                 "confirmation": False,
             },
         )
-        # Check picking data (move has been split in three, 4 done, 2+4 remaining)
-        moves_after = self.picking4.move_lines
-        self.assertEqual(len(moves_after), 3)
-        self.assertEqual(moves_after[0].product_uom_qty, 4)
-        self.assertEqual(moves_after[0].state, "done")
-        self.assertEqual(moves_after[0].move_line_ids.product_uom_qty, 0)
-        self.assertEqual(moves_after[1].product_uom_qty, 4)
-        self.assertEqual(moves_after[1].state, "assigned")
-        self.assertEqual(moves_after[1].move_line_ids.product_uom_qty, 4)
-        self.assertEqual(moves_after[2].product_uom_qty, 2)
-        self.assertEqual(moves_after[2].state, "assigned")
-        self.assertEqual(moves_after[2].move_line_ids.product_uom_qty, 2)
-        self.assertEqual(move_line.qty_done, 4)
-        self.assertNotEqual(move_line.move_id, other_move_line.move_id)
-        # Check response
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
-        self.assert_response_select_line(
+        self.assert_response_set_line_destination(
             response,
             zone_location,
             picking_type,
-            move_lines,
-            message=self.service.msg_store.confirm_pack_moved(),
+            move_line,
+            message=self.service.msg_store.package_not_found_for_barcode(barcode),
         )
 
     def test_set_destination_location_zero_check(self):
