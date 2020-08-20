@@ -194,6 +194,7 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
         return {
             usage: "location_content_transfer",
             initial_state_key: "scan_location",
+            scan_destination_qty: 0,
             states: {
                 init: {
                     enter: () => {
@@ -271,7 +272,7 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                         qty_edit: "on_qty_update",
                     },
                     on_qty_update: qty => {
-                        this.state.data.destination_qty = qty;
+                        this.scan_destination_qty = parseInt(qty, 10);
                     },
                     on_scan: scanned => {
                         let endpoint, endpoint_data;
@@ -291,9 +292,7 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                                 location_id: data.move_line.location_src.id,
                                 barcode: scanned.text,
                                 confirmation: data.confirmation_required,
-                                quantity:
-                                    this.state.data.destination_qty ||
-                                    data.move_line.quantity,
+                                quantity: this.scan_destination_qty,
                             };
                         }
                         this.wait_call(this.odoo.call(endpoint, endpoint_data));
