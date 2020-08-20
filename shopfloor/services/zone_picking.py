@@ -1266,6 +1266,9 @@ class ZonePicking(Component, ChangePackLotMixin):
             return self._response_for_start(
                 message=self.msg_store.picking_type_complete(picking_type)
             )
+        # TODO: when we have no lines here
+        # we should not redirect to `unload_set_destination`
+        # because we'll have nothing to display (currently the UI is broken).
         return self._response_for_unload_set_destination(
             zone_location,
             picking_type,
