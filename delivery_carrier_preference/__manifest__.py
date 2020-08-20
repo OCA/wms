@@ -21,6 +21,6 @@
         "views/delivery_carrier_preference.xml",
         "views/stock_move.xml",
         "views/stock_picking.xml",
-        "views/stock_picking_type.xml",
+        "views/stock_location_route.xml",
     ],
 }

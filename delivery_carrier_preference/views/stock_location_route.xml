@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="stock_location_route_form_view" model="ir.ui.view">
+        <field name="name">stock.location.route.form</field>
+        <field name="model">stock.location.route</field>
+        <field name="inherit_id" ref="stock.stock_location_route_form_view" />
+        <field name="arch" type="xml">
+            <field name="available_to_promise_defer_pull" position="after">
+                <field
+                    name="force_recompute_preferred_carrier_on_release"
+                    attrs="{'invisible': [('available_to_promise_defer_pull', '=', False)]}"
+                />
+            </field>
+        </field>
+    </record>
+</odoo>
