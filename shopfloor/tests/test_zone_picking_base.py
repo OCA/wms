@@ -168,14 +168,9 @@ class ZonePickingCommonCase(CommonCase):
     def _assert_response_select_picking_type(
         self, state, response, zone_location, picking_types, message=None
     ):
+        data = self.service._data_for_select_picking_type(zone_location, picking_types)
         self.assert_response(
-            response,
-            next_state=state,
-            data={
-                "zone_location": self.data.location(zone_location),
-                "picking_types": self.data.picking_types(picking_types),
-            },
-            message=message,
+            response, next_state=state, data=data, message=message,
         )
 
     def assert_response_select_picking_type(
