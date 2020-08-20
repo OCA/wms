@@ -3,9 +3,9 @@
 from odoo import fields, models
 
 
-class PickingType(models.Model):
+class StockLocationRoute(models.Model):
 
-    _inherit = "stock.picking.type"
+    _inherit = "stock.location.route"
 
     force_recompute_preferred_carrier_on_release = fields.Boolean(
         string="Force recomputation of preferred carrier.",
