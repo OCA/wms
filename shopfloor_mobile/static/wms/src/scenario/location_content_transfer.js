@@ -48,7 +48,10 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
 
                     <v-card v-if="wrapped_context()._type == 'move_line'"
                             class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
-                        <packaging-qty-picker :options="utils.misc.move_line_qty_picker_options(rec)" />
+                        <packaging-qty-picker
+                            :key="make_state_component_key(['packaging-qty-picker', rec.id])"
+                            :options="utils.misc.move_line_qty_picker_options(rec)"
+                            />
                     </v-card>
 
                     <line-actions-popup

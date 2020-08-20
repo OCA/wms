@@ -226,7 +226,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
         </v-col>
     </v-row>
     <v-row class="packaging-value">
-        <v-col class="packaging" v-for="pkg in sorted_packaging">
+        <v-col class="packaging" v-for="pkg in sorted_packaging" :key="make_component_key([pkg.id])">
             <div class="inner-wrapper">
                 <div class="input-wrapper">
                     <input type="text" class="pkg-value"
@@ -251,7 +251,7 @@ export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-displ
     },
     template: `
 <div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode: '', 'd-inline']">
-    <span class="packaging" v-for="(pkg, index) in sorted_packaging">
+    <span class="packaging" v-for="(pkg, index) in sorted_packaging" :key="make_component_key([pkg.id])">
         <span class="pkg-qty" v-text="qty_by_pkg[pkg.id] || 0" />
         <span class="pkg-name" v-text="pkg.name" /><span class="sep" v-if="index != Object.keys(sorted_packaging).length - 1">, </span>
     </span>
