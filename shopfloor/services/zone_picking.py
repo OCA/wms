@@ -180,11 +180,38 @@ class ZonePicking(Component, ChangePackLotMixin):
         )
 
     def _data_for_select_picking_type(self, zone_location, picking_types):
-        return {
+        data = {
             "zone_location": self.data.location(zone_location),
             # available picking types to choose from
             "picking_types": self.data.picking_types(picking_types),
         }
+        for datum in data["picking_types"]:
+            picking_type = self.env["stock.picking.type"].browse(datum["id"])
+            zone_lines = self._picking_type_zone_lines(zone_location, picking_type)
+            priority_lines = zone_lines.filtered(
+                lambda line: line.picking_id.priority in ["2", "3"]
+            )
+
+            datum.update(
+                {
+                    "lines_count": len(zone_lines),
+                    "picking_count": len(zone_lines.mapped("picking_id")),
+                    "priority_lines_count": len(priority_lines),
+                    "priority_picking_count": len(priority_lines.mapped("picking_id")),
+                }
+            )
+        return data
+
+    def _picking_type_zone_lines(self, zone_location, picking_type):
+        return self.env["stock.move.line"].search(
+            [
+                ("location_id", "=", zone_location.id),
+                # we have auto_join on picking_id
+                ("picking_id.picking_type_id", "=", picking_type.id),
+                ("qty_done", "=", 0),
+                ("state", "in", ("assigned", "partially_available")),
+            ]
+        )
 
     def _data_for_move_line(self, zone_location, picking_type, move_line):
         return {
@@ -1401,9 +1428,18 @@ class ShopfloorZonePickingValidatorResponse(Component):
 
     @property
     def _schema_for_select_picking_type(self):
+        picking_type = self.schemas.picking_type()
+        picking_type.update(
+            {
+                "lines_count": {"type": "float", "required": True},
+                "picking_count": {"type": "float", "required": True},
+                "priority_lines_count": {"type": "float", "required": True},
+                "priority_picking_count": {"type": "float", "required": True},
+            }
+        )
         schema = {
             "zone_location": self.schemas._schema_dict_of(self.schemas.location()),
-            "picking_types": self.schemas._schema_list_of(self.schemas.picking_type()),
+            "picking_types": self.schemas._schema_list_of(picking_type),
         }
         return schema
 

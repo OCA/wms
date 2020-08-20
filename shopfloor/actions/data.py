@@ -234,41 +234,4 @@ class DataAction(Component):
         return [
             "id",
             "name",
-            ("lines_count", self._picking_type_lines_count),
-            ("picking_count", self._picking_type_picking_count),
-            ("priority_lines_count", self._picking_type_priority_lines_count),
-            ("priority_picking_count", self._picking_type_priority_picking_count),
         ]
-
-    def _picking_type_lines_count(self, rec, field):
-        return self.env["stock.move.line"].search_count(
-            [
-                ("picking_id.picking_type_id", "=", rec.id),
-                ("qty_done", "=", 0),
-                ("state", "in", ("assigned", "partially_available")),
-            ]
-        )
-
-    def _picking_type_priority_lines_count(self, rec, field):
-        return self.env["stock.move.line"].search_count(
-            [
-                ("picking_id.picking_type_id", "=", rec.id),
-                ("qty_done", "=", 0),
-                ("state", "in", ("assigned", "partially_available")),
-                ("picking_id.priority", "in", ["2", "3"]),
-            ]
-        )
-
-    def _picking_type_picking_count(self, rec, field):
-        return self.env["stock.picking"].search_count(
-            [("picking_type_id", "=", rec.id), ("state", "not in", ("cancel", "done"))]
-        )
-
-    def _picking_type_priority_picking_count(self, rec, field):
-        return self.env["stock.picking"].search_count(
-            [
-                ("picking_type_id", "=", rec.id),
-                ("state", "not in", ("cancel", "done")),
-                ("priority", "in", ["2", "3"]),
-            ]
-        )
