@@ -41,6 +41,7 @@ class StockMove(models.Model):
             existing_carriers[picking.id] = picking.carrier_id.id
 
             picking.add_preferred_carrier()
+            picking.group_id.carrier_id = picking.carrier_id
 
         res = super().release_available_to_promise()
 
