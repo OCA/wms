@@ -254,7 +254,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
                         ).quantity;
                     },
                     on_qty_edit: qty => {
-                        this.scan_destination_qty = parseInt(qty);
+                        this.scan_destination_qty = parseInt(qty, 10);
                     },
                     on_scan: scanned => {
                         this.wait_call(
