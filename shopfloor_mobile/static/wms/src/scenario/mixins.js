@@ -342,8 +342,13 @@ export var ScenarioBaseMixin = {
             this.$set(this.messages, "popup", {body: null});
         },
         display_app_error: function(error) {
+            let parts = [error.status, error.name];
+            if (error.description) {
+                parts.push("\n" + error.description);
+            }
+            parts.push("\nURL: " + error.response.url);
             this.set_message({
-                body: error.description,
+                body: parts.join(" "),
                 message_type: "error",
             });
         },
