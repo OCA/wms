@@ -3,12 +3,16 @@ Vue.component("user-information", {
     props: ["message"],
     template: `
     <v-alert :type="alert_type" tile>
-        {{ _.result(message, "body") }}
+        <p v-for="line in message_lines" v-if="line" v-text="line"/>
     </v-alert>
     `,
     computed: {
         alert_type: function() {
             return _.result(this.message, "message_type", "info");
+        },
+        message_lines: function() {
+            const msg = _.result(this.message, "body");
+            return msg ? msg.split("\n") : [];
         },
     },
 });
