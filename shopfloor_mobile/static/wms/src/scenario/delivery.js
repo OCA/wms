@@ -164,9 +164,6 @@ export var Delivery = Vue.component("checkout", {
                         title: "Start by scanning something",
                         scan_placeholder: "Scan pack / picking",
                     },
-                    enter: () => {
-                        this.state_reset_data();
-                    },
                     on_scan: scanned => {
                         this.wait_call(
                             this.odoo.call("scan_deliver", {barcode: scanned.text})

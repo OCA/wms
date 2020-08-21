@@ -198,7 +198,6 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
             states: {
                 init: {
                     enter: () => {
-                        this.state_reset_data();
                         this.wait_call(this.odoo.call("start_or_recover"));
                     },
                 },

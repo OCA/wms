@@ -154,9 +154,6 @@ export var ClusterPicking = Vue.component("cluster-picking", {
             scan_destination_qty: 1,
             states: {
                 start: {
-                    enter: () => {
-                        this.state_reset_data();
-                    },
                     on_get_work: evt => {
                         this.wait_call(this.odoo.call("find_batch"));
                     },
