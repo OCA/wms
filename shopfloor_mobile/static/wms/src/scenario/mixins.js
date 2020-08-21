@@ -317,15 +317,14 @@ export var ScenarioBaseMixin = {
             this.reset_notification();
         },
         set_message: function(message) {
-            this.messages.message = message;
+            this.$set(this.messages, "message", message);
         },
         set_popup: function(popup) {
-            this.messages.popup.body = popup.body;
+            this.$set(this.messages, "popup", popup);
         },
         reset_notification: function() {
-            this.messages.message = null;
-            this.messages.message_type = null;
-            this.messages.popup.body = null;
+            this.$set(this.messages, "message", {body: null, message_type: null});
+            this.$set(this.messages, "popup", {body: null});
         },
         display_app_error: function(error) {
             this.set_message({
