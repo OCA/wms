@@ -1,6 +1,8 @@
 from odoo import _
 
 
+# TODO use a component instead (in actions)
+# delegation > inheritance ;)
 class ChangePackLotMixin:
     def _change_lot(self, move_line, lot, response_ok_func, response_error_func):
         """Change the lot on the move line.
