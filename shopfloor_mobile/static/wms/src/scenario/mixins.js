@@ -14,6 +14,7 @@ export var ScenarioBaseMixin = {
             show_reset_button: false,
             initial_state_key: "start",
             current_state_key: "",
+            current_state: {},
             states: {},
             usage: "", // Match component usage on odoo,
             menu_item_id: false,
@@ -57,14 +58,16 @@ export var ScenarioBaseMixin = {
         they are not really data that changes and then we can make them
         standalone object w/ their own class.
         */
-        state: function() {
-            const state = {
-                key: this.current_state_key,
-                data: this.state_get_data(),
-            };
-            _.extend(state, this.states[this.current_state_key]);
-            _.defaults(state, {display_info: {}});
-            return state;
+        state: {
+            get: function() {
+                if (_.isEmpty(this.current_state)) {
+                    return this._make_current_state();
+                }
+                return this.current_state;
+            },
+            set: function(data) {
+                this.current_state = this._make_current_state(data);
+            },
         },
         search_input_placeholder: function() {
             const placeholder = this.state.display_info.scan_placeholder;
@@ -111,6 +114,15 @@ export var ScenarioBaseMixin = {
                 return this.$route.params.menu_id;
             }
             return menu_id;
+        },
+        _make_current_state: function(data = {}) {
+            const state = {
+                key: this.current_state_key,
+                data: data,
+            };
+            _.extend(state, this.states[this.current_state_key]);
+            _.defaults(state, {display_info: {}});
+            return state;
         },
         screen_klass: function() {
             return this.usage + " " + "state-" + this.state.key;
@@ -160,14 +172,12 @@ export var ScenarioBaseMixin = {
         state_reset_data: function(state_key) {
             state_key = state_key || this.current_state_key;
             this.$root.$storage.remove(this.storage_key(state_key));
-            this.$set(this.states[state_key], "data", {});
         },
         _state_get_data: function(state_key) {
             return this.$root.$storage.get(this.storage_key(state_key), {});
         },
         _state_set_data: function(state_key, v) {
             this.$root.$storage.set(this.storage_key(state_key), v);
-            this.$set(this.states[state_key], "data", v);
         },
         state_get_data: function(state_key) {
             state_key = state_key || this.current_state_key;
@@ -223,6 +233,7 @@ export var ScenarioBaseMixin = {
             }
             this.on_state_exit();
             this.current_state_key = state_key;
+            this.state = this.state_get_data();
             if (promise) {
                 promise.then();
             } else {
@@ -276,6 +287,9 @@ export var ScenarioBaseMixin = {
             }
             if (this.current_state_key != state_key) {
                 this.state_to(state_key);
+            } else {
+                // Refresh computed state anyway
+                this.state = this.state_get_data();
             }
         },
         on_call_error: function(result) {
