@@ -92,12 +92,6 @@ class StockReceptionScreen(models.Model):
     current_filter_product = fields.Char(string="Filter product", copy=False)
     # current move
     current_move_id = fields.Many2one(comodel_name="stock.move", copy=False)
-    current_move_location_dest_id = fields.Many2one(
-        comodel_name="stock.location",
-        string="Destination",
-        compute="_compute_current_move_location_dest_id",
-        inverse="_inverse_current_move_location_dest_id",
-    )
     current_move_product_id = fields.Many2one(
         related="current_move_id.product_id", string="Move's product"
     )
@@ -113,6 +107,12 @@ class StockReceptionScreen(models.Model):
     )
     # current move line
     current_move_line_id = fields.Many2one(comodel_name="stock.move.line", copy=False)
+    current_move_line_location_dest_id = fields.Many2one(
+        comodel_name="stock.location",
+        string="Destination",
+        compute="_compute_current_move_line_location_dest_id",
+        inverse="_inverse_current_move_line_location_dest_id",
+    )
     current_move_line_lot_id = fields.Many2one(
         related="current_move_line_id.lot_id", string="Lot NumBer"
     )
@@ -181,19 +181,21 @@ class StockReceptionScreen(models.Model):
                 step_descr = steps[self.current_step]["label"]
                 wiz.current_step_descr = step_descr
 
-    @api.depends("current_move_id.location_dest_id")
-    def _compute_current_move_location_dest_id(self):
-        for wiz in self:
-            move = wiz.current_move_id
-            wiz.current_move_location_dest_id = move.location_dest_id
-            location = move.location_dest_id._get_putaway_strategy(move.product_id)
-            if location:
-                wiz.current_move_location_dest_id = location
-
-    def _inverse_current_move_location_dest_id(self):
+    @api.depends("current_move_line_id.location_dest_id")
+    def _compute_current_move_line_location_dest_id(self):
         for wiz in self:
             move_line = wiz.current_move_line_id
-            move_line.location_dest_id = wiz.current_move_location_dest_id
+            wiz.current_move_line_location_dest_id = move_line.location_dest_id
+            location = move_line.location_dest_id._get_putaway_strategy(
+                move_line.product_id
+            )
+            if location:
+                wiz.current_move_line_location_dest_id = location
+
+    def _inverse_current_move_line_location_dest_id(self):
+        for wiz in self:
+            move_line = wiz.current_move_line_id
+            move_line.location_dest_id = wiz.current_move_line_location_dest_id
 
     @api.depends("current_move_line_id.qty_done")
     def _compute_current_move_line_qty_status(self):
@@ -503,7 +505,7 @@ class StockReceptionScreen(models.Model):
         self.next_step()
 
     def process_set_location(self):
-        if not self.current_move_location_dest_id:
+        if not self.current_move_line_location_dest_id:
             self.env.user.notify_warning(
                 message="", title=_("You have to set the destination.")
             )

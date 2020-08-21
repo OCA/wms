@@ -77,7 +77,7 @@ class TestReceptionScreen(SavepointCase):
         # Check that a destination location is defined by default
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_location")
-        self.assertTrue(self.screen.current_move_location_dest_id)
+        self.assertTrue(self.screen.current_move_line_location_dest_id)
         # Set a package
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_package")

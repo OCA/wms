@@ -163,10 +163,10 @@
                                         attrs="{'invisible': [('current_move_line_qty_status', '!=', 'gt')]}"
                                     />
                                 </div>
-                                <label for="current_move_location_dest_id" />
+                                <label for="current_move_line_location_dest_id" />
                                 <div>
                                     <field
-                                        name="current_move_location_dest_id"
+                                        name="current_move_line_location_dest_id"
                                         class="mr8"
                                         attrs="{
                       'required': [('current_step', '=', 'set_location')],
