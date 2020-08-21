@@ -183,11 +183,18 @@ export var ScenarioBaseMixin = {
             state_key = state_key || this.current_state_key;
             return this._state_get_data(state_key);
         },
-        state_set_data: function(data, state_key) {
+        state_set_data: function(data, state_key, reload_state = true) {
             state_key = state_key || this.current_state_key;
             const new_data = _.merge({}, this.state_get_data(state_key), data);
             // Trigger update of computed `state.data` and refreshes the UI.
             this._state_set_data(state_key, new_data);
+            if (reload_state) {
+                this._reload_current_state();
+            }
+        },
+        _reload_current_state: function() {
+            // Force re-computation of current state data.
+            this.state = this.state_get_data();
         },
         state_reset_data_all() {
             const self = this;
@@ -234,7 +241,7 @@ export var ScenarioBaseMixin = {
             }
             this.on_state_exit();
             this.current_state_key = state_key;
-            this.state = this.state_get_data();
+            this._reload_current_state();
             if (promise) {
                 promise.then();
             } else {
@@ -277,7 +284,8 @@ export var ScenarioBaseMixin = {
                     : result.next_state;
             if (!_.isUndefined(result.data)) {
                 this.state_reset_data(state_key);
-                this.state_set_data(result.data[state_key], state_key);
+                // Set state data but delay state wrapper reload.
+                this.state_set_data(result.data[state_key], state_key, false);
             }
             this.reset_notification();
             if (result.message) {
@@ -286,11 +294,12 @@ export var ScenarioBaseMixin = {
             if (result.popup) {
                 this.set_popup(result.popup);
             }
-            if (state_key != this.$route.params.state) {
-                this.state_to(state_key);
+            if (state_key == this.$route.params.state) {
+                // As we stay on the same state, just refresh state wrapper data
+                this._reload_current_state();
             } else {
-                // Refresh computed state anyway
-                this.state = this.state_get_data();
+                // Move to new state, data will be refreshed right after.
+                this.state_to(state_key);
             }
         },
         on_call_error: function(result) {
