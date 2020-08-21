@@ -273,9 +273,6 @@ export var Checkout = Vue.component("checkout", {
                         title: "Choose an order to pack",
                         scan_placeholder: "Scan pack / picking / location",
                     },
-                    enter: () => {
-                        this.state_reset_data();
-                    },
                     on_scan: scanned => {
                         this.wait_call(
                             this.odoo.call("scan_document", {barcode: scanned.text})

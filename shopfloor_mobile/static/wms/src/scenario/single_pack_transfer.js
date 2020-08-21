@@ -11,9 +11,6 @@ export var SinglePackStatesMixin = {
                         title: "Start by scanning a pack or a location",
                         scan_placeholder: "Scan pack",
                     },
-                    enter: () => {
-                        this.state_reset_data();
-                    },
                     on_scan: scanned => {
                         const data = this.state.data;
                         this.wait_call(
