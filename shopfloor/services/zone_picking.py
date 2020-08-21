@@ -530,7 +530,7 @@ class ZonePicking(Component, ChangePackLotMixin):
             )
             return (location_changed, response)
         # destination location set to the scanned one
-        move_line.location_dest_id = location
+        self._write_destination_on_lines(move_line, location)
         # the quantity done is set to the passed quantity
         move_line.qty_done = quantity
         # if the move has other move lines, it is split to have only this move line
@@ -1056,7 +1056,7 @@ class ZonePicking(Component, ChangePackLotMixin):
                         confirmation_required=True,
                     )
                 # the scanned location is still valid, use it
-                buffer_lines.location_dest_id = location
+                self._write_destination_on_lines(buffer_lines, location)
             # set lines to done + refresh buffer lines (should be empty)
             moves = buffer_lines.mapped("move_id")
             moves.with_context(_sf_no_backorder=True)._action_done()
@@ -1067,6 +1067,10 @@ class ZonePicking(Component, ChangePackLotMixin):
         return self._set_destination_all_response(
             zone_location, picking_type, buffer_lines, message=message,
         )
+
+    def _write_destination_on_lines(self, lines, location):
+        self._lock_lines(lines)
+        lines.location_dest_id = location
 
     def unload_split(self, zone_location_id, picking_type_id):
         """Indicates that now the buffer must be treated line per line
@@ -1177,7 +1181,7 @@ class ZonePicking(Component, ChangePackLotMixin):
             unload_single_message=self.msg_store.barcode_no_match(package.name),
         )
 
-    def _unload_set_destination_lock_lines(self, lines):
+    def _lock_lines(self, lines):
         """Lock move lines"""
         sql = "SELECT id FROM %s WHERE ID IN %%s FOR UPDATE" % lines._table
         self.env.cr.execute(sql, (tuple(lines.ids),), log_exceptions=False)
@@ -1245,8 +1249,7 @@ class ZonePicking(Component, ChangePackLotMixin):
                         confirmation_required=True,
                     )
                 # the scanned location is valid, use it
-                self._unload_set_destination_lock_lines(buffer_lines)
-                buffer_lines.location_dest_id = location
+                self._write_destination_on_lines(buffer_lines, location)
             # set lines to done + refresh buffer lines (should be empty)
             moves = buffer_lines.mapped("move_id")
             moves.with_context(_sf_no_backorder=True)._action_done()

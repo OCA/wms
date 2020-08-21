@@ -1074,7 +1074,7 @@ class ClusterPicking(Component, ChangePackLotMixin):
             batch, package, lines, barcode, confirmation=confirmation
         )
 
-    def _unload_scan_destination_lock_lines(self, lines):
+    def _lock_lines(self, lines):
         """Lock move lines"""
         sql = "SELECT id FROM %s WHERE ID IN %%s FOR UPDATE" % lines._table
         self.env.cr.execute(sql, (tuple(lines.ids),), log_exceptions=False)
@@ -1083,7 +1083,7 @@ class ClusterPicking(Component, ChangePackLotMixin):
         self, batch, package, lines, barcode, confirmation=False
     ):
         # Lock move lines that will be updated
-        self._unload_scan_destination_lock_lines(lines)
+        self._lock_lines(lines)
         first_line = fields.first(lines)
         picking_type = fields.first(batch.picking_ids).picking_type_id
         scanned_location = self.actions_for("search").location_from_scan(barcode)

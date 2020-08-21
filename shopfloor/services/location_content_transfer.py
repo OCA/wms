@@ -67,7 +67,7 @@ class LocationContentTransfer(Component):
         if confirmation_required and not message:
             message = self.msg_store.need_confirmation()
         return self._response(
-            next_state="scan_destination_all", data=data, message=message,
+            next_state="scan_destination_all", data=data, message=message
         )
 
     def _response_for_start_single(self, pickings, message=None):
@@ -97,9 +97,7 @@ class LocationContentTransfer(Component):
         data["confirmation_required"] = confirmation_required
         if confirmation_required and not message:
             message = self.msg_store.need_confirmation()
-        return self._response(
-            next_state="scan_destination", data=data, message=message,
-        )
+        return self._response(next_state="scan_destination", data=data, message=message)
 
     def _data_content_all_for_location(self, pickings):
         sorter = self.actions_for("location_content_transfer.sorter")
@@ -320,10 +318,19 @@ class LocationContentTransfer(Component):
         )
         return lines
 
-    def _set_destination_lines(self, pickings, move_lines, dest_location):
-        move_lines.location_dest_id = dest_location
-        move_lines.package_level_id.location_dest_id = dest_location
+    # hook used in module shopfloor_checkout_sync
+    def _write_destination_on_lines(self, lines, location):
+        lines.location_dest_id = location
+        lines.package_level_id.location_dest_id = location
+
+    def _set_all_destination_lines_and_done(self, pickings, move_lines, dest_location):
+        self._write_destination_on_lines(move_lines, dest_location)
         pickings.action_done()
+
+    def _lock_lines(self, lines):
+        """Lock move lines"""
+        sql = "SELECT id FROM %s WHERE ID IN %%s FOR UPDATE" % lines._table
+        self.env.cr.execute(sql, (tuple(lines.ids),), log_exceptions=False)
 
     def set_destination_all(self, location_id, barcode, confirmation=False):
         """Scan destination location for all the moves of the location
@@ -359,8 +366,9 @@ class LocationContentTransfer(Component):
             return self._response_for_scan_destination_all(
                 pickings, confirmation_required=True
             )
+        self._lock_lines(move_lines)
 
-        self._set_destination_lines(pickings, move_lines, scanned_location)
+        self._set_all_destination_lines_and_done(pickings, move_lines, scanned_location)
 
         return self._response_for_start(
             message=self.msg_store.location_content_transfer_complete(
@@ -542,13 +550,14 @@ class LocationContentTransfer(Component):
                     location, package_level, confirmation_required=True
                 )
         package_move_lines = package_level.move_line_ids
+        self._lock_lines(package_move_lines)
         package_moves = package_move_lines.mapped("move_id")
         for package_move in package_moves:
             # Check if there is no other lines linked to the move others than
             # the lines related to the package itself. In such case we have to
             # split the move to process only the lines related to the package.
             package_move.split_other_move_lines(package_move_lines)
-        package_level.location_dest_id = scanned_location
+        self._write_destination_on_lines(package_level.move_line_ids, scanned_location)
         package_moves.with_context(_sf_no_backorder=True)._action_done()
         move_lines = self._find_transfer_move_lines(location)
         message = self.msg_store.location_content_transfer_item_complete(
@@ -605,6 +614,9 @@ class LocationContentTransfer(Component):
                 return self._response_for_scan_destination(
                     location, move_line, confirmation_required=True
                 )
+
+        self._lock_lines(move_line)
+
         if quantity < move_line.product_uom_qty:
             # Update the current move line quantity and
             # put the scanned qty (the move line) in its own move
@@ -620,7 +632,7 @@ class LocationContentTransfer(Component):
             for remaining_move_line in current_move.move_line_ids:
                 remaining_move_line.qty_done = remaining_move_line.product_uom_qty
         move_line.move_id.split_other_move_lines(move_line)
-        move_line.location_dest_id = scanned_location
+        self._write_destination_on_lines(move_line, scanned_location)
         move_line.move_id.with_context(_sf_no_backorder=True)._action_done()
         move_lines = self._find_transfer_move_lines(location)
         message = self.msg_store.location_content_transfer_item_complete(
