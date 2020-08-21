@@ -21,7 +21,7 @@ export var Delivery = Vue.component("checkout", {
                     :records_grouped="deliver_picking_summary_records_grouped(state.data.picking)"
                     :action_cancel_package_key="'package_src'"
                     :list_options="deliver_move_line_list_options(state.data.picking)"
-                    :key="make_state_component_key(['manual-select', 'detail-picking', current_picking().id])"
+                    :key="make_state_component_key(['picking-summary', 'detail-picking', state.data.picking.id])"
                     />
             </div>
             <div v-if="state_is('manual_selection')">
@@ -29,7 +29,7 @@ export var Delivery = Vue.component("checkout", {
                     class="with-progress-bar"
                     :records="state.visible_records(this.state.data.pickings)"
                     :options="manual_select_options()"
-                    :key="make_state_component_key(['manual-select'])"
+                    :key="make_state_component_key(['delivery', 'manual-select'])"
                     />
             </div>
             <div class="button-list button-vertical-list full">

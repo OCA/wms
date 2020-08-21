@@ -38,7 +38,7 @@ export var Checkout = Vue.component("checkout", {
                 <manual-select
                     :records="state.data.pickings"
                     :options="manual_selection_manual_select_options()"
-                    :key="make_state_component_key(['manual-select'])"
+                    :key="make_state_component_key(['checkout', 'manual-select'])"
                     />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
