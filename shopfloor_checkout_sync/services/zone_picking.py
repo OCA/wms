@@ -4,8 +4,8 @@
 from odoo.addons.component.core import Component
 
 
-class ClusterPicking(Component):
-    _inherit = "shopfloor.cluster.picking"
+class ZonePicking(Component):
+    _inherit = "shopfloor.zone.picking"
 
     @property
     def checkout_sync(self):
@@ -14,6 +14,6 @@ class ClusterPicking(Component):
     def _lock_lines(self, lines):
         super()._lock_lines(self.checkout_sync._all_lines_to_lock(lines))
 
-    def _unload_write_destination_on_lines(self, lines, location):
+    def _write_destination_on_lines(self, lines, location):
         self.checkout_sync._sync_checkout(lines, location)
-        return super()._unload_write_destination_on_lines(lines, location)
+        return super()._write_destination_on_lines(lines, location)
