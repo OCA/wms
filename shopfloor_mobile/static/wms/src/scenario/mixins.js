@@ -14,9 +14,19 @@ export var ScenarioBaseMixin = {
             show_reset_button: false,
             initial_state_key: "start",
             current_state_key: "",
+            current_state: {},
             states: {},
             usage: "", // Match component usage on odoo,
+            menu_item_id: false,
         };
+    },
+    watch: {
+        "$route.params.menu_id": function() {
+            this.menu_item_id = this._get_menu_item_id();
+        },
+    },
+    created: function() {
+        this.menu_item_id = this._get_menu_item_id();
     },
     beforeRouteUpdate(to, from, next) {
         // Load initial state
@@ -34,20 +44,6 @@ export var ScenarioBaseMixin = {
         this._state_load(this.$route.params.state);
     },
     computed: {
-        menu_item_id: function() {
-            const menu_id = Number.parseInt(this.$route.params.menu_id, 10);
-            if (Number.isNaN(menu_id)) {
-                /*
-                It's very handy for demo data to reference always the same menu id.
-                Since the menu id is included in the URL
-                it allows to reload the page w/out having to refresh menu items.
-                This way you can define multiple scenario w/ different menu items
-                and you can tag them with the same reusable label (eg: case_1).
-                */
-                return this.$route.params.menu_id;
-            }
-            return menu_id;
-        },
         odoo: function() {
             const odoo_params = {
                 process_menu_id: this.menu_item_id,
@@ -62,14 +58,16 @@ export var ScenarioBaseMixin = {
         they are not really data that changes and then we can make them
         standalone object w/ their own class.
         */
-        state: function() {
-            const state = {
-                key: this.current_state_key,
-                data: this.state_get_data(),
-            };
-            _.extend(state, this.states[this.current_state_key]);
-            _.defaults(state, {display_info: {}});
-            return state;
+        state: {
+            get: function() {
+                if (_.isEmpty(this.current_state)) {
+                    return this._make_current_state();
+                }
+                return this.current_state;
+            },
+            set: function(data) {
+                this.current_state = this._make_current_state(data);
+            },
         },
         search_input_placeholder: function() {
             const placeholder = this.state.display_info.scan_placeholder;
@@ -103,6 +101,29 @@ export var ScenarioBaseMixin = {
         },
     },
     methods: {
+        _get_menu_item_id: function() {
+            const menu_id = Number.parseInt(this.$route.params.menu_id, 10);
+            if (Number.isNaN(menu_id)) {
+                /*
+                It's very handy for demo data to reference always the same menu id.
+                Since the menu id is included in the URL
+                it allows to reload the page w/out having to refresh menu items.
+                This way you can define multiple scenario w/ different menu items
+                and you can tag them with the same reusable label (eg: case_1).
+                */
+                return this.$route.params.menu_id;
+            }
+            return menu_id;
+        },
+        _make_current_state: function(data = {}) {
+            const state = {
+                key: this.current_state_key,
+                data: data,
+            };
+            _.extend(state, this.states[this.current_state_key]);
+            _.defaults(state, {display_info: {}});
+            return state;
+        },
         screen_klass: function() {
             return this.usage + " " + "state-" + this.state.key;
         },
@@ -151,24 +172,29 @@ export var ScenarioBaseMixin = {
         state_reset_data: function(state_key) {
             state_key = state_key || this.current_state_key;
             this.$root.$storage.remove(this.storage_key(state_key));
-            this.$set(this.states[state_key], "data", {});
         },
         _state_get_data: function(state_key) {
             return this.$root.$storage.get(this.storage_key(state_key), {});
         },
         _state_set_data: function(state_key, v) {
             this.$root.$storage.set(this.storage_key(state_key), v);
-            this.$set(this.states[state_key], "data", v);
         },
         state_get_data: function(state_key) {
             state_key = state_key || this.current_state_key;
             return this._state_get_data(state_key);
         },
-        state_set_data: function(data, state_key) {
+        state_set_data: function(data, state_key, reload_state = true) {
             state_key = state_key || this.current_state_key;
             const new_data = _.merge({}, this.state_get_data(state_key), data);
             // Trigger update of computed `state.data` and refreshes the UI.
             this._state_set_data(state_key, new_data);
+            if (reload_state) {
+                this._reload_current_state();
+            }
+        },
+        _reload_current_state: function() {
+            // Force re-computation of current state data.
+            this.state = this.state_get_data();
         },
         state_reset_data_all() {
             const self = this;
@@ -192,6 +218,7 @@ export var ScenarioBaseMixin = {
                 or any other case where you want to erase all data on demand.
                 */
                 this.state_reset_data_all();
+                this.reset_notification();
                 /**
                  * Special case: if `init` is defined as state
                  * you can use it do particular initialization.
@@ -214,6 +241,7 @@ export var ScenarioBaseMixin = {
             }
             this.on_state_exit();
             this.current_state_key = state_key;
+            this._reload_current_state();
             if (promise) {
                 promise.then();
             } else {
@@ -256,7 +284,8 @@ export var ScenarioBaseMixin = {
                     : result.next_state;
             if (!_.isUndefined(result.data)) {
                 this.state_reset_data(state_key);
-                this.state_set_data(result.data[state_key], state_key);
+                // Set state data but delay state wrapper reload.
+                this.state_set_data(result.data[state_key], state_key, false);
             }
             this.reset_notification();
             if (result.message) {
@@ -265,7 +294,11 @@ export var ScenarioBaseMixin = {
             if (result.popup) {
                 this.set_popup(result.popup);
             }
-            if (this.current_state_key != state_key) {
+            if (state_key == this.$route.params.state) {
+                // As we stay on the same state, just refresh state wrapper data
+                this._reload_current_state();
+            } else {
+                // Move to new state, data will be refreshed right after.
                 this.state_to(state_key);
             }
         },
@@ -308,19 +341,23 @@ export var ScenarioBaseMixin = {
             this.reset_notification();
         },
         set_message: function(message) {
-            this.messages.message = message;
+            this.$set(this.messages, "message", message);
         },
         set_popup: function(popup) {
-            this.messages.popup.body = popup.body;
+            this.$set(this.messages, "popup", popup);
         },
         reset_notification: function() {
-            this.messages.message = null;
-            this.messages.message_type = null;
-            this.messages.popup.body = null;
+            this.$set(this.messages, "message", {body: null, message_type: null});
+            this.$set(this.messages, "popup", {body: null});
         },
         display_app_error: function(error) {
+            let parts = [error.status, error.name];
+            if (error.description) {
+                parts.push("\n" + error.description);
+            }
+            parts.push("\nURL: " + error.response.url);
             this.set_message({
-                body: error.description,
+                body: parts.join(" "),
                 message_type: "error",
             });
         },
