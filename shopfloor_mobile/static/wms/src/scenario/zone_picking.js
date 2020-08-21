@@ -133,6 +133,7 @@ const template_mobile = `
                 :message="{body: 'Full order picking, no more operation.'}"
                 />
             <picking-summary
+                v-if="state.data.move_line"
                 :record="state.data.move_line.picking"
                 :records="[state.data.move_line]"
                 :records_grouped="picking_summary_records_grouped([state.data.move_line])"
@@ -140,12 +141,19 @@ const template_mobile = `
                 :key="make_state_component_key(['picking-summary'])"
                 />
             <item-detail-card
+                v-if="state.data.move_line"
                 :key="make_state_component_key(['detail-move-line-dest-pack', state.data.move_line.id])"
                 :record="state.data.move_line"
                 :options="{main: true, key_title: 'package_dest.name'}"
                 :card_color="utils.colors.color_for('screen_step_todo')"
                 class="mt-2"
                 />
+            <div class="no-line-found" v-if="state.data.move_line">
+                <!-- In theory this should not happen.
+                Handled only because something seems wrong backend side
+                and we might get here w/ no line info. -->
+                No line to process.
+            </div>
         </div>
 
         <stock-zero-check
@@ -368,6 +376,7 @@ export var ZonePicking = Vue.component("zone-picking", {
             usage: "zone_picking",
             initial_state_key: "scan_location",
             order_lines_by: "priority",
+            scan_destination_qty: 0,
             states: {
                 scan_location: {
                     display_info: {
@@ -425,12 +434,19 @@ export var ZonePicking = Vue.component("zone-picking", {
                     display_info: {
                         title: "Set destination",
                         scan_placeholder: "Scan location or package",
+                        scan_placeholder_full: "Scan location or package",
+                        scan_placeholder_partial: "Scan package",
                     },
                     events: {
                         qty_edit: "on_qty_update",
                     },
                     on_qty_update: qty => {
-                        this.state.data.destination_qty = qty;
+                        this.scan_destination_qty = parseInt(qty, 10);
+                        if (this.state.data.move_line.quantity != qty) {
+                            this.state.display_info.scan_placeholder = this.state.display_info.scan_placeholder_partial;
+                        } else {
+                            this.state.display_info.scan_placeholder = this.state.display_info.scan_placeholder_full;
+                        }
                     },
                     on_scan: scanned => {
                         const data = this.state.data;
@@ -440,8 +456,7 @@ export var ZonePicking = Vue.component("zone-picking", {
                                 picking_type_id: this.current_picking_type().id,
                                 move_line_id: data.move_line.id,
                                 barcode: scanned.text,
-                                quantity:
-                                    data.destination_qty || data.move_line.quantity,
+                                quantity: this.scan_destination_qty,
                                 confirmation: data.confirmation_required,
                             })
                         );
