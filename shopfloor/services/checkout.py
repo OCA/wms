@@ -64,8 +64,7 @@ class Checkout(Component):
         data = {"pickings": self.data.pickings(pickings)}
         return self._response(next_state="manual_selection", data=data, message=message)
 
-    def _response_for_select_package(self, lines, message=None):
-        picking = lines.mapped("picking_id")
+    def _response_for_select_package(self, picking, lines, message=None):
         return self._response(
             next_state="select_package",
             data={
@@ -87,6 +86,7 @@ class Checkout(Component):
         )
         if not packages:
             return self._response_for_select_package(
+                picking,
                 move_lines,
                 message={
                     "message_type": "warning",
@@ -353,7 +353,7 @@ class Checkout(Component):
                 },
             )
         self._select_lines(lines)
-        return self._response_for_select_package(lines)
+        return self._response_for_select_package(picking, lines)
 
     def _select_lines_from_product(self, picking, selection_lines, product):
         if product.tracking in ("lot", "serial"):
@@ -390,7 +390,7 @@ class Checkout(Component):
             return self._select_lines_from_package(picking, selection_lines, packages)
 
         self._select_lines(lines)
-        return self._response_for_select_package(lines)
+        return self._response_for_select_package(picking, lines)
 
     def _select_lines_from_lot(self, picking, selection_lines, lot):
         lines = selection_lines.filtered(lambda l: l.lot_id == lot)
@@ -422,7 +422,7 @@ class Checkout(Component):
             return self._select_lines_from_package(picking, selection_lines, packages)
 
         self._select_lines(lines)
-        return self._response_for_select_package(lines)
+        return self._response_for_select_package(picking, lines)
 
     def _select_line_package(self, picking, selection_lines, package):
         if not package:
@@ -443,7 +443,7 @@ class Checkout(Component):
                 picking, selection_lines, move_line.package_id
             )
         self._select_lines(move_line)
-        return self._response_for_select_package(move_line)
+        return self._response_for_select_package(picking, move_line)
 
     def select_line(self, picking_id, package_id=None, move_line_id=None):
         """Select move lines of the stock picking
@@ -513,6 +513,7 @@ class Checkout(Component):
             else:
                 move_line.qty_done = qty_done
         return self._response_for_select_package(
+            picking,
             self.env["stock.move.line"].browse(selected_line_ids).exists(),
             message=message,
         )
@@ -607,6 +608,7 @@ class Checkout(Component):
         """
         if not self._is_package_allowed(picking, package):
             return self._response_for_select_package(
+                picking,
                 selected_lines,
                 message={
                     "message_type": "error",
@@ -692,6 +694,7 @@ class Checkout(Component):
         if product:
             if product.tracking in ("lot", "serial"):
                 return self._response_for_select_package(
+                    picking,
                     selected_lines,
                     message=self.msg_store.scan_lot_on_product_tracked_by_lot(),
                 )
@@ -714,7 +717,7 @@ class Checkout(Component):
             )
 
         return self._response_for_select_package(
-            selected_lines, message=self.msg_store.barcode_not_found()
+            picking, selected_lines, message=self.msg_store.barcode_not_found()
         )
 
     def new_package(self, picking_id, selected_line_ids):
