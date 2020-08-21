@@ -211,6 +211,7 @@ export var ScenarioBaseMixin = {
                 or any other case where you want to erase all data on demand.
                 */
                 this.state_reset_data_all();
+                this.reset_notification();
                 /**
                  * Special case: if `init` is defined as state
                  * you can use it do particular initialization.
@@ -285,7 +286,7 @@ export var ScenarioBaseMixin = {
             if (result.popup) {
                 this.set_popup(result.popup);
             }
-            if (this.current_state_key != state_key) {
+            if (state_key != this.$route.params.state) {
                 this.state_to(state_key);
             } else {
                 // Refresh computed state anyway
