@@ -368,3 +368,23 @@ Vue.component("line-stock-out", {
   </div>
 `,
 });
+
+Vue.component("screen-loading", {
+    props: {
+        loading: {
+            type: Boolean,
+        },
+    },
+    template: `
+    <v-overlay :value="loading" opacity="0.6">
+      <v-row
+          align="center"
+          justify="center">
+          <v-col cols="12" class="text-center">
+              <v-progress-circular indeterminate :color="utils.colors.color_for('spinner')" />
+              <p class="mt-4">Waiting...</p>
+          </v-col>
+      </v-row>
+    </v-overlay>
+  `,
+});
