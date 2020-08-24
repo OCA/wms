@@ -37,6 +37,10 @@ color_registry.add_theme(
          * selection
          */
         item_selected: "success",
+        /**
+         * spinner
+         */
+        spinner: "#491966",
     },
     "light"
 ); // TODO: we should bave a theme named "coosa" and select it

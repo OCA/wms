@@ -149,6 +149,7 @@ Vue.component("Screen", {
             </div>
 
             <v-container>
+                <screen-loading :loading="$root.loading" />
                 <div class="main-content">
                     <slot>
                         <span v-if="this.$root.has_profile">No content provided.</span>
@@ -158,10 +159,6 @@ Vue.component("Screen", {
             <!-- TODO: use flexbox to put it always at the bottom -->
             <div class="footer" v-if="$slots.footer">
                 <slot name="footer">Optional footer - no content</slot>
-            </div>
-            <div class="loading" v-if="$root.loading && !$root.demo_mode">
-                Loading...
-                <!-- TODO: show a spinner + FIXME: demo mode should work properly -->
             </div>
         </v-content>
     </v-app>
