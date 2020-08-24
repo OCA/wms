@@ -255,7 +255,6 @@ export var ScenarioBaseMixin = {
         _global_state_key: function(state_key) {
             return this.usage + "/" + state_key;
         },
-        // TODO: refactor all transitions to state `wait_call` with this call
         wait_call: function(promise, callback) {
             return promise.then(this.on_call_success, this.on_call_error);
         },
