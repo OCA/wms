@@ -45,11 +45,18 @@ const app = new Vue({
         };
     },
     created: function() {
+        const self = this;
         this.demo_mode = window.location.pathname.includes("demo");
         if (this.demo_mode) {
             this._loadDemoResources();
         }
         this.loadConfig();
+        document.addEventListener("fetchStart", function() {
+            self.loading = true;
+        });
+        document.addEventListener("fetchEnd", function() {
+            self.loading = false;
+        });
     },
     mounted: function() {
         const self = this;
@@ -139,14 +146,12 @@ const app = new Vue({
         },
         _loadConfig: function() {
             const self = this;
-            self.loading = true;
             const odoo = self.getOdoo({usage: "app"});
             return odoo.call("user_config").then(function(result) {
                 if (!_.isUndefined(result.data)) {
                     self.appconfig = result.data;
                     self.authenticated = true;
                     self.$storage.set("appconfig", self.appconfig);
-                    self.loading = false;
                 } else {
                     // TODO: any better thing to do here?
                     console.log(result);
@@ -166,14 +171,12 @@ const app = new Vue({
         },
         _loadMenu: function() {
             const self = this;
-            self.loading = true;
             const odoo = self.getOdoo({
                 usage: "app",
                 profile_id: this.profile.id,
             });
             return odoo.call("menu").then(function(result) {
                 self.appmenu = result.data;
-                self.loading = false;
             });
         },
         _clearConfig: function() {
