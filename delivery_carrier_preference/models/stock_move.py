@@ -33,9 +33,13 @@ class StockMove(models.Model):
 
     def _get_new_picking_values(self):
         vals = super()._get_new_picking_values()
-        group_carrier = self.mapped("group_id.carrier_id")
-        if group_carrier:
-            vals["carrier_id"] = group_carrier.id
+        # Take the carrier_id from the group only when we have a related line
+        # (i.e. we are in an OUT). It reflects the code of the super method in
+        # "delivery" which takes the carrier of the related SO through SO line
+        if self.sale_line_id:
+            group_carrier = self.mapped("group_id.carrier_id")
+            if group_carrier:
+                vals["carrier_id"] = group_carrier.id
         return vals
 
     @staticmethod
