@@ -352,7 +352,8 @@ ul.packaging span:first-child {
     padding-bottom: 5px;
 }
 
-.notifications > .v-alert:last-child {
+.notifications > .v-alert:last-child,
+.notifications p:last-child {
     margin-bottom: 0;
 }
 
