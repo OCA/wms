@@ -107,6 +107,7 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
                 "required": False,
                 "schema": {"body": {"type": "string", "required": True}},
             },
+            "log_entry_url": {"type": "string", "required": False},
         }
         if not data_schema:
             data_schema = {}
