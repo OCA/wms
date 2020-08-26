@@ -115,17 +115,39 @@ export var ScenarioBaseMixin = {
             }
             return menu_id;
         },
+        /**
+         * Retrieve state specification.
+         *
+         * States are described through `this.states` object.
+         * This function returns their specification object.
+         * Defaults to current state.
+         *
+         * @param {*} state_key: a state key other that current_state_key
+         */
+        _get_state_spec: function(state_key) {
+            // TODO: this function is the 1st step towards moving state definition
+            // out of the component data (which makes no sense).
+            return this.states[state_key || this.current_state_key];
+        },
+        /**
+         * Build a wrapped state object based on current state.
+         *
+         * The returned object is a bundle of current state data
+         * and current state specification.
+         *
+         * @param {*} data
+         */
         _make_current_state: function(data = {}) {
             const state = {
                 key: this.current_state_key,
                 data: data,
             };
-            _.extend(state, this.states[this.current_state_key]);
+            _.extend(state, this._get_state_spec());
             _.defaults(state, {display_info: {}});
             return state;
         },
         screen_klass: function() {
-            return this.usage + " " + "state-" + this.state.key;
+            return this.usage + " " + "state-" + this.current_state_key;
         },
         menu_item: function() {
             const self = this;
@@ -207,7 +229,7 @@ export var ScenarioBaseMixin = {
             });
         },
         /*
-            Load given state, handle transition, setup event handlers.
+            Loads a new state, handle transition, setup event handlers.
         */
         _state_load: function(state_key, promise) {
             if (state_key == "init") {
@@ -239,7 +261,10 @@ export var ScenarioBaseMixin = {
             if (!_.has(this.states, state_key)) {
                 alert("State `" + state_key + "` does not exists!");
             }
-            this.on_state_exit();
+            if (this.current_state_key) {
+                // Exiting another state
+                this.on_state_exit();
+            }
             this.current_state_key = state_key;
             this._reload_current_state();
             if (promise) {
@@ -249,7 +274,6 @@ export var ScenarioBaseMixin = {
             }
             this._state_bind_events();
             // notify root
-            // TODO: maybe not needed after introducing routing
             this.$root.$emit("state:change", this._global_state_key(state_key));
         },
         _global_state_key: function(state_key) {
@@ -259,13 +283,15 @@ export var ScenarioBaseMixin = {
             return promise.then(this.on_call_success, this.on_call_error);
         },
         on_state_enter: function() {
-            if (this.state.enter) {
-                this.state.enter();
+            const state = this._get_state_spec();
+            if (state.enter) {
+                state.enter();
             }
         },
         on_state_exit: function() {
-            if (this.state.exit) {
-                this.state.exit();
+            const state = this._get_state_spec();
+            if (state.exit) {
+                state.exit();
             }
         },
         on_call_success: function(result) {
@@ -311,31 +337,22 @@ export var ScenarioBaseMixin = {
         },
         // Specific states methods
         on_scan: function(scanned) {
-            if (this.state.on_scan) {
-                this.state.on_scan(scanned);
+            const state = this._get_state_spec();
+            if (state.on_scan) {
+                state.on_scan(scanned);
             }
         },
-        // TODO: check if we really need these
-        // as we have state event handlers auto binding.
-        // on_select: function(selected) {
-        //     if (this.state.on_select) {
-        //         this.state.on_select(selected);
-        //     }
-        // },
-        // on_back: function() {
-        //     if (this.state.on_back) {
-        //         this.state.on_back();
-        //     }
-        // },
         // TODO: get rid of this as it's used on cluster_picking only and
         // we can use state events binding.
         on_cancel: function() {
-            if (this.state.on_cancel) {
-                this.state.on_cancel();
+            const state = this._get_state_spec();
+            if (state.on_cancel) {
+                state.on_cancel();
             }
         },
         on_user_confirm: function(answer) {
-            this.state.on_user_confirm(answer);
+            const state = this._get_state_spec();
+            state.on_user_confirm(answer);
             this.need_confirmation = false;
             this.reset_notification();
         },
@@ -362,7 +379,8 @@ export var ScenarioBaseMixin = {
             });
         },
         _state_bind_events: function() {
-            if (this.state.events) {
+            const state = this._get_state_spec();
+            if (state.events) {
                 /*
                 Automatically bind events defined by states.
                 A state can define `events` w/ this structure:
@@ -380,12 +398,15 @@ export var ScenarioBaseMixin = {
                 to a particular event fired on a specific state
                 */
                 const self = this;
-                _.each(self.state.events, function(handler, name) {
-                    if (typeof handler == "string") handler = self.state[handler];
+                _.each(state.events, function(handler, name) {
+                    if (typeof handler == "string") handler = state[handler];
                     const event_name =
                         self._global_state_key(self.state.key) + ":" + name;
                     const existing = self.$root.event_hub._events[event_name];
-                    if (handler && _.isEmpty(existing)) {
+                    if (!_.isEmpty(existing)) {
+                        self.$root.event_hub.$off(event_name);
+                    }
+                    if (handler) {
                         self.$root.event_hub.$on(event_name, handler);
                     }
                 });
