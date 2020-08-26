@@ -729,8 +729,12 @@ class ZonePicking(Component, ChangePackLotMixin):
 
         message = None
 
-        if not pkg_moved and not package and accept_only_package:
-            message = self.msg_store.package_not_found_for_barcode(barcode)
+        if not pkg_moved and not package:
+            if accept_only_package:
+                message = self.msg_store.package_not_found_for_barcode(barcode)
+            else:
+                # we don't know if user wanted to scan a location or a package
+                message = self.msg_store.barcode_not_found()
             return self._response_for_set_line_destination(
                 zone_location, picking_type, move_line, message=message
             )
