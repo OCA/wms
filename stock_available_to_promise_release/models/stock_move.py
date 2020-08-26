@@ -26,6 +26,8 @@ class StockMove(models.Model):
         " to older promised operations.",
     )
     need_release = fields.Boolean(index=True,)
+    zip_code = fields.Char(related="partner_id.zip", store="True")
+    city = fields.Char(related="partner_id.city", store="True")
 
     @api.depends()
     def _compute_ordered_available_to_promise(self):
