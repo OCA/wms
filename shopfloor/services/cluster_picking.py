@@ -957,6 +957,7 @@ class ClusterPicking(Component, ChangePackLotMixin):
 
     def _unload_write_destination_on_lines(self, lines, location):
         lines.write({"shopfloor_unloaded": True, "location_dest_id": location.id})
+        lines.package_level_id.location_dest_id = location
         for line in lines:
             # We set the picking to done only when the last line is
             # unloaded to avoid backorders.

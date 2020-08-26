@@ -204,7 +204,9 @@ class SinglePackTransfer(Component):
         return self._response_for_start(message=message, popup=completion_info_popup)
 
     def _set_destination_and_done(self, move, scanned_location):
-        move.move_line_ids[0].location_dest_id = scanned_location.id
+        # when writing the destination on the package level, it writes
+        # on the move lines
+        move.move_line_ids.package_level_id.location_dest_id = scanned_location
         move._action_done()
 
     def cancel(self, package_level_id):
