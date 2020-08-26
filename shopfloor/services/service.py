@@ -1,3 +1,7 @@
+import traceback
+
+from werkzeug.urls import url_encode, url_join
+
 from odoo import _, exceptions, registry
 from odoo.exceptions import MissingError
 from odoo.http import request
@@ -13,6 +17,15 @@ def to_float(val):
     if val:
         return float(val)
     return None
+
+
+class ShopfloorServiceDispatchException(Exception):
+
+    rest_json_info = {}
+
+    def __init__(self, message, log_entry_url):
+        super().__init__(message)
+        self.rest_json_info = {"log_entry_url": log_entry_url}
 
 
 class BaseShopfloorService(AbstractComponent):
@@ -43,13 +56,29 @@ class BaseShopfloorService(AbstractComponent):
         try:
             result = super().dispatch(method_name, _id=_id, params=params)
         except Exception as err:
+            tb = traceback.format_exc()
             self.env.cr.rollback()
             with registry(self.env.cr.dbname).cursor() as cr:
                 env = self.env(cr=cr)
-                self._log_call_in_db(env, request, _id, params, error=err)
-            raise
-        self._log_call_in_db(self.env, request, _id, params, result=result)
+                log_entry = self._log_call_in_db(env, request, _id, params, error=tb)
+                log_entry_url = self._get_log_entry_url(log_entry)
+            raise ShopfloorServiceDispatchException(str(err), log_entry_url) from err
+
+        log_entry = self._log_call_in_db(self.env, request, _id, params, result=result)
+        log_entry_url = self._get_log_entry_url(log_entry)
+        result["log_entry_url"] = log_entry_url
         return result
+
+    def _get_log_entry_url(self, entry):
+        base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
+        url_params = {
+            "action": self.env.ref("shopfloor.action_shopfloor_log").id,
+            "view_type": "form",
+            "model": entry._name,
+            "id": entry.id,
+        }
+        url = "/web?#%s" % url_encode(url_params)
+        return url_join(base_url, url)
 
     @property
     def _log_call_header_strip(self):
@@ -79,7 +108,7 @@ class BaseShopfloorService(AbstractComponent):
         )
         if not values:
             return
-        env["shopfloor.log"].sudo().create(values)
+        return env["shopfloor.log"].sudo().create(values)
 
     def _get(self, _id):
         domain = expression.normalize_domain(self._get_base_search_domain())
