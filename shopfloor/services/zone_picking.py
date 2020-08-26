@@ -382,7 +382,7 @@ class ZonePicking(Component, ChangePackLotMixin):
             move_line = self.env["stock.move.line"].search(domain)
             if len(move_line) == 1:
                 return move_line
-        raise False
+        return False
 
     def _scan_source_package(self, zone_location, picking_type, package, order):
         move_lines = self._find_location_move_lines(
