@@ -346,6 +346,10 @@ class LocationContentTransfer(Component):
             return self._response_for_start(message=self.msg_store.record_not_found())
         move_lines = self._find_transfer_move_lines(location)
         pickings = move_lines.mapped("picking_id")
+        if not pickings:
+            # if we can't find the lines anymore, they likely have been done
+            # by someone else
+            return self._response_for_start(message=self.msg_store.already_done())
         scanned_location = self.actions_for("search").location_from_scan(barcode)
         if not scanned_location:
             return self._response_for_scan_destination_all(
