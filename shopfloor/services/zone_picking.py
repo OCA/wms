@@ -1075,6 +1075,7 @@ class ZonePicking(Component, ChangePackLotMixin):
     def _write_destination_on_lines(self, lines, location):
         self._lock_lines(lines)
         lines.location_dest_id = location
+        lines.package_level_id.location_dest_id = location
 
     def unload_split(self, zone_location_id, picking_type_id):
         """Indicates that now the buffer must be treated line per line
