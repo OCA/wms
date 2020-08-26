@@ -205,15 +205,29 @@ export var PackagingQtyPickerMixin = {
 
 export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
     mixins: [PackagingQtyPickerMixin],
-    watch: {
-        value: {
-            handler: function(newVal, oldVal) {
-                this.$root.trigger("qty_edit", this.value);
-            },
-        },
-    },
+    /** TODO: the trigger has been moved to `updated` because
+     * when if you refresh the same state/page the qty change is not triggered
+     * and the qty stored in the scenario data variable is lost.
+     * (eg: zone_picking/set_line_destination:on_qty_update).
+     * BUT this is still weird because there shouldn't be any need
+     * to retrigger the event if `scan_destination_qty` would not lose its value
+     * when the page is updated.
+     * It seems weird to have to not use `watch` here.
+     * Hence, if we have the time, this is something good to check.
+     */
+    // watch: {
+    //     value: {
+    //         handler: function(newVal, oldVal) {
+    //             this.$root.trigger("qty_edit", this.value);
+    //             console.log("picker trigger");
+    //         },
+    //     },
+    // },
     mounted: function() {
         this._init_editable();
+    },
+    updated: function() {
+        this.$root.trigger("qty_edit", this.value);
     },
     template: `
 <div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode: '']">
