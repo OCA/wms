@@ -221,10 +221,15 @@ export var ZonePicking = Vue.component("zone-picking", {
         },
         manual_select_picking_type_fields: function() {
             return [
-                {path: "lines_count", renderer: this.render_lines_count},
+                {
+                    path: "lines_count",
+                    renderer: this.render_lines_count,
+                    display_no_value: true,
+                },
                 {
                     path: "priority_lines_count",
                     renderer: this.render_priority_lines_count,
+                    display_no_value: true,
                 },
             ];
         },

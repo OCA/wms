@@ -4,6 +4,9 @@ Vue.component("user-information", {
     template: `
     <v-alert :type="alert_type" tile>
         <p v-for="line in message_lines" v-if="line" v-text="line"/>
+        <p v-if="support_url">
+            <a :href="support_url" v-text="message.support_url_text" />
+        </p>
     </v-alert>
     `,
     computed: {
@@ -13,6 +16,9 @@ Vue.component("user-information", {
         message_lines: function() {
             const msg = _.result(this.message, "body");
             return msg ? msg.split("\n") : [];
+        },
+        support_url: function() {
+            return _.result(this.message, "support_url", "");
         },
     },
 });

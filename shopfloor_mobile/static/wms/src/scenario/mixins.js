@@ -354,10 +354,11 @@ export var ScenarioBaseMixin = {
             if (error.description) {
                 parts.push("\n" + error.description);
             }
-            parts.push("\nURL: " + error.response.url);
             this.set_message({
                 body: parts.join(" "),
                 message_type: "error",
+                support_url: error.log_entry_url,
+                support_url_text: "View / share log entry",
             });
         },
         _state_bind_events: function() {
