@@ -42,3 +42,16 @@ class StockPicking(models.Model):
             return self.browse()
         else:
             return super()._create_backorder()
+
+    def action_done(self):
+        self = self.with_context(_action_done_from_picking=True)
+        return super().action_done()
+
+    def _send_confirmation_email(self):
+        # Avoid sending the confirmation email twice (one when the
+        # 'picking.action_done()' is called, and one when the last move of this
+        # picking is validated through 'move._action_done()')
+        # We send the confirmation email
+        if self.env.context.get("_action_done_from_picking"):
+            return
+        super()._send_confirmation_email()
