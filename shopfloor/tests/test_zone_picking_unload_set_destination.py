@@ -119,14 +119,25 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
         move_line = self.picking1.move_line_ids
-        packing_sublocation = (
+        packing_sublocation1 = (
             self.env["stock.location"]
             .sudo()
             .create(
                 {
-                    "name": "Packing sublocation",
+                    "name": "Packing sublocation-1",
                     "location_id": self.packing_location.id,
-                    "barcode": "PACKING_SUBLOCATION",
+                    "barcode": "PACKING_SUBLOCATIO_1",
+                }
+            )
+        )
+        packing_sublocation2 = (
+            self.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Packing sublocation-2",
+                    "location_id": self.packing_location.id,
+                    "barcode": "PACKING_SUBLOCATIO_2",
                 }
             )
         )
@@ -138,13 +149,14 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             move_line.product_uom_qty,
             self.free_package,
         )
+        move_line.location_dest_id = packing_sublocation1
         response = self.service.dispatch(
             "unload_set_destination",
             params={
                 "zone_location_id": zone_location.id,
                 "picking_type_id": picking_type.id,
                 "package_id": self.free_package.id,
-                "barcode": packing_sublocation.barcode,
+                "barcode": packing_sublocation2.barcode,
             },
         )
         self.assert_response_unload_set_destination(
@@ -153,7 +165,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             picking_type,
             move_line,
             message=self.service.msg_store.confirm_location_changed(
-                picking_type.default_location_dest_id, packing_sublocation
+                packing_sublocation1, packing_sublocation2
             ),
             confirmation_required=True,
         )
