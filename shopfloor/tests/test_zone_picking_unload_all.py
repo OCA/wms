@@ -89,14 +89,25 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         another_package = self.env["stock.quant.package"].create(
             {"name": "ANOTHER_PACKAGE"}
         )
-        packing_sublocation = (
+        packing_sublocation1 = (
             self.env["stock.location"]
             .sudo()
             .create(
                 {
-                    "name": "Packing sublocation",
+                    "name": "Packing sublocation-1",
                     "location_id": self.packing_location.id,
-                    "barcode": "PACKING_SUBLOCATION",
+                    "barcode": "PACKING_SUBLOCATION_1",
+                }
+            )
+        )
+        packing_sublocation2 = (
+            self.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Packing sublocation-2",
+                    "location_id": self.packing_location.id,
+                    "barcode": "PACKING_SUBLOCATION_2",
                 }
             )
         )
@@ -115,16 +126,20 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             move_line2.product_uom_qty,
             another_package,
         )
-        # set destination location for all lines in the buffer
+        # set an allowed destination location (inside the picking type default
+        # destination location) for all lines in the buffer with a non-expected
+        # one, meaning a destination which is not a child of the current buffer
+        # lines destination
+        (move_line1 | move_line2).location_dest_id = packing_sublocation1
         response = self.service.dispatch(
             "set_destination_all",
             params={
                 "zone_location_id": zone_location.id,
                 "picking_type_id": picking_type.id,
-                "barcode": packing_sublocation.barcode,
+                "barcode": packing_sublocation2.barcode,
             },
         )
-        # check response
+        # check response: this destination needs the user confirmation
         buffer_lines = self.service._find_buffer_move_lines(zone_location, picking_type)
         self.assert_response_unload_all(
             response,
@@ -132,9 +147,30 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             picking_type,
             buffer_lines,
             message=self.service.msg_store.confirm_location_changed(
-                picking_type.default_location_dest_id, packing_sublocation,
+                packing_sublocation1, packing_sublocation2,
             ),
             confirmation_required=True,
+        )
+        # set an allowed destination location (inside the picking type default
+        # destination location) for all lines in the buffer with an expected one
+        # meaning a destination which is a child of the current buffer lines
+        # destination
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "barcode": packing_sublocation1.barcode,
+            },
+        )
+        # check response: OK
+        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        self.assert_response_select_line(
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.service.msg_store.buffer_complete(),
         )
 
     def test_set_destination_all_ok(self):
