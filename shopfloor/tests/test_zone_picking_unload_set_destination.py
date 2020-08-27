@@ -1,3 +1,5 @@
+from unittest import mock
+
 from .test_zone_picking_base import ZonePickingCommonCase
 
 
@@ -179,16 +181,20 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             move_line.product_uom_qty,
             self.free_package,
         )
-        response = self.service.dispatch(
-            "unload_set_destination",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "package_id": self.free_package.id,
-                "barcode": packing_sublocation.barcode,
-                "confirmation": True,
-            },
-        )
+        with mock.patch.object(
+            type(self.picking1), "_send_confirmation_email"
+        ) as send_confirmation_email:
+            response = self.service.dispatch(
+                "unload_set_destination",
+                params={
+                    "zone_location_id": zone_location.id,
+                    "picking_type_id": picking_type.id,
+                    "package_id": self.free_package.id,
+                    "barcode": packing_sublocation.barcode,
+                    "confirmation": True,
+                },
+            )
+            send_confirmation_email.assert_called_once()
         # check data
         self.assertEqual(move_line.location_dest_id, packing_sublocation)
         self.assertEqual(move_line.move_id.state, "done")
@@ -220,15 +226,19 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
                 package_dest,
             )
         # process 1/2 buffer line
-        response = self.service.dispatch(
-            "unload_set_destination",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "package_id": self.free_package.id,
-                "barcode": self.packing_location.barcode,
-            },
-        )
+        with mock.patch.object(
+            type(self.picking5), "_send_confirmation_email"
+        ) as send_confirmation_email:
+            response = self.service.dispatch(
+                "unload_set_destination",
+                params={
+                    "zone_location_id": zone_location.id,
+                    "picking_type_id": picking_type.id,
+                    "package_id": self.free_package.id,
+                    "barcode": self.packing_location.barcode,
+                },
+            )
+            send_confirmation_email.assert_not_called()
         # check data
         move_line = self.picking5.move_line_ids.filtered(
             lambda l: l.result_package_id == self.free_package

@@ -1,3 +1,5 @@
+from unittest import mock
+
 from .test_location_content_transfer_base import LocationContentTransferCommonCase
 
 
@@ -130,14 +132,18 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
     def test_set_destination_package_dest_location_ok(self):
         """Scanned destination location valid, moves set to done."""
         package_level = self.picking1.package_level_ids[0]
-        response = self.service.dispatch(
-            "set_destination_package",
-            params={
-                "location_id": self.content_loc.id,
-                "package_level_id": package_level.id,
-                "barcode": self.dest_location.barcode,
-            },
-        )
+        with mock.patch.object(
+            type(self.picking1), "_send_confirmation_email"
+        ) as send_confirmation_email:
+            response = self.service.dispatch(
+                "set_destination_package",
+                params={
+                    "location_id": self.content_loc.id,
+                    "package_level_id": package_level.id,
+                    "barcode": self.dest_location.barcode,
+                },
+            )
+            send_confirmation_email.assert_called_once()
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
             response,
@@ -301,15 +307,19 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         self.assertEqual(move_line_c.move_id.state, "done")
         # Scan remaining qty (4/10)
         remaining_move_line_c = move_product_c_splitted.move_line_ids
-        response = self.service.dispatch(
-            "set_destination_line",
-            params={
-                "location_id": self.content_loc.id,
-                "move_line_id": remaining_move_line_c.id,
-                "quantity": remaining_move_line_c.product_uom_qty,
-                "barcode": self.dest_location.barcode,
-            },
-        )
+        with mock.patch.object(
+            type(self.picking2), "_send_confirmation_email"
+        ) as send_confirmation_email:
+            response = self.service.dispatch(
+                "set_destination_line",
+                params={
+                    "location_id": self.content_loc.id,
+                    "move_line_id": remaining_move_line_c.id,
+                    "quantity": remaining_move_line_c.product_uom_qty,
+                    "barcode": self.dest_location.barcode,
+                },
+            )
+            send_confirmation_email.assert_not_called()
         # Check move line data
         self.assertEqual(remaining_move_line_c.move_id.product_uom_qty, 4)
         self.assertEqual(remaining_move_line_c.product_uom_qty, 0)
@@ -329,20 +339,24 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         move_line_d = self.picking2.move_line_ids.filtered(
             lambda m: m.product_id == self.product_d
         )
-        response = self.service.dispatch(
-            "set_destination_line",
-            params={
-                "location_id": self.content_loc.id,
-                "move_line_id": move_line_d.id,
-                "quantity": move_line_d.product_uom_qty,
-                "barcode": self.dest_location.barcode,
-            },
-        )
-        self.assertEqual(move_line_d.move_id.product_uom_qty, 10)
-        self.assertEqual(move_line_d.product_uom_qty, 0)
-        self.assertEqual(move_line_d.qty_done, 10)
-        self.assertEqual(move_line_d.state, "done")
-        self.assertEqual(self.picking2.state, "done")
+        with mock.patch.object(
+            type(self.picking2), "_send_confirmation_email"
+        ) as send_confirmation_email:
+            response = self.service.dispatch(
+                "set_destination_line",
+                params={
+                    "location_id": self.content_loc.id,
+                    "move_line_id": move_line_d.id,
+                    "quantity": move_line_d.product_uom_qty,
+                    "barcode": self.dest_location.barcode,
+                },
+            )
+            self.assertEqual(move_line_d.move_id.product_uom_qty, 10)
+            self.assertEqual(move_line_d.product_uom_qty, 0)
+            self.assertEqual(move_line_d.qty_done, 10)
+            self.assertEqual(move_line_d.state, "done")
+            self.assertEqual(self.picking2.state, "done")
+            send_confirmation_email.assert_called_once()
 
 
 class LocationContentTransferSetDestinationXSpecialCase(
@@ -506,24 +520,32 @@ class LocationContentTransferSetDestinationXSpecialCase(
         remaining_move_lines = self.picking.move_line_ids_without_package.filtered(
             lambda ml: ml.state == "assigned"
         )
-        for ml in remaining_move_lines:
+        with mock.patch.object(
+            type(self.picking), "_send_confirmation_email"
+        ) as send_confirmation_email:
+            for ml in remaining_move_lines:
+                self.service.dispatch(
+                    "set_destination_line",
+                    params={
+                        "location_id": self.content_loc.id,
+                        "move_line_id": ml.id,
+                        "quantity": ml.product_uom_qty,
+                        "barcode": self.dest_location.barcode,
+                    },
+                )
+            self.assertEqual(self.picking.state, "assigned")
+            send_confirmation_email.assert_not_called()
+        package_level = self.picking.package_level_ids[0]
+        with mock.patch.object(
+            type(self.picking), "_send_confirmation_email"
+        ) as send_confirmation_email:
             self.service.dispatch(
-                "set_destination_line",
+                "set_destination_package",
                 params={
                     "location_id": self.content_loc.id,
-                    "move_line_id": ml.id,
-                    "quantity": ml.product_uom_qty,
+                    "package_level_id": package_level.id,
                     "barcode": self.dest_location.barcode,
                 },
             )
-        self.assertEqual(self.picking.state, "assigned")
-        package_level = self.picking.package_level_ids[0]
-        self.service.dispatch(
-            "set_destination_package",
-            params={
-                "location_id": self.content_loc.id,
-                "package_level_id": package_level.id,
-                "barcode": self.dest_location.barcode,
-            },
-        )
-        self.assertEqual(self.picking.state, "done")
+            self.assertEqual(self.picking.state, "done")
+            send_confirmation_email.assert_called_once()
