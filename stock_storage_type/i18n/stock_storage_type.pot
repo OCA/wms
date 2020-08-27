@@ -79,6 +79,14 @@ msgid "Created on"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,help:stock_storage_type.field_product_product__product_package_storage_type_id
+#: model:ir.model.fields,help:stock_storage_type.field_product_template__product_package_storage_type_id
+msgid ""
+"Defines a 'default' package storage type for this product to be applied on "
+"packages without product packagings for put-away computations."
+msgstr ""
+
+#. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_package_storage_type_rel__display_name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__display_name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__display_name
@@ -347,6 +355,8 @@ msgstr ""
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_package_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_product_product__product_package_storage_type_id
+#: model:ir.model.fields,field_description:stock_storage_type.field_product_template__product_package_storage_type_id
 msgid "Package storage type"
 msgstr ""
 
@@ -354,6 +364,14 @@ msgstr ""
 #: code:addons/stock_storage_type/models/stock_quant.py:0
 #, python-format
 msgid "Package storage type %s is not allowed into Location %s"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,help:stock_storage_type.field_stock_quant_package__package_storage_type_id
+msgid ""
+"Package storage type for put-away computation. Computed automatically from "
+"the packaging if set, or from the product ifthe package contains only a "
+"single product."
 msgstr ""
 
 #. module: stock_storage_type
@@ -378,6 +396,11 @@ msgstr ""
 #: model:ir.model,name:stock_storage_type.model_product_packaging
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__product_packaging_ids
 msgid "Product Packaging"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model,name:stock_storage_type.model_product_template
+msgid "Product Template"
 msgstr ""
 
 #. module: stock_storage_type
