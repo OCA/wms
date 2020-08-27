@@ -356,6 +356,9 @@ ul.packaging span:first-child {
 .notifications p:last-child {
     margin-bottom: 0;
 }
+.notifications > .v-alert.error a {
+    color: white;
+}
 
 .searchform > .v-input:first-child {
     margin-top: 0;
