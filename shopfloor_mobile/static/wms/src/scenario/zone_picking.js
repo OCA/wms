@@ -340,7 +340,7 @@ export var ZonePicking = Vue.component("zone-picking", {
                 // group_no_title: true,
                 prepare_records: _.partialRight(
                     this.utils.misc.group_by_pack,
-                    "package_src"
+                    "package_dest"
                 ),
             });
         },
