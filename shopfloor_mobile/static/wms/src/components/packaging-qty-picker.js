@@ -171,7 +171,7 @@ export var PackagingQtyPickerMixin = {
             if (!_.isEmpty(this.unit_uom)) {
                 unit = [this.unit_uom];
             }
-            return _.extend([], this.opts.available_packaging, unit);
+            return _.concat(this.opts.available_packaging, unit);
         },
         /**
          * Sort packaging by qty and exclude the ones w/ qty = 0
