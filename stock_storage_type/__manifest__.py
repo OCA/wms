@@ -20,6 +20,7 @@
     "data": [
         "security/ir.model.access.csv",
         "views/product_packaging.xml",
+        "views/product_template.xml",
         "views/stock_location.xml",
         "views/stock_location_package_storage_type_rel.xml",
         "views/stock_location_storage_type.xml",

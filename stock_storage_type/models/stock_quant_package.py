@@ -7,31 +7,40 @@ class StockQuantPackage(models.Model):
 
     _inherit = "stock.quant.package"
 
-    package_storage_type_id = fields.Many2one("stock.package.storage.type")
+    package_storage_type_id = fields.Many2one(
+        "stock.package.storage.type",
+        compute="_compute_package_storage_type_id",
+        store=True,
+        readonly=False,
+        help="Package storage type for put-away computation. Computed "
+        "automatically from the packaging if set, or from the product if"
+        "the package contains only a single product.",
+    )
 
-    @api.onchange("product_packaging_id")
-    def onchange_product_packaging_id(self):
-        res = super().onchange_product_packaging_id()
-        packaging = self.product_packaging_id
-        storage_type = packaging.package_storage_type_id
-        if storage_type:
-            self.package_storage_type_id = storage_type
-        return res
-
-    @api.model
-    def create(self, vals):
-        vals = self._vals_for_storage_type(vals)
-        return super().create(vals)
-
-    def write(self, vals):
-        vals = self._vals_for_storage_type(vals)
-        return super().write(vals)
-
-    def _vals_for_storage_type(self, vals):
-        packaging_id = vals.get("product_packaging_id")
-        if packaging_id:
-            packaging = self.env["product.packaging"].browse(packaging_id)
-            storage_type = packaging.package_storage_type_id
-            if storage_type:
-                vals = dict(vals, package_storage_type_id=storage_type.id)
-        return vals
+    @api.depends(
+        "product_packaging_id",
+        "product_packaging_id.package_storage_type_id",
+        "quant_ids",
+        "quant_ids.product_id",
+        "quant_ids.product_id.product_package_storage_type_id",
+    )
+    def _compute_package_storage_type_id(self):
+        for pack in self:
+            if pack.package_storage_type_id:
+                continue
+            elif (
+                pack.product_packaging_id
+                and pack.product_packaging_id.package_storage_type_id
+            ):
+                pack.package_storage_type_id = (
+                    pack.product_packaging_id.package_storage_type_id
+                )
+            elif (
+                pack.single_product_id
+                and pack.single_product_id.product_package_storage_type_id
+            ):
+                pack.package_storage_type_id = (
+                    pack.single_product_id.product_package_storage_type_id
+                )
+            else:
+                pack.package_storage_type_id = False
