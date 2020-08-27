@@ -3,7 +3,7 @@
 {
     "name": "Delivery Carrier Preference",
     "summary": "Advanced selection of preferred shipping methods",
-    "version": "13.0.1.2.0",
+    "version": "13.0.1.3.0",
     "category": "Operations/Inventory/Delivery",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",
