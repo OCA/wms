@@ -1,3 +1,5 @@
+from unittest import mock
+
 from .test_zone_picking_base import ZonePickingCommonCase
 
 
@@ -159,14 +161,18 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             another_package,
         )
         # set destination location for all lines in the buffer
-        response = self.service.dispatch(
-            "set_destination_all",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "barcode": self.packing_location.barcode,
-            },
-        )
+        with mock.patch.object(
+            type(self.picking5), "_send_confirmation_email"
+        ) as send_confirmation_email:
+            response = self.service.dispatch(
+                "set_destination_all",
+                params={
+                    "zone_location_id": zone_location.id,
+                    "picking_type_id": picking_type.id,
+                    "barcode": self.packing_location.barcode,
+                },
+            )
+            send_confirmation_email.assert_called_once()
         # check data
         self.assertEqual(self.picking5.state, "done")
         # buffer should be empty
