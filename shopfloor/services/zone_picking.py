@@ -1224,7 +1224,10 @@ class ZonePicking(Component, ChangePackLotMixin):
         if not picking_type.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
         package = self.env["stock.quant.package"].browse(package_id)
-        if not package.exists():
+        buffer_lines = self._find_buffer_move_lines(
+            zone_location, picking_type, dest_package=package
+        )
+        if not package.exists() or not buffer_lines:
             move_lines = self._find_location_move_lines(zone_location, picking_type)
             return self._response_for_select_line(
                 zone_location,
@@ -1232,10 +1235,6 @@ class ZonePicking(Component, ChangePackLotMixin):
                 move_lines,
                 message=self.msg_store.record_not_found(),
             )
-
-        buffer_lines = self._find_buffer_move_lines(
-            zone_location, picking_type, dest_package=package
-        )
         search = self.actions_for("search")
         location = search.location_from_scan(barcode)
         if location:
