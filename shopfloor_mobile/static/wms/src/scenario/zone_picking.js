@@ -148,7 +148,7 @@ const template_mobile = `
                 :card_color="utils.colors.color_for('screen_step_todo')"
                 class="mt-2"
                 />
-            <div class="no-line-found" v-if="state.data.move_line">
+            <div class="no-line-found" v-if="_.isEmpty(state.data.move_line)">
                 <!-- In theory this should not happen.
                 Handled only because something seems wrong backend side
                 and we might get here w/ no line info. -->
