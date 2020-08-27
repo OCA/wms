@@ -18,6 +18,7 @@ setuptools.setup(
         'odoo13-addon-stock_picking_type_shipping_policy',
         'odoo13-addon-stock_picking_type_shipping_policy_group_by',
         'odoo13-addon-stock_storage_type',
+        'odoo13-addon-stock_storage_type_putaway_abc',
     ],
     classifiers=[
         'Programming Language :: Python',
