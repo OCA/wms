@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <record id="sale_delivery_carrier_preference_tree_view" model="ir.ui.view">
-        <field name="name">sale.delivery.carrier.preference.tree.view</field>
-        <field name="model">sale.delivery.carrier.preference</field>
+    <record id="delivery_carrier_preference_tree_view" model="ir.ui.view">
+        <field name="name">delivery.carrier.preference.tree.view</field>
+        <field name="model">delivery.carrier.preference</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="sequence" widget="handle" />
@@ -12,14 +12,14 @@
                     name="carrier_id"
                     attrs="{'required': [('preference', '=', 'carrier')]}"
                 />
-                <field name="sale_order_max_weight" />
+                <field name="max_weight" />
                 <field name="company_id" groups="base.group_multi_company" />
             </tree>
         </field>
     </record>
-    <record id="sale_delivery_carrier_preference_form_view" model="ir.ui.view">
-        <field name="name">sale.delivery.carrier.preference.form.view</field>
-        <field name="model">sale.delivery.carrier.preference</field>
+    <record id="delivery_carrier_preference_form_view" model="ir.ui.view">
+        <field name="name">delivery.carrier.preference.form.view</field>
+        <field name="model">delivery.carrier.preference</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
@@ -39,7 +39,12 @@
                         </group>
                         <group>
                             <field name="sequence" />
-                            <field name="sale_order_max_weight" />
+                            <label for="max_weight" />
+                            <div name="max_weight">
+                                <field name="max_weight" class="oe_inline" />
+                                <field name="max_weight_uom_name" class="oe_inline" />
+                                <field name="max_weight_uom_id" invisible="1" />
+                            </div>
                             <field
                                 name="company_id"
                                 groups="base.group_multi_company"
@@ -50,18 +55,14 @@
             </form>
         </field>
     </record>
-    <record
-        id="action_sale_delivery_carrier_preference_view"
-        model="ir.actions.act_window"
-    >
+    <record id="action_delivery_carrier_preference_view" model="ir.actions.act_window">
         <field name="name">Preferred Shipping Methods</field>
-        <field name="res_model">sale.delivery.carrier.preference</field>
+        <field name="res_model">delivery.carrier.preference</field>
     </record>
     <menuitem
-        id="menu_sale_delivery_carrier_preference"
+        id="menu_delivery_carrier_preference"
         name="Preferred Shipping Methods"
-        parent="sale.menu_sales_config"
-        action="action_sale_delivery_carrier_preference_view"
-        groups="sales_team.group_sale_manager"
+        parent="delivery.menu_delivery"
+        action="action_delivery_carrier_preference_view"
     />
 </odoo>
