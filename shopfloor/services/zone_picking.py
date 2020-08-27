@@ -1048,19 +1048,23 @@ class ZonePicking(Component, ChangePackLotMixin):
                     zone_location, picking_type, buffer_lines, message=error
                 )
             # check if the destination location is not the expected one
-            if location != picking_type.default_location_dest_id:
+            #   - OK if the scanned destination is a child of the current
+            #     destination set on buffer lines
+            #   - To confirm if the scanned destination is not a child of the
+            #     current destination set on buffer lines
+            if not location.is_sublocation_of(buffer_lines.location_dest_id):
                 if not confirmation:
                     return self._response_for_unload_all(
                         zone_location,
                         picking_type,
                         buffer_lines,
                         message=self.msg_store.confirm_location_changed(
-                            picking_type.default_location_dest_id, location
+                            first(buffer_lines.location_dest_id), location
                         ),
                         confirmation_required=True,
                     )
-                # the scanned location is still valid, use it
-                self._write_destination_on_lines(buffer_lines, location)
+            # the scanned location is still valid, use it
+            self._write_destination_on_lines(buffer_lines, location)
             # set lines to done + refresh buffer lines (should be empty)
             moves = buffer_lines.mapped("move_id")
             moves.with_context(_sf_no_backorder=True)._action_done()
@@ -1242,19 +1246,24 @@ class ZonePicking(Component, ChangePackLotMixin):
                     first(buffer_lines),
                     message=self.msg_store.dest_location_not_allowed(),
                 )
-            if location != picking_type.default_location_dest_id:
+            # check if the destination location is not the expected one
+            #   - OK if the scanned destination is a child of the current
+            #     destination set on buffer lines
+            #   - To confirm if the scanned destination is not a child of the
+            #     current destination set on buffer lines
+            if not location.is_sublocation_of(buffer_lines.location_dest_id):
                 if not confirmation:
                     return self._response_for_unload_set_destination(
                         zone_location,
                         picking_type,
                         first(buffer_lines),
                         message=self.msg_store.confirm_location_changed(
-                            picking_type.default_location_dest_id, location
+                            first(buffer_lines.location_dest_id), location
                         ),
                         confirmation_required=True,
                     )
-                # the scanned location is valid, use it
-                self._write_destination_on_lines(buffer_lines, location)
+            # the scanned location is valid, use it
+            self._write_destination_on_lines(buffer_lines, location)
             # set lines to done + refresh buffer lines (should be empty)
             moves = buffer_lines.mapped("move_id")
             moves.with_context(_sf_no_backorder=True)._action_done()
