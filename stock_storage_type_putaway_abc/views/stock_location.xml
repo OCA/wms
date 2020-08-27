@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_location_form_inherit" model="ir.ui.view">
+        <field name="name">stock.location.form.inherit</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock_storage_type.view_location_form_inherit" />
+        <field name="arch" type="xml">
+            <field name="pack_putaway_strategy" position="after">
+                <field name="display_abc_storage" invisible="1" />
+                <field
+                    name="abc_storage"
+                    attrs="{'invisible': [('display_abc_storage', '=', False)]}"
+                />
+            </field>
+        </field>
+    </record>
+</odoo>
