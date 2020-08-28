@@ -175,6 +175,8 @@ class SinglePackTransfer(Component):
             if confirmation:
                 # If the destination of the move would be incoherent
                 # (move line outside of it), we change the moves' destination
+                # TODO in other scenarios, we forbid this. Check if we want
+                # to forbid it as well.
                 if not scanned_location.is_sublocation_of(move.location_dest_id):
                     move.location_dest_id = scanned_location.id
             else:

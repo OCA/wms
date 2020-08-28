@@ -366,6 +366,8 @@ class LocationContentTransfer(Component):
 
         if not scanned_location.is_sublocation_of(
             self.picking_types.mapped("default_location_dest_id")
+        ) or not scanned_location.is_sublocation_of(
+            move_lines.mapped("move_id.location_dest_id"), func=all
         ):
             return self._response_for_scan_destination_all(
                 pickings, message=self.msg_store.dest_location_not_allowed()
@@ -550,6 +552,10 @@ class LocationContentTransfer(Component):
             )
         if not scanned_location.is_sublocation_of(
             package_level.picking_id.picking_type_id.default_location_dest_id
+        ) or not scanned_location.is_sublocation_of(
+            # beware, package_level.move_id is not always set
+            package_level.move_line_ids.move_id.location_dest_id,
+            func=all,
         ):
             return self._response_for_scan_destination(
                 location,
@@ -617,6 +623,8 @@ class LocationContentTransfer(Component):
             )
         if not scanned_location.is_sublocation_of(
             move_line.picking_id.picking_type_id.default_location_dest_id
+        ) or not scanned_location.is_sublocation_of(
+            move_line.move_id.location_dest_id, func=all
         ):
             return self._response_for_scan_destination(
                 location, move_line, message=self.msg_store.dest_location_not_allowed()

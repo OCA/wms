@@ -131,6 +131,34 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             message=self.service.msg_store.confirm_pack_moved(),
         )
 
+    def test_set_destination_location_move_invalid_location(self):
+        # Confirm the destination with a wrong destination, outside of move's
+        # move line (should not happen)
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        move_line = self.picking1.move_line_ids
+        move_line.location_dest_id = self.packing_sublocation_a
+        move_line.move_id.location_dest_id = self.packing_sublocation_a
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "move_line_id": move_line.id,
+                "barcode": self.packing_sublocation_b.barcode,
+                "quantity": move_line.product_uom_qty,
+                "confirmation": True,
+            },
+        )
+        # Check response
+        self.assert_response_set_line_destination(
+            response,
+            zone_location,
+            picking_type,
+            move_line,
+            message=self.service.msg_store.dest_location_not_allowed(),
+        )
+
     def test_set_destination_location_no_other_move_line_full_qty(self):
         """Scanned barcode is the destination location.
 

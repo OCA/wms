@@ -285,6 +285,33 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             message={"message_type": "error", "body": "You cannot place it here"},
         )
 
+    def test_set_destination_all_error_location_move_invalid(self):
+        """Endpoint called with a barcode for an invalid location
+
+        It is invalid when the location is not the destination location or
+        sublocation of move line's move
+        """
+        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        self._set_dest_package_and_done(move_lines, self.bin1)
+        move_lines.write({"location_dest_id": self.packing_a_location.id})
+        move_lines[0].move_id.location_dest_id = self.packing_a_location
+
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "picking_batch_id": self.batch.id,
+                "barcode": self.packing_b_location.barcode,
+            },
+        )
+        location = move_lines[0].location_dest_id
+        data = self._data_for_batch(self.batch, location)
+        self.assert_response(
+            response,
+            next_state="unload_all",
+            data=data,
+            message=self.service.msg_store.dest_location_not_allowed(),
+        )
+
     def test_set_destination_all_need_confirmation(self):
         """Endpoint called with a barcode for another (valid) location"""
         move_lines = self.batch.mapped("picking_ids.move_line_ids")
@@ -649,6 +676,30 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             next_state="unload_set_destination",
             data=data,
             message={"message_type": "error", "body": "You cannot place it here"},
+        )
+
+    def test_unload_scan_destination_error_location_move_invalid(self):
+        """Endpoint called with a barcode for an invalid location
+
+        It is invalid when the location is not the destination location or
+        sublocation of the move line's move
+        """
+        self.bin1_lines[0].move_id.location_dest_id = self.packing_a_location
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": self.packing_b_location.barcode,
+            },
+        )
+        location = self.bin1_lines[0].location_dest_id
+        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        self.assert_response(
+            response,
+            next_state="unload_set_destination",
+            data=data,
+            message=self.service.msg_store.dest_location_not_allowed(),
         )
 
     def test_unload_scan_destination_need_confirmation(self):
