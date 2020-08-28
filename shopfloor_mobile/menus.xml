@@ -2,12 +2,12 @@
 <odoo>
     <record id="action_shopfloor_app" model="ir.actions.act_url">
         <field name="name">Shopfloor mobile app</field>
-        <field name="url">/shopfloormobile/scanner/#</field>
+        <field name="url">/shopfloor_mobile/app/#</field>
         <field name="target">new</field>
     </record>
     <record id="action_shopfloor_app_demo" model="ir.actions.act_url">
         <field name="name">Shopfloor mobile app DEMO</field>
-        <field name="url">/shopfloormobile/scanner/demo/#</field>
+        <field name="url">/shopfloor_mobile/app/demo/#</field>
         <field name="target">new</field>
     </record>
     <menuitem

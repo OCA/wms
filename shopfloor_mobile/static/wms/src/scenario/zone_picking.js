@@ -622,6 +622,4 @@ export var ZonePicking = Vue.component("zone-picking", {
     },
 });
 
-process_registry.add("zone_picking", ZonePicking, {
-    demo_src: "demo/demo.zone_picking.js",
-});
+process_registry.add("zone_picking", ZonePicking);

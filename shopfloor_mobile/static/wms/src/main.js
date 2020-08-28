@@ -46,10 +46,7 @@ const app = new Vue({
     },
     created: function() {
         const self = this;
-        this.demo_mode = window.location.pathname.includes("demo");
-        if (this.demo_mode) {
-            this._loadDemoResources();
-        }
+        this.demo_mode = this.app_info.demo_mode;
         this.loadConfig();
         document.addEventListener("fetchStart", function() {
             self.loading = true;
@@ -71,6 +68,9 @@ const app = new Vue({
         });
     },
     computed: {
+        app_info: function() {
+            return shopfloor_app_info;
+        },
         has_profile: function() {
             return !_.isEmpty(this.profile);
         },
@@ -190,6 +190,7 @@ const app = new Vue({
             this._clearAppData();
             this.$router.push({name: "login"});
         },
+        // Likely not needed anymore
         loadJS: function(url, script_id) {
             if (script_id && !document.getElementById(script_id)) {
                 console.debug("Load JS", url);
@@ -199,20 +200,6 @@ const app = new Vue({
                 script.setAttribute("id", script_id);
                 document.getElementsByTagName("head")[0].appendChild(script);
             }
-        },
-        _loadDemoResources: function() {
-            const self = this;
-            this.loadJS("src/demo/demo.core.js", "demo_core");
-            let registered = [];
-            _.forEach(this.registry.all(), function(process, key) {
-                if (process.metadata.demo_src) {
-                    // FIXME: find a way to not pass relative path
-                    self.loadJS("src/" + process.metadata.demo_src, "demo_" + key);
-                    registered.push(key);
-                }
-            });
-            if (registered.length)
-                console.log("Registered demo resources for:", registered.join(", "));
         },
         /*
         Trigger and event on the event hub.
