@@ -119,5 +119,4 @@ export var ScanAnything = Vue.component("scan-anything", {
 
 process_registry.add("scan_anything", ScanAnything, {
     path: "/scan_anything/:identifier?",
-    demo_src: "demo/demo.scan_anything.js",
 });

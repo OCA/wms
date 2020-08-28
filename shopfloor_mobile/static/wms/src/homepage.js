@@ -35,6 +35,12 @@ export var HomePage = Vue.component("home-page", {
                     </v-col>
                 </v-row>
             </div>
+
+            <v-footer absolute padless>
+                <v-col class="text-center font-weight-light" cols="12">
+                    <span class="version">Version:</span> <span class="version-number" v-text="$root.app_info.app_version" />
+                </v-col>
+            </v-footer>
         </Screen>
     `,
 });

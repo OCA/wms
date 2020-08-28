@@ -277,4 +277,4 @@ export var Delivery = Vue.component("checkout", {
     },
 });
 
-process_registry.add("delivery", Delivery, {demo_src: "demo/demo.delivery.js"});
+process_registry.add("delivery", Delivery);
