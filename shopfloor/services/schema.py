@@ -111,6 +111,7 @@ class BaseShopfloorSchemaResponse(Component):
             "display_name": {"type": "string", "nullable": False, "required": True},
             "default_code": {"type": "string", "nullable": False, "required": True},
             "barcode": {"type": "string", "nullable": True, "required": False},
+            "supplier_code": {"type": "string", "nullable": True, "required": False},
             "packaging": self._schema_list_of(self.packaging()),
             "uom": self._schema_dict_of(
                 self._simple_record(
