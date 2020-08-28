@@ -16,11 +16,18 @@ Vue.component("detail-product", {
                 {path: "lot.name", label: "Lot"},
                 {path: "expiry_date", label: "Expiry date"},
                 {path: "default_code", label: "Internal ref"},
-                {path: "supplier_code", label: "Supplier ref"},
+                {path: "product.supplier_code", label: "Supplier ref"},
             ];
         },
         packaging_detail_fields() {
             return [{path: "name", renderer: this.render_packaging}];
+        },
+        supplier_detail_fields() {
+            return [
+                {path: "name", klass: "loud"},
+                {path: "product_code", label: "Code"},
+                {path: "product_name", label: "Name"},
+            ];
         },
         render_packaging(record, field) {
             return [record["name"], record["qty"] + " " + record["qty_unit"]].join(
@@ -29,14 +36,25 @@ Vue.component("detail-product", {
         },
     },
     template: `
-  <div :class="$options._componentTag">
-      <item-detail-card v-bind="$props" :options="{main: true, fields: product_detail_fields(), key_title: 'display_name'}" />
+<div :class="$options._componentTag">
+    <item-detail-card v-bind="$props" :options="{main: true, fields: product_detail_fields(), key_title: 'display_name'}" />
 
-      <list class="packaging pb-2"
-          v-if="opts.full_detail && record.packaging"
-          :records="record.packaging"
-          :options="{key_title: 'display_name', list_item_fields: packaging_detail_fields()}"
-          />
-  </div>
+    <div class="suppliers mb-4" v-if="_.result(record, 'suppliers', []).length">
+        <separator-title>Suppliers</separator-title>
+        <item-detail-card
+            v-for="supp in record.suppliers"
+            :key="'supp' + supp.id"
+            :record="supp"
+            :options="{no_title: true, fields: supplier_detail_fields()}" />
+    </div>
+
+    <div class="packaging mb-4" v-if="opts.full_detail && record.packaging">
+        <separator-title>Packaging</separator-title>
+        <list
+            :records="record.packaging"
+            :options="{key_title: 'display_name', list_item_fields: packaging_detail_fields()}"
+            />
+    </div>
+</div>
 `,
 });

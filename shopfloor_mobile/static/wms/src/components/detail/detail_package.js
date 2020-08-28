@@ -13,6 +13,7 @@ Vue.component("detail-package", {
         },
         product_list_fields() {
             return [
+                {path: "product.supplier_code", label: "Vendor code", klass: "loud"},
                 {path: "lot.name", label: "Lot"},
                 {path: "product.qty_reserved", label: "Reserved"},
                 {path: "product.qty_available", label: "In stock"},

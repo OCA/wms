@@ -206,6 +206,7 @@ class DataAction(Component):
             "barcode",
             ("packaging_ids:packaging", self._product_packaging),
             ("uom_id:uom", self._simple_record_parser() + ["factor", "rounding"]),
+            ("seller_ids:supplier_code", self._product_supplier_code),
         ]
 
     def _product_packaging(self, rec, field):
@@ -214,6 +215,9 @@ class DataAction(Component):
             self._packaging_parser,
             multi=True,
         )
+
+    def _product_supplier_code(self, rec, field):
+        return rec.seller_ids[0].product_code or "" if rec.seller_ids else ""
 
     def picking_batch(self, record, with_pickings=False, **kw):
         parser = self._picking_batch_parser
