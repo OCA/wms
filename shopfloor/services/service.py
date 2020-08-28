@@ -28,6 +28,18 @@ class ShopfloorServiceDispatchException(Exception):
         self.rest_json_info = {"log_entry_url": log_entry_url}
 
 
+class ShopfloorServiceUserErrorException(
+    ShopfloorServiceDispatchException, exceptions.UserError
+):
+    """User error wrapped exception."""
+
+
+class ShopfloorServiceValidationErrorException(
+    ShopfloorServiceDispatchException, exceptions.ValidationError
+):
+    """Validation error wrapped exception."""
+
+
 class BaseShopfloorService(AbstractComponent):
     """Base class for REST services"""
 
@@ -55,19 +67,44 @@ class BaseShopfloorService(AbstractComponent):
     def _dispatch_with_db_logging(self, method_name, _id=None, params=None):
         try:
             result = super().dispatch(method_name, _id=_id, params=params)
-        except Exception as err:
-            tb = traceback.format_exc()
-            self.env.cr.rollback()
-            with registry(self.env.cr.dbname).cursor() as cr:
-                env = self.env(cr=cr)
-                log_entry = self._log_call_in_db(env, request, _id, params, error=tb)
-                log_entry_url = self._get_log_entry_url(log_entry)
-            raise ShopfloorServiceDispatchException(str(err), log_entry_url) from err
-
+        except exceptions.UserError as orig_exception:
+            self._dispatch_exception(
+                ShopfloorServiceUserErrorException,
+                orig_exception,
+                _id=_id,
+                params=params,
+            )
+        except exceptions.ValidationError as orig_exception:
+            self._dispatch_exception(
+                ShopfloorServiceValidationErrorException,
+                orig_exception,
+                _id=_id,
+                params=params,
+            )
+        except Exception as orig_exception:
+            self._dispatch_exception(
+                ShopfloorServiceDispatchException,
+                orig_exception,
+                _id=_id,
+                params=params,
+            )
         log_entry = self._log_call_in_db(self.env, request, _id, params, result=result)
         log_entry_url = self._get_log_entry_url(log_entry)
         result["log_entry_url"] = log_entry_url
         return result
+
+    def _dispatch_exception(
+        self, exception_klass, orig_exception, _id=None, params=None
+    ):
+        tb = traceback.format_exc()
+        self.env.cr.rollback()
+        with registry(self.env.cr.dbname).cursor() as cr:
+            env = self.env(cr=cr)
+            log_entry = self._log_call_in_db(env, request, _id, params, error=tb)
+            log_entry_url = self._get_log_entry_url(log_entry)
+        # UserError and alike have `name` attribute to store the msg
+        exc_msg = getattr(orig_exception, "name", str(orig_exception))
+        raise exception_klass(exc_msg, log_entry_url) from orig_exception
 
     def _get_log_entry_url(self, entry):
         base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")

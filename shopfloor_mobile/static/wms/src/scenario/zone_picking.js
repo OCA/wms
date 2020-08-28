@@ -140,15 +140,7 @@ const template_mobile = `
                 :list_options="picking_summary_move_line_list_options([state.data.move_line])"
                 :key="make_state_component_key(['picking-summary'])"
                 />
-            <item-detail-card
-                v-if="state.data.move_line"
-                :key="make_state_component_key(['detail-move-line-dest-pack', state.data.move_line.id])"
-                :record="state.data.move_line"
-                :options="{main: true, key_title: 'package_dest.name'}"
-                :card_color="utils.colors.color_for('screen_step_todo')"
-                class="mt-2"
-                />
-            <div class="no-line-found" v-if="state.data.move_line">
+            <div class="no-line-found" v-if="_.isEmpty(state.data.move_line)">
                 <!-- In theory this should not happen.
                 Handled only because something seems wrong backend side
                 and we might get here w/ no line info. -->
@@ -340,8 +332,11 @@ export var ZonePicking = Vue.component("zone-picking", {
                 // group_no_title: true,
                 prepare_records: _.partialRight(
                     this.utils.misc.group_by_pack,
-                    "package_src"
+                    "package_dest"
                 ),
+                group_color_maker: function(lines) {
+                    return "screen_step_todo";
+                },
             });
         },
         picking_summary_move_line_list_options: function(move_lines) {
@@ -515,7 +510,7 @@ export var ZonePicking = Vue.component("zone-picking", {
                             this.odoo.call("unload_scan_pack", {
                                 zone_location_id: this.current_zone_location().id,
                                 picking_type_id: this.current_picking_type().id,
-                                package_id: this.state.data.move_line.package_src.id,
+                                package_id: this.state.data.move_line.package_dest.id,
                                 barcode: scanned.text,
                             })
                         );
@@ -531,7 +526,7 @@ export var ZonePicking = Vue.component("zone-picking", {
                             this.odoo.call("unload_set_destination", {
                                 zone_location_id: this.current_zone_location().id,
                                 picking_type_id: this.current_picking_type().id,
-                                package_id: this.state.data.move_line.package_src.id,
+                                package_id: this.state.data.move_line.package_dest.id,
                                 barcode: scanned.text,
                                 confirmation: this.state.data.confirmation_required,
                             })

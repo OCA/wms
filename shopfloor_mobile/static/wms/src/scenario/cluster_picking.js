@@ -151,7 +151,7 @@ export var ClusterPicking = Vue.component("cluster-picking", {
         return {
             usage: "cluster_picking",
             initial_state_key: "start",
-            scan_destination_qty: 1,
+            scan_destination_qty: 0,
             states: {
                 start: {
                     on_get_work: evt => {
