@@ -51,6 +51,21 @@ class ActionsDataCaseBase(CommonCase):
         (cls.move_a + cls.move_b + cls.move_c + cls.move_d).write({"priority": "1"})
         cls.picking.action_assign()
 
+        cls.supplier = cls.env["res.partner"].sudo().create({"name": "Supplier"})
+        cls.vendor = (
+            cls.env["product.supplierinfo"]
+            .sudo()
+            .create(
+                {
+                    "name": cls.supplier.id,
+                    "price": 8.0,
+                    "product_code": "VENDOR_CODE",
+                    "product_id": cls.product_a.id,
+                    "product_tmpl_id": cls.product_a.product_tmpl_id.id,
+                }
+            )
+        )
+
     def assert_schema(self, schema, data):
         validator = Validator(schema)
         self.assertTrue(validator.validate(data), validator.errors)
@@ -80,6 +95,9 @@ class ActionsDataCaseBase(CommonCase):
                 "name": record.uom_id.name,
                 "rounding": record.uom_id.rounding,
             },
+            "supplier_code": record.seller_ids[0].product_code
+            if record.seller_ids
+            else "",
         }
         data.update(kw)
         return data
