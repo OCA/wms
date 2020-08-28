@@ -510,7 +510,7 @@ export var ZonePicking = Vue.component("zone-picking", {
                             this.odoo.call("unload_scan_pack", {
                                 zone_location_id: this.current_zone_location().id,
                                 picking_type_id: this.current_picking_type().id,
-                                package_id: this.state.data.move_line.package_src.id,
+                                package_id: this.state.data.move_line.package_dest.id,
                                 barcode: scanned.text,
                             })
                         );
@@ -526,7 +526,7 @@ export var ZonePicking = Vue.component("zone-picking", {
                             this.odoo.call("unload_set_destination", {
                                 zone_location_id: this.current_zone_location().id,
                                 picking_type_id: this.current_picking_type().id,
-                                package_id: this.state.data.move_line.package_src.id,
+                                package_id: this.state.data.move_line.package_dest.id,
                                 barcode: scanned.text,
                                 confirmation: this.state.data.confirmation_required,
                             })
