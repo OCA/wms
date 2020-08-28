@@ -511,12 +511,12 @@ I tested only w/ checkout/select_package for now
     border-bottom: 1px solid #ccc;
 }
 
-/* .select-group.v-card {
-    overflow: hidden;
+.detail.item-detail-card .v-card__title button.detail-action.v-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: inline-block;
 }
-.list-item-wrapper {
-    float: left;
-    overflow: hidden;
-    border: 1px solid;
-    margin: 20px;
-} */
+.detail.item-detail-card .v-card__title > span {
+    margin-right: 1.2em;
+}
