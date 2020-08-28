@@ -941,6 +941,8 @@ class ClusterPicking(Component, ChangePackLotMixin):
             )
         if not scanned_location.is_sublocation_of(
             picking_type.default_location_dest_id
+        ) or not scanned_location.is_sublocation_of(
+            lines.mapped("move_id.location_dest_id"), func=all
         ):
             return self._response_for_unload_all(
                 batch, message=self.msg_store.dest_location_not_allowed()
@@ -1092,8 +1094,11 @@ class ClusterPicking(Component, ChangePackLotMixin):
             return self._response_for_unload_set_destination(
                 batch, package, message=self.msg_store.no_location_found()
             )
+
         if not scanned_location.is_sublocation_of(
             picking_type.default_location_dest_id
+        ) or not scanned_location.is_sublocation_of(
+            lines.mapped("move_id.location_dest_id"), func=all
         ):
             return self._response_for_unload_set_destination(
                 batch, package, message=self.msg_store.dest_location_not_allowed()

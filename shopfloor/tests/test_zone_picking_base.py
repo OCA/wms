@@ -71,6 +71,28 @@ class ZonePickingCommonCase(CommonCase):
                 }
             )
         )
+        cls.packing_sublocation_a = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Packing Sublocation A",
+                    "location_id": cls.packing_location.id,
+                    "barcode": "PACKING_SUBLOCATION_A",
+                }
+            )
+        )
+        cls.packing_sublocation_b = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Packing Sublocation B",
+                    "location_id": cls.packing_location.id,
+                    "barcode": "PACKING_SUBLOCATION_B",
+                }
+            )
+        )
         cls.product_e = (
             cls.env["product.product"]
             .sudo()

@@ -115,6 +115,36 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             message=self.service.msg_store.dest_location_not_allowed(),
         )
 
+    def test_unload_set_destination_location_move_not_allowed(self):
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        move_line = self.picking1.move_line_ids
+        move_line[0].move_id.location_dest_id = self.packing_sublocation_a
+        # set the destination package
+        self.service._set_destination_package(
+            zone_location,
+            picking_type,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
+        )
+        response = self.service.dispatch(
+            "unload_set_destination",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "package_id": self.free_package.id,
+                "barcode": self.packing_sublocation_b.barcode,
+            },
+        )
+        self.assert_response_unload_set_destination(
+            response,
+            zone_location,
+            picking_type,
+            move_line,
+            message=self.service.msg_store.dest_location_not_allowed(),
+        )
+
     def test_unload_set_destination_confirm_location(self):
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
