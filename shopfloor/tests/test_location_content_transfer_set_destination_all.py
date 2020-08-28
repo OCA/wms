@@ -149,6 +149,24 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
             message=self.service.msg_store.dest_location_not_allowed(),
         )
 
+    def test_set_destination_all_dest_location_move_invalid(self):
+        """The scanned destination location is not in the move's dest location"""
+        # if we have at least one move which does not match the scanned location
+        # we forbid the action
+        self.pickings.move_lines[0].location_dest_id = self.shelf1
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "location_id": self.content_loc.id,
+                "barcode": self.shelf2.barcode,
+            },
+        )
+        self.assert_response_scan_destination_all(
+            response,
+            self.pickings,
+            message=self.service.msg_store.dest_location_not_allowed(),
+        )
+
     def test_go_to_single(self):
         """User used to 'split by lines' button to process line per line"""
         response = self.service.dispatch(

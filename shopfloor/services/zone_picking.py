@@ -115,7 +115,7 @@ class ZonePicking(Component, ChangePackLotMixin):
         data = self._data_for_move_line(zone_location, picking_type, move_line)
         data["confirmation_required"] = confirmation_required
         return self._response(
-            next_state="set_line_destination", data=data, message=message,
+            next_state="set_line_destination", data=data, message=message
         )
 
     def _response_for_zero_check(
@@ -148,7 +148,7 @@ class ZonePicking(Component, ChangePackLotMixin):
             message = self.msg_store.need_confirmation()
         data = self._data_for_move_lines(zone_location, picking_type, move_lines)
         data["confirmation_required"] = confirmation_required
-        return self._response(next_state="unload_all", data=data, message=message,)
+        return self._response(next_state="unload_all", data=data, message=message)
 
     def _response_for_unload_single(
         self, zone_location, picking_type, move_line, message=None, popup=None
@@ -176,7 +176,7 @@ class ZonePicking(Component, ChangePackLotMixin):
         data = self._data_for_move_line(zone_location, picking_type, move_line)
         data["confirmation_required"] = confirmation_required
         return self._response(
-            next_state="unload_set_destination", data=data, message=message,
+            next_state="unload_set_destination", data=data, message=message
         )
 
     def _data_for_select_picking_type(self, zone_location, picking_types):
@@ -455,7 +455,7 @@ class ZonePicking(Component, ChangePackLotMixin):
             if not move_line:
                 response = self.list_move_lines(zone_location.id, picking_type.id)
                 return self._response(
-                    base_response=response, message=self.msg_store.package_not_found(),
+                    base_response=response, message=self.msg_store.package_not_found()
                 )
         product = search.product_from_scan(barcode)
         if product:
@@ -465,7 +465,7 @@ class ZonePicking(Component, ChangePackLotMixin):
             if not move_line:
                 response = self.list_move_lines(zone_location.id, picking_type.id)
                 return self._response(
-                    base_response=response, message=self.msg_store.product_not_found(),
+                    base_response=response, message=self.msg_store.product_not_found()
                 )
         lot = search.lot_from_scan(barcode)
         if lot:
@@ -473,13 +473,13 @@ class ZonePicking(Component, ChangePackLotMixin):
             if not move_line:
                 response = self.list_move_lines(zone_location.id, picking_type.id)
                 return self._response(
-                    base_response=response, message=self.msg_store.lot_not_found(),
+                    base_response=response, message=self.msg_store.lot_not_found()
                 )
         # barcode not found, get back on 'select_line' screen
         if not move_line:
             response = self.list_move_lines(zone_location.id, picking_type.id)
             return self._response(
-                base_response=response, message=self.msg_store.barcode_not_found(),
+                base_response=response, message=self.msg_store.barcode_not_found()
             )
         return self._response_for_set_line_destination(
             zone_location, picking_type, move_line
@@ -490,11 +490,28 @@ class ZonePicking(Component, ChangePackLotMixin):
     ):
         location_changed = False
         response = None
+
+        # A valid location is a sub-location of the original destination, or a
+        # any sub-location of the picking type's default destination location
+        # if `confirmation is True
         # Ask confirmation to the user if the scanned location is not in the
         # expected ones but is valid (in picking type's default destination)
-        if not location.is_sublocation_of(move_line.location_dest_id) and (
-            not confirmation
-            and location.is_sublocation_of(picking_type.default_location_dest_id)
+        if not location.is_sublocation_of(
+            picking_type.default_location_dest_id
+        ) or not location.is_sublocation_of(
+            move_line.move_id.location_dest_id, func=all
+        ):
+            response = self._response_for_set_line_destination(
+                zone_location,
+                picking_type,
+                move_line,
+                message=self.msg_store.dest_location_not_allowed(),
+            )
+            return (location_changed, response)
+
+        if (
+            not location.is_sublocation_of(move_line.location_dest_id)
+            and not confirmation
         ):
             response = self._response_for_set_line_destination(
                 zone_location,
@@ -506,20 +523,7 @@ class ZonePicking(Component, ChangePackLotMixin):
                 confirmation_required=True,
             )
             return (location_changed, response)
-        # A valid location is a sub-location of the original destination, or a
-        # sub-location of the picking type's default destination location if
-        # `confirmation is True
-        if not location.is_sublocation_of(move_line.location_dest_id) and (
-            confirmation
-            and not location.is_sublocation_of(picking_type.default_location_dest_id)
-        ):
-            response = self._response_for_set_line_destination(
-                zone_location,
-                picking_type,
-                move_line,
-                message=self.msg_store.dest_location_not_allowed(),
-            )
-            return (location_changed, response)
+
         # If no destination package
         if not move_line.result_package_id:
             response = self._response_for_set_line_destination(
@@ -744,7 +748,7 @@ class ZonePicking(Component, ChangePackLotMixin):
 
         # Process the next line
         response = self.list_move_lines(zone_location.id, picking_type.id)
-        return self._response(base_response=response, message=message,)
+        return self._response(base_response=response, message=message)
 
     def is_zero(self, zone_location_id, picking_type_id, move_line_id, zero):
         """Confirm or not if the source location of a move has zero qty
@@ -984,7 +988,7 @@ class ZonePicking(Component, ChangePackLotMixin):
             return self._response_for_unload_single(
                 zone_location, picking_type, first(move_lines)
             )
-        move_lines = self._find_location_move_lines(zone_location, picking_type,)
+        move_lines = self._find_location_move_lines(zone_location, picking_type)
         return self._response_for_select_line(zone_location, picking_type, move_lines)
 
     def _set_destination_all_response(
@@ -992,12 +996,12 @@ class ZonePicking(Component, ChangePackLotMixin):
     ):
         if buffer_lines:
             return self._response_for_unload_all(
-                zone_location, picking_type, buffer_lines, message=message,
+                zone_location, picking_type, buffer_lines, message=message
             )
         move_lines = self._find_location_move_lines(zone_location, picking_type)
         if move_lines:
             return self._response_for_select_line(
-                zone_location, picking_type, move_lines, message=message,
+                zone_location, picking_type, move_lines, message=message
             )
         return self._response_for_start(message=message)
 
@@ -1073,7 +1077,7 @@ class ZonePicking(Component, ChangePackLotMixin):
         else:
             message = self.msg_store.no_location_found()
         return self._set_destination_all_response(
-            zone_location, picking_type, buffer_lines, message=message,
+            zone_location, picking_type, buffer_lines, message=message
         )
 
     def _write_destination_on_lines(self, lines, location):
@@ -1104,7 +1108,7 @@ class ZonePicking(Component, ChangePackLotMixin):
         # more than one remaining move line in the buffer
         if len(buffer_lines) > 1:
             return self._response_for_unload_single(
-                zone_location, picking_type, first(buffer_lines),
+                zone_location, picking_type, first(buffer_lines)
             )
         # only one move line to process in the buffer
         elif len(buffer_lines) == 1:
@@ -1238,7 +1242,11 @@ class ZonePicking(Component, ChangePackLotMixin):
         search = self.actions_for("search")
         location = search.location_from_scan(barcode)
         if location:
-            if not location.is_sublocation_of(picking_type.default_location_dest_id):
+            if not location.is_sublocation_of(
+                picking_type.default_location_dest_id
+            ) or not location.is_sublocation_of(
+                buffer_lines.move_id.location_dest_id, func=all
+            ):
                 return self._response_for_unload_set_destination(
                     zone_location,
                     picking_type,
@@ -1269,7 +1277,7 @@ class ZonePicking(Component, ChangePackLotMixin):
             buffer_lines = self._find_buffer_move_lines(zone_location, picking_type)
             if buffer_lines:
                 return self._response_for_unload_single(
-                    zone_location, picking_type, first(buffer_lines),
+                    zone_location, picking_type, first(buffer_lines)
                 )
             move_lines = self._find_location_move_lines(zone_location, picking_type)
             if move_lines:

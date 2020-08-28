@@ -111,6 +111,28 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             message=self.service.msg_store.dest_location_not_allowed(),
         )
 
+    def test_set_destination_package_dest_location_move_nok(self):
+        """Scanned destination location not valid (different as move)"""
+        package_level = self.picking1.package_level_ids[0]
+        # if the move related to the package level has a destination
+        # location not a parent or equal to the scanned location,
+        # refuse the action
+        move = package_level.move_line_ids.move_id
+        move.location_dest_id = self.shelf1
+        response = self.service.dispatch(
+            "set_destination_package",
+            params={
+                "location_id": self.content_loc.id,
+                "package_level_id": package_level.id,
+                "barcode": self.shelf2.barcode,
+            },
+        )
+        self.assert_response_scan_destination(
+            response,
+            package_level,
+            message=self.service.msg_store.dest_location_not_allowed(),
+        )
+
     def test_set_destination_package_dest_location_to_confirm(self):
         """Scanned destination location valid, but need a confirmation."""
         package_level = self.picking1.package_level_ids[0]
@@ -212,6 +234,28 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
                 "move_line_id": move_line.id,
                 "quantity": move_line.product_uom_qty,
                 "barcode": customer_location.barcode,
+            },
+        )
+        self.assert_response_scan_destination(
+            response,
+            move_line,
+            message=self.service.msg_store.dest_location_not_allowed(),
+        )
+
+    def test_set_destination_line_dest_location_move_nok(self):
+        """Scanned destination location not valid (different as move)"""
+        move_line = self.picking2.move_line_ids[0]
+        # if the move related to the move line has a destination
+        # location not a parent or equal to the scanned location,
+        # refuse the action
+        move_line.move_id.location_dest_id = self.shelf1
+        response = self.service.dispatch(
+            "set_destination_line",
+            params={
+                "location_id": self.content_loc.id,
+                "move_line_id": move_line.id,
+                "quantity": move_line.product_uom_qty,
+                "barcode": self.shelf2.barcode,
             },
         )
         self.assert_response_scan_destination(
