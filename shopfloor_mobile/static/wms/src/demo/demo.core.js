@@ -241,6 +241,7 @@ export class DemoTools {
         _.defaults(defaults, {
             default_code: default_code,
             barcode: default_code,
+            supplier_code: this.makeProductCode(),
             qty_available: this.getRandomInt(200),
             packaging: this.randomSetFromArray(this.packaging, 4),
             uom: this.randomItemFromArray(this.uoms),

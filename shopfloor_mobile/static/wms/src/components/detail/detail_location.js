@@ -10,6 +10,7 @@ Vue.component("detail-location", {
                     action_val_path: "product.barcode",
                     klass: "loud",
                 },
+                {path: "product.supplier_code", label: "Vendor code", klass: "loud"},
                 {
                     path: "package_src.name",
                     label: "Pack",

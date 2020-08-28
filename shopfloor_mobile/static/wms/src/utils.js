@@ -226,6 +226,7 @@ export class Utils {
     move_line_product_detail_options(line, options = {}) {
         const self = this;
         const default_fields = [
+            {path: "product.supplier_code", label: "Vendor code", klass: "loud"},
             {path: "package_src.name", label: "Pack"},
             {path: "lot.name", label: "Lot"},
             {
