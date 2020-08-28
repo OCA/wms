@@ -14,6 +14,7 @@ class ShopfloorProfile(models.Model):
     menu_ids = fields.Many2many(
         "shopfloor.menu", string="Menus", help="Menus visible for this profile"
     )
+    active = fields.Boolean(default=True)
 
     @api.model
     def _default_warehouse_id(self):
