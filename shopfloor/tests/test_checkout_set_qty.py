@@ -127,7 +127,8 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
         selected_lines = self.moves_pack1.move_line_ids
         line_to_change = selected_lines[0]
         line_keep_qty = selected_lines[1]
-        new_qty = 5
+        # Process full qty
+        new_qty = line_to_change.product_uom_qty
         # we want to check that when we give the package id, we get
         # all its move lines
         response = self.service.dispatch(
@@ -136,7 +137,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
                 "picking_id": self.picking.id,
                 "selected_line_ids": selected_lines.ids,
                 "move_line_id": line_to_change.id,
-                "qty_done": 5,
+                "qty_done": new_qty,
             },
         )
         self.assertEqual(line_to_change.qty_done, new_qty)
@@ -216,5 +217,36 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             message={
                 "body": "Negative quantity not allowed.",
                 "message_type": "error",
+            },
+        )
+
+    def test_set_custom_qty_partial(self):
+        selected_lines = self.moves_pack1.move_line_ids
+        line_to_change = selected_lines[0]
+        line_keep_qty = selected_lines[1]
+        # split 1 qty
+        new_qty = line_to_change.product_uom_qty - 1
+        response = self.service.dispatch(
+            "set_custom_qty",
+            params={
+                "picking_id": self.picking.id,
+                "selected_line_ids": selected_lines.ids,
+                "move_line_id": line_to_change.id,
+                "qty_done": new_qty,
+            },
+        )
+        self.assertEqual(line_to_change.qty_done, new_qty)
+        self.assertEqual(line_keep_qty.qty_done, line_keep_qty.product_uom_qty)
+        new_line = [
+            x for x in self.moves_pack1.move_line_ids if x not in selected_lines
+        ][0]
+        self.assertEqual(new_line.product_uom_qty, 1.0)
+        self._assert_selected_qties(
+            response,
+            self.moves_pack1.move_line_ids,
+            {
+                line_to_change: new_qty,
+                line_keep_qty: line_keep_qty.product_uom_qty,
+                new_line: 0.0,
             },
         )
