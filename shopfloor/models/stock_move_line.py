@@ -109,7 +109,7 @@ class StockMoveLine(models.Model):
             pickings = new_picking
         return pickings
 
-    def _check_qty_to_be_done(self, qty_done, split_partial=True):
+    def _check_qty_to_be_done(self, qty_done, split_partial=True, **split_default_vals):
         """Check qty to be done for current move line. Split it if needed.
 
         :param qty_done: qty expected to be done
@@ -133,7 +133,9 @@ class StockMoveLine(models.Model):
             # has to pick some goods from another place because the location
             # contained less items than expected)
             remaining = self.product_uom_qty - qty_done
-            new_line = self.copy({"product_uom_qty": remaining, "qty_done": 0})
+            vals = {"product_uom_qty": remaining, "qty_done": 0}
+            vals.update(split_default_vals)
+            new_line = self.copy(vals)
             # if we didn't bypass reservation update, the quant reservation
             # would be reduced as much as the deduced quantity, which is wrong
             # as we only moved the quantity to a new move line
