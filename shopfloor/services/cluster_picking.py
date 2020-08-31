@@ -1,6 +1,5 @@
 from odoo import _, fields
 from odoo.osv import expression
-from odoo.tools.float_utils import float_compare
 
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
@@ -568,32 +567,12 @@ class ClusterPicking(Component, ChangePackLotMixin):
                 batch, message=self.msg_store.operation_not_found()
             )
 
-        # store a new line if we have split our line (not enough qty)
-        new_line = self.env["stock.move.line"]
-
-        rounding = move_line.product_uom_id.rounding
-        compare = float_compare(
-            quantity, move_line.product_uom_qty, precision_rounding=rounding
-        )
-        qty_lesser = compare == -1
-        qty_greater = compare == 1
-        if qty_greater:
+        new_line, qty_check = move_line._check_qty_to_be_done(quantity)
+        if qty_check == "greater":
             return self._response_for_scan_destination(
                 move_line,
                 message=self.msg_store.unable_to_pick_more(move_line.product_uom_qty),
             )
-        elif qty_lesser:
-            # split the move line which will be processed later (maybe the user
-            # has to pick some goods from another place because the location
-            # contained less items than expected)
-            remaining = move_line.product_uom_qty - quantity
-            new_line = move_line.copy({"product_uom_qty": remaining, "qty_done": 0})
-            # if we didn't bypass reservation update, the quant reservation
-            # would be reduced as much as the deduced quantity, which is wrong
-            # as we only moved the quantity to a new move line
-            move_line.with_context(
-                bypass_reservation_update=True
-            ).product_uom_qty = quantity
 
         search = self.actions_for("search")
         bin_package = search.package_from_scan(barcode)
