@@ -32,31 +32,26 @@ Vue.component("picking-select-line-content", {
         index: Number,
         count: Number,
     },
+    methods: {
+        no_pack_list_item_options(record) {
+            let opts = this.utils.misc.move_line_product_detail_options(record);
+            opts.fields.unshift({
+                path: "product.display_name",
+                action_val_path: "product.barcode",
+            });
+            return opts;
+        },
+    },
     template: `
     <div>
         <div class="has_pack" v-if="record.package_dest">
-            <div class="item-counter">
-                <span>{{ index + 1 }} / {{ count }}</span>
-            </div>
             <span class="clickable" @click="on_detail_action(record.package_dest, {action_val_path: 'name'})">
                 <btn-info-icon />
                 {{ record.package_dest.name }}
             </span>
         </div>
         <div class="no_pack" v-if="!record.package_dest">
-            <div class="item-counter">
-                <span>{{ index + 1 }} / {{ count }}</span>
-            </div>
-            <span class="clickable" @click="on_detail_action(record.product, {action_val_path: 'barcode'})">
-                <btn-info-icon />
-                {{ record.product.display_name }}
-            </span>
-            <div class="lot" v-if="record.lot">
-                <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
-            </div>
-            <div class="qty">
-                <span class="label">Qty:</span> <span>{{ record.quantity }}</span>
-            </div>
+            <list-item v-bind="$props" :options="no_pack_list_item_options(record)" />
         </div>
     </div>
   `,

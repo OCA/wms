@@ -139,7 +139,12 @@ Vue.component("list-item", {
     mixins: [ItemDetailMixin],
     template: `
     <div class="list-item">
-        <v-list-item-title v-if="opts.show_title" :class="{'font-weight-bold': opts.bold_title}" v-text="_.result(record, opts.key_title)"></v-list-item-title>
+        <v-list-item-title v-if="opts.show_title" :class="{'font-weight-bold': opts.bold_title}">
+            <div class="item-counter" v-if="opts.showCounters">
+                <span>{{ index + 1 }} / {{ count }}</span>
+            </div>
+            <span v-text="_.result(record, opts.key_title)" />
+        </v-list-item-title>
         <div class="details">
             <div v-for="(field, index) in options.fields" :class="'field-detail ' + field.path.replace('.', '-') + ' ' + (field.klass || '')">
                 <span v-if="raw_value(record, field) || field.display_no_value">
