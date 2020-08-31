@@ -496,22 +496,29 @@ class Checkout(Component):
             message = self.msg_store.record_not_found()
         for move_line in move_lines:
             qty_done = quantity_func(move_line)
-            if qty_done > move_line.product_uom_qty:
-                qty_done = move_line.product_uom_qty
-                message = {
-                    "body": _(
-                        "Not allowed to pack more than the quantity, "
-                        "the value has been changed to the maximum."
-                    ),
-                    "message_type": "warning",
-                }
             if qty_done < 0:
                 message = {
                     "body": _("Negative quantity not allowed."),
                     "message_type": "error",
                 }
             else:
+                new_line = self.env["stock.move.line"]
+                if qty_done > 0:
+                    new_line, qty_check = move_line._check_qty_to_be_done(
+                        qty_done, split_partial=True, result_package_id=False,
+                    )
+                    if qty_check == "greater":
+                        qty_done = move_line.product_uom_qty
+                        message = {
+                            "body": _(
+                                "Not allowed to pack more than the quantity, "
+                                "the value has been changed to the maximum."
+                            ),
+                            "message_type": "warning",
+                        }
                 move_line.qty_done = qty_done
+                if new_line:
+                    selected_line_ids.append(new_line.id)
         return self._response_for_select_package(
             picking,
             self.env["stock.move.line"].browse(selected_line_ids).exists(),
