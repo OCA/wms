@@ -1,5 +1,6 @@
 from odoo import _, fields, models
 from odoo.exceptions import UserError
+from odoo.tools.float_utils import float_compare
 
 
 class StockMoveLine(models.Model):
@@ -107,3 +108,35 @@ class StockMoveLine(models.Model):
             new_moves._action_assign()
             pickings = new_picking
         return pickings
+
+    def _check_qty_to_be_done(self, qty_done, split_partial=True):
+        """Check qty to be done for current move line. Split it if needed.
+
+        :param qty_done: qty expected to be done
+        :param split_partial: split if qty is less than expected
+            otherwise rely on a backorder.
+        """
+        # store a new line if we have split our line (not enough qty)
+        new_line = self.env["stock.move.line"]
+        rounding = self.product_uom_id.rounding
+        compare = float_compare(
+            qty_done, self.product_uom_qty, precision_rounding=rounding
+        )
+        qty_lesser = compare == -1
+        qty_greater = compare == 1
+        if qty_greater:
+            return (new_line, "greater")
+        elif qty_lesser:
+            if not split_partial:
+                return (new_line, "lesser")
+            # split the move line which will be processed later (maybe the user
+            # has to pick some goods from another place because the location
+            # contained less items than expected)
+            remaining = self.product_uom_qty - qty_done
+            new_line = self.copy({"product_uom_qty": remaining, "qty_done": 0})
+            # if we didn't bypass reservation update, the quant reservation
+            # would be reduced as much as the deduced quantity, which is wrong
+            # as we only moved the quantity to a new move line
+            self.with_context(bypass_reservation_update=True).product_uom_qty = qty_done
+            return (new_line, "lesser")
+        return (new_line, "full")
