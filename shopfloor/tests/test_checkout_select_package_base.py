@@ -8,7 +8,7 @@ class CheckoutSelectPackageMixin:
             next_state="select_package",
             data={
                 "selected_move_lines": [
-                    self._move_line_data(ml) for ml in selected_lines
+                    self._move_line_data(ml) for ml in selected_lines.sorted()
                 ],
                 "picking": self._picking_summary_data(picking),
                 "packing_info": picking.shopfloor_packing_info if packing_info else "",
@@ -26,7 +26,9 @@ class CheckoutSelectPackageMixin:
     ):
         picking = selected_lines.mapped("picking_id")
         deselected_lines = picking.move_line_ids - selected_lines
-        self.assertEqual(selected_lines.ids, [l.id for l in lines_quantities])
+        self.assertEqual(
+            sorted(selected_lines.ids), sorted([l.id for l in lines_quantities])
+        )
         for line, quantity in lines_quantities.items():
             self.assertEqual(line.qty_done, quantity)
         for line in deselected_lines:
