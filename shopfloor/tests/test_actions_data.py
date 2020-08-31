@@ -61,19 +61,44 @@ class ActionsDataCaseBase(CommonCase):
         cls.picking.action_assign()
 
         cls.supplier = cls.env["res.partner"].sudo().create({"name": "Supplier"})
-        cls.vendor = (
+        cls.product_a_vendor = (
             cls.env["product.supplierinfo"]
             .sudo()
             .create(
                 {
                     "name": cls.supplier.id,
                     "price": 8.0,
-                    "product_code": "VENDOR_CODE",
+                    "product_code": "VENDOR_CODE_A",
                     "product_id": cls.product_a.id,
                     "product_tmpl_id": cls.product_a.product_tmpl_id.id,
                 }
             )
         )
+        cls.product_a_variant = cls.product_a.copy(
+            {
+                "name": "Product A variant 1",
+                "type": "product",
+                "default_code": "A-VARIANT",
+                "barcode": "A-VARIANT",
+            }
+        )
+        # create another supplier info w/ lower sequence
+        cls.product_a_vendor = (
+            cls.env["product.supplierinfo"]
+            .sudo()
+            .create(
+                {
+                    "name": cls.supplier.id,
+                    "price": 12.0,
+                    "product_code": "VENDOR_CODE_VARIANT",
+                    "product_id": cls.product_a_variant.id,
+                    "product_tmpl_id": cls.product_a.product_tmpl_id.id,
+                    "sequence": 0,
+                }
+            )
+        )
+        cls.product_a_variant.flush()
+        cls.product_a_vendor.flush()
 
     def assert_schema(self, schema, data):
         validator = Validator(schema)
@@ -104,12 +129,14 @@ class ActionsDataCaseBase(CommonCase):
                 "name": record.uom_id.name,
                 "rounding": record.uom_id.rounding,
             },
-            "supplier_code": record.seller_ids[0].product_code
-            if record.seller_ids
-            else "",
+            "supplier_code": self._expected_supplier_code(record),
         }
         data.update(kw)
         return data
+
+    def _expected_supplier_code(self, product):
+        supplier_info = product.seller_ids.filtered(lambda x: x.product_id == product)
+        return supplier_info[0].product_code if supplier_info else ""
 
     def _expected_packaging(self, record, **kw):
         data = {
