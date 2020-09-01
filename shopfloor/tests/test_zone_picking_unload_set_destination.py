@@ -223,9 +223,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             move_line.product_uom_qty,
             self.free_package,
         )
-        with mock.patch.object(
-            type(self.picking1), "_send_confirmation_email"
-        ) as send_confirmation_email:
+        with mock.patch.object(type(self.picking1), "action_done") as action_done:
             response = self.service.dispatch(
                 "unload_set_destination",
                 params={
@@ -236,7 +234,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
                     "confirmation": True,
                 },
             )
-            send_confirmation_email.assert_called_once()
+            action_done.assert_called_once()
         # check data
         self.assertEqual(move_line.location_dest_id, packing_sublocation)
         self.assertEqual(move_line.move_id.state, "done")
@@ -268,9 +266,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
                 package_dest,
             )
         # process 1/2 buffer line
-        with mock.patch.object(
-            type(self.picking5), "_send_confirmation_email"
-        ) as send_confirmation_email:
+        with mock.patch.object(type(self.picking5), "action_done") as action_done:
             response = self.service.dispatch(
                 "unload_set_destination",
                 params={
@@ -280,7 +276,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
                     "barcode": self.packing_location.barcode,
                 },
             )
-            send_confirmation_email.assert_not_called()
+            action_done.assert_not_called()
         # check data
         move_line = self.picking5.move_line_ids.filtered(
             lambda l: l.result_package_id == self.free_package

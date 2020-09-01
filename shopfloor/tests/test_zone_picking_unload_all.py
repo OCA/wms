@@ -197,9 +197,7 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             another_package,
         )
         # set destination location for all lines in the buffer
-        with mock.patch.object(
-            type(self.picking5), "_send_confirmation_email"
-        ) as send_confirmation_email:
+        with mock.patch.object(type(self.picking5), "action_done") as action_done:
             response = self.service.dispatch(
                 "set_destination_all",
                 params={
@@ -208,7 +206,7 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
                     "barcode": self.packing_location.barcode,
                 },
             )
-            send_confirmation_email.assert_called_once()
+            action_done.assert_called_once()
         # check data
         self.assertEqual(self.picking5.state, "done")
         # buffer should be empty
