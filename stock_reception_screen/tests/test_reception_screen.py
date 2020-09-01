@@ -30,6 +30,20 @@ class TestReceptionScreen(SavepointCase):
                 "max_weight": 10,
             }
         )
+        cls.product_2 = cls.env.ref("product.product_delivery_02")
+        cls.product_2.tracking = "none"
+        cls.product_2_packaging = cls.env["product.packaging"].create(
+            {
+                "name": "PKG TEST 2",
+                "product_id": cls.product_2.id,
+                "qty": 2,
+                "package_storage_type_id": cls.storage_type_pallet.id,
+                "height": 200,
+                "width": 500,
+                "lngth": 500,
+                "max_weight": 10,
+            }
+        )
         cls.location_dest = cls.env.ref("stock.stock_location_stock")
         cls.location_src = cls.env.ref("stock.stock_location_suppliers")
         cls.picking = cls.env["stock.picking"].create(
@@ -50,7 +64,19 @@ class TestReceptionScreen(SavepointCase):
                             "location_id": cls.location_src.id,
                             "location_dest_id": cls.location_dest.id,
                         },
-                    )
+                    ),
+                    (
+                        0,
+                        False,
+                        {
+                            "name": cls.product_2.display_name,
+                            "product_id": cls.product_2.id,
+                            "product_uom": cls.product_2.uom_id.id,
+                            "product_uom_qty": 10,
+                            "location_id": cls.location_src.id,
+                            "location_dest_id": cls.location_dest.id,
+                        },
+                    ),
                 ],
             }
         )
@@ -98,22 +124,12 @@ class TestReceptionScreen(SavepointCase):
             self.screen.current_move_line_height, self.product_packaging.height
         )
         # The first 4 qties should be validated, creating a 2nd move to process
-        self.assertEqual(len(self.picking.move_lines), 1)
-        self.screen.button_save_step()
-        self.assertEqual(self.screen.current_step, "select_product")
         self.assertEqual(len(self.picking.move_lines), 2)
-        # Check the validated move
-        move_done = self.picking.move_lines.filtered(lambda m: m.state == "done")
-        self.assertEqual(len(move_done.move_line_ids), 1)
-        self.assertEqual(move_done.move_line_ids.result_package_id.name, "PID-TEST-1")
-        # Receive the remaining 6 qties
-        move = fields.first(
-            self.screen.picking_filtered_move_lines.filtered(
-                lambda m: not m.quantity_done
-            )
-        )
-        move.action_select_product()
+        self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_lot_number")
+
+        self.assertEqual(self.screen.current_step, "set_lot_number")
+        self.assertEqual(self.screen.current_move_line_lot_id.name, "LOT-TEST-1")
         self.screen.on_barcode_scanned_set_lot_number("LOT-TEST-2")
         self.assertEqual(self.screen.current_step, "set_expiry_date")
         self.screen.current_move_line_lot_life_date = fields.Datetime.today()
@@ -141,10 +157,35 @@ class TestReceptionScreen(SavepointCase):
         self.screen.current_move_line_height = 20
         # Reception done
         self.screen.button_save_step()
+
+        # Receive 2nd product
+        self.assertEqual(self.screen.current_step, "select_product")
+        self.assertEqual(len(self.picking.move_lines), 3)
+        # Check the one move left to do
+        move_left = self.picking.move_lines.filtered(lambda m: m.state != "done")
+        self.assertEqual(len(move_left), 1)
+        move_left.action_select_product()
+        self.assertEqual(len(self.screen.current_move_line_lot_id), 0)
+        self.assertEqual(self.screen.current_step, "set_quantity")
+        self.screen.current_move_line_qty_done = 20
+        self.screen.button_save_step()
+        self.assertEqual(self.screen.current_step, "set_location")
+        self.assertTrue(self.screen.current_move_line_location_dest_id)
+        self.screen.button_save_step()
+        self.assertEqual(self.screen.current_step, "set_package")
+        self.screen.current_move_line_package = "PID-TEST-2.1"
+        self.assertEqual(
+            self.screen.current_move_line_id.result_package_id.name, "PID-TEST-2.1"
+        )
+        self.screen.button_save_step()
+        self.assertEqual(self.screen.current_step, "select_packaging")
+        self.screen.current_move_line_storage_type = self.storage_type_pallet
+        self.screen.current_move_line_height = 20
+        self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "done")
-        self.assertEqual(len(self.picking.move_lines), 2)
         move_states = self.picking.move_lines.mapped("state")
         self.assertTrue(all([state == "done" for state in move_states]))
+        return
 
     def test_reception_screen_check_state(self):
         self.product.tracking = "none"

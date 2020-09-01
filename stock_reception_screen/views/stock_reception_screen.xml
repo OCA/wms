@@ -60,7 +60,7 @@
                             string="Cancel"
                             icon="fa-undo"
                             class="btn-danger"
-                            barcode_trigger="save"
+                            barcode_trigger="cancel"
                             attrs="{'invisible': [('current_step', 'in', ('select_product', 'done'))]}"
                         />
                         <button
@@ -95,6 +95,13 @@
                             <div>
                                 <field
                                     name="current_move_product_display_name"
+                                    class="mr8"
+                                />
+                            </div>
+                            <label for="current_move_product_vendor_code" />
+                            <div>
+                                <field
+                                    name="current_move_product_vendor_code"
                                     class="mr8"
                                 />
                             </div>

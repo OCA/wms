@@ -54,6 +54,15 @@ class StockReceptionScreen(models.Model):
         "select_packaging": {
             "label": _("Select Packaging"),
             "next_steps": [
+                # TODO: Should add a before step
+                {
+                    "before": "_before_next_move_to_set_lot_number",
+                    "next": "set_lot_number",
+                },
+                {
+                    "before": "_before_next_move_to_set_quantity",
+                    "next": "set_quantity",
+                },
                 {
                     # Loop until all moves are processed
                     "before": "_before_set_location_to_select_move",
@@ -104,6 +113,9 @@ class StockReceptionScreen(models.Model):
     current_move_product_uom_id = fields.Many2one(related="current_move_id.product_uom")
     current_move_product_packaging_ids = fields.One2many(
         related="current_move_id.product_id.packaging_ids"
+    )
+    current_move_product_vendor_code = fields.Char(
+        string="Vendor Code", compute="_compute_current_move_product_vendor_code"
     )
     # current move line
     current_move_line_id = fields.Many2one(comodel_name="stock.move.line", copy=False)
@@ -180,6 +192,20 @@ class StockReceptionScreen(models.Model):
                 steps = self.get_reception_screen_steps()
                 step_descr = steps[self.current_step]["label"]
                 wiz.current_step_descr = step_descr
+
+    @api.depends("current_move_product_id")
+    def _compute_current_move_product_vendor_code(self):
+        for wiz in self:
+            supplier_info = fields.first(
+                wiz.current_move_product_id.seller_ids.filtered(
+                    lambda r: r.product_code
+                    and r.product_id == wiz.current_move_product_id
+                )
+            )
+            if supplier_info:
+                wiz.current_move_product_vendor_code = supplier_info.product_code
+            else:
+                wiz.current_move_product_vendor_code = ""
 
     @api.depends("current_move_line_id.location_dest_id")
     def _compute_current_move_line_location_dest_id(self):
@@ -424,7 +450,7 @@ class StockReceptionScreen(models.Model):
         """Check if there is remaining moves to process for the
         selected product.
         """
-        self._validate_current_move()
+        # self._validate_current_move()
         if not self.current_filter_product:
             return False
         moves_to_process_ok = any(
@@ -448,13 +474,20 @@ class StockReceptionScreen(models.Model):
             self.current_move_line_id = False
         return moves_to_process_ok
 
-    def process_select_move(self):
-        self.next_step()
+    def _select_move_line(self):
         # Select the move line to process for the remaining qty
         # NOTE: we should always have one move line available since we run
         # 'action_assign' on the picking each time we validate a move.
         move_line = fields.first(self.current_move_id.move_line_ids)
         self.current_move_line_id = move_line
+        if self.current_move_id.last_move_line_lot_id:
+            self.current_move_line_id.lot_id = (
+                self.current_move_id.last_move_line_lot_id
+            )
+
+    def process_select_move(self):
+        self.next_step()
+        self._select_move_line()
 
     def _before_select_move_to_set_lot_number(self):
         """Decide if we have to handle lots on the current move."""
@@ -466,6 +499,8 @@ class StockReceptionScreen(models.Model):
                 message="", title=_("You have to fill the lot number.")
             )
             return
+        # Saving the lot number for next operation
+        self.current_move_id.last_move_line_lot_id = self.current_move_line_id.lot_id
         self.next_step()
 
     def process_set_expiry_date(self):
@@ -530,6 +565,37 @@ class StockReceptionScreen(models.Model):
     def process_select_packaging(self):
         if self._check_package_data():
             self.next_step()
+
+    def _before_next_move_to_set_lot_number(self):
+        """Receive next move for same product (with lot) directely."""
+        self._validate_current_move()
+        current_product = self.current_move_id.product_id
+        moves_to_do = self.picking_filtered_move_lines.filtered(
+            lambda r: r.quantity_done < r.product_uom_qty
+            and r.product_id == current_product
+        )
+        if not moves_to_do:
+            return False
+        if self.current_move_id.has_tracking == "none":
+            return False
+        self.current_move_id = moves_to_do[0]
+        self._select_move_line()
+        return True
+
+    def _before_next_move_to_set_quantity(self):
+        """Receive next move for same product (without lot) directely."""
+        current_product = self.current_move_id.product_id
+        moves_to_do = self.picking_filtered_move_lines.filtered(
+            lambda r: r.quantity_done < r.product_uom_qty
+            and r.product_id == current_product
+        )
+        if not moves_to_do:
+            return False
+        if self.current_move_id.has_tracking != "none":
+            return False
+        self.current_move_id = moves_to_do[0]
+        self._select_move_line()
+        return True
 
     def _check_package_data(self):
         """Check that the storage type is set.
