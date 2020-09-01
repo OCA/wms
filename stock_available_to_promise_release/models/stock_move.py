@@ -1,10 +1,10 @@
 # Copyright 2019 Camptocamp (https://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import api, fields, models, _
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.tools import date_utils, float_compare
-from odoo.exceptions import UserError
 
 
 class StockMove(models.Model):
@@ -35,19 +35,14 @@ class StockMove(models.Model):
     @api.model
     def _search_ordered_available_to_promise(self, operator, value):
         if operator not in (">", ">=", "="):
-            raise UserError(
-                _("Unsupported operator %s") % (operator,)
-            )
-        moves = self.search([('need_release', '=', True)])
+            raise UserError(_("Unsupported operator %s") % (operator,))
+        moves = self.search([("need_release", "=", True)])
         if operator == ">":
-            moves = moves.filtered(
-                lambda m: m._ordered_available_to_promise() > value)
+            moves = moves.filtered(lambda m: m._ordered_available_to_promise() > value)
         elif operator == ">=":
-            moves = moves.filtered(
-                lambda m: m._ordered_available_to_promise() >= value)
+            moves = moves.filtered(lambda m: m._ordered_available_to_promise() >= value)
         else:
-            moves = moves.filtered(
-                lambda m: m._ordered_available_to_promise() == value)
+            moves = moves.filtered(lambda m: m._ordered_available_to_promise() == value)
         return [("id", "in", moves.ids)]
 
     def _should_compute_ordered_available_to_promise(self):
