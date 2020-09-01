@@ -20,6 +20,7 @@ class StockMove(models.Model):
     ordered_available_to_promise = fields.Float(
         string="Ordered Available to Promise",
         compute="_compute_ordered_available_to_promise",
+        search="_search_ordered_available_to_promise",
         digits="Product Unit of Measure",
         help="Available to Promise quantity minus quantities promised "
         " to older promised operations.",
