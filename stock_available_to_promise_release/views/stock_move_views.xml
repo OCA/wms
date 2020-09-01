@@ -37,7 +37,7 @@
                     name="qty_available_to_release"
                     domain="[('ordered_available_to_promise', '>', 0.0)]"
                 />
-                <separator/>
+                <separator />
             </field>
         </field>
     </record>
@@ -55,7 +55,9 @@
                      (0, 0, {'view_mode': 'form', 'view_id': ref('view_move_release_form')}),
                      ]"
         />
-        <field name="context">{'search_default_groupby_picking_id': 1, 'search_default_qty_available_to_release': 1}</field>
+        <field
+            name="context"
+        >{'search_default_groupby_picking_id': 1, 'search_default_qty_available_to_release': 1}</field>
         <field name="domain">[('need_release', '=' , True)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
