@@ -41,7 +41,7 @@
                      ]"
         />
         <field name="context">{'search_default_groupby_picking_id': 1}</field>
-        <field name="domain">[('need_release', '=' , True)]</field>
+        <field name="domain">[('need_release', '=' , True), ('ordered_available_to_promise', '>', 0.0)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create a new stock movement
