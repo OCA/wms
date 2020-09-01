@@ -26,14 +26,12 @@ class StockMove(models.Model):
         return False
 
     def _action_done(self, cancel_backorder=False):
-        # Overloaded to send the email when the last move of a picking is validated.
-        # The method 'stock.picking._send_confirmation_email' is called only from
-        # the 'stock.picking.action_done()' method but never when moves are
-        # validated partially through the current method.
+        # Overloaded to ensure that the 'action_done' method of the picking
+        # is called when the last move of a picking is validated.
         moves = super()._action_done(cancel_backorder)
         if not self.env.context.get("_action_done_from_picking"):
             pickings = moves.picking_id
             for picking in pickings:
                 if picking.state == "done":
-                    picking._send_confirmation_email()
+                    picking.action_done()
         return moves
