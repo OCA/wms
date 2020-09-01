@@ -6,10 +6,8 @@ main.v-content > .v-content__wrap > .header .container {
 }
 
 #app .v-toolbar__content .v-toolbar__title {
-    /* TODO: handle max-width by screen size */
-    /* max-width: 170px; */
     padding-left: 10px;
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
 
 #app.demo_mode header {
@@ -519,4 +517,10 @@ I tested only w/ checkout/select_package for now
 }
 .detail.item-detail-card .v-card__title > span {
     margin-right: 1.2em;
+}
+
+@media screen and (max-width: 320px) {
+    #app header.has-main-doc .app-bar-actions {
+        display: none;
+    }
 }

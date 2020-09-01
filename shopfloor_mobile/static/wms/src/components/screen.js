@@ -99,6 +99,7 @@ Vue.component("Screen", {
                 dark
                 app
                 dense
+                :class="{'has-main-doc': !_.isEmpty(info.current_doc)}"
                 >
             <v-app-bar-nav-icon @click.stop="drawer = !drawer" v-if="info.showMenu" />
             <v-toolbar-title v-if="info.title">
@@ -209,6 +210,12 @@ Vue.component("nav-items-extra", {
                     route: {name: "home"},
                 },
                 {
+                    id: "scan-anything",
+                    name: "Scan anything",
+                    icon: "mdi-magnify",
+                    route: {name: "scan_anything"},
+                },
+                {
                     id: "settings",
                     name: "Settings",
                     icon: "mdi-settings-outline",
@@ -237,7 +244,7 @@ Vue.component("nav-items-extra", {
 
 Vue.component("app-bar-actions", {
     template: `
-    <div>
+    <div :class="$options._componentTag">
         <v-btn icon @click="$router.push({'name': 'scan_anything'})" :disabled="this.$route.name=='scan_anything'">
             <v-icon >mdi-magnify</v-icon>
         </v-btn>
