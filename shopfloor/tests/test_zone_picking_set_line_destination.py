@@ -180,9 +180,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         self.assertEqual(len(moves_before), 1)
         self.assertEqual(len(moves_before.move_line_ids), 1)
         move_line = moves_before.move_line_ids
-        with mock.patch.object(
-            type(self.picking1), "_send_confirmation_email"
-        ) as send_confirmation_email:
+        with mock.patch.object(type(self.picking1), "action_done") as action_done:
             response = self.service.dispatch(
                 "set_destination",
                 params={
@@ -194,7 +192,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                     "confirmation": False,
                 },
             )
-            send_confirmation_email.assert_called_once()
+            action_done.assert_called_once()
         # Check picking data
         moves_after = self.picking1.move_lines
         self.assertEqual(moves_before, moves_after)
@@ -234,9 +232,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_line = moves_before.move_line_ids
         # we need a destination package if we want to scan a destination location
         move_line.result_package_id = self.free_package
-        with mock.patch.object(
-            type(self.picking3), "_send_confirmation_email"
-        ) as send_confirmation_email:
+        with mock.patch.object(type(self.picking3), "action_done") as action_done:
             response = self.service.dispatch(
                 "set_destination",
                 params={
@@ -248,7 +244,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                     "confirmation": False,
                 },
             )
-            send_confirmation_email.assert_not_called()
+            action_done.assert_not_called()
         self.assert_response_set_line_destination(
             response,
             zone_location,
@@ -285,9 +281,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         # we need a destination package if we want to scan a destination location
         move_line.result_package_id = self.free_package
         other_move_line = moves_before.move_line_ids[1]
-        with mock.patch.object(
-            type(self.picking4), "_send_confirmation_email"
-        ) as send_confirmation_email:
+        with mock.patch.object(type(self.picking4), "action_done") as action_done:
             response = self.service.dispatch(
                 "set_destination",
                 params={
@@ -299,7 +293,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                     "confirmation": False,
                 },
             )
-            send_confirmation_email.assert_not_called()
+            action_done.assert_not_called()
         # Check picking data (move has been split in two, 6 done and 4 remaining)
         moves_after = self.picking4.move_lines
         self.assertEqual(len(moves_after), 2)
@@ -348,9 +342,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_line = moves_before.move_line_ids[0]
         # we need a destination package if we want to scan a destination location
         move_line.result_package_id = self.free_package
-        with mock.patch.object(
-            type(self.picking4), "_send_confirmation_email"
-        ) as send_confirmation_email:
+        with mock.patch.object(type(self.picking4), "action_done") as action_done:
             response = self.service.dispatch(
                 "set_destination",
                 params={
@@ -362,7 +354,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                     "confirmation": False,
                 },
             )
-            send_confirmation_email.assert_not_called()
+            action_done.assert_not_called()
         self.assert_response_set_line_destination(
             response,
             zone_location,
