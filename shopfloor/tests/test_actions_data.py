@@ -24,7 +24,16 @@ class ActionsDataCaseBase(CommonCase):
     @classmethod
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
-        cls.packaging = cls.env["product.packaging"].sudo().create({"name": "Pallet"})
+        cls.packaging_type = (
+            cls.env["product.packaging.type"]
+            .sudo()
+            .create({"name": "Transport Box", "code": "TB", "sequence": 0})
+        )
+        cls.packaging = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create({"name": "Pallet", "packaging_type_id": cls.packaging_type.id})
+        )
         cls.product_b.tracking = "lot"
         cls.product_c.tracking = "lot"
         cls.picking = cls._create_picking(
@@ -105,7 +114,8 @@ class ActionsDataCaseBase(CommonCase):
     def _expected_packaging(self, record, **kw):
         data = {
             "id": record.id,
-            "name": record.name,
+            "name": record.packaging_type_id.name,
+            "code": record.packaging_type_id.code,
             "qty": record.qty,
         }
         data.update(kw)
