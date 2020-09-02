@@ -6,11 +6,10 @@ from odoo.tools.float_utils import float_compare, float_is_zero
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
 
-from .change_pack_lot_mixin import ChangePackLotMixin
 from .service import to_float
 
 
-class ZonePicking(Component, ChangePackLotMixin):
+class ZonePicking(Component):
     """
     Methods for the Zone Picking Process
 
@@ -905,9 +904,9 @@ class ZonePicking(Component, ChangePackLotMixin):
         if not move_line.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
         search = self.actions_for("search")
-        # pre-configured callable used to generate the response as 'ChangePackLotMixin'
-        # is not aware of the needed response type and related parameters for
-        # zone picking scenario
+        # pre-configured callable used to generate the response as the
+        # change.package.lot component is not aware of the needed response type
+        # and related parameters for zone picking scenario
         response_ok_func = functools.partial(
             self._response_for_set_line_destination, zone_location, picking_type
         )
@@ -915,16 +914,17 @@ class ZonePicking(Component, ChangePackLotMixin):
             self._response_for_change_pack_lot, zone_location, picking_type
         )
         response = None
+        change_package_lot = self.actions_for("change.package.lot")
         # handle lot
         lot = search.lot_from_scan(barcode)
         if lot:
-            response = self._change_lot(
+            response = change_package_lot.change_lot(
                 move_line, lot, response_ok_func, response_error_func
             )
         # handle package
         package = search.package_from_scan(barcode)
         if package:
-            response = self._change_pack_lot_change_package(
+            return change_package_lot.change_package(
                 move_line, package, response_ok_func, response_error_func
             )
         # if the response is not an error, we check the move_line status

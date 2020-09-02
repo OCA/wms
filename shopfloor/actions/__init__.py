@@ -17,6 +17,7 @@ Services.
 
 """
 from . import base_action
+from . import change_package_lot
 from . import data
 from . import data_detail
 from . import completion_info
