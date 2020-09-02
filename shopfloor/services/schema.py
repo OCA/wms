@@ -151,6 +151,7 @@ class BaseShopfloorSchemaResponse(Component):
         return {
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
+            "code": {"type": "string", "nullable": True, "required": True},
             "qty": {"type": "float", "required": True},
         }
 
