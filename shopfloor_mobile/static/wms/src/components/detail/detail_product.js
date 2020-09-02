@@ -30,9 +30,11 @@ Vue.component("detail-product", {
             ];
         },
         render_packaging(record, field) {
-            return [record["name"], record["qty"] + " " + record["qty_unit"]].join(
-                " - "
-            );
+            return [
+                record["name"],
+                "(" + record["code"] + ")",
+                "= " + record["qty"],
+            ].join(" ");
         },
     },
     template: `
