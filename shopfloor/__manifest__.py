@@ -17,11 +17,11 @@
         "base_rest",
         "base_jsonify",
         "auth_api_key",
-        # https://github.com/OCA/stock-logistics-warehouse/pull/808
+        #  OCA / stock-logistics-warehouse
         "stock_picking_completion_info",
-        # https://github.com/OCA/stock-logistics-workflow/pull/608
+        #  OCA / stock-logistics-warehouse
         "stock_quant_package_dimension",
-        # https://github.com/OCA/stock-logistics-workflow/pull/607
+        #  OCA / stock-logistics-warehouse
         "stock_quant_package_product_packaging",
         # TODO: used for manuf info on prod detail.
         # This must be an optional dep
