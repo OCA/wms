@@ -1,14 +1,20 @@
 from odoo import _
 
+from odoo.addons.component.core import Component
 
-# TODO use a component instead (in actions)
-# delegation > inheritance ;)
-class ChangePackLotMixin:
-    def _change_lot(self, move_line, lot, response_ok_func, response_error_func):
+
+class ChangePackageLot(Component):
+    """Provide methods for changing a package or a lot on a move line"""
+
+    _name = "shopfloor.change.package.lot.action"
+    _inherit = "shopfloor.process.action"
+    _usage = "change.package.lot"
+
+    def change_lot(self, move_line, lot, response_ok_func, response_error_func):
         """Change the lot on the move line.
 
-        :param response_ok_func: callable used tu return ok response
-        :param response_error_func: callable used tu return error response
+        :param response_ok_func: callable used to return ok response
+        :param response_error_func: callable used to return error response
         """
         # If the lot is part of a package, what we really want
         # is not to change the lot, but change the package (which will
@@ -32,7 +38,7 @@ class ChangePackLotMixin:
             )
         if len(lot_package_quants) == 1:
             package = lot_package_quants.package_id
-            return self._change_pack_lot_change_package(
+            return self.change_package(
                 move_line, package, response_ok_func, response_error_func
             )
         elif len(lot_package_quants) > 1:
@@ -90,9 +96,7 @@ class ChangePackLotMixin:
 
         return grouped_quants == grouped_lines
 
-    def _change_pack_lot_change_package(
-        self, move_line, package, response_ok_func, response_error_func
-    ):
+    def change_package(self, move_line, package, response_ok_func, response_error_func):
         inventory = self.actions_for("inventory")
 
         package_level = move_line.package_level_id
