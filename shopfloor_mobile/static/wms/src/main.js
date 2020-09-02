@@ -158,9 +158,15 @@ const app = new Vue({
                 }
             });
         },
-        _clearConfig: function() {
+        _clearConfig: function(reload = true) {
             this.$storage.remove("appconfig");
-            return this._loadConfig();
+            if (reload) return this._loadConfig();
+        },
+        _clearAppData: function() {
+            this.apikey = "";
+            this.appmenu = [];
+            this.profile = null;
+            this._clearConfig(false);
         },
         loadMenu: function(force) {
             if (this.appmenu && !force) {
@@ -179,13 +185,9 @@ const app = new Vue({
                 self.appmenu = result.data;
             });
         },
-        _clearConfig: function() {
-            this.$storage.remove("appconfig");
-            return this._loadConfig();
-        },
         logout: function() {
-            this.apikey = "";
             this.authenticated = false;
+            this._clearAppData();
             this.$router.push({name: "login"});
         },
         loadJS: function(url, script_id) {
