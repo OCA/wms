@@ -35,6 +35,8 @@
         # TODO: used for picking.carrier_id detail info.
         # This must be an optional dep
         "delivery",
+        #  OCA / product-attribute
+        "product_packaging_type",
     ],
     "data": [
         "data/ir_config_parameter_data.xml",
