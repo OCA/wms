@@ -5,6 +5,20 @@ export var LoginPage = Vue.component("login-page", {
             error: "",
         };
     },
+    computed: {
+        screen_info: function() {
+            return {
+                title: "Login",
+                klass: "login",
+                user_message: this.user_message,
+                noUserMessage: !this.error,
+                showMenu: false,
+            };
+        },
+        user_message: function() {
+            return {body: this.error, message_type: "error"};
+        },
+    },
     methods: {
         login: function(evt) {
             evt.preventDefault();
@@ -14,22 +28,24 @@ export var LoginPage = Vue.component("login-page", {
             this.$root
                 ._loadConfig()
                 .catch(error => {
-                    this.error = "Invalid API KEY";
-                    this.$root.apikey = "";
+                    this._handle_invalid_key();
                 })
                 .then(() => {
                     // TODO: shall we do this in $root._loadRoutes?
                     if (this.$root.authenticated) {
                         this.$router.push({name: "home"});
+                    } else {
+                        this._handle_invalid_key();
                     }
                 });
         },
+        _handle_invalid_key() {
+            this.error = "Invalid API KEY";
+            this.$root.apikey = "";
+        },
     },
     template: `
-    <Screen title="Login"
-            klass="login"
-            :show-menu="false"
-
+    <Screen :screen_info="screen_info" :show-menu="false">
         <v-container>
             <v-row
                 align="center"
@@ -37,11 +53,10 @@ export var LoginPage = Vue.component("login-page", {
                 <v-col cols="12" sm="8" md="4">
                     <div class="login-wrapper">
                         <v-form v-on:submit="login">
-                            <p v-if="error">{{ error }}</p>
                             <v-text-field
                                 v-model="apikey"
                                 label="API Key"
-                                placeholder="Scan your access badge or fill your credential"
+                                placeholder="YOUR_API_KEY_HERE"
                                 autofocus></v-text-field>
                             <v-btn color="success" type="submit">Submit</v-btn>
                         </v-form>
