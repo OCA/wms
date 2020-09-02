@@ -4,11 +4,10 @@ from odoo.osv import expression
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
 
-from .change_pack_lot_mixin import ChangePackLotMixin
 from .service import to_float
 
 
-class ClusterPicking(Component, ChangePackLotMixin):
+class ClusterPicking(Component):
     """
     Methods for the Cluster Picking Process
 
@@ -863,9 +862,10 @@ class ClusterPicking(Component, ChangePackLotMixin):
         search = self.actions_for("search")
         response_ok_func = self._response_for_scan_destination
         response_error_func = self._response_for_change_pack_lot
+        change_package_lot = self.actions_for("change.package.lot")
         lot = search.lot_from_scan(barcode)
         if lot:
-            response = self._change_lot(
+            response = change_package_lot.change_lot(
                 move_line, lot, response_ok_func, response_error_func
             )
             if response:
@@ -873,7 +873,7 @@ class ClusterPicking(Component, ChangePackLotMixin):
 
         package = search.package_from_scan(barcode)
         if package:
-            return self._change_pack_lot_change_package(
+            return change_package_lot.change_package(
                 move_line, package, response_ok_func, response_error_func
             )
 

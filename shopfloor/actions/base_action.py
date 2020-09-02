@@ -10,3 +10,7 @@ class ShopFloorProcessAction(AbstractComponent):
 
     def actions_for(self, usage):
         return self.component(usage=usage)
+
+    @property
+    def msg_store(self):
+        return self.actions_for("message")
