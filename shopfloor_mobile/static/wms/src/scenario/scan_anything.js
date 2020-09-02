@@ -66,10 +66,15 @@ export var ScanAnything = Vue.component("scan-anything", {
             });
         },
         on_scan: function(scanned) {
-            this.$router.push({
-                name: "scan_anything",
-                params: {identifier: scanned.text},
-            });
+            if (this.$route.params.identifier == scanned.text) {
+                // scanned same resource, just reload
+                this.getData(scanned.text);
+            } else {
+                this.$router.push({
+                    name: "scan_anything",
+                    params: {identifier: scanned.text},
+                });
+            }
         },
         detail_component_name() {
             if (_.isEmpty(this.scan_data)) {
