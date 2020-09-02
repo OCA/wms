@@ -1,7 +1,7 @@
 export var LoginPage = Vue.component("login-page", {
     data: function() {
         return {
-            apikey: "72B044F7AC780DAC",
+            apikey: "",
             error: "",
         };
     },
