@@ -49,6 +49,7 @@ Vue.component("Screen", {
         },
         show_profile_not_ready() {
             return (
+                this.$root.authenticated &&
                 !this.$root.has_profile &&
                 this.$route.name != "profile" &&
                 this.$route.name != "settings"
@@ -110,7 +111,7 @@ Vue.component("Screen", {
             <v-btn icon v-if="info.current_doc_identifier" @click="$router.push({'name': 'scan_anything', params: {identifier: info.current_doc_identifier}, query: {displayOnly: 1}})">
                 <btn-info-icon color="'#fff'" />
             </v-btn>
-            <app-bar-actions />
+            <app-bar-actions v-if="$root.authenticated"/>
         </v-app-bar>
         <v-content :class="screen_content_class">
 
