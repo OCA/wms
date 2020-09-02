@@ -107,7 +107,12 @@ class DataAction(Component):
 
     @property
     def _packaging_parser(self):
-        return self._simple_record_parser() + ["qty"]
+        return [
+            "id",
+            ("packaging_type_id:name", lambda rec, fname: rec.packaging_type_id.name),
+            ("packaging_type_id:code", lambda rec, fname: rec.packaging_type_id.code),
+            "qty",
+        ]
 
     def lot(self, record, **kw):
         return self._jsonify(record, self._lot_parser, **kw)
