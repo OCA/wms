@@ -69,6 +69,13 @@ export var LoginPage = Vue.component("login-page", {
                     </div>
                 </v-col>
             </v-row>
+            <div class="button-list button-vertical-list full">
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <btn-fullscreen />
+                    </v-col>
+                </v-row>
+            </div>
         </v-container>
     </Screen>
     `,
