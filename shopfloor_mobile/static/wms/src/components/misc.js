@@ -388,3 +388,48 @@ Vue.component("screen-loading", {
     </v-overlay>
   `,
 });
+
+Vue.component("btn-fullscreen", {
+    data: function() {
+        return {
+            fullscreen_on: document.fullscreenElement ? true : false,
+        };
+    },
+    computed: {
+        btn_label: function() {
+            const transition = this.fullscreen_on ? "exit" : "enter";
+            return this.$t("screen.settings.fullscreen." + transition);
+        },
+    },
+    methods: {
+        go_fullscreen: function() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                /* Firefox */
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) {
+                /* Chrome, Safari & Opera */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                /* IE/Edge */
+                elem.msRequestFullscreen();
+            }
+            this.fullscreen_on = true;
+        },
+        leave_fullscreen: function() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+            this.fullscreen_on = false;
+        },
+    },
+    template: `<btn-action @click="fullscreen_on ? leave_fullscreen() : go_fullscreen()">{{ btn_label }}</btn-action>`,
+});

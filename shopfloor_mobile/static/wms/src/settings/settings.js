@@ -23,6 +23,11 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
                 </v-row>
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
+                        <btn-fullscreen />
+                    </v-col>
+                </v-row>
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
                         <btn-back/>
                     </v-col>
                 </v-row>

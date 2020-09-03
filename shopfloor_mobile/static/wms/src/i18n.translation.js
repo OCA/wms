@@ -21,6 +21,10 @@ export const messages = {
                     name: "Profile",
                     title: "Select profile",
                 },
+                fullscreen: {
+                    enter: "Go fullscreen",
+                    exit: "Exit fullscreen",
+                },
             },
         },
         language: {
@@ -73,6 +77,10 @@ export const messages = {
                     name: "Profil",
                     title: "Choisissez un profil",
                 },
+                fullscreen: {
+                    enter: "Go fullscreen",
+                    exit: "Exit fullscreen",
+                },
             },
         },
         language: {
@@ -115,6 +123,10 @@ export const messages = {
                 profile: {
                     name: "Profil",
                     title: "Wähle Profil",
+                },
+                fullscreen: {
+                    enter: "Go fullscreen",
+                    exit: "Exit fullscreen",
                 },
             },
         },
