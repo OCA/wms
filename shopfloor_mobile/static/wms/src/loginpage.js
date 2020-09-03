@@ -58,7 +58,13 @@ export var LoginPage = Vue.component("login-page", {
                                 label="API Key"
                                 placeholder="YOUR_API_KEY_HERE"
                                 autofocus></v-text-field>
-                            <v-btn color="success" type="submit">Submit</v-btn>
+                            <div class="button-list button-vertical-list full">
+                                <v-row align="center">
+                                    <v-col class="text-center" cols="12">
+                                        <v-btn color="success" type="submit">Login</v-btn>
+                                    </v-col>
+                                </v-row>
+                            </div>
                         </v-form>
                     </div>
                 </v-col>
