@@ -92,6 +92,8 @@ class CommonCase(SavepointCase, ComponentMixin):
             cls.data = work.component(usage="data")
         with cls.work_on_actions(cls) as work:
             cls.data_detail = work.component(usage="data_detail")
+        with cls.work_on_actions(cls) as work:
+            cls.msg_store = work.component(usage="message")
         with cls.work_on_services(cls) as work:
             cls.schema = work.component(usage="schema")
         with cls.work_on_services(cls) as work:
@@ -317,6 +319,32 @@ class CommonCase(SavepointCase, ComponentMixin):
             cls._update_qty_in_location(
                 location, product, qty, package=package, lot=lot
             )
+
+    # used by _create_package_in_location
+    PackageContent = namedtuple(
+        "PackageContent",
+        # recordset of the product,
+        # quantity in float
+        # recordset of the lot (optional)
+        "product quantity lot",
+    )
+
+    def _create_package_in_location(self, location, content):
+        """Create a package and quants in a location
+
+        content is a list of PackageContent
+        """
+        package = self.env["stock.quant.package"].create({})
+        for product, quantity, lot in content:
+            self._update_qty_in_location(
+                location, product, quantity, package=package, lot=lot
+            )
+        return package
+
+    def _create_lot(self, product):
+        return self.env["stock.production.lot"].create(
+            {"product_id": product.id, "company_id": self.env.company.id}
+        )
 
 
 class PickingBatchMixin:
