@@ -432,10 +432,24 @@ class MessageAction(Component):
             ).format(package.name, picking.name),
         }
 
-    def lot_is_not_a_package(self, lot):
+    def units_replaced_by_package(self, new_package):
+        return {
+            "message_type": "success",
+            "body": _("Units replaced by package {}.").format(new_package.name),
+        }
+
+    def package_change_error(self, package, error_msg):
         return {
             "message_type": "error",
-            "body": _("Lot {} is not a package.").format(lot.name),
+            "body": _("Package {} cannot be used: {} ").format(package.name, error_msg),
+        }
+
+    def cannot_change_lot_already_picked(self, lot):
+        return {
+            "message_type": "error",
+            "body": _("Cannot change to lot {} which is entirely picked.").format(
+                lot.name
+            ),
         }
 
     def buffer_complete(self):
