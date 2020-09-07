@@ -869,14 +869,13 @@ class LocationContentTransfer(Component):
                 message=self.msg_store.record_not_found(),
             )
         move_lines = package_level.move_line_ids
+        package_level.explode_package()
         move_lines.write(
             {
-                "result_package_id": False,
                 # ensure all the lines in the package are the next ones to be processed
                 "shopfloor_priority": 1,
             }
         )
-        package_level.unlink()
         return self._response_for_start_single(
             move_lines.mapped("picking_id"), message=self.msg_store.package_open()
         )
