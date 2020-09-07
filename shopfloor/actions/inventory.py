@@ -52,37 +52,6 @@ class InventoryAction(Component):
             }
         )
 
-    def move_package_quants_to_location(self, package, dest_location):
-        """Create inventories to move a package to a different location
-
-        It should be called when the package is - in real life - already in
-        the destination. It creates an inventory to remove the package from
-        the source location and a second inventory to place the package
-        in the destination (to reflect the reality).
-
-        The source location is the current location of the package.
-        """
-        quant_values = []
-        # sudo and the key in context activate is_inventory_mode on quants
-        quants = package.quant_ids.sudo().with_context(inventory_mode=True)
-        for quant in quants:
-            quantity = quant.quantity
-            quant.inventory_quantity = 0
-            quant_values.append(self._quant_move_values(quant, dest_location, quantity))
-
-        quant_model = self.env["stock.quant"].sudo().with_context(inventory_mode=True)
-        quant_model.create(quant_values)
-
-    def _quant_move_values(self, quant, location, quantity):
-        return {
-            "product_id": quant.product_id.id,
-            "inventory_quantity": quantity,
-            "location_id": location.id,
-            "lot_id": quant.lot_id.id,
-            "package_id": quant.package_id.id,
-            "owner_id": quant.owner_id.id,
-        }
-
     def create_control_stock(self, location, product, package, lot, name=None):
         """Create a draft inventory so a user has to check a location
 
@@ -109,13 +78,17 @@ class InventoryAction(Component):
             move, location, package, lot
         )
         qty_to_keep = sum(other_lines.mapped("product_qty"))
-        values = self._stock_issue_inventory_values(
-            move, location, package, lot, qty_to_keep
+        self.create_stock_correction(move, location, package, lot, qty_to_keep)
+        move._action_assign()
+
+    def create_stock_correction(self, move, location, package, lot, quantity):
+        """Create an inventory with a forced quantity"""
+        values = self._stock_correction_inventory_values(
+            move, location, package, lot, quantity
         )
         inventory = self.inventory_model.sudo().create(values)
         inventory.action_start()
         inventory.action_validate()
-        move._action_assign()
 
     def _stock_issue_get_related_move_lines(self, move, location, package, lot):
         """Lookup for all the other moves lines that match given move line"""
@@ -128,7 +101,9 @@ class InventoryAction(Component):
         ]
         return self.env["stock.move.line"].search(domain)
 
-    def _stock_issue_inventory_values(self, move, location, package, lot, line_qty):
+    def _stock_correction_inventory_values(
+        self, move, location, package, lot, line_qty
+    ):
         name = _(
             "{picking.name} stock correction in location {location.name} "
             "for {product_desc}"

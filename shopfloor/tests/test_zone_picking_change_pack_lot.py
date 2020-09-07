@@ -6,6 +6,8 @@ class ZonePickingChangePackLotCase(ZonePickingCommonCase):
 
     * /change_pack_lot
 
+    Only simple cases are tested to check the flow of responses on success and
+    error, the "change.package.lot" component is tested in its own tests.
     """
 
     def test_change_pack_lot_wrong_parameters(self):
@@ -189,70 +191,4 @@ class ZonePickingChangePackLotCase(ZonePickingCommonCase):
             message=self.service.msg_store.lot_replaced_by_lot(
                 previous_lot, self.free_lot
             ),
-        )
-
-    def test_change_pack_lot_change_lot_ok_with_control_stock(self):
-        zone_location = self.zone_location
-        picking_type = self.picking2.picking_type_id
-        move_line = self.picking2.move_line_ids[0]
-        previous_lot = move_line.lot_id
-        self.free_lot.product_id = move_line.product_id
-        # ensure we have our new lot but in another location
-        self._update_qty_in_location(
-            self.zone_sublocation1,
-            move_line.product_id,
-            move_line.product_uom_qty,
-            lot=self.free_lot,
-        )
-        # change lot
-        response = self.service.dispatch(
-            "change_pack_lot",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "move_line_id": move_line.id,
-                "barcode": self.free_lot.name,
-            },
-        )
-        # check data
-        self.assertRecordValues(move_line, [{"lot_id": self.free_lot.id}])
-        # check that reservations could not be made as the lot is
-        # theoretically elsewhere
-        previous_quant = self.env["stock.quant"].search(
-            [
-                ("location_id", "=", move_line.location_id.id),
-                ("product_id", "=", move_line.product_id.id),
-                ("lot_id", "=", previous_lot.id),
-            ]
-        )
-        self.assertEqual(previous_quant.quantity, 10)
-        self.assertEqual(previous_quant.reserved_quantity, 0)
-        new_quant = self.env["stock.quant"].search(
-            [
-                ("location_id", "=", move_line.location_id.id),
-                ("product_id", "=", move_line.product_id.id),
-                ("lot_id", "=", self.free_lot.id),
-            ]
-        )
-        self.assertFalse(new_quant)
-        # as such an inventory of control has been generated to check this issue
-        control_inventory_name = "Pick: stock issue on lot: {} found in {}".format(
-            self.free_lot.name, move_line.location_id.name
-        )
-        control_inventory = self.env["stock.inventory"].search(
-            [
-                ("name", "=", control_inventory_name),
-                ("location_ids", "in", move_line.location_id.id),
-                ("product_ids", "in", move_line.product_id.id),
-                ("state", "in", ("draft", "confirm")),
-            ]
-        )
-        self.assertTrue(control_inventory)
-        # check response
-        message = self.service.msg_store.lot_replaced_by_lot(
-            previous_lot, self.free_lot
-        )
-        message["body"] += " A draft inventory has been created for control."
-        self.assert_response_set_line_destination(
-            response, zone_location, picking_type, move_line, message=message,
         )

@@ -354,7 +354,11 @@ class ClusterPicking(Component):
         """Get the last line picked and put in a pack for this picking"""
         return fields.first(
             picking.move_line_ids.filtered(
-                lambda l: l.qty_done > 0 and l.result_package_id
+                lambda l: l.qty_done > 0
+                and l.result_package_id
+                # if we are moving the entire package, we shouldn't
+                # add stuff inside it, it's not a new package
+                and l.package_id != l.result_package_id
             ).sorted(key="write_date", reverse=True)
         )
 
