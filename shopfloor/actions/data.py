@@ -225,7 +225,7 @@ class DataAction(Component):
         supplier_info = fields.first(
             rec.seller_ids.filtered(lambda x: x.product_id == rec)
         )
-        return supplier_info.product_code if supplier_info else ""
+        return supplier_info.product_code or ""
 
     def picking_batch(self, record, with_pickings=False, **kw):
         parser = self._picking_batch_parser
