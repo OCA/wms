@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import _, exceptions, fields, models
 from odoo.exceptions import UserError
 from odoo.tools.float_utils import float_compare
 
@@ -137,3 +137,109 @@ class StockMoveLine(models.Model):
             self.with_context(bypass_reservation_update=True).product_uom_qty = qty_done
             return (new_line, "lesser")
         return (new_line, "full")
+
+    def replace_package(self, new_package):
+        """Replace a package on an assigned move line"""
+        self.ensure_one()
+
+        # search other move lines which should already pick the scanned package
+        other_reserved_lines = self.env["stock.move.line"].search(
+            [
+                ("package_id", "=", new_package.id),
+                ("state", "in", ("partially_available", "assigned")),
+            ]
+        )
+
+        # we can't change already picked lines
+        unreservable_lines = other_reserved_lines.filtered(
+            lambda line: line.qty_done == 0
+        )
+        to_assign_moves = unreservable_lines.move_id
+
+        # if we leave the package level, it will try to reserve the same
+        # one again
+        unreservable_lines.package_level_id.explode_package()
+        # unreserve qties of other lines
+        unreservable_lines.unlink()
+
+        if new_package.location_id != self.location_id:
+            if new_package.quant_ids.reserved_quantity:
+                # this is a unexpected condition: if we started picking a package
+                # in another location, user should never be able to scan it in
+                # another location, block the operation
+                raise exceptions.UserError(
+                    _(
+                        "Package {} has been partially picked in another location"
+                    ).format(new_package.display_name)
+                )
+            # the package has been scanned in the current location so we know its
+            # a mistake in the data... fix the quant to move the package here
+            new_package.move_package_to_location(self.location_id)
+
+        # several move lines can be moved by the package level, if we change
+        # the package for the current one, we destroy the package level because
+        # we are no longer moving the entire package
+        self.package_level_id.explode_package()
+
+        def is_greater(value, other, rounding):
+            return float_compare(value, other, precision_rounding=rounding) == 1
+
+        def is_lesser(value, other, rounding):
+            return float_compare(value, other, precision_rounding=rounding) == -1
+
+        quant = fields.first(
+            new_package.quant_ids.filtered(
+                lambda quant: quant.product_id == self.product_id
+                and is_greater(
+                    quant.quantity,
+                    quant.reserved_quantity,
+                    quant.product_uom_id.rounding,
+                )
+            )
+        )
+        if not quant:
+            raise exceptions.UserError(
+                _(
+                    "Package {} does not contain available product {},"
+                    " cannot replace package."
+                ).format(new_package.display_name, self.product_id.display_name)
+            )
+
+        values = {
+            "package_id": new_package.id,
+            "lot_id": quant.lot_id.id,
+            "owner_id": quant.owner_id.id,
+            "result_package_id": False,
+        }
+
+        available_quantity = quant.quantity - quant.reserved_quantity
+        if is_lesser(
+            available_quantity, self.product_qty, quant.product_uom_id.rounding
+        ):
+            new_uom_qty = self.product_id.uom_id._compute_quantity(
+                available_quantity, self.product_uom_id, rounding_method="HALF-UP"
+            )
+            values["product_uom_qty"] = new_uom_qty
+
+        self.write(values)
+
+        # try reassign the move in case we had a partial qty, also, it will
+        # recreate a package level if it applies
+        if "product_uom_qty" in values:
+            # when we change the quantity of the move, the state
+            # will still be "assigned" and be skipped by "_action_assign",
+            # recompute the state to be "partially_available"
+            self.move_id._recompute_state()
+
+        # if the new package has less quantities, assign will create new move
+        # lines
+        self.move_id._action_assign()
+
+        # Find other available goods for the lines which were using the
+        # package before...
+        to_assign_moves._action_assign()
+
+        # computation of the 'state' of the package levels is not
+        # triggered, force it
+        to_assign_moves.move_line_ids.package_level_id.modified(["move_line_ids"])
+        self.package_level_id.modified(["move_line_ids"])
