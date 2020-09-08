@@ -311,6 +311,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         move_line_c = self.picking2.move_line_ids.filtered(
             lambda m: m.product_id == self.product_c
         )
+        move = move_line_c.move_id
         self.assertEqual(move_line_c.product_uom_qty, 10)
         self.assertEqual(move_line_c.qty_done, 10)
         # Scan partial qty (6/10)
@@ -328,15 +329,12 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         self.assertEqual(move_line_c.product_uom_qty, 0)
         self.assertEqual(move_line_c.qty_done, 6)
         self.assertEqual(move_line_c.state, "done")
-        # Check the new move created to handle the remaining qty
-        move_product_c_splitted = self.picking2.move_lines.filtered(
-            lambda m: m.product_id == self.product_c and m.state == "assigned"
-        )
-        self.assertEqual(move_product_c_splitted.state, "assigned")
-        self.assertEqual(move_product_c_splitted.product_id, self.product_c)
-        self.assertEqual(move_product_c_splitted.product_uom_qty, 4)
-        self.assertEqual(move_product_c_splitted.move_line_ids.product_uom_qty, 4)
-        self.assertEqual(move_product_c_splitted.move_line_ids.qty_done, 4)
+        # the move is split with the remaining
+        self.assertEqual(move.state, "assigned")
+        self.assertEqual(move.product_id, self.product_c)
+        self.assertEqual(move.product_uom_qty, 4)
+        self.assertEqual(move.move_line_ids.product_uom_qty, 4)
+        self.assertEqual(move.move_line_ids.qty_done, 4)
         # Check the response
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
@@ -348,7 +346,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         )
         self.assertEqual(move_line_c.move_id.state, "done")
         # Scan remaining qty (4/10)
-        remaining_move_line_c = move_product_c_splitted.move_line_ids
+        remaining_move_line_c = move.move_line_ids
         with mock.patch.object(type(self.picking2), "action_done") as action_done:
             response = self.service.dispatch(
                 "set_destination_line",
@@ -583,3 +581,143 @@ class LocationContentTransferSetDestinationXSpecialCase(
             )
             self.assertEqual(self.picking.state, "done")
             action_done.assert_called_once()
+
+
+class LocationContentTransferSetDestinationChainSpecialCase(
+    LocationContentTransferCommonCase
+):
+    """Tests for endpoint used from scan_destination (special cases with
+    chained pickings)
+
+    * /set_destination_package
+    * /set_destination_line
+
+    """
+
+    @classmethod
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
+        # Test split of partial qty when the moves have "move_orig_ids".
+        # We create a chain of pickings to ensure the proper state is computed
+        # for the split move.
+        cls.picking_a = picking_a = cls._create_picking(lines=[(cls.product_c, 10)])
+        cls.picking_b = picking_b = cls._create_picking(lines=[(cls.product_c, 10)])
+        # connect a and b in a chain of moves
+        for move_a in picking_a.move_lines:
+            for move_b in picking_b.move_lines:
+                if move_a.product_id == move_b.product_id:
+                    move_a.move_dest_ids = move_b
+                    move_b.procure_method = "make_to_order"
+
+        cls.pickings = picking_a | picking_b
+        cls._fill_stock_for_moves(picking_a.move_lines, location=cls.content_loc)
+        cls.pickings.action_assign()
+
+        cls.dest_location = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Sub Shelf 1",
+                    "barcode": "subshelf1",
+                    "location_id": cls.shelf1.id,
+                }
+            )
+        )
+
+    def test_set_destination_line_partial_qty_with_move_orig_ids(self):
+        """Scanned destination location with partial qty, but related moves
+        has to be split and the move has origin moves (with origin moves)
+        """
+        picking_a = self.picking_a
+        picking_b = self.picking_b
+        picking_a.move_line_ids.qty_done = 10
+        picking_a.action_done()
+        self.assertEqual(picking_a.state, "done")
+        self.assertEqual(picking_b.state, "assigned")
+        self._simulate_pickings_selected(picking_b)
+
+        move_line_c = picking_b.move_line_ids.filtered(
+            lambda m: m.product_id == self.product_c
+        )
+        move = move_line_c.move_id
+
+        self.assertEqual(move_line_c.product_uom_qty, 10)
+        self.assertEqual(move_line_c.qty_done, 10)
+        # Scan partial qty (6/10)
+        self.service.dispatch(
+            "set_destination_line",
+            params={
+                "location_id": self.content_loc.id,
+                "move_line_id": move_line_c.id,
+                "quantity": move_line_c.product_uom_qty - 4,  # Scan 6 qty
+                "barcode": self.dest_location.barcode,
+            },
+        )
+        # Check move line data
+        self.assertEqual(move_line_c.move_id.product_uom_qty, 6)
+        self.assertEqual(move_line_c.product_uom_qty, 0)
+        self.assertEqual(move_line_c.qty_done, 6)
+        self.assertEqual(move_line_c.state, "done")
+        # the move has been split
+        self.assertNotEqual(move_line_c.move_id, move)
+
+        # Check the move handling the remaining qty
+        self.assertEqual(move.state, "assigned")
+        move_line = move.move_line_ids
+        self.assertEqual(move_line.move_id.product_uom_qty, 4)
+        self.assertEqual(move_line.product_uom_qty, 4)
+        self.assertEqual(move_line.qty_done, 4)
+
+    def test_set_destination_package_partial_qty_with_move_orig_ids(self):
+        """Scanned destination location with partial qty, but related moves
+        has to be split and the move has origin moves
+        (with package and origin moves)
+        """
+        picking_a = self.picking_a
+        picking_b = self.picking_b
+
+        # we put 6 in a new package and 4 in another new package
+        package1 = self.env["stock.quant.package"].create({})
+        package2 = self.env["stock.quant.package"].create({})
+        line1 = picking_a.move_line_ids
+        line2 = line1.copy({"product_uom_qty": 4, "qty_done": 4})
+        line1.with_context(bypass_reservation_update=True).product_uom_qty = 6
+        line1.qty_done = 6
+        line1.result_package_id = package1
+        line2.result_package_id = package2
+        picking_a.action_done()
+        self.assertEqual(picking_a.state, "done")
+        self.assertEqual(picking_b.state, "assigned")
+        # we have 1 move line per package
+        self.assertEqual(len(picking_b.move_line_ids), 2)
+        self._simulate_pickings_selected(picking_b)
+
+        move_line = picking_b.move_line_ids.filtered(lambda m: m.package_id == package1)
+        move = move_line.move_id
+
+        self.assertEqual(move_line.product_uom_qty, 6.0)
+        self.assertEqual(move_line.qty_done, 6.0)
+        # Scan partial qty (6/10)
+        self.service.dispatch(
+            "set_destination_line",
+            params={
+                "location_id": self.content_loc.id,
+                "move_line_id": move_line.id,
+                "quantity": 6.0,  # Scan 6 qty
+                "barcode": self.dest_location.barcode,
+            },
+        )
+        # Check move line data
+        self.assertEqual(move_line.move_id.product_uom_qty, 6)
+        self.assertEqual(move_line.product_uom_qty, 0)
+        self.assertEqual(move_line.qty_done, 6)
+        self.assertEqual(move_line.state, "done")
+
+        # Check the move handling the remaining qty
+        remaining_move = picking_b.move_lines - move
+        self.assertEqual(remaining_move.state, "assigned")
+        remaining_move_line = remaining_move.move_line_ids
+        self.assertEqual(remaining_move_line.move_id.product_uom_qty, 4)
+        self.assertEqual(remaining_move_line.product_uom_qty, 4)
+        self.assertEqual(remaining_move_line.qty_done, 4)

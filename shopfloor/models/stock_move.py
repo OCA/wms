@@ -21,6 +21,7 @@ class StockMove(models.Model):
             backorder_move_id = self._split(qty_to_split)
             backorder_move = self.browse(backorder_move_id)
             backorder_move.move_line_ids = other_move_lines
+            backorder_move._recompute_state()
             backorder_move._action_assign()
             return backorder_move
         return False
