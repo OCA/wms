@@ -46,8 +46,8 @@ class LocationContentTransferSorter(Component):
         )
 
     def sort(self):
-        content = [line for line in self.move_lines()] + [
-            level for level in self.package_levels()
+        content = [line for line in self.move_lines() if line] + [
+            level for level in self.package_levels() if level
         ]
         self._content = sorted(content, key=self._sort_key)
 
