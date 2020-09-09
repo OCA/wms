@@ -134,7 +134,7 @@ class SinglePackTransfer(Component):
         """Forbid a dest location to be used"""
         return scanned_location.is_sublocation_of(
             move.picking_id.picking_type_id.default_location_dest_id
-        )
+        ) and scanned_location.is_sublocation_of(move.location_dest_id)
 
     def _is_dest_location_to_confirm(self, move, scanned_location):
         """Destination that could be used but need confirmation"""
@@ -172,14 +172,7 @@ class SinglePackTransfer(Component):
             )
 
         if self._is_dest_location_to_confirm(move, scanned_location):
-            if confirmation:
-                # If the destination of the move would be incoherent
-                # (move line outside of it), we change the moves' destination
-                # TODO in other scenarios, we forbid this. Check if we want
-                # to forbid it as well.
-                if not scanned_location.is_sublocation_of(move.location_dest_id):
-                    move.location_dest_id = scanned_location.id
-            else:
+            if not confirmation:
                 return self._response_for_scan_location(
                     package_level,
                     confirmation_required=True,
