@@ -73,8 +73,8 @@ class SinglePackTransferCase(CommonCase):
         return {
             "id": package_level.id,
             "name": package_level.package_id.name,
-            "location_src": self.data.location(self.shelf1),
-            "location_dest": self.data.location(self.shelf2),
+            "location_src": self.data.location(package_level.location_id),
+            "location_dest": self.data.location(package_level.location_dest_id),
             "picking": self.data.picking(self.picking),
             "product": self.data.product(self.product_a),
         }
@@ -547,7 +547,7 @@ class SinglePackTransferCase(CommonCase):
         )
 
     def test_validate_location_forbidden(self):
-        """Test a call on /validate on a forbidden location
+        """Test a call on /validate on a forbidden location (not child of type)
 
         The pre-conditions:
 
@@ -557,7 +557,7 @@ class SinglePackTransferCase(CommonCase):
 
         * No change in odoo, Transition with a message
 
-        Note: a forbidden location is when a location is not a child
+        Note: the location is forbidden when a location is not a child
         of the destination location of the picking type used for the process
         """
         # setup the picking as we need, like if the move line
@@ -570,6 +570,47 @@ class SinglePackTransferCase(CommonCase):
                 "package_level_id": package_level.id,
                 # this location is outside of the expected destination
                 "location_barcode": self.dispatch_location.barcode,
+            },
+        )
+
+        self.assert_response(
+            response,
+            next_state="scan_location",
+            data=self.ANY,
+            message={"message_type": "error", "body": "You cannot place it here"},
+        )
+
+    def test_validate_location_forbidden_move_invalid(self):
+        """Test a call on /validate on a forbidden location (not child of move)
+
+        The pre-conditions:
+
+        * /start has been called
+
+        Expected result:
+
+        * No change in odoo, Transition with a message
+
+        Note: the location is forbidden when a location is not a child
+        of the destination location of the move
+        """
+        # setup the picking as we need, like if the move line
+        # was already started by the first step (start operation)
+        package_level = self._simulate_started()
+
+        move = package_level.move_line_ids.move_id
+        # take the parent of the expected dest.: not allowed
+        location = move.location_dest_id.location_id
+        # allow this location to be used in the picking type, otherwise,
+        # we check the wrong condition
+        self.picking_type.sudo().default_location_dest_id = location
+
+        response = self.service.dispatch(
+            "validate",
+            params={
+                "package_level_id": package_level.id,
+                # this location is outside of the expected destination
+                "location_barcode": location.barcode,
             },
         )
 
@@ -599,20 +640,44 @@ class SinglePackTransferCase(CommonCase):
         # was already started by the first step (start operation)
         package_level = self._simulate_started()
 
+        sub_shelf1 = (
+            self.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "subshelf1",
+                    "barcode": "subshelf1",
+                    "location_id": self.shelf2.id,
+                }
+            )
+        )
+        sub_shelf2 = (
+            self.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "subshelf2",
+                    "barcode": "subshelf2",
+                    "location_id": self.shelf2.id,
+                }
+            )
+        )
+
         # expected destination is 'shelf2', we'll scan shelf1 which must
         # ask a confirmation to the user (it's still in the same picking type)
+        package_level.location_dest_id = sub_shelf1
         with mock.patch.object(type(self.picking), "action_done") as action_done:
             response = self.service.dispatch(
                 "validate",
                 params={
                     "package_level_id": package_level.id,
-                    "location_barcode": self.shelf1.barcode,
+                    "location_barcode": sub_shelf2.barcode,
                 },
             )
             action_done.assert_not_called()
 
         message = self.service.actions_for("message").confirm_location_changed(
-            self.shelf2, self.shelf1
+            sub_shelf1, sub_shelf2
         )
         self.assert_response(
             response,
