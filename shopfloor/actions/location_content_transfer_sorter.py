@@ -35,7 +35,7 @@ class LocationContentTransferSorter(Component):
             # postponed content after other contents
             int(content.shopfloor_postponed),
             # sort by shopfloor picking sequence
-            content.location_dest_id.shopfloor_picking_sequence,
+            content.location_dest_id.shopfloor_picking_sequence or "",
             # sort by similar destination
             content.location_dest_id.complete_name,
             # lines before packages (if we have raw products and packages, raw
