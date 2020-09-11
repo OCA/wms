@@ -147,7 +147,7 @@ class LocationContentTransfer(Component):
     def _domain_recover_pickings(self):
         return [
             ("user_id", "=", self.env.uid),
-            ("state", "in", ("assigned", "partially_available")),
+            ("state", "=", "assigned"),
             ("picking_type_id", "in", self.picking_types.ids),
         ]
 
