@@ -222,20 +222,22 @@ class StockMove(models.Model):
         # Set all transfers released to "printed", consider the work has
         # been planned and started and another "release" of moves should
         # (for instance) merge new pickings with this "round of release".
-        self._release_set_printed(pulled_moves)
-        self._release_assign_moves(pulled_moves)
+        pulled_moves._release_assign_moves()
+        pulled_moves._release_set_printed()
 
         return True
 
-    def _release_set_printed(self, moves):
+    def _release_set_printed(self):
         picking_ids = set()
+        moves = self
         while moves:
             picking_ids.update(moves.mapped("picking_id").ids)
             moves = moves.mapped("move_orig_ids")
         pickings = self.env["stock.picking"].browse(picking_ids)
         pickings.filtered(lambda p: not p.printed).printed = True
 
-    def _release_assign_moves(self, moves):
+    def _release_assign_moves(self):
+        moves = self
         while moves:
             moves._action_assign()
             moves = moves.mapped("move_orig_ids")
