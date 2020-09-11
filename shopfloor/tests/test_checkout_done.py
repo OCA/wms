@@ -46,11 +46,7 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
             response,
             next_state="confirm_done",
             data={"picking": self._stock_picking_data(self.picking, done=True)},
-            message={
-                "message_type": "warning",
-                "body": "Not all lines have been processed with full quantity. "
-                "Do you confirm partial operation?",
-            },
+            message=self.service.msg_store.transfer_confirm_done(),
         )
 
     def test_done_partial_confirm(self):
@@ -65,10 +61,7 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            message={
-                "message_type": "success",
-                "body": "Transfer {} done".format(self.picking.name),
-            },
+            message=self.service.msg_store.transfer_done_success(self.picking),
         )
 
 
@@ -124,8 +117,5 @@ class CheckoutDoneRawUnpackedCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            message={
-                "message_type": "success",
-                "body": "Transfer {} done".format(self.picking.name),
-            },
+            message=self.service.msg_store.transfer_done_success(self.picking),
         )
