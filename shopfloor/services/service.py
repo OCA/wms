@@ -358,17 +358,18 @@ class BaseShopfloorProcess(AbstractComponent):
             )
         return picking_types
 
-    def _check_picking_status(self, picking):
-        """Check if `picking` can be processed.
+    def _check_picking_status(self, pickings):
+        """Check if given pickings can be processed.
 
         If the picking is already done, canceled or didn't belong to the
         expected picking type, a message is returned.
         """
-        if not picking.exists():
-            return self.msg_store.stock_picking_not_found()
-        if picking.state == "done":
-            return self.msg_store.already_done()
-        if picking.state != "assigned":  # the picking must be ready
-            return self.msg_store.stock_picking_not_available(picking)
-        if picking.picking_type_id not in self.picking_types:
-            return self.msg_store.cannot_move_something_in_picking_type()
+        for picking in pickings:
+            if not picking.exists():
+                return self.msg_store.stock_picking_not_found()
+            if picking.state == "done":
+                return self.msg_store.already_done()
+            if picking.state != "assigned":  # the picking must be ready
+                return self.msg_store.stock_picking_not_available(picking)
+            if picking.picking_type_id not in self.picking_types:
+                return self.msg_store.cannot_move_something_in_picking_type()
