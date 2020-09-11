@@ -78,7 +78,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             "scan_deliver", params={"barcode": "NO VALID BARCODE", "picking_id": None}
         )
         self.assert_response_deliver(
-            response, message={"message_type": "error", "body": "Barcode not found"}
+            response, message=self.service.msg_store.barcode_not_found(),
         )
 
     def test_scan_deliver_error_barcode_not_found_keep_picking(self):
@@ -91,7 +91,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             # if the client was working on a picking (it sends picking_id, then
             # send refreshed data)
             picking=self.picking,
-            message={"message_type": "error", "body": "Barcode not found"},
+            message=self.service.msg_store.barcode_not_found(),
         )
 
     def _test_scan_set_done_ok(self, move_lines, barcode):
