@@ -1,4 +1,4 @@
-from odoo import fields
+from odoo import _, fields
 from odoo.osv import expression
 from odoo.tools.float_utils import float_is_zero
 
@@ -162,10 +162,14 @@ class Delivery(Component):
         # State of the picking might change while we reach this point: check again!
         message = self._check_picking_status(lines.mapped("picking_id"))
         if message:
-            message = "\n".join([
-                _("Package {} belongs to a picking without a valid state.").format(package.name),
-                message,
-            ])
+            message = "\n".join(
+                [
+                    _("Package {} belongs to a picking without a valid state.").format(
+                        package.name
+                    ),
+                    message,
+                ]
+            )
             return self._response_for_deliver(message=message)
         if not lines:
             return self._response_for_deliver(
@@ -222,10 +226,14 @@ class Delivery(Component):
         # State of the picking might change while we reach this point: check again!
         message = self._check_picking_status(lines.mapped("picking_id"))
         if message:
-            message = "\n".join([
-                _("Product {} belongs to a picking without a valid state.").format(product.name),
-                message,
-            ])
+            message = "\n".join(
+                [
+                    _("Product {} belongs to a picking without a valid state.").format(
+                        product.name
+                    ),
+                    message,
+                ]
+            )
             return self._response_for_deliver(message=message)
 
         new_picking = fields.first(lines.mapped("picking_id"))
@@ -267,10 +275,14 @@ class Delivery(Component):
         # State of the picking might change while we reach this point: check again!
         message = self._check_picking_status(lines.mapped("picking_id"))
         if message:
-            message = "\n".join([
-                _("Lot {} belongs to a picking without a valid state.").format(lot.name),
-                message,
-            ])
+            message = "\n".join(
+                [
+                    _("Lot {} belongs to a picking without a valid state.").format(
+                        lot.name
+                    ),
+                    message,
+                ]
+            )
             return self._response_for_deliver(message=message)
 
         new_picking = fields.first(lines.mapped("picking_id"))
