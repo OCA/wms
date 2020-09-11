@@ -156,11 +156,17 @@ class Delivery(Component):
             line.qty_done = 0
 
     def _deliver_package(self, picking, package):
-        lines = package.move_line_ids
-        lines = lines.filtered(
+        lines = package.move_line_ids.filtered(
             lambda l: l.state in ("assigned", "partially_available")
-            and l.picking_id.picking_type_id in self.picking_types
         )
+        # State of the picking might change while we reach this point: check again!
+        message = self._check_picking_status(lines.mapped("picking_id"))
+        if message:
+            message = "\n".join([
+                _("Package {} belongs to a picking without a valid state.").format(package.name),
+                message,
+            ])
+            return self._response_for_deliver(message=message)
         if not lines:
             return self._response_for_deliver(
                 picking=picking,
@@ -213,6 +219,15 @@ class Delivery(Component):
                 picking, message=self.msg_store.product_not_found_in_pickings()
             )
 
+        # State of the picking might change while we reach this point: check again!
+        message = self._check_picking_status(lines.mapped("picking_id"))
+        if message:
+            message = "\n".join([
+                _("Product {} belongs to a picking without a valid state.").format(product.name),
+                message,
+            ])
+            return self._response_for_deliver(message=message)
+
         new_picking = fields.first(lines.mapped("picking_id"))
         # When products are as units outside of packages, we can select them for
         # packing, but if they are in a package, we want the user to scan the packages.
@@ -248,6 +263,15 @@ class Delivery(Component):
             return self._response_for_deliver(
                 picking, message=self.msg_store.lot_not_found_in_pickings()
             )
+
+        # State of the picking might change while we reach this point: check again!
+        message = self._check_picking_status(lines.mapped("picking_id"))
+        if message:
+            message = "\n".join([
+                _("Lot {} belongs to a picking without a valid state.").format(lot.name),
+                message,
+            ])
+            return self._response_for_deliver(message=message)
 
         new_picking = fields.first(lines.mapped("picking_id"))
 
@@ -306,7 +330,7 @@ class Delivery(Component):
     def _pickings_domain(self):
         return [
             ("picking_type_id", "in", self.picking_types.ids),
-            ("state", "not in", ["cancel", "done", "waiting", "draft"]),
+            ("state", "=", "assigned"),
         ]
 
     def select(self, picking_id):
@@ -446,7 +470,7 @@ class Delivery(Component):
         * deliver: error during action
         * confirm_done: when not all lines of the stock.picking are done
         """
-        picking = self.env["stock.picking"].browse(picking_id).exists()
+        picking = self.env["stock.picking"].browse(picking_id)
         message = self._check_picking_status(picking)
         if message:
             return self._response_for_deliver(message=message)
