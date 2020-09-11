@@ -277,7 +277,10 @@ class Checkout(Component):
         * select_line: the "normal" case, when the user has to put in pack/move
           lines
         """
-        picking = self.env["stock.picking"].browse(picking_id).exists()
+        picking = self.env["stock.picking"].browse(picking_id)
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_manual_selection(message=message)
         return self._select_picking(picking, "manual_selection")
 
     def _select_lines(self, lines):
@@ -313,10 +316,9 @@ class Checkout(Component):
         screen to change the qty done and destination pack if needed
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
 
         search = self.actions_for("search")
 
@@ -464,10 +466,9 @@ class Checkout(Component):
         assert package_id or move_line_id
 
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
 
         selection_lines = self._lines_to_pack(picking)
         if not selection_lines:
@@ -484,10 +485,9 @@ class Checkout(Component):
         self, picking_id, selected_line_ids, move_line_ids, quantity_func
     ):
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
 
         move_lines = self.env["stock.move.line"].browse(move_line_ids).exists()
 
@@ -689,10 +689,9 @@ class Checkout(Component):
         to close the stock picking
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
         search = self.actions_for("search")
 
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
@@ -741,10 +740,9 @@ class Checkout(Component):
         * select_line: goes back to selection of lines to work on next lines
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         return self._create_and_assign_new_packaging(picking, selected_lines)
 
@@ -759,10 +757,9 @@ class Checkout(Component):
         * select_line: goes back to selection of lines to work on next lines
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         selected_lines.write(
             {"shopfloor_checkout_done": True, "result_package_id": False}
@@ -786,11 +783,9 @@ class Checkout(Component):
         * select_package: when no package is available
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
-
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         return self._response_for_select_dest_package(picking, lines)
 
@@ -826,10 +821,9 @@ class Checkout(Component):
         * summary: all lines are put in packages
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         search = self.actions_for("search")
         package = search.package_from_scan(barcode)
@@ -848,10 +842,9 @@ class Checkout(Component):
         * summary: all lines are put in packages
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         package = self.env["stock.quant.package"].browse(package_id).exists()
         return self._set_dest_package_from_selection(picking, lines, package)
@@ -863,10 +856,9 @@ class Checkout(Component):
         * summary
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
         return self._response_for_summary(picking)
 
     def _get_allowed_packaging(self):
@@ -883,11 +875,9 @@ class Checkout(Component):
         * summary: if the package_id no longer exists
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
-
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
         package = self.env["stock.quant.package"].browse(package_id).exists()
         packaging_list = self._get_allowed_packaging()
         return self._response_for_change_packaging(picking, package, packaging_list)
@@ -900,10 +890,9 @@ class Checkout(Component):
         * summary
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
 
         package = self.env["stock.quant.package"].browse(package_id).exists()
         packaging = self.env["product.packaging"].browse(packaging_id).exists()
@@ -937,10 +926,9 @@ class Checkout(Component):
         * summary
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
 
         package = self.env["stock.quant.package"].browse(package_id).exists()
         line = self.env["stock.move.line"].browse(line_id).exists()
@@ -982,23 +970,16 @@ class Checkout(Component):
         * confirm_done: confirm a partial
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        if not picking.exists():
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_found()
-            )
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
         lines = picking.move_line_ids
         if not confirmation:
             if not all(line.qty_done == line.product_uom_qty for line in lines):
                 return self._response_for_summary(
                     picking,
                     need_confirm=True,
-                    message={
-                        "message_type": "warning",
-                        "body": _(
-                            "Not all lines have been processed with full quantity. "
-                            "Do you confirm partial operation?"
-                        ),
-                    },
+                    message=self.msg_store.transfer_confirm_done(),
                 )
             elif not all(line.shopfloor_checkout_done for line in lines):
                 return self._response_for_summary(
@@ -1011,10 +992,7 @@ class Checkout(Component):
                 )
         picking.action_done()
         return self._response_for_select_document(
-            message={
-                "message_type": "success",
-                "body": _("Transfer {} done").format(picking.name),
-            }
+            message=self.msg_store.transfer_done_success(picking)
         )
 
 
