@@ -72,7 +72,7 @@ class MessageAction(Component):
     def stock_picking_not_found(self):
         return {
             "message_type": "error",
-            "body": _("This transfer does not exist anymore."),
+            "body": _("This transfer does not exist or is not available anymore."),
         }
 
     def package_not_found(self):
@@ -355,12 +355,18 @@ class MessageAction(Component):
             ),
         }
 
+    def transfer_done_success(self, picking):
+        return {
+            "message_type": "success",
+            "body": _("Transfer {} done").format(picking.name),
+        }
+
     def transfer_confirm_done(self):
         return {
             "message_type": "warning",
             "body": _(
-                "Not all lines have been processed, do you want to "
-                "confirm partial operation ?"
+                "Not all lines have been processed with full quantity. "
+                "Do you confirm partial operation?"
             ),
         }
 
