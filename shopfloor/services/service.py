@@ -368,7 +368,7 @@ class BaseShopfloorProcess(AbstractComponent):
             return self.msg_store.stock_picking_not_found()
         if picking.state == "done":
             return self.msg_store.already_done()
-        if picking.state not in ("assigned", "partially_available"):
+        if picking.state != "assigned":  # the picking must be ready
             return self.msg_store.stock_picking_not_available(picking)
         if picking.picking_type_id not in self.picking_types:
             return self.msg_store.cannot_move_something_in_picking_type()
