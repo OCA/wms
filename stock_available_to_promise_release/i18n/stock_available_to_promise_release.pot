@@ -26,6 +26,11 @@ msgid "Cancel"
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__city
+msgid "City"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_res_company
 msgid "Companies"
 msgstr ""
@@ -62,6 +67,11 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move_release__create_date
 msgid "Created on"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_tree
+msgid "Customer"
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -120,6 +130,11 @@ msgid "Ordered Available to Promise"
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_tree
+msgid "Postcode"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__date_priority
 msgid "Priority Date"
 msgstr ""
@@ -151,6 +166,17 @@ msgid "Release based on Available to Promise"
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_form
+msgid "Shipment date"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.actions.act_window,name:stock_available_to_promise_release.stock_move_release_action
+#: model:ir.ui.menu,name:stock_available_to_promise_release.stock_move_release_menu
+msgid "Stock Allocation"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_move
 msgid "Stock Move"
 msgstr ""
@@ -158,12 +184,6 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_move_release
 msgid "Stock Move Release"
-msgstr ""
-
-#. module: stock_available_to_promise_release
-#: model:ir.actions.act_window,name:stock_available_to_promise_release.stock_move_release_action
-#: model:ir.ui.menu,name:stock_available_to_promise_release.stock_move_release_menu
-msgid "Stock Moves To Release"
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -206,6 +226,11 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_picking
 msgid "Transfer"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__zip_code
+msgid "Zip"
 msgstr ""
 
 #. module: stock_available_to_promise_release
