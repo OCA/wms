@@ -26,6 +26,12 @@ class PromiseReleaseCommonCase(common.SavepointCase):
         cls.product2 = cls.env["product.product"].create(
             {"name": "Product 2", "type": "product"}
         )
+        cls.product3 = cls.env["product.product"].create(
+            {"name": "Product 3", "type": "product"}
+        )
+        cls.product4 = cls.env["product.product"].create(
+            {"name": "Product 4", "type": "product"}
+        )
         cls.uom_unit = cls.env.ref("uom.product_uom_unit")
         cls.partner_delta = cls.env.ref("base.res_partner_4")
         cls.loc_bin1 = cls.env["stock.location"].create(

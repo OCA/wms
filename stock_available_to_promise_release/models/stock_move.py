@@ -186,9 +186,7 @@ class StockMove(models.Model):
                     # we don't want to deliver unless we can deliver all at
                     # once
                     continue
-                new_move = move.with_context(
-                    release_available_to_promise=True
-                )._release_split(remaining)
+                new_move = move._release_split(remaining)
                 backorder_links[new_move.picking_id] = move.picking_id
 
             values = move._prepare_procurement_values()
@@ -205,6 +203,16 @@ class StockMove(models.Model):
                 )
             )
             pulled_moves |= move
+
+        # move the unreleased moves to a backorder
+        released_pickings = pulled_moves.picking_id
+        unreleased_moves = released_pickings.move_lines - pulled_moves
+        for unreleased_move in unreleased_moves:
+            # no split will occur as we keep the same qty, but the move
+            # will be assigned to a new stock.picking
+            original_picking = unreleased_move.picking_id
+            unreleased_move._release_split(unreleased_move.product_qty)
+            backorder_links[unreleased_move.picking_id] = original_picking
 
         for backorder, origin in backorder_links.items():
             backorder._release_link_backorder(origin)
@@ -239,6 +247,8 @@ class StockMove(models.Model):
         we move it to a new one so that we can release it later as soon as
         the qty is available.
         """
+        context = self.env.context
+        self = self.with_context(release_available_to_promise=True)
         # Rely on `printed` flag to make _assign_picking create a new picking.
         # See `stock.move._assign_picking` and
         # `stock.move._search_picking_for_assignation`.
@@ -249,4 +259,4 @@ class StockMove(models.Model):
         # thus the `_should_be_assigned` condition is not satisfied
         # and the move is not assigned.
         new_move._assign_picking()
-        return new_move
+        return new_move.with_context(context)

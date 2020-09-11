@@ -346,13 +346,21 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             ],
         )
 
-    def test_defer_multi_move(self):
+    def test_defer_multi_move_unreleased_in_backorder(self):
+        """Unreleased moves are put in a backorder"""
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
 
+        self._update_qty_in_location(self.loc_bin1, self.product1, 10.0)
         self._update_qty_in_location(self.loc_bin1, self.product2, 10.0)
 
         pickings = self._create_picking_chain(
-            self.wh, [(self.product1, 20), (self.product2, 10)]
+            self.wh,
+            [
+                (self.product1, 20),
+                (self.product2, 10),
+                (self.product3, 20),
+                (self.product4, 10),
+            ],
         )
         self.assertEqual(len(pickings), 1, "expect only the last out->customer")
         cust_picking = pickings
@@ -366,10 +374,36 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 }
             ],
         )
-
+        cust_picking = pickings
         cust_picking.release_available_to_promise()
 
-        out_picking = self._pickings_in_group(pickings.group_id) - cust_picking
+        backorder = cust_picking.backorder_ids
+        self.assertRecordValues(
+            backorder,
+            [
+                {
+                    "state": "waiting",
+                    "location_id": self.wh.wh_output_stock_loc_id.id,
+                    "location_dest_id": self.loc_customer.id,
+                }
+            ],
+        )
+
+        self.assertRecordValues(
+            backorder.move_lines,
+            [
+                # remaining 10 on product 1 because it was partially available
+                {"product_qty": 10.0, "product_id": self.product1.id},
+                # these 2 moves were not released, so they are moved to a
+                # backorder
+                {"product_qty": 20.0, "product_id": self.product3.id},
+                {"product_qty": 10.0, "product_id": self.product4.id},
+            ],
+        )
+
+        out_picking = (
+            self._pickings_in_group(pickings.group_id) - cust_picking - backorder
+        )
 
         self.assertRecordValues(
             out_picking,
@@ -384,7 +418,10 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
 
         self.assertRecordValues(
             out_picking.move_lines,
-            [{"product_qty": 10.0, "product_id": self.product2.id}],
+            [
+                {"product_qty": 10.0, "product_id": self.product1.id},
+                {"product_qty": 10.0, "product_id": self.product2.id},
+            ],
         )
 
     def test_defer_creation_uom(self):
