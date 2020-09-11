@@ -53,11 +53,15 @@ class CheckoutSelectCase(CheckoutCommonCase):
     def test_select_error_not_found(self):
         picking = self._create_picking()
         picking.sudo().unlink()
-        self._test_error(picking, "This transfer does not exist anymore.")
+        self._test_error(
+            picking, self.service.msg_store.stock_picking_not_found()["body"]
+        )
 
     def test_select_error_not_available(self):
         picking = self._create_picking()
-        self._test_error(picking, "Transfer {} is not available.".format(picking.name))
+        self._test_error(
+            picking, self.service.msg_store.stock_picking_not_available(picking)["body"]
+        )
 
     def test_select_error_not_allowed(self):
         picking = self._create_picking(picking_type=self.wh.pick_type_id)
