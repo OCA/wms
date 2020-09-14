@@ -8,6 +8,28 @@ class ZonePickingStartCase(ZonePickingCommonCase):
 
     """
 
+    @classmethod
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
+        # create a picking w/ a different picking type
+        # which should be excluded from picking types list
+        bad_picking_type = cls.picking_type.sudo().copy(
+            {
+                "name": "Bad type",
+                "sequence_code": "WH/BAD",
+                "default_location_src_id": cls.zone_location.id,
+                "shopfloor_menu_ids": False,
+            }
+        )
+        cls.extra_picking = extra_picking = cls._create_picking(
+            lines=[(cls.product_b, 10)], picking_type=bad_picking_type,
+        )
+        cls._fill_stock_for_moves(
+            extra_picking.move_lines, in_package=True, location=cls.zone_sublocation1
+        )
+        cls._update_qty_in_location(cls.zone_sublocation1, cls.product_b, 10)
+        extra_picking.action_assign()
+
     def test_scan_location_wrong_barcode(self):
         """Scanned location invalid, no location found."""
         response = self.service.dispatch(
