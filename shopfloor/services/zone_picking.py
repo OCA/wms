@@ -244,6 +244,8 @@ class ZonePicking(Component, ChangePackLotMixin):
         ]
         if picking_type:
             domain += [("picking_id.picking_type_id", "=", picking_type.id)]
+        else:
+            domain += [("picking_id.picking_type_id", "in", self.picking_types.ids)]
         if package:
             domain += [("package_id", "=", package.id)]
         if product:
