@@ -57,7 +57,8 @@ export var LoginPage = Vue.component("login-page", {
                                 v-model="apikey"
                                 label="API Key"
                                 placeholder="YOUR_API_KEY_HERE"
-                                autofocus></v-text-field>
+                                autofocus
+                                autocomplete="off"></v-text-field>
                             <div class="button-list button-vertical-list full">
                                 <v-row align="center">
                                     <v-col class="text-center" cols="12">
