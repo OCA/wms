@@ -32,6 +32,8 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         cls.wh.sudo().delivery_steps = "pick_pack_ship"
         cls.pack_location = cls.wh.wh_pack_stock_loc_id
         cls.ship_location = cls.wh.wh_output_stock_loc_id
+        # Allows zone picking to process PICK picking type
+        cls.zp_menu.sudo().picking_type_ids += cls.wh.pick_type_id
         # Allows location content transfer to process PACK picking type
         cls.menu.sudo().picking_type_ids = cls.wh.pack_type_id
         cls.wh.pack_type_id.sudo().default_location_dest_id = cls.env.ref(
