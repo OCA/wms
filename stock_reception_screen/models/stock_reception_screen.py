@@ -480,10 +480,13 @@ class StockReceptionScreen(models.Model):
         # 'action_assign' on the picking each time we validate a move.
         move_line = fields.first(self.current_move_id.move_line_ids)
         self.current_move_line_id = move_line
-        if self.current_move_id.last_move_line_lot_id:
-            self.current_move_line_id.lot_id = (
-                self.current_move_id.last_move_line_lot_id
-            )
+        last_lot = self.current_move_id.last_move_line_lot_id
+        if last_lot:
+            self.current_move_line_id.lot_id = last_lot
+            self.current_move_line_lot_life_date = last_lot.life_date
+        else:
+            # No lot to reuse, we reset the life date
+            self.current_move_line_lot_life_date = False
 
     def process_select_move(self):
         self.next_step()
