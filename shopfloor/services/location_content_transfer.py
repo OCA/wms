@@ -788,6 +788,41 @@ class LocationContentTransfer(Component):
         move_lines = self._find_transfer_move_lines(location)
         return self._response_for_start_single(move_lines.mapped("picking_id"))
 
+    def dismiss_package_level(self, location_id, package_level_id):
+        """Dismiss the package level.
+
+        The result package of the related move lines is unset, then the package
+        level itself is removed from the picking. This allows to move parts
+        of the package to different locations.
+
+        The user is then redirected to process the next line of the related picking.
+
+        Transitions:
+        * start_single: continue with the next line
+        """
+        location = self.env["stock.location"].browse(location_id)
+        if not location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        package_level = self.env["stock.package_level"].browse(package_level_id)
+        if not package_level.exists():
+            move_lines = self._find_transfer_move_lines(location)
+            return self._response_for_start_single(
+                move_lines.mapped("picking_id"),
+                message=self.msg_store.record_not_found(),
+            )
+        move_lines = package_level.move_line_ids
+        move_lines.write(
+            {
+                "result_package_id": False,
+                # ensure all the lines in the package are the next ones to be processed
+                "shopfloor_priority": 1,
+            }
+        )
+        package_level.unlink()
+        return self._response_for_start_single(
+            move_lines.mapped("picking_id"), message=self.msg_store.package_open()
+        )
+
 
 class ShopfloorLocationContentTransferValidator(Component):
     """Validators for the Location Content Transfer endpoints"""
@@ -865,6 +900,12 @@ class ShopfloorLocationContentTransferValidator(Component):
         return {
             "location_id": {"coerce": to_int, "required": True, "type": "integer"},
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
+
+    def dismiss_package_level(self):
+        return {
+            "location_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "package_level_id": {"coerce": to_int, "required": True, "type": "integer"},
         }
 
 
@@ -962,4 +1003,7 @@ class ShopfloorLocationContentTransferValidatorResponse(Component):
         return self._response_schema(next_states={"start", "start_single"})
 
     def stock_out_line(self):
+        return self._response_schema(next_states={"start", "start_single"})
+
+    def dismiss_package_level(self):
         return self._response_schema(next_states={"start", "start_single"})
