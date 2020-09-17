@@ -26,17 +26,6 @@ class StockMove(models.Model):
             return backorder_move
         return False
 
-    def _action_done(self, cancel_backorder=False):
-        # Overloaded to ensure that the 'action_done' method of the picking
-        # is called when the last move of a picking is validated.
-        moves = super()._action_done(cancel_backorder)
-        if not self.env.context.get("_action_done_from_picking"):
-            pickings = moves.picking_id
-            for picking in pickings:
-                if picking.state == "done":
-                    picking.action_done()
-        return moves
-
     def extract_and_action_done(self):
         """Extract the moves in a separate transfer and validate them.
 

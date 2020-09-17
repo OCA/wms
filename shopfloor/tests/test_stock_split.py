@@ -145,7 +145,7 @@ class TestStockSplit(SavepointCase):
             move_line.qty_done = move_line.product_uom_qty
             if i % 2:
                 move_line.location_dest_id = dest_location
-        self.pick_move_a.with_context(_sf_no_backorder=True)._action_done()
+        self.pick_move_a.extract_and_action_done()
         self.assertEqual(self.pick_move_a.state, "done")
         # Pack step, we want to split move lines from common source location
         self.assertEqual(self.pack_move_a.state, "assigned")
