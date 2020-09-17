@@ -456,6 +456,52 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
             response, move_lines.mapped("picking_id"),
         )
 
+    def test_dismiss_package_level_ok(self):
+        """Open a package level"""
+        package_level = self.picking1.move_line_ids.package_level_id
+        move_lines = package_level.move_line_ids
+        response = self.service.dispatch(
+            "dismiss_package_level",
+            params={
+                "location_id": self.content_loc.id,
+                "package_level_id": package_level.id,
+            },
+        )
+        self.assertFalse(package_level.exists())
+        self.assertFalse(move_lines.result_package_id)
+        self.assertFalse(move_lines.package_level_id)
+        self.assertEqual(move_lines.mapped("shopfloor_priority"), [1, 1])
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        self.assert_response_start_single(
+            response,
+            move_lines.mapped("picking_id"),
+            message=self.service.msg_store.package_open(),
+        )
+
+    def test_dismiss_package_level_error_no_package_level(self):
+        """Open a package level, send unknown package level id"""
+        response = self.service.dispatch(
+            "dismiss_package_level",
+            params={"location_id": self.content_loc.id, "package_level_id": 0},
+        )
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        self.assert_response_start_single(
+            response,
+            move_lines.mapped("picking_id"),
+            message=self.service.msg_store.record_not_found(),
+        )
+
+    def test_dismiss_package_level_error_no_location(self):
+        """Open a package level, send unknown location id"""
+        package_level = self.picking1.move_line_ids.package_level_id
+        response = self.service.dispatch(
+            "dismiss_package_level",
+            params={"location_id": 0, "package_level_id": package_level.id},
+        )
+        self.assert_response_start(
+            response, message=self.service.msg_store.record_not_found(),
+        )
+
 
 class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase):
     """Tests for endpoint used from state start_single (special cases)

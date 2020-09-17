@@ -16,15 +16,42 @@ class LocationContentTransferSorter(Component):
         self._pickings |= pickings
 
     def move_lines(self):
-        return self._pickings.move_line_ids.filtered(
-            # lines without package level only (raw products)
+        """Returns valid move lines.
+
+        Valid move lines are:
+            - those not bound to a package level
+            - those bound to invalid package levels
+
+        An invalid package level has one of its line not targetting the
+        expected package.
+        """
+        # lines without package level only (raw products)
+        move_lines = self._pickings.move_line_ids.filtered(
             lambda line: not line.package_level_id
             and line.state not in ("cancel", "done")
         )
+        # lines with invalid package levels
+        invalid_levels = self._pickings.package_level_ids.filtered(
+            lambda level: level.state not in ("cancel", "done")
+            and any(
+                line.result_package_id != level.package_id
+                for line in level.move_line_ids
+            )
+        )
+        return move_lines | invalid_levels.move_line_ids
 
     def package_levels(self):
+        """Returns valid package levels.
+
+        A valid package level has all its related move lines targetting
+        the expected package.
+        """
         return self._pickings.package_level_ids.filtered(
             lambda level: level.state not in ("cancel", "done")
+            and all(
+                line.result_package_id == level.package_id
+                for line in level.move_line_ids
+            )
         )
 
     @staticmethod
