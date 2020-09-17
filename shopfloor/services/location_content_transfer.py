@@ -525,13 +525,6 @@ class LocationContentTransfer(Component):
 
         After the destination is set, the move is set to done.
 
-        Beware, when _action_done() is called on the move, the normal behavior
-        of Odoo would be to create a backorder transfer. We don't want this or
-        we would have a backorder per move. The context key
-        ``_sf_no_backorder`` disables the creation of backorders, it must be set
-        on all moves, but the last one of a transfer (so in case something was not
-        available, a backorder is created).
-
         Transitions:
         * scan_destination: invalid destination or could not
         * start_single: continue with the next package level / line
@@ -576,7 +569,7 @@ class LocationContentTransfer(Component):
             # split the move to process only the lines related to the package.
             package_move.split_other_move_lines(package_move_lines)
         self._write_destination_on_lines(package_level.move_line_ids, scanned_location)
-        package_moves.with_context(_sf_no_backorder=True)._action_done()
+        package_moves.extract_and_action_done()
         move_lines = self._find_transfer_move_lines(location)
         message = self.msg_store.location_content_transfer_item_complete(
             scanned_location
@@ -595,13 +588,6 @@ class LocationContentTransfer(Component):
         so we can post only this part.
 
         After the destination and quantity are set, the move is set to done.
-
-        Beware, when _action_done() is called on the move, the normal behavior
-        of Odoo would be to create a backorder transfer. We don't want this or
-        we would have a backorder per move. The context key
-        ``_sf_no_backorder`` disables the creation of backorders, it must be set
-        on all moves, but the last one of a transfer (so in case something was not
-        available, a backorder is created).
 
         Transitions:
         * scan_destination: invalid destination or could not
@@ -647,13 +633,13 @@ class LocationContentTransfer(Component):
             new_move = self.env["stock.move"].browse(new_move_id)
             new_move.move_line_ids = move_line
             # Ensure that the remaining qty to process is reserved as before
-            current_move._recompute_state()
+            (new_move | current_move)._recompute_state()
             (new_move | current_move)._action_assign()
             for remaining_move_line in current_move.move_line_ids:
                 remaining_move_line.qty_done = remaining_move_line.product_uom_qty
         move_line.move_id.split_other_move_lines(move_line)
         self._write_destination_on_lines(move_line, scanned_location)
-        move_line.move_id.with_context(_sf_no_backorder=True)._action_done()
+        move_line.move_id.extract_and_action_done()
         move_lines = self._find_transfer_move_lines(location)
         message = self.msg_store.location_content_transfer_item_complete(
             scanned_location
