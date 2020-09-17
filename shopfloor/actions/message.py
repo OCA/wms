@@ -459,3 +459,9 @@ class MessageAction(Component):
             "message_type": "error",
             "body": _("New move lines cannot be assigned: canceled."),
         }
+
+    def package_open(self):
+        return {
+            "message_type": "info",
+            "body": _("Package has been opened. You can move partial quantities."),
+        }
