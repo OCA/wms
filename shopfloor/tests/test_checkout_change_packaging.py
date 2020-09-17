@@ -5,12 +5,17 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
     @classmethod
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
+        pallet_type = (
+            cls.env["product.packaging.type"]
+            .sudo()
+            .create({"name": "Pallet", "code": "P", "sequence": 3})
+        )
         cls.packaging_pallet = (
             cls.env["product.packaging"]
             .sudo()
             .create(
                 {
-                    "sequence": 3,
+                    "packaging_type_id": pallet_type.id,
                     "name": "Pallet",
                     "barcode": "PPP",
                     "height": 100,
@@ -19,12 +24,17 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
                 }
             )
         )
+        box_type = (
+            cls.env["product.packaging.type"]
+            .sudo()
+            .create({"name": "Box", "code": "B", "sequence": 2})
+        )
         cls.packaging_box = (
             cls.env["product.packaging"]
             .sudo()
             .create(
                 {
-                    "sequence": 2,
+                    "packaging_type_id": box_type.id,
                     "name": "Box",
                     "barcode": "BBB",
                     "height": 20,
@@ -33,12 +43,17 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
                 }
             )
         )
+        inner_box_type = (
+            cls.env["product.packaging.type"]
+            .sudo()
+            .create({"name": "Inner Box", "code": "I", "sequence": 1})
+        )
         cls.packaging_inner_box = (
             cls.env["product.packaging"]
             .sudo()
             .create(
                 {
-                    "sequence": 1,
+                    "packaging_type_id": inner_box_type.id,
                     "name": "Inner Box",
                     "barcode": "III",
                     "height": 10,
