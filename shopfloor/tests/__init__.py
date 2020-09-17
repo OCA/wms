@@ -51,3 +51,4 @@ from . import test_zone_picking_unload_single
 from . import test_zone_picking_unload_all
 from . import test_zone_picking_unload_set_destination
 from . import test_misc
+from . import test_stock_split
