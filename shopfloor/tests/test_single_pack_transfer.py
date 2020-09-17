@@ -835,7 +835,7 @@ class SinglePackTransferCase(CommonCase):
         picking = move.picking_id
 
         # someone cancel the work started by our operator
-        move._action_done()
+        move.extract_and_action_done()
 
         # now, call the service to cancel
         response = self.service.dispatch(
