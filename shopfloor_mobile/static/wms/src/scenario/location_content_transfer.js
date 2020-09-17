@@ -57,10 +57,7 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                     <line-actions-popup
                         v-if="!wrapped_context()._multi"
                         :line="rec"
-                        :actions="[
-                            {name: 'Postpone line', event_name: 'action_postpone'},
-                            {name: 'Declare stock out', event_name: 'action_stock_out'},
-                        ]"
+                        :actions="line_actions()"
                         :key="make_state_component_key(['line-actions', rec.id])"
                         v-on:action="on_line_action"
                         />
@@ -160,6 +157,16 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                 fields: [{path: "location_src.name", label: "From"}],
             });
         },
+        line_actions: function() {
+            let actions = [
+                {name: "Postpone line", event_name: "action_postpone"},
+                {name: "Declare stock out", event_name: "action_stock_out"},
+            ];
+            if (this.state.data.package_level) {
+                actions.push({name: "Open Package", event_name: "action_open_package"});
+            }
+            return actions;
+        },
         // Common actions
         on_line_action: function(action) {
             this["on_" + action.event_name].call(this);
@@ -185,6 +192,14 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
         on_action_stock_out: function() {
             this.state_set_data(this.state.data, "stock_issue");
             this.state_to("stock_issue");
+        },
+        on_action_open_package: function() {
+            const data = this.state.data;
+            let endpoint_data = {
+                location_id: data.package_level.location_src.id,
+                package_level_id: data.package_level.id,
+            };
+            this.wait_call(this.odoo.call("dismiss_package_level", endpoint_data));
         },
     },
     data: function() {
