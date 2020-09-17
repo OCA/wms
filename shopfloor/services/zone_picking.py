@@ -540,11 +540,10 @@ class ZonePicking(Component):
         move_line.qty_done = quantity
         # if the move has other move lines, it is split to have only this move line
         move_line.move_id.split_other_move_lines(move_line)
-        # set to done (without backorder)
-        move_line.move_id.with_context(_sf_no_backorder=True)._action_done()
         # try to re-assign any split move (in case of partial qty)
         if "confirmed" in move_line.picking_id.move_lines.mapped("state"):
             move_line.picking_id.action_assign()
+        move_line.move_id.extract_and_action_done()
         location_changed = True
         # Zero check
         zero_check = picking_type.shopfloor_zero_check
@@ -1073,7 +1072,7 @@ class ZonePicking(Component):
             self._write_destination_on_lines(buffer_lines, location)
             # set lines to done + refresh buffer lines (should be empty)
             moves = buffer_lines.mapped("move_id")
-            moves.with_context(_sf_no_backorder=True)._action_done()
+            moves.extract_and_action_done()
             message = self.msg_store.buffer_complete()
             buffer_lines = self._find_buffer_move_lines(zone_location, picking_type)
         else:
@@ -1275,7 +1274,7 @@ class ZonePicking(Component):
             self._write_destination_on_lines(buffer_lines, location)
             # set lines to done + refresh buffer lines (should be empty)
             moves = buffer_lines.mapped("move_id")
-            moves.with_context(_sf_no_backorder=True)._action_done()
+            moves.extract_and_action_done()
             buffer_lines = self._find_buffer_move_lines(zone_location, picking_type)
             if buffer_lines:
                 return self._response_for_unload_single(
