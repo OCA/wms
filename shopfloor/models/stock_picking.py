@@ -36,13 +36,3 @@ class StockPicking(models.Model):
         for move_line in self.mapped("move_line_ids"):
             weight += move_line.product_qty * move_line.product_id.weight
         return weight
-
-    def _create_backorder(self):
-        if self.env.context.get("_sf_no_backorder"):
-            return self.browse()
-        else:
-            return super()._create_backorder()
-
-    def action_done(self):
-        self = self.with_context(_action_done_from_picking=True)
-        return super().action_done()
