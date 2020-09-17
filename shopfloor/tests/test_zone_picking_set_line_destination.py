@@ -1,5 +1,3 @@
-from unittest import mock
-
 from .test_zone_picking_base import ZonePickingCommonCase
 
 
@@ -180,19 +178,18 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         self.assertEqual(len(moves_before), 1)
         self.assertEqual(len(moves_before.move_line_ids), 1)
         move_line = moves_before.move_line_ids
-        with mock.patch.object(type(self.picking1), "action_done") as action_done:
-            response = self.service.dispatch(
-                "set_destination",
-                params={
-                    "zone_location_id": zone_location.id,
-                    "picking_type_id": picking_type.id,
-                    "move_line_id": move_line.id,
-                    "barcode": self.packing_location.barcode,
-                    "quantity": move_line.product_uom_qty,
-                    "confirmation": False,
-                },
-            )
-            action_done.assert_called_once()
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "move_line_id": move_line.id,
+                "barcode": self.packing_location.barcode,
+                "quantity": move_line.product_uom_qty,
+                "confirmation": False,
+            },
+        )
+        self.assertEqual(move_line.state, "done")
         # Check picking data
         moves_after = self.picking1.move_lines
         self.assertEqual(moves_before, moves_after)
@@ -232,19 +229,17 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_line = moves_before.move_line_ids
         # we need a destination package if we want to scan a destination location
         move_line.result_package_id = self.free_package
-        with mock.patch.object(type(self.picking3), "action_done") as action_done:
-            response = self.service.dispatch(
-                "set_destination",
-                params={
-                    "zone_location_id": zone_location.id,
-                    "picking_type_id": picking_type.id,
-                    "move_line_id": move_line.id,
-                    "barcode": barcode,
-                    "quantity": 6,
-                    "confirmation": False,
-                },
-            )
-            action_done.assert_not_called()
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "move_line_id": move_line.id,
+                "barcode": barcode,
+                "quantity": 6,
+                "confirmation": False,
+            },
+        )
         self.assert_response_set_line_destination(
             response,
             zone_location,
@@ -281,28 +276,31 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         # we need a destination package if we want to scan a destination location
         move_line.result_package_id = self.free_package
         other_move_line = moves_before.move_line_ids[1]
-        with mock.patch.object(type(self.picking4), "action_done") as action_done:
-            response = self.service.dispatch(
-                "set_destination",
-                params={
-                    "zone_location_id": zone_location.id,
-                    "picking_type_id": picking_type.id,
-                    "move_line_id": move_line.id,
-                    "barcode": self.packing_location.barcode,
-                    "quantity": move_line.product_uom_qty,  # 6 qty
-                    "confirmation": False,
-                },
-            )
-            action_done.assert_not_called()
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "move_line_id": move_line.id,
+                "barcode": self.packing_location.barcode,
+                "quantity": move_line.product_uom_qty,  # 6 qty
+                "confirmation": False,
+            },
+        )
+        self.assertEqual(move_line.state, "done")
         # Check picking data (move has been split in two, 6 done and 4 remaining)
-        moves_after = self.picking4.move_lines
-        self.assertEqual(len(moves_after), 2)
-        self.assertEqual(moves_after[0].product_uom_qty, 6)
-        self.assertEqual(moves_after[0].state, "done")
-        self.assertEqual(moves_after[0].move_line_ids.product_uom_qty, 0)
-        self.assertEqual(moves_after[1].product_uom_qty, 4)
-        self.assertEqual(moves_after[1].state, "assigned")
-        self.assertEqual(moves_after[1].move_line_ids.product_uom_qty, 4)
+
+        done_picking = self.picking4.backorder_ids
+        self.assertEqual(done_picking.state, "done")
+        self.assertEqual(self.picking4.state, "assigned")
+        move_after = self.picking4.move_lines
+        self.assertEqual(len(move_after), 1)
+        self.assertEqual(move_line.move_id.product_uom_qty, 6)
+        self.assertEqual(move_line.move_id.state, "done")
+        self.assertEqual(move_line.move_id.move_line_ids.product_uom_qty, 0)
+        self.assertEqual(move_after.product_uom_qty, 4)
+        self.assertEqual(move_after.state, "assigned")
+        self.assertEqual(move_after.move_line_ids.product_uom_qty, 4)
         self.assertEqual(move_line.qty_done, 6)
         self.assertNotEqual(move_line.move_id, other_move_line.move_id)
         # Check response
@@ -342,19 +340,17 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_line = moves_before.move_line_ids[0]
         # we need a destination package if we want to scan a destination location
         move_line.result_package_id = self.free_package
-        with mock.patch.object(type(self.picking4), "action_done") as action_done:
-            response = self.service.dispatch(
-                "set_destination",
-                params={
-                    "zone_location_id": zone_location.id,
-                    "picking_type_id": picking_type.id,
-                    "move_line_id": move_line.id,
-                    "barcode": barcode,
-                    "quantity": 4,  # 4/6 qty
-                    "confirmation": False,
-                },
-            )
-            action_done.assert_not_called()
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "move_line_id": move_line.id,
+                "barcode": barcode,
+                "quantity": 4,  # 4/6 qty
+                "confirmation": False,
+            },
+        )
         self.assert_response_set_line_destination(
             response,
             zone_location,

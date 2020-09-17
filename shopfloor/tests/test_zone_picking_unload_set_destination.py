@@ -1,5 +1,3 @@
-from unittest import mock
-
 from .test_zone_picking_base import ZonePickingCommonCase
 
 
@@ -223,18 +221,16 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             move_line.product_uom_qty,
             self.free_package,
         )
-        with mock.patch.object(type(self.picking1), "action_done") as action_done:
-            response = self.service.dispatch(
-                "unload_set_destination",
-                params={
-                    "zone_location_id": zone_location.id,
-                    "picking_type_id": picking_type.id,
-                    "package_id": self.free_package.id,
-                    "barcode": packing_sublocation.barcode,
-                    "confirmation": True,
-                },
-            )
-            action_done.assert_called_once()
+        response = self.service.dispatch(
+            "unload_set_destination",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "package_id": self.free_package.id,
+                "barcode": packing_sublocation.barcode,
+                "confirmation": True,
+            },
+        )
         # check data
         self.assertEqual(move_line.location_dest_id, packing_sublocation)
         self.assertEqual(move_line.move_id.state, "done")
@@ -255,8 +251,9 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         self.another_package = self.env["stock.quant.package"].create(
             {"name": "ANOTHER_PACKAGE"}
         )
+        move_lines = self.picking5.move_line_ids
         for move_line, package_dest in zip(
-            self.picking5.move_line_ids, self.free_package | self.another_package
+            move_lines, self.free_package | self.another_package
         ):
             self.service._set_destination_package(
                 zone_location,
@@ -265,24 +262,31 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
                 move_line.product_uom_qty,
                 package_dest,
             )
-        # process 1/2 buffer line
-        with mock.patch.object(type(self.picking5), "action_done") as action_done:
-            response = self.service.dispatch(
-                "unload_set_destination",
-                params={
-                    "zone_location_id": zone_location.id,
-                    "picking_type_id": picking_type.id,
-                    "package_id": self.free_package.id,
-                    "barcode": self.packing_location.barcode,
-                },
-            )
-            action_done.assert_not_called()
-        # check data
-        move_line = self.picking5.move_line_ids.filtered(
+        free_package_line = move_lines.filtered(
             lambda l: l.result_package_id == self.free_package
         )
-        self.assertEqual(move_line.location_dest_id, self.packing_location)
-        self.assertEqual(move_line.move_id.state, "done")
+        another_package_line = move_lines - free_package_line
+
+        # process 1/2 buffer line
+        response = self.service.dispatch(
+            "unload_set_destination",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "package_id": self.free_package.id,
+                "barcode": self.packing_location.barcode,
+            },
+        )
+        # check data
+        done_picking = self.picking5.backorder_ids
+        self.assertEqual(done_picking.state, "done")
+        self.assertEqual(done_picking.move_line_ids, free_package_line)
+
+        self.assertEqual(free_package_line.location_dest_id, self.packing_location)
+        self.assertEqual(free_package_line.move_id.state, "done")
+
+        self.assertEqual(self.picking5.move_line_ids, another_package_line)
+
         # check response
         buffer_line = self.service._find_buffer_move_lines(zone_location, picking_type)
         completion_info = self.service.actions_for("completion.info")
