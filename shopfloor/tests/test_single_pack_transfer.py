@@ -1,5 +1,3 @@
-from unittest import mock
-
 from odoo.tests.common import Form
 
 from .common import CommonCase
@@ -399,15 +397,13 @@ class SinglePackTransferCase(CommonCase):
 
         # now, call the service to proceed with validation of the
         # movement
-        with mock.patch.object(type(self.picking), "action_done") as action_done:
-            response = self.service.dispatch(
-                "validate",
-                params={
-                    "package_level_id": package_level.id,
-                    "location_barcode": self.shelf2.barcode,
-                },
-            )
-            action_done.assert_called_once()
+        response = self.service.dispatch(
+            "validate",
+            params={
+                "package_level_id": package_level.id,
+                "location_barcode": self.shelf2.barcode,
+            },
+        )
 
         self.assert_response(
             response,
@@ -469,15 +465,14 @@ class SinglePackTransferCase(CommonCase):
 
         # now, call the service to proceed with validation of the
         # movement
-        with mock.patch.object(type(self.picking), "action_done") as action_done:
-            response = self.service.dispatch(
-                "validate",
-                params={
-                    "package_level_id": package_level.id,
-                    "location_barcode": self.shelf2.barcode,
-                },
-            )
-            action_done.assert_called_once()
+        response = self.service.dispatch(
+            "validate",
+            params={
+                "package_level_id": package_level.id,
+                "location_barcode": self.shelf2.barcode,
+            },
+        )
+        self.assertEqual(package_level.picking_id.state, "done")
 
         self.assert_response(
             response,
@@ -666,15 +661,13 @@ class SinglePackTransferCase(CommonCase):
         # expected destination is 'shelf2', we'll scan shelf1 which must
         # ask a confirmation to the user (it's still in the same picking type)
         package_level.location_dest_id = sub_shelf1
-        with mock.patch.object(type(self.picking), "action_done") as action_done:
-            response = self.service.dispatch(
-                "validate",
-                params={
-                    "package_level_id": package_level.id,
-                    "location_barcode": sub_shelf2.barcode,
-                },
-            )
-            action_done.assert_not_called()
+        response = self.service.dispatch(
+            "validate",
+            params={
+                "package_level_id": package_level.id,
+                "location_barcode": sub_shelf2.barcode,
+            },
+        )
 
         message = self.service.actions_for("message").confirm_location_changed(
             sub_shelf1, sub_shelf2
@@ -714,17 +707,15 @@ class SinglePackTransferCase(CommonCase):
 
         # expected destination is 'shelf1', we'll scan shelf2 which must
         # ask a confirmation to the user (it's still in the same picking type)
-        with mock.patch.object(type(self.picking), "action_done") as action_done:
-            response = self.service.dispatch(
-                "validate",
-                params={
-                    "package_level_id": package_level.id,
-                    "location_barcode": self.shelf2.barcode,
-                    # acknowledge the change of destination
-                    "confirmation": True,
-                },
-            )
-            action_done.assert_called_once()
+        response = self.service.dispatch(
+            "validate",
+            params={
+                "package_level_id": package_level.id,
+                "location_barcode": self.shelf2.barcode,
+                # acknowledge the change of destination
+                "confirmation": True,
+            },
+        )
 
         self.assert_response(
             response,
