@@ -46,7 +46,7 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
                         :card_color="utils.colors.color_for(state_in(['scan_destination', 'scan_destination_all']) ? 'screen_step_done': 'screen_step_todo')"
                         />
 
-                    <v-card v-if="wrapped_context()._type == 'move_line'"
+                    <v-card v-if="wrapped_context()._type == 'move_line' && state_is('scan_destination')"
                             class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
                         <packaging-qty-picker
                             :key="make_state_component_key(['packaging-qty-picker', rec.id])"
@@ -132,23 +132,21 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
             const data = this.state.data;
             let res = {
                 has_records: true,
-                records: data.move_lines,
+                records: [].concat(data.move_lines || [], data.package_levels || []),
                 location_src: null,
                 location_dest: null,
                 _multi: true,
-                _type: "move_line",
+                _type: "mix",
             };
             if (_.isEmpty(res.records) && data.move_line) {
                 res.records = [data.move_line];
+                res._type = "move_line";
                 res._multi = false;
-            }
-            if (_.isEmpty(res.records) && data.package_levels) {
-                res.records = data.package_levels;
-                res._type = "pkg_level";
             }
             if (_.isEmpty(res.records) && data.package_level) {
                 res.records = [data.package_level];
                 res._type = "pkg_level";
+                res._multi = false;
             }
             res.has_records = res.records.length > 0;
             res.location_src = res.has_records ? res.records[0].location_src : null;
