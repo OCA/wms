@@ -3,7 +3,7 @@ import {process_registry} from "../services/process_registry.js";
 import {demotools} from "../demo/demo.core.js"; // FIXME: dev only
 import {} from "../demo/demo.delivery.js"; // FIXME: dev only
 
-export var Delivery = Vue.component("checkout", {
+const Delivery = {
     mixins: [ScenarioBaseMixin],
     template: `
         <Screen :screen_info="screen_info">
@@ -275,6 +275,8 @@ export var Delivery = Vue.component("checkout", {
             },
         };
     },
-});
+};
 
 process_registry.add("delivery", Delivery);
+
+export default Delivery;

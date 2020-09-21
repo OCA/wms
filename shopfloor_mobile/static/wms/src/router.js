@@ -1,5 +1,4 @@
 import {HomePage} from "./homepage.js";
-import {ScanAnything} from "./scenario/scan_anything.js";
 import {SettingsControlPanel} from "./settings/settings.js";
 import {Profile} from "./settings/profile.js";
 import {Language} from "./settings/language.js";
