@@ -47,9 +47,9 @@ class LocationContentTransfer(Component):
     _usage = "location_content_transfer"
     _description = __doc__
 
-    def _response_for_start(self, message=None):
+    def _response_for_start(self, message=None, popup=None):
         """Transition to the 'start' state"""
-        return self._response(next_state="start", message=message)
+        return self._response(next_state="start", message=message, popup=popup)
 
     def _response_for_scan_destination_all(
         self, pickings, message=None, confirmation_required=False
@@ -70,7 +70,7 @@ class LocationContentTransfer(Component):
             next_state="scan_destination_all", data=data, message=message
         )
 
-    def _response_for_start_single(self, pickings, message=None):
+    def _response_for_start_single(self, pickings, message=None, popup=None):
         """Transition to the 'start_single' state
 
         The client screen shows details of the package level or move line to move.
@@ -79,11 +79,12 @@ class LocationContentTransfer(Component):
         next_content = self._next_content(pickings)
         if not next_content:
             # TODO test (no more lines)
-            return self._response_for_start(message=message)
+            return self._response_for_start(message=message, popup=popup)
         return self._response(
             next_state="start_single",
             data=self._data_content_line_for_location(location, next_content),
             message=message,
+            popup=popup,
         )
 
     def _response_for_scan_destination(
@@ -384,10 +385,13 @@ class LocationContentTransfer(Component):
 
         self._set_all_destination_lines_and_done(pickings, move_lines, scanned_location)
 
+        completion_info = self.actions_for("completion.info")
+        completion_info_popup = completion_info.popup(move_lines)
         return self._response_for_start(
             message=self.msg_store.location_content_transfer_complete(
                 location, scanned_location
-            )
+            ),
+            popup=completion_info_popup,
         )
 
     def go_to_single(self, location_id):
@@ -574,8 +578,12 @@ class LocationContentTransfer(Component):
         message = self.msg_store.location_content_transfer_item_complete(
             scanned_location
         )
+        completion_info = self.actions_for("completion.info")
+        completion_info_popup = completion_info.popup(package_moves.move_line_ids)
         return self._response_for_start_single(
-            move_lines.mapped("picking_id"), message=message
+            move_lines.mapped("picking_id"),
+            message=message,
+            popup=completion_info_popup,
         )
 
     def set_destination_line(
@@ -644,8 +652,12 @@ class LocationContentTransfer(Component):
         message = self.msg_store.location_content_transfer_item_complete(
             scanned_location
         )
+        completion_info = self.actions_for("completion.info")
+        completion_info_popup = completion_info.popup(move_line)
         return self._response_for_start_single(
-            move_lines.mapped("picking_id"), message=message
+            move_lines.mapped("picking_id"),
+            message=message,
+            popup=completion_info_popup,
         )
 
     def postpone_package(self, location_id, package_level_id):

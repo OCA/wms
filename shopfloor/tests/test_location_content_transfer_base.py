@@ -46,8 +46,8 @@ class LocationContentTransferCommonCase(CommonCase):
         for line in pickings.mapped("move_line_ids"):
             line.qty_done = line.product_uom_qty
 
-    def assert_response_start(self, response, message=None):
-        self.assert_response(response, next_state="start", message=message)
+    def assert_response_start(self, response, message=None, popup=None):
+        self.assert_response(response, next_state="start", message=message, popup=popup)
 
     def _assert_response_scan_destination_all(
         self, state, response, pickings, message=None, confirmation_required=False
@@ -81,7 +81,9 @@ class LocationContentTransferCommonCase(CommonCase):
             confirmation_required=confirmation_required,
         )
 
-    def assert_response_start_single(self, response, pickings, message=None):
+    def assert_response_start_single(
+        self, response, pickings, message=None, popup=None
+    ):
         sorter = self.service.actions_for("location_content_transfer.sorter")
         sorter.feed_pickings(pickings)
         location = pickings.mapped("location_id")
@@ -90,6 +92,7 @@ class LocationContentTransferCommonCase(CommonCase):
             next_state="start_single",
             data=self.service._data_content_line_for_location(location, next(sorter)),
             message=message,
+            popup=popup,
         )
 
     def _assert_response_scan_destination(
