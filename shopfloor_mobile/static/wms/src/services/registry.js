@@ -7,6 +7,7 @@ export class Registry {
         return this._data[key];
     }
 
+    // TODO: document (eg: `component` is just an object not a vuejs component)
     add(key, component, metadata) {
         const meta = metadata || {};
         this._data[key] = {
@@ -15,6 +16,11 @@ export class Registry {
             metadata: meta,
             path: meta.path || this.make_path(key),
         };
+    }
+
+    replace(key, component, metadata) {
+        console.log("Replacing process", key);
+        return this.add(key, component, metadata);
     }
 
     all() {
