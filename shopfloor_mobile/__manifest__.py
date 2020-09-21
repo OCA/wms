@@ -9,6 +9,7 @@
     "development_status": "Alpha",
     "depends": ["shopfloor"],
     "author": "Camptocamp, BCIM, Akretion, Odoo Community Association (OCA)",
+    "maintainers": ["simahawk"],
     "website": "https://github.com/OCA/wms",
     "category": "Warehouse Management",
     "license": "AGPL-3",
