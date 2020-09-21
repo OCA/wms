@@ -78,6 +78,48 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         )
         self.assert_all_done(sub_shelf1)
 
+    def test_set_destination_all_dest_location_ok_with_completion_info(self):
+        """Scanned destination location valid, moves set to done accepted
+        and completion info is returned as the next transfer is ready.
+        """
+        move = self.picking1.move_lines[0]
+        next_move = move.copy(
+            {
+                "location_id": move.location_dest_id.id,
+                "location_dest_id": self.customer_location.id,
+                "move_orig_ids": [(6, 0, move.ids)],
+            }
+        )
+        next_move._action_confirm(merge=False)
+        next_move._assign_picking()
+        self.assertEqual(next_move.state, "waiting")
+        sub_shelf1 = (
+            self.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Sub Shelf 1",
+                    "barcode": "subshelf1",
+                    "location_id": self.shelf1.id,
+                }
+            )
+        )
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={"location_id": self.content_loc.id, "barcode": sub_shelf1.barcode},
+        )
+        self.assertEqual(next_move.state, "assigned")
+        completion_info = self.service.actions_for("completion.info")
+        completion_info_popup = completion_info.popup(move_lines)
+        self.assert_response_start(
+            response,
+            message=self.service.msg_store.location_content_transfer_complete(
+                self.content_loc, sub_shelf1
+            ),
+            popup=completion_info_popup,
+        )
+
     def test_set_destination_all_dest_location_not_found(self):
         """Barcode scanned for destination location is not found"""
         response = self.service.dispatch(
