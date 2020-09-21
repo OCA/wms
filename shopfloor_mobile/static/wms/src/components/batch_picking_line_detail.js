@@ -1,3 +1,9 @@
+/**
+ * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * @author Simone Orsi <simahawk@gmail.com>
+ * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+ */
+
 // TODO: rename as we used this not only for batch picking
 export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     props: {

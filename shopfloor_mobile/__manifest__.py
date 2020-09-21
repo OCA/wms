@@ -1,13 +1,15 @@
+# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020 BCIM (http://www.bcim.be)
+# Copyright 2020 Akretion (http://www.akretion.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-
 {
-    "name": "Mobile app for WMS",
-    "summary": ".",
+    "name": "Shopfloor mobile",
+    "summary": "Mobile frontend for WMS Shopfloor app",
     "version": "13.0.1.0.0",
     "development_status": "Alpha",
     "depends": ["shopfloor"],
-    "author": "Camptocamp, Akretion, Odoo Community Association (OCA)",
-    "website": "https://github.com/OCA/stock-logistics-warehouse",
+    "author": "Camptocamp, BCIM, Akretion, Odoo Community Association (OCA)",
+    "website": "https://github.com/OCA/wms",
     "category": "Warehouse Management",
     "license": "AGPL-3",
     "installable": True,

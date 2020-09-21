@@ -1,3 +1,11 @@
+/**
+ * Copyright 2020 Akretion (http://www.akretion.com)
+ * @author Raphaël Reverdy <raphael.reverdy@akretion.com>
+ * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * @author Simone Orsi <simahawk@gmail.com>
+ * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+ */
+
 import {router} from "./router.js";
 import {i18n} from "./i18n.js";
 import {GlobalMixin} from "./mixin.js";
