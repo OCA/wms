@@ -180,6 +180,53 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         for move in package_level.move_line_ids.mapped("move_id"):
             self.assertEqual(move.state, "done")
 
+    def test_set_destination_package_dest_location_ok_with_completion_info(self):
+        """Scanned destination location valid, moves set to done
+        and completion info is returned as the next transfer is ready.
+        """
+        original_picking = self.picking1
+        package_level = original_picking.package_level_ids[0]
+        move = package_level.move_line_ids.move_id[0]
+        next_move = move.copy(
+            {
+                "picking_id": False,
+                "location_id": move.location_dest_id.id,
+                "location_dest_id": self.customer_location.id,
+                "move_orig_ids": [(6, 0, move.ids)],
+            }
+        )
+        next_move._action_confirm(merge=False)
+        next_move._assign_picking()
+        self.assertEqual(next_move.state, "waiting")
+        self.assertTrue(next_move.picking_id)
+        response = self.service.dispatch(
+            "set_destination_package",
+            params={
+                "location_id": self.content_loc.id,
+                "package_level_id": package_level.id,
+                "barcode": self.dest_location.barcode,
+            },
+        )
+        # Check the data (the whole transfer has been validated here w/o backorder)
+        self.assertFalse(original_picking.backorder_ids)
+        self.assertEqual(original_picking.state, "done")
+        self.assertEqual(package_level.state, "done")
+        self.assertEqual(next_move.state, "assigned")
+        # Check the response
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        completion_info = self.service.actions_for("completion.info")
+        completion_info_popup = completion_info.popup(package_level.move_line_ids)
+        self.assert_response_start_single(
+            response,
+            move_lines.mapped("picking_id"),
+            message=self.service.msg_store.location_content_transfer_item_complete(
+                self.dest_location
+            ),
+            popup=completion_info_popup,
+        )
+        for move in package_level.move_line_ids.mapped("move_id"):
+            self.assertEqual(move.state, "done")
+
     def test_set_destination_line_wrong_parameters(self):
         """Wrong 'location' and 'move_line_id' parameters, redirect the
         user to the 'start' screen.
@@ -315,6 +362,56 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             message=self.service.msg_store.location_content_transfer_item_complete(
                 self.dest_location
             ),
+        )
+
+    def test_set_destination_line_dest_location_ok_with_completion_info(self):
+        """Scanned destination location valid, moves set to done
+        and completion info is returned as the next transfer is ready.
+        """
+        original_picking = self.picking2
+        move_line = original_picking.move_line_ids[0]
+        move = move_line.move_id
+        next_move = move.copy(
+            {
+                "picking_id": False,
+                "location_id": move.location_dest_id.id,
+                "location_dest_id": self.customer_location.id,
+                "move_orig_ids": [(6, 0, move.ids)],
+            }
+        )
+        next_move._action_confirm(merge=False)
+        next_move._assign_picking()
+        self.assertEqual(next_move.state, "waiting")
+        self.assertTrue(next_move.picking_id)
+        response = self.service.dispatch(
+            "set_destination_line",
+            params={
+                "location_id": self.content_loc.id,
+                "move_line_id": move_line.id,
+                "quantity": move_line.product_uom_qty,
+                "barcode": self.dest_location.barcode,
+            },
+        )
+        # Check the resulting data
+        # We got a new picking as the original one had two moves (and we
+        # validated only one)
+        new_picking = move_line.picking_id
+        self.assertTrue(new_picking != original_picking)
+        self.assertEqual(move_line.move_id.state, "done")
+        self.assertEqual(move_line.picking_id.state, "done")
+        self.assertEqual(original_picking.state, "assigned")
+        self.assertEqual(next_move.state, "assigned")
+        # Check the response
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        completion_info = self.service.actions_for("completion.info")
+        completion_info_popup = completion_info.popup(move_line)
+        self.assert_response_start_single(
+            response,
+            move_lines.mapped("picking_id"),
+            message=self.service.msg_store.location_content_transfer_item_complete(
+                self.dest_location
+            ),
+            popup=completion_info_popup,
         )
 
     def test_set_destination_line_partial_qty(self):
