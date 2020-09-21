@@ -3,7 +3,7 @@ import {process_registry} from "../services/process_registry.js";
 import {demotools} from "../demo/demo.core.js"; // FIXME: dev only
 import {} from "../demo/demo.checkout.js"; // FIXME: dev only
 
-export var Checkout = Vue.component("checkout", {
+const Checkout = {
     mixins: [ScenarioBaseMixin],
     /*
         /!\ IMPORTANT: we use many times the same component
@@ -627,6 +627,8 @@ export var Checkout = Vue.component("checkout", {
             },
         };
     },
-});
+};
 
 process_registry.add("checkout", Checkout);
+
+export default Checkout;

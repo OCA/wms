@@ -50,7 +50,7 @@ export var SinglePackStatesMixin = {
     },
 };
 
-export var SinglePackTransfer = Vue.component("single-pack-transfer", {
+const SinglePackTransfer = {
     mixins: [ScenarioBaseMixin, SinglePackStatesMixin],
     template: `
         <Screen :screen_info="screen_info">
@@ -92,5 +92,7 @@ export var SinglePackTransfer = Vue.component("single-pack-transfer", {
             },
         };
     },
-});
+};
 process_registry.add("single_pack_transfer", SinglePackTransfer);
+
+export default SinglePackTransfer;

@@ -165,7 +165,7 @@ const TEMPLATES = {
     desktop: Vue.compile(template_mobile),
 };
 
-export var ZonePicking = Vue.component("zone-picking", {
+const ZonePicking = {
     mixins: [ScenarioBaseMixin],
     methods: {
         screen_klass: function() {
@@ -620,6 +620,8 @@ export var ZonePicking = Vue.component("zone-picking", {
         const tmpl = this.compiled_templates[this.device_mode];
         return tmpl.render.call(this, createElement);
     },
-});
+};
 
 process_registry.add("zone_picking", ZonePicking);
+
+export default ZonePicking;

@@ -2,7 +2,7 @@ import {ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
 import {demotools} from "../demo/demo.core.js"; // FIXME: dev only
 
-export var LocationContentTransfer = Vue.component("location-content-transfer", {
+const LocationContentTransfer = {
     mixins: [ScenarioBaseMixin],
     template: `
         <Screen :screen_info="screen_info">
@@ -342,6 +342,8 @@ export var LocationContentTransfer = Vue.component("location-content-transfer", 
             },
         };
     },
-});
+};
 
 process_registry.add("location_content_transfer", LocationContentTransfer);
+
+export default LocationContentTransfer;
