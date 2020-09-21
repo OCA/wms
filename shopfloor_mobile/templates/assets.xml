@@ -53,6 +53,14 @@
             type="module"
         />
         <script
+            t-attf-src="/shopfloor_mobile/assets/src/services/translation_registry.js?#{app_version}"
+            type="module"
+        />
+        <script
+            t-attf-src="/shopfloor_mobile/assets/src/i18n.translation.js?#{app_version}"
+            type="module"
+        />
+        <script
             t-attf-src="/shopfloor_mobile/assets/src/utils.js?#{app_version}"
             type="module"
         />
