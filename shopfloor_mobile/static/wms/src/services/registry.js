@@ -50,3 +50,21 @@ export class ColorRegistry {
         return this.themes;
     }
 }
+
+export class TranslationRegistry {
+    constructor() {
+        this._data = {};
+    }
+
+    get(path) {
+        return _.result(this._data, path);
+    }
+
+    add(path, value) {
+        _.set(this._data, path, value);
+    }
+
+    all() {
+        return this._data;
+    }
+}
