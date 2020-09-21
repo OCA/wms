@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+    @author Sébastien Alix <sebastien.alix@camptocamp.com>
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+-->
 <odoo>
     <record id="action_shopfloor_app" model="ir.actions.act_url">
         <field name="name">Shopfloor mobile app</field>
