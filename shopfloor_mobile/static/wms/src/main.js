@@ -21,6 +21,13 @@ var EventHub = new Vue();
 
 Vue.mixin(GlobalMixin);
 
+let app_components = {};
+_.forEach(process_registry.all(), function(process, key) {
+    app_components[process.key] = process.component;
+});
+if (app_components.length)
+    console.log("Registered component:", app_components.join(", "));
+
 const app = new Vue({
     i18n,
     router: router,
@@ -29,6 +36,7 @@ const app = new Vue({
             themes: color_registry.get_themes(),
         },
     }),
+    components: app_components,
     data: function() {
         return {
             demo_mode: false,
