@@ -24,8 +24,8 @@
                     groups="base.group_no_one"
                 />
                 <field
-                    name="shopfloor_postponed"
-                    string="SF postponed"
+                    name="shopfloor_priority"
+                    string="SF Priority"
                     optional="hide"
                     groups="base.group_no_one"
                 />

@@ -1,15 +1,9 @@
-from odoo import fields, models
+from odoo import models
 
 
 class StockPackageLevel(models.Model):
-    _inherit = "stock.package_level"
-
-    shopfloor_postponed = fields.Boolean(
-        default=False,
-        copy=False,
-        help="Technical field. "
-        "Indicates if a the package level has been postponed in a barcode scenario.",
-    )
+    _name = "stock.package_level"
+    _inherit = ["stock.package_level", "shopfloor.priority.postpone.mixin"]
 
     def replace_package(self, new_package):
         """Replace a package on an assigned package level and related records
