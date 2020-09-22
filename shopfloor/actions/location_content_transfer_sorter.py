@@ -33,7 +33,7 @@ class LocationContentTransferSorter(Component):
         # level
         return (
             # postponed content after other contents
-            int(content.shopfloor_postponed),
+            content.shopfloor_priority or 10,
             # sort by shopfloor picking sequence
             content.location_dest_id.shopfloor_picking_sequence or "",
             # sort by similar destination

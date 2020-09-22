@@ -4,16 +4,11 @@ from odoo.tools.float_utils import float_compare
 
 
 class StockMoveLine(models.Model):
-    _inherit = "stock.move.line"
+    _name = "stock.move.line"
+    _inherit = ["stock.move.line", "shopfloor.priority.postpone.mixin"]
 
     # TODO use a serialized field
     shopfloor_unloaded = fields.Boolean(default=False)
-    shopfloor_postponed = fields.Boolean(
-        default=False,
-        copy=False,
-        help="Technical field. "
-        "Indicates if a the move has been postponed in a barcode scenario.",
-    )
     shopfloor_checkout_done = fields.Boolean(default=False)
     shopfloor_user_id = fields.Many2one(comodel_name="res.users", index=True)
 
