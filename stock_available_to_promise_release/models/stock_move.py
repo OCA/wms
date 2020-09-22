@@ -25,9 +25,33 @@ class StockMove(models.Model):
         help="Available to Promise quantity minus quantities promised "
         " to older promised operations.",
     )
+    release_ready = fields.Boolean(
+        compute="_compute_release_ready", search="_search_release_ready",
+    )
     need_release = fields.Boolean(index=True,)
     zip_code = fields.Char(related="partner_id.zip", store="True")
     city = fields.Char(related="partner_id.city", store="True")
+
+    @api.depends(
+        "ordered_available_to_promise", "picking_id.move_type", "picking_id.move_lines"
+    )
+    def _compute_release_ready(self):
+        for move in self:
+            if move.picking_id.move_type == "one":
+                move.release_ready = all(
+                    m.ordered_available_to_promise > 0
+                    for m in move.picking_id.move_lines
+                )
+            else:
+                move.release_ready = move.ordered_available_to_promise > 0
+
+    @api.model
+    def _search_release_ready(self, operator, value):
+        if operator != "=":
+            raise UserError(_("Unsupported operator %s") % (operator,))
+        moves = self.search([("ordered_available_to_promise", ">", 0)])
+        moves = moves.filtered(lambda m: m.release_ready)
+        return [("id", "in", moves.ids)]
 
     @api.depends()
     def _compute_ordered_available_to_promise(self):
