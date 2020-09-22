@@ -55,7 +55,7 @@
                 <filter
                     string="Qty Available to Release"
                     name="qty_available_to_release"
-                    domain="[('ordered_available_to_promise', '>', 0.0)]"
+                    domain="[('release_ready', '=', True)]"
                 />
                 <separator />
             </field>
