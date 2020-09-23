@@ -158,9 +158,15 @@ class StockReceptionScreen(models.Model):
             "product_packaging_id.type_is_pallet"
         ),
     )
-    current_move_line_storage_type = fields.Many2one(
-        related=("current_move_line_id.result_package_id." "package_storage_type_id"),
+    current_move_line_storage_type_id = fields.Many2one(
+        related=("current_move_line_id.result_package_id.package_storage_type_id"),
         readonly=False,
+    )
+    current_move_line_storage_type_height_required = fields.Boolean(
+        related=(
+            "current_move_line_id.result_package_id."
+            "package_storage_type_id.height_required"
+        )
     )
     current_move_line_height = fields.Integer(
         related="current_move_line_id.result_package_id.height", readonly=False
@@ -262,12 +268,12 @@ class StockReceptionScreen(models.Model):
             vals = {"name": package}
             move_line.result_package_id = package_model.create(vals)
 
-    @api.onchange("current_move_line_product_packaging_id")
+    @api.onchange("current_move_line_storage_type_id")
     def onchange_product_packaging_id(self):
         # NOTE: this onchange is required as the related field
         # doesn't seem to work well on such screen
-        self.current_move_line_product_packaging_type_is_pallet = (
-            self.current_move_line_product_packaging_id.type_is_pallet
+        self.current_move_line_storage_type_height_required = (
+            self.current_move_line_storage_type_id.height_required
         )
 
     def get_reception_screen_steps(self):
@@ -606,7 +612,7 @@ class StockReceptionScreen(models.Model):
         (allowing to quit the reception screen via the exit button and resume
         the step later).
         """
-        if not self.current_move_line_storage_type:
+        if not self.current_move_line_storage_type_id:
             msg = _("The storage type is mandatory before going further.")
             self.env.user.notify_warning(message="", title=msg)
             return False
@@ -625,13 +631,6 @@ class StockReceptionScreen(models.Model):
             )
         ):
             msg = _("Product packaging info are missing. Please use the CUBISCAN.")
-            self.env.user.notify_warning(message="", title=msg)
-            return False
-        if (
-            self.current_move_line_product_packaging_type_is_pallet
-            and not self.current_move_line_height
-        ):
-            msg = _("The height is mandatory before going further.")
             self.env.user.notify_warning(message="", title=msg)
             return False
         return True
@@ -667,3 +666,21 @@ class StockReceptionScreen(models.Model):
         to check the quantity.
         """
         return True
+
+    def write(self, vals):
+        # NOTE: hack to write at the same time several related field values
+        # on the package becauses Odoo triggers two 'write' calls on
+        # 'stock.quant.package' (one per value to write) and this pop-up
+        # the constraint on the package regarding the 'height' field
+        if vals.get("current_move_line_storage_type_id") and vals.get(
+            "current_move_line_height"
+        ):
+            storage_type_id = vals.pop("current_move_line_storage_type_id")
+            height = vals.pop("current_move_line_height")
+            for screen in self:
+                package = screen.current_move_line_id.result_package_id
+                if package:
+                    package.write(
+                        {"package_storage_type_id": storage_type_id, "height": height}
+                    )
+        return super().write(vals)

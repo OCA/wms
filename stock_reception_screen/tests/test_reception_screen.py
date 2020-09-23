@@ -118,7 +118,7 @@ class TestReceptionScreen(SavepointCase):
             self.screen.current_move_line_product_packaging_id, self.product_packaging
         )
         self.assertEqual(
-            self.screen.current_move_line_storage_type, self.storage_type_pallet
+            self.screen.current_move_line_storage_type_id, self.storage_type_pallet
         )
         self.assertEqual(
             self.screen.current_move_line_height, self.product_packaging.height
@@ -150,10 +150,10 @@ class TestReceptionScreen(SavepointCase):
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "select_packaging")
         self.assertFalse(self.screen.current_move_line_product_packaging_id)
-        self.assertFalse(self.screen.current_move_line_storage_type)
+        self.assertFalse(self.screen.current_move_line_storage_type_id)
         self.assertFalse(self.screen.current_move_line_height)
         # Set mandatory package data
-        self.screen.current_move_line_storage_type = self.storage_type_pallet
+        self.screen.current_move_line_storage_type_id = self.storage_type_pallet
         self.screen.current_move_line_height = 20
         # Reception done
         self.screen.button_save_step()
@@ -179,7 +179,7 @@ class TestReceptionScreen(SavepointCase):
         )
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "select_packaging")
-        self.screen.current_move_line_storage_type = self.storage_type_pallet
+        self.screen.current_move_line_storage_type_id = self.storage_type_pallet
         self.screen.current_move_line_height = 20
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "done")

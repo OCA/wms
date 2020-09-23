@@ -85,7 +85,7 @@
                 <field name="current_move_product_id" invisible="1" />
                 <field name="current_move_line_id" invisible="1" />
                 <field
-                    name="current_move_line_product_packaging_type_is_pallet"
+                    name="current_move_line_storage_type_height_required"
                     invisible="1"
                 />
                 <div class="o_screen_data">
@@ -204,10 +204,10 @@
                     }"
                                     />
                                 </div>
-                                <label for="current_move_line_storage_type" />
+                                <label for="current_move_line_storage_type_id" />
                                 <div>
                                     <field
-                                        name="current_move_line_storage_type"
+                                        name="current_move_line_storage_type_id"
                                         class="mr8"
                                         style="width: 15em;"
                                         options="{'no_open': True, 'no_create': True}"
@@ -218,10 +218,10 @@
                                 </div>
                                 <label
                                     for="current_move_line_height"
-                                    attrs="{'invisible': [('current_move_line_product_packaging_type_is_pallet', '=', False)]}"
+                                    attrs="{'invisible': [('current_move_line_storage_type_height_required', '=', False)]}"
                                 />
                                 <div
-                                    attrs="{'invisible': [('current_move_line_product_packaging_type_is_pallet', '=', False)]}"
+                                    attrs="{'invisible': [('current_move_line_storage_type_height_required', '=', False)]}"
                                 >
                                     <field
                                         name="current_move_line_height"
