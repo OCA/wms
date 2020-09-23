@@ -29,6 +29,11 @@ class StockPackageStorageType(models.Model):
         string="Put-Away sequence",
     )
     storage_type_message = fields.Html(compute="_compute_storage_type_message")
+    height_required = fields.Boolean(
+        string="Height required for packages",
+        help=("Height is mandatory for packages configured with this storage type."),
+        default=False,
+    )
 
     @api.depends("storage_location_sequence_ids")
     def _compute_storage_type_message(self):
