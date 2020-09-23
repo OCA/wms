@@ -1,6 +1,7 @@
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class StockQuantPackage(models.Model):
@@ -44,3 +45,13 @@ class StockQuantPackage(models.Model):
                 )
             else:
                 pack.package_storage_type_id = False
+
+    @api.constrains(
+        "height", "package_storage_type_id", "product_packaging_id", "single_product_id"
+    )
+    def _check_storage_type_height_required(self):
+        for package in self:
+            if package.package_storage_type_id.height_required and not package.height:
+                raise ValidationError(
+                    _("The height is mandatory on package {}.").format(package.name)
+                )
