@@ -43,14 +43,15 @@ class ShopfloorMobileAppMixin(object):
 
     def _serve_assets(self, path_fragment=""):
         # TODO Should be authorized via api.key except for the login ?
-        if path_fragment.endswith((".js.map", "scriptElement")):
-            # `js.map` -> JS maps called by debugger
+        if path_fragment.endswith((".map", "scriptElement")):
+            # `.map` -> .map maps called by debugger
             # `scriptElement` -> file imported via JS but not loaded
             return http.request.not_found()
         if path_fragment.startswith("src/"):
             # Serving an asset
             payload = self._make_asset_path(path_fragment)
-            return http.send_file(payload)
+            if os.path.exists(payload):
+                return http.send_file(payload)
         return http.request.not_found()
 
     def _make_asset_path(self, path_fragment):
