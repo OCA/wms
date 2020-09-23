@@ -2,11 +2,11 @@
 <odoo>
     <template id="shopfloor_app_assets" name="Shopfloor app assets">
         <link
-            href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
+            t-attf-href="/shopfloor_mobile/assets/src/css/vendor/google-fonts-roboto.css?#{app_version}"
             rel="stylesheet"
         />
         <link
-            href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css?#{app_version}"
+            t-attf-href="/shopfloor_mobile/assets/src/lib/materialdesign-icons/css/materialdesignicons.min.css?#{app_version}"
             rel="stylesheet"
         />
         <link
@@ -23,8 +23,9 @@
         <script
             t-attf-src="/shopfloor_mobile/assets/src/lib/lodash.js?#{app_version}"
         />
-        <!-- TODO: replace w/ minified source https://vuejs.org/js/vue.min.js -->
-        <script t-attf-src="/shopfloor_mobile/assets/src/lib/vue.js?#{app_version}" />
+        <script
+            t-attf-src="/shopfloor_mobile/assets/src/lib/vue.min.js?#{app_version}"
+        />
         <script
             t-attf-src="/shopfloor_mobile/assets/src/lib/vue-router.js?#{app_version}"
         />
@@ -40,8 +41,9 @@
         <script
             t-attf-src="/shopfloor_mobile/assets/src/lib/vuetify/vuetify.js?#{app_version}"
         />
-        <!-- TODO: make file local -->
-        <script src="https://unpkg.com/vue-i18n/dist/vue-i18n.js?#{app_version}" />
+        <script
+            t-attf-src="/shopfloor_mobile/assets/src/lib/vue-i18n.min.js?#{app_version}"
+        />
         <script
             t-attf-src="/shopfloor_mobile/assets/src/services/odoo.js?#{app_version}"
             type="module"

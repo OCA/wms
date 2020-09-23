@@ -218,7 +218,7 @@ Vue.component("nav-items-extra", {
                 {
                     id: "settings",
                     name: "Settings",
-                    icon: "mdi-settings-outline",
+                    icon: "mdi-cog-outline",
                     route: {name: "settings"},
                 },
             ];
