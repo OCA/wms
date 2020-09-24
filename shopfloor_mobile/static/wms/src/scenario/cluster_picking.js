@@ -417,6 +417,4 @@ export var ClusterPicking = Vue.component("cluster-picking", {
         };
     },
 });
-process_registry.add("cluster_picking", ClusterPicking, {
-    demo_src: "demo/demo.cluster_picking.js",
-});
+process_registry.add("cluster_picking", ClusterPicking);
