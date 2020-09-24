@@ -27,3 +27,8 @@ Change language
 
 * Go to "Settings -> Language"
 * Select a language
+
+Customization
+~~~~~~~~~~~~~
+
+Please refer to `shopfloor_mobile_custom_example`.
