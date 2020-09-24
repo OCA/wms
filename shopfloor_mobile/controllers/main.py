@@ -18,7 +18,7 @@ class ShopfloorMobileAppMixin(object):
     module_path = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
     main_template = "shopfloor_mobile.shopfloor_app_main"
 
-    def _load_app(self, demo=False):
+    def _load_app(self, demo=False, **kw):
         return http.request.render(
             self.main_template, self._get_main_template_values(demo=demo)
         )
@@ -47,7 +47,7 @@ class ShopfloorMobileAppMixin(object):
     def _get_app_version(self):
         return self._get_version("shopfloor_mobile", module_path=self.module_path)
 
-    def _serve_assets(self, path_fragment=""):
+    def _serve_assets(self, path_fragment="", **kw):
         # TODO Should be authorized via api.key except for the login ?
         if path_fragment.endswith((".map", "scriptElement")):
             # `.map` -> .map maps called by debugger
@@ -129,8 +129,8 @@ class ShopfloorMobileAppController(http.Controller, ShopfloorMobileAppMixin):
     @http.route(
         ["/shopfloor_mobile/app", "/shopfloor_mobile/app/<string:demo>"], auth="public",
     )
-    def load_app(self, demo=False):
-        return self._load_app(demo=True if demo else False)
+    def load_app(self, demo=False, **kw):
+        return self._load_app(demo=True if demo else False, **kw)
 
     @http.route(
         ["/shopfloormobile/scanner"], auth="public",
@@ -142,8 +142,8 @@ class ShopfloorMobileAppController(http.Controller, ShopfloorMobileAppMixin):
     @http.route(
         ["/shopfloor_mobile/assets/<path:path_fragment>"], auth="public",
     )
-    def load_assets(self, path_fragment=""):
-        return self._serve_assets(path_fragment=path_fragment)
+    def load_assets(self, path_fragment="", **kw):
+        return self._serve_assets(path_fragment=path_fragment, **kw)
 
     @http.route("/shopfloor_mobile/manifest.json", auth="public")
     def manifest(self):
