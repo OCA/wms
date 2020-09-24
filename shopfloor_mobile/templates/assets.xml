@@ -6,225 +6,290 @@
 -->
 <odoo>
     <template id="shopfloor_app_assets" name="Shopfloor app assets">
+        <!-- Styles  -->
         <link
+            id="link_css_gfonts_roboto"
             t-attf-href="/shopfloor_mobile/assets/src/css/vendor/google-fonts-roboto.css?#{app_version}"
             rel="stylesheet"
         />
         <link
+            id="link_css_materialdesignicons"
             t-attf-href="/shopfloor_mobile/assets/src/lib/materialdesign-icons/css/materialdesignicons.min.css?#{app_version}"
             rel="stylesheet"
         />
         <link
+            id="link_css_vuetify"
             t-attf-href="/shopfloor_mobile/assets/src/lib/vuetify/vuetify.min.css?#{app_version}"
             rel="stylesheet"
         />
         <link
+            id="link_css_main"
             t-attf-href="/shopfloor_mobile/assets/src/css/main.css?#{app_version}"
             rel="stylesheet"
         />
+        <!-- External libs -->
         <script
+            id="script_jquery"
             t-attf-src="/shopfloor_mobile/assets/src/lib/jquery-3.4.1.slim.min.js?#{app_version}"
         />
         <script
+            id="script_lodash"
             t-attf-src="/shopfloor_mobile/assets/src/lib/lodash.js?#{app_version}"
         />
         <script
+            id="script_vue"
             t-attf-src="/shopfloor_mobile/assets/src/lib/vue.min.js?#{app_version}"
         />
         <script
+            id="script_vue_router"
             t-attf-src="/shopfloor_mobile/assets/src/lib/vue-router.js?#{app_version}"
         />
         <!-- https://yarkovaleksei.github.io/vue2-storage/en -->
         <script
+            id="script_vue_storage"
             t-attf-src="/shopfloor_mobile/assets/src/lib/vue2-storage.min.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_vue_super_call"
             t-attf-src="/shopfloor_mobile/assets/src/lib/vue-super-call.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_vue_vuetify"
             t-attf-src="/shopfloor_mobile/assets/src/lib/vuetify/vuetify.js?#{app_version}"
         />
         <script
+            id="script_vue_i18n"
             t-attf-src="/shopfloor_mobile/assets/src/lib/vue-i18n.min.js?#{app_version}"
         />
+        <!-- Custom services, utils, generic scripts -->
         <script
+            id="script_fetch"
+            t-attf-src="/shopfloor_mobile/assets/src/fetch.js?#{app_version}"
+        />
+        <script
+            id="script_service_odoo"
             t-attf-src="/shopfloor_mobile/assets/src/services/odoo.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_registry_process"
             t-attf-src="/shopfloor_mobile/assets/src/services/process_registry.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_registry_translation"
             t-attf-src="/shopfloor_mobile/assets/src/services/translation_registry.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_i18n_translation"
             t-attf-src="/shopfloor_mobile/assets/src/i18n.translation.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_utils"
             t-attf-src="/shopfloor_mobile/assets/src/utils.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_page_home"
             t-attf-src="/shopfloor_mobile/assets/src/homepage.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_page_login"
             t-attf-src="/shopfloor_mobile/assets/src/loginpage.js?#{app_version}"
             type="module"
         />
+        <!-- Global/generic components -->
         <script
+            id="script_component_screen"
             t-attf-src="/shopfloor_mobile/assets/src/components/screen.js?#{app_version}"
         />
         <script
+            id="script_component_misc"
             t-attf-src="/shopfloor_mobile/assets/src/components/misc.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_list"
             t-attf-src="/shopfloor_mobile/assets/src/components/list.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_manual_select"
             t-attf-src="/shopfloor_mobile/assets/src/components/manual_select.js?#{app_version}"
         />
         <script
+            id="script_component_input_number_spinner"
             t-attf-src="/shopfloor_mobile/assets/src/components/input-number-spinner.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_packaging_qty_picker"
             t-attf-src="/shopfloor_mobile/assets/src/components/packaging-qty-picker.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_priority_widget"
             t-attf-src="/shopfloor_mobile/assets/src/components/priority-widget.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_detail_mixin"
             t-attf-src="/shopfloor_mobile/assets/src/components/detail/detail_mixin.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_detail_card"
             t-attf-src="/shopfloor_mobile/assets/src/components/detail/detail_card.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_detail_location"
             t-attf-src="/shopfloor_mobile/assets/src/components/detail/detail_location.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_detail_package"
             t-attf-src="/shopfloor_mobile/assets/src/components/detail/detail_package.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_detail_lot"
             t-attf-src="/shopfloor_mobile/assets/src/components/detail/detail_lot.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_detail_product"
             t-attf-src="/shopfloor_mobile/assets/src/components/detail/detail_product.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_detail_transfer"
             t-attf-src="/shopfloor_mobile/assets/src/components/detail/detail_transfer.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_detail_operation"
             t-attf-src="/shopfloor_mobile/assets/src/components/detail/detail_operation.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_searchbar"
             t-attf-src="/shopfloor_mobile/assets/src/components/searchbar/searchbar.js?#{app_version}"
         />
         <script
+            id="script_component_user_confirmation"
             t-attf-src="/shopfloor_mobile/assets/src/components/userConfirmation/userConfirmation.js?#{app_version}"
         />
         <script
+            id="script_component_user_information"
             t-attf-src="/shopfloor_mobile/assets/src/components/userInformation/userInformation.js?#{app_version}"
         />
         <script
+            id="script_component_batch_picking_detail"
             t-attf-src="/shopfloor_mobile/assets/src/components/batch_picking_detail.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_batch_picking_line_detail"
             t-attf-src="/shopfloor_mobile/assets/src/components/batch_picking_line_detail.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_picking_select"
             t-attf-src="/shopfloor_mobile/assets/src/components/scenario_picking_detail/picking_select.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_component_picking_summary"
             t-attf-src="/shopfloor_mobile/assets/src/components/scenario_picking_detail/picking_summary.js?#{app_version}"
             type="module"
         />
+        <!-- Scenario -->
         <script
+            id="script_scenario_single_pack_transfer"
             t-attf-src="/shopfloor_mobile/assets/src/scenario/single_pack_transfer.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_scenario_cluster_picking"
             t-attf-src="/shopfloor_mobile/assets/src/scenario/cluster_picking.js?#{app_version}"
             type="module"
         />
         <script
-            id="scenario_checkout"
+            id="script_scenario_checkout"
             t-attf-src="/shopfloor_mobile/assets/src/scenario/checkout.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_scenario_delivery"
             t-attf-src="/shopfloor_mobile/assets/src/scenario/delivery.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_scenario_location_content_transfer"
             t-attf-src="/shopfloor_mobile/assets/src/scenario/location_content_transfer.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_scenario_zone_picking"
             t-attf-src="/shopfloor_mobile/assets/src/scenario/zone_picking.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_scenario_scan_anything"
             t-attf-src="/shopfloor_mobile/assets/src/scenario/scan_anything.js?#{app_version}"
             type="module"
         />
-        <script t-attf-src="/shopfloor_mobile/assets/src/fetch.js?#{app_version}" />
+        <!-- Main app script -->
         <script
+            id="script_app_main"
             t-attf-src="/shopfloor_mobile/assets/src/main.js?#{app_version}"
             type="module"
         />
     </template>
     <template id="shopfloor_app_demo_assets" name="Shopfloor app demo assets">
         <script
+            id="script_demo_core"
             t-attf-src="/shopfloor_mobile/assets/src/demo/demo.core.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_demo_checkout"
             t-attf-src="/shopfloor_mobile/assets/src/demo/demo.checkout.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_demo_cluster_picking"
             t-attf-src="/shopfloor_mobile/assets/src/demo/demo.cluster_picking.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_demo_delivery"
             t-attf-src="/shopfloor_mobile/assets/src/demo/demo.delivery.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_demo_single_pack_transfer"
             t-attf-src="/shopfloor_mobile/assets/src/demo/demo.single_pack_transfer.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_demo_zone_picking"
             t-attf-src="/shopfloor_mobile/assets/src/demo/demo.zone_picking.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_demo_location_content_transfer"
             t-attf-src="/shopfloor_mobile/assets/src/demo/demo.location_content_transfer.js?#{app_version}"
             type="module"
         />
         <script
+            id="script_demo_scan_anything"
             t-attf-src="/shopfloor_mobile/assets/src/demo/demo.scan_anything.js?#{app_version}"
             type="module"
         />
