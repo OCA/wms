@@ -29,6 +29,22 @@ export class Registry {
         return this.add(key, component, metadata);
     }
 
+    extend(key, component_override) {
+        const original = this.get(key);
+        if (_.isEmpty(original)) {
+            throw "Component not found: " + key;
+        }
+        const new_component = Object.create(original.component);
+        this._override(new_component, component_override);
+        return new_component;
+    }
+
+    _override(orig_obj, overrides) {
+        _.forEach(overrides, function(value, path) {
+            _.set(orig_obj, path, value);
+        });
+    }
+
     all() {
         return this._data;
     }
