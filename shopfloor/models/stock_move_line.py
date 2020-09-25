@@ -104,7 +104,7 @@ class StockMoveLine(models.Model):
             pickings = new_picking
         return pickings
 
-    def _check_qty_to_be_done(self, qty_done, split_partial=True, **split_default_vals):
+    def _split_qty_to_be_done(self, qty_done, split_partial=True, **split_default_vals):
         """Check qty to be done for current move line. Split it if needed.
 
         :param qty_done: qty expected to be done
