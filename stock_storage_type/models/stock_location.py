@@ -101,6 +101,7 @@ class StockLocation(models.Model):
     max_height = fields.Float(
         string="Max height (mm)",
         compute="_compute_max_height",
+        store=True,
         help="The max height supported among allowed location storage types.",
     )
 
