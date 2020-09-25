@@ -8,6 +8,17 @@ from odoo.fields import first
 ABC_SELECTION = [("a", "A"), ("b", "B"), ("c", "C")]
 
 
+def gather_location_ids(abc_sorted, max_heights_sorted, locations_grouped):
+    """Return a list of location IDs sorted on `abc_sorted` then
+    on `max_heights_sorted`.
+    """
+    location_ids = []
+    for abc_key in abc_sorted:
+        for max_height in max_heights_sorted:
+            location_ids.extend(locations_grouped[abc_key].get(max_height, []))
+    return location_ids
+
+
 class StockLocation(models.Model):
 
     _inherit = "stock.location"
@@ -45,25 +56,39 @@ class StockLocation(models.Model):
 
     def _sort_abc_locations(self, product_abc):
         product_abc = product_abc or "a"
-        a_location_ids = []
-        b_location_ids = []
-        c_location_ids = []
-        for loc in self:
-            if loc.abc_storage == "a":
-                a_location_ids.append(loc.id)
-            elif loc.abc_storage == "b":
-                b_location_ids.append(loc.id)
-            elif loc.abc_storage == "c":
-                c_location_ids.append(loc.id)
-        shuffle(a_location_ids)
-        shuffle(b_location_ids)
-        shuffle(c_location_ids)
+        # group locations by abc_storage and max_height
+        data = self.read_group(
+            [("id", "in", self.ids)], ["max_height"], ["max_height"],
+        )
+        locations_grouped = {}
+        max_heights = set()
+        for line in data:
+            domain = line["__domain"]
+            locations = self.search(domain)
+            for loc in locations:
+                locations_grouped.setdefault(loc.abc_storage, {}).setdefault(
+                    line["max_height"], []
+                )
+                locations_grouped[loc.abc_storage][line["max_height"]].append(loc.id)
+            # keep a list of available max heights
+            max_heights.add(line["max_height"])
+        # sort max heights and take care to put any 0 value at the end
+        max_heights = list(max_heights)
+        max_heights.sort()
+        if 0 in max_heights:
+            max_heights.pop(max_heights.index(0))
+            max_heights.append(0)
+        # shuffle each abc_storage/max_height chunk
+        for line in locations_grouped.values():
+            for max_height in line:
+                shuffle(line[max_height])
+        # prepare the result
         if product_abc == "a":
-            location_ids = a_location_ids + b_location_ids + c_location_ids
+            location_ids = gather_location_ids("abc", max_heights, locations_grouped)
         elif product_abc == "b":
-            location_ids = b_location_ids + c_location_ids + a_location_ids
+            location_ids = gather_location_ids("bca", max_heights, locations_grouped)
         elif product_abc == "c":
-            location_ids = c_location_ids + b_location_ids + a_location_ids
+            location_ids = gather_location_ids("cba", max_heights, locations_grouped)
         else:
             raise ValueError("product_abc = %s" % product_abc)
         return self.env["stock.location"].browse(location_ids)
