@@ -98,6 +98,11 @@ class StockLocation(models.Model):
         compute="_compute_leaf_location_ids",
         help="technical field: all the leaves sub-locations",
     )
+    max_height = fields.Float(
+        string="Max height (mm)",
+        compute="_compute_max_height",
+        help="The max height supported among allowed location storage types.",
+    )
 
     @api.depends("child_ids.leaf_location_ids")
     def _compute_leaf_location_ids(self):
@@ -172,6 +177,22 @@ class StockLocation(models.Model):
                 location.allowed_location_storage_type_ids = [
                     (6, 0, parent.allowed_location_storage_type_ids.ids)
                 ]
+
+    @api.depends("allowed_location_storage_type_ids.max_height")
+    def _compute_max_height(self):
+        """Get the max height supported by location types, knowing that a max
+        height of 0 means 'no limit', so it's considered as the maximum value.
+        """
+        for location in self:
+            allowed_types = location.allowed_location_storage_type_ids
+            types_with_max_height = allowed_types.filtered(
+                lambda o: bool(o.max_height)
+            ).sorted("max_height", reverse=True)
+            types_without_max_height = allowed_types - types_with_max_height
+            types_sorted = types_without_max_height + types_with_max_height
+            location.max_height = (
+                types_sorted.mapped("max_height")[0] if types_sorted else 0
+            )
 
     # method provided by "stock_putaway_hook"
     def _putaway_strategy_finalizer(self, putaway_location, product):
@@ -337,9 +358,10 @@ class StockLocation(models.Model):
             locations = self.search(location_domain, limit=limit)
             valid_location_ids |= set(locations.ids)
 
-        valid_locations = self.env["stock.location"].search(
-            [("id", "in", list(valid_location_ids))], limit=limit
-        )
+        # NOTE: self.ids is ordered as expected, so we want to filter the valid
+        # locations while preserving the initial order
+        valid_location_ids = [id_ for id_ in self.ids if id_ in valid_location_ids]
+        valid_locations = self.browse(valid_location_ids)[:limit]
 
         _logger.debug(
             "select allowed location for package storage"
@@ -357,6 +379,11 @@ class StockLocation(models.Model):
         The locations are candidate locations that will be evaluated one per
         one in order to find the first available location. They must be leaf
         locations where we can actually put goods.
+
+        Locations are ordered by max height, knowing that a max height of 0
+        means "no limit" and as such it should be among the last locations.
         """
-        # Call sorted() to ensure the _order is respected
-        return self.leaf_location_ids.sorted()
+        max_height = max(self.leaf_location_ids.mapped("max_height"))
+        return self.leaf_location_ids.sorted(
+            lambda l: l.max_height if l.max_height else (max_height + 1)
+        )
