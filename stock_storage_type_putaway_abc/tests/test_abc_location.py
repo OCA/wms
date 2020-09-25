@@ -95,7 +95,7 @@ class TestAbcLocation(SavepointCase):
             ordered_locations.ids,
             (
                 self.cardboxes_bin_3_location
-                | self.cardboxes_bin_2_location
                 | self.cardboxes_bin_1_location
+                | self.cardboxes_bin_2_location
             ).ids,
         )
