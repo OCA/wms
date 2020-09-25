@@ -63,7 +63,7 @@ class StockLocation(models.Model):
         elif product_abc == "b":
             location_ids = b_location_ids + c_location_ids + a_location_ids
         elif product_abc == "c":
-            location_ids = c_location_ids + a_location_ids + b_location_ids
+            location_ids = c_location_ids + b_location_ids + a_location_ids
         else:
             raise ValueError("product_abc = %s" % product_abc)
         return self.env["stock.location"].browse(location_ids)
