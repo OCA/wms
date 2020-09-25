@@ -124,7 +124,7 @@ class InventoryAction(Component):
             ("product_id", "=", move.product_id.id),
             ("package_id", "=", package.id),
             ("lot_id", "=", lot.id),
-            ("state", "=", "assigned"),
+            ("state", "in", ("assigned", "partially_available")),
         ]
         return self.env["stock.move.line"].search(domain)
 
