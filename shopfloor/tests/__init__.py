@@ -18,6 +18,7 @@ from . import test_checkout_scan
 from . import test_checkout_select
 from . import test_checkout_scan_line
 from . import test_checkout_select_line
+from . import test_checkout_select_package_base
 from . import test_checkout_set_qty
 from . import test_checkout_scan_package_action
 from . import test_checkout_new_package
@@ -28,7 +29,10 @@ from . import test_checkout_change_packaging
 from . import test_checkout_cancel_line
 from . import test_checkout_done
 from . import test_delivery_base
+from . import test_delivery_done
 from . import test_delivery_scan_deliver
+from . import test_delivery_reset_qty_done_line
+from . import test_delivery_reset_qty_done_pack
 from . import test_delivery_set_qty_done_pack
 from . import test_delivery_set_qty_done_line
 from . import test_delivery_list_stock_picking
@@ -51,4 +55,5 @@ from . import test_zone_picking_unload_single
 from . import test_zone_picking_unload_all
 from . import test_zone_picking_unload_set_destination
 from . import test_misc
+from . import test_scan_anything
 from . import test_stock_split
