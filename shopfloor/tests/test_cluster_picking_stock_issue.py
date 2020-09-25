@@ -340,3 +340,55 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
             ),
             self.shelf2,
         )
+
+    def test_stock_issue_similar_move_with_picked_line(self):
+        """Stock issue on the remaining of a line on partial move
+
+        We have a move with 10 units.
+        2 are reserved in a package. The remaining in another package.
+        We pick 1 of the first package and put it in a bin.
+        A new move line of 1 is created to pick in the first package: we
+        declare a stock out on it.
+        The first move line must be untouched, the second line for the remaining
+        should pick one more item in the other package.
+        """
+        package1 = self.env["stock.quant.package"].create({"name": "PACKAGE_1"})
+        package2 = self.env["stock.quant.package"].create({"name": "PACKAGE_2"})
+        self._update_qty_in_location(self.shelf1, self.product_a, 2, package=package1)
+        self._update_qty_in_location(self.shelf1, self.product_a, 200, package=package2)
+        self.move1._action_assign()
+        self.move2._action_assign()
+        self.move3._action_assign()
+        self._simulate_batch_selected(self.batch, fill_stock=False)
+        self.assertEqual(set(self.batch.picking_ids.mapped("state")), {"assigned"})
+
+        pick_line1, pick_line2 = self.move1.move_line_ids
+        new_line, __ = pick_line1._split_qty_to_be_done(1)
+        self._set_dest_package_and_done(pick_line1, self.dest_package)
+
+        self.assertEqual(pick_line1.product_qty, 1.0)
+        self.assertEqual(new_line.product_qty, 1.0)
+        self.assertEqual(pick_line2.product_qty, 8.0)
+        # on the third move, the operator can't pick anymore in shelf1
+        # because there is nothing inside, they declare a stock issue
+        self._stock_issue(new_line, next_line_func=lambda: pick_line2)
+
+        self.assertRecordValues(
+            # check that the first move line of the move was not altered
+            pick_line1,
+            [
+                {
+                    "location_id": self.shelf1.id,
+                    "qty_done": 1.0,
+                    "result_package_id": self.dest_package.id,
+                }
+            ],
+        )
+        # the line on which we declared stock out does not exists
+        self.assertFalse(new_line.exists())
+        # the second line to pick has been raised to 9 instead of 8
+        # initially, to compensate the stock out
+        self.assertEqual(pick_line2.product_qty, 9.0)
+
+        # quant with stock out has been updated
+        self.assertEqual(package1.quant_ids.quantity, 1.0)
