@@ -566,7 +566,7 @@ class ClusterPicking(Component):
                 batch, message=self.msg_store.operation_not_found()
             )
 
-        new_line, qty_check = move_line._check_qty_to_be_done(quantity)
+        new_line, qty_check = move_line._split_qty_to_be_done(quantity)
         if qty_check == "greater":
             return self._response_for_scan_destination(
                 move_line,
