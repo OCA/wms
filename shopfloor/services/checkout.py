@@ -504,7 +504,7 @@ class Checkout(Component):
             else:
                 new_line = self.env["stock.move.line"]
                 if qty_done > 0:
-                    new_line, qty_check = move_line._check_qty_to_be_done(
+                    new_line, qty_check = move_line._split_qty_to_be_done(
                         qty_done, split_partial=True, result_package_id=False,
                     )
                     if qty_check == "greater":
