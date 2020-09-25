@@ -1,4 +1,12 @@
 /* eslint-disable strict */
+/**
+ * Copyright 2020 Akretion (http://www.akretion.com)
+ * @author Raphaël Reverdy <raphael.reverdy@akretion.com>
+ * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * @author Simone Orsi <simahawk@gmail.com>
+ * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+ */
+
 Vue.component("searchbar", {
     data: function() {
         return {

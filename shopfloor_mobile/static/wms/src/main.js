@@ -1,3 +1,11 @@
+/**
+ * Copyright 2020 Akretion (http://www.akretion.com)
+ * @author Raphaël Reverdy <raphael.reverdy@akretion.com>
+ * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * @author Simone Orsi <simahawk@gmail.com>
+ * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+ */
+
 import {router} from "./router.js";
 import {i18n} from "./i18n.js";
 import {GlobalMixin} from "./mixin.js";
@@ -21,6 +29,13 @@ var EventHub = new Vue();
 
 Vue.mixin(GlobalMixin);
 
+let app_components = {};
+_.forEach(process_registry.all(), function(process, key) {
+    app_components[process.key] = process.component;
+});
+if (app_components.length)
+    console.log("Registered component:", app_components.join(", "));
+
 const app = new Vue({
     i18n,
     router: router,
@@ -29,6 +44,7 @@ const app = new Vue({
             themes: color_registry.get_themes(),
         },
     }),
+    components: app_components,
     data: function() {
         return {
             demo_mode: false,

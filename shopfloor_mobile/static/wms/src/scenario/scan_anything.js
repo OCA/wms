@@ -1,6 +1,13 @@
+/**
+ * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * @author Thierry Ducrest <thierry.ducrest@camptocamp.com>
+ * @author Simone Orsi <simahawk@gmail.com>
+ * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+ */
+
 import {process_registry} from "../services/process_registry.js";
 
-export var ScanAnything = Vue.component("scan-anything", {
+const ScanAnything = {
     template: `
         <Screen :screen_info="screen_info">
             <searchbar
@@ -115,8 +122,10 @@ export var ScanAnything = Vue.component("scan-anything", {
             return !_.isEmpty(this.scan_data);
         },
     },
-});
+};
 
 process_registry.add("scan_anything", ScanAnything, {
     path: "/scan_anything/:identifier?",
 });
+
+export default ScanAnything;

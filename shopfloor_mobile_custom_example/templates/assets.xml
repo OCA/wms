@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+    @author Simone Orsi <simahawk@gmail.com>
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+-->
+<odoo>
+    <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_mobile.shopfloor_app_assets"
+    >
+        <script id="script_scenario_checkout" position="after">
+            <t t-set="mod_name" t-value="'shopfloor_mobile_custom_example'" />
+            <script
+                id="script_scenario_checkout"
+                t-attf-src="/#{mod_name}/static/wms/src/scenario/checkout.js?v=#{get_version(mod_name)}"
+                type="module"
+            />
+        </script>
+    </template>
+</odoo>

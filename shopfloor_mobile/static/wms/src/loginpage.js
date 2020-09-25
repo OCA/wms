@@ -1,3 +1,11 @@
+/**
+ * Copyright 2020 Akretion (http://www.akretion.com)
+ * @author Raphaël Reverdy <raphael.reverdy@akretion.com>
+ * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * @author Thierry Ducrest <thierry.ducrest@camptocamp.com>
+ * @author Simone Orsi <simahawk@gmail.com>
+ * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+ */
 export var LoginPage = Vue.component("login-page", {
     data: function() {
         return {

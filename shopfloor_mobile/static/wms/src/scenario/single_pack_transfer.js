@@ -1,3 +1,11 @@
+/**
+ * Copyright 2020 Akretion (http://www.akretion.com)
+ * @author Raphaël Reverdy <raphael.reverdy@akretion.com>
+ * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * @author Simone Orsi <simahawk@gmail.com>
+ * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+ */
+
 import {ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
 
@@ -50,7 +58,7 @@ export var SinglePackStatesMixin = {
     },
 };
 
-export var SinglePackTransfer = Vue.component("single-pack-transfer", {
+const SinglePackTransfer = {
     mixins: [ScenarioBaseMixin, SinglePackStatesMixin],
     template: `
         <Screen :screen_info="screen_info">
@@ -92,5 +100,7 @@ export var SinglePackTransfer = Vue.component("single-pack-transfer", {
             },
         };
     },
-});
+};
 process_registry.add("single_pack_transfer", SinglePackTransfer);
+
+export default SinglePackTransfer;
