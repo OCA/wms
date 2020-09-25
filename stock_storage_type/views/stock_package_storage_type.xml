@@ -37,6 +37,7 @@
                                 name="location_storage_type_ids"
                                 widget="many2many_tags"
                             />
+                            <field name="height_required" />
                         </group>
                         <group name="msg">
                             <div colspan="2">
