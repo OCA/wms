@@ -36,3 +36,22 @@ class StockPicking(models.Model):
         for move_line in self.mapped("move_line_ids"):
             weight += move_line.product_qty * move_line.product_id.weight
         return weight
+
+    def _check_move_lines_map_quant_package(self, package):
+        # see tests/test_move_action_assign.py for details
+        pack_move_lines = self.move_line_ids.filtered(
+            lambda ml: ml.package_id == package
+        )
+        # if we set a qty_done on any line, it's picked, we don't want
+        # to change it in any case, so we ignore the package level
+        if any(pack_move_lines.mapped("qty_done")):
+            return False
+        # if we already changed the destination package, do not create
+        # a new package level
+        if any(
+            line.result_package_id != package
+            for line in pack_move_lines
+            if line.result_package_id
+        ):
+            return False
+        return super()._check_move_lines_map_quant_package(package)
