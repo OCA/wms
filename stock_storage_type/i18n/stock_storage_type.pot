@@ -110,6 +110,16 @@ msgid "Has Restrictions"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,help:stock_storage_type.field_stock_package_storage_type__height_required
+msgid "Height is mandatory for packages configured with this storage type."
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__height_required
+msgid "Height required for packages"
+msgstr ""
+
+#. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_package_storage_type_rel__id
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__id
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__id
@@ -474,6 +484,12 @@ msgstr ""
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__storage_location_sequence_ids
 msgid "Storage locations sequences"
+msgstr ""
+
+#. module: stock_storage_type
+#: code:addons/stock_storage_type/models/stock_quant_package.py:0
+#, python-format
+msgid "The height is mandatory on package {}."
 msgstr ""
 
 #. module: stock_storage_type
