@@ -72,24 +72,30 @@ class TestAbcLocation(SavepointCase):
         self.product.write({"abc_storage": "a"})
         ordered_locations = self.cardboxes_location.get_storage_locations(self.product)
         self.assertEqual(
-            ordered_locations,
-            self.cardboxes_bin_2_location
-            | self.cardboxes_bin_1_location
-            | self.cardboxes_bin_3_location,
+            ordered_locations.ids,
+            (
+                self.cardboxes_bin_2_location
+                | self.cardboxes_bin_1_location
+                | self.cardboxes_bin_3_location
+            ).ids,
         )
         self.product.write({"abc_storage": "b"})
         ordered_locations = self.cardboxes_location.get_storage_locations(self.product)
         self.assertEqual(
-            ordered_locations,
-            self.cardboxes_bin_1_location
-            | self.cardboxes_bin_3_location
-            | self.cardboxes_bin_2_location,
+            ordered_locations.ids,
+            (
+                self.cardboxes_bin_1_location
+                | self.cardboxes_bin_3_location
+                | self.cardboxes_bin_2_location
+            ).ids,
         )
         self.product.write({"abc_storage": "c"})
         ordered_locations = self.cardboxes_location.get_storage_locations(self.product)
         self.assertEqual(
-            ordered_locations,
-            self.cardboxes_bin_3_location
-            | self.cardboxes_bin_2_location
-            | self.cardboxes_bin_1_location,
+            ordered_locations.ids,
+            (
+                self.cardboxes_bin_3_location
+                | self.cardboxes_bin_2_location
+                | self.cardboxes_bin_1_location
+            ).ids,
         )
