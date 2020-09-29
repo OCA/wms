@@ -450,3 +450,14 @@ Vue.component("empty-location-icon", {
     <v-icon color="orange" :class="$options._componentTag" v-if="record.location_will_be_empty">mdi-alert-rhombus-outline</v-icon>
   `,
 });
+
+Vue.component("select-zone-operation-type-item", {
+    mixins: [ItemDetailMixin],
+    template: `
+<div :class="$options._componentTag">
+    <div v-for="op_type in record.operation_types" :key="make_component_key([op_type.id])">
+        <div class="detail-field">{{ $t("zone_picking.picking_type_detail", op_type) }}</div>
+    </div>
+</div>
+    `,
+});

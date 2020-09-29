@@ -56,6 +56,9 @@ const messages_en = {
         priority_lines_count:
             "{priority_lines_count} priority lines (over {priority_picking_count} operations).",
     },
+    zone_picking: {
+        picking_type_detail: "{lines_count} ({priority_lines_count}) {name}",
+    },
     order_lines_by: {
         priority: "Order by priority",
         location: "Order by location",
