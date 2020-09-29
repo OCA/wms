@@ -4,7 +4,7 @@
 
 # WMS - Warehouse Management System
 
-Warehouse Management System for advanced logistics processes with Odoo.
+Warehouse Management System for advanced logistics processes with Odoo. You can find the presentation made during Odoo XP 2020 [here](https://docs.google.com/presentation/d/1mYOCAaaVWZtCUDbslwIZyOT9_hHezbWkJVXxu0k01fw/edit) 
 
 Work in progress, tracked in this issue https://github.com/OCA/wms/issues/29
 
