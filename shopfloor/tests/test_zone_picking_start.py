@@ -32,6 +32,66 @@ class ZonePickingStartCase(ZonePickingCommonCase):
         cls._update_qty_in_location(cls.zone_sublocation1, cls.product_b, 10)
         extra_picking.action_assign()
 
+    def test_data_for_zone(self):
+        op_type_data = self.data.picking_type(self.menu.picking_type_ids[0])
+        zones_data = self.service._response_for_start()["data"]["start"]["zones"]
+        expected_sub1 = dict(
+            self.data.location(self.zone_sublocation1),
+            operation_types=[
+                dict(
+                    op_type_data,
+                    lines_count=1,
+                    picking_count=1,
+                    priority_lines_count=0,
+                    priority_picking_count=0,
+                )
+            ],
+        )
+        expected_sub2 = dict(
+            self.data.location(self.zone_sublocation2),
+            operation_types=[
+                dict(
+                    op_type_data,
+                    lines_count=2,
+                    picking_count=1,
+                    priority_lines_count=0,
+                    priority_picking_count=0,
+                )
+            ],
+        )
+        expected_sub3 = dict(
+            self.data.location(self.zone_sublocation3),
+            operation_types=[
+                dict(
+                    op_type_data,
+                    lines_count=2,
+                    picking_count=2,
+                    priority_lines_count=0,
+                    priority_picking_count=0,
+                )
+            ],
+        )
+        expected_sub4 = dict(
+            self.data.location(self.zone_sublocation4),
+            operation_types=[
+                dict(
+                    op_type_data,
+                    lines_count=3,
+                    picking_count=2,
+                    priority_lines_count=0,
+                    priority_picking_count=0,
+                )
+            ],
+        )
+        self.assertEqual(
+            zones_data, [expected_sub1, expected_sub2, expected_sub3, expected_sub4]
+        )
+
+    def test_select_zone(self):
+        """Scanned location invalid, no location found."""
+        response = self.service.dispatch("select_zone")
+        self.assert_response_start(response)
+
     def test_scan_location_wrong_barcode(self):
         """Scanned location invalid, no location found."""
         response = self.service.dispatch(
@@ -54,8 +114,11 @@ class ZonePickingStartCase(ZonePickingCommonCase):
 
     def test_scan_location_no_move_lines(self):
         """Scanned location valid, but no move lines found in it."""
+        sub1_lines = self.service._find_location_move_lines(self.zone_sublocation1)
+        # no more lines available
+        sub1_lines.picking_id.action_cancel()
         response = self.service.dispatch(
-            "scan_location", params={"barcode": self.shelf2.barcode},
+            "scan_location", params={"barcode": self.zone_sublocation1.barcode},
         )
         self.assert_response_start(
             response, message=self.service.msg_store.no_lines_to_process(),
