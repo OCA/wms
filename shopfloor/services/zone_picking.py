@@ -18,6 +18,9 @@ class ZonePicking(Component):
 
     Zone picking of move lines.
 
+    You will find a sequence diagram describing states and endpoints
+    relationships [here](../docs/zone_picking_diag_seq.png).
+
     Note:
 
     * Several operation types could be linked to a single menu item
@@ -713,8 +716,8 @@ class ZonePicking(Component):
           quantity - qty_done).
         * set_line_destination: the scanned location is invalid, user has to
           scan another one
-        * confirm_set_line_destination: the scanned location is not in the
-          expected one but is valid (in picking type's default destination)
+        * set_line_destination+confirmation_required: the scanned location is not
+          in the expected one but is valid (in picking type's default destination)
         """
         zone_location = self.env["stock.location"].browse(zone_location_id)
         if not zone_location.exists():
