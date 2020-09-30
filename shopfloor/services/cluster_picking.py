@@ -341,7 +341,7 @@ class ClusterPicking(Component):
         return self._lines_for_picking_batch(
             picking_batch,
             filter_func=lambda l: (
-                l.state == "assigned"
+                l.state in ("assigned", "partially_available")
                 # On 'StockPicking.action_assign()', result_package_id is set to
                 # the same package as 'package_id'. Here, we need to exclude lines
                 # that were already put into a bin, i.e. the destination package
@@ -566,7 +566,7 @@ class ClusterPicking(Component):
                 batch, message=self.msg_store.operation_not_found()
             )
 
-        new_line, qty_check = move_line._check_qty_to_be_done(quantity)
+        new_line, qty_check = move_line._split_qty_to_be_done(quantity)
         if qty_check == "greater":
             return self._response_for_scan_destination(
                 move_line,
@@ -657,7 +657,7 @@ class ClusterPicking(Component):
 
     def _filter_for_unload(self, line):
         return (
-            line.state == "assigned"
+            line.state in ("assigned", "partially_available")
             and line.qty_done > 0
             and line.result_package_id
             and not line.shopfloor_unloaded
