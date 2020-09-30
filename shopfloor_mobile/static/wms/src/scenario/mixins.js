@@ -309,14 +309,17 @@ export var ScenarioBaseMixin = {
                 this.display_app_error(result.error);
                 return;
             }
-            const state_key =
-                result.next_state == "start"
-                    ? this.initial_state_key
-                    : result.next_state;
-            if (!_.isUndefined(result.data)) {
+            let state_key = result.next_state;
+            // TODO: potentially we can return values for other states as well.
+            // We should loop on result.data keys.
+            const state_data = result.data[state_key];
+            if (state_key == "start") {
+                state_key = this.initial_state_key;
+            }
+            if (!_.isUndefined(state_data)) {
                 this.state_reset_data(state_key);
                 // Set state data but delay state wrapper reload.
-                this.state_set_data(result.data[state_key], state_key, false);
+                this.state_set_data(state_data, state_key, false);
             }
             this.reset_notification();
             if (result.message) {
