@@ -45,25 +45,36 @@ class StockLocation(models.Model):
         for rec in self:
             rec.update({"reserved_move_line_ids": rec._get_reserved_move_lines()})
 
-    def planned_qty_in_location_is_empty(self):
+    def planned_qty_in_location_is_empty(self, move_lines=None):
         """Return if a location will be empty when move lines will be confirmed
 
         Used for the "zero check". We need to know if a location is empty, but since
         we set the move lines to "done" only at the end of the unload workflow, we
         have to look at the qty_done of the move lines from this location.
+
+        With `move_lines` we can force the use of the given move lines for the check.
+        This allows to know that the location will be empty if we process only
+        these move lines.
         """
         self.ensure_one()
         quants = self.env["stock.quant"].search(
             [("quantity", ">", 0), ("location_id", "=", self.id)]
         )
         remaining = sum(quants.mapped("quantity"))
-        lines = self.env["stock.move.line"].search(
-            [
-                ("state", "!=", "done"),
-                ("location_id", "=", self.id),
-                ("qty_done", ">", 0),
-            ]
-        )
-        planned = remaining - sum(lines.mapped("qty_done"))
+        move_line_qty_field = "qty_done"
+        if move_lines:
+            move_lines = move_lines.filtered(
+                lambda m: m.state not in ("cancel", "done")
+            )
+            move_line_qty_field = "product_uom_qty"
+        else:
+            move_lines = self.env["stock.move.line"].search(
+                [
+                    ("state", "not in", ("cancel", "done")),
+                    ("location_id", "=", self.id),
+                    ("qty_done", ">", 0),
+                ]
+            )
+        planned = remaining - sum(move_lines.mapped(move_line_qty_field))
         compare = float_compare(planned, 0, precision_rounding=0.01)
         return compare <= 0
