@@ -396,3 +396,42 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         self.assert_response_unload_all(
             response, zone_location, picking_type, self.picking5.move_line_ids,
         )
+
+    def test_list_move_lines_empty_location(self):
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        response = self.service.dispatch(
+            "list_move_lines",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "order": "location",
+            },
+        )
+        move_lines = self.service._find_location_move_lines(
+            zone_location, picking_type, order="location"
+        )
+        self.assert_response_select_line(
+            response, zone_location, picking_type, move_lines,
+        )
+        data_move_lines = response["data"]["select_line"]["move_lines"]
+        # Check that the move line in "Zone sub-location 1" is about to empty
+        # its location if we process it
+        data_move_line = [
+            m
+            for m in data_move_lines
+            if m["location_src"]["barcode"] == "ZONE_SUBLOCATION_1"
+        ][0]
+        self.assertTrue(data_move_line["empty_location_src"])
+        # Same check with the internal method
+        move_line = self.env["stock.move.line"].browse(data_move_line["id"])
+        location_src = move_line.location_id
+        move_line_will_empty_location = location_src.planned_qty_in_location_is_empty(
+            move_lines=move_line
+        )
+        self.assertTrue(move_line_will_empty_location)
+        # But if we check the location without giving the move line as parameter,
+        # knowing that this move line hasn't its 'qty_done' field filled,
+        # the location won't be considered empty with such pending move line
+        move_line_will_empty_location = location_src.planned_qty_in_location_is_empty()
+        self.assertFalse(move_line_will_empty_location)
