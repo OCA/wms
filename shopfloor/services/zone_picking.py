@@ -220,11 +220,17 @@ class ZonePicking(Component):
         }
 
     def _data_for_move_lines(self, zone_location, picking_type, move_lines):
-        return {
+        data = {
             "zone_location": self.data.location(zone_location),
             "picking_type": self.data.picking_type(picking_type),
             "move_lines": self.data.move_lines(move_lines, with_picking=True),
         }
+        for data_move_line in data["move_lines"]:
+            move_line = self.env["stock.move.line"].browse(data_move_line["id"])
+            data_move_line[
+                "empty_location_src"
+            ] = move_line.location_id.planned_qty_in_location_is_empty(move_line)
+        return data
 
     def _data_for_location(self, zone_location, picking_type, location):
         return {
@@ -1428,7 +1434,7 @@ class ShopfloorZonePickingValidatorResponse(Component):
         return {
             "start": {},
             "select_picking_type": self._schema_for_select_picking_type,
-            "select_line": self._schema_for_move_lines,
+            "select_line": self._schema_for_move_lines_empty_location,
             "set_line_destination": self._schema_for_move_line,
             "zero_check": self._schema_for_zero_check,
             "change_pack_lot": self._schema_for_move_line,
@@ -1545,6 +1551,16 @@ class ShopfloorZonePickingValidatorResponse(Component):
                 "nullable": True,
                 "required": False,
             },
+        }
+        return schema
+
+    @property
+    def _schema_for_move_lines_empty_location(self):
+        schema = self._schema_for_move_lines
+        schema["move_lines"]["schema"]["schema"]["empty_location_src"] = {
+            "type": "boolean",
+            "nullable": False,
+            "required": True,
         }
         return schema
 

@@ -216,16 +216,18 @@ class ZonePickingCommonCase(CommonCase):
         message=None,
         popup=None,
     ):
+        data = {
+            "zone_location": self.data.location(zone_location),
+            "picking_type": self.data.picking_type(picking_type),
+            "move_lines": self.data.move_lines(move_lines, with_picking=True),
+        }
+        for data_move_line in data["move_lines"]:
+            move_line = self.env["stock.move.line"].browse(data_move_line["id"])
+            data_move_line[
+                "empty_location_src"
+            ] = move_line.location_id.planned_qty_in_location_is_empty(move_line)
         self.assert_response(
-            response,
-            next_state=state,
-            data={
-                "zone_location": self.data.location(zone_location),
-                "picking_type": self.data.picking_type(picking_type),
-                "move_lines": self.data.move_lines(move_lines, with_picking=True),
-            },
-            message=message,
-            popup=popup,
+            response, next_state=state, data=data, message=message, popup=popup,
         )
 
     def assert_response_select_line(
