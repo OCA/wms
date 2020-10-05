@@ -262,6 +262,7 @@ const ZonePicking = {
             let options = {
                 key_title: "location_src.name",
                 group_color: this.utils.colors.color_for("screen_step_todo"),
+                card_klass: "loud-labels",
                 title_action_field: {action_val_path: "product.barcode"},
                 showActions: false,
                 list_item_options: {
