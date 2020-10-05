@@ -422,7 +422,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             for m in data_move_lines
             if m["location_src"]["barcode"] == "ZONE_SUBLOCATION_1"
         ][0]
-        self.assertTrue(data_move_line["empty_location_src"])
+        self.assertTrue(data_move_line["location_will_be_empty"])
         # Same check with the internal method
         move_line = self.env["stock.move.line"].browse(data_move_line["id"])
         location_src = move_line.location_id

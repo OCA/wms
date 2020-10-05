@@ -224,7 +224,7 @@ class ZonePickingCommonCase(CommonCase):
         for data_move_line in data["move_lines"]:
             move_line = self.env["stock.move.line"].browse(data_move_line["id"])
             data_move_line[
-                "empty_location_src"
+                "location_will_be_empty"
             ] = move_line.location_id.planned_qty_in_location_is_empty(move_line)
         self.assert_response(
             response, next_state=state, data=data, message=message, popup=popup,
