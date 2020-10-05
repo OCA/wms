@@ -216,3 +216,11 @@ class TestAbcLocation(SavepointCase):
                 | self.pallets_bin_2_location
             ).ids,
         )
+
+    def test_get_storage_locations_not_all_keys(self):
+        """Do not crash if we have no A or B or C locations"""
+        self.stock_location.write({"pack_putaway_strategy": "abc"})
+        self.env["stock.location"].search(
+            [("abc_storage", "in", ("a", "b"))]
+        ).abc_storage = "b"
+        self.assertTrue(self.stock_location.get_storage_locations())

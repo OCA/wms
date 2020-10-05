@@ -14,8 +14,11 @@ def gather_location_ids(abc_sorted, max_heights_sorted, locations_grouped):
     """
     location_ids = []
     for abc_key in abc_sorted:
+        group_ids_per_height = locations_grouped.get(abc_key)
+        if not group_ids_per_height:
+            continue
         for max_height in max_heights_sorted:
-            location_ids.extend(locations_grouped[abc_key].get(max_height, []))
+            location_ids.extend(group_ids_per_height.get(max_height, []))
     return location_ids
 
 
