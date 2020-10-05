@@ -4,3 +4,4 @@
 * Document demo mode
 * Find / create a nice icon
 * Finish base translations (move all UI strings to translatable terms)
+* Use SCSS
