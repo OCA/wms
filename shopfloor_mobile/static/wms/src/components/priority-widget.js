@@ -6,7 +6,6 @@
 
 export var PriorityWidget = Vue.component("priority-widget", {
     props: {
-        record: Object,
         options: Object,
     },
     computed: {
