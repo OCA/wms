@@ -232,7 +232,7 @@ Vue.component("manual-select", {
     },
     template: `
     <div :class="klass">
-        <v-card class="select-group"
+        <v-card :class="['select-group', opts.card_klass]"
             :color="group.group_color || opts.group_color"
             v-for="(group, gindex) in selectable"
             :key="make_component_key([$options._componentTag, 'group', gindex])">
