@@ -239,7 +239,8 @@ Vue.component("manual-select", {
             <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
             <v-list v-if="has_records">
                 <div :class="['list-item-wrapper', is_selected(rec) ? selected_color_klass() : '']" v-for="(rec, index) in group.records"">
-                    <v-list-item :key="make_component_key(['group-rec', gindex, index, rec.id])">
+                    <v-list-item :key="make_component_key(['group-rec', gindex, index, rec.id])"
+                                :class="list_item_options.list_item_klass_maker ? list_item_options.list_item_klass_maker(rec) : ''">
                         <v-list-item-content>
                             <component
                                 :is="opts.list_item_component"
