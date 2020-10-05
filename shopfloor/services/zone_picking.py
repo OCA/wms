@@ -226,9 +226,14 @@ class ZonePicking(Component):
             "move_lines": self.data.move_lines(move_lines, with_picking=True),
         }
         for data_move_line in data["move_lines"]:
+            # TODO: this could be expensive, think about a better way
+            # to retrieve if location will be empty.
+            # Maybe group lines by location and compute only once.
             move_line = self.env["stock.move.line"].browse(data_move_line["id"])
+            # `location_will_be_empty` flag states if, by processing this move line
+            # and picking the product, the location will be emptied.
             data_move_line[
-                "empty_location_src"
+                "location_will_be_empty"
             ] = move_line.location_id.planned_qty_in_location_is_empty(move_line)
         return data
 
@@ -1557,7 +1562,7 @@ class ShopfloorZonePickingValidatorResponse(Component):
     @property
     def _schema_for_move_lines_empty_location(self):
         schema = self._schema_for_move_lines
-        schema["move_lines"]["schema"]["schema"]["empty_location_src"] = {
+        schema["move_lines"]["schema"]["schema"]["location_will_be_empty"] = {
             "type": "boolean",
             "nullable": False,
             "required": True,
