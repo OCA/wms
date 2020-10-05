@@ -294,8 +294,15 @@ const ZonePicking = {
             const self = this;
             let fields = [
                 {path: "product.display_name", label: table_mode ? "Product" : null},
-                {path: "package_src.name", label: "Pack"},
-                {path: "lot.name", label: "Lot"},
+                {
+                    path: "package_src.name",
+                    label: "Pack / Lot",
+                    renderer: function(rec, field) {
+                        const pkg = _.result(rec, "package_src.name", "");
+                        const lot = _.result(rec, "lot.name", "");
+                        return lot ? pkg + "\n" + lot : pkg;
+                    },
+                },
                 {
                     path: "quantity",
                     label: "Qty",
