@@ -113,6 +113,7 @@ ul.packaging span:first-child {
     font-size: 1.3em;
     line-height: 1.4em;
 }
+.v-card.loud-labels .label,
 .detail.item-detail-card .field-detail.loud-label .label,
 .detail.item-detail-card.loud-labels .v-card__text.details .label,
 .detail.item-detail-card.loud .v-card__text.details .label {
