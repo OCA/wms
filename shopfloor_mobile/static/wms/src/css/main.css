@@ -113,6 +113,7 @@ ul.packaging span:first-child {
     font-size: 1.3em;
     line-height: 1.4em;
 }
+.v-card.loud-labels .label,
 .detail.item-detail-card .field-detail.loud-label .label,
 .detail.item-detail-card.loud-labels .v-card__text.details .label,
 .detail.item-detail-card.loud .v-card__text.details .label {
@@ -517,6 +518,12 @@ I tested only w/ checkout/select_package for now
 }
 .detail.item-detail-card .v-card__title > span {
     margin-right: 1.2em;
+}
+
+.v-list-item.location-will-be-empty .field-detail.location_will_be_empty {
+    position: absolute;
+    top: 5px;
+    right: 5px;
 }
 
 @media screen and (max-width: 320px) {

@@ -95,7 +95,7 @@ Vue.component("list", {
     },
     template: `
     <div :class="klass">
-        <v-card class="list-group"
+        <v-card :class="['list-group', opts.card_klass]"
                 v-for="(group, gindex) in listable" :key="make_component_key([$options._componentTag, 'group', gindex])"
                 :color="group.group_color || opts.group_color">
             <v-card-title v-if="group.title">{{ group.title }}</v-card-title>

@@ -41,6 +41,18 @@ const template_mobile = `
                 :items="select_line_table_items()"
                 :key="make_state_component_key(['data-table'])"
                 class="elevation-1">
+
+                <template v-slot:item.quantity="{ item }">
+                    <packaging-qty-picker-display
+                        :options="utils.misc.move_line_qty_picker_options(item['_origin'])"
+                        />
+                </template>
+                <template v-slot:item.priority="{ item }">
+                    <priority-widget :options="{priority: parseInt(item.priority || '0', 10)}" />
+                </template>
+                <template v-slot:item.location_will_be_empty="{ item }">
+                    <empty-location-icon :record="item" />
+                </template>
             </v-data-table>
 
             <div class="button-list button-vertical-list full">
@@ -254,6 +266,7 @@ const ZonePicking = {
                         item_data[field.path] = field.renderer(record, field);
                     }
                 });
+                item_data["_origin"] = record;
                 return item_data;
             });
             return items;
@@ -262,11 +275,17 @@ const ZonePicking = {
             let options = {
                 key_title: "location_src.name",
                 group_color: this.utils.colors.color_for("screen_step_todo"),
+                card_klass: "loud-labels",
                 title_action_field: {action_val_path: "product.barcode"},
                 showActions: false,
                 list_item_options: {
                     bold_title: true,
                     fields: this.move_line_list_fields(),
+                    list_item_klass_maker: function(rec) {
+                        return rec.location_will_be_empty
+                            ? "location-will-be-empty"
+                            : "";
+                    },
                 },
             };
             return options;
@@ -275,8 +294,23 @@ const ZonePicking = {
             const self = this;
             let fields = [
                 {path: "product.display_name", label: table_mode ? "Product" : null},
-                {path: "package_src.name", label: "Pack"},
-                {path: "lot.name", label: "Lot"},
+                {
+                    path: "package_src.name",
+                    label: "Pack / Lot",
+                    renderer: function(rec, field) {
+                        const pkg = _.result(rec, "package_src.name", "");
+                        const lot = _.result(rec, "lot.name", "");
+                        return lot ? pkg + "\n" + lot : pkg;
+                    },
+                },
+                {
+                    path: "quantity",
+                    label: "Qty",
+                    render_component: "packaging-qty-picker-display",
+                    render_options: function(record) {
+                        return self.utils.misc.move_line_qty_picker_options(record);
+                    },
+                },
                 {path: "package_src.weight", label: "Weight"},
                 {
                     path: "picking.scheduled_date",
@@ -292,6 +326,11 @@ const ZonePicking = {
                     render_options: function(record) {
                         return {priority: parseInt(record.priority || "0", 10)};
                     },
+                },
+                {
+                    path: "location_will_be_empty",
+                    render_component: "empty-location-icon",
+                    display_no_value: true,
                 },
             ];
             if (table_mode) {

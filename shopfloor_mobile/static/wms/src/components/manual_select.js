@@ -232,14 +232,15 @@ Vue.component("manual-select", {
     },
     template: `
     <div :class="klass">
-        <v-card class="select-group"
+        <v-card :class="['select-group', opts.card_klass]"
             :color="group.group_color || opts.group_color"
             v-for="(group, gindex) in selectable"
             :key="make_component_key([$options._componentTag, 'group', gindex])">
             <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
             <v-list v-if="has_records">
                 <div :class="['list-item-wrapper', is_selected(rec) ? selected_color_klass() : '']" v-for="(rec, index) in group.records"">
-                    <v-list-item :key="make_component_key(['group-rec', gindex, index, rec.id])">
+                    <v-list-item :key="make_component_key(['group-rec', gindex, index, rec.id])"
+                                :class="list_item_options.list_item_klass_maker ? list_item_options.list_item_klass_maker(rec) : ''">
                         <v-list-item-content>
                             <component
                                 :is="opts.list_item_component"
