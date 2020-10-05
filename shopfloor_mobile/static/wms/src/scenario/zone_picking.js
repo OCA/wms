@@ -41,6 +41,10 @@ const template_mobile = `
                 :items="select_line_table_items()"
                 :key="make_state_component_key(['data-table'])"
                 class="elevation-1">
+
+                <template v-slot:item.priority="{ item }">
+                    <priority-widget :options="{priority: parseInt(item.priority || '0', 10)}" />
+                </template>
             </v-data-table>
 
             <div class="button-list button-vertical-list full">
