@@ -437,7 +437,11 @@ Vue.component("btn-fullscreen", {
             this.fullscreen_on = false;
         },
     },
-    template: `<btn-action @click="fullscreen_on ? leave_fullscreen() : go_fullscreen()">{{ btn_label }}</btn-action>`,
+    template: `
+    <btn-action @click="fullscreen_on ? leave_fullscreen() : go_fullscreen()">
+        <v-icon>{{ fullscreen_on ? 'mdi-fullscreen-exit' : 'mdi-fullscreen' }}</v-icon> {{ btn_label }}
+    </btn-action>
+    `,
 });
 
 Vue.component("empty-location-icon", {
