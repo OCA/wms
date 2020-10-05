@@ -42,6 +42,11 @@ const template_mobile = `
                 :key="make_state_component_key(['data-table'])"
                 class="elevation-1">
 
+                <template v-slot:item.quantity="{ item }">
+                    <packaging-qty-picker-display
+                        :options="utils.misc.move_line_qty_picker_options(item['_origin'])"
+                        />
+                </template>
                 <template v-slot:item.priority="{ item }">
                     <priority-widget :options="{priority: parseInt(item.priority || '0', 10)}" />
                 </template>
@@ -261,6 +266,7 @@ const ZonePicking = {
                         item_data[field.path] = field.renderer(record, field);
                     }
                 });
+                item_data["_origin"] = record;
                 return item_data;
             });
             return items;
@@ -290,6 +296,14 @@ const ZonePicking = {
                 {path: "product.display_name", label: table_mode ? "Product" : null},
                 {path: "package_src.name", label: "Pack"},
                 {path: "lot.name", label: "Lot"},
+                {
+                    path: "quantity",
+                    label: "Qty",
+                    render_component: "packaging-qty-picker-display",
+                    render_options: function(record) {
+                        return self.utils.misc.move_line_qty_picker_options(record);
+                    },
+                },
                 {path: "package_src.weight", label: "Weight"},
                 {
                     path: "picking.scheduled_date",
