@@ -44,6 +44,10 @@ const move_lines = demotools.makePickingLines(
     {lines_count: 30, line_random_pack: true, picking_auto: true}
 );
 const select_line_move_lines = _.orderBy(move_lines, ["priority"], ["desc"]);
+_.forEach(select_line_move_lines, function(line, i) {
+    // Simulate random flag
+    line.location_will_be_empty = i % 3 == 0;
+});
 
 const list_move_lines = {
     next_state: "select_line",

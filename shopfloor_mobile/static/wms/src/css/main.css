@@ -520,6 +520,12 @@ I tested only w/ checkout/select_package for now
     margin-right: 1.2em;
 }
 
+.v-list-item.location-will-be-empty .field-detail.location_will_be_empty {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
 @media screen and (max-width: 320px) {
     #app header.has-main-doc .app-bar-actions {
         display: none;

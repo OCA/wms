@@ -439,3 +439,10 @@ Vue.component("btn-fullscreen", {
     },
     template: `<btn-action @click="fullscreen_on ? leave_fullscreen() : go_fullscreen()">{{ btn_label }}</btn-action>`,
 });
+
+Vue.component("empty-location-icon", {
+    mixins: [ItemDetailMixin],
+    template: `
+    <v-icon color="orange" :class="$options._componentTag" v-if="record.location_will_be_empty">mdi-alert-rhombus-outline</v-icon>
+  `,
+});
