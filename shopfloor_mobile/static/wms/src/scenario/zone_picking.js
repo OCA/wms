@@ -45,6 +45,9 @@ const template_mobile = `
                 <template v-slot:item.priority="{ item }">
                     <priority-widget :options="{priority: parseInt(item.priority || '0', 10)}" />
                 </template>
+                <template v-slot:item.location_will_be_empty="{ item }">
+                    <empty-location-icon :record="item" />
+                </template>
             </v-data-table>
 
             <div class="button-list button-vertical-list full">
@@ -272,6 +275,11 @@ const ZonePicking = {
                 list_item_options: {
                     bold_title: true,
                     fields: this.move_line_list_fields(),
+                    list_item_klass_maker: function(rec) {
+                        return rec.location_will_be_empty
+                            ? "location-will-be-empty"
+                            : "";
+                    },
                 },
             };
             return options;
@@ -297,6 +305,11 @@ const ZonePicking = {
                     render_options: function(record) {
                         return {priority: parseInt(record.priority || "0", 10)};
                     },
+                },
+                {
+                    path: "location_will_be_empty",
+                    render_component: "empty-location-icon",
+                    display_no_value: true,
                 },
             ];
             if (table_mode) {
