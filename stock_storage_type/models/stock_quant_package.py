@@ -10,41 +10,10 @@ class StockQuantPackage(models.Model):
 
     package_storage_type_id = fields.Many2one(
         "stock.package.storage.type",
-        compute="_compute_package_storage_type_id",
-        store=True,
-        readonly=False,
-        help="Package storage type for put-away computation. Computed "
+        help="Package storage type for put-away computation. Get value "
         "automatically from the packaging if set, or from the product if"
         "the package contains only a single product.",
     )
-
-    @api.depends(
-        "product_packaging_id",
-        "product_packaging_id.package_storage_type_id",
-        "quant_ids",
-        "quant_ids.product_id",
-        "quant_ids.product_id.product_package_storage_type_id",
-    )
-    def _compute_package_storage_type_id(self):
-        for pack in self:
-            if pack.package_storage_type_id:
-                continue
-            elif (
-                pack.product_packaging_id
-                and pack.product_packaging_id.package_storage_type_id
-            ):
-                pack.package_storage_type_id = (
-                    pack.product_packaging_id.package_storage_type_id
-                )
-            elif (
-                pack.single_product_id
-                and pack.single_product_id.product_package_storage_type_id
-            ):
-                pack.package_storage_type_id = (
-                    pack.single_product_id.product_package_storage_type_id
-                )
-            else:
-                pack.package_storage_type_id = False
 
     @api.constrains(
         "height", "package_storage_type_id", "product_packaging_id", "single_product_id"
@@ -55,3 +24,37 @@ class StockQuantPackage(models.Model):
                 raise ValidationError(
                     _("The height is mandatory on package {}.").format(package.name)
                 )
+
+    def auto_assign_packaging(self):
+        super().auto_assign_packaging()
+        for package in self:
+            if not package.package_storage_type_id:
+                # if no storage type could be set by auto assign,
+                # fallback on the default product's storage type (if any)
+                package._sync_storage_type_from_single_product()
+
+    @api.model_create_multi
+    def create(self, vals):
+        records = super().create(vals)
+        records._sync_storage_type_from_packaging()
+        return records
+
+    def write(self, vals):
+        result = super().write(vals)
+        if vals.get("product_packaging_id"):
+            self._sync_storage_type_from_packaging()
+        return result
+
+    def _sync_storage_type_from_packaging(self):
+        for package in self:
+            storage_type = package.product_packaging_id.package_storage_type_id
+            if not storage_type:
+                continue
+            package.package_storage_type_id = storage_type
+
+    def _sync_storage_type_from_single_product(self):
+        for package in self:
+            storage_type = package.single_product_id.product_package_storage_type_id
+            if not storage_type:
+                continue
+            package.package_storage_type_id = storage_type
