@@ -11,6 +11,11 @@ class ShopfloorMenu(models.Model):
         "location_content_transfer",
     )
 
+    _scenario_allowing_unreserve_other_moves = (
+        "single_pack_transfer",
+        "location_content_transfer",
+    )
+
     name = fields.Char(translate=True)
     sequence = fields.Integer()
     profile_ids = fields.Many2many(
@@ -31,6 +36,15 @@ class ShopfloorMenu(models.Model):
         help="Some scenario may create move(s) when a product or package is"
         " scanned and no move already exists. Any new move is created in the"
         " selected operation type, so it can be active only when one type is selected.",
+    )
+    unreserve_other_moves_is_possible = fields.Boolean(
+        compute="_compute_unreserve_other_moves_is_possible"
+    )
+    allow_unreserve_other_moves = fields.Boolean(
+        string="Allow to process reserved quantities",
+        default=False,
+        help="If you tick this box, this scenario will allow operator to move"
+        " goods even if a reservation is made by a different operation type.",
     )
     active = fields.Boolean(default=True)
 
@@ -63,6 +77,30 @@ class ShopfloorMenu(models.Model):
             if menu.allow_move_create and not menu.move_create_is_possible:
                 raise exceptions.ValidationError(
                     _("Creation of moves is not allowed for menu {}.").format(menu.name)
+                )
+
+    @api.depends("scenario", "picking_type_ids")
+    def _compute_unreserve_other_moves_is_possible(self):
+        for menu in self:
+            menu.unreserve_other_moves_is_possible = (
+                menu.scenario in self._scenario_allowing_unreserve_other_moves
+            )
+
+    @api.onchange("unreserve_other_moves_is_possible")
+    def onchange_unreserve_other_moves_is_possible(self):
+        self.allow_unreserve_other_moves = self.unreserve_other_moves_is_possible
+
+    @api.constrains("scenario", "picking_type_ids", "allow_unreserve_other_moves")
+    def _check_allow_unreserve_other_moves(self):
+        for menu in self:
+            if (
+                menu.allow_unreserve_other_moves
+                and not menu.unreserve_other_moves_is_possible
+            ):
+                raise exceptions.ValidationError(
+                    _(
+                        "Processing reserved quantities is" " not allowed for menu {}."
+                    ).format(menu.name)
                 )
 
     # ATM the goal is to block using single_pack_transfer (SPT)
