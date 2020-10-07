@@ -1,3 +1,10 @@
+import uuid
+
+from psycopg2 import sql
+
+from odoo import fields
+from odoo.sql_db import clear_env, flush_env
+
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
@@ -83,6 +90,39 @@ class SinglePackTransfer(Component):
                 ("picking_id.picking_type_id", "in", picking_types.ids),
             ]
         )
+
+        # Start a savepoint because we are may unreserve moves of other
+        # picking types. If we do and we can't create a package level after,
+        # we rollback to the initial state
+        savepoint_name = uuid.uuid1().hex
+        flush_env(self.env.cr, clear=False)
+        # pylint: disable=sql-injection
+        self.env.cr.execute(
+            sql.SQL("SAVEPOINT {}").format(sql.Identifier(savepoint_name))
+        )
+        unreserved_moves = self.env["stock.move"].browse()
+        if not package_level:
+            other_move_lines = self.env["stock.move.line"].search(
+                [
+                    ("package_id", "=", package.id),
+                    # to exclude canceled and done
+                    ("state", "in", ("assigned", "partially_available")),
+                ]
+            )
+            if any(line.qty_done > 0 for line in other_move_lines) or (
+                other_move_lines and not self.work.menu.allow_unreserve_other_moves
+            ):
+                picking = fields.first(other_move_lines).picking_id
+                return self._response_for_start(
+                    message=self.msg_store.package_already_picked_by(package, picking)
+                )
+            elif other_move_lines and self.work.menu.allow_unreserve_other_moves:
+
+                unreserved_moves = other_move_lines.move_id
+                other_package_levels = other_move_lines.package_level_id
+                other_package_levels.explode_package()
+                unreserved_moves._do_unreserve()
+
         # State is computed, can't use it in the domain. And it's probably faster
         # to filter here rather than using a domain on "picking_id.state" that would
         # use a sub-search on stock.picking: we shouldn't have dozens of package levels
@@ -95,6 +135,14 @@ class SinglePackTransfer(Component):
                 package_level = self._create_package_level(package)
 
         if not package_level:
+            # restore any unreserved move/package level
+            clear_env(self.env.cr)  # required to refresh cache data previous savepoint
+            # pylint: disable=sql-injection
+            self.env.cr.execute(
+                sql.SQL("ROLLBACK TO SAVEPOINT {}").format(
+                    sql.Identifier(savepoint_name)
+                )
+            )
             return self._response_for_start(
                 message=self.msg_store.no_pending_operation_for_pack(package)
             )
@@ -104,6 +152,15 @@ class SinglePackTransfer(Component):
             )
         if not package_level.is_done:
             package_level.is_done = True
+
+        unreserved_moves._action_assign()
+
+        flush_env(self.env.cr, clear=False)
+        # pylint: disable=sql-injection
+        self.env.cr.execute(
+            sql.SQL("RELEASE SAVEPOINT {}").format(sql.Identifier(savepoint_name))
+        )
+
         return self._response_for_scan_location(package_level)
 
     def _create_package_level(self, package):
