@@ -25,3 +25,4 @@ from . import location_content_transfer_sorter
 from . import message
 from . import search
 from . import inventory
+from . import savepoint
