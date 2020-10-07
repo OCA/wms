@@ -23,6 +23,11 @@
                     name="allow_move_create"
                     attrs="{'invisible': [('move_create_is_possible', '=', False)]}"
                 />
+                <field name="unreserve_other_moves_is_possible" invisible="1" />
+                <field
+                    name="allow_unreserve_other_moves"
+                    attrs="{'invisible': [('unreserve_other_moves_is_possible', '=', False)]}"
+                />
             </tree>
         </field>
     </record>
@@ -63,6 +68,16 @@
                         >
                             <field name="move_create_is_possible" invisible="1" />
                             <field name="allow_move_create" />
+                        </group>
+                        <group
+                            name="unreserve_other_moves"
+                            attrs="{'invisible': [('unreserve_other_moves_is_possible', '=', False)]}"
+                        >
+                            <field
+                                name="unreserve_other_moves_is_possible"
+                                invisible="1"
+                            />
+                            <field name="allow_unreserve_other_moves" />
                         </group>
                     </group>
                 </sheet>
