@@ -1,4 +1,9 @@
+import uuid
+
+from psycopg2 import sql
+
 from odoo import _
+from odoo.sql_db import clear_env, flush_env
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -183,6 +188,12 @@ class LocationContentTransfer(Component):
             ("shopfloor_user_id", "=", False),
         ]
 
+    def _find_location_all_move_lines_domain(self, location):
+        return [
+            ("location_id", "=", location.id),
+            ("state", "in", ("assigned", "partially_available")),
+        ]
+
     def _find_location_move_lines(self, location):
         """Find lines that potentially are to move in the location"""
         return self.env["stock.move.line"].search(
@@ -212,6 +223,42 @@ class LocationContentTransfer(Component):
                 }
             )
         return self.env["stock.move"].create(move_vals_list)
+
+    def _unreserve_other_lines(self, location, move_lines):
+        """Unreserve move lines in location in another picking type
+
+        Returns a tuple of (
+          move lines that stays in the location to process,
+          moves to reserve again,
+          response to return to client in case of error
+        )
+        """
+        lines_other_picking_types = move_lines.filtered(
+            lambda line: line.picking_id.picking_type_id not in self.picking_types
+        )
+        if not lines_other_picking_types:
+            return move_lines
+        unreserved_moves = move_lines.move_id
+        location_move_lines = self.env["stock.move.line"].search(
+            self._find_location_all_move_lines_domain(location)
+        )
+        extra_move_lines = location_move_lines - move_lines
+        if extra_move_lines:
+            return (
+                self.env["stock.move.line"].browse(),
+                self.env["stock.move"].browse(),
+                self._response_for_start(
+                    message=self.msg_store.picking_already_started_in_location(
+                        extra_move_lines.picking_id
+                    )
+                ),
+            )
+        package_levels = move_lines.package_level_id
+        # if we leave the package level around, it will try to reserve
+        # the same package as before
+        package_levels.explode_package()
+        unreserved_moves._do_unreserve()
+        return (move_lines - lines_other_picking_types, unreserved_moves, None)
 
     def scan_location(self, barcode):
         """Scan start location
@@ -247,20 +294,37 @@ class LocationContentTransfer(Component):
         pickings = move_lines.picking_id
         picking_types = pickings.mapped("picking_type_id")
 
-        if len(picking_types) > 1:
-            return self._response_for_start(
-                message={
-                    "message_type": "error",
-                    "body": _("This location content can't be moved at once."),
-                }
+        savepoint_name = uuid.uuid1().hex
+        flush_env(self.env.cr, clear=False)
+        # pylint: disable=sql-injection
+        self.env.cr.execute(
+            sql.SQL("SAVEPOINT {}").format(sql.Identifier(savepoint_name))
+        )
+
+        unreserved_moves = self.env["stock.move"].browse()
+        if self.work.menu.allow_unreserve_other_moves:
+            move_lines, unreserved_moves, response = self._unreserve_other_lines(
+                location, move_lines
             )
-        if picking_types - self.picking_types:
-            return self._response_for_start(
-                message={
-                    "message_type": "error",
-                    "body": _("This location content can't be moved using this menu."),
-                }
-            )
+            if response:
+                return response
+        else:
+            if len(picking_types) > 1:
+                return self._response_for_start(
+                    message={
+                        "message_type": "error",
+                        "body": _("This location content can't be moved at once."),
+                    }
+                )
+            if picking_types - self.picking_types:
+                return self._response_for_start(
+                    message={
+                        "message_type": "error",
+                        "body": _(
+                            "This location content can't be moved using this menu."
+                        ),
+                    }
+                )
         # Ensure we process move lines related to pickings having only one source
         # location among all their move lines. If there are different source
         # locations, we put the move lines we are interested in in a separate picking.
@@ -291,7 +355,15 @@ class LocationContentTransfer(Component):
             new_moves._action_confirm(merge=False)
             new_moves._action_assign()
             if not all([x.state == "assigned" for x in new_moves]):
-                new_moves._action_cancel()
+                clear_env(
+                    self.env.cr
+                )  # required to refresh cache data previous savepoint
+                # pylint: disable=sql-injection
+                self.env.cr.execute(
+                    sql.SQL("ROLLBACK TO SAVEPOINT {}").format(
+                        sql.Identifier(savepoint_name)
+                    )
+                )
                 return self._response_for_start(
                     message=self.msg_store.new_move_lines_not_assigned()
                 )
@@ -308,6 +380,14 @@ class LocationContentTransfer(Component):
             line.shopfloor_user_id = self.env.uid
 
         pickings.user_id = self.env.uid
+
+        unreserved_moves._action_assign()
+
+        flush_env(self.env.cr, clear=False)
+        # pylint: disable=sql-injection
+        self.env.cr.execute(
+            sql.SQL("RELEASE SAVEPOINT {}").format(sql.Identifier(savepoint_name))
+        )
 
         return self._router_single_or_all_destination(pickings)
 
