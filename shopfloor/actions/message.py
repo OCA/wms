@@ -355,6 +355,14 @@ class MessageAction(Component):
             ),
         }
 
+    def picking_already_started_in_location(self, pickings):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Picking has already been started in this location in transfer(s): {}"
+            ).format(", ".join(pickings.mapped("name"))),
+        }
+
     def transfer_done_success(self, picking):
         return {
             "message_type": "success",

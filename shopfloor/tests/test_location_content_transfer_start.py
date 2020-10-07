@@ -152,7 +152,7 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
     * /scan_location
     """
 
-    def test_scan_location_wrong_picking_type(self):
+    def test_scan_location_wrong_picking_type_error(self):
         """Content has different picking type than menu"""
         picking = self._create_picking(
             picking_type=self.wh.pick_type_id,
@@ -171,6 +171,93 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
                 "message_type": "error",
                 "body": "This location content can't be moved using this menu.",
             },
+        )
+
+    def test_scan_location_wrong_picking_type_allow_unreserve_ok(self):
+        """Content has different picking type than menu, option to unreserve
+
+        The content must be unreserved, new moves created and the previous
+        content re-reserved.
+        """
+        self.menu.sudo().allow_unreserve_other_moves = True
+
+        picking = self._create_picking(
+            picking_type=self.wh.pick_type_id,
+            lines=[(self.product_a, 10), (self.product_b, 10)],
+        )
+        self._fill_stock_for_moves(
+            picking.move_lines, in_package=True, location=self.content_loc
+        )
+        picking.action_assign()
+        # place goods in shelf1 to ensure the original picking can take goods here
+        other_pack_a = self.env["stock.quant.package"].create({})
+        other_pack_b = self.env["stock.quant.package"].create({})
+        self._update_qty_in_location(
+            self.shelf1, self.product_a, 10, package=other_pack_a
+        )
+        self._update_qty_in_location(
+            self.shelf1, self.product_b, 10, package=other_pack_b
+        )
+        response = self.service.dispatch(
+            "scan_location", params={"barcode": self.content_loc.barcode}
+        )
+        new_picking = self.env["stock.picking"].search(
+            [("picking_type_id", "=", self.picking_type.id)]
+        )
+        self.assertEqual(len(new_picking), 1)
+        self.assert_response_scan_destination_all(response, new_picking)
+        self.assertRecordValues(new_picking, [{"user_id": self.env.uid}])
+        self.assertRecordValues(
+            new_picking.move_line_ids, [{"qty_done": 10.0}, {"qty_done": 10.0}],
+        )
+        self.assertRecordValues(new_picking.package_level_ids, [{"is_done": True}])
+
+        # the original picking must be reserved again, should have taken the goods
+        # of shelf1
+        self.assertRecordValues(
+            picking.move_line_ids,
+            [
+                {
+                    "qty_done": 0.0,
+                    "location_id": self.shelf1.id,
+                    "package_id": other_pack_a.id,
+                },
+                {
+                    "qty_done": 0.0,
+                    "location_id": self.shelf1.id,
+                    "package_id": other_pack_b.id,
+                },
+            ],
+        )
+
+    def test_scan_location_wrong_picking_type_allow_unreserve_error(self):
+        """Content has different picking type than menu, option to unreserve
+
+        If quantity has been partially picked on the existing transfer, prevent
+        to unreserve them.
+        """
+        self.menu.sudo().allow_unreserve_other_moves = True
+
+        picking = self._create_picking(
+            picking_type=self.wh.pick_type_id,
+            lines=[(self.product_a, 10), (self.product_b, 10)],
+        )
+        self._fill_stock_for_moves(
+            picking.move_lines, in_package=True, location=self.content_loc
+        )
+        picking.action_assign()
+        # a user picked qty
+        picking.move_line_ids[0].qty_done = 10
+        response = self.service.dispatch(
+            "scan_location", params={"barcode": self.content_loc.barcode}
+        )
+        self.assert_response_start(
+            response,
+            message=self.service.msg_store.picking_already_started_in_location(picking),
+        )
+        # check that the original moves are still assigned
+        self.assertRecordValues(
+            picking.move_lines, [{"state": "assigned"}, {"state": "assigned"}]
         )
 
     def test_scan_location_create_moves(self):
