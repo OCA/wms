@@ -1,9 +1,4 @@
-import uuid
-
-from psycopg2 import sql
-
 from odoo import fields
-from odoo.sql_db import clear_env, flush_env
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -94,12 +89,7 @@ class SinglePackTransfer(Component):
         # Start a savepoint because we are may unreserve moves of other
         # picking types. If we do and we can't create a package level after,
         # we rollback to the initial state
-        savepoint_name = uuid.uuid1().hex
-        flush_env(self.env.cr, clear=False)
-        # pylint: disable=sql-injection
-        self.env.cr.execute(
-            sql.SQL("SAVEPOINT {}").format(sql.Identifier(savepoint_name))
-        )
+        savepoint = self.actions_for("savepoint").new()
         unreserved_moves = self.env["stock.move"].browse()
         if not package_level:
             other_move_lines = self.env["stock.move.line"].search(
@@ -136,13 +126,7 @@ class SinglePackTransfer(Component):
 
         if not package_level:
             # restore any unreserved move/package level
-            clear_env(self.env.cr)  # required to refresh cache data previous savepoint
-            # pylint: disable=sql-injection
-            self.env.cr.execute(
-                sql.SQL("ROLLBACK TO SAVEPOINT {}").format(
-                    sql.Identifier(savepoint_name)
-                )
-            )
+            savepoint.rollback()
             return self._response_for_start(
                 message=self.msg_store.no_pending_operation_for_pack(package)
             )
@@ -155,11 +139,7 @@ class SinglePackTransfer(Component):
 
         unreserved_moves._action_assign()
 
-        flush_env(self.env.cr, clear=False)
-        # pylint: disable=sql-injection
-        self.env.cr.execute(
-            sql.SQL("RELEASE SAVEPOINT {}").format(sql.Identifier(savepoint_name))
-        )
+        savepoint.release()
 
         return self._response_for_scan_location(package_level)
 
