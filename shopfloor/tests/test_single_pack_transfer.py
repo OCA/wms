@@ -1,22 +1,12 @@
 from odoo.tests.common import Form
 
-from .common import CommonCase
+from .test_single_pack_transfer_base import SinglePackTransferCommonBase
 
 
-class SinglePackTransferCase(CommonCase):
-    @classmethod
-    def setUpClassVars(cls, *args, **kwargs):
-        super().setUpClassVars(*args, **kwargs)
-        cls.menu = cls.env.ref("shopfloor.shopfloor_menu_single_pallet_transfer")
-        cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
-        cls.wh = cls.profile.warehouse_id
-        cls.picking_type = cls.menu.picking_type_ids
-
+class SinglePackTransferCase(SinglePackTransferCommonBase):
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
-        # we activate the move creation in tests when needed
-        cls.menu.sudo().allow_move_create = False
         cls.pack_a = cls.env["stock.quant.package"].create(
             {"location_id": cls.stock_location.id}
         )
@@ -33,15 +23,6 @@ class SinglePackTransferCase(CommonCase):
             )
         )
         cls.picking = cls._create_initial_move()
-
-        # disable the completion on the picking type, we'll have specific test(s)
-        # to check the behavior of this screen
-        cls.picking_type.sudo().display_completion_info = False
-
-    def setUp(self):
-        super().setUp()
-        with self.work_on_services(menu=self.menu, profile=self.profile) as work:
-            self.service = work.component(usage="single_pack_transfer")
 
     @classmethod
     def _create_initial_move(cls):
@@ -188,9 +169,7 @@ class SinglePackTransferCase(CommonCase):
             "confirmation_required": False,
         }
 
-        self.assert_response(
-            response, next_state="scan_location", data=expected_data,
-        )
+        self.assert_response(response, next_state="scan_location", data=expected_data)
 
     def test_start_barcode_not_known(self):
         """Test /start when the barcode is unknown
@@ -866,3 +845,190 @@ class SinglePackTransferCase(CommonCase):
                 "body": "This operation does not exist anymore.",
             },
         )
+
+
+class SinglePackTransferSpecialCase(SinglePackTransferCommonBase):
+    def test_start_package_unreserve_ok(self):
+        """Test /start when the package was already reserved...
+
+        ...for another picking type and unreserving is allowed.
+
+        When we scan a location which contains only one package,
+        we want to move this package.
+
+        The pre-conditions:
+
+        * A package exists in Stock/Shelf1.
+        * A stock picking exists to move the package from Stock/Shelf1 to
+          Out with a different picking type. The move is "assigned".
+        * Another package exists in Stock
+
+        Expected result:
+
+        * the original transfer is reserved to move the other package from Stock
+        * a new transfer is created to move the package from Shelf1
+
+        The next step in the workflow is to call /validate with the
+        package level that will set the move and picking to done.
+        """
+        self.menu.sudo().allow_move_create = True
+        self.menu.sudo().allow_unreserve_other_moves = True
+
+        package = self.env["stock.quant.package"].create({})
+        self._update_qty_in_location(self.shelf1, self.product_a, 10, package=package)
+        # create a picking of another picking type
+        picking = self._create_picking(
+            picking_type=self.wh.out_type_id, lines=[(self.product_a, 10)]
+        )
+        picking.action_assign()
+
+        # create another package that should be used when the picking will
+        # get re-assigned
+        package2 = self.env["stock.quant.package"].create({})
+        self._update_qty_in_location(
+            self.stock_location, self.product_a, 10, package=package2
+        )
+
+        barcode = self.shelf1.barcode
+        params = {"barcode": barcode}
+        response = self.service.dispatch("start", params=params)
+
+        new_picking = self.env["stock.picking"].search(
+            [("picking_type_id", "=", self.picking_type.id)]
+        )
+        self.assertEqual(len(new_picking), 1)
+        new_package_level = new_picking.package_level_ids
+
+        self.assert_response(
+            # We only care about the fact that we jump to the next
+            # screen, so it found the pack. The details are already
+            # checked in the test_start test.
+            response,
+            next_state="scan_location",
+            data=dict(
+                self.service._data_after_package_scanned(new_package_level),
+                confirmation_required=False,
+            ),
+        )
+        self.assertRecordValues(
+            picking.package_level_ids, [{"package_id": package2.id}]
+        )
+
+        self.assertRecordValues(new_package_level, [{"package_id": package.id}])
+
+    def test_start_package_unreserve_picked_error(self):
+        """Test /start when the package was already reserved...
+
+        ...for another picking type and the other move is already picked.
+
+        When we scan a location which contains only one package,
+        we want to move this package.
+
+        The pre-conditions:
+
+        * A package exists in Stock/Shelf1.
+        * A stock picking exists to move the package from Stock/Shelf1 to
+          Out with a different picking type. The move is "assigned".
+
+        Expected result:
+
+        * receive an error that we cannot pick the package
+        """
+        self.menu.sudo().allow_move_create = True
+        self.menu.sudo().allow_unreserve_other_moves = True
+
+        package = self.env["stock.quant.package"].create({})
+        self._update_qty_in_location(self.shelf1, self.product_a, 10, package=package)
+        # create a picking of another picking type
+        picking = self._create_picking(
+            picking_type=self.wh.out_type_id, lines=[(self.product_a, 10)]
+        )
+        picking.action_assign()
+
+        # pick the goods
+        picking.move_line_ids.qty_done = 10
+
+        barcode = self.shelf1.barcode
+        params = {"barcode": barcode}
+        response = self.service.dispatch("start", params=params)
+        self.assert_response(
+            response,
+            next_state="start",
+            message=self.service.msg_store.package_already_picked_by(package, picking),
+        )
+        # no change in the picking
+        self.assertEqual(picking.state, "assigned")
+        self.assertRecordValues(picking.package_level_ids, [{"package_id": package.id}])
+
+    def test_start_package_unreserve_disabled_error(self):
+        """Test /start when the package was already reserved...
+
+        ...for another picking type and unreserving is disallowed.
+
+        When we scan a location which contains only one package,
+        we want to move this package.
+
+        The pre-conditions:
+
+        * A package exists in Stock/Shelf1.
+        * A stock picking exists to move the package from Stock/Shelf1 to
+          Out with a different picking type. The move is "assigned".
+
+        Expected result:
+
+        * receive an error that we cannot pick the package
+        """
+        self.menu.sudo().allow_move_create = True
+        self.menu.sudo().allow_unreserve_other_moves = False
+
+        package = self.env["stock.quant.package"].create({})
+        self._update_qty_in_location(self.shelf1, self.product_a, 10, package=package)
+        # create a picking of another picking type
+        picking = self._create_picking(
+            picking_type=self.wh.out_type_id, lines=[(self.product_a, 10)]
+        )
+        picking.action_assign()
+        barcode = self.shelf1.barcode
+        params = {"barcode": barcode}
+        response = self.service.dispatch("start", params=params)
+        self.assert_response(
+            response,
+            next_state="start",
+            message=self.service.msg_store.package_already_picked_by(package, picking),
+        )
+        # no change in the picking
+        self.assertEqual(picking.state, "assigned")
+        self.assertRecordValues(picking.package_level_ids, [{"package_id": package.id}])
+
+    def test_start_package_unreserve_no_create_error(self):
+        """Test /start when the package was already reserved...
+
+        ...for another picking type and unreserving is allowed
+        and the option to create a move is not allowed.
+
+        This test ensure that the unreservation of the first package
+        is rollbacked.
+
+        """
+        self.menu.sudo().allow_move_create = False
+        self.menu.sudo().allow_unreserve_other_moves = True
+
+        package = self.env["stock.quant.package"].create({})
+        self._update_qty_in_location(self.shelf1, self.product_a, 10, package=package)
+        # create a picking of another picking type
+        picking = self._create_picking(
+            picking_type=self.wh.out_type_id, lines=[(self.product_a, 10)]
+        )
+        picking.action_assign()
+        self.assertEqual(picking.state, "assigned")
+        barcode = self.shelf1.barcode
+        params = {"barcode": barcode}
+        response = self.service.dispatch("start", params=params)
+        self.assert_response(
+            response,
+            next_state="start",
+            message=self.service.msg_store.no_pending_operation_for_pack(package),
+        )
+        # no change in the picking
+        self.assertEqual(picking.state, "assigned")
+        self.assertRecordValues(picking.package_level_ids, [{"package_id": package.id}])
