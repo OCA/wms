@@ -356,7 +356,7 @@ class StockLocation(models.Model):
                 compatible_locations, quants, products
             )
             _logger.debug("pertinent location domain: %s", location_domain)
-            locations = self.search(location_domain, limit=limit)
+            locations = self.search(location_domain)
             valid_location_ids |= set(locations.ids)
 
         # NOTE: self.ids is ordered as expected, so we want to filter the valid
