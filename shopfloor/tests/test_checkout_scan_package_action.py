@@ -1,3 +1,5 @@
+# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from itertools import product
 
 from .test_checkout_base import CheckoutCommonCase
