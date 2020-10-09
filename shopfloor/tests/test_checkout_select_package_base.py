@@ -1,3 +1,7 @@
+# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
+
 class CheckoutSelectPackageMixin:
     def _assert_selected_response(
         self, response, selected_lines, message=None, packing_info=False
