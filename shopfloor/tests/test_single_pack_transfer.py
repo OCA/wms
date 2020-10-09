@@ -1,3 +1,7 @@
+# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020 Akretion (http://www.akretion.com)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
 from odoo.tests.common import Form
 
 from .test_single_pack_transfer_base import SinglePackTransferCommonBase

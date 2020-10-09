@@ -1,3 +1,5 @@
+# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _
 
 from odoo.addons.base_rest.components.service import to_int
