@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record
+        id="stock_package_storage_location_pallets"
+        model="stock.storage.location.sequence"
+    >
+        <field
+            name="package_storage_type_id"
+            ref="stock_storage_type.package_storage_type_pallets"
+        />
+        <field name="sequence">10</field>
+        <field name="location_id" ref="stock_storage_type.stock_location_pallets" />
+    </record>
+    <record
+        id="stock_package_storage_location_pallets_reserve"
+        model="stock.storage.location.sequence"
+    >
+        <field
+            name="package_storage_type_id"
+            ref="stock_storage_type.package_storage_type_pallets"
+        />
+        <field name="sequence">20</field>
+        <field name="location_id" ref="stock_location_pallets_reserve" />
+    </record>
+    <record
+        id="stock_package_storage_location_cardboxes"
+        model="stock.storage.location.sequence"
+    >
+        <field
+            name="package_storage_type_id"
+            ref="stock_storage_type.package_storage_type_cardboxes"
+        />
+        <field name="sequence">10</field>
+        <field name="location_id" ref="stock_storage_type.stock_location_cardboxes" />
+    </record>
+    <record
+        id="stock_package_storage_location_cardboxes_reserve"
+        model="stock.storage.location.sequence"
+    >
+        <field
+            name="package_storage_type_id"
+            ref="stock_storage_type.package_storage_type_cardboxes"
+        />
+        <field name="sequence">20</field>
+        <field name="location_id" ref="stock_location_cardboxes_reserve" />
+    </record>
+</odoo>

@@ -5,8 +5,6 @@ from odoo import api, fields, models
 from odoo.osv import expression
 from odoo.tools import date_utils, float_compare
 
-from odoo.addons import decimal_precision as dp
-
 
 class StockMove(models.Model):
     _inherit = "stock.move"
@@ -21,11 +19,13 @@ class StockMove(models.Model):
     ordered_available_to_promise = fields.Float(
         string="Ordered Available to Promise",
         compute="_compute_ordered_available_to_promise",
-        digits=dp.get_precision("Product Unit of Measure"),
+        digits="Product Unit of Measure",
         help="Available to Promise quantity minus quantities promised "
         " to older promised operations.",
     )
-    need_release = fields.Boolean()
+    need_release = fields.Boolean(index=True,)
+    zip_code = fields.Char(related="partner_id.zip", store="True")
+    city = fields.Char(related="partner_id.city", store="True")
 
     @api.depends()
     def _compute_ordered_available_to_promise(self):
@@ -75,24 +75,50 @@ class StockMove(models.Model):
         return None
 
     def _previous_promised_quantity_domain(self):
-        domain = [
-            ("need_release", "=", True),
+        """Lookup for product promised qty in the same warehouse.
+
+        Moves to consider are either already released or still be to released
+        but not done yet. Each of them should fit the reservation horizon.
+        """
+        base_domain = [
             ("product_id", "=", self.product_id.id),
-            ("date_priority", "<", self.date_priority),
             ("warehouse_id", "=", self.warehouse_id.id),
         ]
         horizon_date = self._promise_reservation_horizon_date()
         if horizon_date:
             # exclude moves planned beyond the horizon
-            domain.append(("date_expected", "<", horizon_date))
-        return domain
+            base_domain.append(("date_expected", "<=", horizon_date))
+
+        # either the move has to be released
+        # and priority is higher than the current one
+        domain_not_released = [
+            ("need_release", "=", True),
+            ("date_priority", "<", self.date_priority),
+        ]
+        # or it has been released already
+        # and is not canceled or done
+        domain_released = [
+            ("need_release", "=", False),
+            (
+                "state",
+                "in",
+                ("waiting", "confirmed", "partially_available", "assigned"),
+            ),
+        ]
+        # NOTE: this domain might be suboptimal as we may lookup too many moves.
+        # If we face performance issues, this is a good candidate to debug.
+        return expression.AND(
+            [base_domain, expression.OR([domain_not_released, domain_released])]
+        )
 
     def _previous_promised_qty(self):
         previous_moves = self.search(
             expression.AND(
+                # TODO: `!=` could be suboptimal, consider filter out on recordset
                 [self._previous_promised_quantity_domain(), [("id", "!=", self.id)]]
             ),
         )
+        # TODO: consider sum via SQL
         promised_qty = sum(
             previous_moves.mapped(
                 lambda move: max(move.product_qty - move.reserved_availability, 0.0)
@@ -125,6 +151,7 @@ class StockMove(models.Model):
         )
         procurement_requests = []
         pulled_moves = self.env["stock.move"]
+        backorder_links = {}
         for move in self:
             if not move.need_release:
                 continue
@@ -144,7 +171,8 @@ class StockMove(models.Model):
                     # we don't want to deliver unless we can deliver all at
                     # once
                     continue
-                move.with_context(release_available_to_promise=True)._split(remaining)
+                new_move = move._release_split(remaining)
+                backorder_links[new_move.picking_id] = move.picking_id
 
             values = move._prepare_procurement_values()
             procurement_requests.append(
@@ -161,10 +189,59 @@ class StockMove(models.Model):
             )
             pulled_moves |= move
 
+        # move the unreleased moves to a backorder
+        released_pickings = pulled_moves.picking_id
+        unreleased_moves = released_pickings.move_lines - pulled_moves
+        for unreleased_move in unreleased_moves:
+            # no split will occur as we keep the same qty, but the move
+            # will be assigned to a new stock.picking
+            original_picking = unreleased_move.picking_id
+            unreleased_move._release_split(unreleased_move.product_qty)
+            backorder_links[unreleased_move.picking_id] = original_picking
+
+        for backorder, origin in backorder_links.items():
+            backorder._release_link_backorder(origin)
+
         self.env["procurement.group"].run_defer(procurement_requests)
 
-        while pulled_moves:
-            pulled_moves._action_assign()
-            pulled_moves = pulled_moves.mapped("move_orig_ids")
+        # Set all transfers released to "printed", consider the work has
+        # been planned and started and another "release" of moves should
+        # (for instance) merge new pickings with this "round of release".
+        self._release_set_printed(pulled_moves)
+        self._release_assign_moves(pulled_moves)
 
         return True
+
+    def _release_set_printed(self, moves):
+        picking_ids = set()
+        while moves:
+            picking_ids.update(moves.mapped("picking_id").ids)
+            moves = moves.mapped("move_orig_ids")
+        pickings = self.env["stock.picking"].browse(picking_ids)
+        pickings.filtered(lambda p: not p.printed).printed = True
+
+    def _release_assign_moves(self, moves):
+        while moves:
+            moves._action_assign()
+            moves = moves.mapped("move_orig_ids")
+
+    def _release_split(self, remaining_qty):
+        """Split move and create a new picking for it.
+
+        Instead of splitting the move and leave remaining qty into the same picking
+        we move it to a new one so that we can release it later as soon as
+        the qty is available.
+        """
+        context = self.env.context
+        self = self.with_context(release_available_to_promise=True)
+        # Rely on `printed` flag to make _assign_picking create a new picking.
+        # See `stock.move._assign_picking` and
+        # `stock.move._search_picking_for_assignation`.
+        if not self.picking_id.printed:
+            self.picking_id.printed = True
+        new_move = self.browse(self._split(remaining_qty))
+        # Picking assignment is needed here because `_split` copies the move
+        # thus the `_should_be_assigned` condition is not satisfied
+        # and the move is not assigned.
+        new_move._assign_picking()
+        return new_move.with_context(context)

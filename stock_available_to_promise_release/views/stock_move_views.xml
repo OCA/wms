@@ -7,9 +7,26 @@
         <field name="inherit_id" ref="stock.view_move_tree" />
         <field eval="900" name="priority" />
         <field name="arch" type="xml">
+            <field name="reference" position="after">
+                <field name="partner_id" string="Customer" />
+                <field name="origin" optional="show" />
+                <field name="group_id" optional="show" />
+                <field name="priority" optional="show" />
+                <field name="zip_code" optional="show" string="Postcode" />
+                <field name="city" optional="show" />
+            </field>
             <field name="product_uom_qty" position="after">
                 <field name="ordered_available_to_promise" />
                 <field name="date_priority" />
+            </field>
+            <field name="location_id" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
+            <field name="location_dest_id" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
+            <field name="state" position="attributes">
+                <attribute name="optional">hide</attribute>
             </field>
         </field>
     </record>
@@ -20,6 +37,9 @@
         <field name="inherit_id" ref="stock.view_move_form" />
         <field eval="900" name="priority" />
         <field name="arch" type="xml">
+            <field name="date_expected" position="attributes">
+                <attribute name="string">Shipment date</attribute>
+            </field>
             <group name="main_grp_col2" position="inside">
                 <field name="ordered_available_to_promise" />
                 <field name="date_priority" />
@@ -27,7 +47,7 @@
         </field>
     </record>
     <record id="stock_move_release_action" model="ir.actions.act_window">
-        <field name="name">Stock Moves To Release</field>
+        <field name="name">Stock Allocation</field>
         <field name="res_model">stock.move</field>
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">tree,kanban,form</field>

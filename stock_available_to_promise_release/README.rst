@@ -54,6 +54,12 @@ then based on the quantity that was promised to the customer (available to promi
 * Allow to perform reservations jointly with your delivery rounds planning.
   Reserve only the quants you planned to deliver.
 
+When move qty is not completely satisfied on release,
+the remaining qty is split and attached to a new picking that can be released later.
+
+Important: if the "Stock reservation horizon" is set, the qty is calculated
+on moves which have an expected date not beyond $today + $horizon (in days).
+
 .. IMPORTANT::
    This is an alpha version, the data model and design can change at any time without warning.
    Only for development or testing purpose, do not use in production.
@@ -67,15 +73,17 @@ then based on the quantity that was promised to the customer (available to promi
 Configuration
 =============
 
-In Inventory > Configuration > Warehouses, activate the option "Release based on Available to Promise"
-when you want to use the feature.
+In Inventory > Configuration > Routes, activate the option "Release based on
+Available to Promise" on the routes where you want to use the feature.
+
+To modify the horizon go to "Inventory > Settings" and change "Stock reservation horizon".
 
 Usage
 =====
 
 When an outgoing transfer would generate chained moves, it will not. The chained
 moves need to be released manually. To do so, open "Inventory > Operations >
-Stock Moves to Release", select the moves to release and use "action > Release
+Stock Allocation", select the moves to release and use "action > Release
 Stock Move". A move can be released only if the available to promise quantity is
 greater than zero. This quantity is computed as the product's virtual quantity
 minus the previous moves in the list (previous being defined by the field

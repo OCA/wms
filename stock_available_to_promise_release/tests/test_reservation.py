@@ -6,111 +6,10 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 
-from odoo import fields
-from odoo.tests import common
+from .common import PromiseReleaseCommonCase
 
 
-class TestAvailableToPromiseRelease(common.SavepointCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
-        cls.wh = cls.env["stock.warehouse"].create(
-            {
-                "name": "Test Warehouse",
-                "reception_steps": "one_step",
-                "delivery_steps": "pick_ship",
-                "code": "WHTEST",
-            }
-        )
-        cls.loc_stock = cls.wh.lot_stock_id
-        cls.loc_customer = cls.env.ref("stock.stock_location_customers")
-        cls.product1 = cls.env["product.product"].create(
-            {"name": "Product 1", "type": "product"}
-        )
-        cls.product2 = cls.env["product.product"].create(
-            {"name": "Product 2", "type": "product"}
-        )
-        cls.uom_unit = cls.env.ref("uom.product_uom_unit")
-        cls.partner_delta = cls.env.ref("base.res_partner_4")
-        cls.loc_bin1 = cls.env["stock.location"].create(
-            {"name": "Bin1", "location_id": cls.loc_stock.id}
-        )
-
-    def _create_picking_chain(self, wh, products=None, date=None, move_type="direct"):
-        """Create picking chain
-
-        It runs the procurement group to create the moves required for
-        a product. According to the WH, it creates the pick/pack/ship
-        moves.
-
-        Products must be a list of tuples (product, quantity) or
-        (product, quantity, uom).
-        One stock move will be created for each tuple.
-        """
-
-        if products is None:
-            products = []
-
-        group = self.env["procurement.group"].create(
-            {
-                "name": "TEST",
-                "move_type": move_type,
-                "partner_id": self.partner_delta.id,
-            }
-        )
-        values = {
-            "company_id": wh.company_id,
-            "group_id": group,
-            "date_planned": date or fields.Datetime.now(),
-            "warehouse_id": wh,
-        }
-
-        for row in products:
-            if len(row) == 2:
-                product, qty = row
-                uom = product.uom_id
-            elif len(row) == 3:
-                product, qty, uom = row
-            else:
-                raise ValueError(
-                    "Expect (product, quantity, uom) or (product, quantity)"
-                )
-
-            self.env["procurement.group"].run(
-                [
-                    self.env["procurement.group"].Procurement(
-                        product,
-                        qty,
-                        uom,
-                        self.loc_customer,
-                        "TEST",
-                        "TEST",
-                        wh.company_id,
-                        values,
-                    )
-                ]
-            )
-        pickings = self._pickings_in_group(group)
-        pickings.mapped("move_lines").write(
-            {"date_priority": date or fields.Datetime.now()}
-        )
-        return pickings
-
-    def _pickings_in_group(self, group):
-        return self.env["stock.picking"].search([("group_id", "=", group.id)])
-
-    def _update_qty_in_location(self, location, product, quantity):
-        self.env["stock.quant"]._update_available_quantity(product, location, quantity)
-        self.env["product.product"].invalidate_cache(
-            fnames=[
-                "qty_available",
-                "virtual_available",
-                "incoming_qty",
-                "outgoing_qty",
-            ]
-        )
-
+class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
     def _prev_picking(self, picking):
         return picking.move_lines.move_orig_ids.picking_id
 
@@ -337,14 +236,21 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
                     "state": "waiting",
                     "location_id": self.wh.wh_output_stock_loc_id.id,
                     "location_dest_id": self.loc_customer.id,
+                    "printed": False,
                 }
             ],
         )
 
         cust_picking.release_available_to_promise()
+        split_cust_picking = cust_picking.backorder_ids
+        self.assertEqual(len(split_cust_picking), 1)
+        out_picking = (
+            self._pickings_in_group(pickings.group_id)
+            - cust_picking
+            - split_cust_picking
+        )
 
-        out_picking = self._pickings_in_group(pickings.group_id) - cust_picking
-
+        # the complete one is assigned and placed into stock output
         self.assertRecordValues(
             out_picking,
             [
@@ -352,12 +258,29 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
                     "state": "assigned",
                     "location_id": self.wh.lot_stock_id.id,
                     "location_dest_id": self.wh.wh_output_stock_loc_id.id,
+                    "printed": True,
+                }
+            ],
+        )
+        # the released customer picking is set to "printed"
+        self.assertRecordValues(cust_picking, [{"printed": True}])
+        # the split once stays in the original location
+        self.assertRecordValues(
+            split_cust_picking,
+            [
+                {
+                    "state": "waiting",
+                    "location_id": self.wh.wh_output_stock_loc_id.id,
+                    "location_dest_id": self.loc_customer.id,
+                    "printed": False,
                 }
             ],
         )
 
         self.assertRecordValues(out_picking.move_lines, [{"product_qty": 7.0}])
+        self.assertRecordValues(split_cust_picking.move_lines, [{"product_qty": 13.0}])
 
+        # let's deliver what we can
         self._deliver(out_picking)
         self.assertRecordValues(out_picking, [{"state": "done"}])
 
@@ -370,13 +293,19 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
                     "product_qty": 7.0,
                     "reserved_availability": 7.0,
                     "procure_method": "make_to_order",
-                },
+                }
+            ],
+        )
+        self.assertRecordValues(split_cust_picking, [{"state": "waiting"}])
+        self.assertRecordValues(
+            split_cust_picking.move_lines,
+            [
                 {
                     "state": "waiting",
                     "product_qty": 13.0,
                     "reserved_availability": 0.0,
                     "procure_method": "make_to_order",
-                },
+                }
             ],
         )
 
@@ -417,13 +346,21 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
             ],
         )
 
-    def test_defer_multi_move(self):
+    def test_defer_multi_move_unreleased_in_backorder(self):
+        """Unreleased moves are put in a backorder"""
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
 
+        self._update_qty_in_location(self.loc_bin1, self.product1, 10.0)
         self._update_qty_in_location(self.loc_bin1, self.product2, 10.0)
 
         pickings = self._create_picking_chain(
-            self.wh, [(self.product1, 20), (self.product2, 10)]
+            self.wh,
+            [
+                (self.product1, 20),
+                (self.product2, 10),
+                (self.product3, 20),
+                (self.product4, 10),
+            ],
         )
         self.assertEqual(len(pickings), 1, "expect only the last out->customer")
         cust_picking = pickings
@@ -437,10 +374,36 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
                 }
             ],
         )
-
+        cust_picking = pickings
         cust_picking.release_available_to_promise()
 
-        out_picking = self._pickings_in_group(pickings.group_id) - cust_picking
+        backorder = cust_picking.backorder_ids
+        self.assertRecordValues(
+            backorder,
+            [
+                {
+                    "state": "waiting",
+                    "location_id": self.wh.wh_output_stock_loc_id.id,
+                    "location_dest_id": self.loc_customer.id,
+                }
+            ],
+        )
+
+        self.assertRecordValues(
+            backorder.move_lines,
+            [
+                # remaining 10 on product 1 because it was partially available
+                {"product_qty": 10.0, "product_id": self.product1.id},
+                # these 2 moves were not released, so they are moved to a
+                # backorder
+                {"product_qty": 20.0, "product_id": self.product3.id},
+                {"product_qty": 10.0, "product_id": self.product4.id},
+            ],
+        )
+
+        out_picking = (
+            self._pickings_in_group(pickings.group_id) - cust_picking - backorder
+        )
 
         self.assertRecordValues(
             out_picking,
@@ -455,7 +418,10 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
 
         self.assertRecordValues(
             out_picking.move_lines,
-            [{"product_qty": 10.0, "product_id": self.product2.id}],
+            [
+                {"product_qty": 10.0, "product_id": self.product1.id},
+                {"product_qty": 10.0, "product_id": self.product2.id},
+            ],
         )
 
     def test_defer_creation_uom(self):
@@ -494,7 +460,13 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
         )
 
         cust_picking.move_lines.release_available_to_promise()
-        out_picking = self._pickings_in_group(pickings.group_id) - cust_picking
+        split_cust_picking = cust_picking.backorder_ids
+        self.assertEqual(len(split_cust_picking), 1)
+        out_picking = (
+            self._pickings_in_group(pickings.group_id)
+            - cust_picking
+            - split_cust_picking
+        )
 
         self.assertRecordValues(
             out_picking.move_lines,
@@ -507,7 +479,20 @@ class TestAvailableToPromiseRelease(common.SavepointCase):
                 }
             ],
         )
+        self.assertRecordValues(
+            split_cust_picking.move_lines,
+            [
+                {
+                    "state": "waiting",
+                    "product_qty": 12.0,
+                    "reserved_availability": 0.0,
+                    "product_uom_qty": 1.0,
+                }
+            ],
+        )
 
     def test_mto_picking(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         # TODO a MTO picking should work normally
+
+    # TODO: test w/ multiple orders by priority

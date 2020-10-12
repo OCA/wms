@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_warehouse_inherit" model="ir.ui.view">
+        <field name="name">stock.warehouse.inherit</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.view_warehouse" />
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field
+                    name="delivery_carrier_id"
+                    domain="['|', ('company_id', '=', False), ('company_id', '=', company_id.id)]"
+                />
+            </field>
+        </field>
+    </record>
+</odoo>
