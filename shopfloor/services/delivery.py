@@ -1,3 +1,5 @@
+# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, fields
 from odoo.osv import expression
 from odoo.tools.float_utils import float_is_zero
