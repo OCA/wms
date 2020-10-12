@@ -7,7 +7,7 @@ Pre-requisites
 Start the app
 ~~~~~~~~~~~~~
 
-* Go to "Inventory -> Settings -> Shopfloor -> Shopfloor App"
+* Go to "Inventory -> Configuration -> Shopfloor -> Shopfloor App"
 * In the login screen fill in your API key
 * Hit "Login"
 
