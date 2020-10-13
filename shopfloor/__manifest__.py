@@ -9,8 +9,9 @@
     "version": "13.0.1.1.0",
     "development_status": "Alpha",
     "category": "Inventory",
-    "website": "https://odoo-community.org",
-    "author": "Akretion, BCIM, Camptocamp, Odoo Community Association (OCA)",
+    "website": "https://github.com/OCA/wms",
+    "author": "Camptocamp, BCIM, Akretion, Odoo Community Association (OCA)",
+    "maintainers": ["guewen", "simahawk", "sebalix"],
     "license": "AGPL-3",
     "application": True,
     "depends": [
