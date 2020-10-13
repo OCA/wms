@@ -27,27 +27,31 @@
         .o_screen_header_content {
             display: flex;
             flex-flow: row nowrap;
-            font-size: 2em;
+            font-size: 1.3em;
             flex: 1 0 auto;
             align-items: center;
-            width: 33%;
+            // width: 33%;
 
+            &.o_screen_header_left {
+                width: 20%;
+            }
             &.o_screen_header_right {
                 justify-content: flex-end;
+                width: 20%;
             }
         }
 
         .o_screen_actions {
             display: flex;
             flex-flow: row nowrap;
-            font-size: 1.2em;
-            padding: $o-screen-padding * 0.5;
+            font-size: 1.1em;
+            padding: $o-screen-padding * 0.4;
         }
 
         .o_screen_operation {
             text-align: center;
-            font-size: 2.5em;
-            padding: 0.5em;
+            font-size: 2em;
+            padding: 0.4em;
             color: #ffffff;
         }
 

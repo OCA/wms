@@ -27,7 +27,6 @@
                         </group>
                     </div>
                     <div class="o_screen_header_right o_screen_header_content">
-                        <label for="picking_state" />
                         <field name="picking_state" />
                     </div>
                 </div>
