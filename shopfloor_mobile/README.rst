@@ -79,7 +79,7 @@ Pre-requisites
 Start the app
 ~~~~~~~~~~~~~
 
-* Go to "Inventory -> Settings -> Shopfloor -> Shopfloor App"
+* Go to "Inventory -> Configuration -> Shopfloor -> Shopfloor App"
 * In the login screen fill in your API key
 * Hit "Login"
 
@@ -114,6 +114,7 @@ Known issues / Roadmap
 * Document demo mode
 * Find / create a nice icon
 * Finish base translations (move all UI strings to translatable terms)
+* Use SCSS
 
 Changelog
 =========
