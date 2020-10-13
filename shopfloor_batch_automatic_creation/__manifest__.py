@@ -9,6 +9,7 @@
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",
+    "maintainers": ["guewen"],
     "license": "AGPL-3",
     "application": True,
     "depends": [
