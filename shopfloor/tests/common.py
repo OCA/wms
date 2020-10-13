@@ -365,9 +365,9 @@ class PickingBatchMixin:
         :param products: list of list of BatchProduct. The outer list creates
         pickings and the innerr list creates moves in these pickings
         """
-        batch_form = Form(cls.env["stock.picking.batch"])
+        batch_form = Form(cls.env["stock.picking.batch"].sudo())
         for transfer in products:
-            picking_form = Form(cls.env["stock.picking"])
+            picking_form = Form(cls.env["stock.picking"].sudo())
             picking_form.picking_type_id = cls.picking_type
             picking_form.location_id = cls.stock_location
             picking_form.location_dest_id = cls.packing_location
