@@ -1,5 +1,5 @@
 Profiles
---------
+~~~~~~~~
 
 In Inventory / Configuration / Shopfloor / Profiles.
 
@@ -8,7 +8,7 @@ application. When a user logs in the scanner application, they have to
 select their profile, so the correct menus are shown.
 
 Menus
------
+~~~~~
 
 In Inventory / Configuration / Shopfloor / Menus.
 
@@ -22,7 +22,7 @@ If a menu has no profile, it is shown in every profile.
 Some scenarios may have additional options, which are explained in tooltips.
 
 Logs retention
---------------
+~~~~~~~~~~~~~~
 
 Logs are kept in database for every REST requests made by a client application.
 They can be used for debugging and monitoring of the activity.
