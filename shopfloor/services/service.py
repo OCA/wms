@@ -289,9 +289,10 @@ class BaseShopfloorService(AbstractComponent):
         defaults = super()._get_openapi_default_parameters()
         # Normal users can't read an API key, ignore it using sudo() only
         # because it's a demo key.
-        demo_api_key = self.env.ref(
-            "shopfloor.api_key_demo", raise_if_not_found=False
-        ).sudo()
+        demo_api_key = self.env.ref("shopfloor.api_key_demo", raise_if_not_found=False)
+        if demo_api_key:
+            demo_api_key = demo_api_key.sudo()
+
         service_params = [
             {
                 "name": "API-KEY",
