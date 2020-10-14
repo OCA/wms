@@ -100,14 +100,20 @@ class BaseShopfloorService(AbstractComponent):
         self, exception_klass, orig_exception, _id=None, params=None
     ):
         tb = traceback.format_exc()
+        # TODO: how to test this? Cannot rollback nor use another cursor
         self.env.cr.rollback()
         with registry(self.env.cr.dbname).cursor() as cr:
             env = self.env(cr=cr)
-            log_entry = self._log_call_in_db(env, request, _id, params, error=tb)
+            log_entry = self._log_call_in_db(
+                env, request, _id, params, traceback=tb, orig_exception=orig_exception
+            )
             log_entry_url = self._get_log_entry_url(log_entry)
         # UserError and alike have `name` attribute to store the msg
-        exc_msg = getattr(orig_exception, "name", str(orig_exception))
+        exc_msg = self._get_exception_message(orig_exception)
         raise exception_klass(exc_msg, log_entry_url) from orig_exception
+
+    def _get_exception_message(self, exception):
+        return getattr(exception, "name", str(exception))
 
     def _get_log_entry_url(self, entry):
         base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
@@ -124,7 +130,7 @@ class BaseShopfloorService(AbstractComponent):
     def _log_call_header_strip(self):
         return ("Cookie", "Api-Key")
 
-    def _log_call_in_db_values(self, _request, _id, params, result=None, error=None):
+    def _log_call_in_db_values(self, _request, _id, params, **kw):
         httprequest = _request.httprequest
         headers = dict(httprequest.headers)
         for header_key in self._log_call_header_strip:
@@ -132,6 +138,17 @@ class BaseShopfloorService(AbstractComponent):
                 headers[header_key] = "<redacted>"
         if _id:
             params = dict(params, _id=_id)
+
+        result = kw.get("result")
+        error = kw.get("traceback")
+        orig_exception = kw.get("orig_exception")
+        exception_name = None
+        exception_message = None
+        if orig_exception:
+            exception_name = orig_exception.__class__.__name__
+            if hasattr(orig_exception, "__module__"):
+                exception_name = orig_exception.__module__ + "." + exception_name
+            exception_message = self._get_exception_message(orig_exception)
         return {
             "request_url": httprequest.url,
             "request_method": httprequest.method,
@@ -139,13 +156,13 @@ class BaseShopfloorService(AbstractComponent):
             "headers": headers,
             "result": result,
             "error": error,
+            "exception_name": exception_name,
+            "exception_message": exception_message,
             "state": "success" if result else "failed",
         }
 
-    def _log_call_in_db(self, env, _request, _id, params, result=None, error=None):
-        values = self._log_call_in_db_values(
-            _request, _id, params, result=result, error=error
-        )
+    def _log_call_in_db(self, env, _request, _id, params, **kw):
+        values = self._log_call_in_db_values(_request, _id, params, **kw)
         if not values:
             return
         return env["shopfloor.log"].sudo().create(values)
