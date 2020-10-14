@@ -10,6 +10,9 @@
                 <field name="request_method" />
                 <field name="request_url" />
                 <field name="state" />
+                <field name="exception_name" />
+                <field name="exception_message" />
+                <field name="severity" />
             </tree>
         </field>
     </record>
@@ -58,7 +61,11 @@
                         name="error"
                         attrs="{'invisible': [('state', '!=', 'failed')]}"
                     >
-                        <group>
+                        <group colspan="2">
+                            <field name="exception_name" />
+                            <field name="severity" />
+                        </group>
+                        <group colspan="4">
                             <field
                                 name="error"
                                 nolabel="1"
