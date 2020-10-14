@@ -36,12 +36,8 @@
                         </group>
                     </group>
                     <group string="Parameters" name="parameters">
-                        <group>
-                            <field name="params" widget="CopyClipboardText" />
-                        </group>
-                        <group>
-                            <field name="headers" widget="CopyClipboardText" />
-                        </group>
+                        <field name="params" />
+                        <field name="headers" />
                     </group>
                     <group
                         string="Result"
@@ -49,11 +45,7 @@
                         attrs="{'invisible': [('state', '!=', 'success')]}"
                     >
                         <group>
-                            <field
-                                name="result"
-                                nolabel="1"
-                                widget="CopyClipboardText"
-                            />
+                            <field name="result" nolabel="1" widget="ace" />
                         </group>
                     </group>
                     <group
@@ -63,13 +55,15 @@
                     >
                         <group colspan="2">
                             <field name="exception_name" />
+                            <field name="exception_message" />
                             <field name="severity" />
                         </group>
                         <group colspan="4">
                             <field
                                 name="error"
                                 nolabel="1"
-                                widget="CopyClipboardText"
+                                widget="ace"
+                                options="{'mode': 'python'}"
                             />
                         </group>
                     </group>
