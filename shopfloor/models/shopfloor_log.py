@@ -26,6 +26,7 @@ class ShopfloorLog(models.Model):
     request_url = fields.Char(readonly=True, string="Request URL")
     request_method = fields.Char(readonly=True)
     params = fields.Text(readonly=True)
+    # TODO: make these fields serialized and use a computed field for displaying
     headers = fields.Text(readonly=True)
     result = fields.Text(readonly=True)
     error = fields.Text(readonly=True)
