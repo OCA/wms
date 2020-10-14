@@ -3,7 +3,7 @@
 import logging
 from datetime import datetime, timedelta
 
-from odoo import fields, models
+from odoo import api, fields, models, tools
 
 _logger = logging.getLogger(__name__)
 
@@ -14,6 +14,14 @@ class ShopfloorLog(models.Model):
     _order = "id desc"
 
     DEFAULT_RETENTION = 30  # days
+    EXCEPTION_SEVERITY_MAPPING = {
+        "odoo.exceptions.UserError": "functional",
+        "odoo.exceptions.ValidationError": "functional",
+        # something broken somewhere
+        "ValueError": "severe",
+        "AttributeError": "severe",
+        "UnboundLocalError": "severe",
+    }
 
     request_url = fields.Char(readonly=True, string="Request URL")
     request_method = fields.Char(readonly=True)
@@ -21,9 +29,70 @@ class ShopfloorLog(models.Model):
     headers = fields.Text(readonly=True)
     result = fields.Text(readonly=True)
     error = fields.Text(readonly=True)
+    exception_name = fields.Char(readonly=True, string="Exception")
+    exception_message = fields.Text(readonly=True)
     state = fields.Selection(
         selection=[("success", "Success"), ("failed", "Failed")], readonly=True,
     )
+    severity = fields.Selection(
+        selection=[
+            ("functional", "Functional"),
+            ("warning", "Warning"),
+            ("severe", "Severe"),
+        ],
+        compute="_compute_severity",
+        store=True,
+        # Grant specific override services' dispatch_exception override
+        # or via UI: user can classify errors as preferred on demand
+        # (maybe using mass_edit)
+        readonly=False,
+    )
+
+    @api.depends("state", "exception_name", "error")
+    def _compute_severity(self):
+        for rec in self:
+            rec.severity = rec.severity or rec._get_severity()
+
+    def _get_severity(self):
+        if not self.exception_name:
+            return False
+        mapping = self._get_exception_severity_mapping()
+        return mapping.get(self.exception_name, "warning")
+
+    def _get_exception_severity_mapping_param(self):
+        param = (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("shopfloor.log.severity.exception.mapping")
+        )
+        return param.strip() if param else ""
+
+    @tools.ormcache("self._get_exception_severity_mapping_param()")
+    def _get_exception_severity_mapping(self):
+        mapping = self.EXCEPTION_SEVERITY_MAPPING.copy()
+        param = self._get_exception_severity_mapping_param()
+        if not param:
+            return mapping
+        # param should be in the form
+        # `[module.dotted.path.]ExceptionName:severity,ExceptionName:severity`
+        for rule in param.split(","):
+            if not rule.strip():
+                continue
+            exc_name = severity = None
+            try:
+                exc_name, severity = [x.strip() for x in rule.split(":")]
+                if not exc_name or not severity:
+                    raise ValueError
+            except ValueError:
+                _logger.exception(
+                    "Could not convert System Parameter"
+                    " 'shopfloor.log.severity.exception.mapping' to mapping."
+                    " The following rule will be ignored: %s",
+                    rule,
+                )
+            if exc_name and severity:
+                mapping[exc_name] = severity
+        return mapping
 
     def _logs_retention_days(self):
         retention = self.DEFAULT_RETENTION
