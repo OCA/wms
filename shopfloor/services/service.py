@@ -1,6 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020 Akretion (http://www.akretion.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+import json
 import traceback
 
 from werkzeug.urls import url_encode, url_join
@@ -152,9 +153,9 @@ class BaseShopfloorService(AbstractComponent):
         return {
             "request_url": httprequest.url,
             "request_method": httprequest.method,
-            "params": params,
-            "headers": headers,
-            "result": result,
+            "params": json.dumps(params),
+            "headers": json.dumps(headers),
+            "result": json.dumps(result),
             "error": error,
             "exception_name": exception_name,
             "exception_message": exception_message,
