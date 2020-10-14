@@ -87,11 +87,34 @@
                 <field name="request_method" />
                 <field name="params" />
                 <field name="headers" />
+                <field name="exception_name" />
+                <field name="severity" />
                 <filter
                     string="Today"
                     name="today"
                     date="create_date"
                     help="Logs generated today"
+                />
+                <separator />
+                <filter
+                    string="Failed"
+                    name="filter_status_failed"
+                    domain="[('state', '=', 'failed')]"
+                />
+                <filter
+                    string="Severe errors"
+                    name="filter_severity_severe"
+                    domain="[('severity', '=', 'severe')]"
+                />
+                <filter
+                    string="Warning errors"
+                    name="filter_severity_warning"
+                    domain="[('severity', '=', 'warning')]"
+                />
+                <filter
+                    string="Functional errors"
+                    name="filter_severity_functional"
+                    domain="[('severity', '=', 'functional')]"
                 />
                 <group expand="0" string="Group By">
                     <filter
@@ -111,6 +134,24 @@
                         name="status"
                         domain="[]"
                         context="{'group_by': 'state'}"
+                    />
+                    <filter
+                        string="Exception"
+                        name="exception_name"
+                        domain="[]"
+                        context="{'group_by': 'exception_name'}"
+                    />
+                    <filter
+                        string="Exception message"
+                        name="exception_message"
+                        domain="[]"
+                        context="{'group_by': 'exception_message'}"
+                    />
+                    <filter
+                        string="Severity"
+                        name="severity"
+                        domain="[]"
+                        context="{'group_by': 'severity'}"
                     />
                     <filter
                         string="Date"
