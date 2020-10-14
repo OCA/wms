@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 # from urllib.parse import urlparse
 # import mock
+import json
 
 from odoo import exceptions
 
@@ -100,12 +101,12 @@ class DBLoggingCase(DBLoggingCaseBase):
         expected = {
             "request_url": httprequest["url"],
             "request_method": httprequest["method"],
-            "params": str(dict(params, _id=_id)),
-            "headers": str(
+            "params": json.dumps(dict(params, _id=_id)),
+            "headers": json.dumps(
                 {"Cookie": "<redacted>", "Api-Key": "<redacted>", "KEEP-ME": "FOO"}
             ),
             "state": "success",
-            "result": str({"data": "worked!"}),
+            "result": json.dumps({"data": "worked!"}),
             "error": False,
             "exception_name": False,
             "severity": False,
@@ -123,7 +124,7 @@ class DBLoggingCase(DBLoggingCaseBase):
             )
         expected = {
             "state": "failed",
-            "result": str({}),
+            "result": "{}",
             "error": False,
             "exception_name": False,
             "severity": False,
@@ -147,7 +148,7 @@ class DBLoggingCase(DBLoggingCaseBase):
             )
         expected = {
             "state": "failed",
-            "result": str({}),
+            "result": "{}",
             "error": fake_tb,
             "exception_name": "ValueError",
             "exception_message": "Ops, something went wrong",
@@ -175,7 +176,7 @@ class DBLoggingCase(DBLoggingCaseBase):
             )
         expected = {
             "state": "failed",
-            "result": str({}),
+            "result": "{}",
             "error": fake_tb,
             "exception_name": "odoo.exceptions.UserError",
             "exception_message": "You are doing something wrong Dave!",
