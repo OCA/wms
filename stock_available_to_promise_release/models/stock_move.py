@@ -155,7 +155,7 @@ class StockMove(models.Model):
         for move in self:
             if not move.need_release:
                 continue
-            if move.state not in ("confirmed", "waiting"):
+            if move.state not in ("confirmed", "waiting", "done", "cancel"):
                 continue
             # do not use the computed field, because it will keep
             # a value in cache that we cannot invalidate declaratively
@@ -193,6 +193,8 @@ class StockMove(models.Model):
         released_pickings = pulled_moves.picking_id
         unreleased_moves = released_pickings.move_lines - pulled_moves
         for unreleased_move in unreleased_moves:
+            if unreleased_move.state in ("done", "cancel"):
+                continue
             # no split will occur as we keep the same qty, but the move
             # will be assigned to a new stock.picking
             original_picking = unreleased_move.picking_id
