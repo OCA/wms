@@ -153,9 +153,9 @@ class BaseShopfloorService(AbstractComponent):
         return {
             "request_url": httprequest.url,
             "request_method": httprequest.method,
-            "params": json.dumps(params),
-            "headers": json.dumps(headers),
-            "result": json.dumps(result),
+            "params": json.dumps(params, indent=4, sort_keys=True),
+            "headers": json.dumps(headers, indent=4, sort_keys=True),
+            "result": json.dumps(result, indent=4, sort_keys=True),
             "error": error,
             "exception_name": exception_name,
             "exception_message": exception_message,
