@@ -4,9 +4,12 @@
 
 # WMS - Warehouse Management System
 
-Warehouse Management System for advanced logistics processes with Odoo. You can find the presentation made during Odoo XP 2020 [here](https://docs.google.com/presentation/d/1mYOCAaaVWZtCUDbslwIZyOT9_hHezbWkJVXxu0k01fw/edit) 
+Warehouse Management System for advanced logistics processes with Odoo. Work in progress, tracked in this issue https://github.com/OCA/wms/issues/29
 
-Work in progress, tracked in this issue https://github.com/OCA/wms/issues/29
+## References
+
+ - The WMS presentation made during Odoo XP 2020 [here](https://docs.google.com/presentation/d/1mYOCAaaVWZtCUDbslwIZyOT9_hHezbWkJVXxu0k01fw/edit) or watch the video [here](https://www.youtube.com/watch?v=Jy4JHBlN7HY)
+ - The Barcode App presentation  made during the OCA days 2020 [here](https://docs.google.com/presentation/d/1nTX_fR9V73y1Qquotf3iiom5kvTNZLfj-3DfgirR29I/edit?pli=1#slide=id.p1)
 
 ![General module architecture](https://user-images.githubusercontent.com/151794/65694568-5c406e80-e076-11e9-8d1c-37716c0ef4b3.png)
 
