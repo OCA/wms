@@ -79,6 +79,7 @@
                     </div>
                 </div>
                 <field name="current_step" invisible="1" />
+                <field name="current_step_focus_field" invisible="1" />
                 <field name="picking_location_dest_id" invisible="1" />
                 <field name="current_move_id" invisible="1" />
                 <field name="current_move_product_id" invisible="1" />
@@ -115,6 +116,7 @@
                                         class="mr8"
                                         style="width: 15em;"
                                         options="{'no_open': True}"
+                                        readonly="1"
                                     />
                                 </div>
                                 <label for="current_move_line_lot_life_date" />
@@ -137,6 +139,7 @@
                                     <field
                                         name="current_move_line_uom_id"
                                         options="{'no_open': True}"
+                                        readonly="1"
                                     />
                                     <button
                                         name="action_check_quantity"

@@ -33,14 +33,17 @@ class StockReceptionScreen(models.Model):
         "set_expiry_date": {
             "label": _("Set Expiry Date"),
             "next_steps": [{"next": "set_quantity"}],
+            "focus_field": "current_move_line_lot_life_date",
         },
         "set_quantity": {
             "label": _("Set Quantity"),
             "next_steps": [{"next": "set_location"}],
+            "focus_field": "current_move_line_qty_done",
         },
         "set_location": {
             "label": _("Set Destination"),
             "next_steps": [{"next": "set_package"}],
+            "focus_field": "current_move_line_location_dest_id",
         },
         "set_package": {
             "label": _("Set Package"),
@@ -50,6 +53,7 @@ class StockReceptionScreen(models.Model):
                     "next": "select_packaging",
                 }
             ],
+            "focus_field": "current_move_line_package",
         },
         "select_packaging": {
             "label": _("Select Packaging"),
@@ -97,6 +101,9 @@ class StockReceptionScreen(models.Model):
     current_step = fields.Char(default="select_product", copy=False)
     current_step_descr = fields.Char(
         string="Operation", compute="_compute_current_step_descr"
+    )
+    current_step_focus_field = fields.Char(
+        string="Focus field", compute="_compute_current_step_descr"
     )
     current_filter_product = fields.Char(string="Filter product", copy=False)
     # current move
@@ -180,10 +187,12 @@ class StockReceptionScreen(models.Model):
     def _compute_current_step_descr(self):
         for wiz in self:
             wiz.current_step_descr = False
+            wiz.current_step_focus_field = False
             if self.current_step:
                 steps = self.get_reception_screen_steps()
                 step_descr = steps[self.current_step]["label"]
                 wiz.current_step_descr = step_descr
+                wiz.current_step_focus_field = steps[self.current_step].get("focus_field", "")
 
     @api.depends("current_move_line_id.location_dest_id")
     def _compute_current_move_line_location_dest_id(self):
