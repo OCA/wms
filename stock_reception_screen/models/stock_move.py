@@ -34,8 +34,7 @@ class StockMove(models.Model):
         for record in self:
             supplier_info = fields.first(
                 record.product_id.seller_ids.filtered(
-                    lambda r: r.product_code
-                    and r.product_id == record.product_id
+                    lambda r: r.product_code and r.product_id == record.product_id
                 )
             )
             if supplier_info:

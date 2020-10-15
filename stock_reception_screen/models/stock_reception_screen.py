@@ -121,7 +121,9 @@ class StockReceptionScreen(models.Model):
     current_move_product_packaging_ids = fields.One2many(
         related="current_move_id.product_id.packaging_ids"
     )
-    current_move_product_vendor_code = fields.Char(related="current_move_id.vendor_code")
+    current_move_product_vendor_code = fields.Char(
+        related="current_move_id.vendor_code"
+    )
     # current move line
     current_move_line_id = fields.Many2one(comodel_name="stock.move.line", copy=False)
     current_move_line_location_dest_id = fields.Many2one(
@@ -192,7 +194,9 @@ class StockReceptionScreen(models.Model):
                 steps = self.get_reception_screen_steps()
                 step_descr = steps[self.current_step]["label"]
                 wiz.current_step_descr = step_descr
-                wiz.current_step_focus_field = steps[self.current_step].get("focus_field", "")
+                wiz.current_step_focus_field = steps[self.current_step].get(
+                    "focus_field", ""
+                )
 
     @api.depends("current_move_line_id.location_dest_id")
     def _compute_current_move_line_location_dest_id(self):

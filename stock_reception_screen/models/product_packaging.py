@@ -7,4 +7,6 @@ from odoo import fields, models
 class ProductPackaging(models.Model):
     _inherit = "product.packaging"
 
-    storage_type_name = fields.Char(related="package_storage_type_id.name", string="Storage Type")
+    storage_type_name = fields.Char(
+        related="package_storage_type_id.name", string="Storage Type"
+    )

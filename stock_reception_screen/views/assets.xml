@@ -11,7 +11,10 @@
                 type="text/scss"
                 href="/stock_reception_screen/static/src/scss/screen.scss"
             />
-        <script type="text/javascript" src="/stock_reception_screen/static/src/js/autofocus.js"/>
+            <script
+                type="text/javascript"
+                src="/stock_reception_screen/static/src/js/autofocus.js"
+            />
         </xpath>
     </template>
 </odoo>
