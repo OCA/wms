@@ -18,13 +18,22 @@ class StockMove(models.Model):
             other_move_lines = self.move_line_ids & move_lines
         else:
             other_move_lines = self.move_line_ids - move_lines
-        if other_move_lines:
-            qty_to_split = sum(other_move_lines.mapped("product_uom_qty"))
+        if other_move_lines or self.state == "partially_available":
+            if intersection:
+                # TODO @sebalix: please check if we can abandon the flag.
+                # Thi behavior can be achieved by passing all move lines
+                # as done at zone_picking.py:1293
+                qty_to_split = sum(other_move_lines.mapped("product_uom_qty"))
+            else:
+                qty_to_split = self.product_uom_qty - sum(
+                    move_lines.mapped("product_uom_qty")
+                )
             backorder_move_id = self._split(qty_to_split)
             backorder_move = self.browse(backorder_move_id)
             backorder_move.move_line_ids = other_move_lines
             backorder_move._recompute_state()
             backorder_move._action_assign()
+            self._recompute_state()
             return backorder_move
         return False
 
