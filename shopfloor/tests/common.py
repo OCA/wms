@@ -379,7 +379,7 @@ class PickingBatchMixin:
                 with picking_form.move_ids_without_package.new() as move:
                     move.product_id = product
                     move.product_uom_qty = quantity
-                picking = picking_form.save()
+            picking = picking_form.save()
             batch_form.picking_ids.add(picking)
 
         batch = batch_form.save()
