@@ -36,8 +36,8 @@
                         </group>
                     </group>
                     <group string="Parameters" name="parameters">
-                        <field name="params" />
-                        <field name="headers" />
+                        <field name="params" widget="ace" />
+                        <field name="headers" widget="ace" />
                     </group>
                     <group
                         string="Result"
