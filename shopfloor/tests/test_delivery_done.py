@@ -100,5 +100,4 @@ class DeliveryDoneCase(DeliveryCommonCase):
         self.assertEqual(self.picking.move_lines, self.raw_move)
         backorder = self.picking.backorder_ids
         self.assertTrue(backorder)
-        self.assertEqual(backorder.state, "assigned")
         self.assertEqual(self.pack1_moves.picking_id, backorder)
