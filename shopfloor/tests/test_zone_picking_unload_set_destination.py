@@ -10,6 +10,25 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
 
     """
 
+    @classmethod
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
+        cls.product_g = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product G",
+                    "type": "product",
+                    "default_code": "G",
+                    "barcode": "G",
+                    "weight": 7,
+                }
+            )
+        )
+        cls.picking_g = cls._create_picking(lines=[(cls.product_g, 40)])
+        cls._update_qty_in_location(cls.zone_sublocation1, cls.product_g, 32)
+
     def test_unload_set_destination_wrong_parameters(self):
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
@@ -299,4 +318,61 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             picking_type,
             buffer_line,
             popup=completion_info_popup,
+        )
+
+    def test_unload_set_destination_partially_available_backorder(self):
+        zone_location = self.zone_location
+        picking_type = self.picking_g.picking_type_id
+        self.assertEqual(self.picking_g.move_lines[0].product_uom_qty, 40)
+        self.picking_g.action_assign()
+        move_line = self.picking_g.move_line_ids
+        self.assertEqual(move_line.product_uom_qty, 32)
+        self.assertEqual(move_line.move_id.state, "partially_available")
+        packing_sublocation = (
+            self.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Packing sublocation",
+                    "location_id": self.packing_location.id,
+                    "barcode": "PACKING_SUBLOCATION",
+                }
+            )
+        )
+        # set the destination package
+        self.service._set_destination_package(
+            zone_location,
+            picking_type,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
+        )
+        response = self.service.dispatch(
+            "unload_set_destination",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "package_id": self.free_package.id,
+                "barcode": packing_sublocation.barcode,
+                "confirmation": True,
+            },
+        )
+        # check data
+        # move line has been moved to a new picking
+        self.assertEqual(move_line.move_id.picking_id, self.picking_g.backorder_ids[0])
+        # the old picking contains a new line w/ the rest of the qty
+        # that couldn't be processed
+        self.assertEqual(self.picking_g.move_lines[0].product_uom_qty, 8)
+        self.assertEqual(self.picking_g.state, "confirmed")
+        # the line has been processed
+        self.assertEqual(move_line.location_dest_id, packing_sublocation)
+        self.assertEqual(move_line.move_id.state, "done")
+        # check response
+        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        self.assert_response_select_line(
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.service.msg_store.buffer_complete(),
         )
