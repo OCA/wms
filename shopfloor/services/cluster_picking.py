@@ -674,7 +674,7 @@ class ClusterPicking(Component):
 
     def _bin_packages_to_unload(self, batch):
         lines = self._lines_to_unload(batch)
-        packages = lines.mapped("result_package_id")
+        packages = lines.mapped("result_package_id").sorted()
         return packages
 
     def _next_bin_package_for_unload_single(self, batch):
