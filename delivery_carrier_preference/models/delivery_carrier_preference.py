@@ -5,6 +5,11 @@ from odoo.exceptions import ValidationError
 from odoo.tools import float_compare
 
 
+# TODO seems like the "partner carrier" preference will not be used.
+# If true, then we should remove this model,
+# move the fields (weight related fields and picking_domain)
+# in "delivery.carrier" (which already has a sequence) and activate
+# the "automatic carrier" by a boolean on the carrier.
 class DeliveryCarrierPreference(models.Model):
 
     _name = "delivery.carrier.preference"

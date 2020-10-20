@@ -36,6 +36,12 @@
                                 name="carrier_id"
                                 attrs="{'required': [('preference', '=', 'carrier')], 'invisible': [('preference', '=', 'partner')]}"
                             />
+                            <field
+                                name="picking_domain"
+                                widget="domain"
+                                attrs="{'invisible': [('preference', '!=',  'carrier')]}"
+                                options="{'model': 'stock.picking', 'in_dialog': true}"
+                            />
                         </group>
                         <group>
                             <field name="sequence" />
