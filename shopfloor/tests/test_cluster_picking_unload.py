@@ -101,8 +101,8 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
         move_lines = self.move_lines
         self._set_dest_package_and_done(move_lines[:2], self.bin1)
         self._set_dest_package_and_done(move_lines[2:], self.bin2)
-        move_lines[:1].write({"location_dest_id": self.packing_a_location.id})
-        move_lines[:1].write({"location_dest_id": self.packing_b_location.id})
+        move_lines[:2].write({"location_dest_id": self.packing_a_location.id})
+        move_lines[2:].write({"location_dest_id": self.packing_b_location.id})
         response = self.service.dispatch(
             "prepare_unload", params={"picking_batch_id": self.batch.id}
         )
