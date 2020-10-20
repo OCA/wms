@@ -158,14 +158,22 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
 
     def test_set_destination_all_remaining_lines(self):
         """Set destination on all lines for a part of the batch"""
-        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        one_line_picking = self.batch.picking_ids.filtered(
+            lambda picking: len(picking.move_lines) == 1
+        )
+        two_lines_picking = self.batch.picking_ids.filtered(
+            lambda picking: len(picking.move_lines) == 2
+        )
+        move_lines = one_line_picking.move_line_ids + two_lines_picking.move_line_ids
         # Put destination packages, the whole quantity on lines and a similar
         # destination (when /set_destination_all is called, all the lines to
         # unload must have the same destination).
         # However, we keep a line without qty_done and destination package,
         # so when the dest location is set, the endpoint should route back
         # to the 'start_line' state to work on the remaining line.
-        lines_to_unload = move_lines[:2]
+        lines_to_unload = (
+            one_line_picking.move_line_ids + two_lines_picking.move_line_ids[0]
+        )
         self._set_dest_package_and_done(lines_to_unload, self.bin1)
         lines_to_unload.write({"location_dest_id": self.packing_location.id})
 
@@ -179,8 +187,6 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         # Since the whole batch is not complete, state should not be done.
         # The picking with one line should be "done" because we unloaded its line.
         # The second one still has a line to pick.
-        one_line_picking = self.batch.picking_ids[0]
-        two_lines_picking = self.batch.picking_ids[1]
         self.assertRecordValues(one_line_picking, [{"state": "done"}])
         self.assertRecordValues(two_lines_picking, [{"state": "assigned"}])
         self.assertRecordValues(
@@ -468,8 +474,12 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         cls._set_dest_package_and_done(cls.bin2_lines, cls.bin2)
         cls.bin1_lines.write({"location_dest_id": cls.packing_a_location.id})
         cls.bin2_lines.write({"location_dest_id": cls.packing_b_location.id})
-        cls.one_line_picking = cls.batch.picking_ids[0]
-        cls.two_lines_picking = cls.batch.picking_ids[1]
+        cls.one_line_picking = cls.batch.picking_ids.filtered(
+            lambda picking: len(picking.move_lines) == 1
+        )
+        cls.two_lines_picking = cls.batch.picking_ids.filtered(
+            lambda picking: len(picking.move_lines) == 2
+        )
 
     def test_unload_scan_destination_ok(self):
         """Endpoint /unload_scan_destination is called, result ok"""
