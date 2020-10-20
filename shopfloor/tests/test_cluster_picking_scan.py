@@ -593,7 +593,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             },
         )
 
-        next_line = self.batch.picking_ids.move_line_ids[1]
+        next_line = self.two_lines_picking.move_line_ids[0]
         # continue to the next one, no zero check
         self.assert_response(
             response,
