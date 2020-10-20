@@ -23,6 +23,24 @@ class ClusterPickingUnloadingCommonCase(ClusterPickingCommonCase):
             ]
         )
         cls._simulate_batch_selected(cls.batch)
+
+        cls.one_line_picking = cls.batch.picking_ids.filtered(
+            lambda picking: len(picking.move_lines) == 1
+        )
+        cls.two_lines_picking = cls.batch.picking_ids.filtered(
+            lambda picking: len(picking.move_lines) == 2
+        )
+        two_lines_product_a = cls.two_lines_picking.move_line_ids.filtered(
+            lambda line: line.product_id == cls.product_a
+        )
+        two_lines_product_b = cls.two_lines_picking.move_line_ids - two_lines_product_a
+        # force order of move lines to use in tests
+        cls.move_lines = (
+            cls.one_line_picking.move_line_ids
+            + two_lines_product_a
+            + two_lines_product_b
+        )
+
         cls.bin1 = cls.env["stock.quant.package"].create({})
         cls.bin2 = cls.env["stock.quant.package"].create({})
         cls.packing_a_location = (
@@ -65,7 +83,7 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
 
     def test_prepare_unload_all_same_dest(self):
         """All move lines have the same destination location"""
-        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        move_lines = self.move_lines
         self._set_dest_package_and_done(move_lines[:2], self.bin1)
         self._set_dest_package_and_done(move_lines[2:], self.bin2)
         move_lines.write({"location_dest_id": self.packing_location.id})
@@ -80,7 +98,7 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
 
     def test_prepare_unload_different_dest(self):
         """All move lines have different destination locations"""
-        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        move_lines = self.move_lines
         self._set_dest_package_and_done(move_lines[:2], self.bin1)
         self._set_dest_package_and_done(move_lines[2:], self.bin2)
         move_lines[:1].write({"location_dest_id": self.packing_a_location.id})
@@ -106,7 +124,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
 
     def test_set_destination_all_ok(self):
         """Set destination on all lines for the full batch and end the process"""
-        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        move_lines = self.move_lines
         # put destination packages, the whole quantity on lines and a similar
         # destination (when /set_destination_all is called, all the lines to
         # unload must have the same destination)
@@ -158,22 +176,13 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
 
     def test_set_destination_all_remaining_lines(self):
         """Set destination on all lines for a part of the batch"""
-        one_line_picking = self.batch.picking_ids.filtered(
-            lambda picking: len(picking.move_lines) == 1
-        )
-        two_lines_picking = self.batch.picking_ids.filtered(
-            lambda picking: len(picking.move_lines) == 2
-        )
-        move_lines = one_line_picking.move_line_ids + two_lines_picking.move_line_ids
         # Put destination packages, the whole quantity on lines and a similar
         # destination (when /set_destination_all is called, all the lines to
         # unload must have the same destination).
         # However, we keep a line without qty_done and destination package,
         # so when the dest location is set, the endpoint should route back
         # to the 'start_line' state to work on the remaining line.
-        lines_to_unload = (
-            one_line_picking.move_line_ids + two_lines_picking.move_line_ids[0]
-        )
+        lines_to_unload = self.move_lines[:2]
         self._set_dest_package_and_done(lines_to_unload, self.bin1)
         lines_to_unload.write({"location_dest_id": self.packing_location.id})
 
@@ -187,16 +196,16 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         # Since the whole batch is not complete, state should not be done.
         # The picking with one line should be "done" because we unloaded its line.
         # The second one still has a line to pick.
-        self.assertRecordValues(one_line_picking, [{"state": "done"}])
-        self.assertRecordValues(two_lines_picking, [{"state": "assigned"}])
+        self.assertRecordValues(self.one_line_picking, [{"state": "done"}])
+        self.assertRecordValues(self.two_lines_picking, [{"state": "assigned"}])
         self.assertRecordValues(
-            move_lines,
+            self.move_lines,
             [
                 {
                     "shopfloor_unloaded": True,
                     "qty_done": 10,
                     "state": "done",
-                    "picking_id": one_line_picking.id,
+                    "picking_id": self.one_line_picking.id,
                     "location_dest_id": self.packing_location.id,
                 },
                 {
@@ -204,14 +213,14 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
                     "qty_done": 10,
                     # will be done when the second line of the picking is unloaded
                     "state": "assigned",
-                    "picking_id": two_lines_picking.id,
+                    "picking_id": self.two_lines_picking.id,
                     "location_dest_id": self.packing_location.id,
                 },
                 {
                     "shopfloor_unloaded": False,
                     "qty_done": 0,
                     "state": "assigned",
-                    "picking_id": two_lines_picking.id,
+                    "picking_id": self.two_lines_picking.id,
                     "location_dest_id": self.packing_location.id,
                 },
             ],
@@ -222,13 +231,13 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             # the remaining move line still needs to be picked
             response,
             next_state="start_line",
-            data=self._line_data(move_lines[2]),
+            data=self._line_data(self.move_lines[2]),
             message={"body": "Batch Transfer line done", "message_type": "success"},
         )
 
     def test_set_destination_all_but_different_dest(self):
         """Endpoint was called but destinations are different"""
-        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        move_lines = self.move_lines
         self._set_dest_package_and_done(move_lines, self.bin1)
         move_lines[:2].write({"location_dest_id": self.packing_a_location.id})
         move_lines[2:].write({"location_dest_id": self.packing_b_location.id})
@@ -248,7 +257,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
 
     def test_set_destination_all_error_location_not_found(self):
         """Endpoint called with a barcode not existing for a location"""
-        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        move_lines = self.move_lines
         self._set_dest_package_and_done(move_lines, self.bin1)
         move_lines.write({"location_dest_id": self.packing_a_location.id})
 
@@ -274,7 +283,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         It is invalid when the location is not the destination location or
         sublocation of the picking type.
         """
-        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        move_lines = self.move_lines
         self._set_dest_package_and_done(move_lines, self.bin1)
         move_lines.write({"location_dest_id": self.packing_a_location.id})
 
@@ -300,7 +309,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         It is invalid when the location is not the destination location or
         sublocation of move line's move
         """
-        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        move_lines = self.move_lines
         self._set_dest_package_and_done(move_lines, self.bin1)
         move_lines.write({"location_dest_id": self.packing_a_location.id})
         move_lines[0].move_id.location_dest_id = self.packing_a_location
@@ -323,7 +332,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
 
     def test_set_destination_all_need_confirmation(self):
         """Endpoint called with a barcode for another (valid) location"""
-        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        move_lines = self.move_lines
         self._set_dest_package_and_done(move_lines, self.bin1)
         move_lines.write({"location_dest_id": self.packing_a_location.id})
 
@@ -342,7 +351,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
 
     def test_set_destination_all_with_confirmation(self):
         """Endpoint called with a barcode for another (valid) location, confirm"""
-        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        move_lines = self.move_lines
         self._set_dest_package_and_done(move_lines, self.bin1)
         move_lines.write({"location_dest_id": self.packing_a_location.id})
 
@@ -380,7 +389,7 @@ class ClusterPickingUnloadSplitCase(ClusterPickingUnloadingCommonCase):
 
     def test_unload_split_ok(self):
         """Call /unload_split and continue to unload single"""
-        move_lines = self.batch.mapped("picking_ids.move_line_ids")
+        move_lines = self.move_lines
         # put destination packages, the whole quantity on lines and a similar
         # destination (when /set_destination_all is called, all the lines to
         # unload must have the same destination)
@@ -413,7 +422,6 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
-        cls.move_lines = cls.batch.mapped("picking_ids.move_line_ids")
         cls._set_dest_package_and_done(cls.move_lines, cls.bin1)
         cls.move_lines[:2].write({"location_dest_id": cls.packing_a_location.id})
         cls.move_lines[2:].write({"location_dest_id": cls.packing_b_location.id})
@@ -467,7 +475,6 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
-        cls.move_lines = cls.batch.mapped("picking_ids.move_line_ids")
         cls.bin1_lines = cls.move_lines[:1]
         cls.bin2_lines = cls.move_lines[1:]
         cls._set_dest_package_and_done(cls.bin1_lines, cls.bin1)
