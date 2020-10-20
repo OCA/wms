@@ -296,8 +296,12 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 [cls.BatchProduct(product=cls.product_a, quantity=10)],
             ]
         )
-        cls.one_line_picking = cls.batch.picking_ids[0]
-        cls.two_lines_picking = cls.batch.picking_ids[1]
+        cls.one_line_picking = cls.batch.picking_ids.filtered(
+            lambda picking: len(picking.move_lines) == 1
+        )
+        cls.two_lines_picking = cls.batch.picking_ids.filtered(
+            lambda picking: len(picking.move_lines) == 2
+        )
 
         cls.bin1 = cls.env["stock.quant.package"].create({})
         cls.bin2 = cls.env["stock.quant.package"].create({})
