@@ -234,7 +234,7 @@ class LocationContentTransfer(Component):
             lambda line: line.picking_id.picking_type_id not in self.picking_types
         )
         if not lines_other_picking_types:
-            return move_lines
+            return (move_lines, None, None)
         unreserved_moves = move_lines.move_id
         location_move_lines = self.env["stock.move.line"].search(
             self._find_location_all_move_lines_domain(location)
