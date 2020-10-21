@@ -233,6 +233,20 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
             ],
         )
 
+    def test_scan_location_wrong_picking_type_allow_unreserve_empty(self):
+        """Content has different picking type than menu, option to unreserve
+
+        There is no move line of another picking type to unreserve.
+        """
+        self.menu.sudo().allow_unreserve_other_moves = True
+        response = self.service.dispatch(
+            "scan_location", params={"barcode": self.content_loc.barcode}
+        )
+        self.assert_response_start(
+            response,
+            message=self.service.msg_store.no_pack_in_location(self.content_loc),
+        )
+
     def test_scan_location_wrong_picking_type_allow_unreserve_error(self):
         """Content has different picking type than menu, option to unreserve
 
