@@ -9,6 +9,12 @@ class TestAbcLocation(SavepointCase):
         super().setUpClass()
         cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
         ref = cls.env.ref
+        cls.cardboxes_location_storage_type = ref(
+            "stock_storage_type.location_storage_type_cardboxes"
+        )
+        cls.pallets_location_storage_type = ref(
+            "stock_storage_type.location_storage_type_pallets"
+        )
         cls.stock_location = ref("stock.stock_location_stock")
         cls.cardboxes_location = ref("stock_storage_type.stock_location_cardboxes")
         cls.pallets_location = ref("stock_storage_type.stock_location_pallets")
@@ -72,24 +78,149 @@ class TestAbcLocation(SavepointCase):
         self.product.write({"abc_storage": "a"})
         ordered_locations = self.cardboxes_location.get_storage_locations(self.product)
         self.assertEqual(
-            ordered_locations,
-            self.cardboxes_bin_2_location
-            | self.cardboxes_bin_1_location
-            | self.cardboxes_bin_3_location,
+            ordered_locations.ids,
+            (
+                self.cardboxes_bin_2_location
+                | self.cardboxes_bin_1_location
+                | self.cardboxes_bin_3_location
+            ).ids,
         )
         self.product.write({"abc_storage": "b"})
         ordered_locations = self.cardboxes_location.get_storage_locations(self.product)
         self.assertEqual(
-            ordered_locations,
-            self.cardboxes_bin_1_location
-            | self.cardboxes_bin_3_location
-            | self.cardboxes_bin_2_location,
+            ordered_locations.ids,
+            (
+                self.cardboxes_bin_1_location
+                | self.cardboxes_bin_3_location
+                | self.cardboxes_bin_2_location
+            ).ids,
         )
         self.product.write({"abc_storage": "c"})
         ordered_locations = self.cardboxes_location.get_storage_locations(self.product)
         self.assertEqual(
-            ordered_locations,
-            self.cardboxes_bin_3_location
-            | self.cardboxes_bin_2_location
-            | self.cardboxes_bin_1_location,
+            ordered_locations.ids,
+            (
+                self.cardboxes_bin_3_location
+                | self.cardboxes_bin_1_location
+                | self.cardboxes_bin_2_location
+            ).ids,
         )
+
+    def test_abc_ordered_with_height(self):
+        # configure stock locations to put an intermediate level between
+        # Stock/ and leaf locations (to ease the tests)
+        sublocation = self.stock_location.copy(
+            {"name": "Sub-location", "location_id": self.stock_location.id}
+        )
+        (self.cardboxes_location | self.pallets_location).location_id = sublocation
+        # configure putaway strategy for all locations
+        sublocation.write({"pack_putaway_strategy": "abc"})
+        # configure abc storage on locations
+        self.cardboxes_bin_1_location.write({"abc_storage": "b"})
+        self.cardboxes_bin_2_location.write({"abc_storage": "a"})
+        self.cardboxes_bin_3_location.write({"abc_storage": "c"})
+        self.pallets_bin_1_location.write({"abc_storage": "b"})
+        self.pallets_bin_2_location.write({"abc_storage": "a"})
+        self.pallets_bin_3_location.write({"abc_storage": "c"})
+        # Test with a product abc_storage=A
+        #   - with max height on pallets storage type higher than the cardboxes one
+        self.product.write({"abc_storage": "a"})
+        self.pallets_location_storage_type.max_height = 3
+        self.cardboxes_location_storage_type.max_height = 1
+        ordered_locations = sublocation.get_storage_locations(self.product)
+        self.assertEqual(
+            ordered_locations.ids,
+            (
+                self.cardboxes_bin_2_location
+                | self.pallets_bin_2_location
+                | self.cardboxes_bin_1_location
+                | self.pallets_bin_1_location
+                | self.cardboxes_bin_3_location
+                | self.pallets_bin_3_location
+            ).ids,
+        )
+        #   - with max height on cardboxes storage type higher than the pallets one
+        self.pallets_location_storage_type.max_height = 1
+        self.cardboxes_location_storage_type.max_height = 2
+        ordered_locations = sublocation.get_storage_locations(self.product)
+        self.assertEqual(
+            ordered_locations.ids,
+            (
+                self.pallets_bin_2_location
+                | self.cardboxes_bin_2_location
+                | self.pallets_bin_1_location
+                | self.cardboxes_bin_1_location
+                | self.pallets_bin_3_location
+                | self.cardboxes_bin_3_location
+            ).ids,
+        )
+        #   - with max height "no-limit" on pallets storage type
+        self.pallets_location_storage_type.max_height = 0
+        self.cardboxes_location_storage_type.max_height = 2
+        ordered_locations = sublocation.get_storage_locations(self.product)
+        self.assertEqual(
+            ordered_locations.ids,
+            (
+                self.cardboxes_bin_2_location
+                | self.pallets_bin_2_location
+                | self.cardboxes_bin_1_location
+                | self.pallets_bin_1_location
+                | self.cardboxes_bin_3_location
+                | self.pallets_bin_3_location
+            ).ids,
+        )
+        # Test with a product abc_storage=B
+        #   - with max height on pallets storage type higher than the cardboxes one
+        self.product.write({"abc_storage": "b"})
+        self.pallets_location_storage_type.max_height = 3
+        self.cardboxes_location_storage_type.max_height = 1
+        ordered_locations = sublocation.get_storage_locations(self.product)
+        self.assertEqual(
+            ordered_locations.ids,
+            (
+                self.cardboxes_bin_1_location
+                | self.pallets_bin_1_location
+                | self.cardboxes_bin_3_location
+                | self.pallets_bin_3_location
+                | self.cardboxes_bin_2_location
+                | self.pallets_bin_2_location
+            ).ids,
+        )
+        #   - with max height on cardboxes storage type higher than the pallets one
+        self.pallets_location_storage_type.max_height = 1
+        self.cardboxes_location_storage_type.max_height = 2
+        ordered_locations = sublocation.get_storage_locations(self.product)
+        self.assertEqual(
+            ordered_locations.ids,
+            (
+                self.pallets_bin_1_location
+                | self.cardboxes_bin_1_location
+                | self.pallets_bin_3_location
+                | self.cardboxes_bin_3_location
+                | self.pallets_bin_2_location
+                | self.cardboxes_bin_2_location
+            ).ids,
+        )
+        #   - with max height "no-limit" on pallets storage type
+        self.pallets_location_storage_type.max_height = 0
+        self.cardboxes_location_storage_type.max_height = 2
+        ordered_locations = sublocation.get_storage_locations(self.product)
+        self.assertEqual(
+            ordered_locations.ids,
+            (
+                self.cardboxes_bin_1_location
+                | self.pallets_bin_1_location
+                | self.cardboxes_bin_3_location
+                | self.pallets_bin_3_location
+                | self.cardboxes_bin_2_location
+                | self.pallets_bin_2_location
+            ).ids,
+        )
+
+    def test_get_storage_locations_not_all_keys(self):
+        """Do not crash if we have no A or B or C locations"""
+        self.stock_location.write({"pack_putaway_strategy": "abc"})
+        self.env["stock.location"].search(
+            [("abc_storage", "in", ("a", "b"))]
+        ).abc_storage = "b"
+        self.assertTrue(self.stock_location.get_storage_locations())
