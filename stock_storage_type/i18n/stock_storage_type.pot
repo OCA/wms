@@ -310,6 +310,7 @@ msgid ""
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__max_height
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__max_height
 msgid "Max height (mm)"
 msgstr ""
@@ -490,6 +491,11 @@ msgstr ""
 #: code:addons/stock_storage_type/models/stock_quant_package.py:0
 #, python-format
 msgid "The height is mandatory on package {}."
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,help:stock_storage_type.field_stock_location__max_height
+msgid "The max height supported among allowed location storage types."
 msgstr ""
 
 #. module: stock_storage_type
