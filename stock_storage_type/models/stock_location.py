@@ -312,6 +312,30 @@ class StockLocation(models.Model):
         )
         return pertinent_loc_storagetype_domain
 
+    def _allowed_locations_for_location_storage_types(
+        self, location_storage_types, quants, products
+    ):
+        valid_location_ids = set()
+        for loc_storage_type in location_storage_types:
+            location_domain = loc_storage_type._domain_location_storage_type(
+                self, quants, products
+            )
+            _logger.debug("pertinent location domain: %s", location_domain)
+            locations = self.search(location_domain)
+            valid_location_ids |= set(locations.ids)
+        return self.browse(valid_location_ids)
+
+    def _select_final_valid_putaway_locations(self, limit=None):
+        """Return the valid locations using the provided limit
+
+        ``self`` contains locations already ordered and contains
+        only valid locations.
+        This method can be used as a hook to add or remove valid
+        locations based on other properties. Pay attention to
+        keep the order.
+        """
+        return self[:limit]
+
     def select_allowed_locations(
         self, package_storage_type, quants, products, limit=None
     ):
@@ -350,19 +374,17 @@ class StockLocation(models.Model):
 
         # now loop over the pertinent location storage types (there should be
         # few of them) and check for properties to find suitable locations
-        valid_location_ids = set()
-        for loc_storage_type in pertinent_loc_storage_types:
-            location_domain = loc_storage_type._domain_location_storage_type(
-                compatible_locations, quants, products
-            )
-            _logger.debug("pertinent location domain: %s", location_domain)
-            locations = self.search(location_domain)
-            valid_location_ids |= set(locations.ids)
+        valid_locations = compatible_locations._allowed_locations_for_location_storage_types(  # noqa
+            pertinent_loc_storage_types, quants, products
+        )
 
         # NOTE: self.ids is ordered as expected, so we want to filter the valid
         # locations while preserving the initial order
-        valid_location_ids = [id_ for id_ in self.ids if id_ in valid_location_ids]
-        valid_locations = self.browse(valid_location_ids)[:limit]
+        valid_location_ids = [id_ for id_ in self.ids if id_ in valid_locations.ids]
+        valid_locations = self.browse(valid_location_ids)
+        valid_locations = valid_locations._select_final_valid_putaway_locations(
+            limit=limit
+        )
 
         _logger.debug(
             "select allowed location for package storage"
