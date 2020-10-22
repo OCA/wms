@@ -11,12 +11,30 @@ const template_mobile = `
             v-on:found="on_scan"
             :input_placeholder="search_input_placeholder"
             />
+
+        <div v-if="state_is('scan_location')">
+            <manual-select
+                v-on:select="state.on_select"
+                :records="state.data.zones"
+                :list_item_fields="manual_select_zone_fields()"
+                :options="{showActions: false}"
+                :key="make_state_component_key(['manual-select'])"
+                />
+            <div class="button-list button-vertical-list full">
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <btn-back />
+                    </v-col>
+                </v-row>
+            </div>
+        </div>
         <div v-if="state_is('select_picking_type')">
             <manual-select
                 v-on:select="state.on_select"
                 :records="state.data.picking_types"
                 :list_item_fields="manual_select_picking_type_fields()"
                 :options="{showActions: false}"
+                :key="make_state_component_key(['manual-select'])"
                 />
             <div class="button-list button-vertical-list full">
                 <v-row align="center">
@@ -223,6 +241,14 @@ const ZonePicking = {
             }
             return data.zone_location;
         },
+        manual_select_zone_fields: function() {
+            return [
+                {
+                    path: "operation_types",
+                    render_component: "select-zone-operation-type-item",
+                },
+            ];
+        },
         manual_select_picking_type_fields: function() {
             return [
                 {
@@ -418,9 +444,17 @@ const ZonePicking = {
             scan_destination_qty: 0,
             states: {
                 scan_location: {
+                    enter: () => {
+                        this.wait_call(this.odoo.call("select_zone"));
+                    },
                     display_info: {
                         title: "Start by scanning a location",
                         scan_placeholder: "Select a zone",
+                    },
+                    on_select: selected => {
+                        this.wait_call(
+                            this.odoo.call("scan_location", {barcode: selected.barcode})
+                        );
                     },
                     on_scan: scanned => {
                         this.wait_call(

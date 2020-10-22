@@ -1,6 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 import functools
+from itertools import groupby
 
 from odoo.fields import first
 from odoo.tools.float_utils import float_compare, float_is_zero
@@ -82,7 +83,14 @@ class ZonePicking(Component):
     _description = __doc__
 
     def _response_for_start(self, message=None):
-        return self._response(next_state="start", message=message)
+        zones = self.work.menu.picking_type_ids.mapped(
+            "default_location_src_id.child_ids"
+        )
+        return self._response(
+            next_state="start",
+            data={"zones": self._data_for_select_zone(zones)},
+            message=message,
+        )
 
     def _response_for_select_picking_type(
         self, zone_location, picking_types, message=None
@@ -189,30 +197,24 @@ class ZonePicking(Component):
         for datum in data["picking_types"]:
             picking_type = self.env["stock.picking.type"].browse(datum["id"])
             zone_lines = self._picking_type_zone_lines(zone_location, picking_type)
-            priority_lines = zone_lines.filtered(
-                lambda line: line.picking_id.priority in ["2", "3"]
-            )
-
-            datum.update(
-                {
-                    "lines_count": len(zone_lines),
-                    "picking_count": len(zone_lines.mapped("picking_id")),
-                    "priority_lines_count": len(priority_lines),
-                    "priority_picking_count": len(priority_lines.mapped("picking_id")),
-                }
-            )
+            datum.update(self._counters_for_zone_lines(zone_lines))
         return data
 
+    def _counters_for_zone_lines(self, zone_lines):
+        # Not using mapped/filtered to support simple lists and generators
+        priority_lines = [x for x in zone_lines if x.picking_id.priority in ("2", "3")]
+        return {
+            "lines_count": len(zone_lines),
+            "picking_count": len({x.picking_id.id for x in zone_lines}),
+            "priority_lines_count": len(priority_lines),
+            "priority_picking_count": len({x.picking_id.id for x in priority_lines}),
+        }
+
     def _picking_type_zone_lines(self, zone_location, picking_type):
-        return self.env["stock.move.line"].search(
-            [
-                ("location_id", "child_of", zone_location.id),
-                # we have auto_join on picking_id
-                ("picking_id.picking_type_id", "=", picking_type.id),
-                ("qty_done", "=", 0),
-                ("state", "in", ("assigned", "partially_available")),
-            ]
+        domain = self._find_location_move_lines_domain(
+            zone_location, picking_type=picking_type
         )
+        return self.env["stock.move.line"].search(domain)
 
     def _data_for_move_line(self, zone_location, picking_type, move_line):
         return {
@@ -246,15 +248,49 @@ class ZonePicking(Component):
             "location": self.data.location(location),
         }
 
+    def _zone_lines(self, zones):
+        return self.env["stock.move.line"].search(
+            self._find_location_move_lines_domain(zones)
+        )
+
+    def _data_for_select_zone(self, zones):
+        """Retrieve detailed info for each zone.
+
+        Zone without lines are skipped.
+        Zone with lines will have line counters by operation type.
+
+        :param zones: zone location recordset
+        :return: see _schema_for_select_zone
+        """
+        res = []
+        for zone in zones:
+            zone_data = self.data.location(zone)
+            zone_lines = self._zone_lines(zone).sorted(
+                key=lambda x: x.picking_id.picking_type_id
+            )
+            if not zone_lines:
+                continue
+            zone_data["operation_types"] = []
+
+            for picking_type, lines in groupby(
+                zone_lines, lambda line: line.picking_id.picking_type_id
+            ):
+                op_type = self.data.picking_type(picking_type)
+                op_type.update(self._counters_for_zone_lines(list(lines)))
+                zone_data["operation_types"].append(op_type)
+            res.append(zone_data)
+        return res
+
     def _find_location_move_lines_domain(
-        self, location, picking_type=None, package=None, product=None, lot=None
+        self, locations, picking_type=None, package=None, product=None, lot=None
     ):
         domain = [
-            ("location_id", "child_of", location.id),
+            ("location_id", "child_of", locations.ids),
             ("qty_done", "=", 0),
             ("state", "in", ("assigned", "partially_available")),
         ]
         if picking_type:
+            # auto_join in place for this field
             domain += [("picking_id.picking_type_id", "=", picking_type.id)]
         else:
             domain += [("picking_id.picking_type_id", "in", self.picking_types.ids)]
@@ -268,17 +304,17 @@ class ZonePicking(Component):
 
     def _find_location_move_lines(
         self,
-        location,
+        locations,
         picking_type=None,
         package=None,
         product=None,
         lot=None,
         order="priority",
     ):
-        """Find lines that potentially are to move in the location"""
+        """Find lines that potentially need work in given locations."""
         move_lines = self.env["stock.move.line"].search(
             self._find_location_move_lines_domain(
-                location, picking_type, package, product, lot
+                locations, picking_type, package, product, lot
             )
         )
         sort_keys_func, reverse = self._sort_key_move_lines(order)
@@ -328,6 +364,16 @@ class ZonePicking(Component):
             data.setdefault(move_line.result_package_id, move_line.browse())
             data[move_line.result_package_id] |= move_line
         return data
+
+    def select_zone(self):
+        """Retrieve all available zones to work with.
+
+        A zone is defined by the first level location below the source location
+        of the operation types linked to the menu.
+
+        The count of lines to process by available operations is computed per each zone.
+        """
+        return self._response_for_start()
 
     def scan_location(self, barcode):
         """Scan the zone location where the picking should occur
@@ -1322,6 +1368,9 @@ class ShopfloorZonePickingValidator(Component):
     _name = "shopfloor.zone_picking.validator"
     _usage = "zone_picking.validator"
 
+    def select_zone(self):
+        return {}
+
     def scan_location(self):
         return {"barcode": {"required": True, "type": "string"}}
 
@@ -1439,7 +1488,7 @@ class ShopfloorZonePickingValidatorResponse(Component):
         to the next state.
         """
         return {
-            "start": {},
+            "start": self._schema_for_select_zone,
             "select_picking_type": self._schema_for_select_picking_type,
             "select_line": self._schema_for_move_lines_empty_location,
             "set_line_destination": self._schema_for_move_line,
@@ -1449,6 +1498,9 @@ class ShopfloorZonePickingValidatorResponse(Component):
             "unload_single": self._schema_for_move_line,
             "unload_set_destination": self._schema_for_move_line,
         }
+
+    def select_zone(self):
+        return self._response_schema(next_states={"start"})
 
     def scan_location(self):
         return self._response_schema(next_states={"start", "select_picking_type"})
@@ -1513,16 +1565,31 @@ class ShopfloorZonePickingValidatorResponse(Component):
         )
 
     @property
+    def _schema_for_select_zone(self):
+        zone_schema = self.schemas.location()
+        picking_type_schema = self.schemas.picking_type()
+        picking_type_schema.update(self._schema_for_zone_line_counters)
+        zone_schema["operation_types"] = self.schemas._schema_list_of(
+            picking_type_schema
+        )
+        zone_schema = {
+            "zones": self.schemas._schema_list_of(zone_schema),
+        }
+        return zone_schema
+
+    @property
+    def _schema_for_zone_line_counters(self):
+        return {
+            "lines_count": {"type": "float", "required": True},
+            "picking_count": {"type": "float", "required": True},
+            "priority_lines_count": {"type": "float", "required": True},
+            "priority_picking_count": {"type": "float", "required": True},
+        }
+
+    @property
     def _schema_for_select_picking_type(self):
         picking_type = self.schemas.picking_type()
-        picking_type.update(
-            {
-                "lines_count": {"type": "float", "required": True},
-                "picking_count": {"type": "float", "required": True},
-                "priority_lines_count": {"type": "float", "required": True},
-                "priority_picking_count": {"type": "float", "required": True},
-            }
-        )
+        picking_type.update(self._schema_for_zone_line_counters)
         schema = {
             "zone_location": self.schemas._schema_dict_of(self.schemas.location()),
             "picking_types": self.schemas._schema_list_of(picking_type),

@@ -29,6 +29,8 @@ class ZonePickingCommonCase(CommonCase):
                 }
             )
         )
+        # Set default location for our picking type
+        cls.menu.picking_type_ids[0].sudo().default_location_src_id = cls.zone_location
         cls.zone_sublocation1 = (
             cls.env["stock.location"]
             .sudo()
@@ -186,8 +188,16 @@ class ZonePickingCommonCase(CommonCase):
         with self.work_on_services(menu=self.menu, profile=self.profile) as work:
             self.service = work.component(usage="zone_picking")
 
-    def assert_response_start(self, response, message=None):
-        self.assert_response(response, next_state="start", message=message)
+    def _assert_response_select_zone(self, response, zone_locations, message=None):
+        data = {"zones": self.service._data_for_select_zone(zone_locations)}
+        self.assert_response(
+            response, next_state="start", data=data, message=message,
+        )
+
+    def assert_response_start(self, response, zone_locations=None, message=None):
+        if zone_locations is None:
+            zone_locations = self.zone_location.child_ids
+        self._assert_response_select_zone(response, zone_locations, message=message)
 
     def _assert_response_select_picking_type(
         self, state, response, zone_location, picking_types, message=None
