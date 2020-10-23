@@ -15,11 +15,13 @@ msgstr ""
 
 #. module: delivery_carrier_preference
 #: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
+#: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
 #, python-format
 msgid "%s (Max weight %s %s)"
 msgstr ""
 
 #. module: delivery_carrier_preference
+#: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
 #: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
 #, python-format
 msgid "%s: %s"
@@ -143,6 +145,7 @@ msgstr ""
 
 #. module: delivery_carrier_preference
 #: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
+#: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
 #, python-format
 msgid "Max weight must have a positive or null value."
 msgstr ""
@@ -162,6 +165,7 @@ msgid ""
 msgstr ""
 
 #. module: delivery_carrier_preference
+#: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
 #: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
 #, python-format
 msgid ""
@@ -197,6 +201,7 @@ msgid "Preferred Shipping Methods"
 msgstr ""
 
 #. module: delivery_carrier_preference
+#: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
 #: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
 #, python-format
 msgid ""
