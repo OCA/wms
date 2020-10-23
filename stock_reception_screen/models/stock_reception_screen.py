@@ -147,30 +147,18 @@ class StockReceptionScreen(models.Model):
         inverse="_inverse_current_move_line_package",
         string="Package N°",
     )
-    current_move_line_product_packaging_id = fields.Many2one(
-        related="current_move_line_id.result_package_id.product_packaging_id",
-        domain="[('product_id', '=', current_move_product_id)]",
-        readonly=False,
+    # == Packaging fields ==
+    # NOTE: Mainly not related as we want to store these data on the current
+    # package when the "select_packaging" step is confirmed by the user
+    product_packaging_id = fields.Many2one(
+        "product.packaging", domain="[('product_id', '=', current_move_product_id)]",
     )
-    current_move_line_product_packaging_type_is_pallet = fields.Boolean(
-        related=(
-            "current_move_line_id.result_package_id."
-            "product_packaging_id.type_is_pallet"
-        ),
+    package_storage_type_id = fields.Many2one("stock.package.storage.type",)
+    package_storage_type_height_required = fields.Boolean(
+        related="package_storage_type_id.height_required"
     )
-    current_move_line_storage_type_id = fields.Many2one(
-        related=("current_move_line_id.result_package_id.package_storage_type_id"),
-        readonly=False,
-    )
-    current_move_line_storage_type_height_required = fields.Boolean(
-        related=(
-            "current_move_line_id.result_package_id."
-            "package_storage_type_id.height_required"
-        )
-    )
-    current_move_line_height = fields.Integer(
-        related="current_move_line_id.result_package_id.height", readonly=False
-    )
+    package_height = fields.Integer()
+    # == / Packaging fields ==
 
     @api.depends("picking_id.move_lines", "current_filter_product")
     def _compute_picking_filtered_move_lines(self):
@@ -268,12 +256,17 @@ class StockReceptionScreen(models.Model):
             vals = {"name": package}
             move_line.result_package_id = package_model.create(vals)
 
-    @api.onchange("current_move_line_storage_type_id")
+    @api.onchange("product_packaging_id")
     def onchange_product_packaging_id(self):
+        self.package_storage_type_id = self.product_packaging_id.package_storage_type_id
+        self.package_height = self.product_packaging_id.height
+
+    @api.onchange("package_storage_type_id")
+    def onchange_package_storage_type_id(self):
         # NOTE: this onchange is required as the related field
         # doesn't seem to work well on such screen
-        self.current_move_line_storage_type_height_required = (
-            self.current_move_line_storage_type_id.height_required
+        self.package_storage_type_height_required = (
+            self.package_storage_type_id.height_required
         )
 
     def get_reception_screen_steps(self):
@@ -409,23 +402,41 @@ class StockReceptionScreen(models.Model):
         self.current_move_line_package = barcode
 
     def on_barcode_scanned_select_packaging(self, barcode):
-        """Set the packaging on the move."""
+        """Auto-complete the package data."""
         packaging = self.current_move_product_packaging_ids.filtered(
             lambda o: o.barcode == barcode
         )[:1]
-        self._handle_product_packaging(packaging)
+        self._autocomplete_package_data(packaging)
 
-    def _handle_product_packaging(self, packaging):
+    def _autocomplete_package_data(self, packaging):
+        """Auto-complete the package data on the screen but doesn't
+        actually update the package itself.
+
+        The update of the package is done by `_set_package_data` method
+        when the user confirm the step.
+        """
         if packaging:
-            # Set the product packaging on the move and on the package
-            self.current_move_id.product_packaging = packaging
-            package = self.current_move_line_id.result_package_id
-            package.product_packaging_id = packaging
-            # Set the storage type on the package
-            storage_type = packaging.package_storage_type_id
-            package.package_storage_type_id = storage_type
-            # Set the height on the package
-            package.height = packaging.height
+            self.product_packaging_id = packaging
+            self.package_storage_type_id = packaging.package_storage_type_id
+            self.package_height = packaging.height
+
+    def _set_package_data(self):
+        """Set the packaging, package storage type and height on the package.
+
+        This is performed at the end to not trigger the constraint regarding
+        the height required for some package storage types.
+        """
+        package = self.current_move_line_id.result_package_id
+        # Set the height at first to not trigger the constraint related to
+        # the product packaging and storage type
+        package.height = self.package_height
+        package.product_packaging_id = self.product_packaging_id
+        package.package_storage_type_id = self.package_storage_type_id
+        # Clean up package data input (better to get them empty on the screen
+        # until they are again autocompleted depending on the selected packaging)
+        self.product_packaging_id = (
+            self.package_storage_type_id
+        ) = self.package_height = False
 
     def process_select_product(self):
         self.next_step()
@@ -560,19 +571,18 @@ class StockReceptionScreen(models.Model):
         self.next_step()
 
     def _before_set_package_to_select_packaging(self):
-        """Set the product packaging matching the qty (if there is one)
-        and the related package storage type.
-        """
+        """Auto-complete the package data matching the qty (if there is one)."""
         qty_done = self.current_move_line_qty_done
         if qty_done:
             packaging = self.current_move_product_packaging_ids.filtered(
                 lambda o: o.qty == qty_done
             )[:1]
-            self._handle_product_packaging(packaging)
+            self._autocomplete_package_data(packaging)
         return True
 
     def process_select_packaging(self):
         if self._check_package_data():
+            self._set_package_data()
             self.next_step()
 
     def _before_next_move_to_set_lot_number(self):
@@ -612,22 +622,22 @@ class StockReceptionScreen(models.Model):
         (allowing to quit the reception screen via the exit button and resume
         the step later).
         """
-        if not self.current_move_line_storage_type_id:
+        if not self.package_storage_type_id:
             msg = _("The storage type is mandatory before going further.")
             self.env.user.notify_warning(message="", title=msg)
             return False
         if (
-            self.current_move_line_product_packaging_id
-            and not self.current_move_line_product_packaging_type_is_pallet
+            self.product_packaging_id
+            and not self.product_packaging_id.type_is_pallet
             and (
                 # NOTE: we are not checking the 'volume' field as it is rounded
                 # to 0 with small dimensions and produces false positive results
                 not (
-                    self.current_move_line_product_packaging_id.lngth
-                    and self.current_move_line_product_packaging_id.width
-                    and self.current_move_line_product_packaging_id.height
+                    self.product_packaging_id.lngth
+                    and self.product_packaging_id.width
+                    and self.product_packaging_id.height
                 )
-                or not self.current_move_line_product_packaging_id.max_weight
+                or not self.product_packaging_id.max_weight
             )
         ):
             msg = _("Product packaging info are missing. Please use the CUBISCAN.")
@@ -659,6 +669,10 @@ class StockReceptionScreen(models.Model):
         self.current_step = self._step_start
         self.current_filter_product = False
         self.current_move_id = self.current_move_line_id = False
+        # Empty package input data
+        self.product_packaging_id = (
+            self.package_storage_type_id
+        ) = self.package_height = False
         return True
 
     def action_check_quantity(self):
@@ -666,21 +680,3 @@ class StockReceptionScreen(models.Model):
         to check the quantity.
         """
         return True
-
-    def write(self, vals):
-        # NOTE: hack to write at the same time several related field values
-        # on the package becauses Odoo triggers two 'write' calls on
-        # 'stock.quant.package' (one per value to write) and this pop-up
-        # the constraint on the package regarding the 'height' field
-        if vals.get("current_move_line_storage_type_id") and vals.get(
-            "current_move_line_height"
-        ):
-            storage_type_id = vals.pop("current_move_line_storage_type_id")
-            height = vals.pop("current_move_line_height")
-            for screen in self:
-                package = screen.current_move_line_id.result_package_id
-                if package:
-                    package.write(
-                        {"package_storage_type_id": storage_type_id, "height": height}
-                    )
-        return super().write(vals)

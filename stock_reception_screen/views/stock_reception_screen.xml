@@ -84,10 +84,7 @@
                 <field name="current_move_id" invisible="1" />
                 <field name="current_move_product_id" invisible="1" />
                 <field name="current_move_line_id" invisible="1" />
-                <field
-                    name="current_move_line_storage_type_height_required"
-                    invisible="1"
-                />
+                <field name="package_storage_type_height_required" invisible="1" />
                 <div class="o_screen_data">
                     <div class="o_screen_data_content" name="data">
                         <group attrs="{'invisible': [('current_move_id', '=', False)]}">
@@ -192,10 +189,10 @@
                                         attrs="{'readonly': [('current_step', '!=', 'set_package')]}"
                                     />
                                 </div>
-                                <label for="current_move_line_product_packaging_id" />
+                                <label for="product_packaging_id" />
                                 <div>
                                     <field
-                                        name="current_move_line_product_packaging_id"
+                                        name="product_packaging_id"
                                         class="mr8"
                                         style="width: 15em;"
                                         options="{'no_open': True, 'no_create': True}"
@@ -204,10 +201,10 @@
                     }"
                                     />
                                 </div>
-                                <label for="current_move_line_storage_type_id" />
+                                <label for="package_storage_type_id" />
                                 <div>
                                     <field
-                                        name="current_move_line_storage_type_id"
+                                        name="package_storage_type_id"
                                         class="mr8"
                                         style="width: 15em;"
                                         options="{'no_open': True, 'no_create': True}"
@@ -217,14 +214,14 @@
                                     />
                                 </div>
                                 <label
-                                    for="current_move_line_height"
-                                    attrs="{'invisible': [('current_move_line_storage_type_height_required', '=', False)]}"
+                                    for="package_height"
+                                    attrs="{'invisible': [('package_storage_type_height_required', '=', False)]}"
                                 />
                                 <div
-                                    attrs="{'invisible': [('current_move_line_storage_type_height_required', '=', False)]}"
+                                    attrs="{'invisible': [('package_storage_type_height_required', '=', False)]}"
                                 >
                                     <field
-                                        name="current_move_line_height"
+                                        name="package_height"
                                         class="mr8"
                                         style="width: 15em;"
                                         attrs="{
