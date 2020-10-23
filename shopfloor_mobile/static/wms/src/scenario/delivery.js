@@ -1,7 +1,5 @@
 import {ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
-import {demotools} from "../demo/demo.core.js"; // FIXME: dev only
-import {} from "../demo/demo.delivery.js"; // FIXME: dev only
 
 const Delivery = {
     mixins: [ScenarioBaseMixin],
@@ -56,15 +54,6 @@ const Delivery = {
             </div>
         </Screen>
         `,
-    // FIXME: just for dev
-    // mounted: function() {
-    //     // TEST force state and data
-    //     const state = "select_package";
-    //     const dcase = demotools.get_case(this.usage);
-    //     const data = dcase["select_package"].data[state];
-    //     this.state_set_data(data, state);
-    //     this._state_load(state);
-    // },
     methods: {
         screen_title: function() {
             if (_.isEmpty(this.current_doc()) || this.state_is(this.initial_state_key))
