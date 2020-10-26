@@ -7,7 +7,7 @@ from odoo.tests.common import Form
 from .test_single_pack_transfer_base import SinglePackTransferCommonBase
 
 
-class SinglePackTransferCase(SinglePackTransferCommonBase):
+class TestSinglePackTransfer(SinglePackTransferCommonBase):
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
