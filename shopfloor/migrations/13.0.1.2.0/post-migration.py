@@ -43,7 +43,9 @@ def _compute_logs_new_values(env):
             else:
                 new_vals[fname] = json.dumps(val, indent=4, sort_keys=True)
         if entry.error and not entry.exception_name:
-            new_vals.update(_get_exception_details(entry))
+            exception_details = _get_exception_details(entry)
+            if exception_details:
+                new_vals.update(exception_details)
         entry.write(new_vals)
 
 
