@@ -165,6 +165,7 @@ export class OdooMocked extends OdooMixin {
                 body: "Record not found.",
                 message_type: "error",
             };
+            console.log("Available index keys", Object.keys(demotools.indexed));
         }
         return Promise.resolve(result);
     }
