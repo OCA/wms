@@ -4,7 +4,7 @@
 from .test_location_content_transfer_base import LocationContentTransferCommonCase
 
 
-class LocationContentTransferStartCase(LocationContentTransferCommonCase):
+class TestLocationContentTransferStart(LocationContentTransferCommonCase):
     """Tests for start state and recover
 
     Endpoints:
