@@ -215,6 +215,11 @@
             t-attf-src="/shopfloor_mobile/assets/src/components/scenario_picking_detail/picking_summary.js?v=#{app_version}"
             type="module"
         />
+        <script
+            id="script_component_form_edit_stock_picking"
+            t-attf-src="/shopfloor_mobile/assets/src/components/forms/form_edit_stock_picking.js?v=#{app_version}"
+            type="module"
+        />
         <!-- Scenario -->
         <script
             id="script_scenario_single_pack_transfer"
@@ -249,6 +254,11 @@
         <script
             id="script_scenario_scan_anything"
             t-attf-src="/shopfloor_mobile/assets/src/scenario/scan_anything.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_scenario_form"
+            t-attf-src="/shopfloor_mobile/assets/src/scenario/form.js?v=#{app_version}"
             type="module"
         />
         <script id="script_devtools" t-if="debug">

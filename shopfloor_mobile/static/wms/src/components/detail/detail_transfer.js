@@ -57,11 +57,28 @@ Vue.component("detail-transfer", {
     },
     template: `
     <div :class="$options._componentTag">
+
         <detail-picking
             :key="record.id"
             :record="record"
             :options="picking_detail_options()"
-            />
+            >
+            <!-- TODO: this actions should come from a registry -->
+            <template v-slot:actions>
+                <speed-dial :fab_btn_attrs="{small: true}" :options="{fab_btn_icon: 'mdi-pencil'}">
+                    <v-btn
+                        fab
+                        dark
+                        small
+                        color="green"
+                        title="Edit carrier"
+                        @click="$router.push({'name': 'edit_form', params: {form_name: 'form_edit_stock_picking', record_id: record.id}})"
+                    >
+                        <v-icon>mdi-truck-outline</v-icon>
+                    </v-btn>
+                </speed-dial>
+            </template>
+        </detail-picking>
 
         <div class="lines" v-if="(record.move_lines || []).length">
             <div v-for="group in grouped_lines()">
