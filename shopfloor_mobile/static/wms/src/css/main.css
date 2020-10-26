@@ -528,3 +528,11 @@ I tested only w/ checkout/select_package for now
         display: none;
     }
 }
+
+.v-speed-dial {
+    /*
+    TODO: this should not be required as per docs
+    https://vuetifyjs.com/en/components/floating-action-buttons/#speed-dial
+    */
+    position: absolute;
+}
