@@ -37,8 +37,14 @@
             t-attf-src="/shopfloor_mobile/assets/src/lib/lodash.js?v=#{app_version}"
         />
         <script
-            id="script_vue"
+            t-if="not debug"
+            id="script_vue_min"
             t-attf-src="/shopfloor_mobile/assets/src/lib/vue.min.js?v=#{app_version}"
+        />
+        <script
+            t-if="debug"
+            id="script_vue"
+            t-attf-src="/shopfloor_mobile/assets/src/lib/vue.js?v=#{app_version}"
         />
         <script
             id="script_vue_router"
@@ -245,6 +251,9 @@
             t-attf-src="/shopfloor_mobile/assets/src/scenario/scan_anything.js?v=#{app_version}"
             type="module"
         />
+        <script id="script_devtools" t-if="debug">
+            Vue.config.devtools = true
+        </script>
         <!-- Main app script -->
         <script
             id="script_app_main"
