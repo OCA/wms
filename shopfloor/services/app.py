@@ -10,19 +10,13 @@ class ShopfloorApp(Component):
     _name = "shopfloor.app"
     _usage = "app"
     _description = __doc__
-    # TODO this is required only for `menu` and not for `user_config`
-    # Maybe we should split them.
-    _requires_header_profile = True
 
+    # TODO: maybe rename to `config` or `app_config`
+    # as this is not related to current user conf
     def user_config(self):
         profiles_comp = self.component("profile")
         profiles = profiles_comp._to_json(profiles_comp._search())
         return self._response(data={"profiles": profiles})
-
-    def menu(self):
-        menu_comp = self.component("menu")
-        menus = menu_comp._to_json(menu_comp._search())
-        return self._response(data={"menus": menus})
 
 
 class ShopfloorAppValidator(Component):
@@ -33,9 +27,6 @@ class ShopfloorAppValidator(Component):
     _usage = "app.validator"
 
     def user_config(self):
-        return {}
-
-    def menu(self):
         return {}
 
 
@@ -56,21 +47,6 @@ class ShopfloorAppValidatorResponse(Component):
                     "schema": {
                         "type": "dict",
                         "schema": profile_return_validator._record_schema,
-                    },
-                },
-            }
-        )
-
-    def menu(self):
-        menu_return_validator = self.component("menu.validator.response")
-        return self._response_schema(
-            {
-                "menus": {
-                    "type": "list",
-                    "required": True,
-                    "schema": {
-                        "type": "dict",
-                        "schema": menu_return_validator._record_schema,
                     },
                 },
             }
