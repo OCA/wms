@@ -461,3 +461,60 @@ Vue.component("select-zone-operation-type-item", {
 </div>
     `,
 });
+
+Vue.component("speed-dial", {
+    props: {
+        options: Object,
+        fab_btn_attrs: Object,
+    },
+    data: () => ({
+        fab: false,
+    }),
+    computed: {
+        opts() {
+            const opts = _.defaults({}, this.$props.options, {
+                direction: "top",
+                fling: false,
+                hover: false,
+                tabs: null,
+                top: false,
+                right: true,
+                bottom: true,
+                left: false,
+                transition: "slide-y-reverse-transition",
+                btn_color: "primary",
+                fab_btn_icon: "mdi-plus",
+            });
+            return opts;
+        },
+    },
+    template: `
+    <v-speed-dial
+        v-bind="$attrs"
+        v-model="fab"
+        :class="$options._componentTag"
+        :top="opts.top"
+        :bottom="opts.bottom"
+        :right="opts.right"
+        :left="opts.left"
+        :direction="opts.direction"
+        :open-on-hover="opts.hover"
+        :transition="opts.transition"
+        >
+      <template v-slot:activator>
+        <v-btn
+          v-model="fab"
+          :color="opts.btn_color"
+          dark
+          fab
+          v-bind="fab_btn_attrs">
+          <v-icon v-if="fab">
+            mdi-close
+          </v-icon>
+          <v-icon v-else v-text="opts.fab_btn_icon"></v-icon>
+        </v-btn>
+      </template>
+      <slot></slot>
+    </v-speed-dial>
+  `,
+});
