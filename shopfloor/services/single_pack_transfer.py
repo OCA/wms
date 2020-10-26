@@ -133,6 +133,16 @@ class SinglePackTransfer(Component):
             return self._response_for_start(
                 message=self.msg_store.no_pending_operation_for_pack(package)
             )
+        if self.work.menu.ignore_no_putaway_available and self._no_putaway_available(
+            package_level
+        ):
+            # the putaway created a move line but no putaway was possible, so revert
+            # to the initial state
+            savepoint.rollback()
+            return self._response_for_start(
+                message=self.msg_store.no_putaway_destination_available()
+            )
+
         if package_level.is_done and not confirmation:
             return self._response_for_confirm_start(
                 package_level, message=self.msg_store.already_running_ask_confirmation()
@@ -145,6 +155,13 @@ class SinglePackTransfer(Component):
         savepoint.release()
 
         return self._response_for_scan_location(package_level)
+
+    def _no_putaway_available(self, package_level):
+        move_lines = package_level.move_line_ids
+        base_locations = self.picking_types.default_location_dest_id
+        # when no putaway is found, the move line destination stays the
+        # default's of the picking type
+        return any(line.location_dest_id in base_locations for line in move_lines)
 
     def _create_package_level(self, package):
         # this method can be called only if we have one picking type
