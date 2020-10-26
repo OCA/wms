@@ -227,6 +227,12 @@ class MessageAction(Component):
             "body": _("No pending operation for package %s.") % pack.name,
         }
 
+    def no_putaway_destination_available(self):
+        return {
+            "message_type": "error",
+            "body": _("No putaway destination is available."),
+        }
+
     def unrecoverable_error(self):
         return {
             "message_type": "error",
