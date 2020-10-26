@@ -82,7 +82,11 @@ class CommonCase(SavepointCase, ComponentMixin):
     def setUpClass(cls):
         super(CommonCase, cls).setUpClass()
         cls.env = cls.env(
-            context=dict(cls.env.context, tracking_disable=cls.tracking_disable)
+            context=dict(
+                cls.env.context,
+                tracking_disable=cls.tracking_disable,
+                _service_skip_request_validation=True,
+            )
         )
 
         cls.setUpComponent()
