@@ -18,6 +18,11 @@ class ShopfloorMenu(models.Model):
         "location_content_transfer",
     )
 
+    _scenario_allowing_ignore_no_putaway_available = (
+        "single_pack_transfer",
+        "location_content_transfer",
+    )
+
     name = fields.Char(translate=True)
     sequence = fields.Integer()
     profile_ids = fields.Many2many(
@@ -47,6 +52,16 @@ class ShopfloorMenu(models.Model):
         default=False,
         help="If you tick this box, this scenario will allow operator to move"
         " goods even if a reservation is made by a different operation type.",
+    )
+    ignore_no_putaway_available_is_possible = fields.Boolean(
+        compute="_compute_ignore_no_putaway_available_is_possible"
+    )
+    ignore_no_putaway_available = fields.Boolean(
+        string="Ignore transfers when no put-away is available",
+        default=False,
+        help="If you tick this box, the transfer is reserved only "
+        "if the put-away can find a sublocation (when putaway destination "
+        "is different from the operation type's destination).",
     )
     active = fields.Boolean(default=True)
 
@@ -91,6 +106,30 @@ class ShopfloorMenu(models.Model):
     @api.onchange("unreserve_other_moves_is_possible")
     def onchange_unreserve_other_moves_is_possible(self):
         self.allow_unreserve_other_moves = self.unreserve_other_moves_is_possible
+
+    @api.depends("scenario", "picking_type_ids")
+    def _compute_ignore_no_putaway_available_is_possible(self):
+        for menu in self:
+            menu.ignore_no_putaway_available_is_possible = bool(
+                menu.scenario in self._scenario_allowing_ignore_no_putaway_available
+            )
+
+    @api.onchange("ignore_no_putaway_available_is_possible")
+    def onchange_ignore_no_putaway_available_is_possible(self):
+        self.ignore_no_putaway_available = self.ignore_no_putaway_available_is_possible
+
+    @api.constrains("scenario", "picking_type_ids", "ignore_no_putaway_available")
+    def _check_ignore_no_putaway_available(self):
+        for menu in self:
+            if (
+                menu.ignore_no_putaway_available
+                and not menu.ignore_no_putaway_available_is_possible
+            ):
+                raise exceptions.ValidationError(
+                    _("Ignoring not found putaway is not allowed for menu {}.").format(
+                        menu.name
+                    )
+                )
 
     @api.constrains("scenario", "picking_type_ids", "allow_unreserve_other_moves")
     def _check_allow_unreserve_other_moves(self):
