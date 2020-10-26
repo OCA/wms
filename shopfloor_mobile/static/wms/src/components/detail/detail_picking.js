@@ -34,6 +34,9 @@ export var PickingDetailMixin = {
           <span>{{ record.partner.name }}</span>
       </span>
     </template>
+    <template v-slot:after_details>
+        <slot name="actions"></slot>
+    </template>
   </item-detail-card>
 `,
 };
