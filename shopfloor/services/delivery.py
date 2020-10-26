@@ -164,12 +164,12 @@ class Delivery(Component):
         # State of the picking might change while we reach this point: check again!
         message = self._check_picking_status(lines.mapped("picking_id"))
         if message:
-            message = "\n".join(
+            message["body"] = "\n".join(
                 [
                     _("Package {} belongs to a picking without a valid state.").format(
                         package.name
                     ),
-                    message,
+                    message["body"],
                 ]
             )
             return self._response_for_deliver(message=message)
@@ -228,12 +228,12 @@ class Delivery(Component):
         # State of the picking might change while we reach this point: check again!
         message = self._check_picking_status(lines.mapped("picking_id"))
         if message:
-            message = "\n".join(
+            message["body"] = "\n".join(
                 [
                     _("Product {} belongs to a picking without a valid state.").format(
                         product.name
                     ),
-                    message,
+                    message["body"],
                 ]
             )
             return self._response_for_deliver(message=message)
@@ -277,12 +277,12 @@ class Delivery(Component):
         # State of the picking might change while we reach this point: check again!
         message = self._check_picking_status(lines.mapped("picking_id"))
         if message:
-            message = "\n".join(
+            message["body"] = "\n".join(
                 [
                     _("Lot {} belongs to a picking without a valid state.").format(
                         lot.name
                     ),
-                    message,
+                    message["body"],
                 ]
             )
             return self._response_for_deliver(message=message)
