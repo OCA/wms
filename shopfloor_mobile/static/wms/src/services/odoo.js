@@ -25,10 +25,10 @@ export class OdooMixin {
         const self = this;
         const params = {
             method: method,
-            headers: this._get_headers(),
+            headers: this._get_headers(method),
         };
-        data = _.isUndefined(data) ? {} : data;
-        if (method == "GET" && data.length) {
+        data = _.isEmpty(data) ? {} : data;
+        if (method == "GET") {
             endpoint += "?" + new URLSearchParams(data).toString();
         } else if (method == "POST") {
             params.body = JSON.stringify(data);
@@ -67,16 +67,19 @@ export class OdooMixin {
         console.log(response.status, response.statusText, response.url);
         return this._error_info(response, json);
     }
-    _get_headers() {
+    _get_headers(method) {
         // /!\ IMPORTANT /!\ Always use headers w/out underscores.
         // https://www.nginx.com/resources/wiki/start/
         // topics/tutorials/config_pitfalls/#missing-disappearing-http-headers
-        return {
-            "Content-Type": "application/json",
+        let headers = {
             "SERVICE-CTX-MENU-ID": this.process_menu_id,
             "SERVICE-CTX-PROFILE-ID": this.profile_id,
             "API-KEY": this.apikey,
         };
+        if (method == "POST") {
+            headers["Content-Type"] = "application/json";
+        }
+        return headers;
     }
     _get_url(endpoint) {
         return "/shopfloor/" + endpoint;
