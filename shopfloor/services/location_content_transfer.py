@@ -354,6 +354,16 @@ class LocationContentTransfer(Component):
             pickings = new_moves.mapped("picking_id")
             move_lines = new_moves.move_line_ids
 
+        if self.work.menu.ignore_no_putaway_available and self._no_putaway_available(
+            move_lines
+        ):
+            # the putaway created a move line but no putaway was possible, so revert
+            # to the initial state
+            savepoint.rollback()
+            return self._response_for_start(
+                message=self.msg_store.no_putaway_destination_available()
+            )
+
         if not pickings:
             return self._response_for_start(
                 message=self.msg_store.location_empty(location)
@@ -370,6 +380,12 @@ class LocationContentTransfer(Component):
         savepoint.release()
 
         return self._router_single_or_all_destination(pickings)
+
+    def _no_putaway_available(self, move_lines):
+        base_locations = self.picking_types.default_location_dest_id
+        # when no putaway is found, the move line destination stays the
+        # default's of the picking type
+        return any(line.location_dest_id in base_locations for line in move_lines)
 
     def _find_transfer_move_lines_domain(self, location):
         return [
