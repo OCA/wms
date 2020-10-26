@@ -20,15 +20,16 @@ class ShopfloorMobileAppMixin(object):
 
     def _load_app(self, demo=False, **kw):
         return http.request.render(
-            self.main_template, self._get_main_template_values(demo=demo)
+            self.main_template, self._get_main_template_values(demo=demo, **kw)
         )
 
-    def _get_main_template_values(self, demo=False):
-        return {
-            "app_version": self._get_app_version(),
-            "get_version": self._get_version,
-            "demo_mode": demo,
-        }
+    def _get_main_template_values(self, demo=False, **kw):
+        return dict(
+            app_version=self._get_app_version(),
+            get_version=self._get_version,
+            demo_mode=demo,
+            **kw
+        )
 
     def _get_version(self, module_name, module_path=None):
         """Return module version straight from manifest."""
