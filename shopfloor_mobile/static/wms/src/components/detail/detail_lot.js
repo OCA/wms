@@ -6,9 +6,18 @@
 
 import {ItemDetailMixin} from "./detail_mixin.js";
 
+// TODO: this should be probably merged or combined w/ detail-product
 Vue.component("detail-lot", {
     mixins: [ItemDetailMixin],
     methods: {
+        lot_detail_options() {
+            return {
+                main: true,
+                key_title: "name",
+                fields: this.lot_detail_fields(),
+                klass: "loud-labels",
+            };
+        },
         lot_detail_fields() {
             const self = this;
             return [
@@ -36,18 +45,34 @@ Vue.component("detail-lot", {
             ];
         },
         render_packaging(record, field) {
-            return [record["name"], record["qty"] + " " + record["qty_unit"]].join(
-                " - "
-            );
+            return [
+                record["name"],
+                "(" + record["code"] + ")",
+                "= " + record["qty"],
+            ].join(" ");
+        },
+        packaging_detail_fields() {
+            return [{path: "name", renderer: this.render_packaging}];
         },
     },
     template: `
     <div :class="$options._componentTag">
-        <item-detail-card :key="'prod-' + record.product.id" v-bind="$props" :options="{main: true, key_title: 'product.display_name'}" />
+        <item-detail-card
+            v-bind="$props"
+            :key="make_component_key(['product'])"
+            :options="{main: true, key_title: 'product.display_name'}"
+            :card_color="utils.colors.color_for('detail_main_card')"
+            />
 
         <!-- TODO: handle image here -->
 
-        <item-detail-card :key="'lot-' + record.id" v-bind="$props" :options="{key_title: 'name', fields: lot_detail_fields()}" />
+        <item-detail-card
+            v-bind="$props"
+            :key="make_component_key(['lot'])"
+            :options="lot_detail_options()"
+            :card_color="utils.colors.color_for('detail_main_card')"
+            />
+
 
         <div class="suppliers mb-4" v-if="record.product.suppliers.length">
             <separator-title>Suppliers</separator-title>
@@ -57,12 +82,14 @@ Vue.component("detail-lot", {
                 :record="supp"
                 :options="{no_title: true, fields: supplier_detail_fields()}" />
         </div>
-        // TODO packaging
-        <list class="packaging pb-2"
-            v-if="opts.full_detail && record.packaging"
-            :records="record.packaging"
-            :options="{key_title: 'display_name', list_item_fields: packaging_detail_fields()}"
-            />
+
+        <div class="packaging pb-2" v-if="opts.full_detail && record.product.packaging">
+            <separator-title>Packaging</separator-title>
+            <list
+                :records="record.product.packaging"
+                :options="{key_title: 'display_name', list_item_fields: packaging_detail_fields()}"
+                />
+        </div>
     </div>
 `,
 });

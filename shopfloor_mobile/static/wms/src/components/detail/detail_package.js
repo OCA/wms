@@ -11,15 +11,31 @@ Vue.component("detail-package", {
     methods: {
         detail_fields() {
             return [
-                {path: "location_src.name"},
-                {path: "weight"},
-                {path: "storage_type.name"},
-                {path: "package_type.name"},
+                {path: "location_src.name", label: "Location"},
+                {path: "weight", label: "Weight"},
+                {path: "packaging.name", label: "Packaging"},
+                {path: "storage_type.name", label: "Storage type"},
+                {path: "package_type.name", label: "Package type"},
             ];
+        },
+        product_list_options() {
+            return {
+                card_klass: "loud-labels",
+                key_title: "",
+                list_item_options: {
+                    fields: this.product_list_fields(),
+                    list_item_klass_maker: this.utils.misc.move_line_color_klass,
+                },
+            };
         },
         product_list_fields() {
             return [
-                {path: "product.supplier_code", label: "Vendor code", klass: "loud"},
+                {
+                    path: "product.display_name",
+                    action_val_path: "product.barcode",
+                    klass: "loud",
+                },
+                {path: "product.supplier_code", label: "Vendor code"},
                 {path: "lot.name", label: "Lot"},
                 {path: "product.qty_reserved", label: "Reserved"},
                 {path: "product.qty_available", label: "In stock"},
@@ -28,16 +44,18 @@ Vue.component("detail-package", {
     },
     template: `
         <div :class="$options._componentTag">
-            <item-detail-card v-bind="$props" :options="{main: true, fields: detail_fields()}" />
-
+            <item-detail-card
+                v-bind="$props"
+                :options="{main: true, fields: detail_fields(), klass: 'loud-labels'}"
+                :card_color="utils.colors.color_for('detail_main_card')"
+                />
 
             <div class="products mb-4" v-if="(record.move_lines || []).length">
                 <separator-title>Products</separator-title>
-                <item-detail-card
-                    v-for="line in record.move_lines"
-                    :record="line"
-                    :key="'line-' + line.id"
-                    :options="{key_title: 'product.display_name', fields: product_list_fields()}"
+                <list
+                    :records="record.move_lines"
+                    :options="product_list_options()"
+                    :key="make_component_key(['product-list'])"
                     />
             </div>
 
@@ -45,16 +63,10 @@ Vue.component("detail-package", {
                 <separator-title>Transfers</separator-title>
                 <detail-picking
                     v-for="picking in record.pickings"
-                    :key="picking.id"
                     :record="picking"
+                    :key="make_component_key(['picking', picking.id])"
                     />
             </div>
         </div>
     `,
 });
-
-// <list class="products mb-2"
-//                 v-if="record.move_lines"
-//                 :records="record.move_lines"
-//                 :options="{key_title: 'display_name', list_item_fields: product_list_fields()}"
-//                 />
