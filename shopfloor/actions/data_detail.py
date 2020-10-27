@@ -43,6 +43,7 @@ class DataDetailAction(Component):
     @property
     def _picking_detail_parser(self):
         return self._picking_parser + [
+            "picking_type_code",
             ("priority", self._select_value_to_label),
             "scheduled_date",
             ("picking_type_id:operation_type", ["id", "name"]),
