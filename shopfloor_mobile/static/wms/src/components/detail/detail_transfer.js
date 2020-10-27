@@ -15,7 +15,6 @@ Vue.component("detail-transfer", {
                 {
                     path: "scheduled_date",
                     label: "Scheduled on",
-                    klass: "loud-label",
                     renderer: function(rec, field) {
                         return self.utils.misc.render_field_date(rec, field);
                     },
@@ -32,7 +31,19 @@ Vue.component("detail-transfer", {
         picking_detail_options() {
             return _.defaults({}, this.opts, {
                 main: true,
+                klass: "loud-labels",
+                title_action_field: null,
             });
+        },
+        line_list_options() {
+            return {
+                card_klass: "loud-labels",
+                key_title: "",
+                list_item_options: {
+                    fields: this.line_list_fields(),
+                    list_item_klass_maker: this.utils.misc.move_line_color_klass,
+                },
+            };
         },
         line_list_fields() {
             return [
@@ -62,9 +73,10 @@ Vue.component("detail-transfer", {
             :key="record.id"
             :record="record"
             :options="picking_detail_options()"
+            :card_color="utils.colors.color_for('detail_main_card')"
             >
             <!-- TODO: this actions should come from a registry -->
-            <template v-slot:actions>
+            <template v-slot:actions v-if="record.picking_type_code == 'outgoing'">
                 <speed-dial :fab_btn_attrs="{small: true}" :options="{fab_btn_icon: 'mdi-pencil'}">
                     <v-btn
                         fab
@@ -88,7 +100,7 @@ Vue.component("detail-transfer", {
                 <list
                     :records="group.records"
                     :key="'group-' + group.key"
-                    :options="{key_title: '', list_item_options: {fields: line_list_fields(), list_item_klass_maker: utils.misc.move_line_color_klass}}"
+                    :options="line_list_options()"
                     />
             </div>
         </div>

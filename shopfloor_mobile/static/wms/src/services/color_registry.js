@@ -48,6 +48,10 @@ color_registry.add_theme(
          * spinner
          */
         spinner: "#491966",
+        /**
+         * details
+         */
+        detail_main_card: "info lighten-4",
     },
     "light"
 ); // TODO: we should bave a theme named "coosa" and select it

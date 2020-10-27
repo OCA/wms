@@ -6,14 +6,8 @@
 
 export var PickingDetailMixin = {
     props: {
-        // TODO: rename to `record`
         record: Object,
         options: Object,
-        // clickable: {
-        //     type: Boolean,
-        //     // TODO: this must be false when showing record screen (eg: scan anything)
-        //     default: true,
-        // },
     },
     computed: {
         opts() {

@@ -9,6 +9,16 @@ import {ItemDetailMixin} from "./detail_mixin.js";
 Vue.component("detail-location", {
     mixins: [ItemDetailMixin],
     methods: {
+        product_list_options() {
+            return {
+                key_title: "display_name",
+                card_klass: "loud-labels",
+                list_item_options: {
+                    fields: this.product_list_fields(),
+                    list_item_klass_maker: this.utils.misc.move_line_color_klass,
+                },
+            };
+        },
         product_list_fields() {
             return [
                 {
@@ -30,7 +40,10 @@ Vue.component("detail-location", {
     },
     template: `
   <div :class="$options._componentTag">
-    <item-detail-card v-bind="$props" :options="{main: true}">
+    <item-detail-card
+      v-bind="$props"
+      :options="{main: true}"
+      :card_color="utils.colors.color_for('detail_main_card')">
 
       <template v-slot:subtitle>
         {{ record.complete_name }}
@@ -43,7 +56,7 @@ Vue.component("detail-location", {
 
         <list
             :records="record.reserved_move_lines"
-            :options="{key_title: 'display_name', list_item_fields: product_list_fields()}"
+            :options="product_list_options()"
             />
 
     </div>
