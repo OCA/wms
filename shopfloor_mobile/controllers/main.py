@@ -120,7 +120,7 @@ class ShopfloorMobileAppMixin(object):
         return {
             "name": "Shopfloor WMS app",
             "short_name": "Shopfloor",
-            "start_url": "/shopfloor/app/#",
+            "start_url": "/shopfloor_mobile/app/#",
             "display": "fullscreen",
             "icons": self._get_app_icons(),
         }
