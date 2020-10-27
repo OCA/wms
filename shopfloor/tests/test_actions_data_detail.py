@@ -87,7 +87,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
         self.assert_schema(self.schema_detail.location_detail(), data)
         move_lines = self.env["stock.move.line"].search(
             [
-                ("location_id", "=", location.id),
+                ("location_id", "child_of", location.id),
                 ("product_qty", ">", 0),
                 ("state", "not in", ("done", "cancel")),
             ]
