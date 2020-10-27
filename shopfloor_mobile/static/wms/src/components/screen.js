@@ -51,6 +51,7 @@ Vue.component("Screen", {
                 "screen-" + this.info.klass,
                 this.$slots.header ? "with-header" : "",
                 this.$slots.footer ? "with-footer" : "",
+                this.utils.colors.color_for("content_bg"),
             ].join(" ");
         },
         show_profile_not_ready() {

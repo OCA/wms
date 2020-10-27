@@ -24,6 +24,7 @@ color_registry.add_theme(
         /**
          * app specific
          */
+        content_bg: "grey lighten-3",
         screen_step_done: "#8fbf44",
         screen_step_todo: "#FFE3AC",
         /**
