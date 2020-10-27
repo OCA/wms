@@ -37,7 +37,7 @@ class StockLocation(models.Model):
     def _get_reserved_move_lines(self):
         return self.env["stock.move.line"].search(
             [
-                ("location_id", "=", self.id),
+                ("location_id", "child_of", self.id),
                 ("product_uom_qty", ">", 0),
                 ("state", "not in", ("done", "cancel")),
             ]
