@@ -66,6 +66,7 @@ Vue.component("list", {
                 list_item_on_click: null,
                 list_item_options: {},
                 group_title_default: "",
+                no_divider: false,
             });
             return opts;
         },
@@ -101,9 +102,14 @@ Vue.component("list", {
             <v-card-title v-if="group.title">{{ group.title }}</v-card-title>
             <v-list v-if="has_records">
                 <div class="list-item-wrapper" v-for="(rec, index) in group.records">
+                    <v-divider
+                        v-if="!opts.no_divider && index != 0"
+                        :key="make_component_key(['divider', gindex, index, rec.id])"
+                        :inset="true" />
                     <v-list-item :key="make_component_key(['group-rec', gindex, index, rec.id])"
                                  :class="list_item_options.list_item_klass_maker ? list_item_options.list_item_klass_maker(rec) : ''"
-                                 @click="opts.list_item_on_click ? opts.list_item_on_click(rec) : undefined">
+                                 @click="opts.list_item_on_click ? opts.list_item_on_click(rec) : undefined"
+                                 inactive>
                         <v-list-item-content>
                             <component
                                 :is="opts.list_item_component"
