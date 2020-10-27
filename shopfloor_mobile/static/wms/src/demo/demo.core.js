@@ -334,6 +334,11 @@ export class DemoTools {
             }),
             note: this.randomItemFromArray([null, "demo picking note"]),
             scheduled_date: this.randomFutureDate(),
+            picking_type_code: this.randomItemFromArray([
+                "outgoing",
+                "incoming",
+                "internal",
+            ]),
         });
         if (options.full_detail) {
             _.defaults(defaults, {
