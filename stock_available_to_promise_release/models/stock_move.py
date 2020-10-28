@@ -132,7 +132,11 @@ class StockMove(models.Model):
         # and priority is higher than the current one
         domain_not_released = [
             ("need_release", "=", True),
+            "|",
+            ("priority", ">", self.priority),
+            "&",
             ("date_priority", "<", self.date_priority),
+            ("priority", "=", self.priority),
         ]
         # or it has been released already
         # and is not canceled or done
