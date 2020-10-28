@@ -18,6 +18,7 @@
             <field name="product_uom_qty" position="after">
                 <field name="ordered_available_to_promise" />
                 <field name="date_priority" />
+                <field name="priority" />
             </field>
             <field name="location_id" position="attributes">
                 <attribute name="optional">hide</attribute>
