@@ -1333,9 +1333,16 @@ class ZonePicking(Component):
             self._write_destination_on_lines(buffer_lines, location)
             # set lines to done + refresh buffer lines (should be empty)
             moves = buffer_lines.mapped("move_id")
+            # split move lines to a backorder move
+            # if quantity is not fully satisfied
+            for move in moves:
+                move.split_other_move_lines(buffer_lines & move.move_line_ids)
+
             moves.extract_and_action_done()
             buffer_lines = self._find_buffer_move_lines(zone_location, picking_type)
+
             if buffer_lines:
+                # TODO: return success message if line has been processed
                 return self._response_for_unload_single(
                     zone_location, picking_type, first(buffer_lines)
                 )
