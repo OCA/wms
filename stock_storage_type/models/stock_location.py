@@ -386,8 +386,10 @@ class StockLocation(models.Model):
 
         # NOTE: self.ids is ordered as expected, so we want to filter the valid
         # locations while preserving the initial order
-        valid_location_ids = [id_ for id_ in self.ids if id_ in valid_locations.ids]
-        valid_locations = self.browse(valid_location_ids)
+        valid_location_ids = set(valid_locations.ids)
+        valid_locations = self.browse(
+            id_ for id_ in self.ids if id_ in valid_location_ids
+        )
         valid_locations = valid_locations._select_final_valid_putaway_locations(
             limit=limit
         )
