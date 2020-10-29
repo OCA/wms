@@ -45,7 +45,11 @@ Vue.component("detail-product", {
     },
     template: `
 <div :class="$options._componentTag">
-    <item-detail-card v-bind="$props" :options="{main: true, fields: product_detail_fields(), key_title: 'display_name'}" />
+    <item-detail-card
+        v-bind="$props"
+        :options="{main: true, fields: product_detail_fields(), key_title: 'display_name'}"
+        card_color="info lighten-3"
+        />
 
     <div class="suppliers mb-4" v-if="_.result(record, 'suppliers', []).length">
         <separator-title>Suppliers</separator-title>
@@ -53,7 +57,8 @@ Vue.component("detail-product", {
             v-for="supp in record.suppliers"
             :key="'supp' + supp.id"
             :record="supp"
-            :options="{no_title: true, fields: supplier_detail_fields()}" />
+            :options="{no_title: true, fields: supplier_detail_fields()}"
+            />
     </div>
 
     <div class="packaging mb-4" v-if="opts.full_detail && record.packaging">

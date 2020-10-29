@@ -6,14 +6,8 @@
 
 export var PickingDetailMixin = {
     props: {
-        // TODO: rename to `record`
         record: Object,
         options: Object,
-        // clickable: {
-        //     type: Boolean,
-        //     // TODO: this must be false when showing record screen (eg: scan anything)
-        //     default: true,
-        // },
     },
     computed: {
         opts() {
@@ -33,6 +27,9 @@ export var PickingDetailMixin = {
       <span class="partner" v-if="record.partner">
           <span>{{ record.partner.name }}</span>
       </span>
+    </template>
+    <template v-slot:after_details>
+        <slot name="actions"></slot>
     </template>
   </item-detail-card>
 `,

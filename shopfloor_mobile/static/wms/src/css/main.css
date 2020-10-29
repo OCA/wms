@@ -216,6 +216,10 @@ ul.packaging span:first-child {
 .manual-select .v-list {
     padding: 0;
 }
+.list .v-list hr.v-divider {
+    max-width: 100%;
+    margin: 0 0.5em;
+}
 .item-counter {
     display: none;
     padding-right: 0.5rem;
@@ -527,4 +531,12 @@ I tested only w/ checkout/select_package for now
     #app header.has-main-doc .app-bar-actions {
         display: none;
     }
+}
+
+.v-speed-dial {
+    /*
+    TODO: this should not be required as per docs
+    https://vuetifyjs.com/en/components/floating-action-buttons/#speed-dial
+    */
+    position: absolute;
 }

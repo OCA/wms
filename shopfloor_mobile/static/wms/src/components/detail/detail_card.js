@@ -50,6 +50,7 @@ Vue.component("item-detail-card", {
                     </div>
                 </v-card-text>
             </slot>
+            <slot name="after_details"></slot>
         </v-card>
         <p v-if="_.isEmpty(record)">
             No detail record to display.

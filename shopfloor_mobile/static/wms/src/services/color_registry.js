@@ -24,6 +24,7 @@ color_registry.add_theme(
         /**
          * app specific
          */
+        content_bg: "grey lighten-3",
         screen_step_done: "#8fbf44",
         screen_step_todo: "#FFE3AC",
         /**
@@ -47,6 +48,10 @@ color_registry.add_theme(
          * spinner
          */
         spinner: "#491966",
+        /**
+         * details
+         */
+        detail_main_card: "info lighten-4",
     },
     "light"
 ); // TODO: we should bave a theme named "coosa" and select it

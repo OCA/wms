@@ -4,6 +4,7 @@
 import json
 import traceback
 
+from werkzeug.exceptions import BadRequest
 from werkzeug.urls import url_encode, url_join
 
 from odoo import _, exceptions, registry
@@ -56,6 +57,7 @@ class BaseShopfloorService(AbstractComponent):
     _log_calls_in_db = True
 
     def dispatch(self, method_name, _id=None, params=None):
+        self._validate_headers_update_work_context(request, method_name)
         if not self._db_logging_active():
             return super().dispatch(method_name, _id=_id, params=params)
         return self._dispatch_with_db_logging(method_name, _id=_id, params=params)
@@ -351,6 +353,65 @@ class BaseShopfloorService(AbstractComponent):
     @property
     def msg_store(self):
         return self.actions_for("message")
+
+    # TODO: maybe to be proposed to base_rest
+    # TODO: add tests
+    def _validate_headers_update_work_context(self, request, method_name):
+        """Validate request and update context per service.
+
+        Our services may require extra headers.
+        The service component is loaded after the ctx has been initialized
+        hence we need an hook were we can validate by component/service
+        if the request is compliant with what we need (eg: missing header)
+        """
+        if self.env.context.get("_service_skip_request_validation"):
+            return
+        extra_work_ctx = {}
+        headers = request.httprequest.environ
+        for rule, active in self._validation_rules:
+            if not active:
+                continue
+            header_name, coerce_func, ctx_value_handler_name = rule
+            try:
+                header_value = coerce_func(headers.get(header_name))
+            except (TypeError, ValueError) as err:
+                raise BadRequest(
+                    "{} header validation error: {}".format(header_name, str(err))
+                )
+            ctx_value_handler = getattr(self, ctx_value_handler_name)
+            dest_key, value = ctx_value_handler(header_value)
+            if not value:
+                raise BadRequest("{} header value lookup error".format(header_name))
+            extra_work_ctx[dest_key] = value
+        for k, v in extra_work_ctx.items():
+            setattr(self.work, k, v)
+
+    @property
+    def _validation_rules(self):
+        return (
+            # rule to apply, active flag
+            (self.MENU_ID_HEADER_RULE, self._requires_header_menu),
+            (self.PROFILE_ID_HEADER_RULE, self._requires_header_profile),
+        )
+
+    MENU_ID_HEADER_RULE = (
+        # header name, coerce func, ctx handler
+        "HTTP_SERVICE_CTX_MENU_ID",
+        int,
+        "_work_ctx_get_menu_id",
+    )
+    PROFILE_ID_HEADER_RULE = (
+        # header name, coerce func, ctx value handler
+        "HTTP_SERVICE_CTX_PROFILE_ID",
+        int,
+        "_work_ctx_get_profile_id",
+    )
+
+    def _work_ctx_get_menu_id(self, rec_id):
+        return "menu", self.env["shopfloor.menu"].browse(rec_id).exists()
+
+    def _work_ctx_get_profile_id(self, rec_id):
+        return "profile", self.env["shopfloor.profile"].browse(rec_id).exists()
 
 
 class BaseShopfloorProcess(AbstractComponent):

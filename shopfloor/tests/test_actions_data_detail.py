@@ -87,7 +87,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
         self.assert_schema(self.schema_detail.location_detail(), data)
         move_lines = self.env["stock.move.line"].search(
             [
-                ("location_id", "=", location.id),
+                ("location_id", "child_of", location.id),
                 ("product_qty", ">", 0),
                 ("state", "not in", ("done", "cancel")),
             ]
@@ -181,6 +181,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
             },
             "carrier": {"id": carrier.id, "name": carrier.name},
             "move_lines": self.data_detail.move_lines(picking.move_line_ids),
+            "picking_type_code": "outgoing",
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-05-13")
         self.assertDictEqual(data, expected)

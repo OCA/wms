@@ -194,7 +194,7 @@ const app = new Vue({
         _loadMenu: function() {
             const self = this;
             const odoo = self.getOdoo({
-                usage: "app",
+                usage: "user",
                 profile_id: this.profile.id,
             });
             return odoo.call("menu").then(function(result) {
