@@ -78,6 +78,15 @@ class StockLocation(models.Model):
         help="technical field: the pending incoming "
         "stock.move.lines in the location",
     )
+    out_move_line_ids = fields.One2many(
+        "stock.move.line",
+        "location_id",
+        domain=[
+            ("state", "in", ("waiting", "confirmed", "partially_available", "assigned"))
+        ],
+        help="technical field: the pending outgoing "
+        "stock.move.lines in the location",
+    )
     location_will_contain_lot_ids = fields.Many2many(
         "stock.production.lot",
         store=True,
@@ -149,12 +158,17 @@ class StockLocation(models.Model):
             ) | rec.mapped("in_move_line_ids.lot_id")
 
     @api.depends(
-        "quant_ids.quantity", "in_move_ids", "in_move_line_ids",
+        "quant_ids.quantity",
+        "out_move_line_ids.qty_done",
+        "in_move_ids",
+        "in_move_line_ids",
     )
     def _compute_location_is_empty(self):
         for rec in self:
             if (
                 sum(rec.quant_ids.mapped("quantity"))
+                - sum(rec.out_move_line_ids.mapped("qty_done"))
+                > 0
                 or rec.in_move_ids
                 or rec.in_move_line_ids
             ):
