@@ -76,7 +76,7 @@ Vue.component("detail-transfer", {
             :card_color="utils.colors.color_for('detail_main_card')"
             >
             <!-- TODO: this actions should come from a registry -->
-            <template v-slot:actions v-if="record.picking_type_code == 'outgoing'">
+            <template v-slot:actions>
                 <speed-dial :fab_btn_attrs="{small: true}" :options="{fab_btn_icon: 'mdi-pencil'}">
                     <v-btn
                         fab
