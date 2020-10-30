@@ -104,6 +104,12 @@ class TestReceptionScreen(SavepointCase):
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_location")
         self.assertTrue(self.screen.current_move_line_location_dest_id)
+        # Check package data (automatically filled normally)
+        self.screen.button_save_step()
+        self.assertEqual(self.screen.current_step, "select_packaging")
+        self.assertEqual(self.screen.product_packaging_id, self.product_packaging)
+        self.assertEqual(self.screen.package_storage_type_id, self.storage_type_pallet)
+        self.assertEqual(self.screen.package_height, self.product_packaging.height)
         # Set a package
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_package")
@@ -111,12 +117,6 @@ class TestReceptionScreen(SavepointCase):
         self.assertEqual(
             self.screen.current_move_line_id.result_package_id.name, "PID-TEST-1"
         )
-        # Check package data (automatically filled normally)
-        self.screen.button_save_step()
-        self.assertEqual(self.screen.current_step, "select_packaging")
-        self.assertEqual(self.screen.product_packaging_id, self.product_packaging)
-        self.assertEqual(self.screen.package_storage_type_id, self.storage_type_pallet)
-        self.assertEqual(self.screen.package_height, self.product_packaging.height)
         # The first 4 qties should be validated, creating a 2nd move to process
         self.assertEqual(len(self.picking.move_lines), 2)
         self.screen.button_save_step()
@@ -133,13 +133,6 @@ class TestReceptionScreen(SavepointCase):
         self.assertEqual(self.screen.current_move_line_qty_status, "eq")
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_location")
-        # Set a package
-        self.screen.button_save_step()
-        self.assertEqual(self.screen.current_step, "set_package")
-        self.screen.current_move_line_package = "PID-TEST-2"
-        self.assertEqual(
-            self.screen.current_move_line_id.result_package_id.name, "PID-TEST-2"
-        )
         # Check package data (not automatically filled as no packaging match)
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "select_packaging")
@@ -149,6 +142,13 @@ class TestReceptionScreen(SavepointCase):
         # Set mandatory package data
         self.screen.package_storage_type_id = self.storage_type_pallet
         self.screen.package_height = 20
+        # Set a package
+        self.screen.button_save_step()
+        self.assertEqual(self.screen.current_step, "set_package")
+        self.screen.current_move_line_package = "PID-TEST-2"
+        self.assertEqual(
+            self.screen.current_move_line_id.result_package_id.name, "PID-TEST-2"
+        )
         # Reception done
         self.screen.button_save_step()
 
@@ -166,15 +166,15 @@ class TestReceptionScreen(SavepointCase):
         self.assertEqual(self.screen.current_step, "set_location")
         self.assertTrue(self.screen.current_move_line_location_dest_id)
         self.screen.button_save_step()
+        self.assertEqual(self.screen.current_step, "select_packaging")
+        self.screen.package_storage_type_id = self.storage_type_pallet
+        self.screen.package_height = 20
+        self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_package")
         self.screen.current_move_line_package = "PID-TEST-2.1"
         self.assertEqual(
             self.screen.current_move_line_id.result_package_id.name, "PID-TEST-2.1"
         )
-        self.screen.button_save_step()
-        self.assertEqual(self.screen.current_step, "select_packaging")
-        self.screen.package_storage_type_id = self.storage_type_pallet
-        self.screen.package_height = 20
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "done")
         move_states = self.picking.move_lines.mapped("state")

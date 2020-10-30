@@ -42,21 +42,20 @@ class StockReceptionScreen(models.Model):
         },
         "set_location": {
             "label": _("Set Destination"),
-            "next_steps": [{"next": "set_package"}],
-            "focus_field": "current_move_line_location_dest_id",
-        },
-        "set_package": {
-            "label": _("Set Package"),
             "next_steps": [
                 {
-                    "before": "_before_set_package_to_select_packaging",
+                    "before": "_before_set_location_to_select_packaging",
                     "next": "select_packaging",
                 }
             ],
-            "focus_field": "current_move_line_package",
+            "focus_field": "current_move_line_location_dest_id",
         },
         "select_packaging": {
             "label": _("Select Packaging"),
+            "next_steps": [{"next": "set_package"}],
+        },
+        "set_package": {
+            "label": _("Set Package"),
             "next_steps": [
                 # TODO: Should add a before step
                 {
@@ -79,6 +78,7 @@ class StockReceptionScreen(models.Model):
                 },
                 {"next": "done", "after": "_after_step_done"},
             ],
+            "focus_field": "current_move_line_package",
         },
         "done": {"label": _("Done"), "next_steps": []},
     }
@@ -564,10 +564,10 @@ class StockReceptionScreen(models.Model):
             return
         self.next_step()
 
-    def process_set_package(self):
+    def process_select_packaging(self):
         self.next_step()
 
-    def _before_set_package_to_select_packaging(self):
+    def _before_set_location_to_select_packaging(self):
         """Auto-complete the package data matching the qty (if there is one)."""
         qty_done = self.current_move_line_qty_done
         if qty_done:
@@ -577,7 +577,7 @@ class StockReceptionScreen(models.Model):
             self._autocomplete_package_data(packaging)
         return True
 
-    def process_select_packaging(self):
+    def process_set_package(self):
         if self._check_package_data():
             self._set_package_data()
             self.next_step()
