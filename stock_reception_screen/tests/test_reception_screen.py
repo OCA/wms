@@ -179,7 +179,69 @@ class TestReceptionScreen(SavepointCase):
         self.assertEqual(self.screen.current_step, "done")
         move_states = self.picking.move_lines.mapped("state")
         self.assertTrue(all([state == "done" for state in move_states]))
-        return
+
+    def test_reception_screen_next_pack(self):
+        # Select the product to receive
+        self.assertEqual(self.screen.current_step, "select_product")
+        move = fields.first(self.screen.picking_filtered_move_lines)
+        move.action_select_product()
+        # Create the lot
+        self.assertEqual(self.screen.current_step, "set_lot_number")
+        self.screen.on_barcode_scanned_set_lot_number("LOT-TEST-1")
+        # Set the expiry date on the lot
+        self.assertEqual(self.screen.current_step, "set_expiry_date")
+        self.screen.current_move_line_lot_life_date = fields.Datetime.today()
+        self.screen.button_save_step()
+        self.assertEqual(self.screen.current_step, "set_quantity")
+        # Receive 4/10 qties (corresponding to the product packaging qty)
+        self.screen.current_move_line_qty_done = 4
+        self.assertEqual(self.screen.current_move_line_qty_status, "lt")
+        # Check that a destination location is defined by default
+        self.screen.button_save_step()
+        self.assertEqual(self.screen.current_step, "set_location")
+        self.assertTrue(self.screen.current_move_line_location_dest_id)
+        # Check package data (automatically filled normally)
+        self.screen.button_save_step()
+        self.assertEqual(self.screen.current_step, "select_packaging")
+        self.assertEqual(self.screen.product_packaging_id, self.product_packaging)
+        self.assertEqual(self.screen.package_storage_type_id, self.storage_type_pallet)
+        self.assertEqual(self.screen.package_height, self.product_packaging.height)
+        # Set a package
+        self.screen.button_save_step()
+        self.assertEqual(self.screen.current_step, "set_package")
+        self.screen.current_move_line_package = "PID-TEST-1"
+        self.assertEqual(
+            self.screen.current_move_line_id.result_package_id.name, "PID-TEST-1"
+        )
+        # Iterate on the same product/lot to scan the second package
+        self.screen.button_next_pack()
+        self.assertEqual(self.screen.current_move_line_qty_done, 4)
+        self.assertTrue(self.screen.current_move_line_location_dest_id)
+        self.assertEqual(self.screen.product_packaging_id, self.product_packaging)
+        self.assertEqual(self.screen.package_storage_type_id, self.storage_type_pallet)
+        self.assertEqual(self.screen.package_height, self.product_packaging.height)
+        self.assertEqual(self.screen.current_step, "set_package")
+        self.screen.current_move_line_package = "PID-TEST-2"
+        self.assertEqual(
+            self.screen.current_move_line_id.result_package_id.name, "PID-TEST-2"
+        )
+        # Third package
+        self.screen.button_next_pack()
+        self.screen.current_move_line_package = "PID-TEST-3"
+        self.assertEqual(
+            self.screen.current_move_line_id.result_package_id.name, "PID-TEST-3"
+        )
+        self.screen.button_next_pack()
+        # At this stage we receive 4*3 = 12 quantities while we were waiting for 10,
+        # it's not an issue.
+        move_lines = self.picking.move_line_ids.filtered(
+            lambda l: "PID-TEST-" in (l.result_package_id.name or "")
+        )
+        qty_received = sum(move_lines.mapped("qty_done"))
+        self.assertEqual(qty_received, 12)
+        # All the product/lot has been processed, the operator can now select
+        # another product
+        self.assertEqual(self.screen.current_step, "select_product")
 
     def test_reception_screen_check_state(self):
         self.product.tracking = "none"

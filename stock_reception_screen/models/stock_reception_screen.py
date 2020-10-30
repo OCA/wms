@@ -85,7 +85,7 @@ class StockReceptionScreen(models.Model):
 
     picking_id = fields.Many2one(
         comodel_name="stock.picking",
-        string=u"Transfer",
+        string="Transfer",
         ondelete="cascade",
         required=True,
     )
@@ -581,6 +581,8 @@ class StockReceptionScreen(models.Model):
         if self._check_package_data():
             self._set_package_data()
             self.next_step()
+            return True
+        return False
 
     def _before_next_move_to_set_lot_number(self):
         """Receive next move for same product (with lot) directely."""
@@ -656,6 +658,55 @@ class StockReceptionScreen(models.Model):
             return
         method = "process_{}".format(self.current_step)
         getattr(self, method)()
+        return True
+
+    def button_next_pack(self):
+        """Process the current package and prepare the screen to scan another
+        one for the same product/lot/packaging data.
+
+        When calling this button we are supposed to be in the `set_package` step,
+        and once triggered the button will complete the first steps with the
+        same data than the previous package, and will stop again on the
+        `set_package` step.
+        """
+        self.ensure_one()
+        if not self.current_move_id and not self.current_move_line_id:
+            return
+        assert self.current_step == "set_package", f"step = {self.current_step}"
+        # Copy relevant data for the next package
+        qty_done = self.current_move_line_qty_done
+        location_dest = self.current_move_line_location_dest_id
+        product_packaging = self.product_packaging_id
+        package_storage_type = self.package_storage_type_id
+        package_height = self.package_height
+        # Validate the current package
+        if not self.process_set_package():
+            # Package data may be missing the first time, aborting operation
+            return
+        # Stop when the current product/lot has been fully processed
+        if self.current_step in ("select_product", "select_move"):
+            return
+        # Process the first steps of the next package
+        #   - process lot if required
+        if self.current_step == "set_lot_number":
+            self.process_set_lot_number()
+            self.process_set_expiry_date()
+        #   - set the quantity
+        assert self.current_step == "set_quantity", f"step = {self.current_step}"
+        self.current_move_line_qty_done = qty_done
+        self.process_set_quantity()
+        #   - set the destination
+        self.current_move_line_location_dest_id = location_dest
+        self.process_set_location()
+        #   - set packaging data
+        assert self.current_step == "select_packaging", f"step = {self.current_step}"
+        self.product_packaging_id = product_packaging
+        self.package_storage_type_id = package_storage_type
+        if self.package_storage_type_height_required:
+            self.package_height = package_height
+        self.process_select_packaging()
+        assert self.current_step == "set_package", f"step = {self.current_step}"
+        return True
 
     def button_reset(self):
         """Reset the current step.

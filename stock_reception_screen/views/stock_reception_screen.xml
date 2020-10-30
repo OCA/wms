@@ -54,6 +54,15 @@
                             attrs="{'invisible': [('current_step', 'in', ('select_product', 'select_move', 'done'))]}"
                         />
                         <button
+                            name="button_next_pack"
+                            type="object"
+                            string="Next PACK"
+                            icon="fa-repeat"
+                            class="btn-secondary"
+                            style="background-color: #eef0f2;"
+                            attrs="{'invisible': [('current_step', '!=', 'set_package')]}"
+                        />
+                        <button
                             name="button_reset"
                             type="object"
                             string="Cancel"
