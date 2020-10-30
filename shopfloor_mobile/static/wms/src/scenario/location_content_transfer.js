@@ -78,7 +78,7 @@ const LocationContentTransfer = {
             <div class="button-list button-vertical-list full">
                 <v-row align="center" v-if="state_is('scan_destination_all')">
                     <v-col class="text-center" cols="12">
-                        <btn-action @click="state.on_split_by_line">Split by line</btn-action>
+                        <btn-action @click="state.on_split_by_line">Process by line</btn-action>
                     </v-col>
                 </v-row>
             </div>
