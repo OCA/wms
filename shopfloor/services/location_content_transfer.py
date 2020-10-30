@@ -575,6 +575,13 @@ class LocationContentTransfer(Component):
             )
 
         search = self.actions_for("search")
+
+        package = search.package_from_scan(barcode)
+        if package and move_line.package_id == package:
+            # In case we have a source package but no package level because if
+            # we have a package level, we would use "scan_package".
+            return self._response_for_scan_destination(location, move_line)
+
         product = search.product_from_scan(barcode)
         if product and product == move_line.product_id:
             if product.tracking in ("lot", "serial"):
