@@ -231,6 +231,11 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         )
         self.assert_response_scan_destination(response, move_line)
 
+    def test_scan_line_package_ok(self):
+        move_line = self.picking2.move_line_ids[0]
+        package = move_line.package_id = self.env["stock.quant.package"].create({})
+        self._test_scan_line_ok(move_line, package.name)
+
     def test_scan_line_product_ok(self):
         move_line = self.picking2.move_line_ids[0]
         # check we selected the good line
