@@ -90,8 +90,18 @@
             type="module"
         />
         <script
-            id="script_i18n_translation"
-            t-attf-src="/shopfloor_mobile/assets/src/i18n.translation.js?v=#{app_version}"
+            id="script_i18n_translation_en"
+            t-attf-src="/shopfloor_mobile/assets/src/i18n/i18n.en.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_i18n_translation_fr"
+            t-attf-src="/shopfloor_mobile/assets/src/i18n/i18n.fr.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_i18n_translation_de"
+            t-attf-src="/shopfloor_mobile/assets/src/i18n/i18n.de.js?v=#{app_version}"
             type="module"
         />
         <script
