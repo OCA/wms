@@ -6,11 +6,13 @@
 
 import {translation_registry} from "./services/translation_registry.js";
 
+const default_lang = translation_registry.get_default_lang();
+const available_langs = translation_registry.available_langs();
 const messages = translation_registry.all();
 
 export const i18n = new VueI18n({
-    locale: "en-US", // set locale
-    availableLocales: ["en-US", "fr-FR", "de-DE"],
+    locale: default_lang, // set locale
+    availableLocales: available_langs,
     messages, // set locale messages
 });
 
