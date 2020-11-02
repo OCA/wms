@@ -16,7 +16,7 @@ export var LoginPage = Vue.component("login-page", {
     computed: {
         screen_info: function() {
             return {
-                title: "Login",
+                title: this.$t("screen.login.title"),
                 klass: "login",
                 user_message: this.user_message,
                 noUserMessage: !this.error,
@@ -48,7 +48,7 @@ export var LoginPage = Vue.component("login-page", {
                 });
         },
         _handle_invalid_key() {
-            this.error = "Invalid API KEY";
+            this.error = this.$("screen.login.error.api_key_invalid");
             this.$root.apikey = "";
         },
     },
@@ -64,13 +64,13 @@ export var LoginPage = Vue.component("login-page", {
                             <v-text-field
                                 v-model="apikey"
                                 label="API Key"
-                                placeholder="YOUR_API_KEY_HERE"
+                                :placeholder="$t('screen.login.api_key_placeholder')"
                                 autofocus
                                 autocomplete="off"></v-text-field>
                             <div class="button-list button-vertical-list full">
                                 <v-row align="center">
                                     <v-col class="text-center" cols="12">
-                                        <v-btn color="success" type="submit">Login</v-btn>
+                                        <v-btn color="success" type="submit">{{ $t('screen.login.action.login') }}</v-btn>
                                     </v-col>
                                 </v-row>
                             </div>

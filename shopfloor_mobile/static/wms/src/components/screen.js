@@ -143,14 +143,14 @@ Vue.component("Screen", {
 
             <div class="profile-not-ready" v-if="show_profile_not_ready">
                 <v-alert type="warning" tile>
-                    <p>Profile not configured yet. Please select one.</p>
+                    <p>{{ $t('app.profile_not_configured') }}</p>
                 </v-alert>
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
                             <v-btn @click="$router.push({'name': 'profile'})">
                                 <v-icon>mdi-account-cog</v-icon>
-                                <span>Configure profile</span>
+                                <span>{{ $t('app.profile_configure') }}</span>
                             </v-btn>
                         </v-col>
                     </v-row>
@@ -161,7 +161,7 @@ Vue.component("Screen", {
                 <screen-loading :loading="$root.loading" />
                 <div class="main-content">
                     <slot>
-                        <span v-if="this.$root.has_profile">Loading...</span>
+                        <span v-if="this.$root.has_profile">$t('app.loading')</span>
                     </slot>
                 </div>
             </v-container>
@@ -195,10 +195,10 @@ Vue.component("nav-items", {
                     {{ item.name }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                    <small class="font-weight-light">Scenario: {{ item.scenario }}</small>
+                    <small class="font-weight-light">{{ $t('app.nav.scenario') }} {{ item.scenario }}</small>
                     <br />
                     <small class="font-weight-light">
-                        Op Types: <span v-for="pt in item.picking_types" :key="'pt-' + item.id + '-' + pt.id">{{ pt.name }}</span>
+                        {{ $t('app.nav.op_types') }} <span v-for="pt in item.picking_types" :key="'pt-' + item.id + '-' + pt.id">{{ pt.name }}</span>
                     </small>
                 </v-list-item-subtitle>
             </v-list-item-content>
@@ -212,19 +212,19 @@ Vue.component("nav-items-extra", {
             return [
                 {
                     id: "home",
-                    name: "Home",
+                    name: this.$t("screen.home.title"),
                     icon: "mdi-home",
                     route: {name: "home"},
                 },
                 {
                     id: "scan-anything",
-                    name: "Scan anything",
+                    name: this.$t("screen.scan_anything.title", {what: ""}),
                     icon: "mdi-magnify",
                     route: {name: "scan_anything"},
                 },
                 {
                     id: "settings",
-                    name: "Settings",
+                    name: this.$t("screen.settings.title"),
                     icon: "mdi-cog-outline",
                     route: {name: "settings"},
                 },
