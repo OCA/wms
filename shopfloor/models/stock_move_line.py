@@ -89,14 +89,13 @@ class StockMoveLine(models.Model):
                     "backorder_id": picking.id,
                 }
             )
-            pickings.message_post(
-                body=_(
-                    'The backorder <a href="#" '
-                    'data-oe-model="stock.picking" '
-                    'data-oe-id="%d">%s</a> has been created.'
-                )
-                % (new_picking.id, new_picking.name)
-            )
+            message = _(
+                'The backorder <a href="#" '
+                'data-oe-model="stock.picking" '
+                'data-oe-id="%d">%s</a> has been created.'
+            ) % (new_picking.id, new_picking.name)
+            for pick in pickings:
+                pick.message_post(body=message)
             new_moves.write({"picking_id": new_picking.id})
             new_moves.mapped("move_line_ids").write({"picking_id": new_picking.id})
             new_moves.move_line_ids.package_level_id.write(
