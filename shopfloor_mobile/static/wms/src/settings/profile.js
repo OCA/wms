@@ -10,7 +10,7 @@ export var Profile = Vue.component("profile", {
             current_profile_id: this.$root.has_profile ? this.$root.profile.id : null,
             profile_selected: false,
             user_notif_updated: {
-                body: "Profile updated",
+                body: this.$t("screen.settings.profile.profile_updated"),
                 message_type: "info",
             },
         };
@@ -44,7 +44,7 @@ export var Profile = Vue.component("profile", {
                 </v-row>
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-action @click="logout()">Logout</btn-action>
+                        <btn-action @click="logout()">{{ $t('screen.settings.profile.action.logout') }}</btn-action>
                     </v-col>
                 </v-row>
             </div>

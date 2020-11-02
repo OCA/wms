@@ -8,13 +8,29 @@ import {translation_registry} from "../services/translation_registry.js";
 
 const messages_en = {
     screen: {
+        login: {
+            title: "Login",
+            api_key_placeholder: "YOUR_API_KEY_HERE",
+            action: {
+                login: "Login",
+            },
+            error: {
+                api_key_invalid: "Invalid API KEY",
+            },
+        },
         home: {
-            title: "Barcode scanner",
+            title: "Home",
+            main_title: "Barcode scanner",
+            version: "Version:",
+            action: {
+                nuke_data_and_reload: "Force reload data and refresh",
+            },
         },
         scan_anything: {
             title: "Scan {what}",
         },
         settings: {
+            title: "Settings",
             home: {
                 name: "Settings",
                 title: "Settings",
@@ -26,11 +42,24 @@ const messages_en = {
             profile: {
                 name: "Profile",
                 title: "Select profile",
+                profile_updated: "Profile updated",
+                action: {
+                    logout: "Logout",
+                },
             },
             fullscreen: {
                 enter: "Go fullscreen",
                 exit: "Exit fullscreen",
             },
+        },
+    },
+    app: {
+        profile_not_configured: "Profile not configured yet. Please select one.",
+        profile_configure: "Configure profile",
+        loading: "Loading...",
+        nav: {
+            scenario: "Scenario:",
+            op_types: "Op Types:",
         },
     },
     language: {
@@ -49,6 +78,26 @@ const messages_en = {
         },
         ok: {
             title: "Ok",
+        },
+        reset: {
+            title: "Reset",
+        },
+        cancel: {
+            title: "Cancel",
+        },
+        reload_config: {
+            title: "Reload config and menu",
+        },
+    },
+    misc: {
+        btn_get_work: "Get work",
+        btn_manual_selection: "Manual selection",
+        stock_zero_check: {
+            confirm_stock_zero: "Confirm stock = 0",
+            confirm_stock_not_zero: "Confirm stock not empty",
+        },
+        actions_popup: {
+            btn_action: "Action",
         },
     },
     picking_type: {
