@@ -23,6 +23,7 @@ setuptools.setup(
         'odoo13-addon-stock_move_source_relocate_dynamic_routing',
         'odoo13-addon-stock_picking_type_shipping_policy',
         'odoo13-addon-stock_picking_type_shipping_policy_group_by',
+        'odoo13-addon-stock_reception_screen',
         'odoo13-addon-stock_storage_type',
         'odoo13-addon-stock_storage_type_putaway_abc',
     ],
