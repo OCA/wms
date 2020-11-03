@@ -28,7 +28,7 @@ export var HomePage = Vue.component("home-page", {
     },
     props: ["routes"],
     template: `
-        <Screen :screen_info="{title: $t('screen.home.title'), klass: 'home'}" :show-menu="false">
+        <Screen :screen_info="{title: $t('screen.home.main_title'), klass: 'home'}" :show-menu="false">
             <v-list v-if="$root.has_profile">
                 <nav-items :navigation="navigation"/>
             </v-list>
@@ -37,14 +37,14 @@ export var HomePage = Vue.component("home-page", {
             <div class="button-list button-vertical-list full" v-if="$root.demo_mode">
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-action action="cancel" @click="nuke_data_and_reload()">Force reload data and refresh</btn-action>
+                        <btn-action action="cancel" @click="nuke_data_and_reload()">$t('screen.home.action.nuke_data_and_reload')</btn-action>
                     </v-col>
                 </v-row>
             </div>
 
             <v-footer absolute padless>
                 <v-col class="text-center font-weight-light" cols="12">
-                    <span class="version">Version:</span> <span class="version-number" v-text="$root.app_info.app_version" />
+                    <span class="version">{{ $t('screen.home.version') }}</span> <span class="version-number" v-text="$root.app_info.app_version" />
                 </v-col>
             </v-footer>
         </Screen>

@@ -17,7 +17,7 @@ Vue.component("reset-screen-button", {
     template: `
         <div class="action reset" v-if="show_reset_button">
             <v-form class="m-t5"  v-on:reset="reset">
-                <v-btn color="warning" x-large @click="reset">Reset</v-btn>
+                <v-btn color="warning" x-large @click="reset">{{ $t('btn.reset.title') }}</v-btn>
             </v-form>
         </div>
     `,
@@ -26,7 +26,7 @@ Vue.component("reset-screen-button", {
 Vue.component("cancel-button", {
     template: `
         <div class="action reset">
-            <v-btn x-large color="error" v-on:click="$emit('cancel')">Cancel</v-btn>
+            <v-btn x-large color="error" v-on:click="$emit('cancel')">{{ $t('btn.cancel.title') }}</v-btn>
         </div>
     `,
 });
@@ -46,7 +46,7 @@ Vue.component("last-operation", {
                     <v-card-text>The next operation is ready to be processed.</v-card-text>
                 </v-card>
                 <v-form class="mt-10">
-                    <v-btn x-large color="success" @click="$emit('confirm')">OK</v-btn>
+                    <v-btn x-large color="success" @click="$emit('confirm')">{{ $t('btn.ok.title') }}</v-btn>
                 </v-form>
             </v-alert>
         </v-dialog>
@@ -58,10 +58,10 @@ Vue.component("get-work", {
     template: `
     <div class="get-work fullscreen-buttons fullscreen-buttons-50">
       <btn-action id="btn-get-work" @click="$emit('get_work')">
-          Get work
+        {{ $t('misc.btn_get_work') }}
       </btn-action>
       <btn-action id="btn-manual" color="default" @click="$emit('manual_selection')">
-          Manual selection
+        {{ $t('misc.btn_manual_selection') }}
       </btn-action>
     </div>
     `,
@@ -75,12 +75,16 @@ Vue.component("stock-zero-check", {
           <div class="button-list button-vertical-list">
             <v-row align="center">
               <v-col class="text-center" cols="12">
-                <v-btn x-large color="primary" @click="$emit('action', 'action_confirm_zero')">Confirm stock = 0</v-btn>
+                <v-btn x-large color="primary" @click="$emit('action', 'action_confirm_zero')">
+                    {{ $t('misc.stock_zero_check.confirm_stock_zero') }}
+                </v-btn>
               </v-col>
             </v-row>
             <v-row align="center">
               <v-col class="text-center" cols="12">
-                <v-btn x-large color="warning" @click="$emit('action', 'action_confirm_not_zero')">Confirm stock NOT empty</v-btn>
+                <v-btn x-large color="warning" @click="$emit('action', 'action_confirm_not_zero')">
+                    {{ $t('misc.stock_zero_check.confirm_stock_not_zero') }}
+                </v-btn>
               </v-col>
             </v-row>
           </div>
@@ -294,7 +298,7 @@ Vue.component("btn-reset-config", {
             this.$root.$router.push(this.$props.redirect);
         },
     },
-    template: `<btn-action action="warn" @click="reset_data()">Reload config and menu</btn-action>`,
+    template: `<btn-action action="warn" @click="reset_data()">{{ $t('btn.reload_config.title') }}</btn-action>`,
 });
 
 Vue.component("line-actions-popup", {
@@ -327,7 +331,7 @@ Vue.component("line-actions-popup", {
         <div class="button-list button-vertical-list full">
           <v-row class="actions bottom-actions">
             <v-col class="text-center" cols="12">
-              <btn-action v-on="on">Action</btn-action>
+              <btn-action v-on="on">{{ $t('misc.actions_popup.btn_action') }}</btn-action>
             </v-col>
           </v-row>
         </div>
@@ -341,7 +345,7 @@ Vue.component("line-actions-popup", {
           </v-row>
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <v-btn x-large @click="dialog = false">Back</v-btn>
+              <v-btn x-large @click="dialog = false">{{ $t('btn.back.title') }}</v-btn>
             </v-col>
           </v-row>
         </div>
@@ -362,7 +366,9 @@ Vue.component("line-stock-out", {
     <div class="button-list button-vertical-list full">
       <v-row align="center">
         <v-col class="text-center" cols="12">
-          <btn-action @click="handle_action('confirm_stock_issue')">Confirm stock = 0</btn-action>
+          <btn-action @click="handle_action('confirm_stock_issue')">
+            {{ $t('misc.stock_zero_check.confirm_stock_zero') }}
+          </btn-action>
         </v-col>
       </v-row>
       <v-row align="center">
