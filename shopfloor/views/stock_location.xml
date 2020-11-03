@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_location_form" model="ir.ui.view">
+        <field name="name">Shopfloor stock.location form</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form" />
+        <field name="arch" type="xml">
+            <!-- show barcode because it's handy -->
+            <xpath expr="//field[@name='location_id']/.." position="after">
+                <label for="barcode" />
+                <field name="barcode" />
+            </xpath>
+            <xpath expr="//group[@name='additional_info']/.." position="inside">
+                <group string="Shopfloor">
+                    <field name="shopfloor_picking_sequence" />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shopfloor_menu_tree_view" model="ir.ui.view">
+        <field name="name">shopfloor menu tree</field>
+        <field name="model">shopfloor.menu</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="scenario" />
+                <field
+                    name="profile_ids"
+                    widget="many2many_tags"
+                    options="{'no_create': 1}"
+                />
+                <field
+                    name="picking_type_ids"
+                    widget="many2many_tags"
+                    options="{'no_create': 1}"
+                />
+            </tree>
+        </field>
+    </record>
+    <record id="shopfloor_menu_form_view" model="ir.ui.view">
+        <field name="name">shopfloor menu form</field>
+        <field name="model">shopfloor.menu</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}"
+                    />
+                    <label for="name" class="oe_edit_only" />
+                    <h1>
+                        <field name="name" />
+                    </h1>
+                    <group name="main">
+                        <field name="active" invisible="1" />
+                        <field name="scenario" />
+                        <field
+                            name="profile_ids"
+                            widget="many2many_tags"
+                            options="{'no_create': 1}"
+                        />
+                        <field
+                            name="picking_type_ids"
+                            widget="many2many_tags"
+                            options="{'no_create': 1}"
+                        />
+                    </group>
+                    <group name="options" string="Scenario Options">
+                        <group
+                            name="move_create"
+                            attrs="{'invisible': [('move_create_is_possible', '=', False)]}"
+                        >
+                            <field name="move_create_is_possible" invisible="1" />
+                            <field name="allow_move_create" />
+                        </group>
+                        <group
+                            name="unreserve_other_moves"
+                            attrs="{'invisible': [('unreserve_other_moves_is_possible', '=', False)]}"
+                        >
+                            <field
+                                name="unreserve_other_moves_is_possible"
+                                invisible="1"
+                            />
+                            <field name="allow_unreserve_other_moves" />
+                        </group>
+                        <group
+                            name="ignore_no_putaway_available"
+                            attrs="{'invisible': [('ignore_no_putaway_available_is_possible', '=', False)]}"
+                        >
+                            <field
+                                name="ignore_no_putaway_available_is_possible"
+                                invisible="1"
+                            />
+                            <field name="ignore_no_putaway_available" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="shopfloor_menu_search_view" model="ir.ui.view">
+        <field name="name">shopfloor menu search</field>
+        <field name="model">shopfloor.menu</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="scenario" />
+                <field name="picking_type_ids" />
+                <field name="profile_ids" />
+                <separator />
+                <filter
+                    string="Archived"
+                    name="inactive"
+                    domain="[('active', '=', False)]"
+                />
+            </search>
+        </field>
+    </record>
+    <record id="action_shopfloor_menu" model="ir.actions.act_window">
+        <field name="name">Menus</field>
+        <field name="res_model">shopfloor.menu</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

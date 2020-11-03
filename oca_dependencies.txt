@@ -22,3 +22,5 @@ product-attribute
 server-tools
 stock-logistics-workflow
 web
+rest-framework
+server-auth

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shopfloor_menu_form_view" model="ir.ui.view">
+        <field name="name">shopfloor menu form</field>
+        <field name="model">shopfloor.menu</field>
+        <field name="inherit_id" ref="shopfloor.shopfloor_menu_form_view" />
+        <field name="arch" type="xml">
+            <group name="options" position="inside">
+                <group
+                    name="batch_create"
+                    attrs="{'invisible': [('scenario', '!=', 'cluster_picking')]}"
+                >
+                    <field name="batch_create" />
+                    <field
+                        name="batch_create_max_picking"
+                        attrs="{'invisible': [('batch_create', '=', False)]}"
+                    />
+                    <field
+                        name="batch_create_max_volume"
+                        attrs="{'invisible': [('batch_create', '=', False)]}"
+                    />
+                    <field
+                        name="batch_create_max_weight"
+                        attrs="{'invisible': [('batch_create', '=', False)]}"
+                    />
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>

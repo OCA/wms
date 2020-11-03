@@ -1,0 +1,10 @@
+<odoo noupdate="1">
+    <record id="shopfloor_profile_hb_truck_demo" model="shopfloor.profile">
+        <field name="name">Highbay Truck</field>
+        <field name="warehouse_id" ref="stock.warehouse0" />
+    </record>
+    <record id="shopfloor_profile_shelf_1_demo" model="shopfloor.profile">
+        <field name="name">Shelf 1</field>
+        <field name="warehouse_id" ref="stock.warehouse0" />
+    </record>
+</odoo>

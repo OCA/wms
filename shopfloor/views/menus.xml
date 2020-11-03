@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem
+        id="menu_shopfloor_settings"
+        parent="stock.menu_stock_config_settings"
+        name="Shopfloor"
+        sequence="200"
+    />
+    <menuitem
+        action="action_shopfloor_menu"
+        id="menu_action_shopfloor_menu"
+        parent="menu_shopfloor_settings"
+        sequence="10"
+    />
+    <menuitem
+        action="action_shopfloor_profile"
+        id="menu_action_shopfloor_profile"
+        parent="menu_shopfloor_settings"
+        sequence="20"
+    />
+    <menuitem
+        action="action_shopfloor_log"
+        id="menu_action_shopfloor_log"
+        parent="menu_shopfloor_settings"
+        groups="base.group_no_one"
+        sequence="30"
+    />
+</odoo>

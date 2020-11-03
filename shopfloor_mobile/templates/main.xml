@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+    @author Simone Orsi <simahawk@gmail.com>
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+-->
+<odoo>
+    <template
+        id="shopfloor_app_layout"
+        inherit_id="web.layout"
+        primary="True"
+        name="Shopfloor app layout"
+    >
+        <link type="image/x-icon" position="after">
+            <link rel="manifest" href="/shopfloor_mobile/manifest.json" />
+        </link>
+    </template>
+    <template id="shopfloor_app_main" name="Shopfloor app main">
+        <t t-call="shopfloor_mobile.shopfloor_app_layout">
+            <t
+                t-set="x_icon"
+                t-value="'/shopfloor_mobile/assets/src/assets/icons/favicon-32x32.png?' + app_version"
+            />
+            <t t-set="html_data" t-value="{'app_version': app_version}" />
+            <t t-set="title">Shopfloor WMS app</t>
+            <t t-set="head">
+                <script type="text/javascript">
+          var shopfloor_app_info = {
+            app_version: "<t t-esc="app_version" />",
+            demo_mode: <t t-esc="'true' if demo_mode else 'false'" />,
+          };
+        </script>
+                <t t-call="shopfloor_mobile.shopfloor_app_assets" />
+                <t
+                    t-call="shopfloor_mobile.shopfloor_app_demo_assets"
+                    t-if="demo_mode"
+                />
+            </t>
+            <noscript>
+                <strong>
+          We're sorry but wms doesn't work properly without JavaScript enabled.
+          Please enable it to continue.
+        </strong>
+            </noscript>
+            <div id="app">
+                <v-app>
+                    <v-container>
+                        <router-view />
+                    </v-container>
+                </v-app>
+            </div>
+        </t>
+    </template>
+</odoo>

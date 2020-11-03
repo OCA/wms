@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_picking_type_form" model="ir.ui.view">
+        <field name="name">Operation Types</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_picking_type_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group[2]" position="inside">
+                <group string="Shopfloor" name="shopfloor">
+                    <field name="shopfloor_menu_ids" widget="many2many_tags" />
+                    <field
+                        name="shopfloor_zero_check"
+                        attrs="{'invisible': [('shopfloor_menu_ids', '=', [])]}"
+                    />
+                    <field
+                        name="shopfloor_display_packing_info"
+                        attrs="{'invisible': [('shopfloor_menu_ids', '=', [])]}"
+                    />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
