@@ -94,6 +94,14 @@ OCA, or the Odoo Community Association, is a nonprofit organization whose
 mission is to support the collaborative development of Odoo features and
 promote its widespread use.
 
+.. |maintainer-guewen| image:: https://github.com/guewen.png?size=40px
+    :target: https://github.com/guewen
+    :alt: guewen
+
+Current `maintainer <https://odoo-community.org/page/maintainer-role>`__:
+
+|maintainer-guewen| 
+
 This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/13.0/shopfloor_batch_automatic_creation>`_ project on GitHub.
 
 You are welcome to contribute. To learn how please visit https://odoo-community.org/page/Contribute.
