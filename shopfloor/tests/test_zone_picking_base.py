@@ -75,6 +75,17 @@ class ZonePickingCommonCase(CommonCase):
                 }
             )
         )
+        cls.zone_sublocation5 = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Zone sub-location 5",
+                    "location_id": cls.zone_location.id,
+                    "barcode": "ZONE_SUBLOCATION_5",
+                }
+            )
+        )
         cls.packing_sublocation_a = (
             cls.env["stock.location"]
             .sudo()
@@ -123,6 +134,32 @@ class ZonePickingCommonCase(CommonCase):
                 }
             )
         )
+        cls.product_g = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product G",
+                    "type": "product",
+                    "default_code": "G",
+                    "barcode": "G",
+                    "weight": 3,
+                }
+            )
+        )
+        cls.product_h = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product H",
+                    "type": "product",
+                    "default_code": "H",
+                    "barcode": "H",
+                    "weight": 3,
+                }
+            )
+        )
         products = (
             cls.product_a
             + cls.product_b
@@ -130,6 +167,8 @@ class ZonePickingCommonCase(CommonCase):
             + cls.product_d
             + cls.product_e
             + cls.product_f
+            + cls.product_g
+            + cls.product_h
         )
         for product in products:
             cls.env["stock.putaway.rule"].sudo().create(
@@ -140,31 +179,42 @@ class ZonePickingCommonCase(CommonCase):
                 }
             )
 
+        # 1 product in a package available in zone_sublocation1
         cls.picking1 = picking1 = cls._create_picking(lines=[(cls.product_a, 10)])
-        cls.picking2 = picking2 = cls._create_picking(
-            lines=[(cls.product_b, 10), (cls.product_c, 10)]
-        )
-        cls.picking3 = picking3 = cls._create_picking(lines=[(cls.product_d, 10)])
-        cls.picking4 = picking4 = cls._create_picking(lines=[(cls.product_e, 10)])
-        cls.picking5 = picking5 = cls._create_picking(
-            lines=[(cls.product_b, 10), (cls.product_f, 10)]
-        )
-        cls.pickings = picking1 | picking2 | picking3 | picking4 | picking5
         cls._fill_stock_for_moves(
             picking1.move_lines, in_package=True, location=cls.zone_sublocation1
+        )
+        # 2 products with lots available in zone_sublocation2
+        cls.picking2 = picking2 = cls._create_picking(
+            lines=[(cls.product_b, 10), (cls.product_c, 10)]
         )
         cls._fill_stock_for_moves(
             picking2.move_lines, in_lot=True, location=cls.zone_sublocation2
         )
+        # 1 product (no package, no lot) available in zone_sublocation3
+        cls.picking3 = picking3 = cls._create_picking(lines=[(cls.product_d, 10)])
         cls._fill_stock_for_moves(picking3.move_lines, location=cls.zone_sublocation3)
+        # 1 product, available in zone_sublocation3 and zone_sublocation4
+        # Put product_e quantities in two different source locations to get
+        # two stock move lines (6 and 4 to satisfy 10 qties)
+        cls.picking4 = picking4 = cls._create_picking(lines=[(cls.product_e, 10)])
+        cls._update_qty_in_location(cls.zone_sublocation3, cls.product_e, 6)
+        cls._update_qty_in_location(cls.zone_sublocation4, cls.product_e, 4)
+        # 2 products in a package available in zone_sublocation4
+        cls.picking5 = picking5 = cls._create_picking(
+            lines=[(cls.product_b, 10), (cls.product_f, 10)]
+        )
         cls._fill_stock_for_moves(
             picking5.move_lines, in_package=True, location=cls.zone_sublocation4
         )
-        # Put product_e quantities in two different source locations to get
-        # two stock move lines (6 and 4 to satisfy 10 qties)
-        cls._update_qty_in_location(cls.zone_sublocation3, cls.product_e, 6)
-        cls._update_qty_in_location(cls.zone_sublocation4, cls.product_e, 4)
-        # cls._fill_stock_for_moves(picking4.move_lines, location=cls.zone_sublocation3)
+        # 2 products available in zone_sublocation5, but one is partially available
+        cls.picking6 = picking6 = cls._create_picking(
+            lines=[(cls.product_g, 6), (cls.product_h, 6)]
+        )
+        cls._update_qty_in_location(cls.zone_sublocation5, cls.product_g, 6)
+        cls._update_qty_in_location(cls.zone_sublocation5, cls.product_h, 3)
+
+        cls.pickings = picking1 | picking2 | picking3 | picking4 | picking5 | picking6
         cls.pickings.action_assign()
         # Some records not related at all to the processed move lines
         cls.free_package = cls.env["stock.quant.package"].create(

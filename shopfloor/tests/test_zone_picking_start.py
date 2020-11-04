@@ -83,8 +83,21 @@ class ZonePickingStartCase(ZonePickingCommonCase):
                 )
             ],
         )
+        expected_sub5 = dict(
+            self.data.location(self.zone_sublocation5),
+            operation_types=[
+                dict(
+                    op_type_data,
+                    lines_count=2,
+                    picking_count=1,
+                    priority_lines_count=0,
+                    priority_picking_count=0,
+                )
+            ],
+        )
         self.assertEqual(
-            zones_data, [expected_sub1, expected_sub2, expected_sub3, expected_sub4]
+            zones_data,
+            [expected_sub1, expected_sub2, expected_sub3, expected_sub4, expected_sub5],
         )
 
     def test_select_zone(self):
