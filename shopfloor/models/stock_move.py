@@ -44,6 +44,12 @@ class StockMove(models.Model):
         to first extract some move lines in a separate move, then validate it
         with this method.
         """
+        # Put remaining qty to process from partially available moves
+        # in their own move (which will be then 'confirmed')
+        partial_moves = self.filtered(lambda m: m.state == "partially_available")
+        for partial_move in partial_moves:
+            partial_move.split_other_move_lines(partial_move.move_line_ids)
+        # Process assigned moves
         moves = self.filtered(lambda m: m.state == "assigned")
         if not moves:
             return False
