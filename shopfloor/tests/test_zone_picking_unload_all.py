@@ -220,6 +220,73 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             message=self.service.msg_store.buffer_complete(),
         )
 
+    def test_set_destination_all_partial_qty_done_ok(self):
+        zone_location = self.zone_location
+        picking_type = self.picking6.picking_type_id
+        move_g = self.picking6.move_lines.filtered(
+            lambda m: m.product_id == self.product_g
+        )
+        move_h = self.picking6.move_lines.filtered(
+            lambda m: m.product_id == self.product_h
+        )
+        self.assertEqual(move_g.state, "assigned")
+        self.assertEqual(move_h.state, "partially_available")
+        move_line_g = move_g.move_line_ids
+        move_line_h = move_h.move_line_ids
+        another_package = self.env["stock.quant.package"].create(
+            {"name": "ANOTHER_PACKAGE"}
+        )
+        # set the destination package on lines
+        self.service._set_destination_package(
+            zone_location,
+            picking_type,
+            move_line_g,
+            move_line_g.product_uom_qty,
+            self.free_package,
+        )
+        self.service._set_destination_package(
+            zone_location,
+            picking_type,
+            move_line_h,
+            move_line_h.product_uom_qty,  # partial qty
+            another_package,
+        )
+        # set destination location for all lines in the buffer
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "barcode": self.packing_location.barcode,
+            },
+        )
+        # check data
+        #   picking validated
+        picking_validated = self.picking6.backorder_ids
+        self.assertEqual(picking_validated.state, "done")
+        self.assertEqual(picking_validated.move_line_ids, move_line_g | move_line_h)
+        self.assertEqual(move_line_g.state, "done")
+        self.assertEqual(move_line_g.qty_done, 6)
+        self.assertEqual(move_line_h.state, "done")
+        self.assertEqual(move_line_h.qty_done, 3)
+        #   current picking (backorder)
+        self.assertEqual(self.picking6.state, "confirmed")
+        self.assertEqual(self.picking6.move_lines.product_id, self.product_h)
+        self.assertEqual(self.picking6.move_lines.product_uom_qty, 3)
+        self.assertFalse(self.picking6.move_line_ids)
+        # buffer should be empty
+        buffer_lines = self.service._find_buffer_move_lines(zone_location, picking_type)
+        self.assertFalse(buffer_lines)
+        # check response
+        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        self.assert_response_select_line(
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.service.msg_store.buffer_complete(),
+        )
+
     def test_set_destination_all_location_not_allowed(self):
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
