@@ -13,21 +13,21 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
-        cls.product_g = (
+        cls.product_z = (
             cls.env["product.product"]
             .sudo()
             .create(
                 {
-                    "name": "Product G",
+                    "name": "Product Z",
                     "type": "product",
-                    "default_code": "G",
-                    "barcode": "G",
+                    "default_code": "Z",
+                    "barcode": "Z",
                     "weight": 7,
                 }
             )
         )
-        cls.picking_g = cls._create_picking(lines=[(cls.product_g, 40)])
-        cls._update_qty_in_location(cls.zone_sublocation1, cls.product_g, 32)
+        cls.picking_z = cls._create_picking(lines=[(cls.product_z, 40)])
+        cls._update_qty_in_location(cls.zone_sublocation1, cls.product_z, 32)
 
     def test_unload_set_destination_wrong_parameters(self):
         zone_location = self.zone_location
@@ -322,10 +322,10 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
 
     def test_unload_set_destination_partially_available_backorder(self):
         zone_location = self.zone_location
-        picking_type = self.picking_g.picking_type_id
-        self.assertEqual(self.picking_g.move_lines[0].product_uom_qty, 40)
-        self.picking_g.action_assign()
-        move_line = self.picking_g.move_line_ids
+        picking_type = self.picking_z.picking_type_id
+        self.assertEqual(self.picking_z.move_lines[0].product_uom_qty, 40)
+        self.picking_z.action_assign()
+        move_line = self.picking_z.move_line_ids
         self.assertEqual(move_line.product_uom_qty, 32)
         self.assertEqual(move_line.move_id.state, "partially_available")
         packing_sublocation = (
@@ -359,11 +359,11 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         )
         # check data
         # move line has been moved to a new picking
-        self.assertEqual(move_line.move_id.picking_id, self.picking_g.backorder_ids[0])
+        self.assertEqual(move_line.move_id.picking_id, self.picking_z.backorder_ids[0])
         # the old picking contains a new line w/ the rest of the qty
         # that couldn't be processed
-        self.assertEqual(self.picking_g.move_lines[0].product_uom_qty, 8)
-        self.assertEqual(self.picking_g.state, "confirmed")
+        self.assertEqual(self.picking_z.move_lines[0].product_uom_qty, 8)
+        self.assertEqual(self.picking_z.state, "confirmed")
         # the line has been processed
         self.assertEqual(move_line.location_dest_id, packing_sublocation)
         self.assertEqual(move_line.move_id.state, "done")
