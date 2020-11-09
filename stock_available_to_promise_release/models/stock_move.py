@@ -1,10 +1,15 @@
 # Copyright 2019 Camptocamp (https://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+import logging
+import operator as py_operator
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.osv import expression
-from odoo.tools import date_utils, float_compare
+from odoo.tools import date_utils, float_compare, float_round
+
+_logger = logging.getLogger(__name__)
 
 
 class StockMove(models.Model):
@@ -17,13 +22,28 @@ class StockMove(models.Model):
         help="Date/time used to sort moves to deliver first. "
         "Used to calculate the ordered available to promise.",
     )
-    ordered_available_to_promise = fields.Float(
-        string="Ordered Available to Promise",
+    previous_promised_qty = fields.Float(
+        string="Quantity Promised before this move",
+        compute="_compute_previous_promised_qty",
+        digits="Product Unit of Measure",
+        help="Quantities promised to moves with higher priority than this move "
+        "(in default UoM of the product).",
+    )
+    ordered_available_to_promise_qty = fields.Float(
+        string="Ordered Available to Promise (Real Qty)",
         compute="_compute_ordered_available_to_promise",
         search="_search_ordered_available_to_promise",
         digits="Product Unit of Measure",
         help="Available to Promise quantity minus quantities promised "
-        " to older promised operations.",
+        " to moves with higher priority (in default UoM of the product).",
+    )
+    ordered_available_to_promise_uom_qty = fields.Float(
+        string="Ordered Available to Promise",
+        compute="_compute_ordered_available_to_promise",
+        search="_search_ordered_available_to_promise_uom_qty",
+        digits="Product Unit of Measure",
+        help="Available to Promise quantity minus quantities promised "
+        " to moves with higher priority (in initial demand's UoM).",
     )
     release_ready = fields.Boolean(
         compute="_compute_release_ready", search="_search_release_ready",
@@ -32,43 +52,196 @@ class StockMove(models.Model):
     zip_code = fields.Char(related="partner_id.zip", store="True")
     city = fields.Char(related="partner_id.city", store="True")
 
+    def _previous_promised_qty_sql_main_query(self):
+        return """
+            SELECT move.id,
+                   COALESCE(SUM(previous_moves.previous_qty), 0.0)
+            FROM stock_move move
+            LEFT JOIN LATERAL (
+                SELECT
+                    m.product_qty - COALESCE(SUM(line.product_qty), 0)
+                    AS previous_qty
+                FROM stock_move m
+                INNER JOIN stock_location loc
+                ON loc.id = m.location_id
+                LEFT JOIN stock_move_line line
+                ON m.id = line.move_id
+                WHERE
+                {lateral_where}
+                GROUP BY m.id
+            ) previous_moves ON true
+            WHERE
+            move.id IN %(move_ids)s
+            GROUP BY move.id;
+        """
+
+    def _previous_promised_qty_sql_lateral_where(self):
+        locations = self._ordered_available_to_promise_locations()
+        sql = """
+                m.id != move.id
+                AND m.product_id = move.product_id
+                AND loc.parent_path LIKE ANY(%(location_paths)s)
+                AND (
+                m.need_release = true
+                AND (
+                    m.priority > move.priority
+                    OR
+                    (
+                        m.priority = move.priority
+                        AND m.date_priority < move.date_priority
+                    )
+                    OR (
+                        m.priority = move.priority
+                        AND m.date_priority = move.date_priority
+                        AND m.id < move.id
+                    )
+                OR ((m.need_release IS false OR m.need_release IS null))
+                ))
+                AND m.state IN (
+                    'waiting', 'confirmed', 'partially_available', 'assigned'
+                )
+        """
+        params = {
+            "location_paths": [
+                "{}%".format(location.parent_path) for location in locations
+            ]
+        }
+        horizon_date = self._promise_reservation_horizon_date()
+        if horizon_date:
+            sql += " AND m.date_expected <= %(horizon)s "
+            params["horizon"] = horizon_date
+        return sql, params
+
+    def _previous_promised_qty_sql(self):
+        """Lookup query for product promised qty in the same warehouse.
+
+        Moves to consider are either already released or still be to released
+        but not done yet. Each of them should fit the reservation horizon.
+        """
+        params = {"move_ids": tuple(self.ids)}
+        lateral_where, lateral_params = self._previous_promised_qty_sql_lateral_where()
+        params.update(lateral_params)
+        query = self._previous_promised_qty_sql_main_query().format(
+            lateral_where=lateral_where
+        )
+        return query, params
+
+    @api.depends()
+    def _compute_previous_promised_qty(self):
+        if not self.ids:
+            return
+        self.flush()
+        self.env["stock.move.line"].flush(["move_id", "product_qty"])
+        self.env["stock.location"].flush(["parent_path"])
+        self.previous_promised_qty = 0
+        query, params = self._previous_promised_qty_sql()
+        self.env.cr.execute(query, params)
+        rows = dict(self.env.cr.fetchall())
+        for move in self:
+            move.previous_promised_qty = rows.get(move.id, 0)
+
     @api.depends(
-        "ordered_available_to_promise", "picking_id.move_type", "picking_id.move_lines"
+        "ordered_available_to_promise_qty",
+        "picking_id.move_type",
+        "picking_id.move_lines",
+        "need_release",
     )
     def _compute_release_ready(self):
         for move in self:
+            if not move.need_release:
+                move.release_ready = False
+                continue
             if move.picking_id.move_type == "one":
                 move.release_ready = all(
-                    m.ordered_available_to_promise > 0
+                    m.ordered_available_to_promise_uom_qty > 0
                     for m in move.picking_id.move_lines
                 )
             else:
-                move.release_ready = move.ordered_available_to_promise > 0
+                move.release_ready = move.ordered_available_to_promise_uom_qty > 0
 
-    @api.model
     def _search_release_ready(self, operator, value):
         if operator != "=":
             raise UserError(_("Unsupported operator %s") % (operator,))
-        moves = self.search([("ordered_available_to_promise", ">", 0)])
+        moves = self.search([("ordered_available_to_promise_uom_qty", ">", 0)])
         moves = moves.filtered(lambda m: m.release_ready)
         return [("id", "in", moves.ids)]
 
+    def _ordered_available_to_promise_locations(self):
+        return self.env["stock.warehouse"].search([]).mapped("view_location_id")
+
     @api.depends()
     def _compute_ordered_available_to_promise(self):
-        for move in self:
-            move.ordered_available_to_promise = move._ordered_available_to_promise()
+        moves = self.filtered(
+            lambda move: move._should_compute_ordered_available_to_promise()
+        )
+        (self - moves).update(
+            {
+                "ordered_available_to_promise_qty": 0.0,
+                "ordered_available_to_promise_uom_qty": 0.0,
+            }
+        )
 
-    @api.model
-    def _search_ordered_available_to_promise(self, operator, value):
-        if operator not in (">", ">=", "="):
+        locations = self._ordered_available_to_promise_locations()
+
+        # Compute On-Hand quantity (equivalent of qty_available) for all "view
+        # locations" of all the warehouses: we may release as soon as we have
+        # the quantity somewhere. Do not use "qty_available" to get a faster
+        # computation.
+        location_domain = []
+        for location in locations:
+            location_domain = expression.OR(
+                [
+                    location_domain,
+                    [("location_id.parent_path", "=like", location.parent_path + "%")],
+                ]
+            )
+        domain_quant = expression.AND(
+            [[("product_id", "in", self.product_id.ids)], location_domain]
+        )
+        location_quants = self.env["stock.quant"].read_group(
+            domain_quant, ["product_id", "quantity"], ["product_id"], orderby="id"
+        )
+        quants_available = {
+            item["product_id"][0]: item["quantity"] for item in location_quants
+        }
+        for move in self:
+            product_uom = move.product_id.uom_id
+            previous_promised_qty = move.previous_promised_qty
+
+            rounding = product_uom.rounding
+            available_qty = float_round(
+                quants_available.get(move.product_id.id, 0.0),
+                precision_rounding=rounding,
+            )
+
+            real_promised = available_qty - previous_promised_qty
+            uom_promised = product_uom._compute_quantity(
+                real_promised, move.product_uom, rounding_method="HALF-UP",
+            )
+
+            move.ordered_available_to_promise_uom_qty = max(
+                min(uom_promised, move.product_uom_qty), 0.0,
+            )
+            move.ordered_available_to_promise_qty = max(
+                min(real_promised, move.product_qty), 0.0,
+            )
+
+    def _search_ordered_available_to_promise_uom_qty(self, operator, value):
+        operator_mapping = {
+            "<": py_operator.lt,
+            "<=": py_operator.le,
+            ">": py_operator.gt,
+            ">=": py_operator.ge,
+            "=": py_operator.eq,
+            "!=": py_operator.ne,
+        }
+        if operator not in operator_mapping:
             raise UserError(_("Unsupported operator %s") % (operator,))
         moves = self.search([("need_release", "=", True)])
-        if operator == ">":
-            moves = moves.filtered(lambda m: m._ordered_available_to_promise() > value)
-        elif operator == ">=":
-            moves = moves.filtered(lambda m: m._ordered_available_to_promise() >= value)
-        else:
-            moves = moves.filtered(lambda m: m._ordered_available_to_promise() == value)
+        operator_func = operator_mapping[operator]
+        moves = moves.filtered(
+            lambda m: operator_func(m.ordered_available_to_promise_uom_qty, value)
+        )
         return [("id", "in", moves.ids)]
 
     def _should_compute_ordered_available_to_promise(self):
@@ -84,23 +257,6 @@ class StockMove(models.Model):
         self.write({"need_release": False})
         return True
 
-    def _ordered_available_to_promise(self):
-        if not self._should_compute_ordered_available_to_promise():
-            return 0.0
-        available = self.product_id.with_context(
-            **self._order_available_to_promise_qty_ctx()
-        ).qty_available
-        return max(
-            min(available - self._previous_promised_qty(), self.product_qty), 0.0
-        )
-
-    def _order_available_to_promise_qty_ctx(self):
-        return {
-            # used by product qty calculation in stock module
-            # (all the way down to `_get_domain_locations`).
-            "location": self.warehouse_id.lot_stock_id.id,
-        }
-
     def _promise_reservation_horizon(self):
         return self.env.company.sudo().stock_reservation_horizon
 
@@ -112,62 +268,6 @@ class StockMove(models.Model):
                 date_utils.end_of(fields.Datetime.today(), "day"), days=horizon
             )
         return None
-
-    def _previous_promised_quantity_domain(self):
-        """Lookup for product promised qty in the same warehouse.
-
-        Moves to consider are either already released or still be to released
-        but not done yet. Each of them should fit the reservation horizon.
-        """
-        base_domain = [
-            ("product_id", "=", self.product_id.id),
-            ("warehouse_id", "=", self.warehouse_id.id),
-        ]
-        horizon_date = self._promise_reservation_horizon_date()
-        if horizon_date:
-            # exclude moves planned beyond the horizon
-            base_domain.append(("date_expected", "<=", horizon_date))
-
-        # either the move has to be released
-        # and priority is higher than the current one
-        domain_not_released = [
-            ("need_release", "=", True),
-            "|",
-            ("priority", ">", self.priority),
-            "&",
-            ("date_priority", "<", self.date_priority),
-            ("priority", "=", self.priority),
-        ]
-        # or it has been released already
-        # and is not canceled or done
-        domain_released = [
-            ("need_release", "=", False),
-            (
-                "state",
-                "in",
-                ("waiting", "confirmed", "partially_available", "assigned"),
-            ),
-        ]
-        # NOTE: this domain might be suboptimal as we may lookup too many moves.
-        # If we face performance issues, this is a good candidate to debug.
-        return expression.AND(
-            [base_domain, expression.OR([domain_not_released, domain_released])]
-        )
-
-    def _previous_promised_qty(self):
-        previous_moves = self.search(
-            expression.AND(
-                # TODO: `!=` could be suboptimal, consider filter out on recordset
-                [self._previous_promised_quantity_domain(), [("id", "!=", self.id)]]
-            ),
-        )
-        # TODO: consider sum via SQL
-        promised_qty = sum(
-            previous_moves.mapped(
-                lambda move: max(move.product_qty - move.reserved_availability, 0.0)
-            )
-        )
-        return promised_qty
 
     def release_available_to_promise(self):
         self._run_stock_rule()
@@ -200,9 +300,7 @@ class StockMove(models.Model):
                 continue
             if move.state not in ("confirmed", "waiting"):
                 continue
-            # do not use the computed field, because it will keep
-            # a value in cache that we cannot invalidate declaratively
-            available_quantity = move._ordered_available_to_promise()
+            available_quantity = move.ordered_available_to_promise_qty
             if float_compare(available_quantity, 0, precision_digits=precision) <= 0:
                 continue
 
