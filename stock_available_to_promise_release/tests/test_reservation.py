@@ -22,21 +22,6 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             line.qty_done = line.product_qty
         picking.action_done()
 
-    def test_qty_ctx(self):
-        move = self.env["stock.move"].create(
-            {
-                "name": "testing ctx",
-                "product_id": self.product1.id,
-                "product_uom_qty": 1,
-                "product_uom": self.uom_unit.id,
-                "warehouse_id": self.wh.id,
-                "location_id": self.loc_stock.id,
-                "location_dest_id": self.loc_customer.id,
-            }
-        )
-        ctx = move._order_available_to_promise_qty_ctx()
-        self.assertEqual(ctx["location"], self.wh.lot_stock_id.id)
-
     def test_horizon_date(self):
         move = self.env["stock.move"].create(
             {
@@ -104,36 +89,174 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             self.assertEqual(pick.move_lines.reserved_availability, 0.0)
         return picking, picking2, picking3, picking4, picking5
 
-    def test_ordered_available_to_promise_value(self):
+    def test_ordered_available_to_promise_value_base(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         picking, picking2, picking3, picking4, picking5 = self._create_pickings()
 
         self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
 
-        self.assertEqual(picking.move_lines._ordered_available_to_promise(), 5)
-        self.assertEqual(picking2.move_lines._ordered_available_to_promise(), 3)
-        self.assertEqual(picking3.move_lines._ordered_available_to_promise(), 12)
-        self.assertEqual(picking4.move_lines._ordered_available_to_promise(), 0)
-        self.assertEqual(picking5.move_lines._ordered_available_to_promise(), 0)
+        self.assertEqual(picking.move_lines.previous_promised_qty, 0)
+        self.assertEqual(picking.move_lines.ordered_available_to_promise_uom_qty, 5)
+
+        self.assertEqual(picking2.move_lines.previous_promised_qty, 5)
+        self.assertEqual(picking2.move_lines.ordered_available_to_promise_uom_qty, 3)
+
+        self.assertEqual(picking3.move_lines.previous_promised_qty, 8)
+        self.assertEqual(picking3.move_lines.ordered_available_to_promise_uom_qty, 12)
+
+        self.assertEqual(picking4.move_lines.previous_promised_qty, 28)
+        self.assertEqual(picking4.move_lines.ordered_available_to_promise_uom_qty, 0)
+
+        self.assertEqual(picking5.move_lines.previous_promised_qty, 48)
+        self.assertEqual(picking5.move_lines.ordered_available_to_promise_uom_qty, 0)
+
+    def test_ordered_available_to_promise_uom_qty_search(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        picking, picking2, picking3, picking4, picking5 = self._create_pickings()
+        self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
+
+        moves = self.env["stock.move"].search(
+            [("ordered_available_to_promise_uom_qty", "=", 5)]
+        )
+        self.assertEqual(moves, picking.move_lines)
+
+        moves = self.env["stock.move"].search(
+            [("ordered_available_to_promise_uom_qty", ">", 5)]
+        )
+        self.assertEqual(moves, picking3.move_lines)
+
+        moves = self.env["stock.move"].search(
+            [("ordered_available_to_promise_uom_qty", ">=", 5)]
+        )
+        self.assertEqual(moves, (picking + picking3).move_lines)
+
+        moves = self.env["stock.move"].search(
+            [("ordered_available_to_promise_uom_qty", "<", 5)]
+        )
+        self.assertEqual(moves, (picking2 + picking4 + picking5).move_lines)
+
+        moves = self.env["stock.move"].search(
+            [("ordered_available_to_promise_uom_qty", "<=", 5)]
+        )
+        self.assertEqual(moves, (picking + picking2 + picking4 + picking5).move_lines)
+
+        moves = self.env["stock.move"].search(
+            [("ordered_available_to_promise_uom_qty", "!=", 0)]
+        )
+        self.assertEqual(moves, (picking + picking2 + picking3).move_lines)
+
+    def test_release_ready_search_move_type_direct(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        picking = self._out_picking(
+            self._create_picking_chain(
+                self.wh,
+                [(self.product1, 5), (self.product2, 5)],
+                date=datetime(2019, 9, 2, 16, 0),
+                move_type="direct",
+            )
+        )
+        # second picking not ready
+        picking2 = self._out_picking(
+            self._create_picking_chain(
+                self.wh,
+                [(self.product1, 5), (self.product2, 5)],
+                date=datetime(2019, 9, 2, 16, 0),
+                move_type="direct",
+            )
+        )
+
+        self._update_qty_in_location(self.loc_bin1, self.product1, 5.0)
+        self._update_qty_in_location(self.loc_bin1, self.product2, 10.0)
+        moves = self.env["stock.move"].search([("release_ready", "=", True)])
+        expected_moves = picking.move_lines
+        # only product2 has enough quantities in picking2,
+        # as we deliver with "direct", we can already release this move
+        expected_moves += picking2.move_lines.filtered(
+            lambda m: m.product_id == self.product2
+        )
+        self.assertEqual(moves, expected_moves)
+
+    def test_release_ready_search_wove_type_one(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        picking = self._out_picking(
+            self._create_picking_chain(
+                self.wh,
+                [(self.product1, 5), (self.product2, 5)],
+                date=datetime(2019, 9, 2, 16, 0),
+                move_type="direct",
+            )
+        )
+        self._out_picking(
+            self._create_picking_chain(
+                self.wh,
+                [(self.product1, 5), (self.product2, 5)],
+                date=datetime(2019, 9, 2, 16, 0),
+                move_type="one",
+            )
+        )
+
+        self._update_qty_in_location(self.loc_bin1, self.product1, 5.0)
+        self._update_qty_in_location(self.loc_bin1, self.product2, 10.0)
+        moves = self.env["stock.move"].search([("release_ready", "=", True)])
+        expected_moves = picking.move_lines
+        # as we deliver picking2 with "one", we cannot release any move
+        # because one of them is not available
+        self.assertEqual(moves, expected_moves)
+
+    def test_ordered_available_to_promise_value_horizon1(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        picking, picking2, picking3, picking4, picking5 = self._create_pickings()
+        self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
 
         self.env.company.stock_reservation_horizon = 1
         with freeze_time("2019-09-03"):
+
             # set expected date for picking moves far in the future
             picking_orig_date_expected = picking.move_lines.date_expected
             picking.move_lines.write({"date_expected": "2019-09-10"})
-            # its quantity won't be counted ib previously reserved
+            # its quantity won't be counted in previously reserved
             # and we get 3 more on the next one
-            self.assertEqual(picking3.move_lines._ordered_available_to_promise(), 17)
+
+            # promised qty is 0 because we picking is excluded by its date
+            self.assertEqual(picking2.move_lines.previous_promised_qty, 0)
+
+            # promised qty is 3 because we have 3 for picking2
+            self.assertEqual(picking3.move_lines.previous_promised_qty, 3)
+            self.assertEqual(
+                picking3.move_lines.ordered_available_to_promise_uom_qty, 17
+            )
+
             # do the same for picking 2
             picking2_orig_date_expected = picking2.move_lines.date_expected
             picking2.move_lines.write({"date_expected": "2019-09-10"})
-            # its quantity won't be counted ib previously reserved
+
+            # since we modified date_expected, force recomputation of the field
+            self.env["stock.move"].invalidate_cache(
+                fnames=["previous_promised_qty", "ordered_available_to_promise_uom_qty"]
+            )
+            # its quantity won't be counted in previously reserved
             # and we get 3 more on the next one
-            self.assertEqual(picking3.move_lines._ordered_available_to_promise(), 20)
-            self.assertEqual(picking4.move_lines._ordered_available_to_promise(), 0)
+            self.assertEqual(picking3.move_lines.previous_promised_qty, 0)
+            self.assertEqual(
+                picking3.move_lines.ordered_available_to_promise_uom_qty, 20
+            )
+
+            self.assertEqual(picking4.move_lines.previous_promised_qty, 20)
+            self.assertEqual(
+                picking4.move_lines.ordered_available_to_promise_uom_qty, 0
+            )
             picking3_orig_date_expected = picking3.move_lines.date_expected
             picking3.move_lines.write({"date_expected": "2019-09-10"})
-            self.assertEqual(picking4.move_lines._ordered_available_to_promise(), 20)
+
+            # since we modified date_expected, force recomputation of the field
+            self.env["stock.move"].invalidate_cache(
+                fnames=["previous_promised_qty", "ordered_available_to_promise_uom_qty"]
+            )
+
+            self.assertEqual(picking4.move_lines.previous_promised_qty, 0)
+            self.assertEqual(
+                picking4.move_lines.ordered_available_to_promise_uom_qty, 20
+            )
             # set a higher priority for picking 5
             # (restoring previous date_expected values for other pickings before)
             picking.move_lines.date_expected = picking_orig_date_expected
@@ -142,15 +265,24 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             picking5.move_lines.write(
                 {"date_expected": "2019-09-01", "date_priority": "2019-09-01"}
             )
-            self.assertEqual(picking5.move_lines._ordered_available_to_promise(), 15)
-            self.assertEqual(picking.move_lines._ordered_available_to_promise(), 5)
-            self.assertEqual(picking2.move_lines._ordered_available_to_promise(), 0)
+            self.assertEqual(
+                picking5.move_lines.ordered_available_to_promise_uom_qty, 15
+            )
+            self.assertEqual(picking.move_lines.ordered_available_to_promise_uom_qty, 5)
+            self.assertEqual(
+                picking2.move_lines.ordered_available_to_promise_uom_qty, 0
+            )
 
         # move the horizon fwd
         self.env.company.stock_reservation_horizon = 10
+        self.env["stock.move"].invalidate_cache(
+            fnames=["previous_promised_qty", "ordered_available_to_promise_uom_qty"]
+        )
         with freeze_time("2019-09-03"):
             # last picking won't have available qty again
-            self.assertEqual(picking4.move_lines._ordered_available_to_promise(), 0)
+            self.assertEqual(
+                picking4.move_lines.ordered_available_to_promise_uom_qty, 0
+            )
 
     def test_ordered_available_to_promise_value_by_priority(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
@@ -158,39 +290,78 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
 
         self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
 
-        self.assertEqual(picking.move_lines._ordered_available_to_promise(), 5)
-        self.assertEqual(picking2.move_lines._ordered_available_to_promise(), 3)
-        self.assertEqual(picking3.move_lines._ordered_available_to_promise(), 12)
-        self.assertEqual(picking4.move_lines._ordered_available_to_promise(), 0)
-        self.assertEqual(picking5.move_lines._ordered_available_to_promise(), 0)
+        self.assertEqual(picking.move_lines.previous_promised_qty, 0)
+        self.assertEqual(picking.move_lines.ordered_available_to_promise_uom_qty, 5)
+
+        self.assertEqual(picking2.move_lines.previous_promised_qty, 5)
+        self.assertEqual(picking2.move_lines.ordered_available_to_promise_uom_qty, 3)
+
+        self.assertEqual(picking3.move_lines.previous_promised_qty, 8)
+        self.assertEqual(picking3.move_lines.ordered_available_to_promise_uom_qty, 12)
+
+        self.assertEqual(picking4.move_lines.previous_promised_qty, 28)
+        self.assertEqual(picking4.move_lines.ordered_available_to_promise_uom_qty, 0)
+
+        self.assertEqual(picking5.move_lines.previous_promised_qty, 48)
+        self.assertEqual(picking5.move_lines.ordered_available_to_promise_uom_qty, 0)
 
         # Set a higher priority on the picking4 (need of 20 units)
         picking4_orig_priority = picking4.priority
         picking4.priority = "2"
-        self.assertEqual(picking.move_lines._ordered_available_to_promise(), 0)
-        self.assertEqual(picking2.move_lines._ordered_available_to_promise(), 0)
-        self.assertEqual(picking3.move_lines._ordered_available_to_promise(), 0)
-        self.assertEqual(picking4.move_lines._ordered_available_to_promise(), 20)
-        self.assertEqual(picking5.move_lines._ordered_available_to_promise(), 0)
+        self.env["stock.move"].invalidate_cache(
+            fnames=["previous_promised_qty", "ordered_available_to_promise_uom_qty"]
+        )
+
+        self.assertEqual(picking4.move_lines.previous_promised_qty, 0)
+        self.assertEqual(picking4.move_lines.ordered_available_to_promise_uom_qty, 20)
+
+        self.assertEqual(picking.move_lines.previous_promised_qty, 20)
+        self.assertEqual(picking.move_lines.ordered_available_to_promise_uom_qty, 0)
+        self.assertEqual(picking2.move_lines.previous_promised_qty, 25)
+        self.assertEqual(picking2.move_lines.ordered_available_to_promise_uom_qty, 0)
+        self.assertEqual(picking3.move_lines.previous_promised_qty, 28)
+        self.assertEqual(picking3.move_lines.ordered_available_to_promise_uom_qty, 0)
+        self.assertEqual(picking5.move_lines.previous_promised_qty, 48)
+        self.assertEqual(picking5.move_lines.ordered_available_to_promise_uom_qty, 0)
 
         # Set a higher priority on the picking 3 (need of 20 units)
         picking3_orig_priority = picking3.priority
         picking3.priority = "3"
-        self.assertEqual(picking.move_lines._ordered_available_to_promise(), 0)
-        self.assertEqual(picking2.move_lines._ordered_available_to_promise(), 0)
-        self.assertEqual(picking3.move_lines._ordered_available_to_promise(), 20)
-        self.assertEqual(picking4.move_lines._ordered_available_to_promise(), 0)
-        self.assertEqual(picking5.move_lines._ordered_available_to_promise(), 0)
+        self.env["stock.move"].invalidate_cache(
+            fnames=["previous_promised_qty", "ordered_available_to_promise_uom_qty"]
+        )
+
+        self.assertEqual(picking3.move_lines.previous_promised_qty, 0)
+        self.assertEqual(picking3.move_lines.ordered_available_to_promise_uom_qty, 20)
+
+        self.assertEqual(picking.move_lines.previous_promised_qty, 40)
+        self.assertEqual(picking.move_lines.ordered_available_to_promise_uom_qty, 0)
+        self.assertEqual(picking2.move_lines.previous_promised_qty, 45)
+        self.assertEqual(picking2.move_lines.ordered_available_to_promise_uom_qty, 0)
+        self.assertEqual(picking4.move_lines.previous_promised_qty, 20)
+        self.assertEqual(picking4.move_lines.ordered_available_to_promise_uom_qty, 0)
+        self.assertEqual(picking5.move_lines.previous_promised_qty, 48)
+        self.assertEqual(picking5.move_lines.ordered_available_to_promise_uom_qty, 0)
 
         # Set a higher priority on the picking 5 (need of 15 units)
         picking3.priority = picking3_orig_priority
         picking4.priority = picking4_orig_priority
         picking5.priority = "2"
-        self.assertEqual(picking.move_lines._ordered_available_to_promise(), 5)
-        self.assertEqual(picking2.move_lines._ordered_available_to_promise(), 0)
-        self.assertEqual(picking3.move_lines._ordered_available_to_promise(), 0)
-        self.assertEqual(picking4.move_lines._ordered_available_to_promise(), 0)
-        self.assertEqual(picking5.move_lines._ordered_available_to_promise(), 15)
+        self.env["stock.move"].invalidate_cache(
+            fnames=["previous_promised_qty", "ordered_available_to_promise_uom_qty"]
+        )
+
+        self.assertEqual(picking5.move_lines.previous_promised_qty, 0)
+        self.assertEqual(picking5.move_lines.ordered_available_to_promise_uom_qty, 15)
+
+        self.assertEqual(picking.move_lines.previous_promised_qty, 15)
+        self.assertEqual(picking.move_lines.ordered_available_to_promise_uom_qty, 5)
+        self.assertEqual(picking2.move_lines.previous_promised_qty, 20)
+        self.assertEqual(picking2.move_lines.ordered_available_to_promise_uom_qty, 0)
+        self.assertEqual(picking3.move_lines.previous_promised_qty, 23)
+        self.assertEqual(picking3.move_lines.ordered_available_to_promise_uom_qty, 0)
+        self.assertEqual(picking4.move_lines.previous_promised_qty, 43)
+        self.assertEqual(picking4.move_lines.ordered_available_to_promise_uom_qty, 0)
 
     def test_normal_chain(self):
         # usual scenario, without using the option to defer the pull
@@ -271,9 +442,19 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertFalse(out_picking)
 
         self._update_qty_in_location(self.loc_bin1, self.product1, 10.0)
+
+        self.env["stock.move"].invalidate_cache(
+            fnames=[
+                "previous_promised_qty",
+                "ordered_available_to_promise_uom_qty",
+                "ordered_available_to_promise_qty",
+            ]
+        )
+
         # now, we have enough, the picking is created
         cust_picking.move_lines.release_available_to_promise()
         out_picking = self._pickings_in_group(pickings.group_id) - cust_picking
+
         self.assertRecordValues(
             out_picking,
             [
@@ -381,10 +562,26 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         )
         self.assertEqual(len(cust_backorder), 1)
 
+        self.env["stock.move"].invalidate_cache(
+            fnames=[
+                "previous_promised_qty",
+                "ordered_available_to_promise_uom_qty",
+                "ordered_available_to_promise_qty",
+            ]
+        )
+
         # nothing happen, no stock
         self.assertEqual(len(self._pickings_in_group(cust_picking.group_id)), 3)
         cust_backorder.release_available_to_promise()
         self.assertEqual(len(self._pickings_in_group(cust_picking.group_id)), 3)
+
+        self.env["stock.move"].invalidate_cache(
+            fnames=[
+                "previous_promised_qty",
+                "ordered_available_to_promise_uom_qty",
+                "ordered_available_to_promise_qty",
+            ]
+        )
 
         # We add stock, so now the release must create the next
         # chained move
@@ -518,7 +715,11 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                     "product_uom": uom_dozen.id,
                     "product_qty": 24.0,
                     "product_uom_qty": 2.0,
-                    "ordered_available_to_promise": 12.0,
+                    # the quantity is based on the same unit as the
+                    # "product_uom_qty" as the field is shown beside
+                    # "product_uom_qty"
+                    "ordered_available_to_promise_qty": 12.0,
+                    "ordered_available_to_promise_uom_qty": 1.0,
                 }
             ],
         )

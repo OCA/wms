@@ -22,13 +22,13 @@ class StockMove(models.Model):
         "product_id.packaging_ids",
         "product_id.packaging_ids.max_weight",
         "product_id.weight",
-        "ordered_available_to_promise",
+        "ordered_available_to_promise_uom_qty",
     )
     def _compute_estimated_shipping_weight(self):
         for move in self:
             prod = move.product_id
             move.estimated_shipping_weight = prod.get_total_weight_from_packaging(
-                move.ordered_available_to_promise
+                move.ordered_available_to_promise_uom_qty
             )
 
     def _get_new_picking_values(self):
@@ -51,7 +51,7 @@ class StockMove(models.Model):
             move.need_release
             # do not change the carrier is nothing can be released on the stock move
             and not tools.float_is_zero(
-                move._ordered_available_to_promise(), precision_digits=precision
+                move.ordered_available_to_promise_uom_qty, precision_digits=precision
             )
             and move.rule_id.route_id.force_recompute_preferred_carrier_on_release
         )
