@@ -16,7 +16,12 @@
                 <field name="city" optional="show" />
             </field>
             <field name="product_uom_qty" position="after">
-                <field name="ordered_available_to_promise" />
+                <field name="ordered_available_to_promise_uom_qty" />
+                <field
+                    name="previous_promised_qty"
+                    optional="hide"
+                    groups="base.group_no_one"
+                />
                 <field name="date_priority" />
                 <field name="priority" />
             </field>
@@ -42,7 +47,7 @@
                 <attribute name="string">Shipment date</attribute>
             </field>
             <group name="main_grp_col2" position="inside">
-                <field name="ordered_available_to_promise" />
+                <field name="ordered_available_to_promise_uom_qty" />
                 <field name="date_priority" />
             </group>
         </field>
