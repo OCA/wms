@@ -590,6 +590,7 @@ class ClusterPicking(Component):
         if any(
             ml.picking_id != move_line.picking_id
             for ml in bin_package.planned_move_line_ids
+            if ml.state not in ("done", "cancel")
         ):
             return self._response_for_scan_destination(
                 move_line,
