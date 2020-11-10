@@ -175,12 +175,6 @@ class MessageAction(Component):
             "body": _("Location %s doesn't contain any package.") % location.name,
         }
 
-    def several_lines_in_location(self, location):
-        return {
-            "message_type": "warning",
-            "body": _("Several lines found in %s, please scan one.") % location.name,
-        }
-
     def several_packs_in_location(self, location):
         return {
             "message_type": "warning",
