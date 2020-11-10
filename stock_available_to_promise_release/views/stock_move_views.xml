@@ -47,6 +47,21 @@
             </group>
         </field>
     </record>
+    <record id="view_move_release_search" model="ir.ui.view">
+        <field name="name">stock.move.release.search</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_search" />
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <filter
+                    string="Qty Available to Release"
+                    name="qty_available_to_release"
+                    domain="[('release_ready', '=', True)]"
+                />
+                <separator />
+            </field>
+        </field>
+    </record>
     <record id="stock_move_release_action" model="ir.actions.act_window">
         <field name="name">Stock Allocation</field>
         <field name="res_model">stock.move</field>
@@ -61,7 +76,9 @@
                      (0, 0, {'view_mode': 'form', 'view_id': ref('view_move_release_form')}),
                      ]"
         />
-        <field name="context">{'search_default_groupby_picking_id': 1}</field>
+        <field
+            name="context"
+        >{'search_default_groupby_picking_id': 1, 'search_default_qty_available_to_release': 1}</field>
         <field name="domain">[('need_release', '=' , True)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

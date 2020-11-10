@@ -1,7 +1,8 @@
 # Copyright 2019 Camptocamp (https://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.tools import date_utils, float_compare
 
@@ -19,18 +20,56 @@ class StockMove(models.Model):
     ordered_available_to_promise = fields.Float(
         string="Ordered Available to Promise",
         compute="_compute_ordered_available_to_promise",
+        search="_search_ordered_available_to_promise",
         digits="Product Unit of Measure",
         help="Available to Promise quantity minus quantities promised "
         " to older promised operations.",
+    )
+    release_ready = fields.Boolean(
+        compute="_compute_release_ready", search="_search_release_ready",
     )
     need_release = fields.Boolean(index=True,)
     zip_code = fields.Char(related="partner_id.zip", store="True")
     city = fields.Char(related="partner_id.city", store="True")
 
+    @api.depends(
+        "ordered_available_to_promise", "picking_id.move_type", "picking_id.move_lines"
+    )
+    def _compute_release_ready(self):
+        for move in self:
+            if move.picking_id.move_type == "one":
+                move.release_ready = all(
+                    m.ordered_available_to_promise > 0
+                    for m in move.picking_id.move_lines
+                )
+            else:
+                move.release_ready = move.ordered_available_to_promise > 0
+
+    @api.model
+    def _search_release_ready(self, operator, value):
+        if operator != "=":
+            raise UserError(_("Unsupported operator %s") % (operator,))
+        moves = self.search([("ordered_available_to_promise", ">", 0)])
+        moves = moves.filtered(lambda m: m.release_ready)
+        return [("id", "in", moves.ids)]
+
     @api.depends()
     def _compute_ordered_available_to_promise(self):
         for move in self:
             move.ordered_available_to_promise = move._ordered_available_to_promise()
+
+    @api.model
+    def _search_ordered_available_to_promise(self, operator, value):
+        if operator not in (">", ">=", "="):
+            raise UserError(_("Unsupported operator %s") % (operator,))
+        moves = self.search([("need_release", "=", True)])
+        if operator == ">":
+            moves = moves.filtered(lambda m: m._ordered_available_to_promise() > value)
+        elif operator == ">=":
+            moves = moves.filtered(lambda m: m._ordered_available_to_promise() >= value)
+        else:
+            moves = moves.filtered(lambda m: m._ordered_available_to_promise() == value)
+        return [("id", "in", moves.ids)]
 
     def _should_compute_ordered_available_to_promise(self):
         return (
