@@ -145,9 +145,19 @@ msgid "Procurement Group"
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_search
+msgid "Qty Available to Release"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_picking_release_form
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_move_release_form
 msgid "Release"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__release_ready
+msgid "Release Ready"
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -226,6 +236,13 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_picking
 msgid "Transfer"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
+msgid "Unsupported operator %s"
 msgstr ""
 
 #. module: stock_available_to_promise_release
