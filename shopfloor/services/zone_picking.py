@@ -434,7 +434,12 @@ class ZonePicking(Component):
         package = quants.package_id
         if len(product) > 1 or len(lot) > 1 or len(package) > 1:
             return False
-        domain = [("location_id", "=", location.id)]
+        domain = [
+            ("location_id", "=", location.id),
+            "|",
+            ("shopfloor_user_id", "=", False),
+            ("shopfloor_user_id", "=", self.env.uid),
+        ]
         if product:
             domain.append(("product_id", "=", product.id))
             if lot:
@@ -508,7 +513,7 @@ class ZonePicking(Component):
                 response = self.list_move_lines(location.id, picking_type.id)
                 return self._response(
                     base_response=response,
-                    message=self.msg_store.several_lines_in_location(location),
+                    message=self.msg_store.location_empty(location),
                 )
         package = search.package_from_scan(barcode)
         if package:
