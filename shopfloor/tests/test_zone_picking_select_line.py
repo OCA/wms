@@ -118,9 +118,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location=self.zone_sublocation2,
             picking_type=self.picking_type,
             move_lines=move_lines,
-            message=self.service.msg_store.several_lines_in_location(
-                self.zone_sublocation2
-            ),
+            message=self.service.msg_store.location_empty(self.zone_sublocation2),
         )
 
     def test_scan_source_barcode_package(self):
@@ -292,6 +290,45 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             move_lines=move_lines,
             message=self.service.msg_store.barcode_not_found(),
         )
+
+    def test_scan_source_multi_users(self):
+        """First user scans the source location 'Zone sub-location 1' containing
+        only one move line, then processes the next step 'set_line_destination'.
+
+        The second user scans the same source location, and should not find any line.
+        """
+        # The first user starts to process the only line available
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        #   - scan source
+        response = self.service.scan_source(
+            zone_location.id, picking_type.id, self.zone_sublocation1.barcode,
+        )
+        move_line = self.picking1.move_line_ids
+        self.assertEqual(response["next_state"], "set_line_destination")
+        #   - set destination
+        self.service.set_destination(
+            zone_location.id,
+            picking_type.id,
+            move_line.id,
+            self.free_package.name,
+            move_line.product_uom_qty,
+        )
+        self.assertEqual(move_line.shopfloor_user_id, self.env.user)
+        # The second user scans the same source location
+        env = self.env(user=self.stock_user2)
+        with self.work_on_services(
+            env=env, menu=self.menu, profile=self.profile
+        ) as work:
+            service = work.component(usage="zone_picking")
+            response = service.scan_source(
+                zone_location.id, picking_type.id, self.zone_sublocation1.barcode,
+            )
+            self.assertEqual(response["next_state"], "select_line")
+            self.assertEqual(
+                response["message"],
+                self.service.msg_store.location_empty(self.zone_sublocation1),
+            )
 
     def test_prepare_unload_wrong_parameters(self):
         zone_location = self.zone_location

@@ -13,6 +13,20 @@ class ZonePickingCommonCase(CommonCase):
         cls.picking_type = cls.menu.picking_type_ids
 
     @classmethod
+    def setUpClassUsers(cls):
+        super().setUpClassUsers()
+        Users = cls.env["res.users"].sudo().with_context(no_reset_password=True)
+        cls.stock_user2 = Users.create(
+            {
+                "name": "Paul Posichon",
+                "login": "paulposichon",
+                "email": "paul.posichon@example.com",
+                "notification_type": "inbox",
+                "groups_id": [(6, 0, [cls.env.ref("stock.group_stock_user").id])],
+            }
+        )
+
+    @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
         cls.packing_location.sudo().active = True
