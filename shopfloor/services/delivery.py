@@ -17,6 +17,9 @@ class Delivery(Component):
 
     Multiple operators could be processing a same delivery order.
 
+    You will find a sequence diagram describing states and endpoints
+    relationships [here](../docs/delivery_diag_seq.png).
+
     Expected:
 
     * Existing packages are moved to customer location
