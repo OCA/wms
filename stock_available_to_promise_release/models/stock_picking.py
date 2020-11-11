@@ -1,4 +1,4 @@
-# Copyright 2019 Camptocamp (https://www.camptocamp.com)
+# Copyright 2020 Camptocamp (https://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from odoo import _, api, exceptions, fields, models
@@ -11,14 +11,23 @@ class StockPicking(models.Model):
     need_release = fields.Boolean(
         compute="_compute_need_release", search="_search_need_release",
     )
+    need_release_count = fields.Integer(
+        string="# of need release moves", compute="_compute_need_release"
+    )
     release_ready = fields.Boolean(
         compute="_compute_release_ready", search="_search_release_ready",
+    )
+    release_ready_count = fields.Integer(
+        string="# of moves ready", compute="_compute_release_ready",
     )
 
     @api.depends("move_lines.need_release")
     def _compute_need_release(self):
         for picking in self:
-            picking.need_release = any(move.need_release for move in picking.move_lines)
+            picking.need_release_count = sum(
+                1 for move in picking.move_lines if move.need_release
+            )
+            picking.need_release = picking.need_release_count
 
     def _search_need_release(self, operator, value):
         if (operator, value) != ("=", True):
@@ -37,21 +46,28 @@ class StockPicking(models.Model):
                 picking.release_ready = False
                 picking.release_ready_count = 0
                 continue
+            move_lines = picking.move_lines.filtered(
+                lambda move: move.state not in ("cancel", "done")
+            )
             if picking.move_type == "one":
-                picking.release_ready = all(
-                    float_compare(
+                picking.release_ready_count = sum(
+                    1
+                    for move in move_lines
+                    if float_compare(
                         move.ordered_available_to_promise_qty,
                         move.product_qty,
                         precision_rounding=move.product_id.uom_id.rounding,
                     )
                     == 0
-                    for move in picking.move_lines
                 )
+                picking.release_ready = picking.release_ready_count == len(move_lines)
             else:
-                picking.release_ready = any(
-                    move.ordered_available_to_promise_qty > 0
-                    for move in picking.move_lines
+                picking.release_ready_count = sum(
+                    1
+                    for move in move_lines
+                    if move.ordered_available_to_promise_qty > 0
                 )
+                picking.release_ready = bool(picking.release_ready_count)
 
     def _search_release_ready(self, operator, value):
         if operator != "=":
@@ -85,3 +101,16 @@ class StockPicking(models.Model):
             )
             % (self.id, self.name)
         )
+
+    def action_open_move_need_release(self):
+        self.ensure_one()
+        if not self.need_release:
+            return
+        xmlid = "stock_available_to_promise_release.stock_move_release_action"
+        action = self.env.ref(xmlid).read()[0]
+        action["domain"] = [
+            ("picking_id", "=", self.id),
+            ("need_release", "=", True),
+        ]
+        action["context"] = {}
+        return action
