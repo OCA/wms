@@ -32,7 +32,6 @@ class StockMove(models.Model):
     ordered_available_to_promise_qty = fields.Float(
         string="Ordered Available to Promise (Real Qty)",
         compute="_compute_ordered_available_to_promise",
-        search="_search_ordered_available_to_promise",
         digits="Product Unit of Measure",
         help="Available to Promise quantity minus quantities promised "
         " to moves with higher priority (in default UoM of the product).",
@@ -152,10 +151,7 @@ class StockMove(models.Model):
                 move.release_ready = False
                 continue
             if move.picking_id.move_type == "one":
-                move.release_ready = all(
-                    m.ordered_available_to_promise_uom_qty > 0
-                    for m in move.picking_id.move_lines
-                )
+                move.release_ready = move.picking_id.release_ready
             else:
                 move.release_ready = move.ordered_available_to_promise_uom_qty > 0
 
