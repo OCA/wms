@@ -12,6 +12,7 @@
         "views/product_product_views.xml",
         "views/stock_move_views.xml",
         "views/stock_picking_views.xml",
+        "views/stock_picking_views.xml",
         "views/stock_location_route_views.xml",
         "views/res_config_settings.xml",
         "wizards/stock_move_release_views.xml",

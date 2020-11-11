@@ -68,7 +68,7 @@
         </field>
     </record>
     <record id="stock_move_release_action" model="ir.actions.act_window">
-        <field name="name">Stock Allocation</field>
+        <field name="name">Moves Allocations</field>
         <field name="res_model">stock.move</field>
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">tree,kanban,form</field>
@@ -99,7 +99,7 @@
     <menuitem
         action="stock_move_release_action"
         id="stock_move_release_menu"
-        parent="stock.menu_stock_warehouse_mgmt"
+        parent="stock.menu_warehouse_report"
         sequence="10"
         groups="stock.group_stock_manager,stock.group_stock_user"
     />
