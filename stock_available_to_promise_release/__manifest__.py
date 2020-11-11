@@ -9,6 +9,7 @@
     "category": "Stock Management",
     "depends": ["stock"],
     "data": [
+        "views/product_product_views.xml",
         "views/stock_move_views.xml",
         "views/stock_picking_views.xml",
         "views/stock_location_route_views.xml",
