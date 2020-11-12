@@ -116,6 +116,25 @@ class StockPicking(models.Model):
             % (self.id, self.name)
         )
 
+    def _after_release_update_chain(self):
+        """Called after the moves are released
+
+        ``self`` contains all the stock.picking of the chain up
+        to the released one.
+        """
+        self._after_release_set_printed()
+        self._after_release_set_expected_date()
+
+    def _after_release_set_printed(self):
+        self.filtered(lambda p: not p.printed).printed = True
+
+    def _after_release_set_expected_date(self):
+        prep_time = self.env.company.stock_release_max_prep_time
+        new_expected_date = fields.Datetime.add(
+            fields.Datetime.now(), minutes=prep_time
+        )
+        self.scheduled_date = new_expected_date
+
     def action_open_move_need_release(self):
         self.ensure_one()
         if not self.need_release:
