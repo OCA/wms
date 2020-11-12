@@ -9,17 +9,26 @@ class StockPicking(models.Model):
     _inherit = "stock.picking"
 
     need_release = fields.Boolean(
-        compute="_compute_need_release", search="_search_need_release",
+        compute="_compute_need_release", search="_search_need_release"
     )
     need_release_count = fields.Integer(
         string="# of need release moves", compute="_compute_need_release"
     )
     release_ready = fields.Boolean(
-        compute="_compute_release_ready", search="_search_release_ready",
+        compute="_compute_release_ready", search="_search_release_ready"
     )
     release_ready_count = fields.Integer(
-        string="# of moves ready", compute="_compute_release_ready",
+        string="# of moves ready", compute="_compute_release_ready"
     )
+    date_priority = fields.Datetime(
+        string="Priority Date",
+        compute="_compute_date_priority",
+        help="Date/time used to sort moves to deliver first. "
+        "Used to calculate the ordered available to promise.",
+    )
+    zip_code = fields.Char(related="partner_id.zip", store=True)
+    state_id = fields.Many2one(related="partner_id.state_id", store=True)
+    city = fields.Char(related="partner_id.city", store=True)
 
     @api.depends("move_lines.need_release")
     def _compute_need_release(self):
@@ -80,6 +89,11 @@ class StockPicking(models.Model):
         pickings = moves.picking_id.filtered("release_ready")
         return [("id", "in", pickings.ids)]
 
+    @api.depends("move_lines.date_priority")
+    def _compute_date_priority(self):
+        for picking in self:
+            picking.date_priority = min(picking.move_lines.mapped("date_priority"))
+
     def release_available_to_promise(self):
         # When the stock.picking form view is opened through the "Deliveries"
         # button of a sale order, the latter sets values in the context such as
@@ -108,9 +122,6 @@ class StockPicking(models.Model):
             return
         xmlid = "stock_available_to_promise_release.stock_move_release_action"
         action = self.env.ref(xmlid).read()[0]
-        action["domain"] = [
-            ("picking_id", "=", self.id),
-            ("need_release", "=", True),
-        ]
+        action["domain"] = [("picking_id", "=", self.id), ("need_release", "=", True)]
         action["context"] = {}
         return action
