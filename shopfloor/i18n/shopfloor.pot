@@ -932,12 +932,6 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Several lines found in %s, please scan one."
-msgstr ""
-
-#. module: shopfloor
-#: code:addons/shopfloor/actions/message.py:0
-#, python-format
 msgid "Several lots found in %s, please scan a lot."
 msgstr ""
 
