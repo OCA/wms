@@ -756,6 +756,42 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             ],
         )
 
+    def test_count_fields(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        picking1 = self._create_picking_chain(
+            self.wh,
+            [
+                (self.product1, 20),
+                (self.product2, 10),
+                (self.product3, 20),
+                (self.product4, 10),
+            ],
+        )
+        picking2 = self._create_picking_chain(self.wh, [(self.product1, 20)],)
+        self.assertEqual(self.product1.move_need_release_count, 2)
+        self.assertEqual(self.product2.move_need_release_count, 1)
+        self.assertEqual(picking1.need_release_count, 4)
+        self.assertEqual(picking2.need_release_count, 1)
+
+    def test_search_picking(self):
+        # this one does not need a release (be sure we don't find it in the
+        # search)
+        self._create_picking_chain(self.wh, [(self.product1, 20)])
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        picking1 = self._create_picking_chain(
+            self.wh, [(self.product1, 20), (self.product2, 10)],
+        )
+        picking2 = self._create_picking_chain(self.wh, [(self.product3, 20)],)
+        self._update_qty_in_location(self.loc_bin1, self.product3, 20.0)
+
+        pickings = self.env["stock.picking"].search([("need_release", "=", True)])
+        self.assertEqual(pickings, picking1 + picking2)
+
+        ready_pickings = self.env["stock.picking"].search(
+            [("release_ready", "=", True)]
+        )
+        self.assertEqual(ready_pickings, picking2)
+
     def test_mto_picking(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         # TODO a MTO picking should work normally
