@@ -42,13 +42,22 @@
         </field>
     </record>
     <record id="view_picking_release_tree" model="ir.ui.view">
-        <field name="name">stock.picking.tree</field>
+        <field name="name">stock.picking.release.tree</field>
         <field name="model">stock.picking</field>
         <field name="mode">primary</field>
         <field name="inherit_id" ref="stock.vpicktree" />
         <field eval="900" name="priority" />
         <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="zip_code" optional="hide" />
+                <field name="city" optional="hide" />
+                <field name="state_id" options="{'no_open': True}" optional="hide" />
+            </field>
+            <field name="origin" position="after">
+                <field name="group_id" optional="hide" />
+            </field>
             <tree position="inside">
+                <field name="date_priority" optional="show" />
                 <field name="need_release" invisible="1" />
                 <field name="release_ready" />
                 <field name="release_ready_count" />
@@ -94,7 +103,7 @@
         />
         <field
             name="context"
-        >{'search_default_groupby_carrier_id': 1, 'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0]}</field>
+        >{'search_default_groupby_carrier_id': 1, 'search_default_release_ready': 1, 'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0]}</field>
         <field name="domain">[('need_release', '=' , True)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
