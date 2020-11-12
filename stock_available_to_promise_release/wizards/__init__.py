@@ -1,1 +1,1 @@
-from . import stock_move_release
+from . import stock_release
