@@ -14,10 +14,17 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: stock_available_to_promise_release
-#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_move__ordered_available_to_promise
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_move__ordered_available_to_promise_qty
 msgid ""
-"Available to Promise quantity minus quantities promised  to older promised "
-"operations."
+"Available to Promise quantity minus quantities promised  to moves with "
+"higher priority (in default UoM of the product)."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_move__ordered_available_to_promise_uom_qty
+msgid ""
+"Available to Promise quantity minus quantities promised  to moves with "
+"higher priority (in initial demand's UoM)."
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -125,8 +132,13 @@ msgid "Need Release"
 msgstr ""
 
 #. module: stock_available_to_promise_release
-#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__ordered_available_to_promise
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__ordered_available_to_promise_uom_qty
 msgid "Ordered Available to Promise"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__ordered_available_to_promise_qty
+msgid "Ordered Available to Promise (Real Qty)"
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -147,6 +159,18 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_search
 msgid "Qty Available to Release"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_move__previous_promised_qty
+msgid ""
+"Quantities promised to moves with higher priority than this move (in default"
+" UoM of the product)."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__previous_promised_qty
+msgid "Quantity Promised before this move"
 msgstr ""
 
 #. module: stock_available_to_promise_release
