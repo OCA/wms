@@ -792,6 +792,22 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         )
         self.assertEqual(ready_pickings, picking2)
 
+    def test_update_scheduled_date(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        self.env.company.stock_release_max_prep_time = 120
+        picking = self._create_picking_chain(self.wh, [(self.product1, 20)])
+        self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
+
+        fake_now = datetime(2020, 11, 12, 14, 00)
+        with freeze_time(fake_now):
+            picking.release_available_to_promise()
+
+        # we add 120 minutes
+        expected_scheduled_date = datetime(2020, 11, 12, 16, 00)
+        self.assertEqual(picking.scheduled_date, expected_scheduled_date)
+        pick_picking = picking.move_lines.move_orig_ids.picking_id
+        self.assertEqual(pick_picking.scheduled_date, expected_scheduled_date)
+
     def test_mto_picking(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         # TODO a MTO picking should work normally
