@@ -41,3 +41,28 @@ class StockPicking(models.Model):
                 "no_breadcrumbs": True,
             },
         }
+
+    def action_cancel(self):
+        # As the moves are posted individually through the reception screen, we
+        # have to put them in a backorder to cancel the remaining ones
+        for picking in self:
+            if picking.picking_type_code == "incoming":
+                picking._create_backorder_for_validated_moves()
+        return super().action_cancel()
+
+    def _create_backorder_for_validated_moves(self):
+        """Put done moves in a backorder."""
+        self.ensure_one()
+        done_moves = self.move_lines.filtered(lambda m: m.state == "done")
+        new_picking = self.copy({"move_lines": [], "backorder_id": self.id})
+        # Set move lines after to bypass checks on creation made by
+        # the `_set_scheduled_date` method
+        new_picking.move_lines = done_moves
+        self.message_post(
+            body=_(
+                'The backorder <a href="#" '
+                'data-oe-model="stock.picking" '
+                'data-oe-id="%d">%s</a> has been created.'
+            )
+            % (new_picking.id, new_picking.name)
+        )
