@@ -1,7 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 import functools
-from itertools import groupby
+from collections import defaultdict
 
 from odoo.fields import first
 from odoo.tools.float_utils import float_compare, float_is_zero
@@ -265,19 +265,19 @@ class ZonePicking(Component):
         res = []
         for zone in zones:
             zone_data = self.data.location(zone)
-            zone_lines = self._zone_lines(zone).sorted(
-                key=lambda x: x.picking_id.picking_type_id
-            )
+            zone_lines = self._zone_lines(zone)
             if not zone_lines:
                 continue
+            lines_by_op_type = defaultdict(list)
+            for line in zone_lines:
+                lines_by_op_type[line.picking_id.picking_type_id].append(line)
+
             zone_data["operation_types"] = []
 
-            for picking_type, lines in groupby(
-                zone_lines, lambda line: line.picking_id.picking_type_id
-            ):
-                op_type = self.data.picking_type(picking_type)
-                op_type.update(self._counters_for_zone_lines(list(lines)))
-                zone_data["operation_types"].append(op_type)
+            for picking_type, lines in lines_by_op_type.items():
+                op_type_data = self.data.picking_type(picking_type)
+                op_type_data.update(self._counters_for_zone_lines(lines))
+                zone_data["operation_types"].append(op_type_data)
             res.append(zone_data)
         return res
 
