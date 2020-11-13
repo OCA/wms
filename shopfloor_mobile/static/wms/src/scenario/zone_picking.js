@@ -305,7 +305,7 @@ const ZonePicking = {
                 title_action_field: {action_val_path: "product.barcode"},
                 showActions: false,
                 list_item_options: {
-                    bold_title: true,
+                    loud_title: true,
                     fields: this.move_line_list_fields(),
                     list_item_klass_maker: function(rec) {
                         return rec.location_will_be_empty
