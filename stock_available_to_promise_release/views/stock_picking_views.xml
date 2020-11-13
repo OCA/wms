@@ -85,6 +85,16 @@
                 />
                 <separator />
             </filter>
+            <filter name="late" position="attributes">
+                <attribute
+                    name="domain"
+                >[('scheduled_date','&lt;', time.strftime('%%Y-%%m-%%d %%H:%%M:%%S')), ('state', 'in', ('assigned', 'waiting', 'confirmed')), ('need_release', '=', False)]</attribute>
+            </filter>
+            <filter name="waiting" position="attributes">
+                <attribute name="domain">
+                    [('state', 'in', ('confirmed', 'waiting')), ('need_release', '=', False)]
+                </attribute>
+            </filter>
         </field>
     </record>
     <record id="stock_picking_release_action" model="ir.actions.act_window">
@@ -103,7 +113,7 @@
         />
         <field
             name="context"
-        >{'search_default_groupby_carrier_id': 1, 'search_default_release_ready': 1, 'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0]}</field>
+        >{'search_default_release_ready': 1, 'contact_display': 'partner_address'}</field>
         <field name="domain">[('need_release', '=' , True)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

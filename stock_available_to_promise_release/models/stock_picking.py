@@ -32,21 +32,37 @@ class StockPicking(models.Model):
 
     @api.depends("move_lines.need_release")
     def _compute_need_release(self):
+        data = self.env["stock.move"].read_group(
+            [("need_release", "=", True), ("picking_id", "in", self.ids)],
+            ["picking_id"],
+            ["picking_id"],
+        )
+        count = {
+            row["picking_id"][0]: row["picking_id_count"]
+            for row in data
+            if row["picking_id"]
+        }
         for picking in self:
-            picking.need_release_count = sum(
-                1 for move in picking.move_lines if move.need_release
-            )
-            picking.need_release = picking.need_release_count
+            picking.need_release_count = count.get(picking.id, 0)
+            picking.need_release = bool(picking.need_release_count)
 
     def _search_need_release(self, operator, value):
-        if (operator, value) != ("=", True):
-            raise exceptions.UserError(
-                _("Unsupported search: %s %s") % (operator, value)
-            )
+        if operator not in ("=", "!="):
+            raise exceptions.UserError(_("Unsupported operator: %s") % (operator,))
         groups = self.env["stock.move"].read_group(
-            [("need_release", operator, value)], ["picking_id"], ["picking_id"]
+            [("need_release", "=", True)], ["picking_id"], ["picking_id"]
         )
-        return [("id", "in", [group["picking_id"][0] for group in groups])]
+        # if we have at least one stock move that needs release, the
+        # picking needs release
+        combinations = {
+            ("=", True): "in",
+            ("=", False): "not in",
+            ("!=", True): "not in",
+            ("!=", False): "in",
+        }
+        in_operator = combinations[(operator, value)]
+        picking_ids = [group["picking_id"][0] for group in groups]
+        return [("id", in_operator, picking_ids)]
 
     @api.depends("move_lines.ordered_available_to_promise_qty")
     def _compute_release_ready(self):

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="stock_picking_type_kanban" model="ir.ui.view">
+        <field name="name">stock.picking.type.kanban</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.stock_picking_type_kanban" />
+        <field name="arch" type="xml">
+            <field name="count_picking_waiting" position="before">
+                <field name="count_picking_need_release" />
+            </field>
+            <xpath
+                expr="//a[@name='get_action_picking_tree_waiting']/../.."
+                position="before"
+            >
+                <div t-if="record.count_picking_need_release.raw_value > 0" class="row">
+                    <div class="col-9">
+                        <a name="get_action_picking_tree_need_release" type="object">
+                            Need Release
+                        </a>
+                    </div>
+                    <div class="col-3">
+                        <field name="count_picking_need_release" />
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
