@@ -229,7 +229,7 @@ const Checkout = {
                 group_title_default: "Pickings to process",
                 group_color: this.utils.colors.color_for("screen_step_todo"),
                 list_item_options: {
-                    bold_title: true,
+                    loud_title: true,
                     fields: [
                         {path: "partner.name"},
                         {path: "origin"},

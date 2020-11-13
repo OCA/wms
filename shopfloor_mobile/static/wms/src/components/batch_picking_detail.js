@@ -28,7 +28,7 @@ Vue.component("batch-picking-detail", {
                 group_color: this.utils.colors.color_for("screen_step_todo"),
                 list_item_options: {
                     key_title: "name",
-                    bold_title: true,
+                    loud_title: true,
                     fields: this.picking_detail_fields(),
                 },
             };

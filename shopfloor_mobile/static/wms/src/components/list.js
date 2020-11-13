@@ -73,7 +73,7 @@ Vue.component("list", {
         list_item_options() {
             const opts = _.defaults({}, this.opts.list_item_options, {
                 key_title: this.opts.key_title,
-                bold_title: false,
+                loud_title: false,
                 showCounters: this.opts.showCounters,
                 // customize fields
                 fields: this.opts.list_item_fields,
@@ -151,7 +151,7 @@ Vue.component("list-item", {
     mixins: [ItemDetailMixin],
     template: `
     <div class="list-item">
-        <v-list-item-title v-if="opts.show_title" :class="{'font-weight-bold': opts.bold_title}">
+        <v-list-item-title v-if="opts.show_title" :class="{'font-weight-bold mb-2': opts.loud_title}">
             <div class="item-counter" v-if="opts.showCounters">
                 <span>{{ index + 1 }} / {{ count }}</span>
             </div>
