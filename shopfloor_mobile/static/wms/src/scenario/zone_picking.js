@@ -16,8 +16,7 @@ const template_mobile = `
             <manual-select
                 v-on:select="state.on_select"
                 :records="state.data.zones"
-                :list_item_fields="manual_select_zone_fields()"
-                :options="{showActions: false}"
+                :options="scan_location_manual_select_options()"
                 :key="make_state_component_key(['manual-select'])"
                 />
             <div class="button-list button-vertical-list full">
@@ -241,6 +240,17 @@ const ZonePicking = {
             }
             return data.zone_location;
         },
+        scan_location_manual_select_options: function() {
+            return {
+                group_title_default: "Available zones",
+                group_color: this.utils.colors.color_for("screen_step_todo"),
+                showActions: false,
+                list_item_options: {
+                    loud_title: true,
+                    fields: this.manual_select_zone_fields(),
+                },
+            };
+        },
         manual_select_zone_fields: function() {
             return [
                 {
@@ -305,7 +315,7 @@ const ZonePicking = {
                 title_action_field: {action_val_path: "product.barcode"},
                 showActions: false,
                 list_item_options: {
-                    bold_title: true,
+                    loud_title: true,
                     fields: this.move_line_list_fields(),
                     list_item_klass_maker: function(rec) {
                         return rec.location_will_be_empty
