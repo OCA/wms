@@ -317,22 +317,25 @@ class ZonePicking(Component):
                 locations, picking_type, package, product, lot
             )
         )
-        sort_keys_func, reverse = self._sort_key_move_lines(order)
-        move_lines = move_lines.sorted(sort_keys_func, reverse=reverse)
+        sort_keys_func = self._sort_key_move_lines(order)
+        move_lines = move_lines.sorted(sort_keys_func)
         return move_lines
 
     @staticmethod
     def _sort_key_move_lines(order):
-        """Return a `(sort_keys_func, reverse)` tuple for move lines."""
+        """Return a sorting function to order lines."""
+
         if order == "priority":
-            return lambda line: line.move_id.priority or "", True
+            # make prority negative to keep sorting ascending
+            return lambda line: (
+                -int(line.move_id.priority or "0"),
+                line.move_id.date_expected,
+            )
         elif order == "location":
-            return (
-                lambda line: (
-                    line.location_id.shopfloor_picking_sequence or "",
-                    line.location_id.name,
-                ),
-                False,
+            return lambda line: (
+                line.location_id.shopfloor_picking_sequence or "",
+                line.location_id.name,
+                line.move_id.date_expected,
             )
 
     def _find_buffer_move_lines_domain(
@@ -447,8 +450,8 @@ class ZonePicking(Component):
             if package:
                 domain.append(("package_id", "=", package.id))
             move_lines = self.env["stock.move.line"].search(domain)
-            sort_keys_func, reverse = self._sort_key_move_lines(order)
-            move_lines = move_lines.sorted(sort_keys_func, reverse=reverse)
+            sort_keys_func = self._sort_key_move_lines(order)
+            move_lines = move_lines.sorted(sort_keys_func)
             return first(move_lines)
         return False
 
