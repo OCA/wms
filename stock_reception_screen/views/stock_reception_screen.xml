@@ -54,6 +54,15 @@
                             attrs="{'invisible': [('current_step', 'in', ('select_product', 'select_move', 'done'))]}"
                         />
                         <button
+                            name="button_next_pack"
+                            type="object"
+                            string="Next PACK"
+                            icon="fa-repeat"
+                            class="btn-secondary"
+                            style="background-color: #eef0f2;"
+                            attrs="{'invisible': [('current_step', '!=', 'set_package')]}"
+                        />
+                        <button
                             name="button_reset"
                             type="object"
                             string="Cancel"
@@ -169,6 +178,7 @@
                                         attrs="{'invisible': [('current_move_line_qty_status', '!=', 'gt')]}"
                                     />
                                 </div>
+                                <!-- set_location -->
                                 <label for="current_move_line_location_dest_id" />
                                 <div>
                                     <field
@@ -182,15 +192,7 @@
                                         domain="[('id', 'child_of', picking_location_dest_id)]"
                                     />
                                 </div>
-                                <label for="current_move_line_package" />
-                                <div>
-                                    <field
-                                        name="current_move_line_package"
-                                        class="mr8"
-                                        style="width: 15em;"
-                                        attrs="{'readonly': [('current_step', '!=', 'set_package')]}"
-                                    />
-                                </div>
+                                <!-- select_packaging -->
                                 <label for="product_packaging_id" />
                                 <div>
                                     <field
@@ -229,6 +231,16 @@
                                         attrs="{
                             'readonly': [('current_step', '!=', 'select_packaging')],
                           }"
+                                    />
+                                </div>
+                                <!-- set_package -->
+                                <label for="current_move_line_package" />
+                                <div>
+                                    <field
+                                        name="current_move_line_package"
+                                        class="mr8"
+                                        style="width: 15em;"
+                                        attrs="{'readonly': [('current_step', '!=', 'set_package')]}"
                                     />
                                 </div>
                             </group>
