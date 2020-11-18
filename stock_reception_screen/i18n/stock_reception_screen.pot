@@ -394,6 +394,14 @@ msgid "Storage Type"
 msgstr ""
 
 #. module: stock_reception_screen
+#: code:addons/stock_reception_screen/models/stock_picking.py:0
+#, python-format
+msgid ""
+"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
+"id=\"%d\">%s</a> has been created."
+msgstr ""
+
+#. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "The move is already processed, aborting."
