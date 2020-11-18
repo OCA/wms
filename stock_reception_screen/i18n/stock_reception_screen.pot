@@ -211,6 +211,11 @@ msgid "Next"
 msgstr ""
 
 #. module: stock_reception_screen
+#: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
+msgid "Next PACK"
+msgstr ""
+
+#. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_step_descr
 msgid "Operation"
 msgstr ""
