@@ -170,6 +170,55 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             move_line=move_line,
         )
 
+    def test_scan_source_barcode_location_two_move_lines_same_product(self):
+        """Scan source: scanned location 'Zone sub-location 1' contains two lines.
+
+        Lines have the same product/package/lot,
+        they get processed one after the other,
+        next step 'set_line_destination' expected.
+        """
+        package = self.picking1.move_line_ids.mapped("package_id")[0]
+        new_picking = self._create_picking(lines=[(self.product_a, 20)])
+        self._fill_stock_for_moves(
+            new_picking.move_lines, in_package=package, location=self.zone_sublocation1
+        )
+        new_picking.action_assign()
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        response = self.service.dispatch(
+            "scan_source",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "barcode": self.zone_sublocation1.barcode,
+            },
+        )
+        move_line = self.picking1.move_line_ids
+        self.assert_response_set_line_destination(
+            response,
+            zone_location=self.zone_location,
+            picking_type=self.picking_type,
+            move_line=move_line,
+        )
+        # first line done
+        move_line.qty_done = move_line.product_uom_qty
+        # get the next one
+        response = self.service.dispatch(
+            "scan_source",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "barcode": self.zone_sublocation1.barcode,
+            },
+        )
+        move_line = new_picking.move_line_ids
+        self.assert_response_set_line_destination(
+            response,
+            zone_location=self.zone_location,
+            picking_type=self.picking_type,
+            move_line=move_line,
+        )
+
     def test_scan_source_barcode_location_several_move_lines(self):
         """Scan source: scanned location 'Zone sub-location 2' contains two
         move lines, next step 'select_line' expected with the list of these
