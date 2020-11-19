@@ -282,7 +282,13 @@ class ZonePicking(Component):
         return res
 
     def _find_location_move_lines_domain(
-        self, locations, picking_type=None, package=None, product=None, lot=None
+        self,
+        locations,
+        picking_type=None,
+        package=None,
+        product=None,
+        lot=None,
+        match_user=False,
     ):
         domain = [
             ("location_id", "child_of", locations.ids),
@@ -300,6 +306,12 @@ class ZonePicking(Component):
             domain += [("product_id", "=", product.id)]
         if lot:
             domain += [("lot_id", "=", lot.id)]
+        if match_user:
+            domain += [
+                "|",
+                ("shopfloor_user_id", "=", False),
+                ("shopfloor_user_id", "=", self.env.uid),
+            ]
         return domain
 
     def _find_location_move_lines(
@@ -310,11 +322,12 @@ class ZonePicking(Component):
         product=None,
         lot=None,
         order="priority",
+        match_user=False,
     ):
         """Find lines that potentially need work in given locations."""
         move_lines = self.env["stock.move.line"].search(
             self._find_location_move_lines_domain(
-                locations, picking_type, package, product, lot
+                locations, picking_type, package, product, lot, match_user=match_user
             )
         )
         sort_keys_func = self._sort_key_move_lines(order)
@@ -437,21 +450,15 @@ class ZonePicking(Component):
         package = quants.package_id
         if len(product) > 1 or len(lot) > 1 or len(package) > 1:
             return False
-        domain = [
-            ("location_id", "=", location.id),
-            "|",
-            ("shopfloor_user_id", "=", False),
-            ("shopfloor_user_id", "=", self.env.uid),
-        ]
-        if product:
-            domain.append(("product_id", "=", product.id))
-            if lot:
-                domain.append(("lot_id", "=", lot.id))
-            if package:
-                domain.append(("package_id", "=", package.id))
-            move_lines = self.env["stock.move.line"].search(domain)
-            sort_keys_func = self._sort_key_move_lines(order)
-            move_lines = move_lines.sorted(sort_keys_func)
+        move_lines = self._find_location_move_lines(
+            location,
+            picking_type=picking_type,
+            product=product,
+            package=package,
+            lot=lot,
+            match_user=True,
+        )
+        if move_lines:
             return first(move_lines)
         return False
 
