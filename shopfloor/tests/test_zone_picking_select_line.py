@@ -1,5 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+from odoo import fields
+
 from .test_zone_picking_base import ZonePickingCommonCase
 
 
@@ -12,12 +14,65 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
 
     """
 
+    def test_list_move_lines_order(self):
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        self.zone_sublocation2.name = "AAA " + self.zone_sublocation2.name
+
+        # Test by location
+        today = fields.Datetime.today()
+        future = fields.Datetime.add(
+            fields.Datetime.end_of(fields.Datetime.today(), "day"), days=2
+        )
+        # change date to lines in the same location
+        move1 = self.picking2.move_lines[0]
+        move1.write({"date_expected": today})
+        move1_line = move1.move_line_ids[0]
+        move2 = self.picking2.move_lines[1]
+        move2.write({"date_expected": future})
+        move2_line = move2.move_line_ids[0]
+
+        move_lines = self.service._find_location_move_lines(
+            zone_location, picking_type, order="location"
+        )
+        order_mapping = {line: i for i, line in enumerate(move_lines)}
+        self.assertTrue(order_mapping[move1_line] < order_mapping[move2_line])
+
+        # swap dates
+        move2.write({"date_expected": today})
+        move1.write({"date_expected": future})
+        move_lines = self.service._find_location_move_lines(
+            zone_location, picking_type, order="location"
+        )
+        order_mapping = {line: i for i, line in enumerate(move_lines)}
+        self.assertTrue(order_mapping[move1_line] > order_mapping[move2_line])
+
+        # Test by priority
+        self.picking2.move_lines.write({"priority": "0"})
+        (self.pickings - self.picking2).move_lines.write({"priority": "2"})
+        move_lines = self.service._find_location_move_lines(
+            zone_location, picking_type, order="priority"
+        )
+        order_mapping = {line: i for i, line in enumerate(move_lines)}
+        # picking2 lines stay at the end as they are low priority
+        # but move1_line comes before the other
+        self.assertTrue(order_mapping[move1_line] > len(move_lines) - 4)
+        self.assertTrue(order_mapping[move2_line] > len(move_lines) - 3)
+        # swap dates again
+        move2.write({"date_expected": future})
+        move1.write({"date_expected": today})
+        # and increase priority
+        self.picking2.move_lines.write({"priority": "3"})
+        move_lines = self.service._find_location_move_lines(
+            zone_location, picking_type, order="priority"
+        )
+        order_mapping = {line: i for i, line in enumerate(move_lines)}
+        self.assertEqual(order_mapping[move1_line], 0)
+        self.assertEqual(order_mapping[move2_line], 1)
+
     def test_list_move_lines_order_by_location(self):
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
-        # Ensure that the second location is ordered before the first one
-        # to avoid "false-positive" checks
-        self.zone_sublocation2.name = "a " + self.zone_sublocation2.name
         response = self.service.dispatch(
             "list_move_lines",
             params={
@@ -28,6 +83,24 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         )
         move_lines = self.service._find_location_move_lines(
             zone_location, picking_type, order="location"
+        )
+        self.assert_response_select_line(
+            response, zone_location, picking_type, move_lines,
+        )
+
+    def test_list_move_lines_order_by_priority(self):
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        response = self.service.dispatch(
+            "list_move_lines",
+            params={
+                "zone_location_id": zone_location.id,
+                "picking_type_id": picking_type.id,
+                "order": "priority",
+            },
+        )
+        move_lines = self.service._find_location_move_lines(
+            zone_location, picking_type, order="priority"
         )
         self.assert_response_select_line(
             response, zone_location, picking_type, move_lines,

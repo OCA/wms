@@ -1,6 +1,8 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo import fields
+
 from .test_cluster_picking_base import ClusterPickingCommonCase
 
 
@@ -263,6 +265,42 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
             [[cls.BatchProduct(product=cls.product_a, quantity=1)]]
         )
         cls._simulate_batch_selected(cls.batch, in_package=True)
+        cls.batch2 = cls._create_picking_batch(
+            [
+                [cls.BatchProduct(product=cls.product_a, quantity=1)],
+                [cls.BatchProduct(product=cls.product_a, quantity=1)],
+                [cls.BatchProduct(product=cls.product_b, quantity=1)],
+                [cls.BatchProduct(product=cls.product_b, quantity=1)],
+            ]
+        )
+        cls._simulate_batch_selected(cls.batch2, in_package=True)
+
+    def test_lines_order(self):
+        batch = self.batch2
+        picking1 = batch.picking_ids[0]
+        today = fields.Datetime.today()
+        future = fields.Datetime.add(
+            fields.Datetime.end_of(fields.Datetime.today(), "day"), days=2
+        )
+        # Change dates
+        move1 = picking1.move_lines[0]
+        move1_line = move1.move_line_ids[0]
+        move1.write({"date_expected": today})
+        (batch.picking_ids.move_lines - move1).write({"date_expected": future})
+
+        move_lines = self.service._lines_for_picking_batch(batch)
+        order_mapping = {line: i for i, line in enumerate(move_lines)}
+
+        # Today line comes first
+        self.assertEqual(order_mapping[move1_line], 0)
+        # swap dates
+        move1.write({"date_expected": future})
+        (batch.picking_ids.move_lines - move1).write({"date_expected": today})
+
+        move_lines = self.service._lines_for_picking_batch(batch)
+        order_mapping = {line: i for i, line in enumerate(move_lines)}
+        self.assertEqual(order_mapping[move1_line], len(move_lines) - 1)
+        # TODO: we should test all the combo of keys affecting sorting.
 
     def test_confirm_start_ok(self):
         """User confirms she starts the selected picking batch (happy path)"""
