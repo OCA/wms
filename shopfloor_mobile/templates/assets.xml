@@ -271,7 +271,7 @@
             t-attf-src="/shopfloor_mobile/assets/src/scenario/form.js?v=#{app_version}"
             type="module"
         />
-        <script id="script_devtools" t-if="debug">
+        <script id="script_devtools" t-if="debug or demo_mode">
             Vue.config.devtools = true
         </script>
         <!-- Main app script -->
