@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+
+    <record model="stock.release.channel" id="stock_release_channel_default">
+        <field name="name">Default</field>
+        <field name="sequence">999</field>
+        <field name="rule_domain">[]</field>
+    </record>
+
+</odoo>
