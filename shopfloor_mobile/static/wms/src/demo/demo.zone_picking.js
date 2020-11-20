@@ -20,11 +20,13 @@ const zone_picking_menu_case1 = demotools.addAppMenu(
 );
 
 function _makePickingType() {
+    const lines_count = demotools.getRandomInt(10);
+    const picking_count = demotools.getRandomInt(10);
     return demotools.makePickingType({
-        lines_count: demotools.getRandomInt(10),
-        picking_count: demotools.getRandomInt(10),
-        priority_lines_count: demotools.getRandomInt(10),
-        priority_picking_count: demotools.getRandomInt(10),
+        lines_count: lines_count,
+        picking_count: picking_count,
+        priority_lines_count: demotools.getRandomInt(lines_count),
+        priority_picking_count: demotools.getRandomInt(picking_count),
         code: "internal",
     });
 }
@@ -36,7 +38,36 @@ const pick_type4 = _makePickingType();
 
 const scan_location_picking_types = _.sampleSize(
     [pick_type1, pick_type2, pick_type3, pick_type4],
-    demotools.getRandomInt(4)
+    demotools.getRandomInt(4, 2)
+);
+
+function _makeZone() {
+    return demotools.makeLocation({
+        lines_count: _.sumBy(scan_location_picking_types, _.property("lines_count")),
+        picking_count: _.sumBy(
+            scan_location_picking_types,
+            _.property("picking_count")
+        ),
+        priority_lines_count: _.sumBy(
+            scan_location_picking_types,
+            _.property("priority_lines_count")
+        ),
+        priority_picking_count: _.sumBy(
+            scan_location_picking_types,
+            _.property("priority_picking_count")
+        ),
+        operation_types: _.cloneDeep(scan_location_picking_types),
+    });
+}
+
+const zone1 = _makeZone();
+const zone2 = _makeZone();
+const zone3 = _makeZone();
+const zone4 = _makeZone();
+
+const available_zones = _.sampleSize(
+    [zone1, zone2, zone3, zone4],
+    demotools.getRandomInt(4, 2)
 );
 
 const move_lines = demotools.makePickingLines(
@@ -74,6 +105,12 @@ const unload_set_destination_data = {
 };
 
 const DEMO_CASE_1 = {
+    select_zone: {
+        next_state: "scan_location",
+        data: {
+            scan_location: {zones: available_zones},
+        },
+    },
     scan_location: {
         next_state: "select_picking_type",
         data: {
