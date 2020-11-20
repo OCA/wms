@@ -22,7 +22,7 @@ const template_mobile = `
             <div class="button-list button-vertical-list full">
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-back />
+                        <btn-back :router_back="false"/>
                     </v-col>
                 </v-row>
             </div>
@@ -38,7 +38,7 @@ const template_mobile = `
             <div class="button-list button-vertical-list full">
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-back />
+                        <btn-back :router_back="false"/>
                     </v-col>
                 </v-row>
             </div>
@@ -82,6 +82,11 @@ const template_mobile = `
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
                         <btn-action @click="state.on_unload_at_destination()">Unload at destination</btn-action>
+                    </v-col>
+                </v-row>
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <btn-back :router_back="false"/>
                     </v-col>
                 </v-row>
             </div>
@@ -445,13 +450,22 @@ const ZonePicking = {
             order_lines_by: "priority",
             scan_destination_qty: 0,
             states: {
-                scan_location: {
+                init: {
                     enter: () => {
                         this.wait_call(this.odoo.call("select_zone"));
                     },
+                },
+                scan_location: {
                     display_info: {
                         title: "Start by scanning a location",
                         scan_placeholder: "Select a zone",
+                    },
+                    events: {
+                        go_back: "on_back",
+                    },
+                    on_back: () => {
+                        this.state_to("init");
+                        this.reset_notification();
                     },
                     on_select: selected => {
                         this.wait_call(
@@ -468,6 +482,13 @@ const ZonePicking = {
                     display_info: {
                         title: "Select operation type",
                     },
+                    events: {
+                        go_back: "on_back",
+                    },
+                    on_back: () => {
+                        this.state_to("init");
+                        this.reset_notification();
+                    },
                     on_select: selected => {
                         this.list_move_lines(selected.id);
                     },
@@ -479,6 +500,15 @@ const ZonePicking = {
                     },
                     events: {
                         select: "on_select",
+                        go_back: "on_back",
+                    },
+                    on_back: () => {
+                        this.reset_notification();
+                        this.wait_call(
+                            this.odoo.call("scan_location", {
+                                barcode: this.current_zone_location().barcode,
+                            })
+                        );
                     },
                     on_scan: scanned => {
                         this.scan_source(scanned.text);
