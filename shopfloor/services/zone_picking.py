@@ -197,7 +197,8 @@ class ZonePicking(Component):
         for datum in data["picking_types"]:
             picking_type = self.env["stock.picking.type"].browse(datum["id"])
             zone_lines = self._picking_type_zone_lines(zone_location, picking_type)
-            datum.update(self._counters_for_zone_lines(zone_lines))
+            counters = self._counters_for_zone_lines(zone_lines)
+            datum.update(counters)
         return data
 
     def _counters_for_zone_lines(self, zone_lines):
@@ -273,11 +274,15 @@ class ZonePicking(Component):
                 lines_by_op_type[line.picking_id.picking_type_id].append(line)
 
             zone_data["operation_types"] = []
-
+            zone_counters = defaultdict(int)
             for picking_type, lines in lines_by_op_type.items():
                 op_type_data = self.data.picking_type(picking_type)
-                op_type_data.update(self._counters_for_zone_lines(lines))
+                counters = self._counters_for_zone_lines(lines)
+                op_type_data.update(counters)
                 zone_data["operation_types"].append(op_type_data)
+                for k, v in counters.items():
+                    zone_counters[k] += v
+            zone_data.update(zone_counters)
             res.append(zone_data)
         return res
 
@@ -1597,6 +1602,7 @@ class ShopfloorZonePickingValidatorResponse(Component):
         zone_schema["operation_types"] = self.schemas._schema_list_of(
             picking_type_schema
         )
+        zone_schema.update(self._schema_for_zone_line_counters)
         zone_schema = {
             "zones": self.schemas._schema_list_of(zone_schema),
         }
