@@ -31,8 +31,7 @@ const template_mobile = `
             <manual-select
                 v-on:select="state.on_select"
                 :records="state.data.picking_types"
-                :list_item_fields="manual_select_picking_type_fields()"
-                :options="{showActions: false}"
+                :options="select_picking_type_manual_select_options()"
                 :key="make_state_component_key(['manual-select'])"
                 />
             <div class="button-list button-vertical-list full">
@@ -264,17 +263,31 @@ const ZonePicking = {
                 },
             ];
         },
+        select_picking_type_manual_select_options: function() {
+            return {
+                group_title_default: "Available operation types",
+                group_color: this.utils.colors.color_for("screen_step_todo"),
+                showActions: false,
+                list_item_options: {
+                    show_title: false,
+                    fields: this.manual_select_picking_type_fields(),
+                },
+            };
+        },
         manual_select_picking_type_fields: function() {
             return [
                 {
-                    path: "lines_count",
+                    path: "name",
                     renderer: this.picking_type_render_lines_count,
                     display_no_value: true,
                 },
             ];
         },
         picking_type_render_lines_count(record, field) {
-            return this.$t("misc.lines_count", record);
+            return _.template("(${counters}) ${name}")({
+                counters: this.$t("misc.lines_count", record),
+                name: record.name,
+            });
         },
         select_line_table_headers: function() {
             // Convert to v-data-table keys
