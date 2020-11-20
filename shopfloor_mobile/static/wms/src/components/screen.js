@@ -161,7 +161,7 @@ Vue.component("Screen", {
                 <screen-loading :loading="$root.loading" />
                 <div class="main-content">
                     <slot>
-                        <span v-if="this.$root.has_profile">$t('app.loading')</span>
+                        <span v-if="this.$root.has_profile">{{ $t('app.loading') }}</span>
                     </slot>
                 </div>
             </v-container>
