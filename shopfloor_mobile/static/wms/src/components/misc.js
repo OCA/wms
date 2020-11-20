@@ -269,15 +269,21 @@ Vue.component("btn-action", {
 });
 
 Vue.component("btn-back", {
+    props: {
+        router_back: {
+            type: Boolean,
+            default: true,
+        },
+    },
     methods: {
         on_back: function() {
             this.$root.trigger("go_back");
-            this.$router.back();
+            if (this.router_back) this.$router.back();
         },
     },
     template: `
 <btn-action v-bind="$attrs" action="back" v-on:click="on_back">
-  <v-icon>mdi-keyboard-backspace</v-icon>{{ $t("btn.back.title") }}
+  <v-icon>mdi-keyboard-backspace</v-icon><slot>{{ $t("btn.back.title") }}</slot>
 </btn-action>
 `,
 });
