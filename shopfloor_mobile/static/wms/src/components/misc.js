@@ -457,13 +457,20 @@ Vue.component("empty-location-icon", {
   `,
 });
 
-Vue.component("select-zone-operation-type-item", {
+Vue.component("select-zone-item", {
     mixins: [ItemDetailMixin],
     template: `
 <div :class="$options._componentTag">
-    <div v-for="op_type in record.operation_types" :key="make_component_key([op_type.id])">
-        <div class="detail-field">{{ $t("zone_picking.picking_type_detail", op_type) }}</div>
+  <div class="detail-field mt-2 title">
+    <span class="counters">({{ $t("misc.lines_count", record) }})</span>
+    <span class="name font-weight-bold">{{ record.name }}</span>
+  </div>
+  <div v-for="op_type in record.operation_types" :key="make_component_key([op_type.id])">
+    <div class="detail-field mt-2">
+      <span class="counters">({{ $t("misc.lines_count", op_type) }})</span>
+      <span class="name">{{ op_type.name }}</span>
     </div>
+  </div>
 </div>
     `,
 });
