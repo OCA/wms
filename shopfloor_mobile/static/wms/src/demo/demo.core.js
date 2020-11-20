@@ -78,9 +78,9 @@ export class DemoTools {
     }
 
     // Tools to generate data
-    getRandomInt(max) {
+    getRandomInt(max, min = 0) {
         max = max ? max : 10000;
-        return Math.floor(Math.random() * Math.floor(max)) + 1;
+        return Math.floor(Math.random() * Math.floor(max - min)) + 1;
     }
 
     randomFutureDate(days) {
