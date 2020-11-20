@@ -246,7 +246,7 @@ const ZonePicking = {
                 group_color: this.utils.colors.color_for("screen_step_todo"),
                 showActions: false,
                 list_item_options: {
-                    loud_title: true,
+                    show_title: false,
                     fields: this.manual_select_zone_fields(),
                 },
             };
@@ -254,8 +254,8 @@ const ZonePicking = {
         manual_select_zone_fields: function() {
             return [
                 {
-                    path: "operation_types",
-                    render_component: "select-zone-operation-type-item",
+                    path: "name",
+                    render_component: "select-zone-item",
                 },
             ];
         },
@@ -263,21 +263,13 @@ const ZonePicking = {
             return [
                 {
                     path: "lines_count",
-                    renderer: this.render_lines_count,
-                    display_no_value: true,
-                },
-                {
-                    path: "priority_lines_count",
-                    renderer: this.render_priority_lines_count,
+                    renderer: this.picking_type_render_lines_count,
                     display_no_value: true,
                 },
             ];
         },
-        render_lines_count(record, field) {
-            return this.$t("picking_type.lines_count", record);
-        },
-        render_priority_lines_count(record, field) {
-            return this.$t("picking_type.priority_lines_count", record);
+        picking_type_render_lines_count(record, field) {
+            return this.$t("misc.lines_count", record);
         },
         select_line_table_headers: function() {
             // Convert to v-data-table keys

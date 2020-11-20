@@ -99,14 +99,8 @@ const messages_en = {
         actions_popup: {
             btn_action: "Action",
         },
-    },
-    picking_type: {
-        lines_count: "{lines_count} lines (over {picking_count} operations).",
-        priority_lines_count:
-            "{priority_lines_count} priority lines (over {priority_picking_count} operations).",
-    },
-    zone_picking: {
-        picking_type_detail: "{lines_count} ({priority_lines_count}) {name}",
+        lines_count: "{priority_lines_count}/{lines_count}",
+        lines_count_position: "{priority_lines_count}/{lines_count} position(s)",
     },
     order_lines_by: {
         priority: "Order by priority",
