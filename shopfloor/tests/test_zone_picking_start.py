@@ -37,6 +37,10 @@ class ZonePickingStartCase(ZonePickingCommonCase):
         zones_data = self.service._response_for_start()["data"]["start"]["zones"]
         expected_sub1 = dict(
             self.data.location(self.zone_sublocation1),
+            lines_count=1,
+            picking_count=1,
+            priority_lines_count=0,
+            priority_picking_count=0,
             operation_types=[
                 dict(
                     op_type_data,
@@ -49,6 +53,10 @@ class ZonePickingStartCase(ZonePickingCommonCase):
         )
         expected_sub2 = dict(
             self.data.location(self.zone_sublocation2),
+            lines_count=2,
+            picking_count=1,
+            priority_lines_count=0,
+            priority_picking_count=0,
             operation_types=[
                 dict(
                     op_type_data,
@@ -61,6 +69,10 @@ class ZonePickingStartCase(ZonePickingCommonCase):
         )
         expected_sub3 = dict(
             self.data.location(self.zone_sublocation3),
+            lines_count=2,
+            picking_count=2,
+            priority_lines_count=0,
+            priority_picking_count=0,
             operation_types=[
                 dict(
                     op_type_data,
@@ -73,6 +85,10 @@ class ZonePickingStartCase(ZonePickingCommonCase):
         )
         expected_sub4 = dict(
             self.data.location(self.zone_sublocation4),
+            lines_count=3,
+            picking_count=2,
+            priority_lines_count=0,
+            priority_picking_count=0,
             operation_types=[
                 dict(
                     op_type_data,
@@ -85,6 +101,10 @@ class ZonePickingStartCase(ZonePickingCommonCase):
         )
         expected_sub5 = dict(
             self.data.location(self.zone_sublocation5),
+            lines_count=2,
+            picking_count=1,
+            priority_lines_count=0,
+            priority_picking_count=0,
             operation_types=[
                 dict(
                     op_type_data,
