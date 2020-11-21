@@ -302,7 +302,10 @@ class CommonCase(SavepointCase, ComponentMixin):
         product_locations = {}
         package = None
         if in_package:
-            package = cls.env["stock.quant.package"].create({})
+            if isinstance(in_package, models.BaseModel):
+                package = in_package
+            else:
+                package = cls.env["stock.quant.package"].create({})
         for move in moves:
             key = (move.product_id, location or move.location_id)
             product_locations.setdefault(key, 0)
