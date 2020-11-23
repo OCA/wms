@@ -320,17 +320,18 @@ class BaseShopfloorService(AbstractComponent):
     def actions_collection(self):
         return _PseudoCollection(self._actions_collection_name, self.env)
 
-    def actions_for(self, usage):
+    def actions_for(self, usage, propagate_kwargs=None):
         """Return an Action Component for a usage
 
         Action Components are the components supporting the business logic of
         the processes, so we can limit the code in Services to the minimum and
         share methods.
         """
+        propagate_kwargs = self.work._propagate_kwargs[:] + (propagate_kwargs or [])
         # propagate custom arguments (such as menu ID/profile ID)
         kwargs = {
             attr_name: getattr(self.work, attr_name)
-            for attr_name in self.work._propagate_kwargs
+            for attr_name in propagate_kwargs
             if attr_name not in ("collection", "components_registry")
         }
         work = WorkContext(collection=self.actions_collection, **kwargs)
@@ -354,6 +355,11 @@ class BaseShopfloorService(AbstractComponent):
     @property
     def msg_store(self):
         return self.actions_for("message")
+
+    @property
+    def search_move_line(self):
+        # TODO: propagating `picking_types` should probably be default
+        return self.actions_for("search_move_line", propagate_kwargs=["picking_types"])
 
     # TODO: maybe to be proposed to base_rest
     # TODO: add tests
@@ -424,8 +430,12 @@ class BaseShopfloorProcess(AbstractComponent):
     _requires_header_menu = True
     _requires_header_profile = True
 
-    @property
-    def picking_types(self):
+    def __init__(self, work_context):
+        super().__init__(work_context)
+        if not hasattr(self.work, "picking_types"):
+            self.work.picking_types = self._get_process_picking_types()
+
+    def _get_process_picking_types(self):
         """Return picking types for the menu and profile"""
         # TODO make this a lazy property or computed field avoid running the
         # filter every time?
@@ -433,13 +443,17 @@ class BaseShopfloorProcess(AbstractComponent):
             lambda pt: not pt.warehouse_id
             or pt.warehouse_id == self.work.profile.warehouse_id
         )
-        if not picking_types:
+        return picking_types
+
+    @property
+    def picking_types(self):
+        if not self.work.picking_types:
             raise exceptions.UserError(
                 _("No operation types configured on menu {} for warehouse {}.").format(
                     self.work.menu.name, self.work.profile.warehouse_id.display_name
                 )
             )
-        return picking_types
+        return self.work.picking_types
 
     def _check_picking_status(self, pickings):
         """Check if given pickings can be processed.
