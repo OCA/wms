@@ -591,6 +591,13 @@ class ClusterPicking(Component):
         search = self.actions_for("search")
         location_dest = search.location_from_scan(barcode)
         if location_dest:
+            if not location_dest.is_sublocation_of(
+                move_line.picking_id.location_dest_id
+            ):
+                return self._response_for_scan_destination(
+                    move_line, message=self.msg_store.dest_location_not_allowed()
+                )
+
             move_line.write({"qty_done": quantity, "location_dest_id": location_dest.id})
             zero_check = move_line.picking_id.picking_type_id.shopfloor_zero_check
             if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
