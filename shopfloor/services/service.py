@@ -344,7 +344,7 @@ class BaseShopfloorService(AbstractComponent):
     def actions_collection(self):
         return _PseudoCollection(self._actions_collection_name, self.env)
 
-    def actions_for(self, usage, propagate_kwargs=None):
+    def actions_for(self, usage, propagate_kwargs=None, **kw):
         """Return an Action Component for a usage
 
         Action Components are the components supporting the business logic of
@@ -357,7 +357,9 @@ class BaseShopfloorService(AbstractComponent):
             attr_name: getattr(self.work, attr_name)
             for attr_name in propagate_kwargs
             if attr_name not in ("collection", "components_registry")
+            and hasattr(self.work, attr_name)
         }
+        kwargs.update(kw)
         work = WorkContext(collection=self.actions_collection, **kwargs)
         return work.component(usage=usage)
 
@@ -472,11 +474,6 @@ class BaseShopfloorProcess(AbstractComponent):
     _requires_header_menu = True
     _requires_header_profile = True
 
-    def __init__(self, work_context):
-        super().__init__(work_context)
-        if not hasattr(self.work, "picking_types"):
-            self.work.picking_types = self._get_process_picking_types()
-
     def _get_process_picking_types(self):
         """Return picking types for the menu and profile"""
         # TODO make this a lazy property or computed field avoid running the
@@ -489,6 +486,8 @@ class BaseShopfloorProcess(AbstractComponent):
 
     @property
     def picking_types(self):
+        if not hasattr(self.work, "picking_types"):
+            self.work.picking_types = self._get_process_picking_types()
         if not self.work.picking_types:
             raise exceptions.UserError(
                 _("No operation types configured on menu {} for warehouse {}.").format(
