@@ -247,6 +247,15 @@ class MessageAction(Component):
             ),
         }
 
+    def x_units_put_in_location(self, qty, product, location):
+        # TODO refactor with x_units_put_in_package
+        return {
+            "message_type": "success",
+            "body": _("{} {} put in {}").format(
+                qty, product.display_name, location.name
+            ),
+        }
+
     def cannot_move_something_in_picking_type(self):
         return {
             "message_type": "error",
