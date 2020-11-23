@@ -10,7 +10,7 @@
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "license": "AGPL-3",
     "application": False,
-    "installable": True,
+    "installable": False,
     "depends": ["stock_storage_type"],
     "data": ["views/product.xml", "views/stock_location.xml"],
     "demo": [],

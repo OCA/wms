@@ -17,10 +17,3 @@
 # To use a specific commit version, set the branch (required) and the
 # commit SHA to select:
 # sale-workflow https://github.com/OCA/sale-workflow branchname f848e37
-
-product-attribute
-server-tools
-stock-logistics-workflow
-web
-rest-framework
-server-auth

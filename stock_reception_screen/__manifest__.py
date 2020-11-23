@@ -29,6 +29,6 @@
         "views/stock_reception_screen.xml",
         "views/manual_barcode.xml",
     ],
-    "installable": True,
+    "installable": False,
     "development_status": "Alpha",
 }

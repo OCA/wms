@@ -9,7 +9,7 @@
     "category": "Stock Management",
     "depends": ["sale_stock", "stock_available_to_promise_release", "delivery"],
     "data": ["views/stock_move_views.xml"],
-    "installable": True,
+    "installable": False,
     "license": "AGPL-3",
     "application": False,
     "development_status": "Alpha",
