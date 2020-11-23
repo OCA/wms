@@ -26,3 +26,4 @@ from . import message
 from . import search
 from . import inventory
 from . import savepoint
+from . import move_line_search
