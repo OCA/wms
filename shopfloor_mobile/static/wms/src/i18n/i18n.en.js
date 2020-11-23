@@ -100,7 +100,9 @@ const messages_en = {
             btn_action: "Action",
         },
         lines_count: "{priority_lines_count}/{lines_count}",
-        lines_count_position: "{priority_lines_count}/{lines_count} position(s)",
+        lines_count_extended: "{priority_lines_count}/{lines_count} position(s)",
+        picking_count: "{priority_picking_count}/{picking_count}",
+        picking_count_extended: "{priority_picking_count}/{picking_count} picking(s)",
     },
     order_lines_by: {
         priority: "Order by priority",

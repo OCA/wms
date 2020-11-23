@@ -521,6 +521,12 @@ export class DemoTools {
                 return false;
             }
         });
+        _.defaults(new_item, {
+            lines_count: 0,
+            priority_lines_count: 0,
+            picking_count: 0,
+            priority_picking_count: 0,
+        });
         if (_.isUndefined(new_item.picking_types)) {
             new_item.picking_types = [{id: 99999999, name: "Fake type"}];
         }
