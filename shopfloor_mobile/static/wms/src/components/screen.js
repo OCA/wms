@@ -73,6 +73,15 @@ Vue.component("Screen", {
         show_message: false,
     }),
     mounted() {
+        this.$watch(
+            "drawer",
+            value => {
+                if (value)
+                    // Refresh menu items and their counters when the drawer is expanded
+                    this.$root.loadMenu(true);
+            },
+            {immediate: true}
+        );
         // Manage popup display by passed property
         this.$watch(
             "screen_info.user_popup",
