@@ -1,40 +1,10 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from .common import CommonCase
+from .test_menu_base import CommonMenuCase
 
 
-class MenuCase(CommonCase):
-    @classmethod
-    def setUpClassVars(cls, *args, **kwargs):
-        super().setUpClassVars(*args, **kwargs)
-        cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
-
-    def setUp(self):
-        super().setUp()
-        with self.work_on_services(profile=self.profile) as work:
-            self.service = work.component(usage="menu")
-
-    def _assert_menu_response(self, response, menus):
-        self.assert_response(
-            response,
-            data={
-                "size": len(menus),
-                "records": [
-                    {
-                        "id": menu.id,
-                        "name": menu.name,
-                        "scenario": menu.scenario,
-                        "picking_types": [
-                            {"id": picking_type.id, "name": picking_type.name}
-                            for picking_type in menu.picking_type_ids
-                        ],
-                    }
-                    for menu in menus
-                ],
-            },
-        )
-
+class MenuCase(CommonMenuCase):
     def test_menu_search(self):
         """Request /menu/search"""
         # Simulate the client searching menus

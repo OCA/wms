@@ -59,16 +59,31 @@ class ShopfloorMenu(Component):
         )
 
     def _convert_one_record(self, record):
-        # TODO: use `jsonify`
-        return {
-            "id": record.id,
-            "name": record.name,
-            "scenario": record.scenario,
-            "picking_types": [
-                {"id": picking_type.id, "name": picking_type.name}
-                for picking_type in record.picking_type_ids
-            ],
-        }
+        values = record.jsonify(self._one_record_parser, one=True)
+        counters = self._get_move_line_counters(record)
+        values.update(counters)
+        return values
+
+    def _get_move_line_counters(self, record):
+        """Lookup for all lines per menu item and compute counters.
+        """
+        # TODO: maybe to be improved w/ raw SQL as this run for each menu item
+        # and it's called every time the menu is opened/gets refreshed
+        move_line_search = self.actions_for(
+            "search_move_line", picking_types=record.picking_type_ids
+        )
+        locations = record.picking_type_ids.mapped("default_location_src_id")
+        lines_per_menu = move_line_search.search_move_lines_by_location(locations)
+        return move_line_search.counters_for_lines(lines_per_menu)
+
+    @property
+    def _one_record_parser(self):
+        return [
+            "id",
+            "name",
+            "scenario",
+            ("picking_type_ids:picking_types", ["id", "name"]),
+        ]
 
 
 class ShopfloorMenuValidator(Component):
@@ -92,28 +107,24 @@ class ShopfloorMenuValidatorResponse(Component):
     _usage = "menu.validator.response"
 
     def return_search(self):
+        record_schema = self._record_schema
         return self._response_schema(
             {
                 "size": {"coerce": to_int, "required": True, "type": "integer"},
-                "records": {
-                    "type": "list",
-                    "required": True,
-                    "schema": {"type": "dict", "schema": self._record_schema},
-                },
+                "records": self.schemas._schema_list_of(record_schema),
             }
         )
 
     @property
     def _record_schema(self):
-        return {
+        schema = {
             "id": {"coerce": to_int, "required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
             "scenario": {"type": "string", "nullable": False, "required": True},
-            "picking_types": {
-                "type": "list",
-                "schema": {"type": "dict", "schema": self._picking_type_schema},
-            },
+            "picking_types": self.schemas._schema_list_of(self._picking_type_schema),
         }
+        schema.update(self.schemas.move_lines_counters())
+        return schema
 
     @property
     def _picking_type_schema(self):
