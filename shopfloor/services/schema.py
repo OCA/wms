@@ -186,3 +186,11 @@ class BaseShopfloorSchemaResponse(Component):
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
         }
+
+    def move_lines_counters(self):
+        return {
+            "lines_count": {"type": "float", "required": True},
+            "picking_count": {"type": "float", "required": True},
+            "priority_lines_count": {"type": "float", "required": True},
+            "priority_picking_count": {"type": "float", "required": True},
+        }
