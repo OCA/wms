@@ -8,6 +8,7 @@ parserOptions:
 
 # Globals available in Odoo that shouldn't produce errorings
 globals:
+  Vue: readonly
   _: readonly
   $: readonly
   fuzzy: readonly

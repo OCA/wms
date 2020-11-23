@@ -136,6 +136,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         product = self.product_a.with_context(location=move_line.location_id.id)
         expected = {
             "id": move_line.id,
+            "done": False,
             "qty_done": 3.0,
             "quantity": move_line.product_uom_qty,
             "product": self._expected_product_detail(product),
@@ -167,6 +168,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         product = self.product_b.with_context(location=move_line.location_id.id)
         expected = {
             "id": move_line.id,
+            "done": False,
             "qty_done": 0.0,
             "quantity": move_line.product_uom_qty,
             "product": self._expected_product_detail(product),
@@ -190,6 +192,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         product = self.product_c.with_context(location=move_line.location_id.id)
         expected = {
             "id": move_line.id,
+            "done": False,
             "qty_done": 0.0,
             "quantity": move_line.product_uom_qty,
             "product": self._expected_product_detail(product),
@@ -225,6 +228,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         product = self.product_d.with_context(location=move_line.location_id.id)
         expected = {
             "id": move_line.id,
+            "done": False,
             "qty_done": 0.0,
             "quantity": move_line.product_uom_qty,
             "product": self._expected_product_detail(product),

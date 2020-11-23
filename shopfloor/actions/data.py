@@ -174,6 +174,12 @@ class DataAction(Component):
                 "move_id:priority",
                 lambda rec, fname: rec.move_id.priority or "",
             ),
+            (
+                "result_package_id:package_dest",
+                lambda rec, fname: self.package(
+                    rec.result_package_id, rec.picking_id, with_packaging=True
+                ),
+            ),
         ]
 
     @ensure_model("stock.package_level")
@@ -256,6 +262,7 @@ class DataAction(Component):
         parser = self._picking_batch_parser
         if with_pickings:
             parser.append(("picking_ids:pickings", self._picking_parser))
+
         return self._jsonify(record, parser, **kw)
 
     def picking_batches(self, record, with_pickings=False, **kw):

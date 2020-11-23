@@ -28,9 +28,9 @@ odoo.define("stock_reception_screen.autofocus", function (require) {
             }
             // Using this.state.fields["current_step_focus_field"].value
             // is empty, does not work ?
-            for (var i = 0; i < (widgets ? widgets.length : 0); i++) {
-                if (widgets[i].name === field2focus) {
-                    focusWidget = widgets[i];
+            for (var j = 0; j < (widgets ? widgets.length : 0); j++) {
+                if (widgets[j].name === field2focus) {
+                    focusWidget = widgets[j];
                     break;
                 }
             }
