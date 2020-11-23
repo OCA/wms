@@ -51,13 +51,13 @@ Vue.component("searchbar", {
         reset: function() {
             this.entered = "";
         },
-        on_screen_reload: function(evt) {
-            if (this.reload_steal_focus) this.$refs.input.focus();
-        },
         refocus: function() {
             if (this.refocusInput) {
                 setTimeout(() => this.$refs.input.focus());
             }
+        },
+        on_screen_reload: function() {
+            if (this.reload_steal_focus) this.$refs.input.focus();
         },
     },
 

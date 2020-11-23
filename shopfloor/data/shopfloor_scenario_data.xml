@@ -24,6 +24,10 @@
         <field name="name">Cluster Picking</field>
         <field name="key">cluster_picking</field>
     </record>
+    <record id="scenario_cluster_batch_picking" model="shopfloor.scenario">
+        <field name="name">Cluster Batch Picking</field>
+        <field name="key">cluster_batch_picking</field>
+    </record>
     <record id="scenario_checkout" model="shopfloor.scenario">
         <field name="name">Checkout</field>
         <field name="key">checkout</field>

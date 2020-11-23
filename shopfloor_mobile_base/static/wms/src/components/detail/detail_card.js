@@ -65,4 +65,7 @@ Vue.component("item-detail-card", {
         </p>
     </div>
   `,
+    renderTriggered() {
+        console.log(this.opts.on_click_action);
+    },
 });

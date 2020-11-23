@@ -50,6 +50,42 @@ class DataDetailAction(Component):
             ),
         ]
 
+    @property
+    def _full_picking_parser(self):
+        return [
+            "id",
+            "name",
+            "origin",
+            "note",
+            ("partner_id:partner", self._simple_record_parser),
+            (
+                "move_line_ids:move_lines",
+                lambda record, fname: self.move_lines(record[fname]),
+            ),
+            "move_line_count",
+            "total_weight:weight",
+            "scheduled_date",
+        ]
+
+    @property
+    def _full_picking_batch_parser(self):
+        return [
+            "id",
+            "name",
+            "picking_count",
+            "move_line_count",
+            ("picking_ids:pickings", self._full_picking_parser),
+            "total_weight:weight",
+        ]
+
+    @ensure_model("stock.picking.batch")
+    def picking_batch(self, record, **kw):
+        parser = self._picking_batch_parser
+
+        data = self._jsonify(record, parser, **kw)
+
+        return data
+
     def package_detail(self, record, picking=None, **kw):
         # Define a new method to not overload the base one which is used in many places
         data = self.package(record, picking=picking, with_packaging=True, **kw)

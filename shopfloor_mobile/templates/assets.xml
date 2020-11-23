@@ -64,7 +64,6 @@
             <script
                 id="script_component_detail_simple_picking"
                 t-attf-src="/shopfloor_mobile/static/wms/src/components/detail/detail_simple_picking.js?v=#{mod_version}"
-                type="module"
             />
             <script
                 id="script_component_detail_transfer"
@@ -102,6 +101,11 @@
                 type="module"
             />
             <script
+                id="script_component_batch_move_lines"
+                t-attf-src="/shopfloor_mobile/static/wms/src/components/batch/move_lines.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
                 id="script_component_form_edit_stock_picking"
                 t-attf-src="/shopfloor_mobile/static/wms/src/components/forms/form_edit_stock_picking.js?v=#{mod_version}"
                 type="module"
@@ -115,6 +119,11 @@
             <script
                 id="script_scenario_cluster_picking"
                 t-attf-src="/shopfloor_mobile/static/wms/src/scenario/cluster_picking.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
+                id="script_scenario_cluster_batch_picking"
+                t-attf-src="/shopfloor_mobile/static/wms/src/scenario/cluster_batch_picking.js?v=#{mod_version}"
                 type="module"
             />
             <script
