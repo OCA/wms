@@ -544,12 +544,12 @@ class ClusterPicking(Component):
 
         return self._response_for_scan_destination(move_line)
 
-    def scan_destination_pack(self, picking_batch_id, move_line_id, barcode, quantity):
-        """Scan the destination package (bin) for a move line
+    def scan_destination(self, picking_batch_id, move_line_id, barcode, quantity):
+        """Scan the destination (location or package (bin)) for a move line
 
         If the quantity picked (passed to the endpoint) is < expected quantity,
         it splits the move line.
-        It changes the destination package of the move line and set the "qty done".
+        It changes the destination (location or package) of the move line and set the "qty done".
         It prevents to put a move line of a picking in a destination package
         used for another picking.
 
@@ -1147,7 +1147,7 @@ class ShopfloorClusterPickingValidator(Component):
             "barcode": {"required": True, "type": "string"},
         }
 
-    def scan_destination_pack(self):
+    def scan_destination(self):
         return {
             "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
@@ -1272,7 +1272,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
     def scan_line(self):
         return self._response_schema(next_states={"start_line", "scan_destination"})
 
-    def scan_destination_pack(self):
+    def scan_destination(self):
         return self._response_schema(
             next_states={
                 # error during scan of pack (wrong barcode, ...)

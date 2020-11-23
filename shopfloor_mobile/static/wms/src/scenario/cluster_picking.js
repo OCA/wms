@@ -255,7 +255,7 @@ const ClusterPicking = {
                     },
                     on_scan: scanned => {
                         this.wait_call(
-                            this.odoo.call("scan_destination_pack", {
+                            this.odoo.call("scan_destination", {
                                 picking_batch_id: this.current_batch().id,
                                 move_line_id: this.state.data.id,
                                 barcode: scanned.text,
