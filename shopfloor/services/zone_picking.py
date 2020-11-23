@@ -1551,12 +1551,7 @@ class ShopfloorZonePickingValidatorResponse(Component):
 
     @property
     def _schema_for_zone_line_counters(self):
-        return {
-            "lines_count": {"type": "float", "required": True},
-            "picking_count": {"type": "float", "required": True},
-            "priority_lines_count": {"type": "float", "required": True},
-            "priority_picking_count": {"type": "float", "required": True},
-        }
+        return self.schemas.move_lines_counters()
 
     @property
     def _schema_for_select_picking_type(self):
