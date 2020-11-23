@@ -96,8 +96,7 @@ Vue.component("Screen", {
                 app
                 >
             <v-list>
-                <v-btn icon class="close-menu" @click.stop="drawer = !drawer"><v-icon>mdi-close</v-icon></v-btn>
-                <nav-items :navigation="navigation"/>
+                <nav-items :navigation="navigation" :show_full_info="false" />
                 <nav-items-extra />
             </v-list>
         </v-navigation-drawer>
@@ -177,6 +176,10 @@ Vue.component("Screen", {
 Vue.component("nav-items", {
     props: {
         navigation: Array,
+        show_full_info: {
+            type: Boolean,
+            default: true,
+        },
     },
     // NOTE: activation via router won't work because we can use the same route w/ several menu items.
     // Hence we match via menu id.
@@ -191,17 +194,26 @@ Vue.component("nav-items", {
             :color="$route.params.menu_id == item.id ? 'v-item-active' : null"
             >
             <v-list-item-content>
-                <v-list-item-title>
+                <v-list-item-title class="primary--text">
                     {{ item.name }}
                 </v-list-item-title>
-                <v-list-item-subtitle>
-                    <small class="font-weight-light">{{ $t('app.nav.scenario') }} {{ item.scenario }}</small>
+                <v-list-item-subtitle v-if="show_full_info">
+                    <small class="font-weight-light"><strong>{{ $t('app.nav.scenario') }}</strong> {{ item.scenario }}</small>
                     <br />
-                    <small class="font-weight-light">
-                        {{ $t('app.nav.op_types') }} <span v-for="pt in item.picking_types" :key="'pt-' + item.id + '-' + pt.id">{{ pt.name }}</span>
+                    <small class="font-weight-light text-wrap pr-2">
+                        <strong>{{ $t('app.nav.op_types') }}</strong>
+                        <span v-for="(pt, index) in item.picking_types"
+                              :key="'pt-' + item.id + '-' + pt.id"
+                              >{{ pt.name }}<span v-if="index != (item.picking_types.length - 1)">,</span>
+                        </span>
                     </small>
                 </v-list-item-subtitle>
             </v-list-item-content>
+            <v-list-item-action>
+                <div class="pa-4 secondary text-no-wrap rounded-pill">
+                    {{ $t('misc.lines_count', item) }}
+                </div>
+            </v-list-item-action>
         </v-list-item>
     </div>
     `,
