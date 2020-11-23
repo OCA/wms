@@ -28,6 +28,10 @@
         <field name="name">Checkout</field>
         <field name="key">checkout</field>
     </record>
+    <record id="scenario_checkout_scan_and_pack" model="shopfloor.scenario">
+        <field name="name">Checkout Scan and Pack</field>
+        <field name="key">checkout_scan_and_pack</field>
+    </record>
     <record id="scenario_delivery" model="shopfloor.scenario">
         <field name="name">Delivery</field>
         <field name="key">delivery</field>
