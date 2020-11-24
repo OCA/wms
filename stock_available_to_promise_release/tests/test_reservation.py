@@ -110,6 +110,20 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertEqual(picking5.move_lines.previous_promised_qty, 48)
         self.assertEqual(picking5.move_lines.ordered_available_to_promise_uom_qty, 0)
 
+    def test_ordered_available_to_promise_value_consider_already_released(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        picking, picking2, picking3, picking4, picking5 = self._create_pickings()
+
+        self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
+        # release picking 1
+        picking.move_lines.release_available_to_promise()
+        # previous qty should still match as former test
+        self.assertEqual(picking2.move_lines.previous_promised_qty, 5)
+        # release picking 2
+        picking2.move_lines.release_available_to_promise()
+        # previous qty should still match as former test
+        self.assertEqual(picking3.move_lines.previous_promised_qty, 8)
+
     def test_ordered_available_to_promise_uom_qty_search(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         picking, picking2, picking3, picking4, picking5 = self._create_pickings()
