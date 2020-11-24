@@ -11,6 +11,7 @@
     "data": [
         "views/stock_move_views.xml",
         "views/stock_picking_views.xml",
+        "views/product_product_views.xml",
         "views/sale_order_views.xml",
     ],
     "installable": True,

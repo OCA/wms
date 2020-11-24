@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record
+        model="ir.ui.view"
+        id="stock_available_to_promise_release.product_normal_form_view"
+    >
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]" />
+    </record>
+</odoo>
