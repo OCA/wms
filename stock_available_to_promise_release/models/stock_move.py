@@ -81,21 +81,24 @@ class StockMove(models.Model):
                 AND m.product_id = move.product_id
                 AND loc.parent_path LIKE ANY(%(location_paths)s)
                 AND (
-                m.need_release = true
-                AND (
-                    m.priority > move.priority
-                    OR
-                    (
-                        m.priority = move.priority
-                        AND m.date_priority < move.date_priority
+                    m.need_release = true
+                    AND (
+                        m.priority > move.priority
+                        OR
+                        (
+                            m.priority = move.priority
+                            AND m.date_priority < move.date_priority
+                        )
+                        OR (
+                            m.priority = move.priority
+                            AND m.date_priority = move.date_priority
+                            AND m.id < move.id
+                        )
                     )
                     OR (
-                        m.priority = move.priority
-                        AND m.date_priority = move.date_priority
-                        AND m.id < move.id
+                        m.need_release IS false OR m.need_release IS null
                     )
-                OR ((m.need_release IS false OR m.need_release IS null))
-                ))
+                )
                 AND m.state IN (
                     'waiting', 'confirmed', 'partially_available', 'assigned'
                 )
