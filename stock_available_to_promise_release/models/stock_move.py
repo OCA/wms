@@ -58,13 +58,13 @@ class StockMove(models.Model):
             FROM stock_move move
             LEFT JOIN LATERAL (
                 SELECT
-                    m.product_qty - COALESCE(SUM(line.product_qty), 0)
+                    m.product_qty
                     AS previous_qty
                 FROM stock_move m
                 INNER JOIN stock_location loc
                 ON loc.id = m.location_id
-                LEFT JOIN stock_move_line line
-                ON m.id = line.move_id
+                LEFT JOIN stock_picking_type p_type
+                ON m.picking_type_id = p_type.id
                 WHERE
                 {lateral_where}
                 GROUP BY m.id
@@ -79,6 +79,7 @@ class StockMove(models.Model):
         sql = """
                 m.id != move.id
                 AND m.product_id = move.product_id
+                AND p_type.code = 'outgoing'
                 AND loc.parent_path LIKE ANY(%(location_paths)s)
                 AND (
                     m.need_release = true
