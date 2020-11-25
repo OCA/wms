@@ -64,7 +64,14 @@
             <tree>
                 <field name="sequence" widget="handle" />
                 <field name="name" />
-                <field name="rule_domain" />
+                <field name="count_picking_all" sum="All Total" />
+                <field name="count_picking_release_ready" sum="Release Ready Total" />
+                <field name="count_picking_released" sum="Released Total" />
+                <field name="count_picking_assigned" sum="Assigned Total" />
+                <field name="count_picking_waiting" sum="Waiting Total" />
+                <field name="count_picking_late" sum="Late Total" />
+                <field name="count_picking_priority" sum="Priority Total" />
+                <field name="count_picking_done" sum="Done Today Total" />
             </tree>
         </field>
     </record>
