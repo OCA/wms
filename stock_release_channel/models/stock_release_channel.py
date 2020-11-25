@@ -405,7 +405,12 @@ class StockReleaseChannel(models.Model):
         action["display_name"] = "{} ({})".format(
             ", ".join(self.mapped("display_name")), description
         )
-        action["context"] = context if context else None
+        # we already have this column in the view's title, save space on the
+        # screen
+        base_context = {"hide_release_channel_id": True}
+        if context:
+            base_context.update(context)
+        action["context"] = base_context
         action["domain"] = [("id", "in", records.ids)]
         return action
 
