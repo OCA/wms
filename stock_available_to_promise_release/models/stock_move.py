@@ -1,4 +1,4 @@
-# Copyright 2019 Camptocamp (https://www.camptocamp.com)
+# Copyright 2019-2020 Camptocamp (https://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import logging
@@ -32,7 +32,6 @@ class StockMove(models.Model):
     ordered_available_to_promise_qty = fields.Float(
         string="Ordered Available to Promise (Real Qty)",
         compute="_compute_ordered_available_to_promise",
-        search="_search_ordered_available_to_promise",
         digits="Product Unit of Measure",
         help="Available to Promise quantity minus quantities promised "
         " to moves with higher priority (in default UoM of the product).",
@@ -49,8 +48,8 @@ class StockMove(models.Model):
         compute="_compute_release_ready", search="_search_release_ready",
     )
     need_release = fields.Boolean(index=True,)
-    zip_code = fields.Char(related="partner_id.zip", store="True")
-    city = fields.Char(related="partner_id.city", store="True")
+    zip_code = fields.Char(related="partner_id.zip", store=True)
+    city = fields.Char(related="partner_id.city", store=True)
 
     def _previous_promised_qty_sql_main_query(self):
         return """
@@ -152,10 +151,7 @@ class StockMove(models.Model):
                 move.release_ready = False
                 continue
             if move.picking_id.move_type == "one":
-                move.release_ready = all(
-                    m.ordered_available_to_promise_uom_qty > 0
-                    for m in move.picking_id.move_lines
-                )
+                move.release_ready = move.picking_id.release_ready
             else:
                 move.release_ready = move.ordered_available_to_promise_uom_qty > 0
 
@@ -348,21 +344,21 @@ class StockMove(models.Model):
         # Set all transfers released to "printed", consider the work has
         # been planned and started and another "release" of moves should
         # (for instance) merge new pickings with this "round of release".
-        pulled_moves._release_assign_moves()
-        pulled_moves._release_set_printed()
+        pulled_moves._after_release_assign_moves()
+        pulled_moves._after_release_update_chain()
 
         return True
 
-    def _release_set_printed(self):
+    def _after_release_update_chain(self):
         picking_ids = set()
         moves = self
         while moves:
             picking_ids.update(moves.mapped("picking_id").ids)
             moves = moves.mapped("move_orig_ids")
         pickings = self.env["stock.picking"].browse(picking_ids)
-        pickings.filtered(lambda p: not p.printed).printed = True
+        pickings._after_release_update_chain()
 
-    def _release_assign_moves(self):
+    def _after_release_assign_moves(self):
         moves = self
         while moves:
             moves._action_assign()

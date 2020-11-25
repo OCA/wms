@@ -8,7 +8,12 @@
     "author": "Camptocamp,Odoo Community Association (OCA)",
     "category": "Stock Management",
     "depends": ["sale_stock", "stock_available_to_promise_release", "delivery"],
-    "data": ["views/stock_move_views.xml"],
+    "data": [
+        "views/stock_move_views.xml",
+        "views/stock_picking_views.xml",
+        "views/product_product_views.xml",
+        "views/sale_order_views.xml",
+    ],
     "installable": True,
     "license": "AGPL-3",
     "application": False,

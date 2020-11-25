@@ -756,6 +756,140 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             ],
         )
 
+    def test_count_fields(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        picking1 = self._create_picking_chain(
+            self.wh,
+            [
+                (self.product1, 20),
+                (self.product2, 10),
+                (self.product3, 20),
+                (self.product4, 10),
+            ],
+        )
+        picking2 = self._create_picking_chain(self.wh, [(self.product1, 20)],)
+        self.assertEqual(self.product1.move_need_release_count, 2)
+        self.assertEqual(self.product2.move_need_release_count, 1)
+        self.assertEqual(picking1.need_release_count, 4)
+        self.assertEqual(picking2.need_release_count, 1)
+
+    def test_search_picking(self):
+        # this one does not need a release (be sure we don't find it in the
+        # search)
+        not_need_release = self._create_picking_chain(self.wh, [(self.product1, 20)])
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        picking1 = self._create_picking_chain(
+            self.wh, [(self.product1, 20), (self.product2, 10)],
+        )
+        picking2 = self._create_picking_chain(self.wh, [(self.product3, 20)],)
+        self._update_qty_in_location(self.loc_bin1, self.product3, 20.0)
+
+        pickings = self.env["stock.picking"].search(
+            [
+                ("need_release", "=", True),
+                ("picking_type_id", "=", self.wh.out_type_id.id),
+            ]
+        )
+        self.assertEqual(pickings, picking1 + picking2)
+
+        pickings = self.env["stock.picking"].search(
+            [
+                ("need_release", "=", False),
+                ("picking_type_id", "=", self.wh.out_type_id.id),
+            ]
+        )
+        self.assertEqual(
+            pickings,
+            not_need_release.filtered(
+                lambda p: p.picking_type_id == self.wh.out_type_id
+            ),
+        )
+
+        ready_pickings = self.env["stock.picking"].search(
+            [
+                ("release_ready", "=", True),
+                ("picking_type_id", "=", self.wh.out_type_id.id),
+            ]
+        )
+        self.assertEqual(ready_pickings, picking2)
+
+    def test_picking_type_count(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        out_type = self.wh.out_type_id
+        self.assertRecordValues(
+            out_type,
+            [
+                {
+                    "count_picking_need_release": 0,
+                    "count_picking_waiting": 0,
+                    "count_picking_late": 0,
+                }
+            ],
+        )
+        picking1 = self._create_picking_chain(
+            self.wh, [(self.product1, 20), (self.product2, 10)],
+        )
+        picking2 = self._create_picking_chain(self.wh, [(self.product3, 20)])
+
+        out_type.invalidate_cache()
+        # need_release are not in "waiting", only in "need_release"
+        self.assertRecordValues(
+            out_type,
+            [
+                {
+                    "count_picking_need_release": 2,
+                    "count_picking_waiting": 0,
+                    "count_picking_late": 0,
+                }
+            ],
+        )
+
+        # late need_release are not in "late" neither
+        picking1.scheduled_date = datetime.now() - relativedelta(days=1)
+        out_type.invalidate_cache()
+
+        self.assertRecordValues(
+            out_type,
+            [
+                {
+                    "count_picking_need_release": 2,
+                    "count_picking_waiting": 0,
+                    "count_picking_late": 0,
+                }
+            ],
+        )
+
+        # but when need_release is off, they are in waiting / late
+        (picking1 + picking2).move_lines.need_release = False
+        out_type.invalidate_cache()
+
+        self.assertRecordValues(
+            out_type,
+            [
+                {
+                    "count_picking_need_release": 0,
+                    "count_picking_waiting": 2,
+                    "count_picking_late": 1,
+                }
+            ],
+        )
+
+    def test_update_scheduled_date(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        self.env.company.stock_release_max_prep_time = 120
+        picking = self._create_picking_chain(self.wh, [(self.product1, 20)])
+        self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
+
+        fake_now = datetime(2020, 11, 12, 14, 00)
+        with freeze_time(fake_now):
+            picking.release_available_to_promise()
+
+        # we add 120 minutes
+        expected_scheduled_date = datetime(2020, 11, 12, 16, 00)
+        self.assertEqual(picking.scheduled_date, expected_scheduled_date)
+        pick_picking = picking.move_lines.move_orig_ids.picking_id
+        self.assertEqual(pick_picking.scheduled_date, expected_scheduled_date)
+
     def test_mto_picking(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         # TODO a MTO picking should work normally
