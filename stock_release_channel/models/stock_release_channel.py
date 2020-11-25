@@ -248,7 +248,7 @@ class StockReleaseChannel(models.Model):
 
     def assign_release_channel(self, pickings):
         pickings = pickings.filtered(
-            lambda picking: picking.need_release
+            lambda picking: picking.picking_type_id.code == "outgoing"
             and picking.state not in ("cancel", "done")
         )
         if not pickings:
