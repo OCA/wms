@@ -154,7 +154,10 @@
                                                         To Do
                                                     </a>
                                                 </div>
-                                                <div class="col-5">
+                                                <div
+                                                    class="col-5"
+                                                    style="padding-left: 0;"
+                                                >
                                                     <field
                                                         name="count_picking_release_ready"
                                                     />
@@ -162,7 +165,7 @@
                                                         name="action_move_release_ready"
                                                         type="object"
                                                     >
-                                                        [<field
+                                                        [~<field
                                                             name="count_move_release_ready"
                                                         />]
                                                     </a>
@@ -178,7 +181,10 @@
                                                         Released
                                                     </a>
                                                 </div>
-                                                <div class="col-5">
+                                                <div
+                                                    class="col-5"
+                                                    style="padding-left: 0;"
+                                                >
                                                     <field
                                                         name="count_picking_released"
                                                     />
@@ -186,7 +192,7 @@
                                                         name="action_move_released"
                                                         type="object"
                                                     >
-                                                        [<field
+                                                        [~<field
                                                             name="count_move_released"
                                                         />]
                                                     </a>
@@ -202,13 +208,16 @@
                                                         Done Today
                                                     </a>
                                                 </div>
-                                                <div class="col-5">
+                                                <div
+                                                    class="col-5"
+                                                    style="padding-left: 0;"
+                                                >
                                                     <field name="count_picking_done" />
                                                     <a
                                                         name="action_move_done"
                                                         type="object"
                                                     >
-                                                        [<field
+                                                        [~<field
                                                             name="count_move_done"
                                                         />]
                                                     </a>
@@ -244,7 +253,7 @@
                                                         t-esc="record.count_picking_assigned.value"
                                                     /> To Process</span>
                                                 <br />
-                                                <span>[<t
+                                                <span>[~<t
                                                         t-esc="record.count_move_assigned.value"
                                                     /> Lines]</span>
                                             </button>
@@ -259,7 +268,10 @@
                                                         Waiting
                                                     </a>
                                                 </div>
-                                                <div class="col-5">
+                                                <div
+                                                    class="col-5"
+                                                    style="padding-left: 0;"
+                                                >
                                                     <field
                                                         name="count_picking_waiting"
                                                     />
@@ -267,7 +279,7 @@
                                                         name="action_move_waiting"
                                                         type="object"
                                                     >
-                                                        [<field
+                                                        [~<field
                                                             name="count_move_waiting"
                                                         />]
                                                     </a>
@@ -287,14 +299,17 @@
                                                         Late
                                                     </a>
                                                 </div>
-                                                <div class="col-5">
+                                                <div
+                                                    class="col-5"
+                                                    style="padding-left: 0;"
+                                                >
                                                     <field name="count_picking_late" />
                                                     <a
                                                         name="action_move_late"
                                                         type="object"
                                                         t-attf-style="#{record.count_picking_late.value > 0 ? 'color: red' : ''}"
                                                     >
-                                                        [<field
+                                                        [~<field
                                                             name="count_move_late"
                                                         />]
                                                     </a>
@@ -310,7 +325,10 @@
                                                         Priority
                                                     </a>
                                                 </div>
-                                                <div class="col-5">
+                                                <div
+                                                    class="col-5"
+                                                    style="padding-left: 0;"
+                                                >
                                                     <field
                                                         name="count_picking_priority"
                                                     />
@@ -318,7 +336,7 @@
                                                         name="action_move_priority"
                                                         type="object"
                                                     >
-                                                        [<field
+                                                        [~<field
                                                             name="count_move_priority"
                                                         />]
                                                     </a>
