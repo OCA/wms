@@ -15,5 +15,5 @@ class SaleOrderLine(models.Model):
         # ensure we assign a channel on any picking OUT generated for the sale,
         # if moves are assigned to an existing transfer, we recompute the
         # channel
-        pickings.assign_release_channel()
+        pickings._delay_assign_release_channel()
         return result
