@@ -1,5 +1,8 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
+from werkzeug.exceptions import BadRequest
+
 from odoo import _
 
 from odoo.addons.base_rest.components.service import to_int
@@ -73,6 +76,9 @@ class Checkout(Component):
                 "selected_move_lines": self._data_for_move_lines(lines.sorted()),
                 "picking": self.data.picking(picking),
                 "packing_info": self._data_for_packing_info(picking),
+                "no_package_enabled": not self.options.get(
+                    "checkout:disable_no_package"
+                ),
             },
             message=message,
         )
@@ -758,6 +764,8 @@ class Checkout(Component):
         Transitions:
         * select_line: goes back to selection of lines to work on next lines
         """
+        if self.options.get("checkout:disable_no_package"):
+            raise BadRequest("`checkout.no_package` endpoint is not enabled")
         picking = self.env["stock.picking"].browse(picking_id)
         message = self._check_picking_status(picking)
         if message:
@@ -1180,6 +1188,11 @@ class ShopfloorCheckoutValidatorResponse(Component):
             "select_package": dict(
                 self._schema_selected_lines,
                 packing_info={"type": "string", "nullable": True},
+                no_package_enabled={
+                    "type": "boolean",
+                    "nullable": True,
+                    "required": False,
+                },
             ),
             "change_quantity": self._schema_selected_lines,
             "select_dest_package": self._schema_select_package,
