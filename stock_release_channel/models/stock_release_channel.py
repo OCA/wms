@@ -45,6 +45,13 @@ class StockReleaseChannel(models.Model):
     )
     active = fields.Boolean(default=True)
 
+    max_auto_release = fields.Integer(
+        string="Max Transfers to release",
+        default=10,
+        help="When clicking on the package icon, it releases X transfers minus "
+        " the work in progress transfers. This field defines X.",
+    )
+
     picking_ids = fields.One2many(
         string="Transfers",
         comodel_name="stock.picking",
@@ -443,3 +450,45 @@ class StockReleaseChannel(models.Model):
             )
         action["res_id"] = self.last_done_picking_id.id
         return action
+
+    def release_next_batch(self):
+        self.ensure_one()
+        if not self.max_auto_release:
+            raise exceptions.UserError(_("No Max transfers to release is configured."))
+
+        wip_domain = self._field_picking_domains()["count_picking_released"]
+        wip_domain += [("release_channel_id", "=", self.id)]
+        released_in_progress = self.env["stock.picking"].search_count(wip_domain)
+
+        release_limit = max(self.max_auto_release - released_in_progress, 0)
+        if not release_limit:
+            raise exceptions.UserError(
+                _(
+                    "The number of released transfers in"
+                    " progress is already at the maximum."
+                )
+            )
+        domain = self._field_picking_domains()["count_picking_release_ready"]
+        domain += [("release_channel_id", "=", self.id)]
+        next_pickings = self.env["stock.picking"].search(domain)
+        if not next_pickings:
+            return {
+                "effect": {
+                    "fadeout": "fast",
+                    "message": _("Nothing in the queue!"),
+                    "img_url": "/web/static/src/img/smile.svg",
+                    "type": "rainbow_man",
+                }
+            }
+        # We have to use a python sort and not a order + limit on the search
+        # because "date_priority" is computed and not stored. If needed, we
+        # should evaluate making it a stored field in the module
+        # "stock_available_to_promise_release".
+        next_pickings = next_pickings.sorted(
+            lambda picking: (
+                -int(picking.priority or 1),
+                picking.date_priority,
+                picking.id,
+            )
+        )[:release_limit]
+        next_pickings.release_available_to_promise()
