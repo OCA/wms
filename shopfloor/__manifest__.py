@@ -17,8 +17,9 @@
     "depends": [
         "stock",
         "stock_picking_batch",
-        "base_rest",
         "base_jsonify",
+        "base_rest",
+        "base_sparse_field",
         "auth_api_key",
         #  OCA / stock-logistics-warehouse
         "stock_picking_completion_info",

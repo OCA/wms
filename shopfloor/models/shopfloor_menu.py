@@ -2,6 +2,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, api, exceptions, fields, models
 
+from odoo.addons.base_sparse_field.models.fields import Serialized
+
 
 class ShopfloorMenu(models.Model):
     _name = "shopfloor.menu"
@@ -33,6 +35,17 @@ class ShopfloorMenu(models.Model):
     )
 
     scenario = fields.Selection(selection="_selection_scenario", required=True)
+    # TODO: `options` field allows to provide custom options for the scenario,
+    # (or for any other kind of service).
+    # Developers should probably have a way to register scenario and their options
+    # which will be computed in this field at the end.
+    # This would allow to get rid of hardcoded settings like
+    # `_scenario_allowing_create_moves` or `_scenario_allowing_unreserve_other_moves`.
+    # For now is not included in any view as it should be customizable by scenario.
+    # Maybe we can have a wizard accessible via a button on the menu tree view.
+    # There's no automation here. Developers are responsible for their usage
+    # and/or their exposure to the scenario api.
+    options = Serialized(default={})
 
     move_create_is_possible = fields.Boolean(compute="_compute_move_create_is_possible")
     # only available for some scenarios, move_create_is_possible defines if the option
