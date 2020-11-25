@@ -93,6 +93,12 @@ class StockMove(models.Model):
             # these are backorders created for unavailable qties,
             # reassign them the original group and carrier
             need_release_pickings = new_group.picking_ids.filtered("need_release")
+
+            # need_release_pickings is empty from the UI
+            # but is not in the unit test
+            # Why ?
+            # This cause the bug in the UI
+
             # reassign the original group and carriers on the backorders
             need_release_pickings.move_lines.group_id = original_group
             need_release_pickings.carrier_id = original_group.carrier_id

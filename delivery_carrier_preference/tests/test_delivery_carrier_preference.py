@@ -34,7 +34,7 @@ class TestSaleDeliveryCarrierPreference(PromiseReleaseCommonCase):
                 "max_weight": 20.0,
             }
         )
-        cls.env["delivery.carrier.preference"].create(
+        cls.theposte = cls.env["delivery.carrier.preference"].create(
             {
                 "sequence": 20,
                 "preference": "carrier",
@@ -137,6 +137,44 @@ class TestSaleDeliveryCarrierPreference(PromiseReleaseCommonCase):
         backorder = delivery_pick.backorder_ids
         self.assertEqual(backorder.carrier_id, self.super_fast_carrier)
         self.assertEqual(backorder.group_id.carrier_id, self.super_fast_carrier)
+
+    def test_delivery_release_available_to_promise_two_sale_order(self):
+        """
+        Customer with the_poste as delivery carrier by default.
+        And the poste carrier is not in preferences.
+        Two sale order confirmed for the same product.
+        There is enough stock to ship some of the first order.
+        Check that the backorder created as the customer default
+        delivery carrier.
+        """
+        self.theposte.unlink()
+        self.partner.property_delivery_carrier_id = self.the_poste_carrier
+        order1 = self._create_sale_order()
+        self._update_order_line_qty(order1, 3)
+        self.env["stock.quant"]._update_available_quantity(
+            self.product, self.loc_stock, 2
+        )
+        self._add_shipping_on_order(order1)
+        order1.action_confirm()
+        delivery_pick = order1.picking_ids
+        self.assertEqual(order1.carrier_id, self.the_poste_carrier)
+        order2 = self._create_sale_order()
+        self._update_order_line_qty(order2, 3)
+        self._add_shipping_on_order(order2)
+        self.assertEqual(order2.carrier_id, self.the_poste_carrier)
+        order2.action_confirm()
+        # Release the first goods
+        delivery_pick = order1.picking_ids
+        delivery_pick.release_available_to_promise()
+        picking_out = order1.picking_ids.filtered(
+            lambda r: r.picking_type_id.code == "outgoing" and not r.backorder_id
+        )
+        picking_backorder = order1.picking_ids.filtered(lambda r: r.backorder_id)
+        # The OUT picking has the prefered carrier for 20kg (normal carrier)
+        self.assertAlmostEqual(picking_out.estimated_shipping_weight, 20.0)
+        self.assertEqual(picking_out.carrier_id, self.normal_delivery_carrier)
+        # Backorder picking should have the partner default carrier (the poste)
+        self.assertEqual(picking_backorder.carrier_id, self.the_poste_carrier)
 
     def test_delivery_add_preferred_carrier_picking_domain(self):
         """

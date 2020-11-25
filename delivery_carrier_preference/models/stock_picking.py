@@ -26,6 +26,7 @@ class StockPicking(models.Model):
 
     def add_preferred_carrier(self):
         self.ensure_one()
+        # There is no order, if there is multiple, is it random ?
         carrier = fields.first(self.get_preferred_carriers())
         if not carrier:
             return {
