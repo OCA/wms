@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 import logging
@@ -70,7 +71,7 @@ class StockLocation(models.Model):
     )
 
     in_move_line_ids = fields.One2many(
-        "stock.move.line",
+        "stock.pack.operation",
         "location_dest_id",
         domain=[
             ("state", "in", ("waiting", "confirmed", "partially_available", "assigned"))
@@ -105,13 +106,16 @@ class StockLocation(models.Model):
         help="The max height supported among allowed location storage types.",
     )
 
+    quant_ids = fields.One2many("stock.quant", "location_id")
+
     @api.depends("child_ids.leaf_location_ids")
     def _compute_leaf_location_ids(self):
         query = """
             SELECT parent.id, ARRAY_AGG(sub.id) AS leaves
             FROM stock_location parent
             INNER JOIN stock_location sub
-            ON sub.parent_path LIKE parent.parent_path || '%%'
+            ON parent.parent_left < sub.parent_left AND
+               parent.parent_right > sub.parent_right
             AND sub.id != parent.id
             LEFT JOIN stock_location subsub
             ON subsub.location_id = sub.id
@@ -138,7 +142,7 @@ class StockLocation(models.Model):
             rec.location_will_contain_product_ids = (
                 rec.mapped("quant_ids.product_id")
                 | rec.mapped("in_move_ids.product_id")
-                | rec.mapped("in_move_line_ids.product_id")
+                | rec.mapped("in_move_line_ids.implied_product_ids")
             )
 
     @api.depends("quant_ids", "in_move_line_ids")
@@ -146,15 +150,15 @@ class StockLocation(models.Model):
         for rec in self:
             rec.location_will_contain_lot_ids = rec.mapped(
                 "quant_ids.lot_id"
-            ) | rec.mapped("in_move_line_ids.lot_id")
+            ) | rec.mapped("in_move_line_ids.implied_lot_ids")
 
     @api.depends(
-        "quant_ids.quantity", "in_move_ids", "in_move_line_ids",
+        "quant_ids.qty", "in_move_ids", "in_move_line_ids",
     )
     def _compute_location_is_empty(self):
         for rec in self:
             if (
-                sum(rec.quant_ids.mapped("quantity"))
+                sum(rec.quant_ids.mapped("qty"))
                 or rec.in_move_ids
                 or rec.in_move_line_ids
             ):
@@ -195,13 +199,19 @@ class StockLocation(models.Model):
                 types_sorted.mapped("max_height")[0] if types_sorted else 0
             )
 
-    # method provided by "stock_putaway_hook"
-    def _putaway_strategy_finalizer(self, putaway_location, product):
-        putaway_location = super()._putaway_strategy_finalizer(
-            putaway_location, product
+    def __get_putaway_strategy(self, product):
+        location = self
+        dest_location_id = (
+            super(StockLocation, self).get_putaway_strategy(product) or location.id
         )
         quant = self.env.context.get("storage_quant")
-        return self._get_pack_putaway_strategy(putaway_location, quant, product)
+        if not quant:
+            reserved_quants = self.env.context.get(
+                "reserved_quants_by_products", {}
+            ).get(product, [])
+            quant = len(reserved_quants) == 1 and next(iter(reserved_quants)) or None
+        putaway_location = self.browse(dest_location_id)
+        return self._get_pack_putaway_strategy(putaway_location, quant, product).id
 
     def _get_pack_putaway_strategy(self, putaway_location, quant, product):
         package_storage_type = False
@@ -384,7 +394,23 @@ class StockLocation(models.Model):
         Locations are ordered by max height, knowing that a max height of 0
         means "no limit" and as such it should be among the last locations.
         """
-        max_height = max(self.leaf_location_ids.mapped("max_height"))
-        return self.leaf_location_ids.sorted(
+        max_height = max(self.mapped("leaf_location_ids.max_height"))
+        return self.mapped("leaf_location_ids").sorted(
             lambda l: l.max_height if l.max_height else (max_height + 1)
+        )
+
+    def write(self, vals):
+        res = super(StockLocation, self).write(vals)
+        self._invalidate_package_level_allowed_location_dest_domain()
+        return res
+
+    @api.model
+    def create(self, vals):
+        res = super(StockLocation, self).create(vals)
+        self._invalidate_package_level_allowed_location_dest_domain()
+        return res
+
+    def _invalidate_package_level_allowed_location_dest_domain(self):
+        self.env["stock.pack.operation"].invalidate_cache(
+            fnames=["allowed_location_dest_domain"]
         )

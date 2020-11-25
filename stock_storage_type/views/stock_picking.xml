@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2020 ACSONE SA/NV
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="stock_picking_form_view" model="ir.ui.view">
+        <field name="name">stock.picking.form (in stock_storage_type)</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form" />
+        <field name="arch" type="xml">
+            <xpath
+                expr="//field[@name='pack_operation_product_ids']//field[@name='location_dest_id']"
+                position="before"
+            >
+                <field name="allowed_location_dest_domain" invisible="1" />
+            </xpath>
+            <xpath
+                expr="//field[@name='pack_operation_product_ids']//field[@name='location_dest_id']"
+                position="attributes"
+            >
+                <attribute name="domain">allowed_location_dest_domain</attribute>
+            </xpath>
+            <xpath
+                expr="//field[@name='pack_operation_product_ids']//field[@name='location_dest_id']"
+                position="after"
+            >
+                <button
+                    name="recompute_pack_putaway"
+                    type="object"
+                    icon="fa-arrow-circle-o-down"
+                    string="Recompute Putaway"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

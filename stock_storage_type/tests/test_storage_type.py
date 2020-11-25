@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo.exceptions import ValidationError
@@ -7,7 +8,7 @@ from odoo.tests import SavepointCase
 class TestStorageType(SavepointCase):
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestStorageType, cls).setUpClass()
         cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
 
         cls.stock_location = cls.env.ref("stock.stock_location_stock")
@@ -30,6 +31,7 @@ class TestStorageType(SavepointCase):
         cls.cardboxes_bin_3 = cls.env.ref(
             "stock_storage_type.stock_location_cardboxes_bin_3"
         )
+        cls.env["stock.location"]._parent_store_compute()
 
     def test_location_allowed_storage_types(self):
         # As cardboxes location storage type is defined on parent stock

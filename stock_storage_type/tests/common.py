@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo.tests import SavepointCase
@@ -6,7 +7,7 @@ from odoo.tests import SavepointCase
 class TestStorageTypeCommon(SavepointCase):
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestStorageTypeCommon, cls).setUpClass()
         cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
         ref = cls.env.ref
         cls.warehouse = ref("stock.warehouse0")
@@ -54,7 +55,8 @@ class TestStorageTypeCommon(SavepointCase):
         cls.internal_picking_type = ref("stock.picking_type_internal")
 
         cls.product = ref("product.product_product_9")
-        cls.product_lot = ref("stock.product_cable_management_box")
+        cls.product_lot = ref("stock.product_icecream")
+        # cls.product_lot.tracking = 'lot'
 
         cls.cardboxes_package_storage_type = ref(
             "stock_storage_type.package_storage_type_cardboxes"
@@ -79,7 +81,7 @@ class TestStorageTypeCommon(SavepointCase):
             {
                 "name": "5 units cardbox",
                 "qty": 5,
-                "product_id": cls.product_lot.id,
+                "product_tmpl_id": cls.product_lot.product_tmpl_id.id,
                 "package_storage_type_id": cls.cardboxes_package_storage_type.id,
             }
         )
@@ -87,19 +89,13 @@ class TestStorageTypeCommon(SavepointCase):
             {
                 "name": "20 units pallet",
                 "qty": 20,
-                "product_id": cls.product_lot.id,
+                "product_tmpl_id": cls.product_lot.product_tmpl_id.id,
                 "package_storage_type_id": cls.pallets_package_storage_type.id,
             }
         )
         cls.internal_picking_type.write({"show_entire_packs": True})
-        # show_reserved must be set here because it changes the behaviour of
-        # put_in_pack operation:
-        # if show_reserved: qty_done must be set on stock.picking.move_line_ids
-        # if not show_reserved: qty_done must be set on
-        # stock.picking.move_line_nosuggest_ids
-        cls.receipts_picking_type.write(
-            {"show_entire_packs": True, "show_reserved": True}
-        )
+        cls.receipts_picking_type.write({"show_entire_packs": True})
+        cls.env["stock.location"]._parent_store_compute()
 
     @classmethod
     def _update_qty_in_location(
@@ -109,7 +105,7 @@ class TestStorageTypeCommon(SavepointCase):
             product, location, lot_id=lot, package_id=package, strict=True
         )
         # this method adds the quantity to the current quantity, so remove it
-        quantity -= sum(quants.mapped("quantity"))
+        quantity -= sum(quants.mapped("qty"))
         cls.env["stock.quant"]._update_available_quantity(
             product, location, quantity, package_id=package, lot_id=lot
         )

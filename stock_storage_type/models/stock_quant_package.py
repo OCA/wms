@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo import _, api, fields, models
@@ -15,9 +16,7 @@ class StockQuantPackage(models.Model):
         "the package contains only a single product.",
     )
 
-    @api.constrains(
-        "height", "package_storage_type_id", "product_packaging_id", "single_product_id"
-    )
+    @api.constrains("height", "package_storage_type_id", "product_packaging_id")
     def _check_storage_type_height_required(self):
         for package in self:
             if package.package_storage_type_id.height_required and not package.height:
@@ -26,21 +25,21 @@ class StockQuantPackage(models.Model):
                 )
 
     def auto_assign_packaging(self):
-        super().auto_assign_packaging()
+        super(StockQuantPackage, self).auto_assign_packaging()
         for package in self:
             if not package.package_storage_type_id:
                 # if no storage type could be set by auto assign,
                 # fallback on the default product's storage type (if any)
                 package._sync_storage_type_from_single_product()
 
-    @api.model_create_multi
-    def create(self, vals):
-        records = super().create(vals)
-        records._sync_storage_type_from_packaging()
-        return records
+    @api.model
+    def create(self, val):
+        record = super(StockQuantPackage, self).create(val)
+        record._sync_storage_type_from_packaging()
+        return record
 
     def write(self, vals):
-        result = super().write(vals)
+        result = super(StockQuantPackage, self).write(vals)
         if vals.get("product_packaging_id"):
             self._sync_storage_type_from_packaging()
         return result

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo import _, api, fields, models
@@ -17,8 +18,8 @@ class StockPackageStorageType(models.Model):
         "package_storage_type_id",
         "location_storage_type_id",
         create_table=False,
-        string="Allowed locations storage types",
-        help="Locations storage types that can accept such a package storage type.",
+        string=u"Allowed locations storage types",
+        help=u"Locations storage types that can accept such a package storage type.",
     )
     product_packaging_ids = fields.One2many(
         "product.packaging", "package_storage_type_id"
@@ -26,12 +27,12 @@ class StockPackageStorageType(models.Model):
     storage_location_sequence_ids = fields.One2many(
         "stock.storage.location.sequence",
         "package_storage_type_id",
-        string="Put-Away sequence",
+        string=u"Put-Away sequence",
     )
     storage_type_message = fields.Html(compute="_compute_storage_type_message")
     height_required = fields.Boolean(
-        string="Height required for packages",
-        help=("Height is mandatory for packages configured with this storage type."),
+        string=u"Height required for packages",
+        help=u"Height is mandatory for packages configured with this storage type.",
         default=False,
     )
 

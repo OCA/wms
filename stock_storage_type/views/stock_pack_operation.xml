@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2020 ACSONE SA/NV
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="stock_pack_operation_form_view" model="ir.ui.view">
+        <field name="name">stock.pack.operation (in stock_storage_type)</field>
+        <field name="model">stock.pack.operation</field>
+        <field name="inherit_id" ref="stock.view_pack_operation_details_form" />
+        <field name="arch" type="xml">
+            <field name="location_dest_id" position="before">
+                <field name="allowed_location_dest_domain" invisible="1" />
+            </field>
+            <field name="location_dest_id" position="attributes">
+                <attribute name="domain">allowed_location_dest_domain</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>

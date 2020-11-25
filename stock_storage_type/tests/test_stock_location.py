@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from .common import TestStorageTypeCommon
@@ -6,7 +7,7 @@ from .common import TestStorageTypeCommon
 class TestStockLocation(TestStorageTypeCommon):
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestStockLocation, cls).setUpClass()
         ref = cls.env.ref
         cls.areas.write({"pack_putaway_strategy": "ordered_locations"})
         cls.pallets_reserve_bin_1_location = ref(

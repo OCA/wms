@@ -1,14 +1,17 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
+# Copyright 2020 ACSONE SA/NV
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 import json
+from collections import defaultdict
 
 from odoo import api, fields, models
 
 
-class StockPackageLevel(models.Model):
+class StockPackOperation(models.Model):
 
-    _inherit = "stock.package_level"
-
+    _inherit = "stock.pack.operation"
     # We use a domain with the module 'web_domain_field', because if we use a
     # many2many with a domain in the view, the onchange updating the many2many
     # client side blocks the browser for several seconds if we have thousands
@@ -18,17 +21,43 @@ class StockPackageLevel(models.Model):
         compute="_compute_allowed_location_dest_domain",
     )
 
+    implied_product_ids = fields.Many2many(
+        "product.product",
+        compute="_compute_implied_products_and_lots",
+        help="technical field: list of product implied by the pack operation",
+    )
+
+    implied_lot_ids = fields.Many2many(
+        "stock.production.lot",
+        compute="_compute_implied_products_and_lots",
+        help="technical field: list of lots implied by the pack operation",
+    )
+
+    @api.depends("product_id", "package_id", "pack_lot_ids")
+    def _compute_implied_products_and_lots(self):
+        ProductProduct = self.env["product.product"]
+        StockProductionLot = self.env["stock.production.lot"]
+        for record in self:
+            quants = record.package_id.get_content()
+            record.implied_product_ids = ProductProduct.browse(
+                record.product_id.ids + quants.mapped("product_id").ids
+            )
+            record.implied_lot_ids = StockProductionLot.browse(
+                record.pack_lot_ids.mapped("lot_id").ids + quants.mapped("lot_id").ids
+            )
+
     @api.depends(
         "package_id",
         "package_id.package_storage_type_id",
         "package_id.package_storage_type_id.location_storage_type_ids",
         "package_id.package_storage_type_id.storage_location_sequence_ids",
         "package_id.package_storage_type_id.storage_location_sequence_ids.location_id",
-        "package_id.package_storage_type_id.storage_location_sequence_ids.location_id.leaf_location_ids",  # noqa
+        "package_id.package_storage_type_id.storage_location_sequence_ids.location_id.leaf_location_ids",
+        # noqa
         # Dependency on quant_ids managed by cache invalidation on create/write
         "picking_id",
         "picking_id.location_dest_id",
-        "picking_id.package_level_ids.location_dest_id",
+        "picking_id.pack_operation_ids.location_dest_id",
     )
     def _compute_allowed_location_dest_domain(self):
         # TODO Add some JS to refresh the domain after changing on a line ?
@@ -40,7 +69,7 @@ class StockPackageLevel(models.Model):
             # computing the domain
             if (
                 pack_level.package_id.package_storage_type_id
-                and pack_level.picking_type_code != "outgoing"
+                and pack_level.picking_id.picking_type_code != "outgoing"
             ):
                 allowed_locations = pack_level._get_allowed_location_dest_ids()
                 # TODO check if intersect is needed as we use picking dest loc
@@ -75,7 +104,7 @@ class StockPackageLevel(models.Model):
             ]
         )
         all_allowed_locations = set()
-        products = self.mapped("move_line_ids.product_id")
+        products = self.implied_product_ids
         for pack_loc in package_locations:
             pref_loc = pack_loc.location_id
             storage_locations = pref_loc.get_storage_locations(products=products)
@@ -94,5 +123,51 @@ class StockPackageLevel(models.Model):
             level.location_dest_id = level.location_dest_id._get_pack_putaway_strategy(
                 level.location_dest_id,
                 level.package_id.quant_ids,
-                level.mapped("move_line_ids.product_id"),
+                level.implied_product_ids,
             )
+
+    @api.model
+    def _finalize_pack_putaway_strategy(self, vals):
+        StockQuantPackage = self.env["stock.quant.package"]
+        StockLocation = self.env["stock.location"]
+        StockPicking = self.env["stock.picking"]
+        ProductProduct = self.env["product.product"]
+
+        product_id = vals.get("product_id")
+        package_id = vals.get("package_id")
+        quant = None
+        product = None
+        if product_id:
+            product = ProductProduct.browse(product_id)
+            reserved_quants_by_products = defaultdict(set)
+            picking = StockPicking.browse(vals["picking_id"])
+            moves = picking.move_lines.filtered(
+                lambda move: move.state in ("assigned", "confirmed", "waiting")
+            )
+            for q in moves.mapped("reserved_quant_ids"):
+                reserved_quants_by_products[q.product_id].add(q)
+            reserved_quants = reserved_quants_by_products.get(product, [])
+            quant = len(reserved_quants) == 1 and next(iter(reserved_quants)) or None
+        elif package_id:
+            quant_package = StockQuantPackage.browse(package_id)
+            if not quant_package.single_product_id:
+                return
+            product = quant_package.single_product_id
+            # we take the first quant since we are only interested by the
+            # package_id on the quant
+            quant = quant_package.get_content()[:1]
+            if not quant:
+                return
+        if not quant or not product:
+            return
+
+        putaway_location = StockLocation.browse(vals["location_dest_id"])
+        location_dest_id = putaway_location._get_pack_putaway_strategy(
+            putaway_location, quant, product
+        ).id
+        vals["location_dest_id"] = location_dest_id
+
+    @api.model
+    def create(self, vals):
+        self._finalize_pack_putaway_strategy(vals)
+        return super(StockPackOperation, self).create(vals)
