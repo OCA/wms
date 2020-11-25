@@ -135,20 +135,23 @@ class StockReleaseChannel(models.Model):
                 ("need_release", "=", False),
                 ("state", "in", ("assigned", "waiting", "confirmed")),
             ],
-            "count_picking_assigned": [("state", "=", "assigned")],
+            "count_picking_assigned": [
+                ("need_release", "=", False),
+                ("state", "=", "assigned"),
+            ],
             "count_picking_waiting": [
                 ("need_release", "=", False),
                 ("state", "in", ("waiting", "confirmed")),
             ],
             "count_picking_late": [
+                ("need_release", "=", False),
                 ("scheduled_date", "<", fields.Datetime.now()),
                 ("state", "in", ("assigned", "waiting", "confirmed")),
-                ("need_release", "=", False),
             ],
             "count_picking_priority": [
+                ("need_release", "=", False),
                 ("priority", ">", "1"),
                 ("state", "in", ("assigned", "waiting", "confirmed")),
-                ("need_release", "=", False),
             ],
             "count_picking_done": [
                 ("state", "=", "done"),
