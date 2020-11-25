@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+
+    <!-- To plan during the night -->
+    <record id="ir_cron_stock_picking_assign_release_channel" model="ir.cron">
+        <field name="name">Re-assign release channel</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">False</field>
+        <field ref="stock.model_stock_picking" name="model_id" />
+        <field name="state">code</field>
+        <field name="code">model.assign_release_channel_on_all_need_release()</field>
+    </record>
+
+</odoo>

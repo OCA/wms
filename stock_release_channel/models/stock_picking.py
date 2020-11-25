@@ -27,3 +27,7 @@ class StockPicking(models.Model):
         backorders = super()._create_backorder()
         backorders._delay_assign_release_channel()
         return backorders
+
+    def assign_release_channel_on_all_need_release(self):
+        need_release = self.env["stock.picking"].search([("need_release", "=", True)],)
+        need_release._delay_assign_release_channel()
