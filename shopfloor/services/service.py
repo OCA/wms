@@ -496,6 +496,14 @@ class BaseShopfloorProcess(AbstractComponent):
             )
         return self.work.picking_types
 
+    @property
+    def search_move_line(self):
+        # TODO: picking types should be set somehow straight in the work context
+        # by `_validate_headers_update_work_context` in this way
+        # we can remove this override and the need to call `_get_process_picking_types`
+        # every time.
+        return self.actions_for("search_move_line", picking_types=self.picking_types)
+
     def _check_picking_status(self, pickings):
         """Check if given pickings can be processed.
 
