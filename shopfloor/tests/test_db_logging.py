@@ -5,6 +5,7 @@
 import json
 
 from odoo import exceptions
+from odoo.tools import mute_logger
 
 from odoo.addons.website.tools import MockRequest
 
@@ -101,17 +102,23 @@ class DBLoggingCase(DBLoggingCaseBase):
         expected = {
             "request_url": httprequest["url"],
             "request_method": httprequest["method"],
-            "params": json.dumps(dict(params, _id=_id)),
-            "headers": json.dumps(
-                {"Cookie": "<redacted>", "Api-Key": "<redacted>", "KEEP-ME": "FOO"}
-            ),
             "state": "success",
-            "result": json.dumps({"data": "worked!"}),
             "error": False,
             "exception_name": False,
             "severity": False,
         }
         self.assertRecordValues(entry, [expected])
+        expected_json = {
+            "result": {"data": "worked!"},
+            "params": dict(params, _id=_id),
+            "headers": {
+                "Cookie": "<redacted>",
+                "Api-Key": "<redacted>",
+                "KEEP-ME": "FOO",
+            },
+        }
+        for k, v in expected_json.items():
+            self.assertEqual(json.loads(entry[k]), v)
 
     def test_log_entry_values_failed(self):
         _id = "whatever-id"
@@ -203,6 +210,7 @@ class DBLoggingCase(DBLoggingCaseBase):
         self.assertEqual(mapping["odoo.exceptions.UserError"], "severe")
         self._test_log_entry_values_failed_with_exception_default("warning")
 
+    @mute_logger("odoo.addons.shopfloor.models.shopfloor_log")
     def test_log_entry_severity_mapping_param_bad_values(self):
         # bad values are discarded
         value = """

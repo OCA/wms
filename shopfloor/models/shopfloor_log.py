@@ -85,7 +85,7 @@ class ShopfloorLog(models.Model):
                 if not exc_name or not severity:
                     raise ValueError
             except ValueError:
-                _logger.exception(
+                _logger.info(
                     "Could not convert System Parameter"
                     " 'shopfloor.log.severity.exception.mapping' to mapping."
                     " The following rule will be ignored: %s",
