@@ -154,6 +154,7 @@ class StockReceptionScreen(models.Model):
         inverse="_inverse_current_move_line_package",
         string="Package N°",
     )
+    current_move_line_package_stored = fields.Char()
     # == Packaging fields ==
     # NOTE: Mainly not related as we want to store these data on the current
     # package when the "select_packaging" step is confirmed by the user
@@ -238,20 +239,12 @@ class StockReceptionScreen(models.Model):
     @api.depends("current_move_line_id.result_package_id.package_storage_type_id")
     def _compute_current_move_line_package(self):
         for wiz in self:
-            self.current_move_line_package = False
-            if wiz.current_move_line_id.result_package_id:
-                package = wiz.current_move_line_id.result_package_id
-                self.current_move_line_package = package.name
+            package = wiz.current_move_line_id.result_package_id
+            wiz.current_move_line_package = package.name
 
     def _inverse_current_move_line_package(self):
-        package_model = self.env["stock.quant.package"]
         for wiz in self:
-            move_line = wiz.current_move_line_id
-            package = wiz.current_move_line_package
-            if not move_line or not package or move_line.result_package_id:
-                continue
-            vals = {"name": package}
-            move_line.result_package_id = package_model.create(vals)
+            wiz.current_move_line_package_stored = wiz.current_move_line_package
 
     @api.onchange("product_packaging_id")
     def onchange_product_packaging_id(self):
@@ -418,12 +411,18 @@ class StockReceptionScreen(models.Model):
             self.package_height = packaging.height
 
     def _set_package_data(self):
-        """Set the packaging, package storage type and height on the package.
+        """Set the packaging, package storage type and height on a newly
+        created package.
 
         This is performed at the end to not trigger the constraint regarding
         the height required for some package storage types.
         """
-        package = self.current_move_line_id.result_package_id
+        # Create the package
+        move_line = self.current_move_line_id
+        package = self.env["stock.quant.package"].create(
+            {"name": self.current_move_line_package_stored}
+        )
+        move_line.result_package_id = package
         # Set the height at first to not trigger the constraint related to
         # the product packaging and storage type
         package.height = self.package_height
@@ -721,6 +720,7 @@ class StockReceptionScreen(models.Model):
         self.product_packaging_id = (
             self.package_storage_type_id
         ) = self.package_height = False
+        self.current_move_line_package_stored = False
         return True
 
     def action_check_quantity(self):
