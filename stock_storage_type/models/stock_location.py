@@ -384,6 +384,8 @@ class StockLocation(models.Model):
         Locations are ordered by max height, knowing that a max height of 0
         means "no limit" and as such it should be among the last locations.
         """
+        if not self.leaf_location_ids:
+            return self.leaf_location_ids
         max_height = max(self.leaf_location_ids.mapped("max_height"))
         return self.leaf_location_ids.sorted(
             lambda l: l.max_height if l.max_height else (max_height + 1)
