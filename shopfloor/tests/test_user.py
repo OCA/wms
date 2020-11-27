@@ -1,9 +1,9 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from .common import CommonCase
+from .test_menu_base import CommonMenuCase
 
 
-class UserCase(CommonCase):
+class UserCase(CommonMenuCase):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
@@ -22,20 +22,7 @@ class UserCase(CommonCase):
         menus = self.env["shopfloor.menu"].search([])
         self.assert_response(
             response,
-            data={
-                "menus": [
-                    {
-                        "id": menu.id,
-                        "name": menu.name,
-                        "scenario": menu.scenario,
-                        "picking_types": [
-                            {"id": picking_type.id, "name": picking_type.name}
-                            for picking_type in menu.picking_type_ids
-                        ],
-                    }
-                    for menu in menus
-                ]
-            },
+            data={"menus": [self._data_for_menu_item(menu) for menu in menus]},
         )
 
     def test_menu_by_profile(self):
@@ -48,18 +35,5 @@ class UserCase(CommonCase):
 
         response = self.service.dispatch("menu")
         self.assert_response(
-            response,
-            data={
-                "menus": [
-                    {
-                        "id": menu.id,
-                        "name": menu.name,
-                        "scenario": menu.scenario,
-                        "picking_types": [
-                            {"id": picking_type.id, "name": picking_type.name}
-                            for picking_type in menu.picking_type_ids
-                        ],
-                    }
-                ]
-            },
+            response, data={"menus": [self._data_for_menu_item(menu)]},
         )

@@ -269,15 +269,21 @@ Vue.component("btn-action", {
 });
 
 Vue.component("btn-back", {
+    props: {
+        router_back: {
+            type: Boolean,
+            default: true,
+        },
+    },
     methods: {
         on_back: function() {
             this.$root.trigger("go_back");
-            this.$router.back();
+            if (this.router_back) this.$router.back();
         },
     },
     template: `
 <btn-action v-bind="$attrs" action="back" v-on:click="on_back">
-  <v-icon>mdi-keyboard-backspace</v-icon>{{ $t("btn.back.title") }}
+  <v-icon>mdi-keyboard-backspace</v-icon><slot>{{ $t("btn.back.title") }}</slot>
 </btn-action>
 `,
 });
@@ -457,13 +463,20 @@ Vue.component("empty-location-icon", {
   `,
 });
 
-Vue.component("select-zone-operation-type-item", {
+Vue.component("select-zone-item", {
     mixins: [ItemDetailMixin],
     template: `
 <div :class="$options._componentTag">
-    <div v-for="op_type in record.operation_types" :key="make_component_key([op_type.id])">
-        <div class="detail-field">{{ $t("zone_picking.picking_type_detail", op_type) }}</div>
+  <div class="detail-field mt-2 title">
+    <span class="counters">({{ $t("misc.lines_count", record) }})</span>
+    <span class="name font-weight-bold">{{ record.name }}</span>
+  </div>
+  <div v-for="op_type in record.operation_types" :key="make_component_key([op_type.id])">
+    <div class="detail-field mt-2">
+      <span class="counters">({{ $t("misc.lines_count", op_type) }})</span>
+      <span class="name">{{ op_type.name }}</span>
     </div>
+  </div>
 </div>
     `,
 });

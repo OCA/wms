@@ -22,7 +22,7 @@ const template_mobile = `
             <div class="button-list button-vertical-list full">
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-back />
+                        <btn-back :router_back="false"/>
                     </v-col>
                 </v-row>
             </div>
@@ -31,14 +31,13 @@ const template_mobile = `
             <manual-select
                 v-on:select="state.on_select"
                 :records="state.data.picking_types"
-                :list_item_fields="manual_select_picking_type_fields()"
-                :options="{showActions: false}"
+                :options="select_picking_type_manual_select_options()"
                 :key="make_state_component_key(['manual-select'])"
                 />
             <div class="button-list button-vertical-list full">
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-back />
+                        <btn-back :router_back="false"/>
                     </v-col>
                 </v-row>
             </div>
@@ -82,6 +81,11 @@ const template_mobile = `
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
                         <btn-action @click="state.on_unload_at_destination()">Unload at destination</btn-action>
+                    </v-col>
+                </v-row>
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <btn-back :router_back="false"/>
                     </v-col>
                 </v-row>
             </div>
@@ -246,7 +250,7 @@ const ZonePicking = {
                 group_color: this.utils.colors.color_for("screen_step_todo"),
                 showActions: false,
                 list_item_options: {
-                    loud_title: true,
+                    show_title: false,
                     fields: this.manual_select_zone_fields(),
                 },
             };
@@ -254,30 +258,36 @@ const ZonePicking = {
         manual_select_zone_fields: function() {
             return [
                 {
-                    path: "operation_types",
-                    render_component: "select-zone-operation-type-item",
+                    path: "name",
+                    render_component: "select-zone-item",
                 },
             ];
+        },
+        select_picking_type_manual_select_options: function() {
+            return {
+                group_title_default: "Available operation types",
+                group_color: this.utils.colors.color_for("screen_step_todo"),
+                showActions: false,
+                list_item_options: {
+                    show_title: false,
+                    fields: this.manual_select_picking_type_fields(),
+                },
+            };
         },
         manual_select_picking_type_fields: function() {
             return [
                 {
-                    path: "lines_count",
-                    renderer: this.render_lines_count,
-                    display_no_value: true,
-                },
-                {
-                    path: "priority_lines_count",
-                    renderer: this.render_priority_lines_count,
+                    path: "name",
+                    renderer: this.picking_type_render_lines_count,
                     display_no_value: true,
                 },
             ];
         },
-        render_lines_count(record, field) {
-            return this.$t("picking_type.lines_count", record);
-        },
-        render_priority_lines_count(record, field) {
-            return this.$t("picking_type.priority_lines_count", record);
+        picking_type_render_lines_count(record, field) {
+            return _.template("(${counters}) ${name}")({
+                counters: this.$t("misc.lines_count", record),
+                name: record.name,
+            });
         },
         select_line_table_headers: function() {
             // Convert to v-data-table keys
@@ -453,13 +463,22 @@ const ZonePicking = {
             order_lines_by: "priority",
             scan_destination_qty: 0,
             states: {
-                scan_location: {
+                init: {
                     enter: () => {
                         this.wait_call(this.odoo.call("select_zone"));
                     },
+                },
+                scan_location: {
                     display_info: {
                         title: "Start by scanning a location",
                         scan_placeholder: "Select a zone",
+                    },
+                    events: {
+                        go_back: "on_back",
+                    },
+                    on_back: () => {
+                        this.state_to("init");
+                        this.reset_notification();
                     },
                     on_select: selected => {
                         this.wait_call(
@@ -476,6 +495,13 @@ const ZonePicking = {
                     display_info: {
                         title: "Select operation type",
                     },
+                    events: {
+                        go_back: "on_back",
+                    },
+                    on_back: () => {
+                        this.state_to("init");
+                        this.reset_notification();
+                    },
                     on_select: selected => {
                         this.list_move_lines(selected.id);
                     },
@@ -487,6 +513,15 @@ const ZonePicking = {
                     },
                     events: {
                         select: "on_select",
+                        go_back: "on_back",
+                    },
+                    on_back: () => {
+                        this.reset_notification();
+                        this.wait_call(
+                            this.odoo.call("scan_location", {
+                                barcode: this.current_zone_location().barcode,
+                            })
+                        );
                     },
                     on_scan: scanned => {
                         this.scan_source(scanned.text);

@@ -197,24 +197,17 @@ class ZonePicking(Component):
         for datum in data["picking_types"]:
             picking_type = self.env["stock.picking.type"].browse(datum["id"])
             zone_lines = self._picking_type_zone_lines(zone_location, picking_type)
-            datum.update(self._counters_for_zone_lines(zone_lines))
+            counters = self._counters_for_zone_lines(zone_lines)
+            datum.update(counters)
         return data
 
     def _counters_for_zone_lines(self, zone_lines):
-        # Not using mapped/filtered to support simple lists and generators
-        priority_lines = [x for x in zone_lines if x.picking_id.priority in ("2", "3")]
-        return {
-            "lines_count": len(zone_lines),
-            "picking_count": len({x.picking_id.id for x in zone_lines}),
-            "priority_lines_count": len(priority_lines),
-            "priority_picking_count": len({x.picking_id.id for x in priority_lines}),
-        }
+        return self.search_move_line.counters_for_lines(zone_lines)
 
     def _picking_type_zone_lines(self, zone_location, picking_type):
-        domain = self._find_location_move_lines_domain(
+        return self.search_move_line.search_move_lines_by_location(
             zone_location, picking_type=picking_type
         )
-        return self.env["stock.move.line"].search(domain)
 
     def _data_for_move_line(self, zone_location, picking_type, move_line):
         return {
@@ -249,9 +242,7 @@ class ZonePicking(Component):
         }
 
     def _zone_lines(self, zones):
-        return self.env["stock.move.line"].search(
-            self._find_location_move_lines_domain(zones)
-        )
+        return self._find_location_move_lines(zones)
 
     def _data_for_select_zone(self, zones):
         """Retrieve detailed info for each zone.
@@ -273,46 +264,17 @@ class ZonePicking(Component):
                 lines_by_op_type[line.picking_id.picking_type_id].append(line)
 
             zone_data["operation_types"] = []
-
+            zone_counters = defaultdict(int)
             for picking_type, lines in lines_by_op_type.items():
                 op_type_data = self.data.picking_type(picking_type)
-                op_type_data.update(self._counters_for_zone_lines(lines))
+                counters = self._counters_for_zone_lines(lines)
+                op_type_data.update(counters)
                 zone_data["operation_types"].append(op_type_data)
+                for k, v in counters.items():
+                    zone_counters[k] += v
+            zone_data.update(zone_counters)
             res.append(zone_data)
         return res
-
-    def _find_location_move_lines_domain(
-        self,
-        locations,
-        picking_type=None,
-        package=None,
-        product=None,
-        lot=None,
-        match_user=False,
-    ):
-        domain = [
-            ("location_id", "child_of", locations.ids),
-            ("qty_done", "=", 0),
-            ("state", "in", ("assigned", "partially_available")),
-        ]
-        if picking_type:
-            # auto_join in place for this field
-            domain += [("picking_id.picking_type_id", "=", picking_type.id)]
-        else:
-            domain += [("picking_id.picking_type_id", "in", self.picking_types.ids)]
-        if package:
-            domain += [("package_id", "=", package.id)]
-        if product:
-            domain += [("product_id", "=", product.id)]
-        if lot:
-            domain += [("lot_id", "=", lot.id)]
-        if match_user:
-            domain += [
-                "|",
-                ("shopfloor_user_id", "=", False),
-                ("shopfloor_user_id", "=", self.env.uid),
-            ]
-        return domain
 
     def _find_location_move_lines(
         self,
@@ -325,31 +287,15 @@ class ZonePicking(Component):
         match_user=False,
     ):
         """Find lines that potentially need work in given locations."""
-        move_lines = self.env["stock.move.line"].search(
-            self._find_location_move_lines_domain(
-                locations, picking_type, package, product, lot, match_user=match_user
-            )
+        return self.search_move_line.search_move_lines_by_location(
+            locations,
+            picking_type=picking_type,
+            package=package,
+            product=product,
+            lot=lot,
+            order=order,
+            match_user=match_user,
         )
-        sort_keys_func = self._sort_key_move_lines(order)
-        move_lines = move_lines.sorted(sort_keys_func)
-        return move_lines
-
-    @staticmethod
-    def _sort_key_move_lines(order):
-        """Return a sorting function to order lines."""
-
-        if order == "priority":
-            # make prority negative to keep sorting ascending
-            return lambda line: (
-                -int(line.move_id.priority or "0"),
-                line.move_id.date_expected,
-            )
-        elif order == "location":
-            return lambda line: (
-                line.location_id.shopfloor_picking_sequence or "",
-                line.location_id.name,
-                line.move_id.date_expected,
-            )
 
     def _find_buffer_move_lines_domain(
         self, zone_location, picking_type, dest_package=None
@@ -1597,6 +1543,7 @@ class ShopfloorZonePickingValidatorResponse(Component):
         zone_schema["operation_types"] = self.schemas._schema_list_of(
             picking_type_schema
         )
+        zone_schema.update(self._schema_for_zone_line_counters)
         zone_schema = {
             "zones": self.schemas._schema_list_of(zone_schema),
         }
@@ -1604,12 +1551,7 @@ class ShopfloorZonePickingValidatorResponse(Component):
 
     @property
     def _schema_for_zone_line_counters(self):
-        return {
-            "lines_count": {"type": "float", "required": True},
-            "picking_count": {"type": "float", "required": True},
-            "priority_lines_count": {"type": "float", "required": True},
-            "priority_picking_count": {"type": "float", "required": True},
-        }
+        return self.schemas.move_lines_counters()
 
     @property
     def _schema_for_select_picking_type(self):
