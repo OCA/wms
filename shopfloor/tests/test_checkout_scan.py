@@ -128,3 +128,34 @@ class CheckoutScanCase(CheckoutCommonCase):
                 " or select a transfer manually.",
             },
         )
+
+    def test_scan_document_recover(self):
+        """If the user starts to process a line, and for whatever reason he
+        stops there and restarts the scenario from the beginning, he should
+        still be able to find the previous line.
+        """
+        picking = self._create_picking()
+        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        picking.action_assign()
+        package = picking.move_line_ids.package_id
+        # The user selects a line, then stops working in the middle of the process
+        response = self.service.dispatch(
+            "scan_document", params={"barcode": package.name}
+        )
+        data = response["data"]["select_line"]
+        self.assertEqual(data["picking"]["move_line_count"], 2)
+        self.assertEqual(len(data["picking"]["move_lines"]), 2)
+        self.assertFalse(picking.move_line_ids.shopfloor_user_id)
+        response = self.service.dispatch(
+            "select_line", params={"picking_id": picking.id, "package_id": package.id},
+        )
+        self.assertTrue(all(l.qty_done for l in picking.move_line_ids))
+        self.assertEqual(picking.move_line_ids.shopfloor_user_id, self.env.user)
+        # He restarts the scenario and try to select again the previous line
+        # to continue its job
+        response = self.service.dispatch(
+            "scan_document", params={"barcode": package.name}
+        )
+        data = response["data"]["select_line"]
+        self.assertEqual(data["picking"]["move_line_count"], 2)
+        self.assertEqual(len(data["picking"]["move_lines"]), 2)  # Lines found
