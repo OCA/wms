@@ -189,7 +189,7 @@
                       'readonly': [('current_step', '!=', 'set_location')],
                     }"
                                         options="{'no_open': True, 'no_create_edit': True}"
-                                        domain="[('id', 'child_of', picking_location_dest_id)]"
+                                        domain="[('id', 'child_of', picking_location_dest_id), ('usage', '!=', 'view')]"
                                     />
                                 </div>
                                 <!-- select_packaging -->
