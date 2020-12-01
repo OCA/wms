@@ -218,7 +218,7 @@ Vue.component("nav-items", {
                     </small>
                 </v-list-item-subtitle>
             </v-list-item-content>
-            <v-list-item-action>
+            <v-list-item-action v-if="item.lines_count">
                 <div class="pa-4 secondary text-no-wrap rounded-pill">
                     {{ $t('misc.lines_count', item) }}
                 </div>
