@@ -22,7 +22,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
                     "barcode": "PPP",
                     "height": 100,
                     "width": 100,
-                    "lngth": 100,
+                    "packaging_length": 100,
                 }
             )
         )
@@ -41,7 +41,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
                     "barcode": "BBB",
                     "height": 20,
                     "width": 20,
-                    "lngth": 20,
+                    "packaging_length": 20,
                 }
             )
         )
@@ -60,7 +60,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
                     "barcode": "III",
                     "height": 10,
                     "width": 10,
-                    "lngth": 10,
+                    "packaging_length": 10,
                 }
             )
         )

@@ -7,8 +7,7 @@ from odoo.addons.component.core import Component
 
 
 class TransferHandler(Component):
-    """Scan anything handler for stock.picking.
-    """
+    """Scan anything handler for stock.picking."""
 
     _name = "shopfloor.scan.transfer.handler"
     _inherit = "shopfloor.scan.anything.handler"

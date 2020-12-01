@@ -25,7 +25,7 @@ class StockAction(Component):
         for picking in moves.picking_id:
             moves_todo = picking.move_lines & moves
             if self._check_backorder(picking, moves_todo):
-                picking.action_done()
+                picking._action_done()
             else:
                 moves_todo.extract_and_action_done()
 

@@ -731,7 +731,7 @@ class TestActionsChangePackageLot(CommonCase):
         expected_message = self.msg_store.package_change_error(
             new_package,
             "Package {} has been partially picked in another location".format(
-                new_package.display_name, line.product_id.display_name
+                new_package.display_name
             ),
         )
         self.change_package_lot.change_package(

@@ -312,7 +312,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                     "barcode": "PPP",
                     "height": 12,
                     "width": 13,
-                    "lngth": 14,
+                    "packaging_length": 14,
                 }
             )
         )
@@ -335,7 +335,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             [
                 {
                     "packaging_id": packaging.id,
-                    "lngth": packaging.lngth,
+                    "pack_length": packaging.packaging_length,
                     "width": packaging.width,
                     "height": packaging.height,
                 }
@@ -382,7 +382,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                     "barcode": "XXX",
                     "height": 12,
                     "width": 13,
-                    "lngth": 14,
+                    "packaging_length": 14,
                 }
             )
         )
@@ -390,10 +390,14 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         # depend on specific implementations that we don't have as dependency.
         # What is important here is to simulate their value when mismatching.
         mock1 = mock.patch.object(
-            type(packaging), "package_carrier_type", new_callable=mock.PropertyMock,
+            type(packaging),
+            "package_carrier_type",
+            new_callable=mock.PropertyMock,
         )
         mock2 = mock.patch.object(
-            type(picking.carrier_id), "delivery_type", new_callable=mock.PropertyMock,
+            type(picking.carrier_id),
+            "delivery_type",
+            new_callable=mock.PropertyMock,
         )
         with mock1 as mocked_package_carrier_type, mock2 as mocked_delivery_type:
             # Not matching at all -> bad

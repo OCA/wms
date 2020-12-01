@@ -263,7 +263,10 @@ class ZonePickingCommonCase(CommonCase):
     def _assert_response_select_zone(self, response, zone_locations, message=None):
         data = {"zones": self.service._data_for_select_zone(zone_locations)}
         self.assert_response(
-            response, next_state="start", data=data, message=message,
+            response,
+            next_state="start",
+            data=data,
+            message=message,
         )
 
     def assert_response_start(self, response, zone_locations=None, message=None):
@@ -276,7 +279,10 @@ class ZonePickingCommonCase(CommonCase):
     ):
         data = self.service._data_for_select_picking_type(zone_location, picking_types)
         self.assert_response(
-            response, next_state=state, data=data, message=message,
+            response,
+            next_state=state,
+            data=data,
+            message=message,
         )
 
     def assert_response_select_picking_type(
@@ -313,7 +319,11 @@ class ZonePickingCommonCase(CommonCase):
                 "location_will_be_empty"
             ] = move_line.location_id.planned_qty_in_location_is_empty(move_line)
         self.assert_response(
-            response, next_state=state, data=data, message=message, popup=popup,
+            response,
+            next_state=state,
+            data=data,
+            message=message,
+            popup=popup,
         )
 
     def assert_response_select_line(
@@ -379,7 +389,13 @@ class ZonePickingCommonCase(CommonCase):
         )
 
     def _assert_response_zero_check(
-        self, state, response, zone_location, picking_type, move_line, message=None,
+        self,
+        state,
+        response,
+        zone_location,
+        picking_type,
+        move_line,
+        message=None,
     ):
         self.assert_response(
             response,
@@ -394,7 +410,12 @@ class ZonePickingCommonCase(CommonCase):
         )
 
     def assert_response_zero_check(
-        self, response, zone_location, picking_type, move_line, message=None,
+        self,
+        response,
+        zone_location,
+        picking_type,
+        move_line,
+        message=None,
     ):
         self._assert_response_zero_check(
             "zero_check",
@@ -406,7 +427,13 @@ class ZonePickingCommonCase(CommonCase):
         )
 
     def _assert_response_change_pack_lot(
-        self, state, response, zone_location, picking_type, move_line, message=None,
+        self,
+        state,
+        response,
+        zone_location,
+        picking_type,
+        move_line,
+        message=None,
     ):
         self.assert_response(
             response,
@@ -420,7 +447,12 @@ class ZonePickingCommonCase(CommonCase):
         )
 
     def assert_response_change_pack_lot(
-        self, response, zone_location, picking_type, move_line, message=None,
+        self,
+        response,
+        zone_location,
+        picking_type,
+        move_line,
+        message=None,
     ):
         self._assert_response_change_pack_lot(
             "change_pack_lot",
