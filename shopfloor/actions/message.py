@@ -239,6 +239,12 @@ class MessageAction(Component):
             "body": _("Package {} has a different content.").format(package.name),
         }
 
+    def package_change_error_same_package(self, package):
+        return {
+            "message_type": "error",
+            "body": _("Same package {} is already assigned.").format(package.name),
+        }
+
     def x_units_put_in_package(self, qty, product, package):
         return {
             "message_type": "success",

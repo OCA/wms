@@ -175,6 +175,13 @@ class ChangePackageLot(Component):
         return move_line.product_id in package.quant_ids.product_id
 
     def change_package(self, move_line, package, response_ok_func, response_error_func):
+        # Prevent change if package is already set and it's the same
+        if move_line.package_id == package:
+            return response_error_func(
+                move_line,
+                message=self.msg_store.package_change_error_same_package(package),
+            )
+
         # prevent to replace a package by a package that would not satisfy the
         # move (different product)
         content_replacement_allowed = self._package_content_replacement_allowed(
