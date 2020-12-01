@@ -49,7 +49,8 @@ class StockReleaseChannel(models.Model):
         string="Max Transfers to release",
         default=10,
         help="When clicking on the package icon, it releases X transfers minus "
-        " the work in progress transfers. This field defines X.",
+        " on-going ones not shipped (X - Waiting)."
+        " This field defines X.",
     )
 
     picking_ids = fields.One2many(
@@ -84,6 +85,21 @@ class StockReleaseChannel(models.Model):
     )
     count_picking_done = fields.Integer(
         string="Transfers Done Today", compute="_compute_picking_count"
+    )
+
+    picking_chain_ids = fields.Many2many(
+        comodel_name="stock.picking",
+        compute="_compute_picking_chain",
+        help="All transfers required to bring goods to the deliveries.",
+    )
+    count_picking_chain = fields.Integer(
+        string="All Related Transfers", compute="_compute_picking_chain"
+    )
+    count_picking_chain_in_progress = fields.Integer(
+        string="In progress Related Transfers", compute="_compute_picking_chain"
+    )
+    count_picking_chain_done = fields.Integer(
+        string="All Done Related Transfers", compute="_compute_picking_chain"
     )
 
     count_move_all = fields.Integer(
@@ -210,6 +226,70 @@ class StockReleaseChannel(models.Model):
                     move_count.get(picking_id, 0) for picking_id in picking_ids
                 )
                 record[move_field] = move_estimate
+
+    def _query_get_chain(self, pickings):
+        """Get all stock.picking before an outgoing one
+
+        Follow recursively the move_orig_ids.
+        Outgoing picking ids are excluded
+        """
+        query = """
+        WITH RECURSIVE
+        pickings AS (
+            SELECT move.picking_id,
+                   true as outgoing,
+                   ''::varchar as state,  -- no need it, we exclude outgoing
+                   move.id as move_orig_id
+            FROM stock_move move
+            WHERE move.picking_id in %s
+
+            UNION
+
+            SELECT move.picking_id,
+                   false as outgoing,
+                   picking.state,
+                   rel.move_orig_id
+            FROM stock_move_move_rel rel
+            INNER JOIN pickings
+            ON pickings.move_orig_id = rel.move_dest_id
+            INNER JOIN stock_move move
+            ON move.id = rel.move_orig_id
+            INNER JOIN stock_picking picking
+            ON picking.id = move.picking_id
+        )
+        SELECT DISTINCT picking_id, state FROM pickings
+        WHERE outgoing is false;
+        """
+        return (query, (tuple(pickings.ids),))
+
+    def _compute_picking_chain(self):
+        self.env["stock.move"].flush(["move_dest_ids", "move_orig_ids", "picking_id"])
+        self.env["stock.picking"].flush(["state"])
+        for channel in self:
+            domain = self._field_picking_domains()["count_picking_released"]
+            domain += [("release_channel_id", "=", channel.id)]
+            released = self.env["stock.picking"].search(domain)
+
+            if not released:
+                channel.picking_chain_ids = False
+                channel.count_picking_chain = 0
+                channel.count_picking_chain_in_progress = 0
+                channel.count_picking_chain_done = 0
+                continue
+
+            self.env.cr.execute(*self._query_get_chain(released))
+            rows = self.env.cr.dictfetchall()
+            channel.picking_chain_ids = [row["picking_id"] for row in rows]
+            channel.count_picking_chain_in_progress = sum(
+                [1 for row in rows if row["state"] not in ("cancel", "done")]
+            )
+            channel.count_picking_chain_done = sum(
+                [1 for row in rows if row["state"] == "done"]
+            )
+            channel.count_picking_chain = (
+                channel.count_picking_chain_done
+                + channel.count_picking_chain_in_progress
+            )
 
     # TODO this duplicated with shopfloor_kanban
     def _compute_last_done_picking(self):
@@ -419,20 +499,9 @@ class StockReleaseChannel(models.Model):
 
     def action_picking_all_related(self):
         """Open all chained transfers for released deliveries"""
-        domain = self._field_picking_domains()["count_picking_released"]
-        domain += [("release_channel_id", "=", self.id)]
-        released = self.env["stock.picking"].search(domain)
-        all_related_ids = set()
-        current_moves = released.move_lines
-        while current_moves:
-            all_related_ids |= set(current_moves.picking_id.ids)
-            current_moves = current_moves.move_orig_ids
-
-        all_related = self.env["stock.picking"].browse(all_related_ids)
-
         return self._build_action(
             "stock.action_picking_tree_all",
-            all_related,
+            self.picking_chain_ids,
             _("All Related Transfers"),
             context={"search_default_available": 1, "search_default_picking_type": 1},
         )
@@ -464,9 +533,9 @@ class StockReleaseChannel(models.Model):
         if not self.max_auto_release:
             raise exceptions.UserError(_("No Max transfers to release is configured."))
 
-        wip_domain = self._field_picking_domains()["count_picking_released"]
-        wip_domain += [("release_channel_id", "=", self.id)]
-        released_in_progress = self.env["stock.picking"].search_count(wip_domain)
+        waiting_domain = self._field_picking_domains()["count_picking_waiting"]
+        waiting_domain += [("release_channel_id", "=", self.id)]
+        released_in_progress = self.env["stock.picking"].search_count(waiting_domain)
 
         release_limit = max(self.max_auto_release - released_in_progress, 0)
         if not release_limit:
