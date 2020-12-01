@@ -1,0 +1,38 @@
+.o_kanban_view.o_kanban_dashboard.o_stock_release_channel {
+    &.o_kanban_ungrouped {
+        .o_kanban_record {
+            width: 340px;
+        }
+    }
+
+    .middle_block {
+        margin-top: $o-kanban-dashboard-vpadding;
+        margin-bottom: $o-kanban-dashboard-vpadding;
+
+        border-top: 1px solid gray("300");
+        border-bottom: 1px solid gray("300");
+        background-color: gray("200");
+        padding-top: $o-kanban-dashboard-vpadding;
+        padding-bottom: $o-kanban-dashboard-vpadding;
+    }
+
+    .kanban_middle_title {
+        padding-right: 0;
+        padding-left: 0;
+        margin-bottom: $o-kanban-dashboard-vpadding;
+    }
+
+    .middle_title {
+        @include o-kanban-record-title($font-size: 13px);
+        display: block;
+    }
+
+    .primary_bottom_buttons {
+        .bottom_buttons_left,
+        .bottom_buttons_right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}

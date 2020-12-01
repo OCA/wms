@@ -72,6 +72,11 @@
                 <field name="count_picking_late" sum="Late Total" />
                 <field name="count_picking_priority" sum="Priority Total" />
                 <field name="count_picking_done" sum="Done Today Total" />
+                <field
+                    name="count_picking_chain_in_progress"
+                    sum="Related In Progress Total"
+                />
+                <field name="count_picking_chain_done" sum="Related Done Total" />
             </tree>
         </field>
     </record>
@@ -81,7 +86,7 @@
         <field name="model">stock.release.channel</field>
         <field name="arch" type="xml">
             <kanban
-                class="oe_background_grey o_kanban_dashboard o_emphasize_colors o_stock_kanban"
+                class="oe_background_grey o_kanban_dashboard o_emphasize_colors o_stock_release_channel"
                 create="0"
             >
                 <field name="color" />
@@ -103,10 +108,12 @@
                 <field name="last_done_picking_id" />
                 <field name="last_done_picking_name" />
                 <field name="last_done_picking_date_done" />
+                <field name="count_picking_chain_done" />
+                <field name="count_picking_chain" />
                 <templates>
                     <t t-name="kanban-box">
                         <div
-                            t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''}"
+                            t-attf-class="#{kanban_color(record.color.raw_value)}"
                             name="release_channel"
                         >
                             <div>
@@ -116,10 +123,7 @@
                                             <field name="name" />
                                         </div>
                                     </div>
-                                    <div
-                                        class="o_kanban_manage_button_section"
-                                        t-if="!selection_mode"
-                                    >
+                                    <div class="o_kanban_manage_button_section">
                                         <hr class="mt4 mb4" />
                                         <a
                                             class="o_kanban_manage_toggle_button"
@@ -132,11 +136,8 @@
                                             /></a>
                                     </div>
                                 </div>
-                                <div
-                                    class="container o_kanban_card_content"
-                                    t-if="!selection_mode"
-                                >
-                                    <div class="row">
+                                <div class="container o_kanban_card_content">
+                                    <div class="row o_kanban_card_upper_content">
                                         <div class="col-4 o_kanban_primary_left">
                                             <button
                                                 class="btn btn-primary"
@@ -158,7 +159,7 @@
                                                         name="action_picking_release_ready"
                                                         type="object"
                                                     >
-                                                        To Do
+                                                        To Release
                                                     </a>
                                                 </div>
                                                 <div
@@ -185,7 +186,7 @@
                                                         name="action_picking_released"
                                                         type="object"
                                                     >
-                                                        Released
+                                                        To Do
                                                     </a>
                                                 </div>
                                                 <div
@@ -234,19 +235,23 @@
                                     </div>
 
                                     <div class="row">
-                                        <div
-                                            class="progress border col-12 px-0 mt-3 mb-3"
-                                            style="background-color: inherit; height:12px;"
-                                        >
-                                            <div
-                                                class="progress-bar"
-                                                role="progressbar"
-                                                aria-valuemin="0"
-                                                t-att-aria-valuenow="record.count_picking_done.raw_value"
-                                                t-att-aria-valuemax="record.count_picking_release_ready.raw_value + record.count_picking_done.raw_value"
-                                                t-attf-style="width: #{record.count_picking_done.raw_value * 100 / (record.count_picking_release_ready.raw_value + record.count_picking_done.raw_value)}%"
+
+                                        <div class="col-12 middle_block">
+                                            <field
+                                                name="count_picking_done"
+                                                widget="progressbar"
+                                                title="Overall Progress"
+                                                options="{'current_value': 'count_picking_done', 'max_value': 'count_picking_release_ready', 'editable': false}"
                                             />
                                         </div>
+
+                                    </div>
+
+                                    <div class="kanban_middle_title">
+                                        <span
+                                            class="middle_title"
+                                        >To Do Situation</span>
+                                        <hr class="mt4 mb4" />
                                     </div>
 
                                     <div class="row">
@@ -258,7 +263,7 @@
                                             >
                                                 <span><t
                                                         t-esc="record.count_picking_assigned.value"
-                                                    /> To Process</span>
+                                                    /> To Ship</span>
                                                 <br />
                                                 <span>[~<t
                                                         t-esc="record.count_move_assigned.value"
@@ -372,44 +377,64 @@
                                                         name="last_done_picking_name"
                                                     />
                                                 </a>
-                                                <br />
-                                                <field
+                                                (<field
                                                     name="last_done_picking_date_done"
-                                                />
+                                                />)
                                             </div>
                                         </div>
                                 </div>
+
+                                <div class="row">
+
+                                    <div
+                                            class="col-12 o_kanban_primary_bottom bottom_block"
+                                        >
+
+                                        <div
+                                                class="row mt-2 mb-2 primary_bottom_buttons"
+                                            >
+                                            <div class="col-6 bottom_buttons_left">
+                                                <button
+                                                        class="btn btn-secondary "
+                                                        name="action_ddmrp_buffer"
+                                                        type="object"
+                                                    >
+                                                    <span>Buffers</span>
+                                                </button>
+                                            </div>
+                                            <div class="col-6 bottom_buttons_right">
+                                                <button
+                                                        class="btn btn-secondary"
+                                                        name="action_picking_all_related"
+                                                        type="object"
+                                                    >
+                                                    <span>Transfers</span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-3">
+                                            <div class="col-12">
+                                                <field
+                                                        name="count_picking_chain_done"
+                                                        widget="progressbar"
+                                                        title="Transfers Progress"
+                                                        options="{'current_value': 'count_picking_chain_done', 'max_value': 'count_picking_chain', 'editable': false}"
+                                                    />
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
                             </div>
 
                             <div
                                     class="container o_kanban_card_manage_pane dropdown-menu"
                                     role="menu"
                                 >
-                                    <div class="row">
-                                        <div
-                                            class="col-6 o_kanban_card_manage_section o_kanban_manage_view"
-                                        >
-                                            <div
-                                                role="menuitem"
-                                                class="o_kanban_card_manage_title"
-                                            >
-                                                <span>View</span>
-                                            </div>
-                                            <div role="menuitem">
-                                                <a
-                                                    name="action_picking_all_related"
-                                                    type="object"
-                                                >All Related Transfers</a>
-                                            </div>
-                                            <div role="menuitem">
-                                                <a
-                                                    name="action_ddmrp_buffer"
-                                                    type="object"
-                                                >Buffers</a>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                     <div
                                         t-if="widget.editable"
                                         class="o_kanban_card_manage_settings row"
