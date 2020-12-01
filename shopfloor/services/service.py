@@ -422,6 +422,24 @@ class BaseShopfloorService(AbstractComponent):
     def _work_ctx_get_profile_id(self, rec_id):
         return "profile", self.env["shopfloor.profile"].browse(rec_id).exists()
 
+    _options = {}
+
+    @property
+    def options(self):
+        """Compute options for current service.
+
+        If the service has a menu, options coming from the menu are injected.
+        """
+        if self._options:
+            return self._options
+
+        options = {}
+        if self._requires_header_menu and getattr(self.work, "menu", None):
+            options = self.work.menu.options or {}
+        options.update(getattr(self.work, "options", {}))
+        self._options = options
+        return self._options
+
 
 class BaseShopfloorProcess(AbstractComponent):
     """Base class for process rest service"""

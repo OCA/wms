@@ -90,7 +90,7 @@ const Checkout = {
                                    >New pack</btn-action>
                         </v-col>
                     </v-row>
-                    <v-row align="center">
+                    <v-row align="center" v-if="state.data.no_package_enabled">
                         <v-col class="text-center" cols="12">
                             <btn-action
                                    @click="state.on_without_pack"
