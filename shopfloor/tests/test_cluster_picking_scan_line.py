@@ -106,8 +106,8 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             },
         )
 
-    def test_scan_line_product_error_in_one_package_and_unit(self):
-        """When we scan a product which is in a package and as raw, error"""
+    def test_scan_line_product_error_in_one_package_and_raw_same_location(self):
+        """Scan product which is both in a package and as raw in same location"""
         self._simulate_batch_selected(self.batch, in_package=True)
         line = self.batch.picking_ids.move_line_ids
         # create a second move line for the same product in a different
@@ -116,6 +116,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._fill_stock_for_moves(move)
         move._action_confirm(merge=False)
         move._action_assign()
+        move.move_line_ids[0].package_id = None
 
         self._scan_line_error(
             line,
@@ -126,6 +127,20 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
                 " packages, please scan a package.",
             },
         )
+
+    def test_scan_line_product_error_in_one_package_and_raw_different_location(self):
+        """Scan product which is both in a package and as raw in another location"""
+        self._simulate_batch_selected(self.batch, in_package=True)
+        line = self.batch.picking_ids.move_line_ids
+        # create a second move line for the same product in a different
+        # package
+        move = line.move_id.copy()
+        self._fill_stock_for_moves(move)
+        move._action_confirm(merge=False)
+        move._action_assign()
+        move.move_line_ids[0].package_id = None
+        move.move_line_ids[0].location_id = line.location_id.copy()
+        self._scan_line_ok(line, move.product_id.barcode)
 
     def test_scan_line_lot_error_several_packages(self):
         """When we scan a lot which is in more than one package, error"""
