@@ -9,8 +9,8 @@ class TestMenuCountersCommonCase(MenuCountersCommonCase):
             self.menu1.id: {
                 "lines_count": 2,
                 "picking_count": 2,
-                "priority_lines_count": 2,
-                "priority_picking_count": 2,
+                "priority_lines_count": 0,
+                "priority_picking_count": 0,
             },
             self.menu2.id: {
                 "lines_count": 6,

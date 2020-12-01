@@ -43,7 +43,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "company_id": self.env.company.id,
                 "ref": "#FOO",
                 "removal_date": "2020-05-20",
-                "life_date": "2020-05-31",
+                "expiration_date": "2020-05-31",
             }
         )
         data = self.data_detail.lot_detail(lot)
@@ -98,11 +98,11 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             {
                 "origin": "created by test",
                 "note": "read me",
-                "priority": "3",
+                "priority": "1",
                 "carrier_id": carrier.id,
             }
         )
-        picking.move_lines.write({"date_expected": "2020-05-13"})
+        picking.move_lines.write({"date": "2020-05-13"})
         data = self.data_detail.picking_detail(picking)
         self.assert_schema(self.schema_detail.picking_detail(), data)
         expected = {
@@ -114,7 +114,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
             "carrier": {"id": picking.carrier_id.id, "name": picking.carrier_id.name},
-            "priority": "Very Urgent",
+            "priority": "Urgent",
             "operation_type": {
                 "id": picking.picking_type_id.id,
                 "name": picking.picking_type_id.name,

@@ -69,6 +69,4 @@ class CheckoutSelectCase(CheckoutCommonCase):
         picking = self._create_picking(picking_type=self.wh.pick_type_id)
         self._fill_stock_for_moves(picking.move_lines, in_package=True)
         picking.action_assign()
-        self._test_error(
-            picking, "You cannot move this using this menu.".format(picking.name)
-        )
+        self._test_error(picking, "You cannot move this using this menu.")

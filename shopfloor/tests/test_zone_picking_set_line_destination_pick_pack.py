@@ -47,8 +47,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         self.menu.sudo().pick_pack_same_time = True
 
     def test_set_destination_location_no_carrier(self):
-        """Scan location but carrier not set on picking
-        """
+        """Scan location but carrier not set on picking"""
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
         move_line = self.picking1.move_line_ids
@@ -101,12 +100,15 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         message = self.msg_store.confirm_pack_moved()
         message["body"] += "\n" + self.msg_store.goods_packed_in(delivery_pkg)["body"]
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines, message=message,
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=message,
         )
 
     def test_set_destination_package_full_qty_no_carrier(self):
-        """Scan destination package, no carrier on picking.
-        """
+        """Scan destination package, no carrier on picking."""
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
         moves_before = self.picking1.move_lines
@@ -133,8 +135,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         )
 
     def test_set_destination_package_full_qty_ok_carrier_bad_package(self):
-        """Scan destination package, carrier on picking, package invalid.
-        """
+        """Scan destination package, carrier on picking, package invalid."""
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
         moves_before = self.picking1.move_lines
@@ -162,8 +163,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         )
 
     def test_set_destination_package_full_qty_ok_carrier_ok_package(self):
-        """Scan destination package, carrier on picking, package valid.
-        """
+        """Scan destination package, carrier on picking, package valid."""
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
         moves_before = self.picking1.move_lines

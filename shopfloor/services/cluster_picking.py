@@ -332,8 +332,8 @@ class ClusterPicking(Component):
             line.shopfloor_priority or 10,
             line.location_id.shopfloor_picking_sequence or "",
             line.location_id.name,
-            -int(line.move_id.priority or 1),
-            line.move_id.date_expected,
+            -int(line.move_id.priority or 0),
+            line.move_id.date,
             line.move_id.sequence,
             line.move_id.id,
             line.id,
@@ -490,7 +490,7 @@ class ClusterPicking(Component):
         # but also if we have one product as a package and the same product as
         # a unit in another line. In both cases, we want the user to scan the
         # package.
-        if packages and len({l.package_id for l in other_product_lines}) > 1:
+        if packages and len({line.package_id for line in other_product_lines}) > 1:
             return self._response_for_start_line(
                 move_line,
                 message=self.msg_store.product_multiple_packages_scan_package(),
@@ -509,7 +509,7 @@ class ClusterPicking(Component):
         # package, but also if we have one lot as a package and the same lot as
         # a unit in another line. In both cases, we want the user to scan the
         # package.
-        if packages and len({l.package_id for l in other_lot_lines}) > 1:
+        if packages and len({line.package_id for line in other_lot_lines}) > 1:
             return self._response_for_start_line(
                 move_line, message=self.msg_store.lot_multiple_packages_scan_package()
             )
@@ -965,8 +965,8 @@ class ClusterPicking(Component):
             if picking.state == "done":
                 continue
             picking_lines = picking.mapped("move_line_ids")
-            if all(l.shopfloor_unloaded for l in picking_lines):
-                picking.action_done()
+            if all(line.shopfloor_unloaded for line in picking_lines):
+                picking._action_done()
 
     def _unload_end(self, batch, completion_info_popup=None):
         """Try to close the batch if all transfers are done.
@@ -994,7 +994,7 @@ class ClusterPicking(Component):
             # TODO add tests for this (for instance a picking is not 'done'
             # because a move was unassigned, we want to validate the batch to
             # produce backorders)
-            batch.mapped("picking_ids").action_done()
+            batch.mapped("picking_ids")._action_done()
             batch.state = "done"
             # Unassign not validated pickings from the batch, they will be
             # processed in another batch automatically later on

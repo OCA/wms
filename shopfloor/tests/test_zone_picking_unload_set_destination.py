@@ -55,7 +55,9 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         move_line = self.picking1.move_line_ids
         # set the destination package
         self.service._set_destination_package(
-            move_line, move_line.product_uom_qty, self.free_package,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
         )
         response = self.service.dispatch(
             "unload_set_destination",
@@ -75,7 +77,9 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         move_line = self.picking1.move_line_ids
         # set the destination package
         self.service._set_destination_package(
-            move_line, move_line.product_uom_qty, self.free_package,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
         )
         response = self.service.dispatch(
             "unload_set_destination",
@@ -100,7 +104,9 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         move_line[0].picking_id.location_dest_id = self.packing_sublocation_a
         # set the destination package
         self.service._set_destination_package(
-            move_line, move_line.product_uom_qty, self.free_package,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
         )
         response = self.service.dispatch(
             "unload_set_destination",
@@ -145,7 +151,9 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         )
         # set the destination package
         self.service._set_destination_package(
-            move_line, move_line.product_uom_qty, self.free_package,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
         )
         move_line.location_dest_id = packing_sublocation1
         response = self.service.dispatch(
@@ -183,7 +191,9 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         )
         # set the destination package
         self.service._set_destination_package(
-            move_line, move_line.product_uom_qty, self.free_package,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
         )
         response = self.service.dispatch(
             "unload_set_destination",
@@ -218,7 +228,9 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             move_lines, self.free_package | self.another_package
         ):
             self.service._set_destination_package(
-                move_line, move_line.product_uom_qty, package_dest,
+                move_line,
+                move_line.product_uom_qty,
+                package_dest,
             )
         free_package_line = move_lines.filtered(
             lambda l: l.result_package_id == self.free_package
@@ -276,7 +288,9 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         )
         # set the destination package
         self.service._set_destination_package(
-            move_line, move_line.product_uom_qty, self.free_package,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
         )
         response = self.service.dispatch(
             "unload_set_destination",

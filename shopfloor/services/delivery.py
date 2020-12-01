@@ -253,7 +253,7 @@ class Delivery(Component):
         # but also if we have one product as a package and the same product as
         # a unit in another line. In both cases, we want the user to scan the
         # package.
-        if packages and len({l.package_id for l in lines}) > 1:
+        if packages and len({m.package_id for m in lines}) > 1:
             return self._response_for_deliver(
                 new_picking,
                 message=self.msg_store.product_multiple_packages_scan_package(),
@@ -303,7 +303,7 @@ class Delivery(Component):
         # package, but also if we have one lot as a package and the same lot as
         # a unit in another line. In both cases, we want the user to scan the
         # package.
-        if packages and len({l.package_id for l in lines}) > 1:
+        if packages and len({m.package_id for m in lines}) > 1:
             return self._response_for_deliver(
                 new_picking, message=self.msg_store.lot_multiple_packages_scan_package()
             )
@@ -335,7 +335,7 @@ class Delivery(Component):
         if picking.state == "done":
             return True
         if force:
-            picking.action_done()
+            picking._action_done()
             return True
         all_done = False
         for move in picking.move_lines:
@@ -346,7 +346,7 @@ class Delivery(Component):
                 # At least one move not satisfied, cannot mark as done automatically
                 break
         if all_done:
-            picking.action_done()
+            picking._action_done()
             return True
         return False
 

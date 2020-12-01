@@ -92,21 +92,19 @@ class MoveLineSearch(Component):
             # make prority negative to keep sorting ascending
             return lambda line: (
                 -int(line.move_id.priority or "0"),
-                line.move_id.date_expected,
+                line.move_id.date,
             )
         elif order == "location":
             return lambda line: (
                 line.location_id.shopfloor_picking_sequence or "",
                 line.location_id.name,
-                line.move_id.date_expected,
+                line.move_id.date,
             )
         return lambda line: line
 
-    def counters_for_lines(self, lines, priority_selection=("2", "3")):
+    def counters_for_lines(self, lines):
         # Not using mapped/filtered to support simple lists and generators
-        priority_lines = [
-            x for x in lines if x.picking_id.priority in priority_selection
-        ]
+        priority_lines = [x for x in lines if x.picking_id.priority == 1]
         return {
             "lines_count": len(lines),
             "picking_count": len({x.picking_id.id for x in lines}),
