@@ -351,7 +351,7 @@ Vue.component("line-actions-popup", {
           </v-row>
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <v-btn x-large @click="dialog = false">{{ $t('btn.back.title') }}</v-btn>
+              <v-btn x-large @click="dialog = false"><v-icon>mdi-keyboard-backspace</v-icon> {{ $t('btn.back.title') }}</v-btn>
             </v-col>
           </v-row>
         </div>

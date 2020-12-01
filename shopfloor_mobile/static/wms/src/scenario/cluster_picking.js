@@ -89,12 +89,15 @@ const ClusterPicking = {
                             <v-btn color="primary" @click="$emit('action', 'action_split')">Split [TODO]</v-btn>
                         </v-col>
                     </v-row>
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <btn-back />
-                        </v-col>
-                    </v-row>
                 </div>
+            </div>
+
+            <div class="button-list button-vertical-list full">
+                <v-row align="center" v-if="state_in(['unload_all', 'change_pack_lot'])">
+                    <v-col class="text-center" cols="12">
+                        <btn-back />
+                    </v-col>
+                </v-row>
             </div>
 
         </Screen>
