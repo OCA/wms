@@ -5,8 +5,7 @@ from .test_location_content_transfer_base import LocationContentTransferCommonCa
 
 
 class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
-    """Tests with putaway when using option to ignore unavailable putaway locations
-    """
+    """Tests with putaway when using option to ignore unavailable putaway locations"""
 
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
@@ -70,7 +69,9 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
             "scan_location", params={"barcode": self.test_loc.barcode}
         )
         self.assert_response(
-            response, next_state="start_single", data=self.ANY,
+            response,
+            next_state="start_single",
+            data=self.ANY,
         )
         package_level_id = response["data"]["start_single"]["package_level"]["id"]
         package_level = self.env["stock.package_level"].browse(package_level_id)

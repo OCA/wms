@@ -44,7 +44,8 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         response = self.service.dispatch(
             "unload_set_destination",
@@ -56,7 +57,8 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         response = self.service.dispatch(
             "unload_set_destination",

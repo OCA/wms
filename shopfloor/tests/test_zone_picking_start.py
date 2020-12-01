@@ -24,7 +24,8 @@ class ZonePickingStartCase(ZonePickingCommonCase):
             }
         )
         cls.extra_picking = extra_picking = cls._create_picking(
-            lines=[(cls.product_b, 10)], picking_type=bad_picking_type,
+            lines=[(cls.product_b, 10)],
+            picking_type=bad_picking_type,
         )
         cls._fill_stock_for_moves(
             extra_picking.move_lines, in_package=True, location=cls.zone_sublocation1
@@ -128,10 +129,12 @@ class ZonePickingStartCase(ZonePickingCommonCase):
     def test_scan_location_wrong_barcode(self):
         """Scanned location invalid, no location found."""
         response = self.service.dispatch(
-            "scan_location", params={"barcode": "UNKNOWN LOCATION"},
+            "scan_location",
+            params={"barcode": "UNKNOWN LOCATION"},
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.no_location_found(),
+            response,
+            message=self.service.msg_store.no_location_found(),
         )
 
     def test_scan_location_not_allowed(self):
@@ -139,10 +142,12 @@ class ZonePickingStartCase(ZonePickingCommonCase):
         types' source location.
         """
         response = self.service.dispatch(
-            "scan_location", params={"barcode": self.customer_location.barcode},
+            "scan_location",
+            params={"barcode": self.customer_location.barcode},
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.location_not_allowed(),
+            response,
+            message=self.service.msg_store.location_not_allowed(),
         )
 
     def test_scan_location_no_move_lines(self):
@@ -151,17 +156,22 @@ class ZonePickingStartCase(ZonePickingCommonCase):
         # no more lines available
         sub1_lines.picking_id.action_cancel()
         response = self.service.dispatch(
-            "scan_location", params={"barcode": self.zone_sublocation1.barcode},
+            "scan_location",
+            params={"barcode": self.zone_sublocation1.barcode},
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.no_lines_to_process(),
+            response,
+            message=self.service.msg_store.no_lines_to_process(),
         )
 
     def test_scan_location_ok(self):
         """Scanned location valid, list of picking types of related move lines."""
         response = self.service.dispatch(
-            "scan_location", params={"barcode": self.zone_location.barcode},
+            "scan_location",
+            params={"barcode": self.zone_location.barcode},
         )
         self.assert_response_select_picking_type(
-            response, zone_location=self.zone_location, picking_types=self.picking_type,
+            response,
+            zone_location=self.zone_location,
+            picking_types=self.picking_type,
         )

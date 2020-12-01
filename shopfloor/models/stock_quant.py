@@ -7,7 +7,7 @@ class StockQuant(models.Model):
     _inherit = "stock.quant"
 
     def _is_inventory_mode(self):
-        """ Used to control whether a quant was written on or created during an
+        """Used to control whether a quant was written on or created during an
         "inventory session", meaning a mode where we need to create the stock.move
         record necessary to be consistent with the `inventory_quantity` field.
         """

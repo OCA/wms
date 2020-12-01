@@ -46,7 +46,8 @@ class DeliveryDoneCase(DeliveryCommonCase):
             move_line.qty_done = move_line.product_uom_qty
         response = self.service.dispatch("done", params={"picking_id": self.picking.id})
         self.assert_response_deliver(
-            response, message=self.service.msg_store.transfer_complete(self.picking),
+            response,
+            message=self.service.msg_store.transfer_complete(self.picking),
         )
         self.assertEqual(self.picking.state, "done")
 
@@ -79,7 +80,8 @@ class DeliveryDoneCase(DeliveryCommonCase):
             "done", params={"picking_id": self.picking.id, "confirm": True}
         )
         self.assert_response_deliver(
-            response, message=self.service.msg_store.transfer_no_qty_done(),
+            response,
+            message=self.service.msg_store.transfer_no_qty_done(),
         )
         self.assertEqual(self.picking.state, "assigned")
 
@@ -94,7 +96,8 @@ class DeliveryDoneCase(DeliveryCommonCase):
             "done", params={"picking_id": self.picking.id, "confirm": True}
         )
         self.assert_response_deliver(
-            response, message=self.service.msg_store.transfer_complete(self.picking),
+            response,
+            message=self.service.msg_store.transfer_complete(self.picking),
         )
         self.assertEqual(self.picking.state, "done")
         self.assertEqual(self.picking.move_lines, self.raw_move)
