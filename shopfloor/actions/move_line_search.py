@@ -28,6 +28,7 @@ class MoveLineSearch(Component):
         product=None,
         lot=None,
         match_user=False,
+        picking_ready=True,
     ):
         domain = [
             ("location_id", "child_of", locations.ids),
@@ -51,6 +52,8 @@ class MoveLineSearch(Component):
                 ("shopfloor_user_id", "=", False),
                 ("shopfloor_user_id", "=", self.env.uid),
             ]
+        if picking_ready:
+            domain += [("picking_id.state", "=", "assigned")]
         return domain
 
     def search_move_lines_by_location(
@@ -63,11 +66,18 @@ class MoveLineSearch(Component):
         order="priority",
         match_user=False,
         sort_keys_func=None,
+        picking_ready=True,
     ):
         """Find lines that potentially need work in given locations."""
         move_lines = self.env["stock.move.line"].search(
             self._search_move_lines_by_location_domain(
-                locations, picking_type, package, product, lot, match_user=match_user
+                locations,
+                picking_type,
+                package,
+                product,
+                lot,
+                match_user=match_user,
+                picking_ready=picking_ready,
             )
         )
         sort_keys_func = sort_keys_func or self._sort_key_move_lines(order)
