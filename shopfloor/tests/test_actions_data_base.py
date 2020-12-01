@@ -173,7 +173,7 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
         data = {
             "id": record.id,
             "name": record.name,
-            "weight": record.pack_weight or record.estimated_pack_weight,
+            "weight": record.pack_weight or record.estimated_pack_weight_kg,
             "storage_type": None,
         }
         data.update(kw)

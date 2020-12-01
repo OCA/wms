@@ -71,10 +71,10 @@ class ClusterPickingBatchCase(CommonCase, PickingBatchMixin):
         self.batch6.state = "cancel"
         # we should not have batches in progress
         self.batch4.user_id = self.env.ref("base.user_demo")
-        self.batch4.confirm_picking()
+        self.batch4.action_confirm()
         # unless it's assigned to our user
         self.batch3.user_id = self.env.user
-        self.batch3.confirm_picking()
+        self.batch3.action_confirm()
 
         # Simulate the client asking the list of picking batch
         res = self.service._batch_picking_search()

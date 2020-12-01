@@ -760,7 +760,7 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         picking_a = self.picking_a
         picking_b = self.picking_b
         picking_a.move_line_ids.qty_done = 10
-        picking_a.action_done()
+        picking_a._action_done()
         self.assertEqual(picking_a.state, "done")
         self.assertEqual(picking_b.state, "assigned")
         self._simulate_pickings_selected(picking_b)
@@ -816,7 +816,7 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         line1.qty_done = 6
         line1.result_package_id = package1
         line2.result_package_id = package2
-        picking_a.action_done()
+        picking_a._action_done()
         self.assertEqual(picking_a.state, "done")
         self.assertEqual(picking_b.state, "assigned")
         # we have 1 move line per package

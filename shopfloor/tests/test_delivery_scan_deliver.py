@@ -282,7 +282,7 @@ class DeliveryScanDeliverSpecialCase(DeliveryCommonCase):
         self._fill_stock_for_moves(picking.move_lines, in_package=True)
         picking.action_assign()
         picking.move_line_ids.qty_done = picking.move_line_ids.product_uom_qty
-        picking.action_done()
+        picking._action_done()
         response = self.service.dispatch(
             "scan_deliver", params={"barcode": picking.name}
         )

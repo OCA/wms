@@ -28,9 +28,9 @@ class CheckoutSetQtyCommonCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         self.deselected_lines = self.moves_pack2.move_line_ids
         self.service._select_lines(self.selected_lines)
         self.assertTrue(
-            all(l.qty_done == l.product_uom_qty for l in self.selected_lines)
+            all(line.qty_done == line.product_uom_qty for line in self.selected_lines)
         )
-        self.assertTrue(all(l.qty_done == 0 for l in self.deselected_lines))
+        self.assertTrue(all(line.qty_done == 0 for line in self.deselected_lines))
 
 
 class CheckoutResetLineQtyCase(CheckoutSetQtyCommonCase):

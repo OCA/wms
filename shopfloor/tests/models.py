@@ -13,7 +13,9 @@ from odoo import fields, models
 class DeliveryCarrierTest(models.Model):
     _inherit = "delivery.carrier"
 
-    delivery_type = fields.Selection(selection_add=[("test", "TEST")])
+    delivery_type = fields.Selection(
+        selection_add=[("test", "TEST")], ondelete={"test": "set default"}
+    )
     test_default_packaging_id = fields.Many2one(
         "product.packaging", string="Default Package Type"
     )
@@ -22,4 +24,6 @@ class DeliveryCarrierTest(models.Model):
 class ProductPackagingTest(models.Model):
     _inherit = "product.packaging"
 
-    package_carrier_type = fields.Selection(selection_add=[("test", "TEST")])
+    package_carrier_type = fields.Selection(
+        selection_add=[("test", "TEST")], ondelete={"test": "set default"}
+    )

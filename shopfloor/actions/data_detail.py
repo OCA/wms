@@ -85,7 +85,7 @@ class DataDetailAction(Component):
     def _lot_detail_parser(self):
         return self._lot_parser + [
             "removal_date",
-            "life_date:expire_date",
+            "expiration_date:expire_date",
             (
                 "product_id:product",
                 lambda record, fname: self.product_detail(record[fname]),

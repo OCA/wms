@@ -7,8 +7,7 @@ from odoo.addons.component.core import Component
 
 
 class ProductHandler(Component):
-    """Scan anything handler for product.product.
-    """
+    """Scan anything handler for product.product."""
 
     _name = "shopfloor.scan.product.handler"
     _inherit = "shopfloor.scan.anything.handler"

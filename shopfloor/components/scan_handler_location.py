@@ -7,8 +7,7 @@ from odoo.addons.component.core import Component
 
 
 class LocationHandler(Component):
-    """Scan anything handler for stock.location.
-    """
+    """Scan anything handler for stock.location."""
 
     _name = "shopfloor.scan.location.handler"
     _inherit = "shopfloor.scan.anything.handler"

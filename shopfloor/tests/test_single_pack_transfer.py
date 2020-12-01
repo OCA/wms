@@ -817,6 +817,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         move_lines_a = package_level_a.move_line_ids
         picking = move_a.picking_id
         # someone cancel the work started by our operator
+        move_lines_a.write({"qty_done": 0})
         move_a._action_cancel()
 
         # now, call the service to cancel the first package
@@ -840,6 +841,8 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         # keep references for later checks
         move_b = package_level_b.move_line_ids.move_id
         # someone cancel the work started by our operator
+        move_lines_b = package_level_b.move_line_ids
+        move_lines_b.write({"qty_done": 0})
         move_b._action_cancel()
         # then cancel the second package
         response = self.service.dispatch(

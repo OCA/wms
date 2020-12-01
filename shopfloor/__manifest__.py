@@ -6,7 +6,7 @@
 {
     "name": "Shopfloor",
     "summary": "manage warehouse operations with barcode scanners",
-    "version": "13.0.4.10.2",
+    "version": "14.0.1.0.0",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
@@ -25,9 +25,9 @@
         #  OCA / stock-logistics-warehouse
         "stock_helper",
         "stock_picking_completion_info",
-        "stock_quant_package_product_packaging",
         #  OCA / stock-logistics-workflow
         "stock_quant_package_dimension",
+        "stock_quant_package_product_packaging",
         # TODO: used for manuf info on prod detail.
         # This must be an optional dep
         "product_manufacturer",
@@ -55,5 +55,5 @@
         "views/stock_move_line.xml",
     ],
     "demo": ["demo/stock_picking_type_demo.xml", "demo/shopfloor_menu_demo.xml"],
-    "installable": False,
+    "installable": True,
 }
