@@ -25,7 +25,9 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
         # drop base demo data and create our own batches to work with
-        cls.env["stock.picking.batch"].search([]).unlink()
+        old_batchs = cls.env["stock.picking.batch"].search([])
+        old_batchs.write({"state": "draft"})
+        old_batchs.unlink()
         cls.batch1 = cls._create_picking_batch(
             [[cls.BatchProduct(product=cls.product_a, quantity=3)]]
         )
@@ -51,7 +53,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
             self.batch1 | self.batch2 | self.batch3
         )
         self.batch3.user_id = self.env.uid
-        self.batch3.confirm_picking()  # set to in progress
+        self.batch3.action_confirm()  # set to in progress
         response = self.service.dispatch("find_batch")
 
         # we expect to find batch 3 as it's assigned to the current
@@ -206,6 +208,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
     def test_select_not_exists(self):
         """Select a draft that does not exist"""
         batch_id = self.batch1.id
+        self.batch1.state = "draft"
         self.batch1.unlink()
         # Simulate the client selecting the batch in a list
         response = self.service.dispatch(
@@ -255,6 +258,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
     def test_unassign_batch_not_exists(self):
         """User cancels after selecting a batch deleted meanwhile"""
         batch_id = self.batch1.id
+        self.batch1.state = "draft"
         self.batch1.unlink()
         # Simulate the client selecting the batch in a list
         response = self.service.dispatch(
@@ -297,8 +301,8 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         # Change dates
         move1 = picking1.move_lines[0]
         move1_line = move1.move_line_ids[0]
-        move1.write({"date_expected": today})
-        (batch.picking_ids.move_lines - move1).write({"date_expected": future})
+        move1.write({"date": today})
+        (batch.picking_ids.move_lines - move1).write({"date": future})
 
         move_lines = self.service._lines_for_picking_batch(batch)
         order_mapping = {line: i for i, line in enumerate(move_lines)}
@@ -306,8 +310,8 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         # Today line comes first
         self.assertEqual(order_mapping[move1_line], 0)
         # swap dates
-        move1.write({"date_expected": future})
-        (batch.picking_ids.move_lines - move1).write({"date_expected": today})
+        move1.write({"date": future})
+        (batch.picking_ids.move_lines - move1).write({"date": today})
 
         move_lines = self.service._lines_for_picking_batch(batch)
         order_mapping = {line: i for i, line in enumerate(move_lines)}
@@ -343,6 +347,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
     def test_confirm_start_not_exists(self):
         """User confirms she starts but batch has been deleted meanwhile"""
         batch_id = self.batch.id
+        self.batch.state = "draft"
         self.batch.unlink()
         response = self.service.dispatch(
             "confirm_start", params={"picking_batch_id": batch_id}
@@ -366,7 +371,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
             self.batch.mapped("picking_ids.move_line_ids"),
             self.env["stock.quant.package"].create({}),
         )
-        self.batch.done()
+        self.batch.action_done()
         response = self.service.dispatch(
             "confirm_start", params={"picking_batch_id": self.batch.id}
         )

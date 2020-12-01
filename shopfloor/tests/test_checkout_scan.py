@@ -147,9 +147,10 @@ class CheckoutScanCase(CheckoutCommonCase):
         self.assertEqual(len(data["picking"]["move_lines"]), 2)
         self.assertFalse(picking.move_line_ids.shopfloor_user_id)
         response = self.service.dispatch(
-            "select_line", params={"picking_id": picking.id, "package_id": package.id},
+            "select_line",
+            params={"picking_id": picking.id, "package_id": package.id},
         )
-        self.assertTrue(all(l.qty_done for l in picking.move_line_ids))
+        self.assertTrue(all(m.qty_done for m in picking.move_line_ids))
         self.assertEqual(picking.move_line_ids.shopfloor_user_id, self.env.user)
         # He restarts the scenario and try to select again the previous line
         # to continue its job

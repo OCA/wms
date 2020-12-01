@@ -21,10 +21,13 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
         # wrong package ID, and there is still a move line to unload
         # => get back on 'unload_single' screen
         self.service._set_destination_package(
-            move_line, move_line.product_uom_qty, self.free_package,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
         )
         response = self.service.dispatch(
-            "unload_scan_pack", params={"package_id": 1234567890, "barcode": "UNKNOWN"},
+            "unload_scan_pack",
+            params={"package_id": 1234567890, "barcode": "UNKNOWN"},
         )
         completion_info = self.service._actions_for("completion.info")
         completion_info_popup = completion_info.popup(move_line)
@@ -42,7 +45,8 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
             {"qty_done": 0, "shopfloor_user_id": False, "result_package_id": False}
         )
         response = self.service.dispatch(
-            "unload_scan_pack", params={"package_id": 1234567890, "barcode": "UNKNOWN"},
+            "unload_scan_pack",
+            params={"package_id": 1234567890, "barcode": "UNKNOWN"},
         )
         move_lines = self.service._find_location_move_lines()
         self.assert_response_select_line(
@@ -56,7 +60,8 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
         # => get back on 'start' screen
         self.pickings.move_lines._do_unreserve()
         response = self.service.dispatch(
-            "unload_scan_pack", params={"package_id": 1234567890, "barcode": "UNKNOWN"},
+            "unload_scan_pack",
+            params={"package_id": 1234567890, "barcode": "UNKNOWN"},
         )
         self.assert_response_start(
             response,
@@ -69,7 +74,9 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
         move_line = self.picking1.move_line_ids
         # set the destination package
         self.service._set_destination_package(
-            move_line, move_line.product_uom_qty, self.free_package,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
         )
         response = self.service.dispatch(
             "unload_scan_pack",
@@ -79,7 +86,10 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_unload_set_destination(
-            response, zone_location, picking_type, move_line,
+            response,
+            zone_location,
+            picking_type,
+            move_line,
         )
 
     def test_unload_scan_pack_barcode_not_match(self):
@@ -91,7 +101,9 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
         )
         # set the destination package
         self.service._set_destination_package(
-            move_line, move_line.product_uom_qty, self.free_package,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
         )
         response = self.service.dispatch(
             "unload_scan_pack",

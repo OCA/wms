@@ -183,11 +183,17 @@ class ZonePicking(Component):
         data = self._data_for_move_lines(move_lines)
         data["confirmation_required"] = confirmation_required
         return self._response(
-            next_state="select_line", data=data, message=message, popup=popup,
+            next_state="select_line",
+            data=data,
+            message=message,
+            popup=popup,
         )
 
     def _response_for_set_line_destination(
-        self, move_line, message=None, confirmation_required=False,
+        self,
+        move_line,
+        message=None,
+        confirmation_required=False,
     ):
         if confirmation_required and not message:
             message = self.msg_store.need_confirmation()
@@ -200,7 +206,11 @@ class ZonePicking(Component):
     def _response_for_zero_check(self, move_line, message=None):
         data = self._data_for_location(move_line.location_id)
         data["move_line"] = self.data.move_line(move_line)
-        return self._response(next_state="zero_check", data=data, message=message,)
+        return self._response(
+            next_state="zero_check",
+            data=data,
+            message=message,
+        )
 
     def _response_for_change_pack_lot(self, move_line, message=None):
         return self._response(
@@ -210,7 +220,10 @@ class ZonePicking(Component):
         )
 
     def _response_for_unload_all(
-        self, move_lines, message=None, confirmation_required=False,
+        self,
+        move_lines,
+        message=None,
+        confirmation_required=False,
     ):
         if confirmation_required and not message:
             message = self.msg_store.need_confirmation()
@@ -230,7 +243,10 @@ class ZonePicking(Component):
         )
 
     def _response_for_unload_set_destination(
-        self, move_line, message=None, confirmation_required=False,
+        self,
+        move_line,
+        message=None,
+        confirmation_required=False,
     ):
         if confirmation_required and not message:
             message = self.msg_store.need_confirmation()
@@ -433,8 +449,7 @@ class ZonePicking(Component):
         return self._response_for_select_line(move_lines)
 
     def _scan_source_location(self, barcode, confirmation=False):
-        """Search a location and find available lines into it.
-        """
+        """Search a location and find available lines into it."""
         response = None
         message = None
         search = self._actions_for("search")
@@ -455,7 +470,11 @@ class ZonePicking(Component):
             return response, message
 
         move_lines = self._find_location_move_lines(
-            location, product=product, lot=lot, package=package, match_user=True,
+            location,
+            product=product,
+            lot=lot,
+            package=package,
+            match_user=True,
         )
         if move_lines:
             response = self._response_for_set_line_destination(first(move_lines))
@@ -466,8 +485,7 @@ class ZonePicking(Component):
         return response, message
 
     def _find_product_in_location(self, location):
-        """Find a prooduct in stock in given location move line in the location.
-        """
+        """Find a prooduct in stock in given location move line in the location."""
         quants = self.env["stock.quant"].search([("location_id", "=", location.id)])
         product = quants.product_id
         lot = quants.lot_id
@@ -518,8 +536,7 @@ class ZonePicking(Component):
         return response, message
 
     def _scan_source_product(self, barcode, confirmation=False):
-        """Search a product and find available lines for it.
-        """
+        """Search a product and find available lines for it."""
         message = None
         response = None
         search = self._actions_for("search")
@@ -535,8 +552,7 @@ class ZonePicking(Component):
         return response, message
 
     def _scan_source_lot(self, barcode, confirmation=False):
-        """Search a lot and find available lines for it.
-        """
+        """Search a lot and find available lines for it."""
         message = None
         response = None
         search = self._actions_for("search")
@@ -603,7 +619,8 @@ class ZonePicking(Component):
         # expected ones but is valid (in picking type's default destination)
         if not self.is_dest_location_valid(move_line.move_id, location):
             response = self._response_for_set_line_destination(
-                move_line, message=self.msg_store.dest_location_not_allowed(),
+                move_line,
+                message=self.msg_store.dest_location_not_allowed(),
             )
             return (location_changed, response)
 
@@ -622,7 +639,8 @@ class ZonePicking(Component):
         # If no destination package
         if not move_line.result_package_id:
             response = self._response_for_set_line_destination(
-                move_line, message=self.msg_store.dest_package_required(),
+                move_line,
+                message=self.msg_store.dest_package_required(),
             )
             return (location_changed, response)
         # destination location set to the scanned one
@@ -676,12 +694,14 @@ class ZonePicking(Component):
         # * not used as destination for another move line
         if not self._is_package_empty(package):
             response = self._response_for_set_line_destination(
-                move_line, message=self.msg_store.package_not_empty(package),
+                move_line,
+                message=self.msg_store.package_not_empty(package),
             )
             return (package_changed, response)
         if self._is_package_already_used(package):
             response = self._response_for_set_line_destination(
-                move_line, message=self.msg_store.package_already_used(package),
+                move_line,
+                message=self.msg_store.package_already_used(package),
             )
             return (package_changed, response)
         # the quantity done is set to the passed quantity
@@ -722,7 +742,11 @@ class ZonePicking(Component):
 
     # flake8: noqa: C901
     def set_destination(
-        self, move_line_id, barcode, quantity, confirmation=False,
+        self,
+        move_line_id,
+        barcode,
+        quantity,
+        confirmation=False,
     ):
         """Set a destination location (and done) or a destination package (in buffer)
 
@@ -795,7 +819,10 @@ class ZonePicking(Component):
                             move_line, message=message
                         )
                 pkg_moved, response = self._set_destination_location(
-                    move_line, quantity, confirmation, location,
+                    move_line,
+                    quantity,
+                    confirmation,
+                    location,
                 )
                 if response:
                     if extra_message:
@@ -1046,7 +1073,8 @@ class ZonePicking(Component):
             return response
 
         return self._response_for_change_pack_lot(
-            move_line, message=self.msg_store.no_package_or_lot_for_barcode(barcode),
+            move_line,
+            message=self.msg_store.no_package_or_lot_for_barcode(barcode),
         )
 
     def prepare_unload(self):
@@ -1190,7 +1218,8 @@ class ZonePicking(Component):
         # no remaining move lines in buffer
         move_lines = self._find_location_move_lines()
         return self._response_for_select_line(
-            move_lines, message=self.msg_store.buffer_complete(),
+            move_lines,
+            message=self.msg_store.buffer_complete(),
         )
 
     def _unload_response(self, unload_single_message=None):
@@ -1199,14 +1228,16 @@ class ZonePicking(Component):
         move_lines = self._find_buffer_move_lines()
         if move_lines:
             return self._response_for_unload_single(
-                first(move_lines), message=unload_single_message,
+                first(move_lines),
+                message=unload_single_message,
             )
         # if there are still move lines to process from the picking type
         #   => buffer complete!
         move_lines = self._find_location_move_lines()
         if move_lines:
             return self._response_for_select_line(
-                move_lines, message=self.msg_store.buffer_complete(),
+                move_lines,
+                message=self.msg_store.buffer_complete(),
             )
         # no more move lines to process from the current picking type
         #   => picking type complete!
@@ -1273,7 +1304,8 @@ class ZonePicking(Component):
         if not package.exists() or not buffer_lines:
             move_lines = self._find_location_move_lines()
             return self._response_for_select_line(
-                move_lines, message=self.msg_store.record_not_found(),
+                move_lines,
+                message=self.msg_store.record_not_found(),
             )
         search = self._actions_for("search")
         location = search.location_from_scan(barcode)
@@ -1317,7 +1349,8 @@ class ZonePicking(Component):
             move_lines = self._find_location_move_lines()
             if move_lines:
                 return self._response_for_select_line(
-                    move_lines, message=self.msg_store.buffer_complete(),
+                    move_lines,
+                    message=self.msg_store.buffer_complete(),
                 )
             return self._response_for_start(
                 message=self.msg_store.picking_type_complete(self.picking_type)
@@ -1326,7 +1359,8 @@ class ZonePicking(Component):
         # we should not redirect to `unload_set_destination`
         # because we'll have nothing to display (currently the UI is broken).
         return self._response_for_unload_set_destination(
-            first(buffer_lines), message=self.msg_store.no_location_found(),
+            first(buffer_lines),
+            message=self.msg_store.no_location_found(),
         )
 
 

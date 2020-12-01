@@ -215,7 +215,7 @@ class MenuCountersCommonCase(CommonMenuCase):
         cls.picking1 = picking1 = cls._create_picking(
             picking_type=cls.menu1_picking_type, lines=[(cls.product_a, 10)]
         )
-        picking1.priority = "2"
+        picking1.priority = "0"
         cls._fill_stock_for_moves(
             picking1.move_lines, in_package=True, location=cls.zone_sublocation1
         )
@@ -224,7 +224,7 @@ class MenuCountersCommonCase(CommonMenuCase):
             picking_type=cls.menu1_picking_type,
             lines=[(cls.product_b, 10), (cls.product_c, 10)],
         )
-        picking2.priority = "3"
+        picking2.priority = "1"
         cls._fill_stock_for_moves(
             picking2.move_lines, in_lot=True, location=cls.zone_sublocation2
         )
@@ -232,7 +232,7 @@ class MenuCountersCommonCase(CommonMenuCase):
         cls.picking3 = picking3 = cls._create_picking(
             picking_type=cls.menu1_picking_type, lines=[(cls.product_d, 10)]
         )
-        picking3.priority = "2"
+        picking3.priority = "0"
         cls._fill_stock_for_moves(picking3.move_lines, location=cls.zone_sublocation1)
 
         cls.picking4 = picking4 = cls._create_picking(

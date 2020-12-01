@@ -33,7 +33,9 @@ class ZonePickingUnloadBufferLinesCase(ZonePickingCommonCase):
                 {"name": f"TEST PKG {i}"}
             )
             self.service._set_destination_package(
-                line, line.product_uom_qty, dest_package,
+                line,
+                line.product_uom_qty,
+                dest_package,
             )
 
         # We can unload all the lines no matter which zone we are before unload
@@ -57,7 +59,9 @@ class ZonePickingUnloadBufferLinesCase(ZonePickingCommonCase):
                 {"name": f"TEST PKG {i}"}
             )
             self.service._set_destination_package(
-                line, line.product_uom_qty, dest_package,
+                line,
+                line.product_uom_qty,
+                dest_package,
             )
 
         # We can unload all the lines no matter which zone we are before unload
@@ -83,7 +87,9 @@ class ZonePickingUnloadBufferLinesCase(ZonePickingCommonCase):
                 {"name": f"TEST PKG {i}"}
             )
             self.service._set_destination_package(
-                line, line.product_uom_qty, dest_package,
+                line,
+                line.product_uom_qty,
+                dest_package,
             )
         # Simulate line from picking1 processed by another user
         for i, line in enumerate(self.picking1.move_line_ids):

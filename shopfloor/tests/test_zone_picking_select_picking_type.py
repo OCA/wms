@@ -13,7 +13,10 @@ class ZonePickingSelectPickingTypeCase(ZonePickingCommonCase):
     def test_list_move_lines_ok(self):
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
-        response = self.service.dispatch("list_move_lines", params={},)
+        response = self.service.dispatch(
+            "list_move_lines",
+            params={},
+        )
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
         self.assert_response_select_line(
             response,

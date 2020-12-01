@@ -26,7 +26,8 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
 
     def test_set_destination_location_confirm(self):
@@ -492,5 +493,8 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         self.assertTrue(location_is_empty())
         # Check response
         self.assert_response_zero_check(
-            response, zone_location, picking_type, move_line,
+            response,
+            zone_location,
+            picking_type,
+            move_line,
         )

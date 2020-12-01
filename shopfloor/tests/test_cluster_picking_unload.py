@@ -600,7 +600,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
     def test_unload_scan_destination_one_line_of_picking_only(self):
         """Endpoint /unload_scan_destination is called, only one line of picking"""
         # For this test, we assume the move in bin1 is already done.
-        self.one_line_picking.action_done()
+        self.one_line_picking._action_done()
         # And for the second picking, we put one line bin2 and one line in bin3
         # so the user would have to go through 2 screens for each pack.
         # After scanning and setting the destination for bin2, the picking will
@@ -662,7 +662,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
     def test_unload_scan_destination_last_line(self):
         """Endpoint /unload_scan_destination is called on last line"""
         # For this test, we assume the move in bin1 is already done.
-        self.one_line_picking.action_done()
+        self.one_line_picking._action_done()
         # And for the second picking, bin2 was already unloaded,
         # remains bin3 to unload.
         bin3 = self.env["stock.quant.package"].create({})
