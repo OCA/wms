@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="stock.view_picking_form" />
         <field name="arch" type="xml">
             <xpath
-                expr="//notebook/page[1]//button[@name='put_in_pack']"
+                expr="//notebook/page[1]//button[@name='action_put_in_pack']"
                 position="before"
             >
                 <group name="shopfloor">
@@ -18,7 +18,7 @@
                 </group>
             </xpath>
             <xpath
-                expr="//notebook/page[2]//button[@name='put_in_pack']"
+                expr="//notebook/page[2]//button[@name='action_put_in_pack']"
                 position="before"
             >
                 <group name="shopfloor">

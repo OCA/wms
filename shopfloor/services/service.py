@@ -90,7 +90,10 @@ class BaseShopfloorService(AbstractComponent):
             )
         except Exception as orig_exception:
             self._dispatch_exception(
-                ShopfloorServiceDispatchException, orig_exception, *args, params=params,
+                ShopfloorServiceDispatchException,
+                orig_exception,
+                *args,
+                params=params,
             )
         log_entry = self._log_call_in_db(
             self.env, request, *args, params=params, result=result

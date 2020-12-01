@@ -777,6 +777,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         picking = move.picking_id
 
         # someone cancel the work started by our operator
+        move_lines.write({"qty_done": 0})
         move._action_cancel()
 
         # now, call the service to cancel

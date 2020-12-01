@@ -22,12 +22,12 @@ class ProfileCase(CommonCase):
                     {
                         "id": self.ANY,
                         "name": "Highbay Truck",
-                        "warehouse": {"id": self.ANY, "name": "YourCompany"},
+                        "warehouse": {"id": self.ANY, "name": "San Francisco"},
                     },
                     {
                         "id": self.ANY,
                         "name": "Shelf 1",
-                        "warehouse": {"id": self.ANY, "name": "YourCompany"},
+                        "warehouse": {"id": self.ANY, "name": "San Francisco"},
                     },
                 ],
             },
