@@ -190,6 +190,13 @@ const template_mobile = `
             v-if="state_is('stock_issue')"
             v-on:confirm_stock_issue="state.on_confirm_stock_issue"
             />
+        <div class="button-list button-vertical-list full">
+            <v-row align="center" v-if="state_in(['change_pack_lot'])">
+                <v-col class="text-center" cols="12">
+                    <btn-back />
+                </v-col>
+            </v-row>
+        </div>
     </Screen>
 `;
 
