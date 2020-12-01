@@ -297,8 +297,8 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         # Change dates
         move1 = picking1.move_lines[0]
         move1_line = move1.move_line_ids[0]
-        move1.write({"date_expected": today})
-        (batch.picking_ids.move_lines - move1).write({"date_expected": future})
+        move1.write({"date_deadline": today})
+        (batch.picking_ids.move_lines - move1).write({"date_deadline": future})
 
         move_lines = self.service._lines_for_picking_batch(batch)
         order_mapping = {line: i for i, line in enumerate(move_lines)}
@@ -306,8 +306,8 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         # Today line comes first
         self.assertEqual(order_mapping[move1_line], 0)
         # swap dates
-        move1.write({"date_expected": future})
-        (batch.picking_ids.move_lines - move1).write({"date_expected": today})
+        move1.write({"date_deadline": future})
+        (batch.picking_ids.move_lines - move1).write({"date_deadline": today})
 
         move_lines = self.service._lines_for_picking_batch(batch)
         order_mapping = {line: i for i, line in enumerate(move_lines)}
