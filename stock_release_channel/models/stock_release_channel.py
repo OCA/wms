@@ -337,7 +337,7 @@ class StockReleaseChannel(models.Model):
         if not pickings:
             return
         # do a single query rather than one for each rule*picking
-        for channel in self.search([]):
+        for channel in self.sudo().search([]):
             domain = channel._prepare_domain()
 
             if domain:
