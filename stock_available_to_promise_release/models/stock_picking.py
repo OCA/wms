@@ -108,7 +108,12 @@ class StockPicking(models.Model):
     @api.depends("move_lines.date_priority")
     def _compute_date_priority(self):
         for picking in self:
-            picking.date_priority = min(picking.move_lines.mapped("date_priority"))
+            dates = [
+                date_priority
+                for date_priority in picking.move_lines.mapped("date_priority")
+                if date_priority
+            ]
+            picking.date_priority = min(dates) if dates else False
 
     def release_available_to_promise(self):
         # When the stock.picking form view is opened through the "Deliveries"
