@@ -448,14 +448,40 @@ you must choose one before starting.</p>
 <p>Please refer to <cite>shopfloor_mobile_custom_example</cite>.</p>
 <div class="section" id="known-issues-roadmap">
 <h2>Known issues / Roadmap</h2>
-<ul class="simple">
-<li>Split module by scenario</li>
-<li>Improve documentation and demo data</li>
-<li>Document each component</li>
-<li>Document demo mode</li>
-<li>Find / create a nice icon</li>
-<li>Finish base translations (move all UI strings to translatable terms)</li>
-<li>Use SCSS</li>
+<ul>
+<li><p class="first">Split module by scenario</p>
+</li>
+<li><p class="first">Improve documentation and demo data</p>
+</li>
+<li><p class="first">Document each component</p>
+</li>
+<li><p class="first">Document demo mode</p>
+</li>
+<li><p class="first">Find / create a nice icon</p>
+</li>
+<li><p class="first">Finish base translations (move all UI strings to translatable terms)</p>
+</li>
+<li><p class="first">Use SCSS</p>
+</li>
+<li><p class="first">Refactor states definition</p>
+<p>States are now part of the scenario data. They should be specific objects with their own class.
+They should also provide all the actions that should be displayed w/ their handlers when needed.
+Actions can be popup actions or buttons at the bottom of the screen.
+The tricky part here could be how to register this states for the given component.
+Today states have access to the full object of the scenario component as they are part of it.
+<cite>_get_state_spec</cite> could probably lookup for registered states
+(eg: when you register a component in the registry you should provide states as well).
+When we’ll have states in this fashion we should also consider if they should provide their own template.
+This way the component template will hold only the generic bits of the scenario.</p>
+</li>
+<li><p class="first">Back buttons should be smarter</p>
+<p>In some cases getting back using history is fine but very often this could lead to outdated data display.
+To mitigate this in particular scenario’s steps, custom handlers for the back action have been implemented.
+For instance, in cluster_picking when you hit back on manual selection it forces the state to go to start and reload.
+For starting we should provide <cite>on_back</cite> property to all states where we want to display it
+(no more specific check on the state to display this button).
+This part is also related to “Refactor states definition”.</p>
+</li>
 </ul>
 </div>
 <div class="section" id="changelog">
