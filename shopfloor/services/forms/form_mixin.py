@@ -7,8 +7,7 @@ from odoo.addons.component.core import AbstractComponent
 
 
 class ShopfloorFormMixin(AbstractComponent):
-    """Allow to edit records.
-    """
+    """Allow to edit records."""
 
     _inherit = "base.shopfloor.service"
     _name = "shopfloor.form.mixin"

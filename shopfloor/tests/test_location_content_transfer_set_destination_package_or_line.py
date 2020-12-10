@@ -77,7 +77,8 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         )
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
         )
 
     def test_set_destination_package_dest_location_nok(self):
@@ -93,7 +94,9 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             },
         )
         self.assert_response_scan_destination(
-            response, package_level, message=self.service.msg_store.no_location_found(),
+            response,
+            package_level,
+            message=self.service.msg_store.no_location_found(),
         )
         # Destination location not allowed
         customer_location = self.env.ref("stock.stock_location_customers")
@@ -255,7 +258,8 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         )
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
         )
 
     def test_set_destination_line_dest_location_nok(self):
@@ -272,7 +276,9 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             },
         )
         self.assert_response_scan_destination(
-            response, move_line, message=self.service.msg_store.no_location_found(),
+            response,
+            move_line,
+            message=self.service.msg_store.no_location_found(),
         )
         # Destination location not allowed
         customer_location = self.env.ref("stock.stock_location_customers")
@@ -552,7 +558,9 @@ class LocationContentTransferSetDestinationXSpecialCase(
         )
         cls.move_product_a.product_uom_qty = 15
         cls._update_qty_in_location(
-            cls.picking.location_id, cls.product_a, 5,
+            cls.picking.location_id,
+            cls.product_a,
+            5,
         )
         # Put product_b quantities in two different source locations to get
         # two stock move lines (6 and 4 to satisfy 10 qties)

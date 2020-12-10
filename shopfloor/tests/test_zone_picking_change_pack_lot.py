@@ -26,7 +26,8 @@ class ZonePickingChangePackLotCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         response = self.service.dispatch(
             "change_pack_lot",
@@ -38,7 +39,8 @@ class ZonePickingChangePackLotCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         response = self.service.dispatch(
             "change_pack_lot",
@@ -50,7 +52,8 @@ class ZonePickingChangePackLotCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
 
     def test_change_pack_lot_no_package_or_lot_for_barcode(self):

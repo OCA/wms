@@ -93,7 +93,9 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
         location = self.packing_location
         data = self._data_for_batch(self.batch, location)
         self.assert_response(
-            response, next_state="unload_all", data=data,
+            response,
+            next_state="unload_all",
+            data=data,
         )
 
     def test_prepare_unload_different_dest(self):
@@ -110,7 +112,9 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
         location = first_line.location_dest_id
         data = self._data_for_batch(self.batch, location, pack=self.bin1)
         self.assert_response(
-            response, next_state="unload_single", data=data,
+            response,
+            next_state="unload_single",
+            data=data,
         )
 
 
@@ -252,7 +256,9 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         location = move_lines[0].location_dest_id
         data = self._data_for_batch(self.batch, location, pack=self.bin1)
         self.assert_response(
-            response, next_state="unload_single", data=data,
+            response,
+            next_state="unload_single",
+            data=data,
         )
 
     def test_set_destination_all_error_location_not_found(self):
@@ -346,7 +352,9 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         location = move_lines[0].location_dest_id
         data = self._data_for_batch(self.batch, location)
         self.assert_response(
-            response, next_state="confirm_unload_all", data=data,
+            response,
+            next_state="confirm_unload_all",
+            data=data,
         )
 
     def test_set_destination_all_with_confirmation(self):
@@ -439,7 +447,9 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
         location = self.move_lines[0].location_dest_id
         data = self._data_for_batch(self.batch, location, pack=self.bin1)
         self.assert_response(
-            response, next_state="unload_set_destination", data=data,
+            response,
+            next_state="unload_set_destination",
+            data=data,
         )
 
     def test_unload_scan_pack_wrong_barcode(self):
@@ -543,7 +553,9 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         location = self.bin2_lines[0].location_dest_id
         data = self._data_for_batch(self.batch, location, pack=self.bin2)
         self.assert_response(
-            response, next_state="unload_single", data=data,
+            response,
+            next_state="unload_single",
+            data=data,
         )
 
     def test_unload_scan_destination_one_line_of_picking_only(self):
@@ -603,7 +615,9 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         location = bin3_line.location_dest_id
         data = self._data_for_batch(self.batch, location, pack=bin3)
         self.assert_response(
-            response, next_state="unload_single", data=data,
+            response,
+            next_state="unload_single",
+            data=data,
         )
 
     def test_unload_scan_destination_last_line(self):
@@ -735,7 +749,9 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         location = self.bin1_lines[0].location_dest_id
         data = self._data_for_batch(self.batch, location, pack=self.bin1)
         self.assert_response(
-            response, next_state="confirm_unload_set_destination", data=data,
+            response,
+            next_state="confirm_unload_set_destination",
+            data=data,
         )
 
     def test_unload_scan_destination_with_confirmation(self):

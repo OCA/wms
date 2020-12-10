@@ -211,7 +211,8 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
         self.assert_response_scan_destination_all(response, new_picking)
         self.assertRecordValues(new_picking, [{"user_id": self.env.uid}])
         self.assertRecordValues(
-            new_picking.move_line_ids, [{"qty_done": 10.0}, {"qty_done": 10.0}],
+            new_picking.move_line_ids,
+            [{"qty_done": 10.0}, {"qty_done": 10.0}],
         )
         self.assertRecordValues(new_picking.package_level_ids, [{"is_done": True}])
 
@@ -282,7 +283,9 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
         picking_type = self.menu.picking_type_ids
         # product_a alone
         self.env["stock.quant"]._update_available_quantity(
-            self.product_a, self.content_loc, 10,
+            self.product_a,
+            self.content_loc,
+            10,
         )
         # product_b in a package
         package = self.env["stock.quant.package"].create({})

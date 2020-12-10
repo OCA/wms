@@ -21,7 +21,8 @@ class DeliveryListStockPickingCase(DeliveryCommonCase):
         """No picking is ready, no picking to list."""
         response = self.service.dispatch("list_stock_picking", params={})
         self.assert_response_manual_selection(
-            response, pickings=[],
+            response,
+            pickings=[],
         )
 
     def test_list_stock_picking_ok(self):
@@ -32,7 +33,8 @@ class DeliveryListStockPickingCase(DeliveryCommonCase):
         response = self.service.dispatch("list_stock_picking", params={})
         # picking1 only available
         self.assert_response_manual_selection(
-            response, pickings=self.picking1,
+            response,
+            pickings=self.picking1,
         )
         # prepare 2nd picking
         self._fill_stock_for_moves(self.picking2.move_lines)
@@ -40,5 +42,6 @@ class DeliveryListStockPickingCase(DeliveryCommonCase):
         response = self.service.dispatch("list_stock_picking", params={})
         # all pickings available
         self.assert_response_manual_selection(
-            response, pickings=self.picking1 + self.picking2,
+            response,
+            pickings=self.picking1 + self.picking2,
         )

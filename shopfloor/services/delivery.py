@@ -415,7 +415,8 @@ class Delivery(Component):
                 )
             return self._response_for_deliver(picking)
         return self._response_for_deliver(
-            picking=picking, message=self.msg_store.record_not_found(),
+            picking=picking,
+            message=self.msg_store.record_not_found(),
         )
 
     def reset_qty_done_pack(self, picking_id, package_id):
@@ -474,7 +475,8 @@ class Delivery(Component):
             self._reset_lines(line)
             return self._response_for_deliver(picking)
         return self._response_for_deliver(
-            picking=picking, message=self.msg_store.record_not_found(),
+            picking=picking,
+            message=self.msg_store.record_not_found(),
         )
 
     def done(self, picking_id, confirm=False):
@@ -511,7 +513,8 @@ class Delivery(Component):
                 message=self.msg_store.transfer_complete(picking)
             )
         return self._response_for_confirm_done(
-            picking, message=self.msg_store.transfer_confirm_done(),
+            picking,
+            message=self.msg_store.transfer_confirm_done(),
         )
 
 

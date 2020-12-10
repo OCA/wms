@@ -85,7 +85,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location, picking_type, order="location"
         )
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines,
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
         )
 
     def test_list_move_lines_order_by_priority(self):
@@ -103,7 +106,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location, picking_type, order="priority"
         )
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines,
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
         )
 
     def test_scan_source_wrong_parameters(self):
@@ -118,7 +124,8 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         response = self.service.dispatch(
             "scan_source",
@@ -129,7 +136,8 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
 
     def test_scan_source_barcode_location_not_allowed(self):
@@ -145,7 +153,8 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.location_not_allowed(),
+            response,
+            message=self.service.msg_store.location_not_allowed(),
         )
 
     def test_scan_source_barcode_location_one_move_line(self):
@@ -259,7 +268,9 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             },
         )
         move_lines = self.service._find_location_move_lines(
-            zone_location, picking_type, package=package,
+            zone_location,
+            picking_type,
+            package=package,
         )
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         move_line = move_lines[0]
@@ -309,7 +320,9 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             },
         )
         move_line = self.service._find_location_move_lines(
-            zone_location, picking_type, product=self.product_a,
+            zone_location,
+            picking_type,
+            product=self.product_a,
         )
         self.assert_response_set_line_destination(
             response,
@@ -358,7 +371,9 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             },
         )
         move_lines = self.service._find_location_move_lines(
-            zone_location, picking_type, lot=lot,
+            zone_location,
+            picking_type,
+            lot=lot,
         )
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         move_line = move_lines[0]
@@ -424,7 +439,9 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         picking_type = self.picking1.picking_type_id
         #   - scan source
         response = self.service.scan_source(
-            zone_location.id, picking_type.id, self.zone_sublocation1.barcode,
+            zone_location.id,
+            picking_type.id,
+            self.zone_sublocation1.barcode,
         )
         move_line = self.picking1.move_line_ids
         self.assertEqual(response["next_state"], "set_line_destination")
@@ -444,7 +461,9 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         ) as work:
             service = work.component(usage="zone_picking")
             response = service.scan_source(
-                zone_location.id, picking_type.id, self.zone_sublocation1.barcode,
+                zone_location.id,
+                picking_type.id,
+                self.zone_sublocation1.barcode,
             )
             self.assertEqual(response["next_state"], "select_line")
             self.assertEqual(
@@ -463,7 +482,8 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         response = self.service.dispatch(
             "prepare_unload",
@@ -473,7 +493,8 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
 
     def test_prepare_unload_buffer_empty(self):
@@ -490,7 +511,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         # check response
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines,
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
         )
 
     def test_prepare_unload_buffer_one_line(self):
@@ -518,7 +542,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         )
         # check response
         self.assert_response_unload_set_destination(
-            response, zone_location, picking_type, move_line,
+            response,
+            zone_location,
+            picking_type,
+            move_line,
         )
 
     def test_prepare_unload_buffer_multi_line_same_destination(self):
@@ -555,7 +582,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         )
         # check response
         self.assert_response_unload_all(
-            response, zone_location, picking_type, self.picking5.move_line_ids,
+            response,
+            zone_location,
+            picking_type,
+            self.picking5.move_line_ids,
         )
 
     def test_list_move_lines_empty_location(self):
@@ -573,7 +603,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location, picking_type, order="location"
         )
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines,
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
         )
         data_move_lines = response["data"]["select_line"]["move_lines"]
         # Check that the move line in "Zone sub-location 1" is about to empty

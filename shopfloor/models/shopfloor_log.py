@@ -33,7 +33,8 @@ class ShopfloorLog(models.Model):
     exception_name = fields.Char(readonly=True, string="Exception")
     exception_message = fields.Text(readonly=True)
     state = fields.Selection(
-        selection=[("success", "Success"), ("failed", "Failed")], readonly=True,
+        selection=[("success", "Success"), ("failed", "Failed")],
+        readonly=True,
     )
     severity = fields.Selection(
         selection=[

@@ -5,8 +5,7 @@ from .test_cluster_picking_base import ClusterPickingCommonCase
 
 
 class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
-    """Tests covering the /skip_line endpoint
-    """
+    """Tests covering the /skip_line endpoint"""
 
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):

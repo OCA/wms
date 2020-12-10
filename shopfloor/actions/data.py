@@ -160,7 +160,10 @@ class DataAction(Component):
             ("lot_id:lot", self._lot_parser),
             ("location_id:location_src", self._location_parser),
             ("location_dest_id:location_dest", self._location_parser),
-            ("move_id:priority", lambda rec, fname: rec.move_id.priority or "",),
+            (
+                "move_id:priority",
+                lambda rec, fname: rec.move_id.priority or "",
+            ),
         ]
 
     def package_level(self, record, **kw):

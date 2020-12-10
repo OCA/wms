@@ -885,7 +885,8 @@ class ClusterPicking(Component):
             )
 
         return self._response_for_change_pack_lot(
-            move_line, message=self.msg_store.no_package_or_lot_for_barcode(barcode),
+            move_line,
+            message=self.msg_store.no_package_or_lot_for_barcode(barcode),
         )
 
     def set_destination_all(self, picking_batch_id, barcode, confirmation=False):
