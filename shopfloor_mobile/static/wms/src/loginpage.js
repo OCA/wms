@@ -7,14 +7,14 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 export var LoginPage = Vue.component("login-page", {
-    data: function() {
+    data: function () {
         return {
             apikey: "",
             error: "",
         };
     },
     computed: {
-        screen_info: function() {
+        screen_info: function () {
             return {
                 title: this.$t("screen.login.title"),
                 klass: "login",
@@ -23,19 +23,19 @@ export var LoginPage = Vue.component("login-page", {
                 showMenu: false,
             };
         },
-        user_message: function() {
+        user_message: function () {
             return {body: this.error, message_type: "error"};
         },
     },
     methods: {
-        login: function(evt) {
+        login: function (evt) {
             evt.preventDefault();
             // Call odoo application load => set the result in the local storage in json
             this.error = "";
             this.$root.apikey = this.apikey;
             this.$root
                 ._loadConfig()
-                .catch(error => {
+                .catch((error) => {
                     this._handle_invalid_key();
                 })
                 .then(() => {

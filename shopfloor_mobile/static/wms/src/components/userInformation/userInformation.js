@@ -17,14 +17,14 @@ Vue.component("user-information", {
     </v-alert>
     `,
     computed: {
-        alert_type: function() {
+        alert_type: function () {
             return _.result(this.message, "message_type", "info");
         },
-        message_lines: function() {
+        message_lines: function () {
             const msg = _.result(this.message, "body");
             return msg ? msg.split("\n") : [];
         },
-        support_url: function() {
+        support_url: function () {
             return _.result(this.message, "support_url", "");
         },
     },
@@ -40,10 +40,10 @@ Vue.component("user-popup", {
     },
     computed: {
         dialog: {
-            get: function() {
+            get: function () {
                 return this.visible;
             },
-            set: function(value) {
+            set: function (value) {
                 if (!value) {
                     this.$emit("close");
                 }

@@ -8,7 +8,7 @@ export var PackagingQtyPickerMixin = {
     props: {
         options: Object,
     },
-    data: function() {
+    data: function () {
         return {
             value: 0,
             original_value: 0,
@@ -17,7 +17,7 @@ export var PackagingQtyPickerMixin = {
         };
     },
     methods: {
-        on_change_pkg_qty: function(event) {
+        on_change_pkg_qty: function (event) {
             const input = event.target;
             let new_qty = parseInt(input.value || 0, 10);
             const data = $(input).data();
@@ -41,7 +41,7 @@ export var PackagingQtyPickerMixin = {
                 .closest(".inner-wrapper")
                 .addClass("error shake-it")
                 .delay(800)
-                .queue(function() {
+                .queue(function () {
                     // End animation
                     $(this)
                         .removeClass("error shake-it", 2000, "easeInOutQuad")
@@ -50,7 +50,7 @@ export var PackagingQtyPickerMixin = {
                     $(input).val(new_qty);
                 });
         },
-        packaging_by_id: function(id) {
+        packaging_by_id: function (id) {
             // Special case for UOM ids as they can clash w/ pkg ids
             // we prefix it w/ "uom-"
             id = id.startsWith("uom-") ? id : parseInt(id, 10);
@@ -71,7 +71,7 @@ export var PackagingQtyPickerMixin = {
          * @param {*} min_unit minimal unit of measure as a tuple (qty, name).
                    Default: to UoM unit.
         */
-        product_qty_by_packaging: function() {
+        product_qty_by_packaging: function () {
             return this._product_qty_by_packaging(this.sorted_packaging, this.value);
         },
         /**
@@ -81,11 +81,11 @@ export var PackagingQtyPickerMixin = {
          * @param {*} pkg_by_qty packaging records sorted by major qty
          * @param {*} qty total qty to satisfy
          */
-        _product_qty_by_packaging: function(pkg_by_qty, qty) {
+        _product_qty_by_packaging: function (pkg_by_qty, qty) {
             const self = this;
             let res = {};
             // const min_unit = _.last(pkg_by_qty);
-            pkg_by_qty.forEach(function(pkg) {
+            pkg_by_qty.forEach(function (pkg) {
                 let qty_per_pkg = 0;
                 [qty_per_pkg, qty] = self._qty_by_pkg(pkg.qty, qty);
                 if (qty_per_pkg) res[pkg.id] = qty_per_pkg;
@@ -99,7 +99,7 @@ export var PackagingQtyPickerMixin = {
          * @param {*} pkg_by_qty
          * @param {*} qty
          */
-        _qty_by_pkg: function(pkg_qty, qty) {
+        _qty_by_pkg: function (pkg_qty, qty) {
             const precision = this.unit_uom.rounding || 3;
             let qty_per_pkg = 0;
             // TODO: anything better to do like `float_compare`?
@@ -109,22 +109,22 @@ export var PackagingQtyPickerMixin = {
             }
             return [qty_per_pkg, qty];
         },
-        _compute_qty: function() {
+        _compute_qty: function () {
             const self = this;
             let value = 0;
-            _.forEach(this.qty_by_pkg, function(qty, id) {
+            _.forEach(this.qty_by_pkg, function (qty, id) {
                 value += self.packaging_by_id(id).qty * qty;
             });
             return value;
         },
-        compute_qty: function(newVal, oldVal) {
+        compute_qty: function (newVal, oldVal) {
             this.value = this._compute_qty();
         },
         _init_editable() {
             const self = this;
             this.$watch(
                 "qty_by_pkg",
-                function() {
+                function () {
                     self.compute_qty();
                 },
                 {deep: true}
@@ -134,7 +134,7 @@ export var PackagingQtyPickerMixin = {
             // hooking via `v-on:change` we don't get the full event but only the qty :/
             // And forget about using v-text-field because it loses the full event object
             $(".pkg-value", this.$el).change(this.on_change_pkg_qty);
-            $(".pkg-value", this.$el).on("focus click", function() {
+            $(".pkg-value", this.$el).on("focus click", function () {
                 $(this).select();
             });
         },
@@ -143,7 +143,7 @@ export var PackagingQtyPickerMixin = {
             this.compute_qty();
         },
     },
-    created: function() {
+    created: function () {
         this.original_value = parseInt(this.opts.init_value, 10);
         this.value = parseInt(this.opts.init_value, 10);
     },
@@ -158,7 +158,7 @@ export var PackagingQtyPickerMixin = {
             });
             return opts;
         },
-        unit_uom: function() {
+        unit_uom: function () {
             let unit = {};
             if (!_.isEmpty(this.opts.uom)) {
                 // Create an object like the packaging
@@ -172,7 +172,7 @@ export var PackagingQtyPickerMixin = {
             }
             return unit;
         },
-        packaging: function() {
+        packaging: function () {
             let unit = [];
             if (!_.isEmpty(this.unit_uom)) {
                 unit = [this.unit_uom];
@@ -182,7 +182,7 @@ export var PackagingQtyPickerMixin = {
         /**
          * Sort packaging by qty and exclude the ones w/ qty = 0
          */
-        sorted_packaging: function() {
+        sorted_packaging: function () {
             return _.reverse(
                 _.sortBy(_.filter(this.packaging, _.property("qty")), _.property("qty"))
             );
@@ -191,11 +191,11 @@ export var PackagingQtyPickerMixin = {
          * Collect qty of contained packaging inside bigger packaging.
          * Eg: "1 Pallet" contains "4 Big boxes".
          */
-        contained_packaging: function() {
+        contained_packaging: function () {
             const self = this;
             let res = {};
             const packaging = this.sorted_packaging;
-            _.forEach(packaging, function(pkg, i) {
+            _.forEach(packaging, function (pkg, i) {
                 if (packaging[i + 1]) {
                     const next_pkg = packaging[i + 1];
                     res[pkg.id] = {
@@ -229,10 +229,10 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
     //         },
     //     },
     // },
-    mounted: function() {
+    mounted: function () {
         this._init_editable();
     },
-    updated: function() {
+    updated: function () {
         this.$root.trigger("qty_edit", this.value);
     },
     template: `
@@ -266,7 +266,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
 
 export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-display", {
     mixins: [PackagingQtyPickerMixin],
-    mounted: function() {
+    mounted: function () {
         this._init_readonly();
     },
     template: `

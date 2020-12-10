@@ -55,26 +55,26 @@ const Delivery = {
         </Screen>
         `,
     methods: {
-        screen_title: function() {
+        screen_title: function () {
             if (_.isEmpty(this.current_doc()) || this.state_is(this.initial_state_key))
                 return this.menu_item().name;
             return this.current_picking().name;
         },
-        current_doc: function() {
+        current_doc: function () {
             const picking = this.current_picking();
             return {
                 record: picking,
                 identifier: picking.name,
             };
         },
-        current_picking: function() {
+        current_picking: function () {
             const data = this.state_get_data("deliver");
             if (_.isEmpty(data) || _.isEmpty(data.picking)) {
                 return {};
             }
             return data.picking;
         },
-        has_picking: function() {
+        has_picking: function () {
             return !_.isEmpty(this.current_picking());
         },
         deliver_picking_summary_records_grouped(picking) {
@@ -84,14 +84,14 @@ const Delivery = {
                     this.utils.misc.group_by_pack,
                     "package_src"
                 ),
-                group_color_maker: function(lines) {
+                group_color_maker: function (lines) {
                     return self.utils.misc.move_lines_completeness(lines) == 100
                         ? "screen_step_done"
                         : "screen_step_todo";
                 },
             });
         },
-        deliver_move_line_list_options: function(picking) {
+        deliver_move_line_list_options: function (picking) {
             return {
                 list_item_options: {
                     actions: ["action_cancel_line"],
@@ -100,10 +100,10 @@ const Delivery = {
                 },
             };
         },
-        move_line_detail_fields: function() {
+        move_line_detail_fields: function () {
             return [{path: "package_src.name", klass: "loud"}];
         },
-        manual_select_options: function() {
+        manual_select_options: function () {
             return {
                 show_title: false,
                 showActions: false,
@@ -115,7 +115,7 @@ const Delivery = {
                 },
             };
         },
-        manual_select_picking_fields: function() {
+        manual_select_picking_fields: function () {
             const self = this;
             return [
                 {path: "name", klass: "loud", action_val_path: "name"},
@@ -124,7 +124,7 @@ const Delivery = {
                 {
                     path: "move_line_count",
                     label: "Lines",
-                    renderer: function(rec, field) {
+                    renderer: function (rec, field) {
                         return (
                             self.utils.misc.completed_move_lines(rec.move_lines) +
                             " / " +
@@ -134,7 +134,7 @@ const Delivery = {
                 },
             ];
         },
-        existing_package_select_fields: function() {
+        existing_package_select_fields: function () {
             return [
                 {path: "weight"},
                 {path: "move_line_count", label: "Line count"},
@@ -142,7 +142,7 @@ const Delivery = {
             ];
         },
     },
-    data: function() {
+    data: function () {
         return {
             usage: "delivery",
             initial_state_key: "select_document",
@@ -153,12 +153,12 @@ const Delivery = {
                         title: "Start by scanning something",
                         scan_placeholder: "Scan pack / picking",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("scan_deliver", {barcode: scanned.text})
                         );
                     },
-                    on_manual_selection: evt => {
+                    on_manual_selection: (evt) => {
                         this.wait_call(this.odoo.call("list_stock_picking"));
                     },
                 },
@@ -170,7 +170,7 @@ const Delivery = {
                     events: {
                         cancel_picking_line: "on_cancel",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("scan_deliver", {
                                 barcode: scanned.text,
@@ -178,10 +178,10 @@ const Delivery = {
                             })
                         );
                     },
-                    on_manual_selection: evt => {
+                    on_manual_selection: (evt) => {
                         this.wait_call(this.odoo.call("list_stock_picking"));
                     },
-                    on_cancel: data => {
+                    on_cancel: (data) => {
                         let endpoint, endpoint_data;
                         // TODO: can't we have a single endpoint as per checkout.summary.destroy?
                         if (data.package_id) {
@@ -216,25 +216,25 @@ const Delivery = {
                         select: "on_select",
                         go_back: "on_back",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.state_set_data({filtered: scanned.text});
                     },
                     on_back: () => {
                         this.state_to("start");
                         this.reset_notification();
                     },
-                    on_select: selected => {
+                    on_select: (selected) => {
                         this.wait_call(
                             this.odoo.call("scan_deliver", {barcode: selected.name})
                         );
                     },
-                    visible_records: records => {
+                    visible_records: (records) => {
                         const self = this;
                         let visible_records = this.utils.misc.order_picking_by_completeness(
                             records
                         );
                         if (this.state.data.filtered) {
-                            visible_records = _.filter(visible_records, function(rec) {
+                            visible_records = _.filter(visible_records, function (rec) {
                                 return rec.name.search(self.state.data.filtered) > 0;
                             });
                         }

@@ -15,7 +15,7 @@ var _oldFetch = fetch;
 /**
  * Patch `fetch` to trigger events on start and end request.
  */
-window.fetch = function() {
+window.fetch = function () {
     // Create hooks
     var fetchStart = new Event("fetchStart", {
         view: document,
@@ -35,11 +35,11 @@ window.fetch = function() {
     document.dispatchEvent(fetchStart);
 
     fetchCall
-        .then(function() {
+        .then(function () {
             // Trigger the fetchEnd event
             document.dispatchEvent(fetchEnd);
         })
-        .catch(function() {
+        .catch(function () {
             // Trigger the fetchEnd event
             document.dispatchEvent(fetchEnd);
         });

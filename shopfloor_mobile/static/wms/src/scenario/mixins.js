@@ -5,7 +5,7 @@
  */
 
 export var ScenarioBaseMixin = {
-    data: function() {
+    data: function () {
         return {
             messages: {
                 message: {
@@ -27,11 +27,11 @@ export var ScenarioBaseMixin = {
         };
     },
     watch: {
-        "$route.params.menu_id": function() {
+        "$route.params.menu_id": function () {
             this.menu_item_id = this._get_menu_item_id();
         },
     },
-    created: function() {
+    created: function () {
         this.menu_item_id = this._get_menu_item_id();
     },
     beforeRouteUpdate(to, from, next) {
@@ -39,7 +39,7 @@ export var ScenarioBaseMixin = {
         this._state_load(to.params.state);
         next();
     },
-    beforeMount: function() {
+    beforeMount: function () {
         /*
         Ensure initial state is set.
         beforeRouteUpdate` runs only if the route has changed,
@@ -50,7 +50,7 @@ export var ScenarioBaseMixin = {
         this._state_load(this.$route.params.state);
     },
     computed: {
-        odoo: function() {
+        odoo: function () {
             const odoo_params = {
                 process_menu_id: this.menu_item_id,
                 profile_id: this.$root.profile.id,
@@ -65,24 +65,24 @@ export var ScenarioBaseMixin = {
         standalone object w/ their own class.
         */
         state: {
-            get: function() {
+            get: function () {
                 if (_.isEmpty(this.current_state)) {
                     return this._make_current_state();
                 }
                 return this.current_state;
             },
-            set: function(data) {
+            set: function (data) {
                 this.current_state = this._make_current_state(data);
             },
         },
-        search_input_placeholder: function() {
+        search_input_placeholder: function () {
             const placeholder = this.state.display_info.scan_placeholder;
             return _.isFunction(placeholder) ? placeholder.call(this) : placeholder;
         },
-        show_cancel_button: function() {
+        show_cancel_button: function () {
             return this.state.display_info.show_cancel_button;
         },
-        screen_info: function() {
+        screen_info: function () {
             return {
                 // you can provide a different screen title
                 title: this.screen_title ? this.screen_title() : this.menu_item().name,
@@ -93,13 +93,13 @@ export var ScenarioBaseMixin = {
                 noUserMessage: this.need_confirmation,
             };
         },
-        user_message: function() {
+        user_message: function () {
             if (_.result(this.messages, "message.body")) {
                 return this.messages.message;
             }
             return null;
         },
-        user_popup: function() {
+        user_popup: function () {
             if (_.result(this.messages, "popup.body")) {
                 return this.messages.popup;
             }
@@ -107,7 +107,7 @@ export var ScenarioBaseMixin = {
         },
     },
     methods: {
-        _get_menu_item_id: function() {
+        _get_menu_item_id: function () {
             const menu_id = Number.parseInt(this.$route.params.menu_id, 10);
             if (Number.isNaN(menu_id)) {
                 /*
@@ -130,7 +130,7 @@ export var ScenarioBaseMixin = {
          *
          * @param {*} state_key: a state key other that current_state_key
          */
-        _get_state_spec: function(state_key) {
+        _get_state_spec: function (state_key) {
             // TODO: this function is the 1st step towards moving state definition
             // out of the component data (which makes no sense).
             return this.states[state_key || this.current_state_key];
@@ -143,7 +143,7 @@ export var ScenarioBaseMixin = {
          *
          * @param {*} data
          */
-        _make_current_state: function(data = {}) {
+        _make_current_state: function (data = {}) {
             const state = {
                 key: this.current_state_key,
                 data: data,
@@ -152,30 +152,30 @@ export var ScenarioBaseMixin = {
             _.defaults(state, {display_info: {}});
             return state;
         },
-        screen_klass: function() {
+        screen_klass: function () {
             return this.usage + " " + "state-" + this.current_state_key;
         },
-        menu_item: function() {
+        menu_item: function () {
             const self = this;
             return _.head(
-                _.filter(this.$root.appmenu.menus, function(m) {
+                _.filter(this.$root.appmenu.menus, function (m) {
                     return m.id === self.menu_item_id;
                 })
             );
         },
-        make_state_component_key: function(bits) {
+        make_state_component_key: function (bits) {
             bits.unshift(this.current_state_key);
             bits.unshift(this.usage);
             return this.make_component_key(bits);
         },
-        storage_key: function(state_key) {
+        storage_key: function (state_key) {
             state_key = _.isUndefined(state_key) ? this.current_state_key : state_key;
             return this.usage + "." + state_key;
         },
         /*
         Switch state to given one.
         */
-        state_to: function(state_key) {
+        state_to: function (state_key) {
             const self = this;
             return this.$router
                 .push({
@@ -191,27 +191,27 @@ export var ScenarioBaseMixin = {
                 });
         },
         // Generic states methods
-        state_is: function(state_key) {
+        state_is: function (state_key) {
             return state_key == this.current_state_key;
         },
-        state_in: function(state_keys) {
+        state_in: function (state_keys) {
             return _.filter(state_keys, this.state_is).length > 0;
         },
-        state_reset_data: function(state_key) {
+        state_reset_data: function (state_key) {
             state_key = state_key || this.current_state_key;
             this.$root.$storage.remove(this.storage_key(state_key));
         },
-        _state_get_data: function(state_key) {
+        _state_get_data: function (state_key) {
             return this.$root.$storage.get(this.storage_key(state_key), {});
         },
-        _state_set_data: function(state_key, v) {
+        _state_set_data: function (state_key, v) {
             this.$root.$storage.set(this.storage_key(state_key), v);
         },
-        state_get_data: function(state_key) {
+        state_get_data: function (state_key) {
             state_key = state_key || this.current_state_key;
             return this._state_get_data(state_key);
         },
-        state_set_data: function(data, state_key, reload_state = true) {
+        state_set_data: function (data, state_key, reload_state = true) {
             state_key = state_key || this.current_state_key;
             const new_data = _.merge({}, this.state_get_data(state_key), data);
             // Trigger update of computed `state.data` and refreshes the UI.
@@ -220,16 +220,16 @@ export var ScenarioBaseMixin = {
                 this._reload_current_state();
             }
         },
-        _reload_current_state: function() {
+        _reload_current_state: function () {
             // Force re-computation of current state data.
             this.state = this.state_get_data();
         },
         state_reset_data_all() {
             const self = this;
-            const keys_to_clear = _.filter(this.$storage.keys(), x => {
+            const keys_to_clear = _.filter(this.$storage.keys(), (x) => {
                 return x.includes(self.usage);
             });
-            keys_to_clear.forEach(key => {
+            keys_to_clear.forEach((key) => {
                 // Key includes the whole string w/ prefix, need the state key only
                 self.state_reset_data(_.last(key.split(".")));
             });
@@ -237,7 +237,7 @@ export var ScenarioBaseMixin = {
         /*
             Loads a new state, handle transition, setup event handlers.
         */
-        _state_load: function(state_key, promise) {
+        _state_load: function (state_key, promise) {
             if (state_key == "init") {
                 /*
                 Alias "init" to the initial state
@@ -282,25 +282,25 @@ export var ScenarioBaseMixin = {
             // notify root
             this.$root.$emit("state:change", this._global_state_key(state_key));
         },
-        _global_state_key: function(state_key) {
+        _global_state_key: function (state_key) {
             return this.usage + "/" + state_key;
         },
-        wait_call: function(promise, callback) {
+        wait_call: function (promise, callback) {
             return promise.then(this.on_call_success, this.on_call_error);
         },
-        on_state_enter: function() {
+        on_state_enter: function () {
             const state = this._get_state_spec();
             if (state.enter) {
                 state.enter();
             }
         },
-        on_state_exit: function() {
+        on_state_exit: function () {
             const state = this._get_state_spec();
             if (state.exit) {
                 state.exit();
             }
         },
-        on_call_success: function(result) {
+        on_call_success: function (result) {
             if (_.isUndefined(result)) {
                 console.error(result);
                 alert("Something went wrong. Check log.");
@@ -336,16 +336,16 @@ export var ScenarioBaseMixin = {
                 this.state_to(state_key);
             }
         },
-        on_call_error: function(result) {
+        on_call_error: function (result) {
             alert(result.status + " " + result.error);
         },
-        on_reset: function(e) {
+        on_reset: function (e) {
             this.state_reset_data_all();
             this.reset_notification();
             this.state_to("start");
         },
         // Specific states methods
-        on_scan: function(scanned) {
+        on_scan: function (scanned) {
             const state = this._get_state_spec();
             if (state.on_scan) {
                 state.on_scan(scanned);
@@ -353,29 +353,29 @@ export var ScenarioBaseMixin = {
         },
         // TODO: get rid of this as it's used on cluster_picking only and
         // we can use state events binding.
-        on_cancel: function() {
+        on_cancel: function () {
             const state = this._get_state_spec();
             if (state.on_cancel) {
                 state.on_cancel();
             }
         },
-        on_user_confirm: function(answer) {
+        on_user_confirm: function (answer) {
             const state = this._get_state_spec();
             state.on_user_confirm(answer);
             this.need_confirmation = false;
             this.reset_notification();
         },
-        set_message: function(message) {
+        set_message: function (message) {
             this.$set(this.messages, "message", message);
         },
-        set_popup: function(popup) {
+        set_popup: function (popup) {
             this.$set(this.messages, "popup", popup);
         },
-        reset_notification: function() {
+        reset_notification: function () {
             this.$set(this.messages, "message", {body: null, message_type: null});
             this.$set(this.messages, "popup", {body: null});
         },
-        display_app_error: function(error) {
+        display_app_error: function (error) {
             let parts = [error.status, error.name];
             if (error.description) {
                 parts.push("\n" + error.description);
@@ -387,7 +387,7 @@ export var ScenarioBaseMixin = {
                 support_url_text: "View / share log entry",
             });
         },
-        _state_bind_events: function() {
+        _state_bind_events: function () {
             const state = this._get_state_spec();
             if (state.events) {
                 /*
@@ -407,7 +407,7 @@ export var ScenarioBaseMixin = {
                 to a particular event fired on a specific state
                 */
                 const self = this;
-                _.each(state.events, function(handler, name) {
+                _.each(state.events, function (handler, name) {
                     if (typeof handler == "string") handler = state[handler];
                     const event_name =
                         self._global_state_key(self.state.key) + ":" + name;

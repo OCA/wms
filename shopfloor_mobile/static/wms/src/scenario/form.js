@@ -24,7 +24,7 @@ const Form = {
             </div>
         </Screen>
     `,
-    data: function() {
+    data: function () {
         return {
             usage: "",
             form_name: "",
@@ -33,7 +33,7 @@ const Form = {
             user_message: {},
         };
     },
-    mounted: function() {
+    mounted: function () {
         this.usage = this.$route.params.form_name;
         const odoo_params = {
             usage: this.usage,
@@ -45,14 +45,14 @@ const Form = {
         }
     },
     methods: {
-        on_change: function(form_data) {
+        on_change: function (form_data) {
             if (!form_data.changed) {
                 return;
             }
             const self = this;
             let form_values = form_data.values;
             form_values["_id"] = this.record.id;
-            this.odoo.call("update", form_values).then(function(result) {
+            this.odoo.call("update", form_values).then(function (result) {
                 self._load_form_data(result);
                 /**
                  * TODO: dirty hack to be able to display the message to the user
@@ -62,16 +62,16 @@ const Form = {
                  * by form as you might want to stay in the same place on save.
                  *  */
 
-                setTimeout(function() {
+                setTimeout(function () {
                     self.$root.trigger("go_back");
                     self.$router.back();
                 }, 1500);
             });
         },
-        _getFormData: function(record_id) {
+        _getFormData: function (record_id) {
             this.odoo.call(record_id, {}, "GET").then(this._load_form_data);
         },
-        _load_form_data: function(result) {
+        _load_form_data: function (result) {
             this.odoo_data = result.data || {};
             this.record = this.odoo_data.record || {};
             this.form = this.odoo_data.form || {};
@@ -91,14 +91,14 @@ const Form = {
         },
     },
     computed: {
-        screen_info: function() {
+        screen_info: function () {
             return {
                 title: this.screen_title,
                 klass: "form",
                 user_message: this.user_message,
             };
         },
-        screen_title: function() {
+        screen_title: function () {
             let title = "Edit"; // TODO: this should come from the form
             if (!_.isEmpty(this.record)) {
                 title = "Edit: " + this.record.name;

@@ -13,7 +13,7 @@ export var ListActionsConsumerMixin = {
         _get_list_item_actions(to_enable) {
             let actions = [];
             const avail_list_item_actions = this._get_available_list_item_actions();
-            to_enable.forEach(function(action) {
+            to_enable.forEach(function (action) {
                 if (
                     typeof action === "string" &&
                     !_.isUndefined(avail_list_item_actions[action])

@@ -5,7 +5,7 @@
  */
 
 export var SettingsControlPanel = Vue.component("settings-control-panel", {
-    data: function() {
+    data: function () {
         return {};
     },
     template: `

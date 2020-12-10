@@ -24,14 +24,14 @@ Vue.component("detail-lot", {
                 {
                     path: "expire_date",
                     label: "Expiry date",
-                    renderer: function(rec, field) {
+                    renderer: function (rec, field) {
                         return self.utils.misc.render_field_date(rec, field);
                     },
                 },
                 {
                     path: "removal_date",
                     label: "Removal date",
-                    renderer: function(rec, field) {
+                    renderer: function (rec, field) {
                         return self.utils.misc.render_field_date(rec, field);
                     },
                 },

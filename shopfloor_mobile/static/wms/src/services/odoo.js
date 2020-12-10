@@ -33,13 +33,13 @@ export class OdooMixin {
         } else if (method == "POST") {
             params.body = JSON.stringify(data);
         }
-        return fetch(this._get_url(endpoint), params).then(response => {
+        return fetch(this._get_url(endpoint), params).then((response) => {
             if (!response.ok) {
                 let handler = self["_handle_" + response.status.toString()];
                 if (_.isUndefined(handler)) {
                     handler = this._handle_error;
                 }
-                return response.json().then(json => {
+                return response.json().then((json) => {
                     return {error: handler.call(this, response, json)};
                 });
             }

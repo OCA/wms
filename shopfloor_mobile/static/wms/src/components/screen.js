@@ -9,7 +9,7 @@ Vue.component("Screen", {
     props: {
         screen_info: {
             type: Object,
-            default: function() {
+            default: function () {
                 return {};
             },
         },
@@ -75,7 +75,7 @@ Vue.component("Screen", {
     mounted() {
         this.$watch(
             "drawer",
-            value => {
+            (value) => {
                 if (value)
                     // Refresh menu items and their counters when the drawer is expanded
                     this.$root.loadMenu(true);
@@ -85,14 +85,14 @@ Vue.component("Screen", {
         // Manage popup display by passed property
         this.$watch(
             "screen_info.user_popup",
-            value => {
+            (value) => {
                 this.show_popup = Boolean(value);
             },
             {immediate: true}
         );
         this.$watch(
             "screen_info.user_message",
-            value => {
+            (value) => {
                 this.show_message = !this.info.noUserMessage && !_.isEmpty(value);
             },
             {immediate: true}
@@ -229,7 +229,7 @@ Vue.component("nav-items", {
 });
 Vue.component("nav-items-extra", {
     methods: {
-        navigation: function() {
+        navigation: function () {
             return [
                 {
                     id: "home",

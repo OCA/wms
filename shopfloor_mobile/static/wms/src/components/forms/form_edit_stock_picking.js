@@ -7,14 +7,14 @@
 /* eslint-disable strict */
 Vue.component("form-edit-stock-picking", {
     props: ["record", "form"],
-    data: function() {
+    data: function () {
         return {
             form_values: {},
             changed: false,
         };
     },
     methods: {
-        on_select: function(selected, fname) {
+        on_select: function (selected, fname) {
             this.$set(this.form_values, fname, selected.id);
             this.changed = true;
             this.$emit("change", {changed: this.changed, values: this.form_values});

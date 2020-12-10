@@ -8,7 +8,7 @@
  */
 
 Vue.component("searchbar", {
-    data: function() {
+    data: function () {
         return {
             entered: "",
             autofocus: {
@@ -26,7 +26,7 @@ Vue.component("searchbar", {
         },
     },
     methods: {
-        search: function(e) {
+        search: function (e) {
             e.preventDefault();
             // Talk to parent
             this.$emit("found", {
@@ -35,7 +35,7 @@ Vue.component("searchbar", {
             });
             if (this.reset_on_submit) this.reset();
         },
-        reset: function() {
+        reset: function () {
             this.entered = "";
         },
     },

@@ -23,7 +23,7 @@ export var Language = Vue.component("language", {
         </Screen>
     `,
     methods: {
-        on_select: function(selected) {
+        on_select: function (selected) {
             const self = this;
             this.$i18n.locale = selected.id;
             // this.$root.trigger("language:selected", selected, true);

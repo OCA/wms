@@ -60,19 +60,19 @@ export var NumberSpinner = Vue.component("input-number-spinner", {
             default: true,
         },
     },
-    data: function() {
+    data: function () {
         return {
             value: 0,
             original_value: 0,
         };
     },
     methods: {
-        increase: function() {
+        increase: function () {
             if (this.max == undefined || this.value < this.max) {
                 this.value += this.step;
             }
         },
-        decrease: function() {
+        decrease: function () {
             if (this.value > this.min) {
                 const new_val = this.value - this.step;
                 this.value = new_val >= this.min ? new_val : this.min;
@@ -81,17 +81,17 @@ export var NumberSpinner = Vue.component("input-number-spinner", {
     },
     watch: {
         value: {
-            handler: function(newVal, oldVal) {
+            handler: function (newVal, oldVal) {
                 this.value = newVal;
                 this.$emit("input", this.value);
             },
         },
     },
-    created: function() {
+    created: function () {
         this.original_value = parseInt(this.init_value);
         this.value = parseInt(this.init_value);
     },
-    mounted: function() {
+    mounted: function () {
         if (this.$props.select_value_on_load) {
             const input = $("input", this.$el).get(0);
             input.focus();

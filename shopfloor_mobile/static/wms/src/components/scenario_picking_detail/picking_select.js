@@ -16,13 +16,13 @@ Vue.component("detail-picking-select", {
             return {
                 action_qty_edit: {
                     comp_name: "edit-action",
-                    get_record: function(rec, action) {
+                    get_record: function (rec, action) {
                         return rec;
                     },
-                    get_options: function(rec, action) {
+                    get_options: function (rec, action) {
                         return {click_event: "qty_edit"};
                     },
-                    enabled: function(rec, action) {
+                    enabled: function (rec, action) {
                         return true;
                     },
                 },

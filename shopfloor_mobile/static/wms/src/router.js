@@ -23,7 +23,7 @@ let routes = [
     // { path: '*', component: NotFound },
 ];
 let registered = [];
-_.forEach(process_registry.all(), function(process, key) {
+_.forEach(process_registry.all(), function (process, key) {
     routes.push({
         name: process.key,
         path: process.path,

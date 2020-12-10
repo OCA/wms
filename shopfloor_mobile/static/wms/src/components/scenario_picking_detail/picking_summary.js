@@ -37,7 +37,7 @@ Vue.component("picking-summary", {
             return {
                 action_change_pkg: {
                     comp_name: "edit-action",
-                    get_record: function(rec, action) {
+                    get_record: function (rec, action) {
                         /**
                          * Here we can get records grouped.
                          * If lines have a dest package or not
@@ -53,10 +53,10 @@ Vue.component("picking-summary", {
                         }
                         return rec;
                     },
-                    get_options: function(rec, action) {
+                    get_options: function (rec, action) {
                         return {click_event: "pkg_change_type"};
                     },
-                    enabled: function(rec, action) {
+                    enabled: function (rec, action) {
                         // Exclude for non-packaged records.
                         // NOTE: `pack` is available only if records are grouped.
                         // See `utils.group_by_pack`.
@@ -65,19 +65,19 @@ Vue.component("picking-summary", {
                 },
                 action_cancel_line: {
                     comp_name: "cancel-move-line-action",
-                    get_options: function(rec, action) {
+                    get_options: function (rec, action) {
                         return {
                             package_cancel_key: self.$props.action_cancel_package_key,
                         };
                     },
-                    get_record: function(rec, action) {
+                    get_record: function (rec, action) {
                         if (rec.records) {
                             // lines grouped, get real line
                             return rec.records[0];
                         }
                         return rec;
                     },
-                    enabled: function(rec, action) {
+                    enabled: function (rec, action) {
                         return true;
                     },
                 },
@@ -93,14 +93,14 @@ Vue.component("picking-summary-content", {
         index: Number,
         count: Number,
     },
-    data: function() {
+    data: function () {
         return {
             panel: [],
         };
     },
     watch: {
         panel: {
-            handler: function(newVal, oldVal) {
+            handler: function (newVal, oldVal) {
                 // The panel is opened
                 $(this.$parent.$el).toggleClass("inner-panel-expanded", newVal == 0);
             },

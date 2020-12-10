@@ -13,7 +13,7 @@ export var GlobalMixin = {
 
         Includes tha parent key by default.
         */
-        make_component_key: function(bits) {
+        make_component_key: function (bits) {
             const parent_key = _.result(this.$parent, "$options._componentTag", "");
             if (parent_key) bits.unshift(parent_key + "-");
             bits.unshift(this.$options._componentTag);
@@ -24,7 +24,7 @@ export var GlobalMixin = {
         /*
         Provide utils to all components
         */
-        utils: function() {
+        utils: function () {
             return {
                 misc: utils,
                 colors: color_registry,

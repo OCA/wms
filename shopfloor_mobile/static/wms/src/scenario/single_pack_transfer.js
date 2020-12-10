@@ -10,7 +10,7 @@ import {ScenarioBaseMixin} from "./mixins.js";
 import {process_registry} from "../services/process_registry.js";
 
 export var SinglePackStatesMixin = {
-    data: function() {
+    data: function () {
         return {
             states: {
                 // Generic state for when to start w/ scanning a pack or loc
@@ -19,7 +19,7 @@ export var SinglePackStatesMixin = {
                         title: "Start by scanning a pack or a location",
                         scan_placeholder: "Scan pack",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         const data = this.state.data;
                         this.wait_call(
                             this.odoo.call("start", {
@@ -85,7 +85,7 @@ const SinglePackTransfer = {
             <cancel-button v-on:cancel="on_cancel" v-if="show_cancel_button"></cancel-button>
         </Screen>
     `,
-    data: function() {
+    data: function () {
         return {
             usage: "single_pack_transfer",
             show_reset_button: true,

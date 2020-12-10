@@ -10,7 +10,7 @@ import {ItemDetailMixin} from "./detail/detail_mixin.js";
 Vue.component("reset-screen-button", {
     props: ["show_reset_button"],
     methods: {
-        reset: function() {
+        reset: function () {
             this.$emit("reset");
         },
     },
@@ -34,7 +34,7 @@ Vue.component("cancel-button", {
 // TODO: could be merged w/ userConfirmation
 Vue.component("last-operation", {
     // Props: ['info'],
-    data: function() {
+    data: function () {
         return {info: {}};
     },
     template: `
@@ -99,7 +99,7 @@ Vue.component("state-display-info", {
         info: Object,
     },
     computed: {
-        title: function() {
+        title: function () {
             return _.isFunction(this.info.title) ? this.info.title() : this.info.title;
         },
     },
@@ -117,7 +117,7 @@ Vue.component("edit-action", {
         record: Object,
         options: {
             type: Object,
-            default: function() {
+            default: function () {
                 return {
                     click_event: "edit",
                 };
@@ -145,7 +145,7 @@ Vue.component("cancel-move-line-action", {
         },
         options: {
             type: Object,
-            default: function() {
+            default: function () {
                 // Take control of which package key (source or destination) is used
                 // to cancel the line when cancel line action is available.
                 return {
@@ -160,7 +160,7 @@ Vue.component("cancel-move-line-action", {
         };
     },
     methods: {
-        on_user_confirm: function(answer) {
+        on_user_confirm: function (answer) {
             this.dialog = false;
             if (answer === "yes") {
                 let data = {};
@@ -175,10 +175,10 @@ Vue.component("cancel-move-line-action", {
     },
     computed: {
         // `package` is a reserved identifier!
-        the_package: function() {
+        the_package: function () {
             return _.result(this.record, this.$props.options.package_cancel_key);
         },
-        message: function() {
+        message: function () {
             const item = this.the_package
                 ? this.the_package.name
                 : this.record.product.name;
@@ -276,7 +276,7 @@ Vue.component("btn-back", {
         },
     },
     methods: {
-        on_back: function() {
+        on_back: function () {
             this.$root.trigger("go_back");
             if (this.router_back) this.$router.back();
         },
@@ -292,13 +292,13 @@ Vue.component("btn-reset-config", {
     props: {
         redirect: {
             type: Object,
-            default: function() {
+            default: function () {
                 return {name: "home"};
             },
         },
     },
     methods: {
-        reset_data: function() {
+        reset_data: function () {
             this.$root._clearConfig();
             this.$root._loadMenu();
             this.$root.$router.push(this.$props.redirect);
@@ -314,7 +314,7 @@ Vue.component("line-actions-popup", {
         },
         actions: {
             type: Array,
-            default: function() {
+            default: function () {
                 return [];
             },
         },
@@ -408,19 +408,19 @@ Vue.component("screen-loading", {
 });
 
 Vue.component("btn-fullscreen", {
-    data: function() {
+    data: function () {
         return {
             fullscreen_on: document.fullscreenElement ? true : false,
         };
     },
     computed: {
-        btn_label: function() {
+        btn_label: function () {
             const transition = this.fullscreen_on ? "exit" : "enter";
             return this.$t("screen.settings.fullscreen." + transition);
         },
     },
     methods: {
-        go_fullscreen: function() {
+        go_fullscreen: function () {
             const elem = document.documentElement;
             if (elem.requestFullscreen) {
                 elem.requestFullscreen();
@@ -436,7 +436,7 @@ Vue.component("btn-fullscreen", {
             }
             this.fullscreen_on = true;
         },
-        leave_fullscreen: function() {
+        leave_fullscreen: function () {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             } else if (document.mozCancelFullScreen) {

@@ -85,12 +85,12 @@ const LocationContentTransfer = {
         </Screen>
         `,
     methods: {
-        screen_title: function() {
+        screen_title: function () {
             if (!this.has_picking()) return this.menu_item().name;
             return this.current_picking().name;
         },
         // TODO: if we have this working we can remove the picking detail?
-        current_doc: function() {
+        current_doc: function () {
             const picking = this.current_picking();
             return {
                 record: picking,
@@ -98,14 +98,14 @@ const LocationContentTransfer = {
             };
         },
         // TODO: ask Joél if this is needed
-        current_picking: function() {
+        current_picking: function () {
             const data = this.state_get_data("start");
             if (_.isEmpty(data) || _.isEmpty(data.move_line.picking)) {
                 return {};
             }
             return data.move_line.picking;
         },
-        has_picking: function() {
+        has_picking: function () {
             return !_.isEmpty(this.current_picking());
         },
         /**
@@ -115,7 +115,7 @@ const LocationContentTransfer = {
          * We'll work alway with multiple records and loop on them.
          * TODO: this should be computed to be cached.
          */
-        wrapped_context: function() {
+        wrapped_context: function () {
             const data = this.state.data;
             let res = {
                 has_records: true,
@@ -140,14 +140,14 @@ const LocationContentTransfer = {
             res.location_dest = res.has_records ? res.records[0].location_dest : null;
             return res;
         },
-        move_line_detail_list_options: function(move_line) {
+        move_line_detail_list_options: function (move_line) {
             return this.utils.misc.move_line_product_detail_options(move_line, {
                 loud_labels: true,
                 fields_blacklist: ["product.qty_available"],
                 fields: [{path: "location_src.name", label: "From"}],
             });
         },
-        line_actions: function() {
+        line_actions: function () {
             let actions = [
                 {name: "Postpone line", event_name: "action_postpone"},
                 {name: "Declare stock out", event_name: "action_stock_out"},
@@ -158,10 +158,10 @@ const LocationContentTransfer = {
             return actions;
         },
         // Common actions
-        on_line_action: function(action) {
+        on_line_action: function (action) {
             this["on_" + action.event_name].call(this);
         },
-        on_action_postpone: function() {
+        on_action_postpone: function () {
             let endpoint, endpoint_data;
             const data = this.state.data;
             if (data.package_level) {
@@ -179,11 +179,11 @@ const LocationContentTransfer = {
             }
             this.wait_call(this.odoo.call(endpoint, endpoint_data));
         },
-        on_action_stock_out: function() {
+        on_action_stock_out: function () {
             this.state_set_data(this.state.data, "stock_issue");
             this.state_to("stock_issue");
         },
-        on_action_open_package: function() {
+        on_action_open_package: function () {
             const data = this.state.data;
             let endpoint_data = {
                 location_id: data.package_level.location_src.id,
@@ -192,7 +192,7 @@ const LocationContentTransfer = {
             this.wait_call(this.odoo.call("dismiss_package_level", endpoint_data));
         },
     },
-    data: function() {
+    data: function () {
         const self = this;
         return {
             usage: "location_content_transfer",
@@ -209,7 +209,7 @@ const LocationContentTransfer = {
                         title: "Start by scanning a location",
                         scan_placeholder: "Scan location",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("scan_location", {barcode: scanned.text})
                         );
@@ -220,7 +220,7 @@ const LocationContentTransfer = {
                         title: "Scan destination location for all items",
                         scan_placeholder: "Scan location",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         const data = this.state.data;
                         this.wait_call(
                             this.odoo.call("set_destination_all", {
@@ -241,7 +241,7 @@ const LocationContentTransfer = {
                     display_info: {
                         scan_placeholder: "Scan pack / product / lot",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         let endpoint, endpoint_data;
                         const data = this.state.data;
                         if (data.package_level) {
@@ -273,10 +273,10 @@ const LocationContentTransfer = {
                     events: {
                         qty_edit: "on_qty_update",
                     },
-                    on_qty_update: qty => {
+                    on_qty_update: (qty) => {
                         this.scan_destination_qty = parseInt(qty, 10);
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         let endpoint, endpoint_data;
                         const data = this.state.data;
                         if (data.package_level) {

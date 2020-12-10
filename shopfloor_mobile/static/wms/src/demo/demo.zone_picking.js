@@ -75,7 +75,7 @@ const move_lines = demotools.makePickingLines(
     {lines_count: 30, line_random_pack: true, picking_auto: true}
 );
 const select_line_move_lines = _.orderBy(move_lines, ["priority"], ["desc"]);
-_.forEach(select_line_move_lines, function(line, i) {
+_.forEach(select_line_move_lines, function (line, i) {
     // Simulate random flag
     line.location_will_be_empty = i % 3 == 0;
 });
@@ -120,7 +120,7 @@ const DEMO_CASE_1 = {
             },
         },
     },
-    list_move_lines: function(data) {
+    list_move_lines: function (data) {
         let res = _.cloneDeep(list_move_lines);
         if (data.order == "location") {
             res.data.select_line.move_lines = _.orderBy(
@@ -190,7 +190,7 @@ const DEMO_CASE_1 = {
             select_line: _.cloneDeep(list_move_lines.data.select_line),
         },
     },
-    set_destination_all: function(data) {
+    set_destination_all: function (data) {
         if (!data.confirmation) {
             const _data = _.extend(_.cloneDeep(unload_all_data), {
                 confirmation_required: true,
@@ -249,7 +249,7 @@ const DEMO_CASE_1 = {
             unload_set_destination: unload_set_destination_data,
         },
     },
-    unload_scan_destination: function(data) {
+    unload_scan_destination: function (data) {
         if (!data.confirmation) {
             const _data = _.extend(_.cloneDeep(unload_set_destination_data), {
                 confirmation_required: true,

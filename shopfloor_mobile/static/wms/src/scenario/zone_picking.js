@@ -208,26 +208,26 @@ const TEMPLATES = {
 const ZonePicking = {
     mixins: [ScenarioBaseMixin],
     methods: {
-        screen_klass: function() {
+        screen_klass: function () {
             return (
                 this.$super(ScenarioBaseMixin).screen_klass() +
                 " device-mode-" +
                 this.device_mode
             );
         },
-        screen_title: function() {
+        screen_title: function () {
             const record = this.current_picking_type();
             if (!record) return this.menu_item().name;
             return record.name;
         },
         // TODO: if we have this working we can remove the picking detail?
-        current_doc: function() {
+        current_doc: function () {
             const record = this.current_picking_type();
             return {
                 record: record,
             };
         },
-        current_picking_type: function() {
+        current_picking_type: function () {
             if (
                 ["start", "scan_location", "select_picking_type"].includes(
                     this.current_state_key
@@ -241,7 +241,7 @@ const ZonePicking = {
             }
             return data.picking_type;
         },
-        current_zone_location: function() {
+        current_zone_location: function () {
             if (["start", "scan_location"].includes(this.current_state_key)) {
                 return {};
             }
@@ -251,7 +251,7 @@ const ZonePicking = {
             }
             return data.zone_location;
         },
-        scan_location_manual_select_options: function() {
+        scan_location_manual_select_options: function () {
             return {
                 group_title_default: "Available zones",
                 group_color: this.utils.colors.color_for("screen_step_todo"),
@@ -262,7 +262,7 @@ const ZonePicking = {
                 },
             };
         },
-        manual_select_zone_fields: function() {
+        manual_select_zone_fields: function () {
             return [
                 {
                     path: "name",
@@ -270,7 +270,7 @@ const ZonePicking = {
                 },
             ];
         },
-        select_picking_type_manual_select_options: function() {
+        select_picking_type_manual_select_options: function () {
             return {
                 group_title_default: "Available operation types",
                 group_color: this.utils.colors.color_for("screen_step_todo"),
@@ -281,7 +281,7 @@ const ZonePicking = {
                 },
             };
         },
-        manual_select_picking_type_fields: function() {
+        manual_select_picking_type_fields: function () {
             return [
                 {
                     path: "name",
@@ -296,9 +296,9 @@ const ZonePicking = {
                 name: record.name,
             });
         },
-        select_line_table_headers: function() {
+        select_line_table_headers: function () {
             // Convert to v-data-table keys
-            let headers = _.map(this.move_line_list_fields(true), function(field) {
+            let headers = _.map(this.move_line_list_fields(true), function (field) {
                 return {
                     text: field.label,
                     value: field.path,
@@ -308,12 +308,12 @@ const ZonePicking = {
             });
             return headers;
         },
-        select_line_table_items: function() {
+        select_line_table_items: function () {
             const self = this;
             // Convert to v-data-table keys
-            let items = _.map(this.state.data.move_lines, function(record) {
+            let items = _.map(this.state.data.move_lines, function (record) {
                 let item_data = {};
-                _.forEach(self.move_line_list_fields(true), function(field) {
+                _.forEach(self.move_line_list_fields(true), function (field) {
                     item_data[field.path] = _.result(record, field.path);
                     if (field.renderer) {
                         item_data[field.path] = field.renderer(record, field);
@@ -324,7 +324,7 @@ const ZonePicking = {
             });
             return items;
         },
-        select_line_move_line_detail_options: function() {
+        select_line_move_line_detail_options: function () {
             let options = {
                 key_title: "location_src.name",
                 group_color: this.utils.colors.color_for("screen_step_todo"),
@@ -334,7 +334,7 @@ const ZonePicking = {
                 list_item_options: {
                     loud_title: true,
                     fields: this.move_line_list_fields(),
-                    list_item_klass_maker: function(rec) {
+                    list_item_klass_maker: function (rec) {
                         return rec.location_will_be_empty
                             ? "location-will-be-empty"
                             : "";
@@ -343,14 +343,14 @@ const ZonePicking = {
             };
             return options;
         },
-        move_line_list_fields: function(table_mode = false) {
+        move_line_list_fields: function (table_mode = false) {
             const self = this;
             let fields = [
                 {path: "product.display_name", label: table_mode ? "Product" : null},
                 {
                     path: "package_src.name",
                     label: "Pack / Lot",
-                    renderer: function(rec, field) {
+                    renderer: function (rec, field) {
                         const pkg = _.result(rec, "package_src.name", "");
                         const lot = _.result(rec, "lot.name", "");
                         return lot ? pkg + "\n" + lot : pkg;
@@ -360,7 +360,7 @@ const ZonePicking = {
                     path: "quantity",
                     label: "Qty",
                     render_component: "packaging-qty-picker-display",
-                    render_options: function(record) {
+                    render_options: function (record) {
                         return self.utils.misc.move_line_qty_picker_options(record);
                     },
                 },
@@ -368,7 +368,7 @@ const ZonePicking = {
                 {
                     path: "picking.scheduled_date",
                     label: "Date",
-                    renderer: function(rec, field) {
+                    renderer: function (rec, field) {
                         return self.utils.misc.render_field_date(rec, field);
                     },
                 },
@@ -376,7 +376,7 @@ const ZonePicking = {
                     path: "priority",
                     label: table_mode ? "Priority" : null,
                     render_component: "priority-widget",
-                    render_options: function(record) {
+                    render_options: function (record) {
                         return {priority: parseInt(record.priority || "0", 10)};
                     },
                 },
@@ -426,12 +426,12 @@ const ZonePicking = {
                     this.utils.misc.group_by_pack,
                     "package_dest"
                 ),
-                group_color_maker: function(lines) {
+                group_color_maker: function (lines) {
                     return "screen_step_todo";
                 },
             });
         },
-        picking_summary_move_line_list_options: function(move_lines) {
+        picking_summary_move_line_list_options: function (move_lines) {
             return {
                 group_color: this.state_in(["unload_set_destination"])
                     ? this.utils.colors.color_for("screen_step_done")
@@ -443,7 +443,7 @@ const ZonePicking = {
                 },
             };
         },
-        picking_summary_move_line_detail_fields: function() {
+        picking_summary_move_line_detail_fields: function () {
             return [{path: "package_src.name", klass: "loud"}];
         },
     },
@@ -455,7 +455,7 @@ const ZonePicking = {
         },
         device_mode() {
             let _mode = "mobile";
-            _.forEach(this.media_queries, function(mode, query) {
+            _.forEach(this.media_queries, function (mode, query) {
                 if (window.matchMedia(query).matches) {
                     _mode = mode;
                 }
@@ -463,7 +463,7 @@ const ZonePicking = {
             return _mode;
         },
     },
-    data: function() {
+    data: function () {
         return {
             usage: "zone_picking",
             initial_state_key: "scan_location",
@@ -487,12 +487,12 @@ const ZonePicking = {
                         this.state_to("init");
                         this.reset_notification();
                     },
-                    on_select: selected => {
+                    on_select: (selected) => {
                         this.wait_call(
                             this.odoo.call("scan_location", {barcode: selected.barcode})
                         );
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("scan_location", {barcode: scanned.text})
                         );
@@ -509,7 +509,7 @@ const ZonePicking = {
                         this.state_to("init");
                         this.reset_notification();
                     },
-                    on_select: selected => {
+                    on_select: (selected) => {
                         this.list_move_lines(selected.id);
                     },
                 },
@@ -530,16 +530,16 @@ const ZonePicking = {
                             })
                         );
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.scan_source(scanned.text);
                     },
-                    on_select: selected => {
+                    on_select: (selected) => {
                         let path = "package_src.name";
                         let barcode = _.result(selected, path);
                         while (!barcode) {
                             _.forEach(
                                 ["lot.name", "product.barcode", "location_src.barcode"],
-                                function(path) {
+                                function (path) {
                                     barcode = _.result(selected, path);
                                 }
                             );
@@ -565,7 +565,7 @@ const ZonePicking = {
                     events: {
                         qty_edit: "on_qty_update",
                     },
-                    on_qty_update: qty => {
+                    on_qty_update: (qty) => {
                         this.scan_destination_qty = parseInt(qty, 10);
                         if (this.state.data.move_line.quantity != qty) {
                             this.state.display_info.scan_placeholder = this.state.display_info.scan_placeholder_partial;
@@ -573,7 +573,7 @@ const ZonePicking = {
                             this.state.display_info.scan_placeholder = this.state.display_info.scan_placeholder_full;
                         }
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         const data = this.state.data;
                         this.wait_call(
                             this.odoo.call("set_destination", {
@@ -586,7 +586,7 @@ const ZonePicking = {
                             })
                         );
                     },
-                    on_action: action => {
+                    on_action: (action) => {
                         this.state["on_" + action.event_name].call(this);
                     },
                     on_action_stock_out: () => {
@@ -605,7 +605,7 @@ const ZonePicking = {
                         title: "Unload all bins",
                         scan_placeholder: "Scan location",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.state_set_data({location_barcode: scanned.text});
                         this.wait_call(
                             this.odoo.call("set_destination_all", {
@@ -630,7 +630,7 @@ const ZonePicking = {
                         title: "Unload single pack",
                         scan_placeholder: "Scan pack",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("unload_scan_pack", {
                                 zone_location_id: this.current_zone_location().id,
@@ -646,7 +646,7 @@ const ZonePicking = {
                         title: "Set destination",
                         scan_placeholder: "Scan location",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("unload_set_destination", {
                                 zone_location_id: this.current_zone_location().id,
@@ -663,7 +663,7 @@ const ZonePicking = {
                         title: "Change pack or lot",
                         scan_placeholder: "Scan pack or lot",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("change_pack_lot", {
                                 zone_location_id: this.current_zone_location().id,
@@ -678,7 +678,7 @@ const ZonePicking = {
                     enter: () => {
                         this.reset_notification();
                     },
-                    on_action: action => {
+                    on_action: (action) => {
                         this.state["on_" + action].call(this);
                     },
                     on_confirm_stock_issue: () => {
@@ -697,10 +697,10 @@ const ZonePicking = {
                     },
                 },
                 zero_check: {
-                    on_action: action => {
+                    on_action: (action) => {
                         this.state["on_" + action].call(this);
                     },
-                    is_zero: zero_flag => {
+                    is_zero: (zero_flag) => {
                         this.wait_call(
                             this.odoo.call("is_zero", {
                                 zone_location_id: this.current_zone_location().id,
@@ -728,7 +728,7 @@ const ZonePicking = {
         },
         media_queries: {
             type: Object,
-            default: function() {
+            default: function () {
                 return {
                     "(min-width: 500px)": "desktop",
                 };
@@ -736,7 +736,7 @@ const ZonePicking = {
         },
         compiled_templates: {
             type: Object,
-            default: function() {
+            default: function () {
                 return TEMPLATES;
             },
         },
