@@ -154,7 +154,7 @@ class StockMove(models.Model):
             if not move.need_release:
                 move.release_ready = False
                 continue
-            if move.picking_id.move_type == "one":
+            if move.picking_id._get_shipping_policy() == "one":
                 move.release_ready = move.picking_id.release_ready
             else:
                 move.release_ready = move.ordered_available_to_promise_uom_qty > 0
@@ -308,7 +308,7 @@ class StockMove(models.Model):
             remaining = move.product_qty - quantity
 
             if float_compare(remaining, 0, precision_digits=precision) > 0:
-                if move.picking_id.move_type == "one":
+                if move.picking_id._get_shipping_policy() == "one":
                     # we don't want to deliver unless we can deliver all at
                     # once
                     continue
