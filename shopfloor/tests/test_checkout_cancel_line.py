@@ -103,11 +103,13 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
 
         # and now, we want to drop the new_package
         response = self.service.dispatch(
-            "cancel_line", params={"picking_id": picking.id, "line_id": raw_line.id},
+            "cancel_line",
+            params={"picking_id": picking.id, "line_id": raw_line.id},
         )
 
         self.assertRecordValues(
-            raw_line, [{"qty_done": 0, "shopfloor_checkout_done": False}],
+            raw_line,
+            [{"qty_done": 0, "shopfloor_checkout_done": False}],
         )
 
         self.assert_response(

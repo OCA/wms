@@ -321,7 +321,8 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         )
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
         )
 
     def test_postpone_package_ok(self):
@@ -337,7 +338,8 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self.assertTrue(package_level.shopfloor_postponed)
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
         )
 
     def test_postpone_sorter(self):
@@ -379,7 +381,8 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         )
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
         )
 
     def test_postpone_line_ok(self):
@@ -392,7 +395,8 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self.assertTrue(move_line.shopfloor_postponed)
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
         )
 
     def test_stock_out_package_wrong_parameters(self):
@@ -419,7 +423,8 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         )
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
         )
 
     def test_stock_out_package_ok(self):
@@ -434,7 +439,8 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         )
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
         )
 
     def test_stock_out_line_wrong_parameters(self):
@@ -461,7 +467,8 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         )
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
         )
 
     def test_dismiss_package_level_ok(self):
@@ -507,7 +514,8 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
             params={"location_id": 0, "package_level_id": package_level.id},
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
 
 
@@ -550,7 +558,9 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
         )
         cls.move_product_a.product_uom_qty = 15
         cls._update_qty_in_location(
-            cls.content_loc, cls.product_a, 5,
+            cls.content_loc,
+            cls.product_a,
+            5,
         )
         # Put product_b quantities in two different source locations to get
         # two stock move lines (6 and 4 to satisfy 10 qties)
@@ -611,7 +621,8 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
         # Check the response
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
         )
 
     def test_stock_out_line_split_move(self):
@@ -667,5 +678,6 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
         # Check the response
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
-            response, move_lines.mapped("picking_id"),
+            response,
+            move_lines.mapped("picking_id"),
         )

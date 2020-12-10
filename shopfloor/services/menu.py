@@ -65,8 +65,7 @@ class ShopfloorMenu(Component):
         return values
 
     def _get_move_line_counters(self, record):
-        """Lookup for all lines per menu item and compute counters.
-        """
+        """Lookup for all lines per menu item and compute counters."""
         # TODO: maybe to be improved w/ raw SQL as this run for each menu item
         # and it's called every time the menu is opened/gets refreshed
         move_line_search = self.actions_for(

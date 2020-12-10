@@ -105,7 +105,10 @@ class LocationContentTransferCommonCase(CommonCase):
         data = self.service._data_content_line_for_location(location, next_content)
         data["confirmation_required"] = confirmation_required
         self.assert_response(
-            response, next_state=state, data=data, message=message,
+            response,
+            next_state=state,
+            data=data,
+            message=message,
         )
 
     def assert_response_scan_destination(

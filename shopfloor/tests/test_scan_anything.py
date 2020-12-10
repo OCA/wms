@@ -14,7 +14,8 @@ class ScanAnythingCase(ActionsDataDetailCaseBase):
         params = {"identifier": identifier}
         response = self.service.dispatch("scan", params=params)
         self.assert_response(
-            response, data={"type": rec_type, "identifier": identifier, "record": data},
+            response,
+            data={"type": rec_type, "identifier": identifier, "record": data},
         )
 
     def _test_response_ko(self, identifier, tried=None):

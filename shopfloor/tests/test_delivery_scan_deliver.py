@@ -81,7 +81,8 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             "scan_deliver", params={"barcode": "NO VALID BARCODE", "picking_id": None}
         )
         self.assert_response_deliver(
-            response, message=self.service.msg_store.barcode_not_found(),
+            response,
+            message=self.service.msg_store.barcode_not_found(),
         )
 
     def test_scan_deliver_error_barcode_not_found_keep_picking(self):
@@ -168,7 +169,8 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             "scan_deliver", params={"barcode": self.free_product.barcode}
         )
         self.assert_response_deliver(
-            response, message=self.service.msg_store.product_not_found_in_pickings(),
+            response,
+            message=self.service.msg_store.product_not_found_in_pickings(),
         )
 
     def test_scan_deliver_scan_lot_ok(self):
@@ -179,7 +181,8 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
     def test_scan_deliver_scan_lot_not_found(self):
         response = self.service.dispatch("scan_deliver", params={"barcode": "FREE_LOT"})
         self.assert_response_deliver(
-            response, message=self.service.msg_store.lot_not_found_in_pickings(),
+            response,
+            message=self.service.msg_store.lot_not_found_in_pickings(),
         )
 
     def test_scan_deliver_scan_lot_in_mixed_package(self):
@@ -217,13 +220,15 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         self.assertEqual(self.picking.state, "assigned")
         lot = self.raw_lot_move.move_line_ids.lot_id
         response = self.service.dispatch(
-            "scan_deliver", params={"barcode": lot.name, "picking_id": self.picking.id},
+            "scan_deliver",
+            params={"barcode": lot.name, "picking_id": self.picking.id},
         )
         self.assertEqual(self.picking.state, "assigned")
         packages_f = self.pack3_move.move_line_ids.mapped("package_id")
         # While all lines are not processed, response still returns the picking
         self.assert_response_deliver(
-            response, picking=self.picking,
+            response,
+            picking=self.picking,
         )
         response = None
         # Once all lines are processed, the last response has no picking returned
@@ -234,7 +239,8 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             )
         self.assertEqual(self.picking.state, "done")
         self.assert_response_deliver(
-            response, message=self.service.msg_store.transfer_complete(self.picking),
+            response,
+            message=self.service.msg_store.transfer_complete(self.picking),
         )
 
 

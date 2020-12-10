@@ -58,7 +58,9 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         # user and in progress (first priority)
         data = self.data.picking_batch(self.batch3, with_pickings=True)
         self.assert_response(
-            response, next_state="confirm_start", data=data,
+            response,
+            next_state="confirm_start",
+            data=data,
         )
 
     def test_find_batch_assigned(self):
@@ -78,7 +80,9 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         # we expect to find batch 2 as it's assigned to the current user
         data = self.data.picking_batch(self.batch2, with_pickings=True)
         self.assert_response(
-            response, next_state="confirm_start", data=data,
+            response,
+            next_state="confirm_start",
+            data=data,
         )
 
     def test_find_batch_unassigned_draft(self):
@@ -97,7 +101,9 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         # available
         data = self.data.picking_batch(self.batch2, with_pickings=True)
         self.assert_response(
-            response, next_state="confirm_start", data=data,
+            response,
+            next_state="confirm_start",
+            data=data,
         )
 
     def test_find_batch_not_found(self):
@@ -153,7 +159,9 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         # we don't care in these tests, 'find_batch' tests them already
         data["pickings"] = self.ANY
         self.assert_response(
-            response, next_state="confirm_start", data=data,
+            response,
+            next_state="confirm_start",
+            data=data,
         )
 
     def test_select_draft_assigned(self):
@@ -171,7 +179,9 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         # we don't care in these tests, 'find_batch' tests them already
         data["pickings"] = self.ANY
         self.assert_response(
-            response, next_state="confirm_start", data=data,
+            response,
+            next_state="confirm_start",
+            data=data,
         )
 
     def test_select_draft_unassigned(self):
@@ -188,7 +198,9 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         # we don't care in these tests, 'find_batch' tests them already
         data["pickings"] = self.ANY
         self.assert_response(
-            response, next_state="confirm_start", data=data,
+            response,
+            next_state="confirm_start",
+            data=data,
         )
 
     def test_select_not_exists(self):
@@ -323,7 +335,9 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         data["picking"] = self.data.picking(picking)
         data["batch"] = self.data.picking_batch(batch)
         self.assert_response(
-            response, data=data, next_state="start_line",
+            response,
+            data=data,
+            next_state="start_line",
         )
 
     def test_confirm_start_not_exists(self):

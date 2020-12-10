@@ -23,7 +23,8 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         response = self.service.dispatch(
             "stock_issue",
@@ -34,7 +35,8 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         response = self.service.dispatch(
             "stock_issue",
@@ -45,7 +47,8 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
 
     def test_stock_issue_no_more_reservation(self):
@@ -65,7 +68,10 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
         self.assertFalse(move.move_line_ids)
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines,
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
         )
 
     def test_stock_issue1(self):
@@ -87,7 +93,10 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
         self.assertFalse(move.move_line_ids)
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines,
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
         )
         # Check that the inventory exists
         inventory = self.env["stock.inventory"].search(
@@ -129,7 +138,10 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
         self.assertTrue(move.move_line_ids)
         self.assertEqual(move.move_line_ids.location_id, location)
         self.assert_response_set_line_destination(
-            response, zone_location, picking_type, move.move_line_ids,
+            response,
+            zone_location,
+            picking_type,
+            move.move_line_ids,
         )
         # Check the inventory
         inventory = self.env["stock.inventory"].search(
@@ -173,7 +185,10 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
         self.assertTrue(move.move_line_ids)
         self.assertEqual(move.move_line_ids.location_id, self.zone_sublocation2)
         self.assert_response_set_line_destination(
-            response, zone_location, picking_type, move.move_line_ids,
+            response,
+            zone_location,
+            picking_type,
+            move.move_line_ids,
         )
         # Check the inventory
         inventory = self.env["stock.inventory"].search(

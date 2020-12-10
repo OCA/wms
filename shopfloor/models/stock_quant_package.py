@@ -20,7 +20,8 @@ class StockQuantPackage(models.Model):
     )
     # TODO: review other fields
     reserved_move_line_ids = fields.One2many(
-        comodel_name="stock.move.line", compute="_compute_reserved_move_lines",
+        comodel_name="stock.move.line",
+        compute="_compute_reserved_move_lines",
     )
 
     def _get_reserved_move_lines(self):

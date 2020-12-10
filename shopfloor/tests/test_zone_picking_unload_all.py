@@ -23,7 +23,8 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         response = self.service.dispatch(
             "set_destination_all",
@@ -34,7 +35,8 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
 
     def test_set_destination_all_different_destination(self):
@@ -147,7 +149,8 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             picking_type,
             buffer_lines,
             message=self.service.msg_store.confirm_location_changed(
-                packing_sublocation1, packing_sublocation2,
+                packing_sublocation1,
+                packing_sublocation2,
             ),
             confirmation_required=True,
         )
@@ -389,7 +392,10 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         # check response
         buffer_lines = self.service._find_buffer_move_lines(zone_location, picking_type)
         self.assert_response_unload_set_destination(
-            response, zone_location, picking_type, buffer_lines,
+            response,
+            zone_location,
+            picking_type,
+            buffer_lines,
         )
 
     def test_unload_split_buffer_multi_lines(self):
