@@ -149,7 +149,9 @@ class StockLocation(models.Model):
             ) | rec.mapped("in_move_line_ids.lot_id")
 
     @api.depends(
-        "quant_ids.quantity", "in_move_ids", "in_move_line_ids",
+        "quant_ids.quantity",
+        "in_move_ids",
+        "in_move_line_ids",
     )
     def _compute_location_is_empty(self):
         for rec in self:
@@ -342,8 +344,10 @@ class StockLocation(models.Model):
                 ),
             ]
         )
-        pertinent_loc_s_t_domain = compatible_locations._domain_location_storage_type_constraints(  # noqa
-            package_storage_type, quants, products
+        pertinent_loc_s_t_domain = (
+            compatible_locations._domain_location_storage_type_constraints(  # noqa
+                package_storage_type, quants, products
+            )
         )
 
         pertinent_loc_storage_types = LocStorageType.search(pertinent_loc_s_t_domain)

@@ -199,7 +199,7 @@ const Checkout = {
         </Screen>
         `,
     computed: {
-        existing_package_select_fields: function() {
+        existing_package_select_fields: function () {
             return [
                 {path: "weight"},
                 {path: "move_line_count", label: "Line count"},
@@ -208,13 +208,13 @@ const Checkout = {
         },
     },
     methods: {
-        screen_title: function() {
+        screen_title: function () {
             if (_.isEmpty(this.current_doc()) || this.state_is("confirm_start"))
                 return this.menu_item().name;
             let title = this.current_doc().record.name;
             return title;
         },
-        current_doc: function() {
+        current_doc: function () {
             const data = this.state_get_data("select_line");
             if (_.isEmpty(data)) {
                 return null;
@@ -224,7 +224,7 @@ const Checkout = {
                 identifier: data.picking.name,
             };
         },
-        manual_selection_manual_select_options: function() {
+        manual_selection_manual_select_options: function () {
             return {
                 group_title_default: "Pickings to process",
                 group_color: this.utils.colors.color_for("screen_step_todo"),
@@ -238,12 +238,12 @@ const Checkout = {
                 },
             };
         },
-        select_line_manual_select_opts: function() {
+        select_line_manual_select_opts: function () {
             return {
                 group_color: this.utils.colors.color_for("screen_step_todo"),
             };
         },
-        select_package_manual_select_opts: function() {
+        select_package_manual_select_opts: function () {
             return {
                 multiple: true,
                 initSelectAll: true,
@@ -252,7 +252,7 @@ const Checkout = {
             };
         },
     },
-    data: function() {
+    data: function () {
         return {
             usage: "checkout",
             initial_state_key: "select_document",
@@ -262,12 +262,12 @@ const Checkout = {
                         title: "Choose an order to pack",
                         scan_placeholder: "Scan pack / picking / location",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("scan_document", {barcode: scanned.text})
                         );
                     },
-                    on_manual_selection: evt => {
+                    on_manual_selection: (evt) => {
                         this.wait_call(this.odoo.call("list_stock_picking"));
                     },
                 },
@@ -283,7 +283,7 @@ const Checkout = {
                         this.state_to("init");
                         this.reset_notification();
                     },
-                    on_select: selected => {
+                    on_select: (selected) => {
                         this.wait_call(
                             this.odoo.call("select", {
                                 picking_id: selected.id,
@@ -301,7 +301,7 @@ const Checkout = {
                         select: "on_select",
                         back: "on_back",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("scan_line", {
                                 picking_id: this.state.data.picking.id,
@@ -309,7 +309,7 @@ const Checkout = {
                             })
                         );
                     },
-                    on_select: selected => {
+                    on_select: (selected) => {
                         if (!selected) {
                             return;
                         }
@@ -337,7 +337,7 @@ const Checkout = {
                         );
                     },
                     // FIXME: is not to change qty
-                    on_edit_package: pkg => {
+                    on_edit_package: (pkg) => {
                         this.state_set_data({package: pkg}, change_quantity);
                         this.state_to("change_quantity");
                     },
@@ -365,7 +365,7 @@ const Checkout = {
                             selected: this.state.data.selected_move_lines,
                         });
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("scan_package_action", {
                                 picking_id: this.state.data.picking.id,
@@ -377,7 +377,7 @@ const Checkout = {
                             })
                         );
                     },
-                    on_select: selected => {
+                    on_select: (selected) => {
                         if (!selected) {
                             return;
                         }
@@ -401,7 +401,7 @@ const Checkout = {
                             );
                         }
                     },
-                    on_qty_edit: record => {
+                    on_qty_edit: (record) => {
                         this.state_set_data(
                             {
                                 picking: this.state.data.picking,
@@ -465,7 +465,7 @@ const Checkout = {
                         this.state_to("select_package");
                         this.reset_notification();
                     },
-                    on_qty_update: qty => {
+                    on_qty_update: (qty) => {
                         console.log(qty);
                         this.state.data.qty = qty;
                     },
@@ -488,7 +488,7 @@ const Checkout = {
                         select: "on_select",
                         back: "on_back",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         const selected_lines = this.state_get_data("select_package")
                             .selected;
                         this.wait_call(
@@ -502,7 +502,7 @@ const Checkout = {
                             })
                         );
                     },
-                    on_select: selected => {
+                    on_select: (selected) => {
                         if (!selected) {
                             return;
                         }
@@ -540,7 +540,7 @@ const Checkout = {
                         this.state_to("start");
                         this.reset_notification();
                     },
-                    on_pkg_change_type: pkg => {
+                    on_pkg_change_type: (pkg) => {
                         this.wait_call(
                             this.odoo.call("list_packaging", {
                                 picking_id: this.state.data.picking.id,
@@ -548,7 +548,7 @@ const Checkout = {
                             })
                         );
                     },
-                    on_cancel: data => {
+                    on_cancel: (data) => {
                         this.wait_call(
                             this.odoo.call("cancel_line", {
                                 picking_id: this.state.data.picking.id,
@@ -580,7 +580,7 @@ const Checkout = {
                     events: {
                         select: "on_select",
                     },
-                    on_select: selected => {
+                    on_select: (selected) => {
                         if (!selected) {
                             return;
                         }

@@ -10,7 +10,7 @@ import {process_registry} from "/shopfloor_mobile/assets/src/services/process_re
 // Clone the original component
 const DemoCheckout = process_registry.extend("checkout", {
     // `extend` accepts a path to the final key
-    "methods.screen_title": function() {
+    "methods.screen_title": function () {
         return this.$t("shopfloor_demo.checkout.title");
     },
 });

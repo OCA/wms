@@ -19,7 +19,8 @@ class StockLocation(models.Model):
         comodel_name="stock.move.line", inverse_name="location_id", readonly=True
     )
     reserved_move_line_ids = fields.One2many(
-        comodel_name="stock.move.line", compute="_compute_reserved_move_lines",
+        comodel_name="stock.move.line",
+        compute="_compute_reserved_move_lines",
     )
 
     def is_sublocation_of(self, others, func=any):

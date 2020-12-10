@@ -5,8 +5,7 @@ from odoo.addons.component.core import Component
 
 
 class CheckoutSyncAction(Component):
-    """Provide methods sync destination location on checkout/packing
-    """
+    """Provide methods sync destination location on checkout/packing"""
 
     _name = "shopfloor.checkout.sync.action"
     _inherit = "shopfloor.process.action"

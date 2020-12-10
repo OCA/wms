@@ -61,7 +61,9 @@ class StockLocation(models.Model):
         product_abc = product_abc or "a"
         # group locations by abc_storage and max_height
         data = self.read_group(
-            [("id", "in", self.ids)], ["max_height"], ["max_height"],
+            [("id", "in", self.ids)],
+            ["max_height"],
+            ["max_height"],
         )
         locations_grouped = {}
         max_heights = set()

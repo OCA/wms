@@ -10,11 +10,13 @@ class StockMove(models.Model):
     reception_screen_current_step = fields.Char(
         related="picking_id.reception_screen_id.current_step"
     )
-    last_move_line_lot_id = fields.Many2one(comodel_name="stock.production.lot",)
+    last_move_line_lot_id = fields.Many2one(
+        comodel_name="stock.production.lot",
+    )
     vendor_code = fields.Char(compute="_compute_vendor_code")
 
     def action_select_product(self):
-        """"Same than `action_select_move` excepting that as we we are in the
+        """ "Same than `action_select_move` excepting that as we we are in the
         'select_product' step and that the user already selected the right
         move through this button, we automatically go to the next step
         (done by `process_select_product`).

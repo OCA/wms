@@ -1,4 +1,4 @@
-odoo.define("stock_reception_screen.autofocus", function(require) {
+odoo.define("stock_reception_screen.autofocus", function (require) {
     "use strict";
     var FormRenderer = require("web.FormRenderer");
 
@@ -7,7 +7,7 @@ odoo.define("stock_reception_screen.autofocus", function(require) {
     // compute field
 
     FormRenderer.include({
-        _custom_autofocus: function() {
+        _custom_autofocus: function () {
             if (this.mode === "readonly") {
                 return;
             }
@@ -41,7 +41,7 @@ odoo.define("stock_reception_screen.autofocus", function(require) {
                 }
             }
         },
-        _updateView: function() {
+        _updateView: function () {
             this._super.apply(this, arguments);
             this._custom_autofocus();
         },

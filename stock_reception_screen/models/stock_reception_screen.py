@@ -159,9 +159,12 @@ class StockReceptionScreen(models.Model):
     # NOTE: Mainly not related as we want to store these data on the current
     # package when the "select_packaging" step is confirmed by the user
     product_packaging_id = fields.Many2one(
-        "product.packaging", domain="[('product_id', '=', current_move_product_id)]",
+        "product.packaging",
+        domain="[('product_id', '=', current_move_product_id)]",
     )
-    package_storage_type_id = fields.Many2one("stock.package.storage.type",)
+    package_storage_type_id = fields.Many2one(
+        "stock.package.storage.type",
+    )
     package_storage_type_height_required = fields.Boolean(
         related="package_storage_type_id.height_required"
     )

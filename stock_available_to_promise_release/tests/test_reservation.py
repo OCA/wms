@@ -781,7 +781,10 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 (self.product4, 10),
             ],
         )
-        picking2 = self._create_picking_chain(self.wh, [(self.product1, 20)],)
+        picking2 = self._create_picking_chain(
+            self.wh,
+            [(self.product1, 20)],
+        )
         self.assertEqual(self.product1.move_need_release_count, 2)
         self.assertEqual(self.product2.move_need_release_count, 1)
         self.assertEqual(picking1.need_release_count, 4)
@@ -793,9 +796,13 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         not_need_release = self._create_picking_chain(self.wh, [(self.product1, 20)])
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         picking1 = self._create_picking_chain(
-            self.wh, [(self.product1, 20), (self.product2, 10)],
+            self.wh,
+            [(self.product1, 20), (self.product2, 10)],
         )
-        picking2 = self._create_picking_chain(self.wh, [(self.product3, 20)],)
+        picking2 = self._create_picking_chain(
+            self.wh,
+            [(self.product3, 20)],
+        )
         self._update_qty_in_location(self.loc_bin1, self.product3, 20.0)
 
         pickings = self.env["stock.picking"].search(
@@ -841,7 +848,8 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             ],
         )
         picking1 = self._create_picking_chain(
-            self.wh, [(self.product1, 20), (self.product2, 10)],
+            self.wh,
+            [(self.product1, 20), (self.product2, 10)],
         )
         picking2 = self._create_picking_chain(self.wh, [(self.product3, 20)])
 

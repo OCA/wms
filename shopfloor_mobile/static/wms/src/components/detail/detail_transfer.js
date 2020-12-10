@@ -15,7 +15,7 @@ Vue.component("detail-transfer", {
                 {
                     path: "scheduled_date",
                     label: "Scheduled on",
-                    renderer: function(rec, field) {
+                    renderer: function (rec, field) {
                         return self.utils.misc.render_field_date(rec, field);
                     },
                 },

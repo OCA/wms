@@ -30,7 +30,7 @@ var EventHub = new Vue();
 Vue.mixin(GlobalMixin);
 
 let app_components = {};
-_.forEach(process_registry.all(), function(process, key) {
+_.forEach(process_registry.all(), function (process, key) {
     app_components[process.key] = process.component;
 });
 if (app_components.length)
@@ -45,7 +45,7 @@ const app = new Vue({
         },
     }),
     components: app_components,
-    data: function() {
+    data: function () {
         return {
             demo_mode: false,
             global_state_key: "",
@@ -60,79 +60,79 @@ const app = new Vue({
             registry: process_registry,
         };
     },
-    created: function() {
+    created: function () {
         const self = this;
         this.demo_mode = this.app_info.demo_mode;
         this.loadConfig();
-        document.addEventListener("fetchStart", function() {
+        document.addEventListener("fetchStart", function () {
             self.loading = true;
         });
-        document.addEventListener("fetchEnd", function() {
+        document.addEventListener("fetchEnd", function () {
             self.loading = false;
         });
     },
-    mounted: function() {
+    mounted: function () {
         const self = this;
         // components can trigger `state:change` on the root
         // and the current state gets stored into `global_state_key`
-        this.$root.$on("state:change", function(key) {
+        this.$root.$on("state:change", function (key) {
             self.global_state_key = key;
         });
-        this.$root.event_hub.$on("profile:selected", function(profile) {
+        this.$root.event_hub.$on("profile:selected", function (profile) {
             self.profile = profile;
             self.loadMenu(true);
         });
     },
     computed: {
-        app_info: function() {
+        app_info: function () {
             return shopfloor_app_info;
         },
-        has_profile: function() {
+        has_profile: function () {
             return !_.isEmpty(this.profile);
         },
         // TODO: we can add an handler for this and avoid duplicate code
         profile: {
-            get: function() {
+            get: function () {
                 if (_.isEmpty(this.current_profile)) {
                     this.current_profile = this.$storage.get("profile");
                 }
                 return this.current_profile;
             },
-            set: function(v) {
+            set: function (v) {
                 this.current_profile = v;
                 this.$storage.set("profile", v);
             },
         },
-        profiles: function() {
+        profiles: function () {
             return this.appconfig ? this.appconfig.profiles || [] : [];
         },
         appmenu: {
-            get: function() {
+            get: function () {
                 if (_.isEmpty(this.profile_menu)) {
                     this.profile_menu = this.$storage.get("menu");
                 }
                 return this.profile_menu || [];
             },
-            set: function(v) {
+            set: function (v) {
                 this.profile_menu = v;
                 this.$storage.set("menu", v);
             },
         },
         apikey: {
-            get: function() {
+            get: function () {
                 if (!this.current_apikey) {
                     this.current_apikey = this.$storage.get("apikey");
                 }
                 return this.current_apikey;
             },
-            set: function(v) {
+            set: function (v) {
                 this.current_apikey = v;
                 this.$storage.set("apikey", v);
             },
         },
     },
     methods: {
-        getOdoo: function(odoo_params) {
+        getOdoo: function (odoo_params) {
             const params = _.defaults({}, odoo_params, {
                 apikey: this.apikey,
                 debug: this.demo_mode,
@@ -145,7 +145,7 @@ const app = new Vue({
             }
             return new OdooClass(params);
         },
-        loadConfig: function(force) {
+        loadConfig: function (force) {
             if (this.appconfig && !force) {
                 return this.appconfig;
             }
@@ -160,10 +160,10 @@ const app = new Vue({
             }
             this._loadConfig();
         },
-        _loadConfig: function() {
+        _loadConfig: function () {
             const self = this;
             const odoo = self.getOdoo({usage: "app"});
-            return odoo.call("user_config").then(function(result) {
+            return odoo.call("user_config").then(function (result) {
                 if (!_.isUndefined(result.data)) {
                     self.appconfig = result.data;
                     self.authenticated = true;
@@ -174,40 +174,40 @@ const app = new Vue({
                 }
             });
         },
-        _clearConfig: function(reload = true) {
+        _clearConfig: function (reload = true) {
             this.$storage.remove("appconfig");
             if (reload) return this._loadConfig();
         },
-        _clearAppData: function() {
+        _clearAppData: function () {
             this.apikey = "";
             this.appmenu = [];
             this.profile = null;
             this._clearConfig(false);
         },
-        loadMenu: function(force) {
+        loadMenu: function (force) {
             if (this.appmenu && !force) {
                 return this.appmenu;
             }
             this._loadMenu();
             return this.appmenu;
         },
-        _loadMenu: function() {
+        _loadMenu: function () {
             const self = this;
             const odoo = self.getOdoo({
                 usage: "user",
                 profile_id: this.profile.id,
             });
-            return odoo.call("menu").then(function(result) {
+            return odoo.call("menu").then(function (result) {
                 self.appmenu = result.data;
             });
         },
-        logout: function() {
+        logout: function () {
             this.authenticated = false;
             this._clearAppData();
             this.$router.push({name: "login"});
         },
         // Likely not needed anymore
-        loadJS: function(url, script_id) {
+        loadJS: function (url, script_id) {
             if (script_id && !document.getElementById(script_id)) {
                 console.debug("Load JS", url);
                 var script = document.createElement("script");

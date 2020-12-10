@@ -93,7 +93,7 @@ export class ProcessRegistry {
      * Keys can be Lodash-like paths to the destination keys to override.
      */
     _override(orig_obj, overrides) {
-        _.forEach(overrides, function(value, path) {
+        _.forEach(overrides, function (value, path) {
             _.set(orig_obj, path, value);
         });
     }

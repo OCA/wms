@@ -140,7 +140,7 @@ export class DemoTools {
             let move_lines = [];
             _.forEach(
                 _.range(1, options.move_lines_count || this.getRandomInt(10)),
-                function() {
+                function () {
                     move_lines.push(self.makeProductFullDetail({}, {}));
                 }
             );
@@ -358,7 +358,7 @@ export class DemoTools {
         const picking = this.makeSimpleRecord(defaults, options);
         if (!options.no_lines) {
             picking.move_lines = this.makePickingLines({}, options);
-            picking.move_lines.forEach(function(line) {
+            picking.move_lines.forEach(function (line) {
                 // Avoid cyclic references to the same picking record
                 line.picking = _.cloneDeep(picking);
             });
@@ -515,7 +515,7 @@ export class DemoTools {
 
         // Find insert index to keep items w/ same scenario grouped
         let index = 0;
-        this.app_menus.every(function(item, i) {
+        this.app_menus.every(function (item, i) {
             if (item.scenario == new_item.scenario) {
                 index = i;
                 return false;

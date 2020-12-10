@@ -42,7 +42,9 @@ class TestSinglePackTransferPutaway(SinglePackTransferCommonBase):
             "start", params={"barcode": self.shelf1.barcode}
         )
         self.assert_response(
-            response, next_state="scan_location", data=self.ANY,
+            response,
+            next_state="scan_location",
+            data=self.ANY,
         )
         package_level_id = response["data"]["scan_location"]["id"]
         package_level = self.env["stock.package_level"].browse(package_level_id)

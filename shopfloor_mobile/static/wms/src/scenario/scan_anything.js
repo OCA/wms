@@ -34,7 +34,7 @@ const ScanAnything = {
             </div>
         </Screen>
     `,
-    data: function() {
+    data: function () {
         return {
             usage: "scan_anything",
             scan_full_data: {},
@@ -61,18 +61,18 @@ const ScanAnything = {
         next();
     },
     methods: {
-        on_reset: function(e) {
+        on_reset: function (e) {
             this.scan_data = {};
             this.$router.push({name: "scan_anything", params: {identifier: undefined}});
         },
-        getData: function(identifier) {
-            this.odoo.call("scan", {identifier: identifier}).then(result => {
+        getData: function (identifier) {
+            this.odoo.call("scan", {identifier: identifier}).then((result) => {
                 this.scan_full_data = result || {};
                 this.scan_data = result.data || {};
                 this.scan_message = result.message || null;
             });
         },
-        on_scan: function(scanned) {
+        on_scan: function (scanned) {
             if (this.$route.params.identifier == scanned.text) {
                 // scanned same resource, just reload
                 this.getData(scanned.text);
@@ -96,14 +96,14 @@ const ScanAnything = {
         },
     },
     computed: {
-        screen_info: function() {
+        screen_info: function () {
             return {
                 title: this.screen_title,
                 klass: "scan-anything",
                 user_message: this.scan_message,
             };
         },
-        screen_title: function() {
+        screen_title: function () {
             let title = "Scan";
             if (this.$route.params.identifier) {
                 title = "Scanned: " + this.$route.params.identifier;
@@ -112,13 +112,13 @@ const ScanAnything = {
                 what: this.$route.params.identifier,
             });
         },
-        displayOnly: function() {
+        displayOnly: function () {
             return this.$route.query.displayOnly;
         },
-        showBackBtn: function() {
+        showBackBtn: function () {
             return "childOf" in this.$route.query || this.displayOnly;
         },
-        showResetBtn: function() {
+        showResetBtn: function () {
             return !_.isEmpty(this.scan_data);
         },
     },

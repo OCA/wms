@@ -33,7 +33,7 @@ const manual_selection_pickings = _.sampleSize(pickings, _.random(1, 8));
 
 let scan_deliver = {};
 
-manual_selection_pickings.forEach(function(p) {
+manual_selection_pickings.forEach(function (p) {
     scan_deliver[p.name] = {
         // All line have a destination pack
         next_state: "deliver",
