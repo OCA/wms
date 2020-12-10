@@ -14,7 +14,7 @@
         "views/product_product_views.xml",
         "views/sale_order_views.xml",
     ],
-    "installable": True,
+    "installable": False,
     "license": "AGPL-3",
     "application": False,
     "development_status": "Alpha",
