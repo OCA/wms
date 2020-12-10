@@ -1,1 +1,6 @@
 freezegun
+odoo10-addon-base_m2m_custom_field @ git+https://github.com/OCA/server-tools@refs/pull/1940/head#subdirectory=setup/base_m2m_custom_field
+odoo10-addon-stock_quant_package_dimension @ git+https://github.com/OCA/stock-logistics-workflow@refs/pull/744/head#subdirectory=setup/stock_quant_package_dimension
+odoo10-addon-stock_quant_package_product_packaging @ git+https://github.com/OCA/stock-logistics-workflow@refs/pull/743/head#subdirectory=setup/stock_quant_package_product_packaging
+odoo10-addon-product_packaging_dimension @ git+https://github.com/OCA/product-attribute@refs/pull/695/head#subdirectory=setup/product_packaging_dimension
+odoo10-addon-product_packaging_type @ git+https://github.com/OCA/product-attribute@refs/pull/693/head#subdirectory=setup/product_packaging_type
