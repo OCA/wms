@@ -12,6 +12,6 @@
     "demo": [],
     "data": [],
     "auto_install": True,
-    "installable": True,
+    "installable": False,
     "development_status": "Alpha",
 }
