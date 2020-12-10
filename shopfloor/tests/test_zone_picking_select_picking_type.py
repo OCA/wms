@@ -21,7 +21,8 @@ class ZonePickingSelectPickingTypeCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         response = self.service.dispatch(
             "list_move_lines",
@@ -31,7 +32,8 @@ class ZonePickingSelectPickingTypeCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
 
     def test_list_move_lines_ok(self):

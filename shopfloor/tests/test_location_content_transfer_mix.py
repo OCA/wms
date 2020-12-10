@@ -158,7 +158,8 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
                 self.assert_response_start(
                     response,
                     message=service.msg_store.location_content_transfer_complete(
-                        pack_location, out_location,
+                        pack_location,
+                        out_location,
                     ),
                 )
                 self.assertEqual(move_line.state, "done")
@@ -339,7 +340,8 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         self.assert_response_start(
             response,
             message=self.service.msg_store.location_content_transfer_complete(
-                pack_first_pallet.location_id, pack_first_pallet.location_dest_id,
+                pack_first_pallet.location_id,
+                pack_first_pallet.location_dest_id,
             ),
         )
         self.assertEqual(pack_first_pallet.qty_done, 4)

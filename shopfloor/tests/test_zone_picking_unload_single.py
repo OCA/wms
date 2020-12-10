@@ -25,7 +25,8 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         response = self.service.dispatch(
             "unload_scan_pack",
@@ -37,7 +38,8 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         # wrong package ID, and there is still a move line to unload
         # => get back on 'unload_single' screen
@@ -128,7 +130,10 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_unload_set_destination(
-            response, zone_location, picking_type, move_line,
+            response,
+            zone_location,
+            picking_type,
+            move_line,
         )
 
     def test_unload_scan_pack_barcode_not_match(self):

@@ -24,7 +24,8 @@ class ZonePickingZeroCheckCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         response = self.service.dispatch(
             "is_zero",
@@ -36,7 +37,8 @@ class ZonePickingZeroCheckCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
         response = self.service.dispatch(
             "is_zero",
@@ -48,7 +50,8 @@ class ZonePickingZeroCheckCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
 
     def test_is_zero_is_empty(self):
@@ -67,7 +70,10 @@ class ZonePickingZeroCheckCase(ZonePickingCommonCase):
         )
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines,
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
         )
 
     def test_is_zero_is_not_empty(self):
@@ -86,7 +92,10 @@ class ZonePickingZeroCheckCase(ZonePickingCommonCase):
         )
         move_lines = self.service._find_location_move_lines(zone_location, picking_type)
         self.assert_response_select_line(
-            response, zone_location, picking_type, move_lines,
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
         )
         inventory = self.env["stock.inventory"].search(
             [
@@ -100,6 +109,7 @@ class ZonePickingZeroCheckCase(ZonePickingCommonCase):
         self.assertEqual(
             inventory.name,
             "Zero check issue on location {} ({})".format(
-                move_line.location_id.name, picking_type.name,
+                move_line.location_id.name,
+                picking_type.name,
             ),
         )

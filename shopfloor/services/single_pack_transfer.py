@@ -34,14 +34,22 @@ class SinglePackTransfer(Component):
     def _response_for_confirm_start(self, package_level, message=None):
         data = self._data_after_package_scanned(package_level)
         data["confirmation_required"] = True
-        return self._response(next_state="start", data=data, message=message,)
+        return self._response(
+            next_state="start",
+            data=data,
+            message=message,
+        )
 
     def _response_for_scan_location(
         self, package_level, message=None, confirmation_required=False
     ):
         data = self._data_after_package_scanned(package_level)
         data["confirmation_required"] = confirmation_required
-        return self._response(next_state="scan_location", data=data, message=message,)
+        return self._response(
+            next_state="scan_location",
+            data=data,
+            message=message,
+        )
 
     def _response_for_show_completion_info(self, message=None):
         return self._response(next_state="show_completion_info", message=message)

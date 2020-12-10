@@ -5,8 +5,7 @@ from .test_cluster_picking_base import ClusterPickingCommonCase
 
 
 class ClusterPickingStockIssue(ClusterPickingCommonCase):
-    """Tests covering the /stock_issue endpoint
-    """
+    """Tests covering the /stock_issue endpoint"""
 
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):

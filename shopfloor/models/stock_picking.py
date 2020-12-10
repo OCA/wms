@@ -18,7 +18,8 @@ class StockPicking(models.Model):
         related="picking_type_id.shopfloor_display_packing_info",
     )
     shopfloor_packing_info = fields.Text(
-        string="Packing information", related="partner_id.shopfloor_packing_info",
+        string="Packing information",
+        related="partner_id.shopfloor_packing_info",
     )
 
     @api.depends(
