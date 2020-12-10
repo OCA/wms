@@ -64,6 +64,11 @@ class StockPicking(models.Model):
         picking_ids = [group["picking_id"][0] for group in groups]
         return [("id", in_operator, picking_ids)]
 
+    def _get_shipping_policy(self):
+        """Hook returning the related shipping policy."""
+        self.ensure_one()
+        return self.move_type
+
     @api.depends("move_lines.ordered_available_to_promise_qty")
     def _compute_release_ready(self):
         for picking in self:
@@ -74,7 +79,7 @@ class StockPicking(models.Model):
             move_lines = picking.move_lines.filtered(
                 lambda move: move.state not in ("cancel", "done")
             )
-            if picking.move_type == "one":
+            if picking._get_shipping_policy() == "one":
                 picking.release_ready_count = sum(
                     1
                     for move in move_lines
