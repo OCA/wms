@@ -13,7 +13,10 @@ class StockStorageLocationSequence(models.Model):
         "stock.package.storage.type", required=True
     )
     sequence = fields.Integer(required=True)
-    location_id = fields.Many2one("stock.location", required=True,)
+    location_id = fields.Many2one(
+        "stock.location",
+        required=True,
+    )
     location_putaway_strategy = fields.Selection(
         related="location_id.pack_putaway_strategy"
     )
@@ -36,7 +39,8 @@ class StockStorageLocationSequence(models.Model):
                     pack_storage_strat = strat[1]
                     break
             msg = ' * <span style="color: green;">{} ({})</span>'.format(
-                self.location_id.name, pack_storage_strat,
+                self.location_id.name,
+                pack_storage_strat,
             )
             if last:
                 # If last, we want to check if restrictions are defined on
