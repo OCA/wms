@@ -45,7 +45,8 @@ class StockMove(models.Model):
         " to moves with higher priority (in initial demand's UoM).",
     )
     release_ready = fields.Boolean(
-        compute="_compute_release_ready", search="_search_release_ready",
+        compute="_compute_release_ready",
+        search="_search_release_ready",
     )
     need_release = fields.Boolean(index=True, copy=False)
     zip_code = fields.Char(related="partner_id.zip", store=True)
@@ -216,14 +217,18 @@ class StockMove(models.Model):
 
             real_promised = available_qty - previous_promised_qty
             uom_promised = product_uom._compute_quantity(
-                real_promised, move.product_uom, rounding_method="HALF-UP",
+                real_promised,
+                move.product_uom,
+                rounding_method="HALF-UP",
             )
 
             move.ordered_available_to_promise_uom_qty = max(
-                min(uom_promised, move.product_uom_qty), 0.0,
+                min(uom_promised, move.product_uom_qty),
+                0.0,
             )
             move.ordered_available_to_promise_qty = max(
-                min(real_promised, move.product_qty), 0.0,
+                min(real_promised, move.product_qty),
+                0.0,
             )
 
     def _search_ordered_available_to_promise_uom_qty(self, operator, value):
