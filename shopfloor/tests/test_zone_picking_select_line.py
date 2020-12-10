@@ -249,7 +249,9 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location=self.zone_sublocation2,
             picking_type=self.picking_type,
             move_lines=move_lines,
-            message=self.service.msg_store.location_empty(self.zone_sublocation2),
+            message=self.service.msg_store.several_products_in_location(
+                self.zone_sublocation2
+            ),
         )
 
     def test_scan_source_barcode_package(self):

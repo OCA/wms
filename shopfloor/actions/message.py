@@ -283,10 +283,8 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                _(
-                    "This product is part of a package with other products, "
-                    "please scan a package."
-                )
+                "This product is part of a package with other products, "
+                "please scan a package."
             ),
         }
 
@@ -306,10 +304,8 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                _(
-                    "This lot is part of a package with other products, "
-                    "please scan a package."
-                )
+                "This lot is part of a package with other products, "
+                "please scan a package."
             ),
         }
 
@@ -436,7 +432,7 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _(
-                _("Package {} cannot be picked, already moved by transfer {}.")
+                "Package {} cannot be picked, already moved by transfer {}."
             ).format(package.name, picking.name),
         }
 
