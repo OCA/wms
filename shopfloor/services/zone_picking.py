@@ -385,31 +385,25 @@ class ZonePicking(Component):
         )
         return self._response_for_select_line(zone_location, picking_type, move_lines)
 
-    def _scan_source_location(
-        self, zone_location, picking_type, location, order="priority"
-    ):
+    def _scan_source_location(self, zone_location, picking_type, location, **kw):
         """Return the move line related to the scanned `location`.
 
         The method tries to identify unambiguously a move line in the location
         if possible, otherwise return `False`.
         """
-        quants = self.env["stock.quant"].search([("location_id", "=", location.id)])
-        product = quants.product_id
-        lot = quants.lot_id
-        package = quants.package_id
-        if len(product) > 1 or len(lot) > 1 or len(package) > 1:
-            return False
         move_lines = self._find_location_move_lines(
-            location,
-            picking_type=picking_type,
-            product=product,
-            package=package,
-            lot=lot,
-            match_user=True,
+            location, picking_type=picking_type, match_user=True, **kw
         )
         if move_lines:
             return first(move_lines)
         return False
+
+    def _find_product_in_location(self, location):
+        quants = self.env["stock.quant"].search([("location_id", "=", location.id)])
+        product = quants.product_id
+        lot = quants.lot_id
+        package = quants.package_id
+        return product, lot, package
 
     def _scan_source_package(self, zone_location, picking_type, package, order):
         move_lines = self._find_location_move_lines(
@@ -464,8 +458,21 @@ class ZonePicking(Component):
                 return self._response_for_start(
                     message=self.msg_store.location_not_allowed()
                 )
+            product, lot, package = self._find_product_in_location(location)
+            if len(product) > 1 or len(lot) > 1 or len(package) > 1:
+                response = self.list_move_lines(location.id, picking_type.id)
+                return self._response(
+                    base_response=response,
+                    message=self.msg_store.several_products_in_location(location),
+                )
             move_line = self._scan_source_location(
-                zone_location, picking_type, location, order=order
+                zone_location,
+                picking_type,
+                location,
+                order=order,
+                product=product,
+                lot=lot,
+                package=package,
             )
             # if no move line, narrow the list of move lines on the scanned location
             if not move_line:
