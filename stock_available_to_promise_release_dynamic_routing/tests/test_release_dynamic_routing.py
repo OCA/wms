@@ -64,7 +64,8 @@ class TestAvailableToPromiseReleaseDynamicRouting(PromiseReleaseCommonCase):
         self._update_qty_in_location(self.location_hb_1, self.product2, 10.0)
 
         pickings = self._create_picking_chain(
-            self.wh, [(self.product1, 20), (self.product2, 10)],
+            self.wh,
+            [(self.product1, 20), (self.product2, 10)],
         )
         self.assertEqual(len(pickings), 1, "expect only the last out->customer")
         cust_picking = pickings
@@ -134,7 +135,8 @@ class TestAvailableToPromiseReleaseDynamicRouting(PromiseReleaseCommonCase):
         self._update_qty_in_location(self.loc_bin1, self.product2, 10.0)
 
         pickings = self._create_picking_chain(
-            self.wh, [(self.product1, 20), (self.product2, 10)],
+            self.wh,
+            [(self.product1, 20), (self.product2, 10)],
         )
         self.assertEqual(len(pickings), 1, "expect only the last out->customer")
         cust_picking = pickings
@@ -173,7 +175,11 @@ class TestAvailableToPromiseReleaseDynamicRouting(PromiseReleaseCommonCase):
                 "location_id": pick_type_routing.default_location_src_id.id,
                 "picking_type_id": self.wh.pick_type_id.id,
                 "rule_ids": [
-                    (0, 0, {"method": "pull", "picking_type_id": pick_type_routing.id},)
+                    (
+                        0,
+                        0,
+                        {"method": "pull", "picking_type_id": pick_type_routing.id},
+                    )
                 ],
             }
         )
@@ -194,7 +200,8 @@ class TestAvailableToPromiseReleaseDynamicRouting(PromiseReleaseCommonCase):
         self._update_qty_in_location(self.loc_bin1, self.product2, 10.0)
 
         pickings = self._create_picking_chain(
-            self.wh, [(self.product1, 20), (self.product2, 10)],
+            self.wh,
+            [(self.product1, 20), (self.product2, 10)],
         )
         self.assertEqual(len(pickings), 1, "expect only the last out->customer")
         cust_picking = pickings
