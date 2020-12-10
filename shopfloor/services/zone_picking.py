@@ -382,43 +382,130 @@ class ZonePicking(Component):
         )
         return self._response_for_select_line(zone_location, picking_type, move_lines)
 
-    def _scan_source_location(self, zone_location, picking_type, location, **kw):
-        """Return the move line related to the scanned `location`.
-
-        The method tries to identify unambiguously a move line in the location
-        if possible, otherwise return `False`.
+    def _scan_source_location(
+        self, zone_location, picking_type, barcode, order="priority"
+    ):
+        """Search a location and find available lines into it.
         """
+        response = None
+        message = None
+        search = self.actions_for("search")
+        location = search.location_from_scan(barcode)
+        if not location:
+            return response, message
+
+        if not location.is_sublocation_of(zone_location):
+            response = self._response_for_start(
+                message=self.msg_store.location_not_allowed()
+            )
+            return response, message
+
+        product, lot, package = self._find_product_in_location(location)
+        if len(product) > 1 or len(lot) > 1 or len(package) > 1:
+            response = self.list_move_lines(location.id, picking_type.id, order=order)
+            message = self.msg_store.several_products_in_location(location)
+            return response, message
+
         move_lines = self._find_location_move_lines(
-            location, picking_type=picking_type, match_user=True, **kw
+            location,
+            picking_type=picking_type,
+            product=product,
+            lot=lot,
+            package=package,
+            order=order,
+            match_user=True,
         )
         if move_lines:
-            return first(move_lines)
-        return False
+            response = self._response_for_set_line_destination(
+                zone_location, picking_type, first(move_lines)
+            )
+        else:
+            # if no move line, narrow the list of move lines on the scanned location
+            response = self.list_move_lines(location.id, picking_type.id, order=order)
+            message = self.msg_store.location_empty(location)
+        return response, message
 
     def _find_product_in_location(self, location):
+        """Find a prooduct in stock in given location move line in the location.
+        """
         quants = self.env["stock.quant"].search([("location_id", "=", location.id)])
         product = quants.product_id
         lot = quants.lot_id
         package = quants.package_id
         return product, lot, package
 
-    def _scan_source_package(self, zone_location, picking_type, package, order):
+    def _scan_source_package(
+        self, zone_location, picking_type, barcode, order="priority"
+    ):
+        """Search a package and find available lines for it.
+        """
+        message = None
+        response = None
+        search = self.actions_for("search")
+        package = search.package_from_scan(barcode)
+        if not package:
+            return response, message
         move_lines = self._find_location_move_lines(
-            zone_location, picking_type, package=package, order=order
+            zone_location, picking_type=picking_type, package=package, order=order
         )
-        return first(move_lines)
+        if move_lines:
+            response = self._response_for_set_line_destination(
+                zone_location, picking_type, first(move_lines)
+            )
+        else:
+            response = self.list_move_lines(
+                zone_location.id, picking_type.id, order=order
+            )
+            message = self.msg_store.package_not_found()
+        return response, message
 
-    def _scan_source_product(self, zone_location, picking_type, product, order):
+    def _scan_source_product(
+        self, zone_location, picking_type, barcode, order="priority"
+    ):
+        """Search a product and find available lines for it.
+        """
+        message = None
+        response = None
+        search = self.actions_for("search")
+        product = search.product_from_scan(barcode)
+        if not product:
+            return response, message
         move_lines = self._find_location_move_lines(
-            zone_location, picking_type, product=product, order=order
+            zone_location, picking_type=picking_type, product=product, order=order
         )
-        return first(move_lines)
+        if move_lines:
+            response = self._response_for_set_line_destination(
+                zone_location, picking_type, first(move_lines)
+            )
+        else:
+            response = self.list_move_lines(
+                zone_location.id, picking_type.id, order=order
+            )
+            message = self.msg_store.product_not_found()
+        return response, message
 
-    def _scan_source_lot(self, zone_location, picking_type, lot, order):
+    def _scan_source_lot(self, zone_location, picking_type, barcode, order="priority"):
+        """Search a lot and find available lines for it.
+        """
+        message = None
+        response = None
+        search = self.actions_for("search")
+        lot = search.lot_from_scan(barcode)
+        if not lot:
+            return response, message
         move_lines = self._find_location_move_lines(
-            zone_location, picking_type, lot=lot, order=order
+            zone_location, picking_type=picking_type, lot=lot, order=order
         )
-        return first(move_lines)
+        if move_lines:
+            response = self._response_for_set_line_destination(
+                zone_location, picking_type, first(move_lines)
+            )
+        else:
+            response = self.list_move_lines(
+                zone_location.id, picking_type.id, order=order
+            )
+            message = self.msg_store.lot_not_found()
+        return response, message
 
     def scan_source(self, zone_location_id, picking_type_id, barcode, order="priority"):
         """Select a move line or narrow the list of move lines
@@ -447,73 +534,25 @@ class ZonePicking(Component):
         if not picking_type.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
         # select corresponding move line from barcode (location, package, product, lot)
-        search = self.actions_for("search")
-        move_line = self.env["stock.move.line"]
-        location = search.location_from_scan(barcode)
-        if location:
-            if not location.is_sublocation_of(zone_location):
-                return self._response_for_start(
-                    message=self.msg_store.location_not_allowed()
-                )
-            product, lot, package = self._find_product_in_location(location)
-            if len(product) > 1 or len(lot) > 1 or len(package) > 1:
-                response = self.list_move_lines(location.id, picking_type.id)
-                return self._response(
-                    base_response=response,
-                    message=self.msg_store.several_products_in_location(location),
-                )
-            move_line = self._scan_source_location(
-                zone_location,
-                picking_type,
-                location,
-                order=order,
-                product=product,
-                lot=lot,
-                package=package,
+        handlers = (
+            # search by location 1st
+            self._scan_source_location,
+            # then by package
+            self._scan_source_package,
+            # then by product
+            self._scan_source_product,
+            # then by lot
+            self._scan_source_lot,
+        )
+        for handler in handlers:
+            response, message = handler(
+                zone_location, picking_type, barcode, order=order
             )
-            # if no move line, narrow the list of move lines on the scanned location
-            if not move_line:
-                response = self.list_move_lines(location.id, picking_type.id)
-                return self._response(
-                    base_response=response,
-                    message=self.msg_store.location_empty(location),
-                )
-        package = search.package_from_scan(barcode)
-        if package:
-            move_line = self._scan_source_package(
-                zone_location, picking_type, package, order
-            )
-            if not move_line:
-                response = self.list_move_lines(zone_location.id, picking_type.id)
-                return self._response(
-                    base_response=response, message=self.msg_store.package_not_found()
-                )
-        product = search.product_from_scan(barcode)
-        if product:
-            move_line = self._scan_source_product(
-                zone_location, picking_type, product, order
-            )
-            if not move_line:
-                response = self.list_move_lines(zone_location.id, picking_type.id)
-                return self._response(
-                    base_response=response, message=self.msg_store.product_not_found()
-                )
-        lot = search.lot_from_scan(barcode)
-        if lot:
-            move_line = self._scan_source_lot(zone_location, picking_type, lot, order)
-            if not move_line:
-                response = self.list_move_lines(zone_location.id, picking_type.id)
-                return self._response(
-                    base_response=response, message=self.msg_store.lot_not_found()
-                )
-        # barcode not found, get back on 'select_line' screen
-        if not move_line:
-            response = self.list_move_lines(zone_location.id, picking_type.id)
-            return self._response(
-                base_response=response, message=self.msg_store.barcode_not_found()
-            )
-        return self._response_for_set_line_destination(
-            zone_location, picking_type, move_line
+            if response:
+                return self._response(base_response=response, message=message)
+        response = self.list_move_lines(zone_location.id, picking_type.id, order=order)
+        return self._response(
+            base_response=response, message=self.msg_store.barcode_not_found()
         )
 
     def _set_destination_location(
