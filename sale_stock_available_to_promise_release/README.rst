@@ -10,9 +10,9 @@ Stock Available to Promise Release - Sale Integration
 .. |badge1| image:: https://img.shields.io/badge/maturity-Alpha-red.png
     :target: https://odoo-community.org/page/development-status
     :alt: Alpha
-.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
-    :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
-    :alt: License: AGPL-3
+.. |badge2| image:: https://img.shields.io/badge/licence-LGPL--3-blue.png
+    :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
+    :alt: License: LGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fwms-lightgray.png?logo=github
     :target: https://github.com/OCA/wms/tree/13.0/sale_stock_available_to_promise_release
     :alt: OCA/wms
@@ -23,7 +23,7 @@ Stock Available to Promise Release - Sale Integration
     :target: https://runbot.odoo-community.org/runbot/285/13.0
     :alt: Try me on Runbot
 
-|badge1| |badge2| |badge3| |badge4| |badge5| 
+|badge1| |badge2| |badge3| |badge4| |badge5|
 
 Integrate the Release of Operation based on Available to Promise with Sales. The Priority Date of Stock
 Moves will be equal to the confirmation date of their sales order.
