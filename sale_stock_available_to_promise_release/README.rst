@@ -23,7 +23,7 @@ Stock Available to Promise Release - Sale Integration
     :target: https://runbot.odoo-community.org/runbot/285/13.0
     :alt: Try me on Runbot
 
-|badge1| |badge2| |badge3| |badge4| |badge5|
+|badge1| |badge2| |badge3| |badge4| |badge5| 
 
 Integrate the Release of Operation based on Available to Promise with Sales. The Priority Date of Stock
 Moves will be equal to the confirmation date of their sales order.
