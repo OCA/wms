@@ -19,4 +19,5 @@
         "product_total_weight_from_packaging",  # OCA/product-attribute
     ],
     "data": ["views/shopfloor_menu_views.xml"],
+    "installable": False,
 }
