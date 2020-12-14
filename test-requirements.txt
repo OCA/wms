@@ -1,6 +1,4 @@
 odoo13-addon-stock_location_children @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/855/head#subdirectory=setup/stock_location_children
 odoo13-addon-stock_checkout_sync @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/907/head#subdirectory=setup/stock_checkout_sync
-odoo13-addon-stock_packaging_calculator @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/939/head#subdirectory=setup/stock_packaging_calculator
-odoo13-addon-product_total_weight_from_packaging @ git+https://github.com/OCA/product-attribute@refs/pull/651/head#subdirectory=setup/product_total_weight_from_packaging
 
 freezegun
