@@ -958,6 +958,11 @@ class ClusterPicking(Component):
                 picking.action_done()
 
     def _unload_end(self, batch, completion_info_popup=None):
+        """Try to close the batch if all transfers are done.
+
+        Returns to `start_line` transition if some lines could still be processed,
+        otherwise try to validate all the transfers of the batch.
+        """
         if all(picking.state == "done" for picking in batch.picking_ids):
             # do not use the 'done()' method because it does many things we
             # don't care about
@@ -980,6 +985,12 @@ class ClusterPicking(Component):
             # produce backorders)
             batch.mapped("picking_ids").action_done()
             batch.state = "done"
+            # Unassign not validated pickings from the batch, they will be
+            # processed in another batch automatically later on
+            pickings_not_done = batch.mapped("picking_ids").filtered(
+                lambda p: p.state != "done"
+            )
+            pickings_not_done.batch_id = False
             return self._response_for_start(
                 message=self.msg_store.batch_transfer_complete(),
                 popup=completion_info_popup,
