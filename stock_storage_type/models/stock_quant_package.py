@@ -15,9 +15,7 @@ class StockQuantPackage(models.Model):
         "the package contains only a single product.",
     )
 
-    @api.constrains(
-        "height", "package_storage_type_id", "product_packaging_id", "single_product_id"
-    )
+    @api.constrains("height", "package_storage_type_id", "product_packaging_id")
     def _check_storage_type_height_required(self):
         for package in self:
             if package.package_storage_type_id.height_required and not package.height:
