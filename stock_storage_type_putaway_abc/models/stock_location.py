@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from random import shuffle
@@ -52,7 +53,7 @@ class StockLocation(models.Model):
             products = self.env["product.product"]
         if self.pack_putaway_strategy == "abc":
             return self._get_abc_locations(products)
-        return super().get_storage_locations(products)
+        return super(StockLocation, self).get_storage_locations(products)
 
     def _get_abc_locations(self, products):
         return self.leaf_location_ids._sort_abc_locations(first(products).abc_storage)

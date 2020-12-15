@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo.tests import SavepointCase
@@ -6,7 +7,7 @@ from odoo.tests import SavepointCase
 class TestAbcLocation(SavepointCase):
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestAbcLocation, cls).setUpClass()
         cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
         ref = cls.env.ref
         cls.cardboxes_location_storage_type = ref(
@@ -37,6 +38,7 @@ class TestAbcLocation(SavepointCase):
             "stock_storage_type.stock_location_pallets_bin_3"
         )
         cls.product = ref("product.product_product_9")
+        cls.env["stock.location"]._parent_store_compute()
 
     def test_display_abc_storage_one_level(self):
         self.cardboxes_location.write({"pack_putaway_strategy": "abc"})
@@ -112,7 +114,9 @@ class TestAbcLocation(SavepointCase):
         sublocation = self.stock_location.copy(
             {"name": "Sub-location", "location_id": self.stock_location.id}
         )
-        (self.cardboxes_location | self.pallets_location).location_id = sublocation
+        self.pallets_location.location_id = sublocation
+        self.cardboxes_location.location_id = sublocation
+        self.env["stock.location"]._parent_store_compute()
         # configure putaway strategy for all locations
         sublocation.write({"pack_putaway_strategy": "abc"})
         # configure abc storage on locations
@@ -220,7 +224,7 @@ class TestAbcLocation(SavepointCase):
     def test_get_storage_locations_not_all_keys(self):
         """Do not crash if we have no A or B or C locations"""
         self.stock_location.write({"pack_putaway_strategy": "abc"})
-        self.env["stock.location"].search(
-            [("abc_storage", "in", ("a", "b"))]
-        ).abc_storage = "b"
+        self.env["stock.location"].search([("abc_storage", "in", ("a", "b"))]).write(
+            {"abc_storage": "b"}
+        )
         self.assertTrue(self.stock_location.get_storage_locations())
