@@ -239,6 +239,45 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             message={"body": "Batch Transfer line done", "message_type": "success"},
         )
 
+    def test_set_destination_all_picking_unassigned(self):
+        """Set destination on lines for some transfers of the batch.
+
+        The remaining transfers stay as unavailable (confirmed) and are removed
+        from the batch when this one is validated.
+        The remaining transfers will be processed later in a new batch.
+        """
+        self.batch.picking_ids.do_unreserve()
+        location = self.one_line_picking.location_id
+        product = self.one_line_picking.move_lines.product_id
+        qty = self.one_line_picking.move_lines.product_uom_qty
+        self._update_qty_in_location(location, product, qty)
+        self.one_line_picking.action_assign()
+        # Prepare lines to process
+        lines = self.one_line_picking.move_line_ids
+        self._set_dest_package_and_done(lines, self.bin1)
+        lines.write({"location_dest_id": self.packing_location.id})
+
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "picking_batch_id": self.batch.id,
+                "barcode": self.packing_location.barcode,
+            },
+        )
+        # The batch should be done with only one picking.
+        # The remaining picking has been removed from the current batch
+        self.assertRecordValues(self.one_line_picking, [{"state": "done"}])
+        self.assertRecordValues(self.two_lines_picking, [{"state": "confirmed"}])
+        self.assertRecordValues(self.batch, [{"state": "done"}])
+        self.assertEqual(self.one_line_picking.batch_id, self.batch)
+        self.assertFalse(self.two_lines_picking.batch_id)
+
+        self.assert_response(
+            response,
+            next_state="start",
+            message=self.service.msg_store.batch_transfer_complete(),
+        )
+
     def test_set_destination_all_but_different_dest(self):
         """Endpoint was called but destinations are different"""
         move_lines = self.move_lines
