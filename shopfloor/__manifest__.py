@@ -62,4 +62,5 @@
         "demo/shopfloor_menu_demo.xml",
         "demo/shopfloor_profile_demo.xml",
     ],
+    "installable": False,
 }
