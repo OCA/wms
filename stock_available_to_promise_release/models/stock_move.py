@@ -83,7 +83,7 @@ class StockMove(models.Model):
                 AND p_type.code = 'outgoing'
                 AND loc.parent_path LIKE ANY(%(location_paths)s)
                 AND (
-                    m.need_release = true
+                    COALESCE(m.need_release, False) = COALESCE(move.need_release, False)
                     AND (
                         m.priority > move.priority
                         OR
@@ -98,7 +98,8 @@ class StockMove(models.Model):
                         )
                     )
                     OR (
-                        m.need_release IS false OR m.need_release IS null
+                        move.need_release IS true
+                        AND (m.need_release IS false OR m.need_release IS null)
                     )
                 )
                 AND m.state IN (
