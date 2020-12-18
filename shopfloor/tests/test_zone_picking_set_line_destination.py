@@ -10,45 +10,15 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
 
     """
 
+    def setUp(self):
+        super().setUp()
+        self.service.work.current_picking_type = self.picking1.picking_type_id
+
     def test_set_destination_wrong_parameters(self):
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         move_line = self.picking1.move_line_ids[0]
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": 1234567890,
-                "picking_type_id": picking_type.id,
-                "move_line_id": move_line.id,
-                "barcode": self.packing_location.barcode,
-                "quantity": move_line.product_uom_qty,
-                "confirmation": False,
-            },
-        )
-        self.assert_response_start(
-            response,
-            message=self.service.msg_store.record_not_found(),
-        )
-        response = self.service.dispatch(
-            "set_destination",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": 1234567890,
-                "move_line_id": move_line.id,
-                "barcode": self.packing_location.barcode,
-                "quantity": move_line.product_uom_qty,
-                "confirmation": False,
-            },
-        )
-        self.assert_response_start(
-            response,
-            message=self.service.msg_store.record_not_found(),
-        )
-        response = self.service.dispatch(
-            "set_destination",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": 1234567890,
                 "barcode": self.packing_location.barcode,
                 "quantity": move_line.product_uom_qty,
@@ -56,8 +26,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             },
         )
         self.assert_response_start(
-            response,
-            message=self.service.msg_store.record_not_found(),
+            response, message=self.service.msg_store.record_not_found(),
         )
 
     def test_set_destination_location_confirm(self):
@@ -72,8 +41,6 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": move_line.product_uom_qty,
@@ -95,8 +62,6 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
                 "barcode": self.customer_location.barcode,
                 "quantity": move_line.product_uom_qty,
@@ -115,8 +80,6 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": move_line.product_uom_qty,
@@ -124,7 +87,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             },
         )
         # Check response
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        move_lines = self.service._find_location_move_lines()
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
@@ -145,8 +108,6 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
                 "barcode": self.packing_sublocation_b.barcode,
                 "quantity": move_line.product_uom_qty,
@@ -186,8 +147,6 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": move_line.product_uom_qty,
@@ -200,7 +159,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         self.assertEqual(moves_before, moves_after)
         self.assertEqual(move_line.qty_done, 10)
         # Check response
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        move_lines = self.service._find_location_move_lines()
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
@@ -237,8 +196,6 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
                 "barcode": barcode,
                 "quantity": 6,
@@ -284,8 +241,6 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": move_line.product_uom_qty,  # 6 qty
@@ -309,7 +264,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         self.assertEqual(move_line.qty_done, 6)
         self.assertNotEqual(move_line.move_id, other_move_line.move_id)
         # Check response
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        move_lines = self.service._find_location_move_lines()
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
@@ -348,8 +303,6 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
                 "barcode": barcode,
                 "quantity": 4,  # 4/6 qty
@@ -380,8 +333,6 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": move_line.product_uom_qty,
@@ -391,10 +342,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         self.assertTrue(location_is_empty())
         # Check response
         self.assert_response_zero_check(
-            response,
-            zone_location,
-            picking_type,
-            move_line.location_id,
+            response, zone_location, picking_type, move_line.location_id,
         )
 
     def test_set_destination_package_full_qty(self):
@@ -419,8 +367,6 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": move_line.product_uom_qty,
@@ -442,7 +388,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             ],
         )
         # Check response
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        move_lines = self.service._find_location_move_lines()
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
@@ -475,8 +421,6 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": 6,
@@ -513,7 +457,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             ],
         )
         # Check response
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        move_lines = self.service._find_location_move_lines()
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
@@ -539,8 +483,6 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": move_line.product_uom_qty,
@@ -550,8 +492,5 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         self.assertTrue(location_is_empty())
         # Check response
         self.assert_response_zero_check(
-            response,
-            zone_location,
-            picking_type,
-            move_line.location_id,
+            response, zone_location, picking_type, move_line.location_id,
         )
