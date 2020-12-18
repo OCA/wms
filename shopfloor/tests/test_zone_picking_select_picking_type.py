@@ -10,32 +10,6 @@ class ZonePickingSelectPickingTypeCase(ZonePickingCommonCase):
 
     """
 
-    def test_list_move_lines_wrong_parameters(self):
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
-        response = self.service.dispatch(
-            "list_move_lines",
-            params={
-                "zone_location_id": 1234567890,
-                "picking_type_id": picking_type.id,
-            },
-        )
-        self.assert_response_start(
-            response,
-            message=self.service.msg_store.record_not_found(),
-        )
-        response = self.service.dispatch(
-            "list_move_lines",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": 1234567890,
-            },
-        )
-        self.assert_response_start(
-            response,
-            message=self.service.msg_store.record_not_found(),
-        )
-
     def test_list_move_lines_ok(self):
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id

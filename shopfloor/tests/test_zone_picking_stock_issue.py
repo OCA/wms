@@ -10,45 +10,16 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
 
     """
 
+    def setUp(self):
+        super().setUp()
+        self.service.work.current_picking_type = self.picking1.picking_type_id
+
     def test_stock_issue_wrong_parameters(self):
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
-        move_line = self.picking1.move_line_ids[0]
         response = self.service.dispatch(
-            "stock_issue",
-            params={
-                "zone_location_id": 1234567890,
-                "picking_type_id": picking_type.id,
-                "move_line_id": move_line.id,
-            },
+            "stock_issue", params={"move_line_id": 1234567890},
         )
         self.assert_response_start(
-            response,
-            message=self.service.msg_store.record_not_found(),
-        )
-        response = self.service.dispatch(
-            "stock_issue",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": 1234567890,
-                "move_line_id": move_line.id,
-            },
-        )
-        self.assert_response_start(
-            response,
-            message=self.service.msg_store.record_not_found(),
-        )
-        response = self.service.dispatch(
-            "stock_issue",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "move_line_id": 1234567890,
-            },
-        )
-        self.assert_response_start(
-            response,
-            message=self.service.msg_store.record_not_found(),
+            response, message=self.service.msg_store.record_not_found(),
         )
 
     def test_stock_issue_no_more_reservation(self):
@@ -57,21 +28,13 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
         move_line = self.picking1.move_line_ids[0]
         move = move_line.move_id
         response = self.service.dispatch(
-            "stock_issue",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "move_line_id": move_line.id,
-            },
+            "stock_issue", params={"move_line_id": move_line.id},
         )
         self.assertFalse(move_line.exists())
         self.assertFalse(move.move_line_ids)
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        move_lines = self.service._find_location_move_lines()
         self.assert_response_select_line(
-            response,
-            zone_location,
-            picking_type,
-            move_lines,
+            response, zone_location, picking_type, move_lines,
         )
 
     def test_stock_issue1(self):
@@ -82,21 +45,13 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
         location = move_line.location_id
         move = move_line.move_id
         response = self.service.dispatch(
-            "stock_issue",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "move_line_id": move_line.id,
-            },
+            "stock_issue", params={"move_line_id": move_line.id},
         )
         self.assertFalse(move_line.exists())
         self.assertFalse(move.move_line_ids)
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        move_lines = self.service._find_location_move_lines()
         self.assert_response_select_line(
-            response,
-            zone_location,
-            picking_type,
-            move_lines,
+            response, zone_location, picking_type, move_lines,
         )
         # Check that the inventory exists
         inventory = self.env["stock.inventory"].search(
@@ -127,21 +82,13 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
         # Increase the quantity in the current location
         self._update_qty_in_location(location, move.product_id, 100)
         response = self.service.dispatch(
-            "stock_issue",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "move_line_id": move_line.id,
-            },
+            "stock_issue", params={"move_line_id": move_line.id},
         )
         self.assertFalse(move_line.exists())
         self.assertTrue(move.move_line_ids)
         self.assertEqual(move.move_line_ids.location_id, location)
         self.assert_response_set_line_destination(
-            response,
-            zone_location,
-            picking_type,
-            move.move_line_ids,
+            response, zone_location, picking_type, move.move_line_ids,
         )
         # Check the inventory
         inventory = self.env["stock.inventory"].search(
@@ -174,21 +121,13 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
         # Put some quantity in another location to get a new reservations from there
         self._update_qty_in_location(self.zone_sublocation2, move.product_id, 10)
         response = self.service.dispatch(
-            "stock_issue",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "move_line_id": move_line.id,
-            },
+            "stock_issue", params={"move_line_id": move_line.id},
         )
         self.assertFalse(move_line.exists())
         self.assertTrue(move.move_line_ids)
         self.assertEqual(move.move_line_ids.location_id, self.zone_sublocation2)
         self.assert_response_set_line_destination(
-            response,
-            zone_location,
-            picking_type,
-            move.move_line_ids,
+            response, zone_location, picking_type, move.move_line_ids,
         )
         # Check the inventory
         inventory = self.env["stock.inventory"].search(

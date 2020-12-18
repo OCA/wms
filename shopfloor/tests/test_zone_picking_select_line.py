@@ -14,9 +14,11 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
 
     """
 
+    def setUp(self):
+        super().setUp()
+        self.service.work.current_picking_type = self.picking1.picking_type_id
+
     def test_list_move_lines_order(self):
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         self.zone_sublocation2.name = "AAA " + self.zone_sublocation2.name
 
         # Test by location
@@ -32,27 +34,24 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         move2.write({"date_expected": future})
         move2_line = move2.move_line_ids[0]
 
-        move_lines = self.service._find_location_move_lines(
-            zone_location, picking_type, order="location"
-        )
+        self.service.work.current_lines_order = "location"
+        move_lines = self.service._find_location_move_lines()
         order_mapping = {line: i for i, line in enumerate(move_lines)}
         self.assertTrue(order_mapping[move1_line] < order_mapping[move2_line])
 
         # swap dates
         move2.write({"date_expected": today})
         move1.write({"date_expected": future})
-        move_lines = self.service._find_location_move_lines(
-            zone_location, picking_type, order="location"
-        )
+        move_lines = self.service._find_location_move_lines()
         order_mapping = {line: i for i, line in enumerate(move_lines)}
         self.assertTrue(order_mapping[move1_line] > order_mapping[move2_line])
 
         # Test by priority
         self.picking2.move_lines.write({"priority": "0"})
         (self.pickings - self.picking2).move_lines.write({"priority": "2"})
-        move_lines = self.service._find_location_move_lines(
-            zone_location, picking_type, order="priority"
-        )
+
+        self.service.work.current_lines_order = "priority"
+        move_lines = self.service._find_location_move_lines()
         order_mapping = {line: i for i, line in enumerate(move_lines)}
         # picking2 lines stay at the end as they are low priority
         # but move1_line comes before the other
@@ -63,113 +62,47 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         move1.write({"date_expected": today})
         # and increase priority
         self.picking2.move_lines.write({"priority": "3"})
-        move_lines = self.service._find_location_move_lines(
-            zone_location, picking_type, order="priority"
-        )
+        move_lines = self.service._find_location_move_lines()
         order_mapping = {line: i for i, line in enumerate(move_lines)}
         self.assertEqual(order_mapping[move1_line], 0)
         self.assertEqual(order_mapping[move2_line], 1)
 
     def test_list_move_lines_order_by_location(self):
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
-        response = self.service.dispatch(
-            "list_move_lines",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "order": "location",
-            },
-        )
-        move_lines = self.service._find_location_move_lines(
-            zone_location, picking_type, order="location"
-        )
+        self.service.work.current_lines_order = "location"
+        response = self.service.dispatch("list_move_lines", params={})
+        move_lines = self.service._find_location_move_lines()
+        res = [
+            x["location_src"]["name"]
+            for x in response["data"]["select_line"]["move_lines"]
+        ]
+        self.assertEqual(res, [x.location_id.name for x in move_lines])
+        self.maxDiff = None
         self.assert_response_select_line(
-            response,
-            zone_location,
-            picking_type,
-            move_lines,
+            response, self.zone_location, self.picking1.picking_type_id, move_lines,
         )
 
     def test_list_move_lines_order_by_priority(self):
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
-        response = self.service.dispatch(
-            "list_move_lines",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "order": "priority",
-            },
-        )
-        move_lines = self.service._find_location_move_lines(
-            zone_location, picking_type, order="priority"
-        )
+        response = self.service.dispatch("list_move_lines", params={})
+        move_lines = self.service._find_location_move_lines()
         self.assert_response_select_line(
-            response,
-            zone_location,
-            picking_type,
-            move_lines,
-        )
-
-    def test_scan_source_wrong_parameters(self):
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
-        response = self.service.dispatch(
-            "scan_source",
-            params={
-                "zone_location_id": 1234567890,
-                "picking_type_id": picking_type.id,
-                "barcode": self.zone_sublocation1.barcode,
-            },
-        )
-        self.assert_response_start(
-            response,
-            message=self.service.msg_store.record_not_found(),
-        )
-        response = self.service.dispatch(
-            "scan_source",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": 1234567890,
-                "barcode": self.zone_sublocation1.barcode,
-            },
-        )
-        self.assert_response_start(
-            response,
-            message=self.service.msg_store.record_not_found(),
+            response, self.zone_location, self.picking_type, move_lines,
         )
 
     def test_scan_source_barcode_location_not_allowed(self):
         """Scan source: scanned location not allowed."""
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         response = self.service.dispatch(
-            "scan_source",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "barcode": self.customer_location.barcode,
-            },
+            "scan_source", params={"barcode": self.customer_location.barcode},
         )
         self.assert_response_start(
-            response,
-            message=self.service.msg_store.location_not_allowed(),
+            response, message=self.service.msg_store.location_not_allowed(),
         )
 
     def test_scan_source_barcode_location_one_move_line(self):
         """Scan source: scanned location 'Zone sub-location 1' contains only
         one move line, next step 'set_line_destination' expected.
         """
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         response = self.service.dispatch(
-            "scan_source",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "barcode": self.zone_sublocation1.barcode,
-            },
+            "scan_source", params={"barcode": self.zone_sublocation1.barcode},
         )
         move_line = self.picking1.move_line_ids
         self.assert_response_set_line_destination(
@@ -192,15 +125,8 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             new_picking.move_lines, in_package=package, location=self.zone_sublocation1
         )
         new_picking.action_assign()
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         response = self.service.dispatch(
-            "scan_source",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "barcode": self.zone_sublocation1.barcode,
-            },
+            "scan_source", params={"barcode": self.zone_sublocation1.barcode},
         )
         move_line = self.picking1.move_line_ids
         self.assert_response_set_line_destination(
@@ -213,12 +139,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         move_line.qty_done = move_line.product_uom_qty
         # get the next one
         response = self.service.dispatch(
-            "scan_source",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "barcode": self.zone_sublocation1.barcode,
-            },
+            "scan_source", params={"barcode": self.zone_sublocation1.barcode},
         )
         move_line = new_picking.move_line_ids
         self.assert_response_set_line_destination(
@@ -233,20 +154,13 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         move lines, next step 'select_line' expected with the list of these
         move lines.
         """
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         response = self.service.dispatch(
-            "scan_source",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "barcode": self.zone_sublocation2.barcode,
-            },
+            "scan_source", params={"barcode": self.zone_sublocation2.barcode},
         )
         move_lines = self.picking2.move_line_ids
         self.assert_response_select_line(
             response,
-            zone_location=self.zone_sublocation2,
+            zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_lines=move_lines,
             message=self.service.msg_store.several_products_in_location(
@@ -258,22 +172,11 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         """Scan source: scanned package has one related move line,
         next step 'set_line_destination' expected on it.
         """
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         package = self.picking1.package_level_ids[0].package_id
         response = self.service.dispatch(
-            "scan_source",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "barcode": package.name,
-            },
+            "scan_source", params={"barcode": package.name},
         )
-        move_lines = self.service._find_location_move_lines(
-            zone_location,
-            picking_type,
-            package=package,
-        )
+        move_lines = self.service._find_location_move_lines(package=package,)
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         move_line = move_lines[0]
         self.assert_response_set_line_destination(
@@ -287,17 +190,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         """Scan source: scanned package has no related move line,
         next step 'select_line' expected.
         """
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         response = self.service.dispatch(
-            "scan_source",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "barcode": self.free_package.name,
-            },
+            "scan_source", params={"barcode": self.free_package.name},
         )
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        move_lines = self.service._find_location_move_lines()
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
@@ -311,21 +207,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         """Scan source: scanned product has one related move line,
         next step 'set_line_destination' expected on it.
         """
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         response = self.service.dispatch(
-            "scan_source",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "barcode": self.product_a.barcode,
-            },
+            "scan_source", params={"barcode": self.product_a.barcode},
         )
-        move_line = self.service._find_location_move_lines(
-            zone_location,
-            picking_type,
-            product=self.product_a,
-        )
+        move_line = self.service._find_location_move_lines(product=self.product_a,)
         self.assert_response_set_line_destination(
             response,
             zone_location=self.zone_location,
@@ -337,17 +222,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         """Scan source: scanned product has no related move line,
         next step 'select_line' expected.
         """
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         response = self.service.dispatch(
-            "scan_source",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "barcode": self.free_product.barcode,
-            },
+            "scan_source", params={"barcode": self.free_product.barcode},
         )
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        move_lines = self.service._find_location_move_lines()
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
@@ -361,22 +239,9 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         """Scan source: scanned lot has one related move line,
         next step 'set_line_destination' expected on it.
         """
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         lot = self.picking2.move_line_ids.lot_id[0]
-        response = self.service.dispatch(
-            "scan_source",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "barcode": lot.name,
-            },
-        )
-        move_lines = self.service._find_location_move_lines(
-            zone_location,
-            picking_type,
-            lot=lot,
-        )
+        response = self.service.dispatch("scan_source", params={"barcode": lot.name},)
+        move_lines = self.service._find_location_move_lines(lot=lot)
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         move_line = move_lines[0]
         self.assert_response_set_line_destination(
@@ -390,17 +255,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         """Scan source: scanned lot has no related move line,
         next step 'select_line' expected.
         """
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         response = self.service.dispatch(
-            "scan_source",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "barcode": self.free_lot.name,
-            },
+            "scan_source", params={"barcode": self.free_lot.name},
         )
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        move_lines = self.service._find_location_move_lines()
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
@@ -411,17 +269,15 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         )
 
     def test_scan_source_barcode_not_found(self):
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         response = self.service.dispatch(
             "scan_source",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
+                "zone_location_id": self.zone_location.id,
+                "picking_type_id": self.picking_type.id,
                 "barcode": "UNKNOWN",
             },
         )
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        move_lines = self.service._find_location_move_lines()
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,
@@ -437,122 +293,60 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         The second user scans the same source location, and should not find any line.
         """
         # The first user starts to process the only line available
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         #   - scan source
-        response = self.service.scan_source(
-            zone_location.id,
-            picking_type.id,
-            self.zone_sublocation1.barcode,
-        )
+        response = self.service.scan_source(self.zone_sublocation1.barcode,)
         move_line = self.picking1.move_line_ids
         self.assertEqual(response["next_state"], "set_line_destination")
         #   - set destination
         self.service.set_destination(
-            zone_location.id,
-            picking_type.id,
-            move_line.id,
-            self.free_package.name,
-            move_line.product_uom_qty,
+            move_line.id, self.free_package.name, move_line.product_uom_qty,
         )
         self.assertEqual(move_line.shopfloor_user_id, self.env.user)
         # The second user scans the same source location
         env = self.env(user=self.stock_user2)
         with self.work_on_services(
-            env=env, menu=self.menu, profile=self.profile
+            env=env,
+            menu=self.menu,
+            profile=self.profile,
+            current_zone_location=self.zone_location,
+            current_picking_type=self.picking_type,
         ) as work:
             service = work.component(usage="zone_picking")
-            response = service.scan_source(
-                zone_location.id,
-                picking_type.id,
-                self.zone_sublocation1.barcode,
-            )
+            response = service.scan_source(self.zone_sublocation1.barcode,)
             self.assertEqual(response["next_state"], "select_line")
             self.assertEqual(
                 response["message"],
                 self.service.msg_store.location_empty(self.zone_sublocation1),
             )
 
-    def test_prepare_unload_wrong_parameters(self):
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
-        response = self.service.dispatch(
-            "prepare_unload",
-            params={
-                "zone_location_id": 1234567890,
-                "picking_type_id": picking_type.id,
-            },
-        )
-        self.assert_response_start(
-            response,
-            message=self.service.msg_store.record_not_found(),
-        )
-        response = self.service.dispatch(
-            "prepare_unload",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": 1234567890,
-            },
-        )
-        self.assert_response_start(
-            response,
-            message=self.service.msg_store.record_not_found(),
-        )
-
     def test_prepare_unload_buffer_empty(self):
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         # unload goods
-        response = self.service.dispatch(
-            "prepare_unload",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-            },
-        )
+        response = self.service.dispatch("prepare_unload", params={},)
         # check response
-        move_lines = self.service._find_location_move_lines(zone_location, picking_type)
+        move_lines = self.service._find_location_move_lines()
         self.assert_response_select_line(
-            response,
-            zone_location,
-            picking_type,
-            move_lines,
+            response, self.zone_location, self.picking_type, move_lines,
         )
 
     def test_prepare_unload_buffer_one_line(self):
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         # scan a destination package to get something in the buffer
         move_line = self.picking1.move_line_ids
         response = self.service.dispatch(
             "set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": move_line.product_uom_qty,
             },
         )
         # unload goods
-        response = self.service.dispatch(
-            "prepare_unload",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-            },
-        )
+        response = self.service.dispatch("prepare_unload", params={},)
         # check response
         self.assert_response_unload_set_destination(
-            response,
-            zone_location,
-            picking_type,
-            move_line,
+            response, self.zone_location, self.picking_type, move_line,
         )
 
     def test_prepare_unload_buffer_multi_line_same_destination(self):
-        zone_location = self.zone_location
-        picking_type = self.picking5.picking_type_id
         # scan a destination package for some move lines
         # to get several lines in the buffer (which have the same destination)
         self.another_package = self.env["stock.quant.package"].create(
@@ -567,48 +361,29 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             self.service.dispatch(
                 "set_destination",
                 params={
-                    "zone_location_id": zone_location.id,
-                    "picking_type_id": picking_type.id,
                     "move_line_id": move_line.id,
                     "barcode": package_dest.name,
                     "quantity": move_line.product_uom_qty,
                 },
             )
         # unload goods
-        response = self.service.dispatch(
-            "prepare_unload",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-            },
-        )
+        response = self.service.dispatch("prepare_unload", params={},)
         # check response
         self.assert_response_unload_all(
             response,
-            zone_location,
-            picking_type,
+            self.zone_location,
+            self.picking_type,
             self.picking5.move_line_ids,
         )
 
     def test_list_move_lines_empty_location(self):
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
         response = self.service.dispatch(
-            "list_move_lines",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "order": "location",
-            },
+            "list_move_lines", params={"order": "location"},
         )
-        move_lines = self.service._find_location_move_lines(
-            zone_location, picking_type, order="location"
-        )
+        # TODO: order by location?
+        move_lines = self.service._find_location_move_lines()
         self.assert_response_select_line(
-            response,
-            zone_location,
-            picking_type,
-            move_lines,
+            response, self.zone_location, self.picking_type, move_lines,
         )
         data_move_lines = response["data"]["select_line"]["move_lines"]
         # Check that the move line in "Zone sub-location 1" is about to empty
