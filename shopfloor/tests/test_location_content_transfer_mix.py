@@ -96,6 +96,8 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         picking = move_line.picking_id
         zone_location = picking.location_id
         picking_type = picking.picking_type_id
+        self.zp_service.work.current_zone_location = zone_location
+        self.zp_service.work.current_picking_type = picking_type
         move_lines = picking.move_line_ids.filtered(
             lambda m: m.state not in ("cancel", "done")
         )
@@ -107,11 +109,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         assert picking_type.id in available_picking_type_ids
         assert "message" not in response
         # Check the move lines related to the picking type
-        response = self.zp_service.list_move_lines(
-            zone_location_id=zone_location.id,
-            picking_type_id=picking_type.id,
-            order="priority",
-        )
+        response = self.zp_service.list_move_lines()
         available_move_line_ids = [
             r["id"] for r in response["data"]["select_line"]["move_lines"]
         ]
@@ -122,12 +120,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
             dest_location = move_line.location_dest_id
         qty = move_line.product_uom_qty
         response = self.zp_service.set_destination(
-            zone_location.id,
-            picking_type.id,
-            move_line.id,
-            dest_location.barcode,
-            qty,
-            confirmation=True,
+            move_line.id, dest_location.barcode, qty, confirmation=True,
         )
         assert response["message"]["message_type"] == "success"
         self.assertEqual(move_line.state, "done")

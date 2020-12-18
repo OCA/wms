@@ -249,7 +249,12 @@ class ZonePickingCommonCase(CommonCase):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(menu=self.menu, profile=self.profile) as work:
+        with self.work_on_services(
+            menu=self.menu,
+            profile=self.profile,
+            current_zone_location=self.zone_location,
+            current_picking_type=self.picking_type,
+        ) as work:
             self.service = work.component(usage="zone_picking")
 
     def _assert_response_select_zone(self, response, zone_locations, message=None):
