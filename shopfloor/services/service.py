@@ -378,12 +378,16 @@ class BaseShopfloorService(AbstractComponent):
         extra_work_ctx = {}
         headers = request.httprequest.environ
         for rule, active in self._validation_rules:
+            if callable(active):
+                active = active(request, method_name)
             if not active:
                 continue
-            header_name, coerce_func, ctx_value_handler_name = rule
+            header_name, coerce_func, ctx_value_handler_name, mandatory = rule
             try:
                 header_value = coerce_func(headers.get(header_name))
             except (TypeError, ValueError) as err:
+                if not mandatory:
+                    continue
                 raise BadRequest(
                     "{} header validation error: {}".format(header_name, str(err))
                 )
@@ -404,16 +408,18 @@ class BaseShopfloorService(AbstractComponent):
         )
 
     MENU_ID_HEADER_RULE = (
-        # header name, coerce func, ctx handler
+        # header name, coerce func, ctx handler, mandatory
         "HTTP_SERVICE_CTX_MENU_ID",
         int,
         "_work_ctx_get_menu_id",
+        True,
     )
     PROFILE_ID_HEADER_RULE = (
-        # header name, coerce func, ctx value handler
+        # header name, coerce func, ctx value handler, mandatory
         "HTTP_SERVICE_CTX_PROFILE_ID",
         int,
         "_work_ctx_get_profile_id",
+        True,
     )
 
     def _work_ctx_get_menu_id(self, rec_id):
