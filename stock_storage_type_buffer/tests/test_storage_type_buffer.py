@@ -1,5 +1,6 @@
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
+from lxml import html
 
 from odoo.addons.stock_storage_type.tests.common import TestStorageTypeCommon
 
@@ -15,7 +16,7 @@ class TestStorageTypeBuffer(TestStorageTypeCommon):
             {"name": "Pallet Buffer", "location_id": cls.warehouse.lot_stock_id.id}
         )
 
-        cls.env["stock.location.storage.buffer"].create(
+        cls.storage_buffer = cls.env["stock.location.storage.buffer"].create(
             {
                 "buffer_location_ids": [(6, 0, cls.buffer_location.ids)],
                 "location_ids": [(6, 0, cls.pallets_location.ids)],
@@ -88,4 +89,106 @@ class TestStorageTypeBuffer(TestStorageTypeCommon):
         )
         self.assertIn(
             move_line.location_dest_id, self.pallets_reserve_location.leaf_location_ids
+        )
+
+    def test_buffer_name_get(self):
+        self.assertEqual(self.storage_buffer.display_name, "Pallet Buffer")
+
+        box_buffer = self.env["stock.location"].create(
+            {"name": "Box Buffer", "location_id": self.warehouse.lot_stock_id.id}
+        )
+        pallet_buffer_2 = self.env["stock.location"].create(
+            {"name": "Pallet Buffer 2", "location_id": self.warehouse.lot_stock_id.id}
+        )
+        pallet_buffer_3 = self.env["stock.location"].create(
+            {"name": "Pallet Buffer 3", "location_id": self.warehouse.lot_stock_id.id}
+        )
+        self.storage_buffer.buffer_location_ids = (
+            self.buffer_location + box_buffer + pallet_buffer_2 + pallet_buffer_3
+        )
+        self.storage_buffer.invalidate_cache(fnames=["display_name"])
+        self.assertEqual(
+            self.storage_buffer.display_name,
+            "Pallet Buffer, Box Buffer, Pallet Buffer 2, ...",
+        )
+
+    def test_buffer_help_message_capacity(self):
+        expected_result = """
+        <span>The buffer locations</span>
+        <ul class="mt8">
+            <li>
+                <span>WH/Stock/Pallet Buffer</span>
+            </li>
+        </ul>
+        <span>
+            currently <strong>have capacity</strong>,
+            so the following locations
+            <strong>can receive putaways</strong>:
+        </span>
+        <ul class="mt8">
+            <li>
+                <span>WH/Stock/Pallets storage area/Pallets Bin 1</span>
+            </li>
+            <li>
+                <span>WH/Stock/Pallets storage area/Pallets Bin 2</span>
+            </li>
+            <li>
+                <span>WH/Stock/Pallets storage area/Pallets Bin 3</span>
+            </li>
+        </ul>
+        """
+        self.assertEqual(
+            html.fromstring(self.storage_buffer.help_message.strip()),
+            html.fromstring(expected_result),
+        )
+
+    def test_buffer_help_message_no_capacity(self):
+        # put anything in the buffer
+        self._update_qty_in_location(self.buffer_location, self.product, 1)
+
+        # message should show it has no capacity
+        expected_result = """
+        <span>The buffer locations</span>
+        <ul class="mt8">
+            <li>
+                <span>WH/Stock/Pallet Buffer</span>
+            </li>
+        </ul>
+        <span>
+            currently <strong>have no capacity</strong>,
+            so the following locations
+            <strong>cannot receive putaways</strong>:
+        </span>
+        <ul class="mt8">
+            <li>
+                <span>WH/Stock/Pallets storage area/Pallets Bin 1</span>
+            </li>
+            <li>
+                <span>WH/Stock/Pallets storage area/Pallets Bin 2</span>
+            </li>
+            <li>
+                <span>WH/Stock/Pallets storage area/Pallets Bin 3</span>
+            </li>
+        </ul>
+        <p>
+            The buffers have no capacity because they all contain
+            goods or will contain goods due to move lines reaching them.
+        </p>
+        """
+        self.assertEqual(
+            html.fromstring(self.storage_buffer.help_message.strip()),
+            html.fromstring(expected_result),
+        )
+
+    def test_buffer_help_message_no_record(self):
+        expected_result = (
+            "<p>Select buffer locations and locations "
+            "blocked for putaways when the buffer locations "
+            "already contain goods or have move lines "
+            "reaching them.</p>"
+        )
+        self.storage_buffer.buffer_location_ids = False
+        self.assertEqual(
+            html.fromstring(self.storage_buffer.help_message.strip()),
+            html.fromstring(expected_result),
         )
