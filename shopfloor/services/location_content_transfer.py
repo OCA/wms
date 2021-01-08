@@ -656,7 +656,8 @@ class LocationContentTransfer(Component):
             # split the move to process only the lines related to the package.
             package_move.split_other_move_lines(package_move_lines)
         self._write_destination_on_lines(package_level.move_line_ids, scanned_location)
-        package_moves.extract_and_action_done()
+        stock = self.actions_for("stock")
+        stock.validate_moves(package_moves)
         move_lines = self._find_transfer_move_lines(location)
         message = self.msg_store.location_content_transfer_item_complete(
             scanned_location
@@ -730,7 +731,8 @@ class LocationContentTransfer(Component):
                 remaining_move_line.qty_done = remaining_move_line.product_uom_qty
         move_line.move_id.split_other_move_lines(move_line)
         self._write_destination_on_lines(move_line, scanned_location)
-        move_line.move_id.extract_and_action_done()
+        stock = self.actions_for("stock")
+        stock.validate_moves(move_line.move_id)
         move_lines = self._find_transfer_move_lines(location)
         message = self.msg_store.location_content_transfer_item_complete(
             scanned_location
