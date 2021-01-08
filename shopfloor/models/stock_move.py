@@ -37,6 +37,15 @@ class StockMove(models.Model):
             return backorder_move
         return False
 
+    def split_unavailable_qty(self):
+        """Put unavailable qty of a partially available move in their own
+        move (which will be 'confirmed').
+        """
+        partial_moves = self.filtered(lambda m: m.state == "partially_available")
+        for partial_move in partial_moves:
+            partial_move.split_other_move_lines(partial_move.move_line_ids)
+        return partial_moves
+
     def extract_and_action_done(self):
         """Extract the moves in a separate transfer and validate them.
 
@@ -44,20 +53,19 @@ class StockMove(models.Model):
         to first extract some move lines in a separate move, then validate it
         with this method.
         """
-        # Put remaining qty to process from partially available moves
-        # in their own move (which will be then 'confirmed')
-        partial_moves = self.filtered(lambda m: m.state == "partially_available")
-        for partial_move in partial_moves:
-            partial_move.split_other_move_lines(partial_move.move_line_ids)
         # Process assigned moves
         moves = self.filtered(lambda m: m.state == "assigned")
         if not moves:
             return False
         for picking in moves.picking_id:
             moves_todo = picking.move_lines & moves
+            # No need to create a new transfer if we are processing all moves
             if moves_todo == picking.move_lines:
-                # No need to create a new transfer if we are processing all moves
                 new_picking = picking
+            # We process some available moves of the picking, but there are still
+            # some other moves to process, then we put the moves to process in
+            # a new transfer to validate. All remaining moves stay in the
+            # current transfer.
             else:
                 new_picking = picking.copy(
                     {
