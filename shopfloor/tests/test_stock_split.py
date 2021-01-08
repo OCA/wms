@@ -171,7 +171,7 @@ class TestStockSplit(SavepointCase):
             set(self.pack_move_a.move_line_ids.mapped("state")), {"assigned"}
         )
 
-    def test_extract_and_action_done_one_move(self):
+    def test_extract_and_action_done_one_assigned_move(self):
         self.assertFalse(self.picking.backorder_ids)
         self.assertEqual(self.picking.state, "assigned")
         for move_line in self.pick_move_b.move_line_ids:
@@ -187,7 +187,7 @@ class TestStockSplit(SavepointCase):
         self.assertEqual(self.pick_move_b.state, "done")
         self.assertEqual(new_picking.state, "done")
 
-    def test_extract_and_action_done_several_moves(self):
+    def test_extract_and_action_done_multiple_assigned_moves(self):
         self.assertFalse(self.picking.backorder_ids)
         self.assertEqual(self.picking.state, "assigned")
         for move_line in self.picking.move_line_ids:
