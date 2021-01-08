@@ -262,7 +262,7 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         )
         # check data
         #   picking validated
-        picking_validated = self.picking6.backorder_ids
+        picking_validated = self.picking6
         self.assertEqual(picking_validated.state, "done")
         self.assertEqual(picking_validated.move_line_ids, move_line_g | move_line_h)
         self.assertEqual(move_line_g.state, "done")
@@ -270,10 +270,11 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         self.assertEqual(move_line_h.state, "done")
         self.assertEqual(move_line_h.qty_done, 3)
         #   current picking (backorder)
-        self.assertEqual(self.picking6.state, "confirmed")
-        self.assertEqual(self.picking6.move_lines.product_id, self.product_h)
-        self.assertEqual(self.picking6.move_lines.product_uom_qty, 3)
-        self.assertFalse(self.picking6.move_line_ids)
+        backorder = self.picking6.backorder_ids
+        self.assertEqual(backorder.state, "confirmed")
+        self.assertEqual(backorder.move_lines.product_id, self.product_h)
+        self.assertEqual(backorder.move_lines.product_uom_qty, 3)
+        self.assertFalse(backorder.move_line_ids)
         # buffer should be empty
         buffer_lines = self.service._find_buffer_move_lines(zone_location, picking_type)
         self.assertFalse(buffer_lines)

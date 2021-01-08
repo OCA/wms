@@ -259,7 +259,8 @@ class SinglePackTransfer(Component):
         # when writing the destination on the package level, it writes
         # on the move lines
         move.move_line_ids.package_level_id.location_dest_id = scanned_location
-        move.extract_and_action_done()
+        stock = self.actions_for("stock")
+        stock.validate_moves(move)
 
     def cancel(self, package_level_id):
         package_level = self.env["stock.package_level"].browse(package_level_id)
