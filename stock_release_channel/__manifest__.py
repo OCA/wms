@@ -11,7 +11,6 @@
     "depends": [
         "sale_stock",
         "stock_available_to_promise_release",  # OCA/wms
-        "ddmrp",  # OCA/ddmrp
         "queue_job",  # OCA/queue
     ],
     "data": [
@@ -23,4 +22,5 @@
         "data/ir_cron_data.xml",
         "security/stock_release_channel.xml",
     ],
+    "installable": True,
 }
