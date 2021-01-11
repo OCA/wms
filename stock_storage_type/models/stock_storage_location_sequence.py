@@ -13,7 +13,7 @@ class StockStorageLocationSequence(models.Model):
     package_storage_type_id = fields.Many2one(
         "stock.package.storage.type", required=True
     )
-    sequence = fields.Integer(required=True)
+    sequence = fields.Integer(required=True, default=1)
     location_id = fields.Many2one("stock.location", required=True,)
     location_putaway_strategy = fields.Selection(
         related="location_id.pack_putaway_strategy"
