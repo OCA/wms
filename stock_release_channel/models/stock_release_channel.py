@@ -506,16 +506,6 @@ class StockReleaseChannel(models.Model):
             context={"search_default_available": 1, "search_default_picking_type": 1},
         )
 
-    # TODO extract to glue module with ddmrp
-    def action_ddmrp_buffer(self):
-        domain = self._field_picking_domains()["count_picking_released"]
-        domain += [("release_channel_id", "=", self.id)]
-        released = self.env["stock.picking"].search(domain)
-        buffers = released.move_lines.product_id.buffer_ids
-        return self._build_action(
-            "ddmrp.action_stock_buffer", buffers, _("DDMRP Buffers")
-        )
-
     # TODO almost duplicated with stock_picking_type_kanban
     def get_action_picking_form(self):
         self.ensure_one()

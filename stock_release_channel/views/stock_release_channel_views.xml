@@ -6,7 +6,6 @@
         <field name="model">stock.release.channel</field>
         <field name="arch" type="xml">
             <form>
-                <!-- TODO buttons to open pickings -->
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                     </div>
@@ -394,13 +393,6 @@
                                                 class="row mt-2 mb-2 primary_bottom_buttons"
                                             >
                                             <div class="col-6 bottom_buttons_left">
-                                                <button
-                                                        class="btn btn-secondary "
-                                                        name="action_ddmrp_buffer"
-                                                        type="object"
-                                                    >
-                                                    <span>Buffers</span>
-                                                </button>
                                             </div>
                                             <div class="col-6 bottom_buttons_right">
                                                 <button
