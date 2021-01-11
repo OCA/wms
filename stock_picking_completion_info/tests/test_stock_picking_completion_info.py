@@ -1,6 +1,6 @@
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
-from odoo.tests import SavepointCase
+from odoo.tests import Form, SavepointCase
 
 
 class TestStockPickingCompletionInfo(SavepointCase):
@@ -156,10 +156,10 @@ class TestStockPickingCompletionInfo(SavepointCase):
         self.assertEqual(pick_move_2.state, "assigned")
         self.assertEqual(pick_order.state, "assigned")
         self.assertEqual(pick_order.completion_info, "full_order_picking")
-        wiz = self.env["stock.immediate.transfer"].create(
-            {"pick_ids": [(4, pick_order.id)]}
-        )
-        wiz.process()
+        res = pick_order.button_validate()
+        Form(
+            self.env["stock.immediate.transfer"].with_context(res["context"])
+        ).save().process()
         self.assertEqual(pick_move_1.state, "done")
         self.assertEqual(pick_move_2.state, "done")
         self.assertEqual(pick_order.state, "done")
@@ -206,20 +206,20 @@ class TestStockPickingCompletionInfo(SavepointCase):
         self.assertEqual(pick_move_2.state, "assigned")
         self.assertEqual(pick_order_2.state, "assigned")
         self.assertEqual(pick_order_2.completion_info, "no")
-        wiz = self.env["stock.immediate.transfer"].create(
-            {"pick_ids": [(4, pick_order_1.id)]}
-        )
-        wiz.process()
+        res = pick_order_1.button_validate()
+        Form(
+            self.env["stock.immediate.transfer"].with_context(res["context"])
+        ).save().process()
         self.assertEqual(pick_move_1.state, "done")
         self.assertEqual(pick_order_1.state, "done")
         self.assertEqual(pick_order_1.completion_info, "no")
         self.assertNotEqual(pick_move_2.state, "done")
         self.assertNotEqual(pick_order_2.state, "done")
         self.assertEqual(pick_order_2.completion_info, "last_picking")
-        wiz = self.env["stock.immediate.transfer"].create(
-            {"pick_ids": [(4, pick_order_2.id)]}
-        )
-        wiz.process()
+        res = pick_order_2.button_validate()
+        Form(
+            self.env["stock.immediate.transfer"].with_context(res["context"])
+        ).save().process()
         self.assertEqual(pick_move_2.state, "done")
         self.assertEqual(pick_order_2.state, "done")
         self.assertEqual(pick_order_2.completion_info, "next_picking_ready")
@@ -262,7 +262,7 @@ class TestStockPickingCompletionInfo(SavepointCase):
         # Process partially to create backorder
         pick_move_1.move_line_ids.qty_done = 1.0
         pick_move_2.move_line_ids.qty_done = pick_move_2.move_line_ids.product_uom_qty
-        pick_order.action_done()
+        pick_order._action_done()
         pick_backorder = self.env["stock.picking"].search(
             [("backorder_id", "=", pick_order.id)]
         )
@@ -270,6 +270,7 @@ class TestStockPickingCompletionInfo(SavepointCase):
         self.assertEqual(pick_move_1.state, "done")
         self.assertEqual(pick_move_2.state, "done")
         self.assertEqual(pick_order.state, "done")
+        pick_backorder.action_assign()
         self.assertEqual(pick_backorder_move.state, "assigned")
         self.assertEqual(pick_backorder.state, "assigned")
         self.assertEqual(pick_order.completion_info, "no")
@@ -278,7 +279,7 @@ class TestStockPickingCompletionInfo(SavepointCase):
         pick_backorder_move.move_line_ids.qty_done = (
             pick_backorder_move.move_line_ids.product_uom_qty
         )
-        pick_backorder.action_done()
+        pick_backorder._action_done()
         self.assertEqual(pick_backorder_move.state, "done")
         self.assertEqual(pick_backorder.state, "done")
         self.assertEqual(pick_order.completion_info, "next_picking_ready")
