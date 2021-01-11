@@ -33,7 +33,7 @@ const Delivery = {
             <div class="button-list button-vertical-list full">
                 <v-row align="center" v-if="state_is('deliver') && has_picking()">
                     <v-col class="text-center" cols="12">
-                        <btn-action @click="state.on_mark_as_done">Mark as done</btn-action>
+                        <btn-action @click="state.on_mark_as_done">Make partial delivery</btn-action>
                     </v-col>
                 </v-row>
                 <v-row align="center" v-if="state_in([initial_state_key, 'deliver'])">
