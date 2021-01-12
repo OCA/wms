@@ -213,7 +213,43 @@ const TEMPLATES = {
 const ZonePicking = {
     mixins: [ScenarioBaseMixin],
     methods: {
-        screen_klass: function () {
+        /**
+         * Override to inject headers for zone location and picking type when needed.
+         */
+        _get_odoo_params: function() {
+            const params = this.$super(ScenarioBaseMixin)._get_odoo_params();
+            const zone = this.current_zone_location();
+            const picking_type = this.current_picking_type();
+            if (_.isUndefined(params.headers)) {
+                params["headers"] = {};
+            }
+            _.defaults(
+                params.headers,
+                this._get_zone_picking_headers(zone.id, picking_type.id)
+            );
+            return params;
+        },
+        /**
+         * Retrieve zone_picking scenario specific headers.
+         *
+         * The zone picking scenario requires some special headers
+         * to share some key parameters accross all methods.
+         *
+         * @param {*} zone_id: ID of current zone
+         * @param {*} picking_type_id: ID of selected picking type
+         */
+        _get_zone_picking_headers: function(zone_id, picking_type_id) {
+            let res = {};
+            if (_.isInteger(zone_id)) {
+                res["SERVICE-CTX-ZONE-LOCATION-ID"] = zone_id;
+            }
+            if (_.isInteger(picking_type_id)) {
+                res["SERVICE-CTX-PICKING-TYPE-ID"] = picking_type_id;
+            }
+            res["SERVICE-CTX-LINES-ORDER"] = this.order_lines_by;
+            return res;
+        },
+        screen_klass: function() {
             return (
                 this.$super(ScenarioBaseMixin).screen_klass() +
                 " device-mode-" +
@@ -405,19 +441,15 @@ const ZonePicking = {
             return this.list_move_lines(this.current_picking_type().id);
         },
         list_move_lines(picking_type_id) {
-            return this.wait_call(
-                this.odoo.call("list_move_lines", {
-                    zone_location_id: this.current_zone_location().id,
-                    picking_type_id: picking_type_id,
-                    order: this.order_lines_by,
-                })
+            const zone_id = this.current_zone_location().id;
+            this.odoo._update_headers(
+                this._get_zone_picking_headers(zone_id, picking_type_id)
             );
+            return this.wait_call(this.odoo.call("list_move_lines", {}));
         },
         scan_source(barcode) {
             return this.wait_call(
                 this.odoo.call("scan_source", {
-                    zone_location_id: this.current_zone_location().id,
-                    picking_type_id: this.current_picking_type().id,
                     barcode: barcode,
                 })
             );
@@ -552,12 +584,7 @@ const ZonePicking = {
                         this.scan_source(barcode);
                     },
                     on_unload_at_destination: () => {
-                        this.wait_call(
-                            this.odoo.call("prepare_unload", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
-                            })
-                        );
+                        this.wait_call(this.odoo.call("prepare_unload", {}));
                     },
                 },
                 set_line_destination: {
@@ -582,8 +609,6 @@ const ZonePicking = {
                         const data = this.state.data;
                         this.wait_call(
                             this.odoo.call("set_destination", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 move_line_id: data.move_line.id,
                                 barcode: scanned.text,
                                 quantity: this.scan_destination_qty,
@@ -614,20 +639,13 @@ const ZonePicking = {
                         this.state_set_data({location_barcode: scanned.text});
                         this.wait_call(
                             this.odoo.call("set_destination_all", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 barcode: scanned.text,
                                 confirmation: this.state.data.confirmation_required,
                             })
                         );
                     },
                     on_action_split: () => {
-                        this.wait_call(
-                            this.odoo.call("unload_split", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
-                            })
-                        );
+                        this.wait_call(this.odoo.call("unload_split", {}));
                     },
                 },
                 unload_single: {
@@ -638,8 +656,6 @@ const ZonePicking = {
                     on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("unload_scan_pack", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 package_id: this.state.data.move_line.package_dest.id,
                                 barcode: scanned.text,
                             })
@@ -654,8 +670,6 @@ const ZonePicking = {
                     on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("unload_set_destination", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 package_id: this.state.data.move_line.package_dest.id,
                                 barcode: scanned.text,
                                 confirmation: this.state.data.confirmation_required,
@@ -671,8 +685,6 @@ const ZonePicking = {
                     on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("change_pack_lot", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 move_line_id: this.state.data.move_line.id,
                                 barcode: scanned.text,
                             })
@@ -689,8 +701,6 @@ const ZonePicking = {
                     on_confirm_stock_issue: () => {
                         this.wait_call(
                             this.odoo.call("stock_issue", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 move_line_id: this.state.data.move_line.id,
                             })
                         );
@@ -708,8 +718,6 @@ const ZonePicking = {
                     is_zero: (zero_flag) => {
                         this.wait_call(
                             this.odoo.call("is_zero", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 move_line_id: this.state.data.move_line.id,
                                 zero: zero_flag,
                             })
