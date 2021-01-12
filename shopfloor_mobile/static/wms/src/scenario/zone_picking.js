@@ -60,14 +60,19 @@ const template_mobile = `
 
                 <template v-slot:item.quantity="{ item }">
                     <packaging-qty-picker-display
+                        :key="make_state_component_key(['qty-picker-widget', item['_origin'].id])"
                         :options="utils.misc.move_line_qty_picker_options(item['_origin'])"
                         />
                 </template>
                 <template v-slot:item.priority="{ item }">
-                    <priority-widget :options="{priority: parseInt(item.priority || '0', 10)}" />
+                    <priority-widget
+                        :key="make_state_component_key(['priority-widget', item['_origin'].id])"
+                        :options="{priority: parseInt(item.priority || '0', 10)}" />
                 </template>
                 <template v-slot:item.location_will_be_empty="{ item }">
-                    <empty-location-icon :record="item" />
+                    <empty-location-icon :record="item"
+                        :key="make_state_component_key(['empty-location-icon', item['_origin'].id])"
+                        />
                 </template>
             </v-data-table>
 
