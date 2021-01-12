@@ -191,7 +191,6 @@ class StockReleaseChannel(models.Model):
                 for row in data
                 if row["release_channel_id"]
             }
-
             picking_ids_per_field.update(
                 {
                     (row["release_channel_id"][0], field): row["picking_ids"]
@@ -291,7 +290,6 @@ class StockReleaseChannel(models.Model):
                 + channel.count_picking_chain_in_progress
             )
 
-    # TODO this duplicated with shopfloor_kanban
     def _compute_last_done_picking(self):
         for channel in self:
             # TODO we have one query per channel, could be better
@@ -447,9 +445,7 @@ class StockReleaseChannel(models.Model):
         )
 
     def action_move_release_ready(self):
-        return self._action_move_for_field(
-            "count_picking_release_ready", context={"search_default_release_ready": 1}
-        )
+        return self._action_move_for_field("count_picking_release_ready")
 
     def action_move_released(self):
         return self._action_move_for_field("count_picking_released")
@@ -506,14 +502,13 @@ class StockReleaseChannel(models.Model):
             context={"search_default_available": 1, "search_default_picking_type": 1},
         )
 
-    # TODO almost duplicated with stock_picking_type_kanban
     def get_action_picking_form(self):
         self.ensure_one()
         action = self.env.ref("stock.action_picking_form").read()[0]
         action["context"] = {}
         if not self.last_done_picking_id:
             raise exceptions.UserError(
-                _("Channel {} has no validated transfer yet.").format(name=self.name)
+                _("Channel %s has no validated transfer yet.") % (self.name,)
             )
         action["res_id"] = self.last_done_picking_id.id
         return action
