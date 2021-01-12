@@ -10,6 +10,7 @@ export class OdooMixin {
         this.params = params;
         this.apikey = params.apikey;
         this.usage = params.usage;
+        this.headers = params.headers || {};
         this.process_menu_id = this.params.process_menu_id;
         this.profile_id = this.params.profile_id;
         this.debug = this.params.debug;
@@ -79,10 +80,16 @@ export class OdooMixin {
         if (method == "POST") {
             headers["Content-Type"] = "application/json";
         }
+        if (!_.isEmpty(this.headers)) {
+            _.merge(headers, this.headers);
+        }
         return headers;
     }
     _get_url(endpoint) {
         return "/shopfloor/" + endpoint;
+    }
+    _update_headers(headers) {
+        _.merge(this.headers, headers);
     }
 }
 

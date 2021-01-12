@@ -50,12 +50,8 @@ export var ScenarioBaseMixin = {
         this._state_load(this.$route.params.state);
     },
     computed: {
-        odoo: function () {
-            const odoo_params = {
-                process_menu_id: this.menu_item_id,
-                profile_id: this.$root.profile.id,
-                usage: this.usage,
-            };
+        odoo: function() {
+            const odoo_params = this._get_odoo_params();
             return this.$root.getOdoo(odoo_params);
         },
         /*
@@ -107,7 +103,20 @@ export var ScenarioBaseMixin = {
         },
     },
     methods: {
-        _get_menu_item_id: function () {
+        /**
+         * Retrieve Odoo connection params.
+         */
+        _get_odoo_params: function() {
+            return {
+                process_menu_id: this.menu_item_id,
+                profile_id: this.$root.profile.id,
+                usage: this.usage,
+            };
+        },
+        /**
+         * Retrieve current menu item ID.
+         */
+        _get_menu_item_id: function() {
             const menu_id = Number.parseInt(this.$route.params.menu_id, 10);
             if (Number.isNaN(menu_id)) {
                 /*
