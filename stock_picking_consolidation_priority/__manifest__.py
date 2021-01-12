@@ -9,7 +9,7 @@
     "website": "https://github.com/OCA/wms",
     "category": "Stock Management",
     "depends": ["stock"],
-    "data": [],
+    "data": ["views/stock_picking_type.xml"],
     "installable": True,
     "license": "AGPL-3",
 }
