@@ -30,8 +30,8 @@ class UserCase(CommonMenuCase):
         # Simulate the client asking the menu
         menus = self.env["shopfloor.menu"].sudo().search([])
         menu = menus[0]
-        menu.profile_ids = self.profile
-        (menus - menu).profile_ids = self.profile2
+        menu.profile_id = self.profile
+        (menus - menu).profile_id = self.profile2
 
         response = self.service.dispatch("menu")
         self.assert_response(

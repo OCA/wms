@@ -8,11 +8,7 @@
                 <field name="sequence" widget="handle" />
                 <field name="name" />
                 <field name="scenario" />
-                <field
-                    name="profile_ids"
-                    widget="many2many_tags"
-                    options="{'no_create': 1}"
-                />
+                <field name="profile_id" options="{'no_create': 1}" />
                 <field
                     name="picking_type_ids"
                     widget="many2many_tags"
@@ -40,11 +36,7 @@
                     <group name="main">
                         <field name="active" invisible="1" />
                         <field name="scenario" />
-                        <field
-                            name="profile_ids"
-                            widget="many2many_tags"
-                            options="{'no_create': 1}"
-                        />
+                        <field name="profile_id" options="{'no_create': 1}" />
                         <field
                             name="picking_type_ids"
                             widget="many2many_tags"
@@ -92,7 +84,7 @@
                 <field name="name" />
                 <field name="scenario" />
                 <field name="picking_type_ids" />
-                <field name="profile_ids" />
+                <field name="profile_id" />
                 <separator />
                 <filter
                     string="Archived"
