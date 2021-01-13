@@ -8,7 +8,10 @@ class ShopfloorProfile(models.Model):
     _description = "Shopfloor profile settings"
 
     name = fields.Char(required=True)
-    menu_ids = fields.Many2many(
-        "shopfloor.menu", string="Menus", help="Menus visible for this profile"
+    menu_ids = fields.One2many(
+        comodel_name="shopfloor.menu",
+        inverse_name="profile_id",
+        string="Menus",
+        help="Menus visible for this profile",
     )
     active = fields.Boolean(default=True)

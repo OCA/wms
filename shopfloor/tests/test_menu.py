@@ -19,7 +19,7 @@ class MenuCase(CommonMenuCase):
         menus_without_profile = menus[0:2]
         # these menus should now be hidden for the current profile
         other_profile = self.env.ref("shopfloor.shopfloor_profile_hb_truck_demo")
-        menus_without_profile.profile_ids = other_profile
+        menus_without_profile.profile_id = other_profile
 
         response = self.service.dispatch("search")
 

@@ -27,8 +27,8 @@ class ShopfloorMenu(Component):
                 base_domain,
                 [
                     "|",
-                    ("profile_ids", "=", False),
-                    ("profile_ids", "in", self.work.profile.ids),
+                    ("profile_id", "=", False),
+                    ("profile_id", "=", self.work.profile.id),
                 ],
             ]
         )
