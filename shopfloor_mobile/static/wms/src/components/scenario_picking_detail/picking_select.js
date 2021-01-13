@@ -79,6 +79,9 @@ Vue.component("picking-select-package-content", {
             <div class="qty">
                 <span class="label">Qty:</span> <span>{{ record.qty_done }} / {{ record.quantity }}</span>
             </div>
+            <div class="vendor-code">
+                <span class="label">Vendor code:</span> <span>{{ record.product.supplier_code }}</span>
+            </div>
         </div>
     </div>
   `,
