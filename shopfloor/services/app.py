@@ -16,7 +16,9 @@ class ShopfloorApp(Component):
     def user_config(self):
         profiles_comp = self.component("profile")
         profiles = profiles_comp._to_json(profiles_comp._search())
-        return self._response(data={"profiles": profiles})
+        user_comp = self.component("user")
+        user_info = user_comp._user_info()
+        return self._response(data={"profiles": profiles, "user_info": user_info})
 
 
 class ShopfloorAppValidator(Component):
@@ -39,6 +41,7 @@ class ShopfloorAppValidatorResponse(Component):
 
     def user_config(self):
         profile_return_validator = self.component("profile.validator.response")
+        user_return_validator = self.component("user.validator.response")
         return self._response_schema(
             {
                 "profiles": {
@@ -48,6 +51,11 @@ class ShopfloorAppValidatorResponse(Component):
                         "type": "dict",
                         "schema": profile_return_validator._record_schema,
                     },
+                },
+                "user_info": {
+                    "type": "dict",
+                    "required": True,
+                    "schema": user_return_validator._user_info_schema(),
                 },
             }
         )
