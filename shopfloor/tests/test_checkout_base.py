@@ -9,8 +9,8 @@ class CheckoutCommonCase(CommonCase):
         super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_checkout")
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
-        cls.wh = cls.profile.warehouse_id
         cls.picking_type = cls.menu.picking_type_ids
+        cls.wh = cls.picking_type.warehouse_id
 
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
