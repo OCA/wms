@@ -1339,11 +1339,6 @@ msgid "Visible for these profiles"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__warehouse_id
-msgid "Warehouse"
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_log__severity__warning
 msgid "Warning"
 msgstr ""

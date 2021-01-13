@@ -483,14 +483,8 @@ class BaseShopfloorProcess(AbstractComponent):
     _requires_header_profile = True
 
     def _get_process_picking_types(self):
-        """Return picking types for the menu and profile"""
-        # TODO make this a lazy property or computed field avoid running the
-        # filter every time?
-        picking_types = self.work.menu.picking_type_ids.filtered(
-            lambda pt: not pt.warehouse_id
-            or pt.warehouse_id == self.work.profile.warehouse_id
-        )
-        return picking_types
+        """Return picking types for the menu"""
+        return self.work.menu.picking_type_ids
 
     @property
     def picking_types(self):
@@ -498,8 +492,8 @@ class BaseShopfloorProcess(AbstractComponent):
             self.work.picking_types = self._get_process_picking_types()
         if not self.work.picking_types:
             raise exceptions.UserError(
-                _("No operation types configured on menu {} for warehouse {}.").format(
-                    self.work.menu.name, self.work.profile.warehouse_id.display_name
+                _("No operation types configured on menu {}.").format(
+                    self.work.menu.name
                 )
             )
         return self.work.picking_types
