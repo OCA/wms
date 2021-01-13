@@ -38,3 +38,11 @@ class UserCase(CommonMenuCase):
             response,
             data={"menus": [self._data_for_menu_item(menu)]},
         )
+
+    def test_user_info(self):
+        """Request /user/user_info"""
+        response = self.service.dispatch("user_info")
+        self.assert_response(
+            response,
+            data={"user_info": {"id": self.env.user.id, "name": self.env.user.name}},
+        )

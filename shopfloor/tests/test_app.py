@@ -34,5 +34,6 @@ class AppCase(CommonCase):
                     }
                     for profile in profiles
                 ],
+                "user_info": {"id": self.env.user.id, "name": self.env.user.name},
             },
         )
