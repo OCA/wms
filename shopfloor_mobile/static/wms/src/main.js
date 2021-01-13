@@ -106,6 +106,9 @@ const app = new Vue({
         profiles: function () {
             return this.appconfig ? this.appconfig.profiles || [] : [];
         },
+        user: function() {
+            return this.appconfig ? this.appconfig.user_info || {} : {};
+        },
         appmenu: {
             get: function () {
                 if (_.isEmpty(this.profile_menu)) {
