@@ -18,8 +18,8 @@ class DBLoggingCaseBase(CommonCase):
         super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_checkout")
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
-        cls.wh = cls.profile.warehouse_id
         cls.picking_type = cls.menu.picking_type_ids
+        cls.wh = cls.picking_type.warehouse_id
         with cls.work_on_services(cls, menu=cls.menu, profile=cls.profile) as work:
             cls.service = work.component(usage="checkout")
         cls.log_model = cls.env["shopfloor.log"].sudo()
