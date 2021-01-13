@@ -10,6 +10,21 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
     },
     template: `
         <Screen :screen_info="{title: $t('screen.settings.home.title'), klass: 'settings settings-control-panel'}">
+
+            <v-card outlined v-if="$root.user.id">
+                <v-list>
+                    <v-list-item>
+                        <v-list-item-avatar>
+                            <v-avatar color="primary" size="36">
+                                <v-icon dark>mdi-account-circle</v-icon>
+                            </v-avatar>
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                            <span v-text="$root.user.name" />
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list>
+            </v-card>
             <div class="button-list button-vertical-list full">
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
