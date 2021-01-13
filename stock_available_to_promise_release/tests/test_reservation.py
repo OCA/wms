@@ -827,6 +827,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         )
         self.assertEqual(ready_pickings, picking2)
 
+    @freeze_time("2020-12-16 00:00:00")
     def test_picking_type_count(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         out_type = self.wh.out_type_id
