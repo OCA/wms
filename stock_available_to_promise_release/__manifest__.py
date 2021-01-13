@@ -3,7 +3,7 @@
 
 {
     "name": "Stock Available to Promise Release",
-    "version": "13.0.1.10.2",
+    "version": "13.0.1.10.3",
     "summary": "Release Operations based on available to promise",
     "author": "Camptocamp,Odoo Community Association (OCA)",
     "category": "Stock Management",
