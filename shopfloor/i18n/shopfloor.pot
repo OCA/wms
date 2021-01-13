@@ -817,9 +817,9 @@ msgstr ""
 
 #. module: shopfloor
 #: model:ir.actions.act_window,name:shopfloor.action_shopfloor_profile
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__profile_ids
-#: model:ir.ui.menu,name:shopfloor.menu_action_shopfloor_profile
-msgid "Profiles"
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__profile_id
+#: model:ir.ui.menu,name:shopfloor.menu_action_shopfloor_profil
+msgid "Profile"
 msgstr ""
 
 #. module: shopfloor
@@ -1334,8 +1334,8 @@ msgid "User"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__profile_ids
-msgid "Visible for these profiles"
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__profile_id
+msgid "Visible on this profile only"
 msgstr ""
 
 #. module: shopfloor

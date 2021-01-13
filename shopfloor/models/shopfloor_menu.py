@@ -27,8 +27,8 @@ class ShopfloorMenu(models.Model):
 
     name = fields.Char(translate=True)
     sequence = fields.Integer()
-    profile_ids = fields.Many2many(
-        "shopfloor.profile", string="Profiles", help="Visible for these profiles"
+    profile_id = fields.Many2one(
+        "shopfloor.profile", string="Profile", help="Visible on this profile only"
     )
     picking_type_ids = fields.Many2many(
         comodel_name="stock.picking.type", string="Operation Types", required=True
