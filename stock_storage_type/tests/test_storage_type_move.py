@@ -98,7 +98,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         in_picking.action_confirm()
         # Put in pack
         in_picking.move_line_ids.qty_done = 48.0
-        first_package = in_picking.put_in_pack()
+        first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         first_package.product_packaging_id = self.product_pallet_product_packaging
         # Put in pack again
@@ -106,7 +106,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             lambda ml: not ml.result_package_id
         )
         ml_without_package.qty_done = 48.0
-        second_pack = in_picking.put_in_pack()
+        second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_pallet_product_packaging
 
@@ -243,7 +243,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         in_picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product
         ).qty_done = 48.0
-        first_package = in_picking.put_in_pack()
+        first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         first_package.product_packaging_id = self.product_pallet_product_packaging
         # Put in pack again
@@ -251,7 +251,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             lambda ml: ml.product_id == self.product and not ml.result_package_id
         )
         product_ml_without_package.qty_done = 4.0
-        second_pack = in_picking.put_in_pack()
+        second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_cardbox_product_packaging
         # Create lots to be used on move lines
@@ -273,7 +273,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         in_picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product_lot
         ).write({"qty_done": 5.0, "lot_id": lot_a0001.id})
-        third_pack = in_picking.put_in_pack()
+        third_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         third_pack.product_packaging_id = self.product_lot_cardbox_product_packaging
         # Put in pack lot product again
@@ -281,7 +281,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             lambda ml: ml.product_id == self.product_lot and not ml.result_package_id
         )
         product_lot_ml_without_package.write({"qty_done": 5.0, "lot_id": lot_a0002.id})
-        fourth_pack = in_picking.put_in_pack()
+        fourth_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         fourth_pack.product_packaging_id = self.product_lot_cardbox_product_packaging
         # Put in pack lot product again ... again (to have two times same lot)
@@ -289,7 +289,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             lambda ml: ml.product_id == self.product_lot and not ml.result_package_id
         )
         product_lot_ml_without_package.write({"qty_done": 5.0, "lot_id": lot_a0002.id})
-        fifth_pack = in_picking.put_in_pack()
+        fifth_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         fifth_pack.product_packaging_id = self.product_lot_cardbox_product_packaging
         # Validate picking
