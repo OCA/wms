@@ -134,16 +134,20 @@ class SinglePackTransfer(Component):
         package_level = package_level.filtered(
             lambda pl: pl.state not in ("cancel", "done")
         )
-        if not package_level:
-            if self.work.menu.allow_move_create:
-                package_level = self._create_package_level(package)
+        message = self.msg_store.no_pending_operation_for_pack(package)
+        if not package_level and self.work.menu.allow_move_create:
+            package_level = self._create_package_level(package)
+            if not package_level.location_dest_id.is_sublocation_of(
+                picking_types.default_location_dest_id
+            ):
+                package_level = None
+                savepoint.rollback()
+                message = self.msg_store.package_unable_to_transfer(package)
 
         if not package_level:
             # restore any unreserved move/package level
             savepoint.rollback()
-            return self._response_for_start(
-                message=self.msg_store.no_pending_operation_for_pack(package)
-            )
+            return self._response_for_start(message=message)
         if self.work.menu.ignore_no_putaway_available and self._no_putaway_available(
             package_level
         ):

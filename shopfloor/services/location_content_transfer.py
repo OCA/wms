@@ -353,6 +353,17 @@ class LocationContentTransfer(Component):
                 )
             pickings = new_moves.mapped("picking_id")
             move_lines = new_moves.move_line_ids
+            for move_line in move_lines:
+                if not move_line.location_dest_id.is_sublocation_of(
+                    menu.picking_type_ids.default_location_dest_id
+                ):
+                    savepoint.rollback()
+
+                    return self._response_for_start(
+                        message=self.msg_store.location_content_unable_to_transfer(
+                            location
+                        )
+                    )
 
         if self.work.menu.ignore_no_putaway_available and self._no_putaway_available(
             move_lines
