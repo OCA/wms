@@ -11,13 +11,17 @@ Vue.component("searchbar", {
     data: function () {
         return {
             entered: "",
-            autofocus: {
-                type: Boolean,
-                default: true,
-            },
         };
     },
     props: {
+        autofocus: {
+            type: Boolean,
+            default: true,
+        },
+        autocomplete: {
+            type: String,
+            default: "off",
+        },
         input_placeholder: String,
         input_data_type: String,
         reset_on_submit: {
@@ -51,6 +55,7 @@ Vue.component("searchbar", {
       required v-model="entered"
       :placeholder="input_placeholder"
       :autofocus="autofocus ? 'autofocus' : null"
+      :autocomplete="autocomplete"
       />
   </v-form>
   `,
