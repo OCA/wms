@@ -38,10 +38,6 @@ class ShopfloorProfile(Component):
         return {
             "id": record.id,
             "name": record.name,
-            "warehouse": {
-                "id": record.warehouse_id.id,
-                "name": record.warehouse_id.name,
-            },
         }
 
 
@@ -81,11 +77,4 @@ class ShopfloorProfileValidatorResponse(Component):
         return {
             "id": {"coerce": to_int, "required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
-            "warehouse": {
-                "type": "dict",
-                "schema": {
-                    "id": {"coerce": to_int, "required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
         }

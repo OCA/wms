@@ -35,20 +35,12 @@ class ShopfloorMenu(Component):
 
     def _search(self, name_fragment=None):
         if not self.work.profile:
-            # we need to know the warehouse of the profile
-            # to load menus
+            # we need to know the profile to load menus
             return self.env["shopfloor.menu"].browse()
         domain = self._get_base_search_domain()
         if name_fragment:
             domain.append(("name", "ilike", name_fragment))
         records = self.env[self._expose_model].search(domain)
-        current_wh = self.work.profile.warehouse_id
-        records = records.filtered(
-            lambda menu: all(
-                not pt.warehouse_id or pt.warehouse_id == current_wh
-                for pt in menu.picking_type_ids
-            )
-        )
         return records
 
     def search(self, name_fragment=None):

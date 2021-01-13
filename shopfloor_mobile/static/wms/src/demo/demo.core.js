@@ -485,8 +485,8 @@ export class DemoTools {
     }
     makeProfiles() {
         const profiles = [
-            {id: 1, name: "SCH Transport", warehouse: {id: 1, name: "Schlieren"}},
-            {id: 2, name: "SCH Pick", warehouse: {id: 1, name: "Schlieren"}},
+            {id: 1, name: "SCH Transport"},
+            {id: 2, name: "SCH Pick"},
         ];
         return profiles;
     }

@@ -6,7 +6,6 @@
         <field name="arch" type="xml">
             <tree editable="bottom">
                 <field name="name" />
-                <field name="warehouse_id" />
             </tree>
         </field>
     </record>
@@ -27,7 +26,6 @@
                             <field name="name" />
                         </group>
                         <group>
-                            <field name="warehouse_id" />
                             <field name="active" invisible="1" />
                         </group>
                     </group>
@@ -41,7 +39,6 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name" />
-                <field name="warehouse_id" />
                 <separator />
                 <filter
                     string="Archived"

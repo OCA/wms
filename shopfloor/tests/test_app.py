@@ -24,15 +24,7 @@ class AppCase(CommonCase):
             response,
             data={
                 "profiles": [
-                    {
-                        "id": profile.id,
-                        "name": profile.name,
-                        "warehouse": {
-                            "id": profile.warehouse_id.id,
-                            "name": profile.warehouse_id.name,
-                        },
-                    }
-                    for profile in profiles
+                    {"id": profile.id, "name": profile.name} for profile in profiles
                 ],
             },
         )
