@@ -247,6 +247,7 @@ const Checkout = {
             return {
                 multiple: true,
                 initSelectAll: true,
+                card_klass: "loud-labels",
                 list_item_component: "picking-select-package-content",
                 list_item_options: {actions: ["action_qty_edit"]},
             };
