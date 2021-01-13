@@ -227,6 +227,13 @@ class MessageAction(Component):
             "body": _("No putaway destination is available."),
         }
 
+    def package_unable_to_transfer(self, pack):
+        return {
+            "message_type": "error",
+            "body": _("The package %s cannot be transferred with this scenario.")
+            % pack.name,
+        }
+
     def unrecoverable_error(self):
         return {
             "message_type": "error",
@@ -357,6 +364,14 @@ class MessageAction(Component):
             "body": _("Content transferred from {} to {}.").format(
                 location_src.name, location_dest.name
             ),
+        }
+
+    def location_content_unable_to_transfer(self, location_dest):
+        return {
+            "message_type": "error",
+            "body": _(
+                "The content of {} cannot be transferred with this scenario."
+            ).format(location_dest.name),
         }
 
     def picking_already_started_in_location(self, pickings):
