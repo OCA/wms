@@ -296,13 +296,16 @@ class Checkout(Component):
             if line.shopfloor_checkout_done:
                 continue
             line.qty_done = line.product_uom_qty
+            line.shopfloor_user_id = self.env.user
 
         picking = lines.mapped("picking_id")
         other_lines = picking.move_line_ids - lines
         self._deselect_lines(other_lines)
 
     def _deselect_lines(self, lines):
-        lines.filtered(lambda l: not l.shopfloor_checkout_done).qty_done = 0
+        lines.filtered(lambda l: not l.shopfloor_checkout_done).write(
+            {"qty_done": 0, "shopfloor_user_id": False}
+        )
 
     def scan_line(self, picking_id, barcode):
         """Scan move lines of the stock picking
@@ -598,7 +601,9 @@ class Checkout(Component):
 
     @staticmethod
     def _filter_lines_unpacked(move_line):
-        return move_line.qty_done == 0 and not move_line.shopfloor_checkout_done
+        return (
+            move_line.qty_done == 0 or move_line.shopfloor_user_id
+        ) and not move_line.shopfloor_checkout_done
 
     @staticmethod
     def _filter_lines_to_pack(move_line):
