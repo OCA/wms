@@ -48,6 +48,7 @@ from . import test_location_content_transfer_start
 from . import test_location_content_transfer_set_destination_all
 from . import test_location_content_transfer_single
 from . import test_location_content_transfer_set_destination_package_or_line
+from . import test_location_content_transfer_putaway
 from . import test_location_content_transfer_mix
 from . import test_zone_picking_base
 from . import test_zone_picking_start

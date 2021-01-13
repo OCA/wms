@@ -103,3 +103,39 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
         )
         # no package level created to move the package
         self.assertFalse(package_levels)
+
+    def test_putaway_move_dest_not_child_of_picking_type_dest(self):
+        """Putaway is applied on move but the destination location is not a
+        child of the default picking type destination location.
+        """
+        # Change the default destination location of the picking type
+        # to get it outside of the putaway destination
+        self.picking_type.sudo().default_location_dest_id = self.main_pallets_location
+        # Create a standard putaway to move the package from pallet storage
+        # to a unrelated one (outside of the pallet storage tree)
+        self.env["stock.putaway.rule"].sudo().create(
+            {
+                "product_id": self.product_a.id,
+                "location_in_id": self.picking_type.default_location_dest_id.id,
+                "location_out_id": self.env.ref("stock.location_refrigerator_small").id,
+            }
+        )
+        # Check the result
+        existing_moves = self.env["stock.move"].search(
+            [("location_id", "=", self.test_loc.id), ("state", "=", "assigned")]
+        )
+        response = self.service.dispatch(
+            "scan_location", params={"barcode": self.test_loc.barcode}
+        )
+        self.assert_response(
+            response,
+            next_state="start",
+            data=self.ANY,
+            message=self.service.msg_store.location_content_unable_to_transfer(
+                self.test_loc
+            ),
+        )
+        current_moves = self.env["stock.move"].search(
+            [("location_id", "=", self.test_loc.id), ("state", "=", "assigned")]
+        )
+        self.assertEqual(existing_moves, current_moves)
