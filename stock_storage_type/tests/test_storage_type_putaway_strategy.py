@@ -34,7 +34,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         in_picking.action_confirm()
         # Put in pack
         in_picking.move_line_ids.qty_done = 4.0
-        first_package = in_picking.put_in_pack()
+        first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         first_package.product_packaging_id = self.product_cardbox_product_packaging
         # Put in pack again
@@ -42,7 +42,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             lambda ml: not ml.result_package_id
         )
         ml_without_package.qty_done = 4.0
-        second_pack = in_picking.put_in_pack()
+        second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_cardbox_product_packaging
 
@@ -91,7 +91,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         in_picking.action_confirm()
         # Put in pack
         in_picking.move_line_ids.qty_done = 48.0
-        first_package = in_picking.put_in_pack()
+        first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         first_package.product_packaging_id = self.product_pallet_product_packaging
         # Put in pack again
@@ -99,7 +99,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             lambda ml: not ml.result_package_id
         )
         ml_without_package.qty_done = 48.0
-        second_pack = in_picking.put_in_pack()
+        second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_pallet_product_packaging
 
@@ -156,7 +156,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         in_picking.action_confirm()
         # Put in pack
         in_picking.move_line_ids.qty_done = 48.0
-        first_package = in_picking.put_in_pack()
+        first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         first_package.product_packaging_id = self.product_pallet_product_packaging
         first_package.onchange_product_packaging_id()
@@ -166,7 +166,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             lambda ml: not ml.result_package_id
         )
         ml_without_package.qty_done = 48.0
-        second_pack = in_picking.put_in_pack()
+        second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_pallet_product_packaging
         second_pack.onchange_product_packaging_id()
@@ -236,7 +236,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         in_picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product
         ).qty_done = 4.0
-        product_first_package = in_picking.put_in_pack()
+        product_first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         product_first_package.product_packaging_id = (
             self.product_cardbox_product_packaging
@@ -246,7 +246,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             lambda ml: not ml.result_package_id and ml.product_id == self.product
         )
         product_ml_without_package.qty_done = 4.0
-        product_second_pack = in_picking.put_in_pack()
+        product_second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         product_second_pack.product_packaging_id = (
             self.product_cardbox_product_packaging
@@ -257,7 +257,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             lambda ml: not ml.result_package_id and ml.product_id == self.product_lot
         )
         product_lot_ml.write({"qty_done": 5.0, "lot_name": "A0001"})
-        product_lot_first_pack = in_picking.put_in_pack()
+        product_lot_first_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         product_lot_first_pack.product_packaging_id = (
             self.product_lot_cardbox_product_packaging
@@ -267,7 +267,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             lambda ml: not ml.result_package_id and ml.product_id == self.product_lot
         )
         product_lot_ml_without_package.write({"qty_done": 5.0, "lot_name": "A0002"})
-        product_lot_second_pack = in_picking.put_in_pack()
+        product_lot_second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         product_lot_second_pack.product_packaging_id = (
             self.product_lot_cardbox_product_packaging
