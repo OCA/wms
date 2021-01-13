@@ -1,1 +1,2 @@
 freezegun
+odoo14-addon-base_m2m_custom_field @ git+https://github.com/OCA/server-tools@refs/pull/1992/head#subdirectory=setup/base_m2m_custom_field
