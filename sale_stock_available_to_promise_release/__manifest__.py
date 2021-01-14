@@ -7,6 +7,7 @@
     "summary": "Integration between Sales and Available to Promise Release",
     "author": "Camptocamp,Odoo Community Association (OCA)",
     "category": "Stock Management",
+    "website": "https://github.com/OCA/wms",
     "depends": ["sale_stock", "stock_available_to_promise_release", "delivery"],
     "data": [
         "views/stock_move_views.xml",
