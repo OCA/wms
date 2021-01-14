@@ -104,7 +104,12 @@ class ClusterPicking(Component):
         last_picked_line = self._last_picked_line(move_line.picking_id)
         if last_picked_line:
             # suggest pack to be used for the next line
-            data["package_dest"] = self.data.package(last_picked_line.result_package_id)
+            data["package_dest"] = self.data.package(
+                last_picked_line.result_package_id.with_context(
+                    picking_id=move_line.picking_id.id
+                ),
+                picking=move_line.picking_id,
+            )
         return self._response(next_state="scan_destination", data=data, message=message)
 
     def _response_for_change_pack_lot(self, move_line, message=None):
