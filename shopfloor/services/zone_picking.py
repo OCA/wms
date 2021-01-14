@@ -612,7 +612,8 @@ class ZonePicking(Component):
         # try to re-assign any split move (in case of partial qty)
         if "confirmed" in move_line.picking_id.move_lines.mapped("state"):
             move_line.picking_id.action_assign()
-        move_line.move_id.extract_and_action_done()
+        stock = self.actions_for("stock")
+        stock.validate_moves(move_line.move_id)
         location_changed = True
         # Zero check
         zero_check = picking_type.shopfloor_zero_check
@@ -1141,7 +1142,8 @@ class ZonePicking(Component):
             self._write_destination_on_lines(buffer_lines, location)
             # set lines to done + refresh buffer lines (should be empty)
             moves = buffer_lines.mapped("move_id")
-            moves.extract_and_action_done()
+            stock = self.actions_for("stock")
+            stock.validate_moves(moves)
             message = self.msg_store.buffer_complete()
             buffer_lines = self._find_buffer_move_lines(zone_location, picking_type)
         else:
@@ -1348,7 +1350,8 @@ class ZonePicking(Component):
             for move in moves:
                 move.split_other_move_lines(buffer_lines & move.move_line_ids)
 
-            moves.extract_and_action_done()
+            stock = self.actions_for("stock")
+            stock.validate_moves(moves)
             buffer_lines = self._find_buffer_move_lines(zone_location, picking_type)
 
             if buffer_lines:
