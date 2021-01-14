@@ -82,7 +82,7 @@ class StockMove(models.Model):
                 AND p_type.code = 'outgoing'
                 AND loc.parent_path LIKE ANY(%(location_paths)s)
                 AND (
-                    m.need_release = true
+                    COALESCE(m.need_release, False) = COALESCE(move.need_release, False)
                     AND (
                         m.priority > move.priority
                         OR
@@ -97,7 +97,8 @@ class StockMove(models.Model):
                         )
                     )
                     OR (
-                        m.need_release IS false OR m.need_release IS null
+                        move.need_release IS true
+                        AND (m.need_release IS false OR m.need_release IS null)
                     )
                 )
                 AND m.state IN (
@@ -181,7 +182,7 @@ class StockMove(models.Model):
             }
         )
 
-        locations = self._ordered_available_to_promise_locations()
+        locations = moves._ordered_available_to_promise_locations()
 
         # Compute On-Hand quantity (equivalent of qty_available) for all "view
         # locations" of all the warehouses: we may release as soon as we have
@@ -196,7 +197,7 @@ class StockMove(models.Model):
                 ]
             )
         domain_quant = expression.AND(
-            [[("product_id", "in", self.product_id.ids)], location_domain]
+            [[("product_id", "in", moves.product_id.ids)], location_domain]
         )
         location_quants = self.env["stock.quant"].read_group(
             domain_quant, ["product_id", "quantity"], ["product_id"], orderby="id"
@@ -204,7 +205,7 @@ class StockMove(models.Model):
         quants_available = {
             item["product_id"][0]: item["quantity"] for item in location_quants
         }
-        for move in self:
+        for move in moves:
             product_uom = move.product_id.uom_id
             previous_promised_qty = move.previous_promised_qty
 
@@ -247,7 +248,6 @@ class StockMove(models.Model):
     def _should_compute_ordered_available_to_promise(self):
         return (
             self.picking_code == "outgoing"
-            and self.need_release
             and not self.product_id.type == "consu"
             and not self.location_id.should_bypass_reservation()
         )
