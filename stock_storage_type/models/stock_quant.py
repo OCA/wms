@@ -29,6 +29,10 @@ class StockQuant(models.Model):
                     % (pack_storage_type.name, location.name)
                 )
             allowed = False
+            package_weight_kg = (
+                quant.package_id.pack_weight_in_kg
+                or quant.package_id.estimated_pack_weight_kg
+            )
             package_quants = quant.package_id.mapped("quant_ids")
             package_products = package_quants.mapped("product_id")
             package_lots = package_quants.mapped("lot_id")
@@ -97,8 +101,7 @@ class StockQuant(models.Model):
                     continue
                 if (
                     loc_storage_type.max_weight_in_kg
-                    and quant.package_id.pack_weight_in_kg
-                    > loc_storage_type.max_weight_in_kg
+                    and package_weight_kg > loc_storage_type.max_weight_in_kg
                 ):
                     lst_fails.append(
                         _(
@@ -107,7 +110,7 @@ class StockQuant(models.Model):
                             % (
                                 loc_storage_type.name,
                                 loc_storage_type.max_weight_in_kg,
-                                quant.package_id.pack_weight_in_kg,
+                                package_weight_kg,
                             )
                         )
                     )
