@@ -23,7 +23,7 @@
         "auth_api_key",
         #  OCA / stock-logistics-warehouse
         "stock_picking_completion_info",
-        #  OCA / stock-logistics-warehouse
+        #  OCA / stock-logistics-workflow
         "stock_quant_package_dimension",
         #  OCA / stock-logistics-warehouse
         "stock_quant_package_product_packaging",

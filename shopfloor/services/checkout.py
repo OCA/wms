@@ -103,7 +103,9 @@ class Checkout(Component):
             )
         picking_data = self.data.picking(picking)
         packages_data = self.data.packages(
-            packages.sorted(), picking=picking, with_packaging=True
+            packages.with_context(picking_id=picking.id).sorted(),
+            picking=picking,
+            with_packaging=True,
         )
         return self._response(
             next_state="select_dest_package",

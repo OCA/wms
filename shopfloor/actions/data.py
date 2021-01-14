@@ -116,7 +116,7 @@ class DataAction(Component):
         return [
             "id",
             "name",
-            "pack_weight:weight",
+            "shopfloor_weight:weight",
             ("package_storage_type_id:storage_type", ["id", "name"]),
         ]
 
@@ -169,7 +169,11 @@ class DataAction(Component):
                         record.package_id, record.picking_id, **kw
                     ),
                     "package_dest": self.package(
-                        record.result_package_id, record.picking_id, **kw
+                        record.result_package_id.with_context(
+                            picking_id=record.picking_id.id
+                        ),
+                        record.picking_id,
+                        **kw,
                     ),
                 }
             )
