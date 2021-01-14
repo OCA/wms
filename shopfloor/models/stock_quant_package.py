@@ -23,6 +23,12 @@ class StockQuantPackage(models.Model):
         comodel_name="stock.move.line",
         compute="_compute_reserved_move_lines",
     )
+    shopfloor_weight = fields.Float(
+        "Shopfloor weight (kg)",
+        digits="Product Unit of Measure",
+        compute="_compute_shopfloor_weight",
+        help="Real pack weight or the estimated one.",
+    )
 
     def _get_reserved_move_lines(self):
         return self.env["stock.move.line"].search(
@@ -33,6 +39,12 @@ class StockQuantPackage(models.Model):
     def _compute_reserved_move_lines(self):
         for rec in self:
             rec.update({"reserved_move_line_ids": rec._get_reserved_move_lines()})
+
+    @api.depends("pack_weight", "estimated_pack_weight")
+    @api.depends_context("picking_id")
+    def _compute_shopfloor_weight(self):
+        for rec in self:
+            rec.shopfloor_weight = rec.pack_weight or rec.estimated_pack_weight
 
     # TODO: we should refactor this like
 
