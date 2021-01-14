@@ -375,11 +375,15 @@ class StockLocation(models.Model):
                 ("max_height_in_m", "=", 0),
                 ("max_height_in_m", ">=", quants.package_id.height_in_m),
             ]
-        if quants.package_id.pack_weight:
+        package_weight_kg = (
+            quants.package_id.pack_weight_in_kg
+            or quants.package_id.estimated_pack_weight_kg
+        )
+        if package_weight_kg:
             pertinent_loc_storagetype_domain += [
                 "|",
                 ("max_weight_in_kg", "=", 0),
-                ("max_weight_in_kg", ">=", quants.package_id.pack_weight_in_kg),
+                ("max_weight_in_kg", ">=", package_weight_kg),
             ]
         _logger.debug(
             "pertinent storage type domain: %s", pertinent_loc_storagetype_domain
