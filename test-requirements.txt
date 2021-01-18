@@ -1,3 +1,1 @@
-odoo13-addon-stock_location_children @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/855/head#subdirectory=setup/stock_location_children
-
 freezegun
