@@ -72,3 +72,106 @@ class TestStockLocation(TestStorageTypeCommon):
                 | self.cardboxes_bin_4_location
             ).ids,
         )
+
+    def test_will_contain_product_ids(self):
+        location = self.pallets_bin_1_location
+        location.allowed_location_storage_type_ids.only_empty = False
+        location.allowed_location_storage_type_ids.do_not_mix_products = True
+
+        self._update_qty_in_location(location, self.product, 10)
+        self.assertEqual(location.location_will_contain_product_ids, self.product)
+
+        # the moves and move lines created are not really valid, but we don't care, it's
+        # only to have "in_move_ids" and "in_move_line_ids" on the location
+        self.env["stock.move"].create(
+            {
+                "name": "test",
+                "product_id": self.product2.id,
+                "location_id": self.stock_location.id,
+                "location_dest_id": location.id,
+                "product_uom": self.product2.uom_id.id,
+                "product_uom_qty": 10,
+                "state": "waiting",
+            }
+        )
+        self.assertEqual(
+            location.location_will_contain_product_ids, self.product | self.product2
+        )
+
+        ml_move = self.env["stock.move"].create(
+            {
+                "name": "test",
+                "product_id": self.product3.id,
+                "location_id": self.stock_location.id,
+                "location_dest_id": location.location_id.id,
+                "product_uom": self.product2.uom_id.id,
+                "product_uom_qty": 10,
+                "state": "waiting",
+            }
+        )
+        self.env["stock.move.line"].create(
+            {
+                "product_id": self.product3.id,
+                "location_id": self.stock_location.id,
+                "location_dest_id": location.id,
+                "product_uom_id": self.product3.uom_id.id,
+                "product_uom_qty": 10,
+                "move_id": ml_move.id,
+                "company_id": self.env.company.id,
+            }
+        )
+        self.assertEqual(
+            location.location_will_contain_product_ids,
+            self.product | self.product2 | self.product3,
+        )
+
+        location.allowed_location_storage_type_ids.do_not_mix_products = False
+        self.assertEqual(
+            location.location_will_contain_product_ids,
+            self.env["product.product"].browse(),
+        )
+
+    def test_will_contain_lot_ids(self):
+        location = self.pallets_bin_1_location
+        location.allowed_location_storage_type_ids.only_empty = False
+        location.allowed_location_storage_type_ids.do_not_mix_products = True
+        location.allowed_location_storage_type_ids.do_not_mix_lots = True
+        lot_values = {"product_id": self.product.id, "company_id": self.env.company.id}
+        lot1 = self.env["stock.production.lot"].create(lot_values)
+        lot2 = self.env["stock.production.lot"].create(lot_values)
+
+        self._update_qty_in_location(location, self.product, 10, lot=lot1)
+        self.assertEqual(location.location_will_contain_lot_ids, lot1)
+
+        # the moves and move lines created are not really valid, but we don't care, it's
+        # only to have "in_move_ids" and "in_move_line_ids" on the location
+        ml_move = self.env["stock.move"].create(
+            {
+                "name": "test",
+                "product_id": self.product.id,
+                "location_id": self.stock_location.id,
+                "location_dest_id": location.location_id.id,
+                "product_uom": self.product2.uom_id.id,
+                "product_uom_qty": 10,
+                "state": "waiting",
+            }
+        )
+        self.env["stock.move.line"].create(
+            {
+                "product_id": self.product.id,
+                "lot_id": lot2.id,
+                "location_id": self.stock_location.id,
+                "location_dest_id": location.id,
+                "product_uom_id": self.product.uom_id.id,
+                "product_uom_qty": 10,
+                "move_id": ml_move.id,
+                "company_id": self.env.company.id,
+            }
+        )
+        self.assertEqual(location.location_will_contain_lot_ids, lot1 | lot2)
+
+        location.allowed_location_storage_type_ids.do_not_mix_lots = False
+        self.assertEqual(
+            location.location_will_contain_lot_ids,
+            self.env["stock.production.lot"].browse(),
+        )
