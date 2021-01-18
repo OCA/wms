@@ -20,6 +20,8 @@ class ZonePicking(Component):
 
     You will find a sequence diagram describing states and endpoints
     relationships [here](../docs/zone_picking_diag_seq.png).
+    Keep [the sequence diagram](../docs/delivery_diag_seq.txt)
+    up-to-date if you change endpoints.
 
     Note:
 
