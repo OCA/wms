@@ -141,21 +141,48 @@ class StockLocation(models.Model):
             leaves = self.search([("id", "in", leave_ids)])
             loc.leaf_location_ids = leaves
 
-    @api.depends("quant_ids", "in_move_ids", "in_move_line_ids")
+    def _should_compute_will_contain_product_ids(self):
+        return any(
+            location.do_not_mix_products
+            for location in self.allowed_location_storage_type_ids
+        )
+
+    def _should_compute_will_contain_lot_ids(self):
+        return any(
+            location.do_not_mix_lots
+            for location in self.allowed_location_storage_type_ids
+        )
+
+    @api.depends(
+        "quant_ids",
+        "in_move_ids",
+        "in_move_line_ids",
+        "allowed_location_storage_type_ids.do_not_mix_products",
+    )
     def _compute_location_will_contain_product_ids(self):
         for rec in self:
-            rec.location_will_contain_product_ids = (
-                rec.mapped("quant_ids.product_id")
-                | rec.mapped("in_move_ids.product_id")
-                | rec.mapped("in_move_line_ids.product_id")
-            )
+            products = self.env["product.product"].browse()
+            if rec._should_compute_will_contain_product_ids():
+                products = (
+                    rec.mapped("quant_ids.product_id")
+                    | rec.mapped("in_move_ids.product_id")
+                    | rec.mapped("in_move_line_ids.product_id")
+                )
+            rec.location_will_contain_product_ids = products
 
-    @api.depends("quant_ids", "in_move_line_ids")
+    @api.depends(
+        "quant_ids",
+        "in_move_line_ids",
+        "allowed_location_storage_type_ids.do_not_mix_lots",
+    )
     def _compute_location_will_contain_lot_ids(self):
         for rec in self:
-            rec.location_will_contain_lot_ids = rec.mapped(
-                "quant_ids.lot_id"
-            ) | rec.mapped("in_move_line_ids.lot_id")
+            lots = self.env["stock.production.lot"].browse()
+            if rec._should_compute_will_contain_lot_ids():
+                lots = rec.mapped("quant_ids.lot_id") | rec.mapped(
+                    "in_move_line_ids.lot_id"
+                )
+            rec.location_will_contain_lot_ids = lots
 
     @api.depends(
         "quant_ids.quantity",
