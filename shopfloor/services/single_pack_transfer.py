@@ -8,7 +8,13 @@ from odoo.addons.component.core import Component
 
 
 class SinglePackTransfer(Component):
-    """Methods for the Single Pack Transfer Process"""
+    """Methods for the Single Pack Transfer Process
+
+    You will find a sequence diagram describing states and endpoints
+    relationships [here](../docs/single_pack_transfer_diag_seq.png).
+    Keep [the sequence diagram](../docs/single_pack_transfer_diag_seq.txt)
+    up-to-date if you change endpoints.
+    """
 
     _inherit = "base.shopfloor.process"
     _name = "shopfloor.single.pack.transfer"
@@ -50,9 +56,6 @@ class SinglePackTransfer(Component):
             data=data,
             message=message,
         )
-
-    def _response_for_show_completion_info(self, message=None):
-        return self._response(next_state="show_completion_info", message=message)
 
     def start(self, barcode, confirmation=False):
         search = self.actions_for("search")
