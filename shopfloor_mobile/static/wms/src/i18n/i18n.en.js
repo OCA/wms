@@ -43,9 +43,6 @@ const messages_en = {
                 name: "Profile",
                 title: "Select profile",
                 profile_updated: "Profile updated",
-                action: {
-                    logout: "Logout",
-                },
             },
             workstation: {
                 name: "Workstation",
@@ -63,6 +60,9 @@ const messages_en = {
         profile_configure: "Configure profile",
         workstation_scan: "Scan workstation",
         loading: "Loading...",
+        action: {
+            logout: "Logout",
+        },
         nav: {
             scenario: "Scenario:",
             op_types: "Op Types:",
