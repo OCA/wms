@@ -1,6 +1,105 @@
-# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo.addons.component.core import AbstractComponent
+import logging
+
+from odoo.addons.component.core import AbstractComponent, Component
+from odoo.addons.component.exception import NoComponentError
+
+_logger = logging.getLogger(__name__)
+
+
+class ShopfloorRestCerberusValidator(Component):
+    """Customize the handling of validators
+
+    In the initial implementation of rest_api, the schema validators
+    had to be returned by methods in the same service as the method, named
+    after the endpoint's method with a prefix: "_validator_<method>" or
+    "_validator_return_<method>".
+
+    As we have a lot of endpoints methods in some services, we extracted
+    the validator methods in dedicated components with
+    "base.shopfloor.validator" and "base.shopfloor.validator.response" usages,
+    and methods of the same name as the endpoint's method.
+
+    With the new API, endpoints are decorated with "@restapi.method" and the
+    validator is defined there. Example:
+
+        @restapi.method(
+            [(["/<int:id>/get", "/<int:id>"], "GET")],
+            input_param=restapi.CerberusValidator("_get_partner_input_schema"),
+            output_param=restapi.CerberusValidator("_get_partner_output_schema"),
+            auth="public",
+        )
+
+    The schema is get by calling the method "_get..." on the service.
+
+    For backward compatilibity, base_rest patches the methods not decorated
+    and sets the "input_param" and "output_param" to call the
+    "_validator_<method>" or "_validator_return_<method>":
+
+    https://github.com/OCA/rest-framework/blob/abd74cd7241d3b93054825cc3e41cb7b693c9000/base_rest/models/rest_service_registration.py#L240-L250  # noqa
+
+    The following change in base_rest allows to customize the way the validator
+    handler is get: https://github.com/OCA/rest-framework/pull/99
+
+    This is what is used here to delegate to our ".validator" and
+    ".validator.response" components.
+    """
+
+    _name = "shopfloor.rest.cerberus.validator"
+    _inherit = "base.rest.cerberus.validator"
+    _usage = "cerberus.validator"
+    _collection = "shopfloor.service"
+    _is_rest_service_component = False
+
+    def _get_validator_component(self, service, method_name, direction):
+        assert direction in ("input", "output")
+        if direction == "input":
+            suffix = "validator"
+            method_name = method_name.replace("_validator_", "")
+        else:
+            suffix = "validator.response"
+            method_name = method_name.replace("_validator_return_", "")
+        validator_component = self.component(
+            usage="{}.{}".format(service._usage, suffix)
+        )
+        return validator_component, method_name
+
+    def get_validator_handler(self, service, method_name, direction):
+        """Get the validator handler for a method
+
+        By default, it returns the method on the current service instance. It
+        can be customized to delegate the validators to another component.
+        """
+        try:
+            validator_component, method_name = self._get_validator_component(
+                service, method_name, direction
+            )
+        except NoComponentError:
+            _logger.warning("no component found for %s method %s", service, method_name)
+            return {}
+
+        try:
+            return getattr(validator_component, method_name)
+        except AttributeError:
+            _logger.warning(
+                "no validator method found for %s method %s", service, method_name
+            )
+            return {}
+
+    def has_validator_handler(self, service, method_name, direction):
+        """Return if the service has a validator handler for a method
+
+        By default, it returns True if the the method exists on the service. It
+        can be customized to delegate the validators to another component.
+        """
+        try:
+            validator_component, method_name = self._get_validator_component(
+                service, method_name, direction
+            )
+        except NoComponentError:
+            return False
+        return hasattr(validator_component, method_name)
 
 
 class BaseShopfloorValidator(AbstractComponent):
