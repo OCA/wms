@@ -14,6 +14,7 @@ from odoo.osv import expression
 
 from odoo.addons.base_rest.controllers.main import _PseudoCollection
 from odoo.addons.component.core import AbstractComponent, WorkContext
+from odoo.addons.component.exception import NoComponentError
 
 
 def to_float(val):
@@ -56,11 +57,11 @@ class BaseShopfloorService(AbstractComponent):
     # can be overridden to disable logging of requests to DB
     _log_calls_in_db = True
 
-    def dispatch(self, method_name, _id=None, params=None):
+    def dispatch(self, method_name, *args, params=None):
         self._validate_headers_update_work_context(request, method_name)
         if not self._db_logging_active():
-            return super().dispatch(method_name, _id=_id, params=params)
-        return self._dispatch_with_db_logging(method_name, _id=_id, params=params)
+            return super().dispatch(method_name, *args, params=params)
+        return self._dispatch_with_db_logging(method_name, *args, params=params)
 
     def _db_logging_active(self):
         return (
@@ -70,45 +71,47 @@ class BaseShopfloorService(AbstractComponent):
         )
 
     # TODO logging to DB should be an extra module for base_rest
-    def _dispatch_with_db_logging(self, method_name, _id=None, params=None):
+    def _dispatch_with_db_logging(self, method_name, *args, params=None):
         try:
-            result = super().dispatch(method_name, _id=_id, params=params)
+            result = super().dispatch(method_name, *args, params=params)
         except exceptions.UserError as orig_exception:
             self._dispatch_exception(
                 ShopfloorServiceUserErrorException,
                 orig_exception,
-                _id=_id,
+                *args,
                 params=params,
             )
         except exceptions.ValidationError as orig_exception:
             self._dispatch_exception(
                 ShopfloorServiceValidationErrorException,
                 orig_exception,
-                _id=_id,
+                *args,
                 params=params,
             )
         except Exception as orig_exception:
             self._dispatch_exception(
-                ShopfloorServiceDispatchException,
-                orig_exception,
-                _id=_id,
-                params=params,
+                ShopfloorServiceDispatchException, orig_exception, *args, params=params,
             )
-        log_entry = self._log_call_in_db(self.env, request, _id, params, result=result)
+        log_entry = self._log_call_in_db(
+            self.env, request, *args, params=params, result=result
+        )
         log_entry_url = self._get_log_entry_url(log_entry)
         result["log_entry_url"] = log_entry_url
         return result
 
-    def _dispatch_exception(
-        self, exception_klass, orig_exception, _id=None, params=None
-    ):
+    def _dispatch_exception(self, exception_klass, orig_exception, *args, params=None):
         tb = traceback.format_exc()
         # TODO: how to test this? Cannot rollback nor use another cursor
         self.env.cr.rollback()
         with registry(self.env.cr.dbname).cursor() as cr:
             env = self.env(cr=cr)
             log_entry = self._log_call_in_db(
-                env, request, _id, params, traceback=tb, orig_exception=orig_exception
+                env,
+                request,
+                *args,
+                params=params,
+                traceback=tb,
+                orig_exception=orig_exception,
             )
             log_entry_url = self._get_log_entry_url(log_entry)
         # UserError and alike have `name` attribute to store the msg
@@ -133,14 +136,14 @@ class BaseShopfloorService(AbstractComponent):
     def _log_call_header_strip(self):
         return ("Cookie", "Api-Key")
 
-    def _log_call_in_db_values(self, _request, _id, params, **kw):
+    def _log_call_in_db_values(self, _request, *args, params=None, **kw):
         httprequest = _request.httprequest
         headers = dict(httprequest.headers)
         for header_key in self._log_call_header_strip:
             if header_key in headers:
                 headers[header_key] = "<redacted>"
-        if _id:
-            params = dict(params, _id=_id)
+        if args:
+            params = dict(params or {}, args=args)
 
         result = kw.get("result")
         error = kw.get("traceback")
@@ -164,8 +167,8 @@ class BaseShopfloorService(AbstractComponent):
             "state": "success" if result else "failed",
         }
 
-    def _log_call_in_db(self, env, _request, _id, params, **kw):
-        values = self._log_call_in_db_values(_request, _id, params, **kw)
+    def _log_call_in_db(self, env, _request, *args, params=None, **kw):
+        values = self._log_call_in_db_values(_request, *args, params=params, **kw)
         if not values:
             return
         return env["shopfloor.log"].sudo().create(values)
@@ -194,19 +197,42 @@ class BaseShopfloorService(AbstractComponent):
             res.append(self._convert_one_record(record))
         return res
 
-    def _get_input_validator(self, method_name):
-        # override the method to get the validator in a component
-        # instead of a method, to keep things apart
-        validator_component = self.component(usage="%s.validator" % self._usage)
-        return validator_component._get_validator(method_name)
-
-    def _get_output_validator(self, method_name):
-        # override the method to get the validator in a component
-        # instead of a method, to keep things apart
+    def _get_validator_schema(self, method_name, usage_suffix):
         validator_component = self.component(
-            usage="%s.validator.response" % self._usage
+            usage="{}.{}".format(self._usage, usage_suffix)
         )
-        return validator_component._get_validator(method_name)
+        return getattr(validator_component, method_name)
+
+    # FIXME: must be replaced by a cleaner way to customize the validator
+    # handler, using: https://github.com/OCA/rest-framework/pull/99
+    def __getattr__(self, item):
+        # We have delegated the validator / return validators to dedicated
+        # components. In the new base_rest API, validator schemas are handled
+        # differently, but a backward compatibility layer adds
+        # "_validator_<method>" and "_validator_return_<method>" in the
+        # "routing" of the endpoints, which are automatically called on the
+        # service. As we have no way to replace the current service by the
+        # validator upstream, catch calls to these methods and get the schema
+        # from the validator services.
+        if item.startswith("_validator_return_"):
+            method_name = item.replace("_validator_return_", "")
+            try:
+                schema_handler = self._get_validator_schema(
+                    method_name, "validator.response"
+                )
+            except NoComponentError:
+                return super().__getattr__(item)
+            return schema_handler
+
+        if item.startswith("_validator_"):
+            method_name = item.replace("_validator_", "")
+            try:
+                schema_handler = self._get_validator_schema(method_name, "validator")
+            except NoComponentError:
+                return super().__getattr__(item)
+            return schema_handler
+
+        return super().__getattr__(item)
 
     def _response(
         self, base_response=None, data=None, next_state=None, message=None, popup=None
