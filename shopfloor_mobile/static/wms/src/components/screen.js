@@ -58,8 +58,11 @@ Vue.component("Screen", {
             return (
                 this.$root.authenticated &&
                 !this.$root.has_profile &&
+                // TODO: Routes should have a metadata flag `profile_required` ?
+                // to replace the following check.
                 this.$route.name != "profile" &&
-                this.$route.name != "settings"
+                this.$route.name != "settings" &&
+                this.$route.name != "workstation"
             );
         },
     },
@@ -174,6 +177,12 @@ Vue.component("Screen", {
                             <v-btn @click="$router.push({'name': 'profile'})">
                                 <v-icon>mdi-account-cog</v-icon>
                                 <span>{{ $t('app.profile_configure') }}</span>
+                            </v-btn>
+                        </v-col>
+                        <v-col class="text-center" cols="12">
+                            <v-btn @click="$router.push({'name': 'workstation'})">
+                                <v-icon>mdi-account-cog-outline</v-icon>
+                                <span>{{ $t('app.workstation_scan') }}</span>
                             </v-btn>
                         </v-col>
                     </v-row>

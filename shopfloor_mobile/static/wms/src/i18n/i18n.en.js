@@ -44,6 +44,11 @@ const messages_en = {
                 title: "Select profile",
                 profile_updated: "Profile updated",
             },
+            workstation: {
+                name: "Workstation",
+                title: "Select workstation",
+                workstation_updated: "Workstation updated",
+            },
             fullscreen: {
                 enter: "Go fullscreen",
                 exit: "Exit fullscreen",
@@ -53,6 +58,7 @@ const messages_en = {
     app: {
         profile_not_configured: "Profile not configured yet. Please select one.",
         profile_configure: "Configure profile",
+        workstation_scan: "Scan workstation",
         loading: "Loading...",
         action: {
             logout: "Logout",
