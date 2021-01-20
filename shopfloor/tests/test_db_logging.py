@@ -97,7 +97,7 @@ class DBLoggingCase(DBLoggingCaseBase):
             httprequest=httprequest, extra_headers=extra_headers
         ) as mocked_request:
             entry = self.service._log_call_in_db(
-                self.env, mocked_request, _id, params, **kw
+                self.env, mocked_request, _id, params=params, **kw
             )
         expected = {
             "request_url": httprequest["url"],
@@ -110,7 +110,7 @@ class DBLoggingCase(DBLoggingCaseBase):
         self.assertRecordValues(entry, [expected])
         expected_json = {
             "result": {"data": "worked!"},
-            "params": dict(params, _id=_id),
+            "params": dict(params, args=[_id]),
             "headers": {
                 "Cookie": "<redacted>",
                 "Api-Key": "<redacted>",

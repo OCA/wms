@@ -24,7 +24,7 @@ class PickingFormCase(CommonCase):
 
     def test_picking_form_get(self):
         available_carriers = self.service._get_available_carriers(self.picking)
-        response = self.service.dispatch("get", _id=self.picking.id)
+        response = self.service.dispatch("get", self.picking.id)
         self.assert_response(
             response,
             data={
@@ -42,7 +42,7 @@ class PickingFormCase(CommonCase):
         available_carriers = self.service._get_available_carriers(self.picking)
         self.picking.carrier_id = available_carriers[0]
         params = {"carrier_id": available_carriers[1].id}
-        response = self.service.dispatch("update", _id=self.picking.id, params=params)
+        response = self.service.dispatch("update", self.picking.id, params=params)
         self.assert_response(
             response,
             data={
