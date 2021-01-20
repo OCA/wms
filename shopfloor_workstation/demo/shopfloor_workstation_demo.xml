@@ -1,0 +1,10 @@
+<odoo noupdate="0">
+    <record id="ws_pollux" model="shopfloor.workstation">
+        <field name="name">Pollux</field>
+        <field name="barcode">ws-1</field>
+        <field
+            name="shopfloor_profile_id"
+            ref="shopfloor.shopfloor_profile_hb_truck_demo"
+        />
+    </record>
+</odoo>
