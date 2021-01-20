@@ -32,22 +32,7 @@ export var Language = Vue.component("language", {
     },
     computed: {
         available_languages() {
-            // FIXME: this should come from odoo and from app config
-            // They will match w/ $i18n.availableLocales
-            return [
-                {
-                    id: "en-US",
-                    name: this.$t("language.name.English"),
-                },
-                {
-                    id: "fr-FR",
-                    name: this.$t("language.name.French"),
-                },
-                {
-                    id: "de-DE",
-                    name: this.$t("language.name.German"),
-                },
-            ];
+            return this.$root.available_languages;
         },
         current_language_code() {
             return this.$i18n.locale || "en-US";

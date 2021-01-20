@@ -42,11 +42,6 @@ export var Profile = Vue.component("profile", {
                         <btn-reset-config />
                     </v-col>
                 </v-row>
-                <v-row align="center">
-                    <v-col class="text-center" cols="12">
-                        <btn-action @click="logout()">{{ $t('screen.settings.profile.action.logout') }}</btn-action>
-                    </v-col>
-                </v-row>
             </div>
         </Screen>
     `,
