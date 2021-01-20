@@ -5,8 +5,26 @@
  */
 
 export var SettingsControlPanel = Vue.component("settings-control-panel", {
-    data: function () {
-        return {};
+    data: function() {
+        return {
+            profile_name: this.$root.has_profile ? this.$root.profile.name : "?",
+        };
+    },
+    methods: {
+        logout: function() {
+            this.$root.logout();
+        },
+    },
+    computed: {
+        available_languages() {
+            return this.$root.available_languages;
+        },
+        active_language() {
+            const language = this.available_languages.find(
+                ({id}) => id === this.$i18n.locale
+            );
+            return language ? language.name : "?";
+        },
     },
     template: `
         <Screen :screen_info="{title: $t('screen.settings.home.title'), klass: 'settings settings-control-panel'}">
@@ -30,7 +48,7 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
                     <v-col class="text-center" cols="12">
                         <v-btn @click="$router.push({'name': 'profile'})">
                             <v-icon>mdi-account-cog</v-icon>
-                            <span>{{ $t("screen.settings.profile.name") }}</span>
+                            <span>{{ $t("screen.settings.profile.name") }} - {{ profile_name }}</span>
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -38,8 +56,13 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
                     <v-col class="text-center" cols="12">
                         <v-btn @click="$router.push({'name': 'language'})">
                             <v-icon>mdi-flag</v-icon>
-                            <span>{{ $t("screen.settings.language.name") }}</span>
+                            <span>{{ $t("screen.settings.language.name") }} - {{ this.active_language }}</span>
                         </v-btn>
+                    </v-col>
+                </v-row>
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <btn-action @click="logout()">{{ $t('app.action.logout') }}</btn-action>
                     </v-col>
                 </v-row>
                 <v-row align="center">

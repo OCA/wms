@@ -43,9 +43,6 @@ const messages_en = {
                 name: "Profile",
                 title: "Select profile",
                 profile_updated: "Profile updated",
-                action: {
-                    logout: "Logout",
-                },
             },
             fullscreen: {
                 enter: "Go fullscreen",
@@ -57,6 +54,9 @@ const messages_en = {
         profile_not_configured: "Profile not configured yet. Please select one.",
         profile_configure: "Configure profile",
         loading: "Loading...",
+        action: {
+            logout: "Logout",
+        },
         nav: {
             scenario: "Scenario:",
             op_types: "Op Types:",
