@@ -105,6 +105,9 @@ class PromiseReleaseCommonCase(common.SavepointCase):
 
     @classmethod
     def _update_qty_in_location(cls, location, product, quantity):
+        quants = cls.env["stock.quant"]._gather(product, location, strict=True)
+        # this method adds the quantity to the current quantity, so remove it
+        quantity -= sum(quants.mapped("quantity"))
         cls.env["stock.quant"]._update_available_quantity(product, location, quantity)
         cls.env["product.product"].invalidate_cache(
             fnames=[
