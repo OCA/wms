@@ -7,6 +7,7 @@
     "summary": "Release Operations based on available to promise",
     "author": "Camptocamp,Odoo Community Association (OCA)",
     "category": "Stock Management",
+    "website": "https://github.com/OCA/wms",
     "depends": ["stock"],
     "data": [
         "views/product_product_views.xml",
