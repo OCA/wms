@@ -16,6 +16,7 @@ class TestReceptionScreen(SavepointCase):
         cls.storage_type_pallet = cls.env.ref(
             "stock_storage_type.package_storage_type_pallets"
         )
+        cls.storage_type_pallet.barcode = "123"
         cls.product = cls.env.ref("product.product_delivery_01")
         cls.product.tracking = "lot"
         cls.product_packaging = cls.env["product.packaging"].create(
@@ -266,3 +267,29 @@ class TestReceptionScreen(SavepointCase):
         self.screen.current_move_line_qty_done = 4
         with self.assertRaises(exceptions.UserError):
             self.screen.button_save_step()
+
+    def test_reception_screen_scan_storage_type(self):
+        """ Tests the scanning of a storage type.
+        """
+        # Moves until the screen in which we select a packaging.
+        move = fields.first(self.screen.picking_filtered_move_lines)
+        move.action_select_product()
+        self.screen.on_barcode_scanned_set_lot_number("LOT-TEST-1")
+        self.screen.current_move_line_lot_life_date = fields.Datetime.today()
+        self.screen.button_save_step()
+        self.screen.current_move_line_qty_done = 1
+        self.screen.button_save_step()
+        self.screen.button_save_step()
+        self.assertEqual(self.screen.current_step, "select_packaging")
+        self.assertFalse(self.screen.product_packaging_id)
+        self.assertFalse(self.screen.package_storage_type_id)
+        self.assertFalse(self.screen.package_height)
+
+        # Scans the barcode of the storage type, this will select automatically
+        # the storage type and the packaging.
+        self.screen.on_barcode_scanned_select_packaging(
+            self.storage_type_pallet.barcode
+        )
+        self.assertEqual(self.screen.product_packaging_id, self.product_packaging)
+        self.assertEqual(self.screen.package_storage_type_id, self.storage_type_pallet)
+        self.assertEqual(self.screen.package_height, self.product_packaging.height)
