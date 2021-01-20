@@ -54,6 +54,14 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
                 </v-row>
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
+                        <v-btn @click="$router.push({'name': 'workstation'})">
+                            <v-icon>mdi-printer</v-icon>
+                            <span>{{ $t("screen.settings.workstation.name") }}</span>
+                        </v-btn>
+                    </v-col>
+                </v-row>
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
                         <v-btn @click="$router.push({'name': 'language'})">
                             <v-icon>mdi-flag</v-icon>
                             <span>{{ $t("screen.settings.language.name") }} - {{ this.active_language }}</span>
