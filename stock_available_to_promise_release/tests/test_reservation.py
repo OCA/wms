@@ -296,6 +296,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             self.env["stock.move"].invalidate_cache(
                 fnames=["previous_promised_qty", "ordered_available_to_promise_uom_qty"]
             )
+            self.assertEqual(picking.move_lines.previous_promised_qty, 0)
             self.assertEqual(
                 picking5.move_lines.ordered_available_to_promise_uom_qty, 15
             )
