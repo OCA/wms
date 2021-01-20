@@ -8,6 +8,7 @@ from odoo import models
 from odoo.tests.common import Form, SavepointCase
 
 from odoo.addons.base_rest.controllers.main import _PseudoCollection
+from odoo.addons.base_rest.tests.common import RegistryMixin
 from odoo.addons.component.core import WorkContext
 from odoo.addons.component.tests.common import ComponentMixin
 
@@ -26,7 +27,7 @@ class AnyObject:
         return True
 
 
-class CommonCase(SavepointCase, ComponentMixin):
+class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
     """Base class for writing Shopfloor tests
 
     All tests are run as normal stock user by default, to check that all the
@@ -90,6 +91,7 @@ class CommonCase(SavepointCase, ComponentMixin):
         )
 
         cls.setUpComponent()
+        cls.setUpRegistry()
         cls.setUpClassUsers()
         cls.setUpClassVars()
         cls.setUpClassBaseData()
