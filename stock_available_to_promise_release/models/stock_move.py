@@ -112,7 +112,10 @@ class StockMove(models.Model):
         }
         horizon_date = self._promise_reservation_horizon_date()
         if horizon_date:
-            sql += " AND m.date_expected <= %(horizon)s "
+            sql += (
+                " AND (m.need_release IS true AND m.date_expected <= %(horizon)s "
+                "      OR m.need_release IS false)"
+            )
             params["horizon"] = horizon_date
         return sql, params
 
