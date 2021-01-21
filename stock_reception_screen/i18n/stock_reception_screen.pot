@@ -93,6 +93,11 @@ msgid "Current Move Line"
 msgstr ""
 
 #. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_package_stored
+msgid "Current Move Line Package Stored"
+msgstr ""
+
+#. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move__reception_screen_current_step
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_step
 msgid "Current Step"
