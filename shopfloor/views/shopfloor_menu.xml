@@ -8,11 +8,7 @@
                 <field name="sequence" widget="handle" />
                 <field name="name" />
                 <field name="scenario" />
-                <field
-                    name="profile_ids"
-                    widget="many2many_tags"
-                    options="{'no_create': 1}"
-                />
+                <field name="profile_id" options="{'no_create': 1}" />
                 <field
                     name="picking_type_ids"
                     widget="many2many_tags"
@@ -40,11 +36,7 @@
                     <group name="main">
                         <field name="active" invisible="1" />
                         <field name="scenario" />
-                        <field
-                            name="profile_ids"
-                            widget="many2many_tags"
-                            options="{'no_create': 1}"
-                        />
+                        <field name="profile_id" options="{'no_create': 1}" />
                         <field
                             name="picking_type_ids"
                             widget="many2many_tags"
@@ -91,14 +83,28 @@
             <search>
                 <field name="name" />
                 <field name="scenario" />
+                <field name="profile_id" />
                 <field name="picking_type_ids" />
-                <field name="profile_ids" />
                 <separator />
                 <filter
                     string="Archived"
                     name="inactive"
                     domain="[('active', '=', False)]"
                 />
+                <group expand="0" string="Group By">
+                    <filter
+                        string="Profile"
+                        name="groupby_profile_id"
+                        domain="[]"
+                        context="{'group_by': 'profile_id'}"
+                    />
+                    <filter
+                        string="Scenario"
+                        name="groupby_scenario"
+                        domain="[]"
+                        context="{'group_by': 'scenario'}"
+                    />
+                </group>
             </search>
         </field>
     </record>

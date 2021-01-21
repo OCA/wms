@@ -19,16 +19,8 @@ class ProfileCase(CommonCase):
             data={
                 "size": 2,
                 "records": [
-                    {
-                        "id": self.ANY,
-                        "name": "Highbay Truck",
-                        "warehouse": {"id": self.ANY, "name": "YourCompany"},
-                    },
-                    {
-                        "id": self.ANY,
-                        "name": "Shelf 1",
-                        "warehouse": {"id": self.ANY, "name": "YourCompany"},
-                    },
+                    {"id": self.ANY, "name": "Highbay Truck"},
+                    {"id": self.ANY, "name": "Shelf 1"},
                 ],
             },
         )
