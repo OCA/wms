@@ -140,13 +140,13 @@ class StockLocation(models.Model):
             loc.leaf_location_ids = leaves
 
     def _should_compute_will_contain_product_ids(self):
-        return any(
+        return self.usage == "internal" and any(
             location.do_not_mix_products
             for location in self.allowed_location_storage_type_ids
         )
 
     def _should_compute_will_contain_lot_ids(self):
-        return any(
+        return self.usage == "internal" and any(
             location.do_not_mix_lots
             for location in self.allowed_location_storage_type_ids
         )
@@ -189,6 +189,11 @@ class StockLocation(models.Model):
     )
     def _compute_location_is_empty(self):
         for rec in self:
+            if rec.usage != "internal":
+                # No restriction should apply on customer/supplier/...
+                # locations.
+                rec.location_is_empty = True
+                continue
             if (
                 sum(rec.quant_ids.mapped("quantity"))
                 or rec.in_move_ids
