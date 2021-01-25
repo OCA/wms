@@ -12,7 +12,7 @@ class SinglePackTransfer(Component):
 
     You will find a sequence diagram describing states and endpoints
     relationships [here](../docs/single_pack_transfer_diag_seq.png).
-    Keep [the sequence diagram](../docs/single_pack_transfer_diag_seq.txt)
+    Keep [the sequence diagram](../docs/single_pack_transfer_diag_seq.plantuml)
     up-to-date if you change endpoints.
     """
 
