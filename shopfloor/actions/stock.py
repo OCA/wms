@@ -32,10 +32,14 @@ class StockAction(Component):
     def _check_backorder(self, picking, moves):
         """Check if the `picking` has to be validated as usual to create a backorder.
 
-        If the moves are equal to all available moves of the current picking
-        - but there are still unavailable moves to process - then we want to
-        create a normal backorder (i.e. the current picking is validated and
-        the remaining moves are put in a backorder as usual)
+        We want to create a normal backorder if:
+
+            - the moves are equal to all available moves of the current picking
+              but there are still unavailable moves to process
+            - the moves are not linked to unprocessed ancestor moves
         """
         assigned_moves = picking.move_lines.filtered(lambda m: m.state == "assigned")
-        return moves == assigned_moves
+        has_ancestors = bool(
+            moves.move_orig_ids.filtered(lambda m: m.state not in ("cancel", "done"))
+        )
+        return moves == assigned_moves and not has_ancestors

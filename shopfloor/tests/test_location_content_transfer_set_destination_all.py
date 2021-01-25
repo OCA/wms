@@ -81,6 +81,100 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         )
         self.assert_all_done(sub_shelf1)
 
+    def test_set_destination_all_with_partially_available_move_without_ancestor(self):
+        """Scanned destination location valid, but one of the move to process
+        is partially available and has no ancestor move.
+
+        In such case, normal backorder is created with the remaining qty while
+        the current pickings is validated.
+        """
+        # Put a partial quantity for 'product_d' to get a partially available move
+        self.picking2.do_unreserve()
+        self._update_qty_in_location(self.content_loc, self.product_d, 5)
+        self.picking2.action_assign()
+        self._simulate_pickings_selected(self.picking2)
+        move_d = self.picking2.move_lines.filtered(
+            lambda m: m.product_id == self.product_d
+        )
+
+        sub_shelf1 = (
+            self.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Sub Shelf 1",
+                    "barcode": "subshelf1",
+                    "location_id": self.shelf1.id,
+                }
+            )
+        )
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={"location_id": self.content_loc.id, "barcode": sub_shelf1.barcode},
+        )
+        self.assert_response_start(
+            response,
+            message=self.service.msg_store.location_content_transfer_complete(
+                self.content_loc, sub_shelf1
+            ),
+        )
+        # As we have no ancestor move in progress, a normal backorder is created
+        # with the remaining qties
+        self.assertEqual(self.picking2.state, "done")
+        self.assertEqual(move_d.state, "done")
+        self.assertEqual(move_d.product_qty, 5)
+        self.assertTrue(self.picking2.backorder_ids)
+        self.assertNotEqual(self.picking2.backorder_ids.state, "done")
+        self.assertEqual(self.picking2.backorder_ids.move_lines.product_qty, 5)
+
+    def test_set_destination_all_with_partially_available_move_with_ancestor(self):
+        """Scanned destination location valid, but one of the move to process
+        is partially available and has an unprocessed ancestor move.
+
+        In such case, new picking is created to validate the moves, and the
+        remaining qties stay in their current picking.
+        """
+        # Put a partial quantity for 'product_d' to get a partially available move
+        self.picking2.do_unreserve()
+        self._update_qty_in_location(self.content_loc, self.product_d, 5)
+        self.picking2.action_assign()
+        self._simulate_pickings_selected(self.picking2)
+        # Set an ancestor move on the partially available move
+        move_d = self.picking2.move_lines.filtered(
+            lambda m: m.product_id == self.product_d
+        )
+        move_d.move_orig_ids |= move_d.copy({"picking_id": False})
+
+        sub_shelf1 = (
+            self.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Sub Shelf 1",
+                    "barcode": "subshelf1",
+                    "location_id": self.shelf1.id,
+                }
+            )
+        )
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={"location_id": self.content_loc.id, "barcode": sub_shelf1.barcode},
+        )
+        self.assert_response_start(
+            response,
+            message=self.service.msg_store.location_content_transfer_complete(
+                self.content_loc, sub_shelf1
+            ),
+        )
+        # The current picking with the remaining qties is waiting (because of the
+        # ancestor move), and other moves are validated in a new one.
+        self.assertEqual(self.picking2.state, "waiting")
+        self.assertEqual(self.picking2.move_lines.state, "waiting")
+        self.assertEqual(self.picking2.move_lines.product_qty, 5)
+        self.assertEqual(self.picking2.backorder_ids.state, "done")
+        self.assertEqual(move_d.state, "done")
+        self.assertEqual(move_d.product_qty, 5)
+
     def test_set_destination_all_dest_location_ok_with_completion_info(self):
         """Scanned destination location valid, moves set to done accepted
         and completion info is returned as the next transfer is ready.
