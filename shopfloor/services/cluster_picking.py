@@ -64,7 +64,10 @@ class ClusterPicking(Component):
       (picking) to the second one (unload). The scenario will go
       back to the first phase if some lines remain in the queue of lines to pick.
 
-    Flow Diagram: https://www.draw.io/#G1qRenBcezk50ggIazDuu2qOfkTsoIAxXP
+    You will find a sequence diagram describing states and endpoints
+    relationships [here](../docs/cluster_picking_diag_seq.png).
+    Keep [the sequence diagram](../docs/cluster_picking_diag_seq.plantuml)
+    up-to-date if you change endpoints.
     """
 
     _inherit = "base.shopfloor.process"
