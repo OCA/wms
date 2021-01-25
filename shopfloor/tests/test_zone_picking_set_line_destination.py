@@ -342,7 +342,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         self.assertTrue(location_is_empty())
         # Check response
         self.assert_response_zero_check(
-            response, zone_location, picking_type, move_line.location_id,
+            response, zone_location, picking_type, move_line
         )
 
     def test_set_destination_package_full_qty(self):
@@ -492,5 +492,5 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         self.assertTrue(location_is_empty())
         # Check response
         self.assert_response_zero_check(
-            response, zone_location, picking_type, move_line.location_id,
+            response, zone_location, picking_type, move_line,
         )
