@@ -199,20 +199,6 @@ class StockLocation(models.Model):
                 types_sorted.mapped("max_height")[0] if types_sorted else 0
             )
 
-    def __get_putaway_strategy(self, product):
-        location = self
-        dest_location_id = (
-            super(StockLocation, self).get_putaway_strategy(product) or location.id
-        )
-        quant = self.env.context.get("storage_quant")
-        if not quant:
-            reserved_quants = self.env.context.get(
-                "reserved_quants_by_products", {}
-            ).get(product, [])
-            quant = len(reserved_quants) == 1 and next(iter(reserved_quants)) or None
-        putaway_location = self.browse(dest_location_id)
-        return self._get_pack_putaway_strategy(putaway_location, quant, product).id
-
     def _get_pack_putaway_strategy(self, putaway_location, quant, product):
         package_storage_type = False
         if quant:
