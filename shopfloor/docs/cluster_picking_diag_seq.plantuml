@@ -1,0 +1,112 @@
+# Diagram to generate with PlantUML (https://plantuml.com/)
+#
+#   $ sudo apt install plantuml
+#   $ plantuml cluster_picking_diag_seq.plantuml
+#
+
+@startuml
+participant start
+participant manual_selection
+participant confirm_start
+
+participant start_line
+participant scan_destination
+participant zero_check
+participant stock_issue
+participant change_pack_lot
+
+participant unload_all
+participant confirm_unload_all
+participant unload_single
+participant unload_set_destination
+participant confirm_unload_set_destination
+
+skinparam roundcorner 20
+skinparam sequence {
+
+ParticipantBorderColor #875A7B
+ParticipantBackgroundColor #875A7B
+ParticipantFontSize 17
+ParticipantFontColor white
+
+LifeLineBorderColor #875A7B
+
+ArrowColor #00A09D
+}
+
+header <img:oca_logo.png>
+title <size:35>Cluster Picking scenario</size>
+
+
+== Batch Transfer Selection ==
+start -[#red]> start: **/find_batch** \n(error)
+start -> confirm_start: **/find_batch**
+
+start -> manual_selection: **/list_batch**
+
+manual_selection -[#red]> manual_selection: **/select(picking_batch_id)** \n(error)
+manual_selection -> confirm_start: **/select(picking_batch_id)**
+manual_selection -> start: Button **Back** (client-side)
+
+confirm_start -> start_line: **/confirm_start(picking_batch_id)**
+confirm_start -> unload_all: **/confirm_start(picking_batch_id)** \n(we reopen a batch with all lines picked and have to be unloaded in the same destination)
+confirm_start -> unload_single: **/confirm_start(picking_batch_id)** \n(we reopen a batch with all lines picked and have to be unloaded in different destinations)
+confirm_start -> start: **/unassign(picking_batch_id)**
+
+== Picking ==
+
+start_line -[#red]> start_line: **/scan_line(picking_batch_id, move_line_id, barcode[package|product|lot])** \n(error)
+start_line -> scan_destination: **/scan_line(picking_batch_id, move_line_id, barcode[package|product|lot])** \n(error)
+
+scan_destination -[#red]> scan_destination: **/scan_destination_pack(picking_batch_id, move_line_id, barcode[package], quantity)** \n(error)
+scan_destination -> start_line: **/scan_destination_pack(picking_batch_id, move_line_id, barcode[package], quantity)** \n(other lines to pick)
+scan_destination -> zero_check: **/scan_destination_pack(picking_batch_id, move_line_id, barcode[package], quantity)** \n(source location is now empty)
+scan_destination -> unload_all: **/scan_destination_pack(picking_batch_id, move_line_id, barcode[package], quantity)** \n(all lines picked and same destination)
+scan_destination -> unload_single: **/scan_destination_pack(picking_batch_id, move_line_id, barcode[package], quantity)** \n(all lines picked and different destinations)
+
+start_line -> unload_all: **/prepare_unload(picking_batch_id)** \n(all lines picked and same destination)
+start_line -> unload_single: **/prepare_unload(picking_batch_id)** \n(all lines picked and different destinations)
+
+start_line -> start_line: **/skip_line(picking_batch_id, move_line_id)**
+
+start_line -> stock_issue: Button *Stock Issue* (client-side)
+stock_issue -> start_line: **/stock_issue(picking_batch_id, move_line_id)** \n(other lines to pick)
+stock_issue -> unload_all: **/stock_issue(picking_batch_id, move_line_id)** \n(all lines picked and same destination)
+stock_issue -> unload_single: **/stock_issue(picking_batch_id, move_line_id)** \n(all lines picked and different destinations)
+
+zero_check -> start_line: **/is_zero(picking_batch_id, move_line_id, zero[bool])** \n(other lines to pick)
+zero_check -> unload_all: **/is_zero(picking_batch_id, move_line_id, zero[bool])** \n(all lines picked and same destination)
+zero_check -> unload_single: **/is_zero(picking_batch_id, move_line_id, zero[bool])** \n(all lines picked and different destinations)
+
+start_line -> change_pack_lot: Button *Change Package/Lot* (client-side)
+change_pack_lot -[#red]> change_pack_lot: **/change_pack_lot(picking_batch_id, move_line_id, barcode[package|lot])** \n(error)
+change_pack_lot -> scan_destination: **/change_pack_lot(picking_batch_id, move_line_id, barcode[package|lot])**
+
+== Unloading ==
+
+unload_all -[#red]> unload_all: **/set_destination_all(picking_batch_id, barcode[location], confirmation=False)** \n(error)
+unload_all -> start_line: **/set_destination_all(picking_batch_id, barcode[location], confirmation=False)** \n(unloaded, batch contains other lines to pick)
+unload_all -> unload_single: **/set_destination_all(picking_batch_id, barcode[location], confirmation=False)** \n(lines have different destinations after all)
+unload_all -> confirm_unload_all: **/set_destination_all(picking_batch_id, barcode[location], confirmation=False)** \n(change of destination to confirm)
+unload_all -> start: **/set_destination_all(picking_batch_id, barcode[location], confirmation=False)** \n(batch finished)
+
+confirm_unload_all -[#red]> unload_all: **/set_destination_all(picking_batch_id, barcode[location], confirmation=False)** \n(error)
+confirm_unload_all -> start_line: **/set_destination_all(picking_batch_id, barcode[location], confirmation=False)** \n(unloaded, batch contains other lines to pick)
+confirm_unload_all -> unload_single: **/set_destination_all(picking_batch_id, barcode[location], confirmation=False)** \n(lines have different destinations after all)
+confirm_unload_all -> start: **/set_destination_all(picking_batch_id, barcode[location], confirmation=False)** \n(batch finished)
+
+unload_all -> unload_single: **/unload_split(picking_batch_id)**
+
+unload_single -[#red]> unload_single: **/unload_scan_pack(picking_batch_id, package_id, barcode[location])** \n(error)
+unload_single -> start_line: **/unload_scan_pack(picking_batch_id, package_id, barcode[location])** \n(package not found and still have lines to pick)
+unload_single -> unload_set_destination: **/unload_scan_pack(picking_batch_id, package_id, barcode[location])** \n(scan is ok, has to set a destination)
+
+unload_set_destination -[#red]> unload_single: **/unload_scan_destination(picking_batch_id, package_id, barcode[location], confirmation=False)** \n(error)
+unload_set_destination -> confirm_unload_set_destination: **/unload_scan_destination(picking_batch_id, package_id, barcode[location], confirmation=False)** \n(change of destination needs confirmation)
+unload_set_destination -> start_line: **/unload_scan_destination(picking_batch_id, package_id, barcode[location], confirmation=False)** \n(batch has other lines to pick)
+unload_set_destination -> start: **/unload_scan_destination(picking_batch_id, package_id, barcode[location], confirmation=False)** \n(batch finished)
+confirm_unload_set_destination -[#red]> unload_single: **/unload_scan_destination(picking_batch_id, package_id, barcode[location], confirmation=False)** \n(error)
+confirm_unload_set_destination -> start_line: **/unload_scan_destination(picking_batch_id, package_id, barcode[location], confirmation=False)** \n(batch has other lines to pick)
+confirm_unload_set_destination -> start: **/unload_scan_destination(picking_batch_id, package_id, barcode[location], confirmation=False)** \n(batch finished)
+
+@enduml
