@@ -94,7 +94,7 @@ const messages_en = {
         btn_manual_selection: "Manual selection",
         stock_zero_check: {
             confirm_stock_zero: "Confirm stock = 0",
-            confirm_stock_not_zero: "Confirm stock not empty",
+            confirm_stock_not_zero: "Declare stock not empty",
         },
         actions_popup: {
             btn_action: "Action",
