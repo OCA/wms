@@ -1,7 +1,7 @@
 # Diagram to generate with PlantUML (https://plantuml.com/)
 #
 #   $ sudo apt install plantuml
-#   $ plantuml single_pack_transfer_diag_seq.txt
+#   $ plantuml single_pack_transfer_diag_seq.plantuml
 #
 
 @startuml
