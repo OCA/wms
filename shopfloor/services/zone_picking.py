@@ -187,12 +187,10 @@ class ZonePicking(Component):
             next_state="set_line_destination", data=data, message=message
         )
 
-    def _response_for_zero_check(self, location, message=None):
-        return self._response(
-            next_state="zero_check",
-            data=self._data_for_location(location),
-            message=message,
-        )
+    def _response_for_zero_check(self, move_line, message=None):
+        data = self._data_for_location(move_line.location_id)
+        data["move_line"] = self.data.move_line(move_line)
+        return self._response(next_state="zero_check", data=data, message=message,)
 
     def _response_for_change_pack_lot(self, move_line, message=None):
         return self._response(
@@ -612,7 +610,7 @@ class ZonePicking(Component):
         # Zero check
         zero_check = self.picking_type.shopfloor_zero_check
         if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
-            response = self._response_for_zero_check(move_line.location_id)
+            response = self._response_for_zero_check(move_line)
         return (location_changed, response)
 
     def _is_package_empty(self, package):
@@ -686,7 +684,7 @@ class ZonePicking(Component):
         # Zero check
         zero_check = self.picking_type.shopfloor_zero_check
         if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
-            response = self._response_for_zero_check(move_line.location_id)
+            response = self._response_for_zero_check(move_line)
         return (package_changed, response)
 
     def set_destination(
@@ -1463,5 +1461,6 @@ class ShopfloorZonePickingValidatorResponse(Component):
             "zone_location": self.schemas._schema_dict_of(self.schemas.location()),
             "picking_type": self.schemas._schema_dict_of(self.schemas.picking_type()),
             "location": self.schemas._schema_dict_of(self.schemas.location()),
+            "move_line": self.schemas._schema_dict_of(self.schemas.move_line()),
         }
         return schema
