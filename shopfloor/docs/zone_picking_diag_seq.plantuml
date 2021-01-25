@@ -1,7 +1,7 @@
 # Diagram to generate with PlantUML (https://plantuml.com/)
 #
 #   $ sudo apt install plantuml
-#   $ plantuml zone_picking_diag_seq.txt
+#   $ plantuml zone_picking_diag_seq.plantuml
 #
 
 @startuml
