@@ -372,7 +372,7 @@ class ZonePickingCommonCase(CommonCase):
         )
 
     def _assert_response_zero_check(
-        self, state, response, zone_location, picking_type, location, message=None,
+        self, state, response, zone_location, picking_type, move_line, message=None,
     ):
         self.assert_response(
             response,
@@ -380,20 +380,21 @@ class ZonePickingCommonCase(CommonCase):
             data={
                 "zone_location": self.data.location(zone_location),
                 "picking_type": self.data.picking_type(picking_type),
-                "location": self.data.location(location),
+                "location": self.data.location(move_line.location_id),
+                "move_line": self.data.move_line(move_line),
             },
             message=message,
         )
 
     def assert_response_zero_check(
-        self, response, zone_location, picking_type, location, message=None,
+        self, response, zone_location, picking_type, move_line, message=None,
     ):
         self._assert_response_zero_check(
             "zero_check",
             response,
             zone_location,
             picking_type,
-            location,
+            move_line,
             message=message,
         )
 
