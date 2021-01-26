@@ -108,6 +108,14 @@ class ChannelReleaseCase(PromiseReleaseCommonCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.commercial_partner = cls.env["res.partner"].create({"name": "Main Company"})
+        cls.delivery_address_1 = cls.env["res.partner"].create(
+            {"name": "Delivery 1", "parent_id": cls.commercial_partner.id}
+        )
+        cls.delivery_address_2 = cls.env["res.partner"].create(
+            {"name": "Delivery 2", "parent_id": cls.commercial_partner.id}
+        )
+        cls.other_partner = cls.env["res.partner"].create({"name": "Partner 2"})
 
         cls.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         cls.picking = cls._out_picking(
@@ -115,16 +123,19 @@ class ChannelReleaseCase(PromiseReleaseCommonCase):
                 cls.wh, [(cls.product1, 5), (cls.product2, 5)], move_type="direct",
             )
         )
+        cls.picking.partner_id = cls.delivery_address_1
         cls.picking2 = cls._out_picking(
             cls._create_picking_chain(
                 cls.wh, [(cls.product1, 5), (cls.product2, 5)], move_type="direct",
             )
         )
+        cls.picking2.partner_id = cls.delivery_address_2
         cls.picking3 = cls._out_picking(
             cls._create_picking_chain(
                 cls.wh, [(cls.product1, 5), (cls.product2, 5)], move_type="direct",
             )
         )
+        cls.picking3.partner_id = cls.other_partner
         (cls.picking + cls.picking2 + cls.picking3).assign_release_channel()
 
         cls.channel = cls.picking.release_channel_id
