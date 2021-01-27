@@ -346,7 +346,7 @@ class ZonePicking(Component):
 
     def _find_buffer_move_lines_domain(self, dest_package=None):
         domain = [
-            ("location_id", "child_of", self.zone_location.id),
+            ("picking_id.picking_type_id", "in", self.picking_types.ids),
             ("qty_done", ">", 0),
             ("state", "not in", ("cancel", "done")),
             ("result_package_id", "!=", False),
@@ -675,17 +675,20 @@ class ZonePicking(Component):
             move_line.with_context(
                 bypass_reservation_update=True
             ).product_uom_qty = quantity
-        move_line.qty_done = quantity
-        # destination package is set to the scanned one
-        move_line.result_package_id = package
-        # the field ``shopfloor_user_id`` is updated with the current user
-        move_line.shopfloor_user_id = self.env.user
+        self._set_move_line_as_done(move_line, quantity, package)
         package_changed = True
         # Zero check
         zero_check = self.picking_type.shopfloor_zero_check
         if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
             response = self._response_for_zero_check(move_line)
         return (package_changed, response)
+
+    def _set_move_line_as_done(self, move_line, quantity, package, user=None):
+        move_line.qty_done = quantity
+        # destination package is set to the scanned one
+        move_line.result_package_id = package
+        # the field ``shopfloor_user_id`` is updated with the current user
+        move_line.shopfloor_user_id = user or self.env.user
 
     def set_destination(
         self, move_line_id, barcode, quantity, confirmation=False,
