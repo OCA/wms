@@ -178,20 +178,6 @@
                                         attrs="{'invisible': [('current_move_line_qty_status', '!=', 'gt')]}"
                                     />
                                 </div>
-                                <!-- set_location -->
-                                <label for="current_move_line_location_dest_id" />
-                                <div>
-                                    <field
-                                        name="current_move_line_location_dest_id"
-                                        class="mr8"
-                                        attrs="{
-                      'required': [('current_step', '=', 'set_location')],
-                      'readonly': [('current_step', '!=', 'set_location')],
-                    }"
-                                        options="{'no_open': True, 'no_create_edit': True}"
-                                        domain="[('id', 'child_of', picking_location_dest_id), ('usage', '!=', 'view')]"
-                                    />
-                                </div>
                                 <!-- select_packaging -->
                                 <label for="package_storage_type_id" />
                                 <div>
@@ -231,6 +217,20 @@
                                         attrs="{
                             'readonly': [('current_step', '!=', 'select_packaging')],
                           }"
+                                    />
+                                </div>
+                                <!-- set_location -->
+                                <label for="current_move_line_location_dest_id" />
+                                <div>
+                                    <field
+                                        name="current_move_line_location_dest_id"
+                                        class="mr8"
+                                        attrs="{
+                      'required': [('current_step', '=', 'set_location')],
+                      'readonly': [('current_step', '!=', 'set_location')],
+                    }"
+                                        options="{'no_open': True, 'no_create_edit': True}"
+                                        domain="[('id', 'child_of', picking_location_dest_id), ('usage', '!=', 'view')]"
                                     />
                                 </div>
                                 <!-- set_package -->

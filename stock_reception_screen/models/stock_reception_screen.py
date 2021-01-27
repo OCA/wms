@@ -37,22 +37,22 @@ class StockReceptionScreen(models.Model):
         },
         "set_quantity": {
             "label": _("Set Quantity"),
-            "next_steps": [{"next": "set_location"}],
-            "focus_field": "current_move_line_qty_done",
-        },
-        "set_location": {
-            "label": _("Set Destination"),
             "next_steps": [
                 {
-                    "before": "_before_set_location_to_select_packaging",
+                    "before": "_before_set_quantity_to_select_packaging",
                     "next": "select_packaging",
                 }
             ],
-            "focus_field": "current_move_line_location_dest_id",
+            "focus_field": "current_move_line_qty_done",
         },
         "select_packaging": {
             "label": _("Select Packaging"),
+            "next_steps": [{"next": "set_location"}],
+        },
+        "set_location": {
+            "label": _("Set Destination"),
             "next_steps": [{"next": "set_package"}],
+            "focus_field": "current_move_line_location_dest_id",
         },
         "set_package": {
             "label": _("Set Package"),
@@ -570,7 +570,7 @@ class StockReceptionScreen(models.Model):
     def process_select_packaging(self):
         self.next_step()
 
-    def _before_set_location_to_select_packaging(self):
+    def _before_set_quantity_to_select_packaging(self):
         """Auto-complete the package data matching the qty (if there is one)."""
         qty_done = self.current_move_line_qty_done
         if qty_done:
@@ -698,9 +698,6 @@ class StockReceptionScreen(models.Model):
         assert self.current_step == "set_quantity", f"step = {self.current_step}"
         self.current_move_line_qty_done = qty_done
         self.process_set_quantity()
-        #   - set the destination
-        self.current_move_line_location_dest_id = location_dest
-        self.process_set_location()
         #   - set packaging data
         assert self.current_step == "select_packaging", f"step = {self.current_step}"
         self.product_packaging_id = product_packaging
@@ -708,6 +705,10 @@ class StockReceptionScreen(models.Model):
         if self.package_storage_type_height_required:
             self.package_height = package_height
         self.process_select_packaging()
+        #   - set the destination
+        assert self.current_step == "set_location", f"step = {self.current_step}"
+        self.current_move_line_location_dest_id = location_dest
+        self.process_set_location()
         assert self.current_step == "set_package", f"step = {self.current_step}"
         return True
 
