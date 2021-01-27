@@ -19,12 +19,7 @@ class ZonePickingChangePackLotCase(ZonePickingCommonCase):
         barcode = "UNKNOWN"
         response = self.service.dispatch(
             "change_pack_lot",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "move_line_id": move_line.id,
-                "barcode": barcode,
-            },
+            params={"move_line_id": move_line.id, "barcode": barcode},
         )
         self.assert_response_change_pack_lot(
             response,
@@ -49,12 +44,7 @@ class ZonePickingChangePackLotCase(ZonePickingCommonCase):
         # change package
         response = self.service.dispatch(
             "change_pack_lot",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "move_line_id": move_line.id,
-                "barcode": self.free_package.name,
-            },
+            params={"move_line_id": move_line.id, "barcode": self.free_package.name},
         )
         # check data
         self.assertRecordValues(
@@ -115,12 +105,7 @@ class ZonePickingChangePackLotCase(ZonePickingCommonCase):
         # change lot
         response = self.service.dispatch(
             "change_pack_lot",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "move_line_id": move_line.id,
-                "barcode": self.free_lot.name,
-            },
+            params={"move_line_id": move_line.id, "barcode": self.free_lot.name},
         )
         # check data
         self.assertRecordValues(move_line, [{"lot_id": self.free_lot.id}])
