@@ -104,8 +104,6 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "unload_set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "package_id": self.free_package.id,
                 "barcode": self.packing_sublocation_b.barcode,
             },

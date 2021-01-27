@@ -34,12 +34,7 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         )
         # set destination location for all lines in the buffer
         response = self.service.dispatch(
-            "set_destination_all",
-            params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
-                "barcode": self.packing_location.barcode,
-            },
+            "set_destination_all", params={"barcode": self.packing_location.barcode},
         )
         # check response
         buffer_lines = self.service._find_buffer_move_lines()
