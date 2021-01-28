@@ -165,6 +165,13 @@ class StockReceptionScreen(models.Model):
     package_storage_type_id = fields.Many2one(
         "stock.package.storage.type",
     )
+    package_storage_type_id = fields.Many2one("stock.package.storage.type",)
+    allowed_location_dest_ids = fields.One2many(
+        "stock.location",
+        string="Allowed destination locations",
+        help="Allowed destination locations based on the package storage type.",
+        compute="_compute_allowed_location_dest_ids",
+    )
     package_storage_type_height_required = fields.Boolean(
         related="package_storage_type_id.height_required"
     )
@@ -204,14 +211,20 @@ class StockReceptionScreen(models.Model):
 
     @api.depends("current_move_line_id.location_dest_id")
     def _compute_current_move_line_location_dest_id(self):
+        """Compute the default destination location for the processed line."""
         for wiz in self:
             move_line = wiz.current_move_line_id
+            # Default location
             wiz.current_move_line_location_dest_id = move_line.location_dest_id
             location = move_line.location_dest_id._get_putaway_strategy(
                 move_line.product_id
             )
             if location:
                 wiz.current_move_line_location_dest_id = location
+            # If there are some allowed destinations set the field empty,
+            # the user will choose the right one among them
+            if wiz.allowed_location_dest_ids:
+                wiz.current_move_line_location_dest_id = False
 
     def _inverse_current_move_line_location_dest_id(self):
         for wiz in self:
@@ -248,6 +261,24 @@ class StockReceptionScreen(models.Model):
     def _inverse_current_move_line_package(self):
         for wiz in self:
             wiz.current_move_line_package_stored = wiz.current_move_line_package
+
+    @api.depends("package_storage_type_id.location_storage_type_ids")
+    def _compute_allowed_location_dest_ids(self):
+        for wiz in self:
+            if wiz.package_storage_type_id:
+                wiz.allowed_location_dest_ids = self.env["stock.location"].search(
+                    [
+                        (
+                            "allowed_location_storage_type_ids",
+                            "in",
+                            wiz.package_storage_type_id.location_storage_type_ids.ids,
+                        ),
+                    ]
+                )
+            else:
+                wiz.allowed_location_dest_ids = self.env["stock.location"].search(
+                    [("id", "child_of", self.picking_location_dest_id.id)]
+                )
 
     @api.onchange("product_packaging_id")
     def onchange_product_packaging_id(self):
