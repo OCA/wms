@@ -292,6 +292,7 @@ msgstr ""
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_search_view
 msgid "Group By"
 msgstr ""
 
@@ -545,7 +546,7 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/services/service.py:0
 #, python-format
-msgid "No operation types configured on menu {} for warehouse {}."
+msgid "No operation types configured on menu {}."
 msgstr ""
 
 #. module: shopfloor
@@ -622,6 +623,11 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Operation's already running. Would you like to take it over?"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__options
+msgid "Options"
 msgstr ""
 
 #. module: shopfloor
@@ -816,10 +822,15 @@ msgid "Product(s) processed as raw product(s)"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.actions.act_window,name:shopfloor.action_shopfloor_profile
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__profile_id
-#: model:ir.ui.menu,name:shopfloor.menu_action_shopfloor_profil
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_search_view
 msgid "Profile"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.actions.act_window,name:shopfloor.action_shopfloor_profile
+#: model:ir.ui.menu,name:shopfloor.menu_action_shopfloor_profile
+msgid "Profiles"
 msgstr ""
 
 #. module: shopfloor
@@ -894,6 +905,12 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "Same package {} is already assigned."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "Scan the destination location"
 msgstr ""
 
@@ -906,6 +923,7 @@ msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scenario
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_search_view
 msgid "Scenario"
 msgstr ""
 
@@ -1146,6 +1164,12 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "The content of {} cannot be transferred with this scenario."
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/services/cluster_picking.py:0
 #, python-format
 msgid "The destination bin {} is not empty, please take another."
@@ -1155,6 +1179,12 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The pack has been moved, you can scan a new pack."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "The package %s cannot be transferred with this scenario."
 msgstr ""
 
 #. module: shopfloor
