@@ -94,6 +94,7 @@
                 <field name="current_move_product_id" invisible="1" />
                 <field name="current_move_line_id" invisible="1" />
                 <field name="package_storage_type_height_required" invisible="1" />
+                <field name="allowed_location_dest_ids" invisible="1" />
                 <div class="o_screen_data">
                     <div class="o_screen_data_content" name="data">
                         <group attrs="{'invisible': [('current_move_id', '=', False)]}">
@@ -230,7 +231,7 @@
                       'readonly': [('current_step', '!=', 'set_location')],
                     }"
                                         options="{'no_open': True, 'no_create_edit': True}"
-                                        domain="[('id', 'child_of', picking_location_dest_id), ('usage', '!=', 'view')]"
+                                        domain="[('usage', '!=', 'view'), ('id', 'in', allowed_location_dest_ids)]"
                                     />
                                 </div>
                                 <!-- set_package -->
