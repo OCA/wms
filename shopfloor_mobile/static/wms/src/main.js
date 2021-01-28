@@ -122,9 +122,6 @@ const app = new Vue({
                 this.$storage.set("profile", v);
             },
         },
-        has_set_workstation: function() {
-            return !_.isEmpty(this.workstation);
-        },
         workstation: {
             get: function() {
                 if (_.isEmpty(this.current_workstation)) {
