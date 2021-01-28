@@ -50,6 +50,7 @@ export var Workstation = Vue.component("workstation", {
                 this.scan_data = result.data;
                 this.scan_message = result.message;
                 if (this.scan_data) {
+                    this.$root.workstation = this.scan_data;
                     if (this.scan_data.profile) {
                         this.$root.trigger(
                             "profile:selected",
