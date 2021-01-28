@@ -108,6 +108,7 @@ class StockReceptionScreen(models.Model):
     current_filter_product = fields.Char(string="Filter product", copy=False)
     # current move
     current_move_id = fields.Many2one(comodel_name="stock.move", copy=False)
+    current_move_has_tracking = fields.Selection(related="current_move_id.has_tracking")
     current_move_product_id = fields.Many2one(
         related="current_move_id.product_id", string="Move's product"
     )
@@ -123,6 +124,16 @@ class StockReceptionScreen(models.Model):
     )
     current_move_product_vendor_code = fields.Char(
         related="current_move_id.vendor_code"
+    )
+    current_move_product_qty_available = fields.Float(
+        related="current_move_id.product_id.qty_available"
+    )
+    current_move_product_outgoing_qty = fields.Float(
+        related="current_move_id.product_id.outgoing_qty"
+    )
+    current_move_product_last_lot_life_date = fields.Datetime(
+        compute="_compute_current_move_product_last_lot_life_date",
+        string="Most recent exp. date",
     )
     # current move line
     current_move_line_id = fields.Many2one(comodel_name="stock.move.line", copy=False)
@@ -208,6 +219,18 @@ class StockReceptionScreen(models.Model):
                 wiz.current_step_focus_field = steps[self.current_step].get(
                     "focus_field", ""
                 )
+
+    def _compute_current_move_product_last_lot_life_date(self):
+        for wiz in self:
+            lot = self.env["stock.production.lot"].search(
+                [
+                    ("product_id", "=", wiz.current_move_product_id.id),
+                    ("life_date", "!=", False),
+                ],
+                order="life_date DESC",
+                limit=1,
+            )
+            wiz.current_move_product_last_lot_life_date = lot.life_date
 
     @api.depends("current_move_line_id.location_dest_id")
     def _compute_current_move_line_location_dest_id(self):
