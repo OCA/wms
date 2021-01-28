@@ -24,3 +24,4 @@ stock-logistics-workflow
 web
 rest-framework
 server-auth
+report-print-send
