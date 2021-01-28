@@ -353,6 +353,17 @@ class LocationContentTransfer(Component):
                 )
             pickings = new_moves.mapped("picking_id")
             move_lines = new_moves.move_line_ids
+            for move_line in move_lines:
+                if not move_line.location_dest_id.is_sublocation_of(
+                    menu.picking_type_ids.default_location_dest_id
+                ):
+                    savepoint.rollback()
+
+                    return self._response_for_start(
+                        message=self.msg_store.location_content_unable_to_transfer(
+                            location
+                        )
+                    )
 
         if self.work.menu.ignore_no_putaway_available and self._no_putaway_available(
             move_lines
@@ -410,7 +421,8 @@ class LocationContentTransfer(Component):
 
     def _set_all_destination_lines_and_done(self, pickings, move_lines, dest_location):
         self._write_destination_on_lines(move_lines, dest_location)
-        pickings.action_done()
+        stock = self.actions_for("stock")
+        stock.validate_moves(move_lines.move_id)
 
     def _lock_lines(self, lines):
         """Lock move lines"""
@@ -656,7 +668,8 @@ class LocationContentTransfer(Component):
             # split the move to process only the lines related to the package.
             package_move.split_other_move_lines(package_move_lines)
         self._write_destination_on_lines(package_level.move_line_ids, scanned_location)
-        package_moves.extract_and_action_done()
+        stock = self.actions_for("stock")
+        stock.validate_moves(package_moves)
         move_lines = self._find_transfer_move_lines(location)
         message = self.msg_store.location_content_transfer_item_complete(
             scanned_location
@@ -730,7 +743,8 @@ class LocationContentTransfer(Component):
                 remaining_move_line.qty_done = remaining_move_line.product_uom_qty
         move_line.move_id.split_other_move_lines(move_line)
         self._write_destination_on_lines(move_line, scanned_location)
-        move_line.move_id.extract_and_action_done()
+        stock = self.actions_for("stock")
+        stock.validate_moves(move_line.move_id)
         move_lines = self._find_transfer_move_lines(location)
         message = self.msg_store.location_content_transfer_item_complete(
             scanned_location

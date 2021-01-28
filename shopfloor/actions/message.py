@@ -227,6 +227,13 @@ class MessageAction(Component):
             "body": _("No putaway destination is available."),
         }
 
+    def package_unable_to_transfer(self, pack):
+        return {
+            "message_type": "error",
+            "body": _("The package %s cannot be transferred with this scenario.")
+            % pack.name,
+        }
+
     def unrecoverable_error(self):
         return {
             "message_type": "error",
@@ -237,6 +244,12 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Package {} has a different content.").format(package.name),
+        }
+
+    def package_change_error_same_package(self, package):
+        return {
+            "message_type": "error",
+            "body": _("Same package {} is already assigned.").format(package.name),
         }
 
     def x_units_put_in_package(self, qty, product, package):
@@ -277,10 +290,8 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                _(
-                    "This product is part of a package with other products, "
-                    "please scan a package."
-                )
+                "This product is part of a package with other products, "
+                "please scan a package."
             ),
         }
 
@@ -300,10 +311,8 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                _(
-                    "This lot is part of a package with other products, "
-                    "please scan a package."
-                )
+                "This lot is part of a package with other products, "
+                "please scan a package."
             ),
         }
 
@@ -355,6 +364,14 @@ class MessageAction(Component):
             "body": _("Content transferred from {} to {}.").format(
                 location_src.name, location_dest.name
             ),
+        }
+
+    def location_content_unable_to_transfer(self, location_dest):
+        return {
+            "message_type": "error",
+            "body": _(
+                "The content of {} cannot be transferred with this scenario."
+            ).format(location_dest.name),
         }
 
     def picking_already_started_in_location(self, pickings):
@@ -430,7 +447,7 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _(
-                _("Package {} cannot be picked, already moved by transfer {}.")
+                "Package {} cannot be picked, already moved by transfer {}."
             ).format(package.name, picking.name),
         }
 

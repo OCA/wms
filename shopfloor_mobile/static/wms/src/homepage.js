@@ -37,7 +37,7 @@ export var HomePage = Vue.component("home-page", {
             <div class="button-list button-vertical-list full" v-if="$root.demo_mode">
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-action action="cancel" @click="nuke_data_and_reload()">$t('screen.home.action.nuke_data_and_reload')</btn-action>
+                        <btn-action action="cancel" @click="nuke_data_and_reload()">{{ $t('screen.home.action.nuke_data_and_reload') }}</btn-action>
                     </v-col>
                 </v-row>
             </div>

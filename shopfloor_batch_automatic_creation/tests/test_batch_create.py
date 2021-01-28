@@ -1,5 +1,5 @@
-import os
-import unittest
+# Copyright 2020 Camptocamp
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from odoo.addons.shopfloor.tests.common import CommonCase
 
@@ -10,8 +10,8 @@ class TestBatchCreate(CommonCase):
         super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
-        cls.wh = cls.profile.warehouse_id
         cls.picking_type = cls.menu.picking_type_ids
+        cls.wh = cls.picking_type.warehouse_id
 
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
@@ -64,9 +64,6 @@ class TestBatchCreate(CommonCase):
         # when we have users on pickings, we select only those for the batch
         self.assertEqual(batch.picking_ids, self.picking2 + self.picking3)
 
-    @unittest.skipIf(
-        os.getenv("TRAVIS"), "failing test only on travis, need to be investigated"
-    )
     def test_create_batch_max_weight(self):
         # each picking has 2 lines of 10 units, set weight of 1kg per unit,
         # we'll have a total weight of 20kg per picking

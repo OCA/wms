@@ -73,6 +73,15 @@ Vue.component("Screen", {
         show_message: false,
     }),
     mounted() {
+        this.$watch(
+            "drawer",
+            value => {
+                if (value)
+                    // Refresh menu items and their counters when the drawer is expanded
+                    this.$root.loadMenu(true);
+            },
+            {immediate: true}
+        );
         // Manage popup display by passed property
         this.$watch(
             "screen_info.user_popup",
@@ -96,10 +105,24 @@ Vue.component("Screen", {
                 app
                 >
             <v-list>
-                <v-btn icon class="close-menu" @click.stop="drawer = !drawer"><v-icon>mdi-close</v-icon></v-btn>
-                <nav-items :navigation="navigation"/>
+                <nav-items :navigation="navigation" :show_full_info="false" />
                 <nav-items-extra />
             </v-list>
+            <template v-slot:append>
+                <v-divider></v-divider>
+                <v-list v-if="$root.user.id">
+                    <v-list-item>
+                        <v-list-item-avatar>
+                            <v-avatar color="primary" size="36">
+                                <v-icon dark>mdi-account-circle</v-icon>
+                            </v-avatar>
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                            <span v-text="$root.user.name" />
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list>
+            </template>
         </v-navigation-drawer>
         <v-app-bar
                 color="#491966"
@@ -161,7 +184,7 @@ Vue.component("Screen", {
                 <screen-loading :loading="$root.loading" />
                 <div class="main-content">
                     <slot>
-                        <span v-if="this.$root.has_profile">$t('app.loading')</span>
+                        <span v-if="this.$root.has_profile">{{ $t('app.loading') }}</span>
                     </slot>
                 </div>
             </v-container>
@@ -177,6 +200,10 @@ Vue.component("Screen", {
 Vue.component("nav-items", {
     props: {
         navigation: Array,
+        show_full_info: {
+            type: Boolean,
+            default: true,
+        },
     },
     // NOTE: activation via router won't work because we can use the same route w/ several menu items.
     // Hence we match via menu id.
@@ -191,17 +218,26 @@ Vue.component("nav-items", {
             :color="$route.params.menu_id == item.id ? 'v-item-active' : null"
             >
             <v-list-item-content>
-                <v-list-item-title>
+                <v-list-item-title class="primary--text">
                     {{ item.name }}
                 </v-list-item-title>
-                <v-list-item-subtitle>
-                    <small class="font-weight-light">{{ $t('app.nav.scenario') }} {{ item.scenario }}</small>
+                <v-list-item-subtitle v-if="show_full_info">
+                    <small class="font-weight-light"><strong>{{ $t('app.nav.scenario') }}</strong> {{ item.scenario }}</small>
                     <br />
-                    <small class="font-weight-light">
-                        {{ $t('app.nav.op_types') }} <span v-for="pt in item.picking_types" :key="'pt-' + item.id + '-' + pt.id">{{ pt.name }}</span>
+                    <small class="font-weight-light text-wrap pr-2">
+                        <strong>{{ $t('app.nav.op_types') }}</strong>
+                        <span v-for="(pt, index) in item.picking_types"
+                              :key="'pt-' + item.id + '-' + pt.id"
+                              >{{ pt.name }}<span v-if="index != (item.picking_types.length - 1)">,</span>
+                        </span>
                     </small>
                 </v-list-item-subtitle>
             </v-list-item-content>
+            <v-list-item-action v-if="item.lines_count">
+                <div class="pa-4 secondary text-no-wrap rounded-pill">
+                    {{ $t('misc.lines_count', item) }}
+                </div>
+            </v-list-item-action>
         </v-list-item>
     </div>
     `,

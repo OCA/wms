@@ -64,7 +64,10 @@ class ClusterPicking(Component):
       (picking) to the second one (unload). The scenario will go
       back to the first phase if some lines remain in the queue of lines to pick.
 
-    Flow Diagram: https://www.draw.io/#G1qRenBcezk50ggIazDuu2qOfkTsoIAxXP
+    You will find a sequence diagram describing states and endpoints
+    relationships [here](../docs/cluster_picking_diag_seq.png).
+    Keep [the sequence diagram](../docs/cluster_picking_diag_seq.plantuml)
+    up-to-date if you change endpoints.
     """
 
     _inherit = "base.shopfloor.process"
@@ -468,10 +471,10 @@ class ClusterPicking(Component):
                 move_line, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
             )
 
-        # if we scanned a product and it's part of several packages, we can't be
-        # sure the user scanned the correct one, in such case, ask to scan a package
+        # If scanned product is part of several packages in the same location,
+        # we can't be sure it's the correct one, in such case, ask to scan a package
         other_product_lines = picking.move_line_ids.filtered(
-            lambda l: l.product_id == product
+            lambda l: l.product_id == product and l.location_id == move_line.location_id
         )
         packages = other_product_lines.mapped("package_id")
         # Do not use mapped here: we want to see if we have more than one package,
@@ -957,6 +960,11 @@ class ClusterPicking(Component):
                 picking.action_done()
 
     def _unload_end(self, batch, completion_info_popup=None):
+        """Try to close the batch if all transfers are done.
+
+        Returns to `start_line` transition if some lines could still be processed,
+        otherwise try to validate all the transfers of the batch.
+        """
         if all(picking.state == "done" for picking in batch.picking_ids):
             # do not use the 'done()' method because it does many things we
             # don't care about
@@ -979,6 +987,12 @@ class ClusterPicking(Component):
             # produce backorders)
             batch.mapped("picking_ids").action_done()
             batch.state = "done"
+            # Unassign not validated pickings from the batch, they will be
+            # processed in another batch automatically later on
+            pickings_not_done = batch.mapped("picking_ids").filtered(
+                lambda p: p.state != "done"
+            )
+            pickings_not_done.batch_id = False
             return self._response_for_start(
                 message=self.msg_store.batch_transfer_complete(),
                 popup=completion_info_popup,

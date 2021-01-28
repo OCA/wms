@@ -56,11 +56,11 @@ class BaseShopfloorService(AbstractComponent):
     # can be overridden to disable logging of requests to DB
     _log_calls_in_db = True
 
-    def dispatch(self, method_name, _id=None, params=None):
+    def dispatch(self, method_name, *args, params=None):
         self._validate_headers_update_work_context(request, method_name)
         if not self._db_logging_active():
-            return super().dispatch(method_name, _id=_id, params=params)
-        return self._dispatch_with_db_logging(method_name, _id=_id, params=params)
+            return super().dispatch(method_name, *args, params=params)
+        return self._dispatch_with_db_logging(method_name, *args, params=params)
 
     def _db_logging_active(self):
         return (
@@ -70,45 +70,47 @@ class BaseShopfloorService(AbstractComponent):
         )
 
     # TODO logging to DB should be an extra module for base_rest
-    def _dispatch_with_db_logging(self, method_name, _id=None, params=None):
+    def _dispatch_with_db_logging(self, method_name, *args, params=None):
         try:
-            result = super().dispatch(method_name, _id=_id, params=params)
+            result = super().dispatch(method_name, *args, params=params)
         except exceptions.UserError as orig_exception:
             self._dispatch_exception(
                 ShopfloorServiceUserErrorException,
                 orig_exception,
-                _id=_id,
+                *args,
                 params=params,
             )
         except exceptions.ValidationError as orig_exception:
             self._dispatch_exception(
                 ShopfloorServiceValidationErrorException,
                 orig_exception,
-                _id=_id,
+                *args,
                 params=params,
             )
         except Exception as orig_exception:
             self._dispatch_exception(
-                ShopfloorServiceDispatchException,
-                orig_exception,
-                _id=_id,
-                params=params,
+                ShopfloorServiceDispatchException, orig_exception, *args, params=params,
             )
-        log_entry = self._log_call_in_db(self.env, request, _id, params, result=result)
+        log_entry = self._log_call_in_db(
+            self.env, request, *args, params=params, result=result
+        )
         log_entry_url = self._get_log_entry_url(log_entry)
         result["log_entry_url"] = log_entry_url
         return result
 
-    def _dispatch_exception(
-        self, exception_klass, orig_exception, _id=None, params=None
-    ):
+    def _dispatch_exception(self, exception_klass, orig_exception, *args, params=None):
         tb = traceback.format_exc()
         # TODO: how to test this? Cannot rollback nor use another cursor
         self.env.cr.rollback()
         with registry(self.env.cr.dbname).cursor() as cr:
             env = self.env(cr=cr)
             log_entry = self._log_call_in_db(
-                env, request, _id, params, traceback=tb, orig_exception=orig_exception
+                env,
+                request,
+                *args,
+                params=params,
+                traceback=tb,
+                orig_exception=orig_exception,
             )
             log_entry_url = self._get_log_entry_url(log_entry)
         # UserError and alike have `name` attribute to store the msg
@@ -133,14 +135,14 @@ class BaseShopfloorService(AbstractComponent):
     def _log_call_header_strip(self):
         return ("Cookie", "Api-Key")
 
-    def _log_call_in_db_values(self, _request, _id, params, **kw):
+    def _log_call_in_db_values(self, _request, *args, params=None, **kw):
         httprequest = _request.httprequest
         headers = dict(httprequest.headers)
         for header_key in self._log_call_header_strip:
             if header_key in headers:
                 headers[header_key] = "<redacted>"
-        if _id:
-            params = dict(params, _id=_id)
+        if args:
+            params = dict(params or {}, args=args)
 
         result = kw.get("result")
         error = kw.get("traceback")
@@ -164,8 +166,8 @@ class BaseShopfloorService(AbstractComponent):
             "state": "success" if result else "failed",
         }
 
-    def _log_call_in_db(self, env, _request, _id, params, **kw):
-        values = self._log_call_in_db_values(_request, _id, params, **kw)
+    def _log_call_in_db(self, env, _request, *args, params=None, **kw):
+        values = self._log_call_in_db_values(_request, *args, params=params, **kw)
         if not values:
             return
         return env["shopfloor.log"].sudo().create(values)
@@ -193,20 +195,6 @@ class BaseShopfloorService(AbstractComponent):
         for record in records:
             res.append(self._convert_one_record(record))
         return res
-
-    def _get_input_validator(self, method_name):
-        # override the method to get the validator in a component
-        # instead of a method, to keep things apart
-        validator_component = self.component(usage="%s.validator" % self._usage)
-        return validator_component._get_validator(method_name)
-
-    def _get_output_validator(self, method_name):
-        # override the method to get the validator in a component
-        # instead of a method, to keep things apart
-        validator_component = self.component(
-            usage="%s.validator.response" % self._usage
-        )
-        return validator_component._get_validator(method_name)
 
     def _response(
         self, base_response=None, data=None, next_state=None, message=None, popup=None
@@ -320,19 +308,22 @@ class BaseShopfloorService(AbstractComponent):
     def actions_collection(self):
         return _PseudoCollection(self._actions_collection_name, self.env)
 
-    def actions_for(self, usage):
+    def actions_for(self, usage, propagate_kwargs=None, **kw):
         """Return an Action Component for a usage
 
         Action Components are the components supporting the business logic of
         the processes, so we can limit the code in Services to the minimum and
         share methods.
         """
+        propagate_kwargs = self.work._propagate_kwargs[:] + (propagate_kwargs or [])
         # propagate custom arguments (such as menu ID/profile ID)
         kwargs = {
             attr_name: getattr(self.work, attr_name)
-            for attr_name in self.work._propagate_kwargs
+            for attr_name in propagate_kwargs
             if attr_name not in ("collection", "components_registry")
+            and hasattr(self.work, attr_name)
         }
+        kwargs.update(kw)
         work = WorkContext(collection=self.actions_collection, **kwargs)
         return work.component(usage=usage)
 
@@ -355,6 +346,11 @@ class BaseShopfloorService(AbstractComponent):
     def msg_store(self):
         return self.actions_for("message")
 
+    @property
+    def search_move_line(self):
+        # TODO: propagating `picking_types` should probably be default
+        return self.actions_for("search_move_line", propagate_kwargs=["picking_types"])
+
     # TODO: maybe to be proposed to base_rest
     # TODO: add tests
     def _validate_headers_update_work_context(self, request, method_name):
@@ -370,12 +366,16 @@ class BaseShopfloorService(AbstractComponent):
         extra_work_ctx = {}
         headers = request.httprequest.environ
         for rule, active in self._validation_rules:
+            if callable(active):
+                active = active(request, method_name)
             if not active:
                 continue
-            header_name, coerce_func, ctx_value_handler_name = rule
+            header_name, coerce_func, ctx_value_handler_name, mandatory = rule
             try:
                 header_value = coerce_func(headers.get(header_name))
             except (TypeError, ValueError) as err:
+                if not mandatory:
+                    continue
                 raise BadRequest(
                     "{} header validation error: {}".format(header_name, str(err))
                 )
@@ -396,16 +396,18 @@ class BaseShopfloorService(AbstractComponent):
         )
 
     MENU_ID_HEADER_RULE = (
-        # header name, coerce func, ctx handler
+        # header name, coerce func, ctx handler, mandatory
         "HTTP_SERVICE_CTX_MENU_ID",
         int,
         "_work_ctx_get_menu_id",
+        True,
     )
     PROFILE_ID_HEADER_RULE = (
-        # header name, coerce func, ctx value handler
+        # header name, coerce func, ctx value handler, mandatory
         "HTTP_SERVICE_CTX_PROFILE_ID",
         int,
         "_work_ctx_get_profile_id",
+        True,
     )
 
     def _work_ctx_get_menu_id(self, rec_id):
@@ -413,6 +415,24 @@ class BaseShopfloorService(AbstractComponent):
 
     def _work_ctx_get_profile_id(self, rec_id):
         return "profile", self.env["shopfloor.profile"].browse(rec_id).exists()
+
+    _options = {}
+
+    @property
+    def options(self):
+        """Compute options for current service.
+
+        If the service has a menu, options coming from the menu are injected.
+        """
+        if self._options:
+            return self._options
+
+        options = {}
+        if self._requires_header_menu and getattr(self.work, "menu", None):
+            options = self.work.menu.options or {}
+        options.update(getattr(self.work, "options", {}))
+        self._options = options
+        return self._options
 
 
 class BaseShopfloorProcess(AbstractComponent):
@@ -424,22 +444,29 @@ class BaseShopfloorProcess(AbstractComponent):
     _requires_header_menu = True
     _requires_header_profile = True
 
+    def _get_process_picking_types(self):
+        """Return picking types for the menu"""
+        return self.work.menu.picking_type_ids
+
     @property
     def picking_types(self):
-        """Return picking types for the menu and profile"""
-        # TODO make this a lazy property or computed field avoid running the
-        # filter every time?
-        picking_types = self.work.menu.picking_type_ids.filtered(
-            lambda pt: not pt.warehouse_id
-            or pt.warehouse_id == self.work.profile.warehouse_id
-        )
-        if not picking_types:
+        if not hasattr(self.work, "picking_types"):
+            self.work.picking_types = self._get_process_picking_types()
+        if not self.work.picking_types:
             raise exceptions.UserError(
-                _("No operation types configured on menu {} for warehouse {}.").format(
-                    self.work.menu.name, self.work.profile.warehouse_id.display_name
+                _("No operation types configured on menu {}.").format(
+                    self.work.menu.name
                 )
             )
-        return picking_types
+        return self.work.picking_types
+
+    @property
+    def search_move_line(self):
+        # TODO: picking types should be set somehow straight in the work context
+        # by `_validate_headers_update_work_context` in this way
+        # we can remove this override and the need to call `_get_process_picking_types`
+        # every time.
+        return self.actions_for("search_move_line", picking_types=self.picking_types)
 
     def _check_picking_status(self, pickings):
         """Check if given pickings can be processed.

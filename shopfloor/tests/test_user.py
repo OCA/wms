@@ -1,9 +1,9 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from .common import CommonCase
+from .test_menu_base import CommonMenuCase
 
 
-class UserCase(CommonCase):
+class UserCase(CommonMenuCase):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
@@ -22,20 +22,7 @@ class UserCase(CommonCase):
         menus = self.env["shopfloor.menu"].search([])
         self.assert_response(
             response,
-            data={
-                "menus": [
-                    {
-                        "id": menu.id,
-                        "name": menu.name,
-                        "scenario": menu.scenario,
-                        "picking_types": [
-                            {"id": picking_type.id, "name": picking_type.name}
-                            for picking_type in menu.picking_type_ids
-                        ],
-                    }
-                    for menu in menus
-                ]
-            },
+            data={"menus": [self._data_for_menu_item(menu) for menu in menus]},
         )
 
     def test_menu_by_profile(self):
@@ -43,23 +30,18 @@ class UserCase(CommonCase):
         # Simulate the client asking the menu
         menus = self.env["shopfloor.menu"].sudo().search([])
         menu = menus[0]
-        menu.profile_ids = self.profile
-        (menus - menu).profile_ids = self.profile2
+        menu.profile_id = self.profile
+        (menus - menu).profile_id = self.profile2
 
         response = self.service.dispatch("menu")
         self.assert_response(
+            response, data={"menus": [self._data_for_menu_item(menu)]},
+        )
+
+    def test_user_info(self):
+        """Request /user/user_info"""
+        response = self.service.dispatch("user_info")
+        self.assert_response(
             response,
-            data={
-                "menus": [
-                    {
-                        "id": menu.id,
-                        "name": menu.name,
-                        "scenario": menu.scenario,
-                        "picking_types": [
-                            {"id": picking_type.id, "name": picking_type.name}
-                            for picking_type in menu.picking_type_ids
-                        ],
-                    }
-                ]
-            },
+            data={"user_info": {"id": self.env.user.id, "name": self.env.user.name}},
         )

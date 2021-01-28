@@ -35,6 +35,7 @@ class StockPackageStorageType(models.Model):
         help=u"Height is mandatory for packages configured with this storage type.",
         default=False,
     )
+    barcode = fields.Char("Barcode", copy=False)
 
     @api.depends("storage_location_sequence_ids")
     def _compute_storage_type_message(self):

@@ -78,9 +78,9 @@ export class DemoTools {
     }
 
     // Tools to generate data
-    getRandomInt(max) {
+    getRandomInt(max, min = 0) {
         max = max ? max : 10000;
-        return Math.floor(Math.random() * Math.floor(max)) + 1;
+        return Math.floor(Math.random() * Math.floor(max - min)) + 1;
     }
 
     randomFutureDate(days) {
@@ -485,8 +485,8 @@ export class DemoTools {
     }
     makeProfiles() {
         const profiles = [
-            {id: 1, name: "SCH Transport", warehouse: {id: 1, name: "Schlieren"}},
-            {id: 2, name: "SCH Pick", warehouse: {id: 1, name: "Schlieren"}},
+            {id: 1, name: "SCH Transport"},
+            {id: 2, name: "SCH Pick"},
         ];
         return profiles;
     }
@@ -520,6 +520,12 @@ export class DemoTools {
                 index = i;
                 return false;
             }
+        });
+        _.defaults(new_item, {
+            lines_count: 0,
+            priority_lines_count: 0,
+            picking_count: 0,
+            priority_picking_count: 0,
         });
         if (_.isUndefined(new_item.picking_types)) {
             new_item.picking_types = [{id: 99999999, name: "Fake type"}];

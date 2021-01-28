@@ -1,8 +1,29 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+from functools import wraps
+
 from odoo import fields
 
 from odoo.addons.component.core import Component
+
+
+def ensure_model(model_name):
+    """Decorator to ensure data method is called w/ the right recordset."""
+
+    def _ensure_model(func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            # 1st arg is `self`
+            record = args[1]
+            if record is not None:
+                assert (
+                    record._name == model_name
+                ), f"Expected model: {model_name}. Got: {record._name}"
+            return func(*args, **kwargs)
+
+        return wrapped
+
+    return _ensure_model
 
 
 class DataAction(Component):
@@ -25,6 +46,7 @@ class DataAction(Component):
     def _simple_record_parser(self):
         return ["id", "name"]
 
+    @ensure_model("res.partner")
     def partner(self, record, **kw):
         return self._jsonify(record, self._partner_parser, **kw)
 
@@ -35,6 +57,7 @@ class DataAction(Component):
     def _partner_parser(self):
         return self._simple_record_parser()
 
+    @ensure_model("stock.location")
     def location(self, record, **kw):
         return self._jsonify(
             record.with_context(location=record.id), self._location_parser, **kw
@@ -47,6 +70,7 @@ class DataAction(Component):
     def _location_parser(self):
         return ["id", "name", "barcode"]
 
+    @ensure_model("stock.picking")
     def picking(self, record, **kw):
         return self._jsonify(record, self._picking_parser, **kw)
 
@@ -66,6 +90,7 @@ class DataAction(Component):
             "scheduled_date",
         ]
 
+    @ensure_model("stock.quant.package")
     def package(self, record, picking=None, with_packaging=False, **kw):
         """Return data for a stock.quant.package
 
@@ -101,6 +126,7 @@ class DataAction(Component):
             ("packaging_id:packaging", self._packaging_parser),
         ]
 
+    @ensure_model("product.packaging")
     def packaging(self, record, **kw):
         return self._jsonify(record, self._packaging_parser, **kw)
 
@@ -116,6 +142,7 @@ class DataAction(Component):
             "qty",
         ]
 
+    @ensure_model("stock.production.lot")
     def lot(self, record, **kw):
         return self._jsonify(record, self._lot_parser, **kw)
 
@@ -126,6 +153,7 @@ class DataAction(Component):
     def _lot_parser(self):
         return self._simple_record_parser() + ["ref"]
 
+    @ensure_model("stock.move.line")
     def move_line(self, record, with_picking=False, **kw):
         record = record.with_context(location=record.location_id.id)
         parser = self._move_line_parser
@@ -163,6 +191,7 @@ class DataAction(Component):
             ("move_id:priority", lambda rec, fname: rec.move_id.priority or "",),
         ]
 
+    @ensure_model("stock.package_level")
     def package_level(self, record, **kw):
         return self._jsonify(record, self._package_level_parser)
 
@@ -197,6 +226,7 @@ class DataAction(Component):
             ),
         ]
 
+    @ensure_model("product.product")
     def product(self, record, **kw):
         return self._jsonify(record, self._product_parser, **kw)
 
@@ -229,6 +259,7 @@ class DataAction(Component):
         )
         return supplier_info.product_code or ""
 
+    @ensure_model("stock.picking.batch")
     def picking_batch(self, record, with_pickings=False, **kw):
         parser = self._picking_batch_parser
         if with_pickings:
@@ -242,6 +273,7 @@ class DataAction(Component):
     def _picking_batch_parser(self):
         return ["id", "name", "picking_count", "move_line_count", "total_weight:weight"]
 
+    @ensure_model("stock.picking.type")
     def picking_type(self, record, **kw):
         parser = self._picking_type_parser
         return self._jsonify(record, parser, **kw)

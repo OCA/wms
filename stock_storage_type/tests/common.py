@@ -55,8 +55,13 @@ class TestStorageTypeCommon(SavepointCase):
         cls.internal_picking_type = ref("stock.picking_type_internal")
 
         cls.product = ref("product.product_product_9")
+        cls.product2 = cls.env["product.product"].create(
+            {"name": "Product B", "type": "product"}
+        )
+        cls.product3 = cls.env["product.product"].create(
+            {"name": "Product C", "type": "product"}
+        )
         cls.product_lot = ref("stock.product_icecream")
-        # cls.product_lot.tracking = 'lot'
 
         cls.cardboxes_package_storage_type = ref(
             "stock_storage_type.package_storage_type_cardboxes"

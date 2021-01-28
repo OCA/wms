@@ -1,5 +1,5 @@
-# Copyright 2019 Camptocamp (https://www.camptocamp.com)
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# Copyright 2019-2020 Camptocamp (https://www.camptocamp.com)
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 import logging
 import operator as py_operator
@@ -32,7 +32,6 @@ class StockMove(models.Model):
     ordered_available_to_promise_qty = fields.Float(
         string="Ordered Available to Promise (Real Qty)",
         compute="_compute_ordered_available_to_promise",
-        search="_search_ordered_available_to_promise",
         digits="Product Unit of Measure",
         help="Available to Promise quantity minus quantities promised "
         " to moves with higher priority (in default UoM of the product).",
@@ -48,9 +47,9 @@ class StockMove(models.Model):
     release_ready = fields.Boolean(
         compute="_compute_release_ready", search="_search_release_ready",
     )
-    need_release = fields.Boolean(index=True,)
-    zip_code = fields.Char(related="partner_id.zip", store="True")
-    city = fields.Char(related="partner_id.city", store="True")
+    need_release = fields.Boolean(index=True, copy=False)
+    zip_code = fields.Char(related="partner_id.zip", store=True)
+    city = fields.Char(related="partner_id.city", store=True)
 
     def _previous_promised_qty_sql_main_query(self):
         return """
@@ -59,13 +58,13 @@ class StockMove(models.Model):
             FROM stock_move move
             LEFT JOIN LATERAL (
                 SELECT
-                    m.product_qty - COALESCE(SUM(line.product_qty), 0)
+                    m.product_qty
                     AS previous_qty
                 FROM stock_move m
                 INNER JOIN stock_location loc
                 ON loc.id = m.location_id
-                LEFT JOIN stock_move_line line
-                ON m.id = line.move_id
+                LEFT JOIN stock_picking_type p_type
+                ON m.picking_type_id = p_type.id
                 WHERE
                 {lateral_where}
                 GROUP BY m.id
@@ -80,23 +79,28 @@ class StockMove(models.Model):
         sql = """
                 m.id != move.id
                 AND m.product_id = move.product_id
+                AND p_type.code = 'outgoing'
                 AND loc.parent_path LIKE ANY(%(location_paths)s)
                 AND (
-                m.need_release = true
-                AND (
-                    m.priority > move.priority
-                    OR
-                    (
-                        m.priority = move.priority
-                        AND m.date_priority < move.date_priority
+                    COALESCE(m.need_release, False) = COALESCE(move.need_release, False)
+                    AND (
+                        m.priority > move.priority
+                        OR
+                        (
+                            m.priority = move.priority
+                            AND m.date_priority < move.date_priority
+                        )
+                        OR (
+                            m.priority = move.priority
+                            AND m.date_priority = move.date_priority
+                            AND m.id < move.id
+                        )
                     )
                     OR (
-                        m.priority = move.priority
-                        AND m.date_priority = move.date_priority
-                        AND m.id < move.id
+                        move.need_release IS true
+                        AND (m.need_release IS false OR m.need_release IS null)
                     )
-                OR ((m.need_release IS false OR m.need_release IS null))
-                ))
+                )
                 AND m.state IN (
                     'waiting', 'confirmed', 'partially_available', 'assigned'
                 )
@@ -108,7 +112,10 @@ class StockMove(models.Model):
         }
         horizon_date = self._promise_reservation_horizon_date()
         if horizon_date:
-            sql += " AND m.date_expected <= %(horizon)s "
+            sql += (
+                " AND (m.need_release IS true AND m.date_expected <= %(horizon)s "
+                "      OR m.need_release IS false)"
+            )
             params["horizon"] = horizon_date
         return sql, params
 
@@ -151,11 +158,8 @@ class StockMove(models.Model):
             if not move.need_release:
                 move.release_ready = False
                 continue
-            if move.picking_id.move_type == "one":
-                move.release_ready = all(
-                    m.ordered_available_to_promise_uom_qty > 0
-                    for m in move.picking_id.move_lines
-                )
+            if move.picking_id._get_shipping_policy() == "one":
+                move.release_ready = move.picking_id.release_ready
             else:
                 move.release_ready = move.ordered_available_to_promise_uom_qty > 0
 
@@ -181,7 +185,7 @@ class StockMove(models.Model):
             }
         )
 
-        locations = self._ordered_available_to_promise_locations()
+        locations = moves._ordered_available_to_promise_locations()
 
         # Compute On-Hand quantity (equivalent of qty_available) for all "view
         # locations" of all the warehouses: we may release as soon as we have
@@ -196,7 +200,7 @@ class StockMove(models.Model):
                 ]
             )
         domain_quant = expression.AND(
-            [[("product_id", "in", self.product_id.ids)], location_domain]
+            [[("product_id", "in", moves.product_id.ids)], location_domain]
         )
         location_quants = self.env["stock.quant"].read_group(
             domain_quant, ["product_id", "quantity"], ["product_id"], orderby="id"
@@ -204,7 +208,7 @@ class StockMove(models.Model):
         quants_available = {
             item["product_id"][0]: item["quantity"] for item in location_quants
         }
-        for move in self:
+        for move in moves:
             product_uom = move.product_id.uom_id
             previous_promised_qty = move.previous_promised_qty
 
@@ -247,7 +251,6 @@ class StockMove(models.Model):
     def _should_compute_ordered_available_to_promise(self):
         return (
             self.picking_code == "outgoing"
-            and self.need_release
             and not self.product_id.type == "consu"
             and not self.location_id.should_bypass_reservation()
         )
@@ -308,7 +311,7 @@ class StockMove(models.Model):
             remaining = move.product_qty - quantity
 
             if float_compare(remaining, 0, precision_digits=precision) > 0:
-                if move.picking_id.move_type == "one":
+                if move.picking_id._get_shipping_policy() == "one":
                     # we don't want to deliver unless we can deliver all at
                     # once
                     continue
@@ -348,21 +351,21 @@ class StockMove(models.Model):
         # Set all transfers released to "printed", consider the work has
         # been planned and started and another "release" of moves should
         # (for instance) merge new pickings with this "round of release".
-        pulled_moves._release_assign_moves()
-        pulled_moves._release_set_printed()
+        pulled_moves._after_release_assign_moves()
+        pulled_moves._after_release_update_chain()
 
         return True
 
-    def _release_set_printed(self):
+    def _after_release_update_chain(self):
         picking_ids = set()
         moves = self
         while moves:
             picking_ids.update(moves.mapped("picking_id").ids)
             moves = moves.mapped("move_orig_ids")
         pickings = self.env["stock.picking"].browse(picking_ids)
-        pickings.filtered(lambda p: not p.printed).printed = True
+        pickings._after_release_update_chain()
 
-    def _release_assign_moves(self):
+    def _after_release_assign_moves(self):
         moves = self
         while moves:
             moves._action_assign()

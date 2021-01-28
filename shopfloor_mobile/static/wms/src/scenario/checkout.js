@@ -90,7 +90,7 @@ const Checkout = {
                                    >New pack</btn-action>
                         </v-col>
                     </v-row>
-                    <v-row align="center">
+                    <v-row align="center" v-if="state.data.no_package_enabled">
                         <v-col class="text-center" cols="12">
                             <btn-action
                                    @click="state.on_without_pack"
@@ -247,6 +247,7 @@ const Checkout = {
             return {
                 multiple: true,
                 initSelectAll: true,
+                card_klass: "loud-labels",
                 list_item_component: "picking-select-package-content",
                 list_item_options: {actions: ["action_qty_edit"]},
             };

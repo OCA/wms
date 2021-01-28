@@ -9,8 +9,8 @@ class ZonePickingCommonCase(CommonCase):
         super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_zone_picking")
         cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
-        cls.wh = cls.profile.warehouse_id
         cls.picking_type = cls.menu.picking_type_ids
+        cls.wh = cls.picking_type.warehouse_id
 
     @classmethod
     def setUpClassUsers(cls):
@@ -249,7 +249,12 @@ class ZonePickingCommonCase(CommonCase):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(menu=self.menu, profile=self.profile) as work:
+        with self.work_on_services(
+            menu=self.menu,
+            profile=self.profile,
+            current_zone_location=self.zone_location,
+            current_picking_type=self.picking_type,
+        ) as work:
             self.service = work.component(usage="zone_picking")
 
     def _assert_response_select_zone(self, response, zone_locations, message=None):
@@ -367,7 +372,7 @@ class ZonePickingCommonCase(CommonCase):
         )
 
     def _assert_response_zero_check(
-        self, state, response, zone_location, picking_type, location, message=None,
+        self, state, response, zone_location, picking_type, move_line, message=None,
     ):
         self.assert_response(
             response,
@@ -375,20 +380,21 @@ class ZonePickingCommonCase(CommonCase):
             data={
                 "zone_location": self.data.location(zone_location),
                 "picking_type": self.data.picking_type(picking_type),
-                "location": self.data.location(location),
+                "location": self.data.location(move_line.location_id),
+                "move_line": self.data.move_line(move_line),
             },
             message=message,
         )
 
     def assert_response_zero_check(
-        self, response, zone_location, picking_type, location, message=None,
+        self, response, zone_location, picking_type, move_line, message=None,
     ):
         self._assert_response_zero_check(
             "zero_check",
             response,
             zone_location,
             picking_type,
-            location,
+            move_line,
             message=message,
         )
 
