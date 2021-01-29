@@ -233,17 +233,33 @@ class StockReceptionScreen(models.Model):
         """Compute the default destination location for the processed line."""
         for wiz in self:
             move_line = wiz.current_move_line_id
-            # Default location
-            wiz.current_move_line_location_dest_id = move_line.location_dest_id
-            location = move_line.location_dest_id._get_putaway_strategy(
-                move_line.product_id
+            destination = move_line.location_dest_id
+
+            # if a destination has been set on a move line, keep it
+            has_destination_set = (
+                move_line.location_dest_id != move_line.move_id.location_dest_id
             )
-            if location:
-                wiz.current_move_line_location_dest_id = location
+            if has_destination_set:
+                wiz.current_move_line_location_dest_id = destination
+                continue
+
+            # Compute default location using put-away and storage type when
+            # the location has not been chosen yet
+            destination = (
+                move_line.location_dest_id._get_putaway_strategy(move_line.product_id)
+                or destination
+            )
+
             # If there are some allowed destinations set the field empty,
             # the user will choose the right one among them
-            if wiz.allowed_location_dest_ids:
+            if (
+                wiz.allowed_location_dest_ids
+                and wiz.allowed_location_dest_ids != destination
+            ):
                 wiz.current_move_line_location_dest_id = False
+                continue
+
+            wiz.current_move_line_location_dest_id = destination
 
     def _inverse_current_move_line_location_dest_id(self):
         for wiz in self:
