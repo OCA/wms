@@ -18,11 +18,4 @@
         parent="menu_shopfloor_settings"
         sequence="20"
     />
-    <menuitem
-        action="action_shopfloor_log"
-        id="menu_action_shopfloor_log"
-        parent="menu_shopfloor_settings"
-        groups="base.group_no_one"
-        sequence="30"
-    />
 </odoo>
