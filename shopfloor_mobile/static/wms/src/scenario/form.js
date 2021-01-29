@@ -51,22 +51,24 @@ const Form = {
             }
             const self = this;
             let form_values = form_data.values;
-            form_values["_id"] = this.record.id;
-            this.odoo.call("update", form_values).then(function (result) {
-                self._load_form_data(result);
-                /**
-                 * TODO: dirty hack to be able to display the message to the user
-                 * and redirect right after to former page.
-                 * Ideally we should bubble up the event and the message
-                 * to the parent component, but this should be made configurable
-                 * by form as you might want to stay in the same place on save.
-                 *  */
 
-                setTimeout(function () {
-                    self.$root.trigger("go_back");
-                    self.$router.back();
-                }, 1500);
-            });
+            this.odoo
+                .call(this.record.id + "/update", form_values)
+                .then(function(result) {
+                    self._load_form_data(result);
+                    /**
+                     * TODO: dirty hack to be able to display the message to the user
+                     * and redirect right after to former page.
+                     * Ideally we should bubble up the event and the message
+                     * to the parent component, but this should be made configurable
+                     * by form as you might want to stay in the same place on save.
+                     *  */
+
+                    setTimeout(function() {
+                        self.$root.trigger("go_back");
+                        self.$router.back();
+                    }, 1500);
+                });
         },
         _getFormData: function (record_id) {
             this.odoo.call(record_id, {}, "GET").then(this._load_form_data);
