@@ -68,4 +68,3 @@ from . import test_move_action_assign
 from . import test_scan_anything
 from . import test_stock_split
 from . import test_picking_form
-from . import test_db_logging
