@@ -19,6 +19,7 @@
         "stock_picking_batch",
         "base_jsonify",
         "base_rest",
+        "rest_log",
         "base_sparse_field",
         "auth_api_key",
         #  OCA / stock-logistics-warehouse
@@ -43,15 +44,12 @@
         "product_packaging_type",
     ],
     "data": [
-        "data/ir_config_parameter_data.xml",
-        "data/ir_cron_data.xml",
         "security/ir.model.access.csv",
         "views/shopfloor_menu.xml",
         "views/stock_picking_type.xml",
         "views/stock_location.xml",
         "views/stock_move_line.xml",
         "views/shopfloor_profile_views.xml",
-        "views/shopfloor_log_views.xml",
         "views/menus.xml",
     ],
     "demo": [
