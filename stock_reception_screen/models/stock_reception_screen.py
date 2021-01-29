@@ -284,20 +284,16 @@ class StockReceptionScreen(models.Model):
     @api.depends("package_storage_type_id.location_storage_type_ids")
     def _compute_allowed_location_dest_ids(self):
         for wiz in self:
+            domain = [("id", "child_of", wiz.picking_location_dest_id.id)]
             if wiz.package_storage_type_id:
-                wiz.allowed_location_dest_ids = self.env["stock.location"].search(
-                    [
-                        (
-                            "allowed_location_storage_type_ids",
-                            "in",
-                            wiz.package_storage_type_id.location_storage_type_ids.ids,
-                        ),
-                    ]
-                )
-            else:
-                wiz.allowed_location_dest_ids = self.env["stock.location"].search(
-                    [("id", "child_of", self.picking_location_dest_id.id)]
-                )
+                domain += [
+                    (
+                        "allowed_location_storage_type_ids",
+                        "in",
+                        wiz.package_storage_type_id.location_storage_type_ids.ids,
+                    )
+                ]
+            wiz.allowed_location_dest_ids = self.env["stock.location"].search(domain)
 
     @api.onchange("product_packaging_id")
     def onchange_product_packaging_id(self):
