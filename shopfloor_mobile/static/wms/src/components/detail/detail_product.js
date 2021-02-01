@@ -22,6 +22,7 @@ Vue.component("detail-product", {
                 {path: "lot.name", label: "Lot"},
                 {path: "expiry_date", label: "Expiry date"},
                 {path: "default_code", label: "Internal ref"},
+                {path: "barcode", label: "Barcode"},
                 {path: "product.supplier_code", label: "Supplier ref"},
             ];
         },
