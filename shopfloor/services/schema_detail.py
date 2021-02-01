@@ -51,6 +51,7 @@ class ShopfloorSchemaDetailResponse(Component):
             {
                 "pickings": self._schema_list_of(self.picking()),
                 "move_lines": self._schema_list_of(self.move_line()),
+                "location": self._schema_dict_of(self._simple_record()),
             }
         )
         return schema
