@@ -73,6 +73,7 @@ class DataDetailAction(Component):
                 "reserved_move_line_ids:move_lines",
                 lambda record, fname: self.move_lines(record[fname]),
             ),
+            ("location_id:location", ["id", "display_name:name"]),
         ]
 
     def lot_detail(self, record, **kw):
