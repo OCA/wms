@@ -6,23 +6,6 @@ from odoo import _, api, exceptions, fields, models
 class ShopfloorMenu(models.Model):
     _inherit = "shopfloor.menu"
 
-    # TODO: replace w/ options on shopfloor.scenario
-    # TODO: check if migration step is required for old `options` stored on menu
-    _scenario_allowing_create_moves = (
-        "single_pack_transfer",
-        "location_content_transfer",
-    )
-
-    _scenario_allowing_unreserve_other_moves = (
-        "single_pack_transfer",
-        "location_content_transfer",
-    )
-
-    _scenario_allowing_ignore_no_putaway_available = (
-        "single_pack_transfer",
-        "location_content_transfer",
-    )
-
     picking_type_ids = fields.Many2many(
         comodel_name="stock.picking.type", string="Operation Types", required=True
     )
@@ -61,7 +44,7 @@ class ShopfloorMenu(models.Model):
     def _compute_move_create_is_possible(self):
         for menu in self:
             menu.move_create_is_possible = bool(
-                menu.scenario in self._scenario_allowing_create_moves
+                menu.scenario_id.has_option("allow_create_moves")
                 and len(menu.picking_type_ids) == 1
             )
 
@@ -77,22 +60,22 @@ class ShopfloorMenu(models.Model):
                     _("Creation of moves is not allowed for menu {}.").format(menu.name)
                 )
 
-    @api.depends("scenario_id", "picking_type_ids")
+    @api.depends("scenario_id")
     def _compute_unreserve_other_moves_is_possible(self):
         for menu in self:
-            menu.unreserve_other_moves_is_possible = (
-                menu.scenario in self._scenario_allowing_unreserve_other_moves
+            menu.unreserve_other_moves_is_possible = menu.scenario_id.has_option(
+                "allow_unreserve_other_moves"
             )
 
     @api.onchange("unreserve_other_moves_is_possible")
     def onchange_unreserve_other_moves_is_possible(self):
         self.allow_unreserve_other_moves = self.unreserve_other_moves_is_possible
 
-    @api.depends("scenario_id", "picking_type_ids")
+    @api.depends("scenario_id")
     def _compute_ignore_no_putaway_available_is_possible(self):
         for menu in self:
-            menu.ignore_no_putaway_available_is_possible = bool(
-                menu.scenario in self._scenario_allowing_ignore_no_putaway_available
+            menu.ignore_no_putaway_available_is_possible = menu.scenario_id.has_option(
+                "allow_ignore_no_putaway_available"
             )
 
     @api.onchange("ignore_no_putaway_available_is_possible")
@@ -125,13 +108,6 @@ class ShopfloorMenu(models.Model):
                     ).format(menu.name)
                 )
 
-    # ATM the goal is to block using single_pack_transfer (SPT)
-    # w/out moving the full pkg.
-    # Is not optimal, but is mandatory as long as SPT does not work w/ moves
-    # but only w/ package levels.
-    # TODO: add tests.
-    _move_entire_packs_scenario = ("single_pack_transfer", "delivery")
-
     @api.constrains("scenario_id", "picking_type_ids")
     def _check_move_entire_packages(self):
         for menu in self:
@@ -139,7 +115,10 @@ class ShopfloorMenu(models.Model):
             bad_picking_types = [
                 x.name for x in menu.picking_type_ids if not x.show_entire_packs
             ]
-            if menu.scenario in self._move_entire_packs_scenario and bad_picking_types:
+            if (
+                menu.scenario_id.has_option("must_move_entire_pack")
+                and bad_picking_types
+            ):
                 scenario_name = menu.scenario_id.name
                 raise exceptions.ValidationError(
                     _(
