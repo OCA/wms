@@ -2,8 +2,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 import logging
 
-from .common import CommonCase
-
 _logger = logging.getLogger(__name__)
 
 
@@ -13,27 +11,16 @@ except ImportError:
     _logger.debug("Can not import cerberus")
 
 
-class ActionsDataCaseBase(CommonCase):
-    @classmethod
-    def setUpClassBaseData(cls):
-        super().setUpClassBaseData()
-        cls.partner = cls.env.ref("base.res_partner_12")
-
+class ActionsDataTestMixin(object):
     def assert_schema(self, schema, data):
         validator = Validator(schema)
         self.assertTrue(validator.validate(data), validator.errors)
 
 
-class CommonMenuCase(CommonCase):
-    @classmethod
-    def setUpClassVars(cls, *args, **kwargs):
-        super().setUpClassVars(*args, **kwargs)
-        cls.profile = cls.env.ref("shopfloor_base.profile_demo_2")
-
-    def setUp(self):
-        super().setUp()
-        with self.work_on_services(profile=self.profile) as work:
-            self.service = work.component(usage="menu")
+class MenuTestMixin(object):
+    def _get_service(self, profile=None):
+        with self.work_on_services(profile=profile or self.profile) as work:
+            return work.component(usage="menu")
 
     def _assert_menu_response(self, response, menus, **kw):
         self.assert_response(
@@ -53,7 +40,7 @@ class CommonMenuCase(CommonCase):
         return data
 
 
-class OpenAPICommonCase(CommonCase):
+class OpenAPITestMixin(object):
     def _test_openapi(self, **kw):
         with self.work_on_services(**kw) as work:
             components = work.many_components()
