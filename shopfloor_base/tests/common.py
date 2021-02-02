@@ -107,6 +107,7 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
             {"no_reset_password": True, "mail_create_nosubscribe": True}
         )
         cls.shopfloor_user = Users.create(cls._shopfloor_user_values())
+        cls.shopfloor_manager = Users.create(cls._shopfloor_manager_values())
         cls.env = cls.env(user=cls.shopfloor_user)
 
     @classmethod
@@ -117,6 +118,17 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
             "email": "p.p@example.com",
             "groups_id": [
                 (6, 0, [cls.env.ref("shopfloor_base.group_shopfloor_user").id])
+            ],
+        }
+
+    @classmethod
+    def _shopfloor_manager_values(cls):
+        return {
+            "name": "Johnny Manager",
+            "login": "jmanager",
+            "email": "jmanager@example.com",
+            "groups_id": [
+                (6, 0, [cls.env.ref("shopfloor_base.group_shopfloor_manager").id])
             ],
         }
 

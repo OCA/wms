@@ -1,3 +1,4 @@
+from . import test_shopfloor_models
 from . import test_app
 from . import test_user
 from . import test_menu
