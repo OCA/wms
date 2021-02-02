@@ -15,7 +15,7 @@ class ClusterPicking(Component):
         return batch
 
     def _batch_auto_create(self):
-        auto_batch = self.actions_for("picking.batch.auto.create")
+        auto_batch = self._actions_for("picking.batch.auto.create")
         menu = self.work.menu
         return auto_batch.create_batch(
             self.picking_types,
