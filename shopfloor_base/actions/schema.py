@@ -13,7 +13,7 @@ class SchemaAction(Component):
     """
 
     _inherit = "shopfloor.process.action"
-    _name = "base.shopfloor.schema"
+    _name = "shopfloor.schema.action"
     _usage = "schema"
 
     def _schema_list_of(self, schema, **kw):
