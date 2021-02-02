@@ -13,8 +13,6 @@
         # OCA/stock-logistics-warehouse
         "stock_checkout_sync",
     ],
-    "demo": [],
-    "data": [],
     "auto_install": True,
     "installable": True,
 }
