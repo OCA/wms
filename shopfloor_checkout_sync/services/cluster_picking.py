@@ -9,7 +9,7 @@ class ClusterPicking(Component):
 
     @property
     def checkout_sync(self):
-        return self.actions_for("checkout.sync")
+        return self._actions_for("checkout.sync")
 
     def _lock_lines(self, lines):
         super()._lock_lines(self.checkout_sync._all_lines_to_lock(lines))
