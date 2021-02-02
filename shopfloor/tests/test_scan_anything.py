@@ -1,33 +1,14 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2021 ACSONE SA/NV (http://www.camptocamp.com)
+# @author Simone Orsi <simahawk@gmail.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from .test_actions_data_detail import ActionsDataDetailCaseBase
+from odoo.addons.shopfloor_base.tests.common_misc import ScanAnythingTestMixin
+
+from .test_actions_data_base import ActionsDataDetailCaseBase
 
 
-class TestScanAnythingCase(ActionsDataDetailCaseBase):
-    def setUp(self):
-        super().setUp()
-        with self.work_on_services() as work:
-            self.service = work.component(usage="scan_anything")
-
-    def _test_response_ok(self, rec_type, data, identifier):
-        params = {"identifier": identifier}
-        response = self.service.dispatch("scan", params=params)
-        self.assert_response(
-            response,
-            data={"type": rec_type, "identifier": identifier, "record": data},
-        )
-
-    def _test_response_ko(self, identifier, tried=None):
-        tried = tried or [x[0] for x in self.service._scan_handlers()]
-        params = {"identifier": identifier}
-        response = self.service.dispatch("scan", params=params)
-        message = response["message"]
-        self.assertEqual(message["message_type"], "error")
-        self.assertIn("Record not found", message["body"])
-        for rec_type in tried:
-            self.assertIn(rec_type, message["body"])
-
+class ScanAnythingCase(ActionsDataDetailCaseBase, ScanAnythingTestMixin):
     def test_scan_product(self):
         record = self.product_b
         record.barcode = "PROD-B"
@@ -63,6 +44,3 @@ class TestScanAnythingCase(ActionsDataDetailCaseBase):
         identifier = record.name
         data = self.data_detail.picking_detail(record)
         self._test_response_ok(rec_type, data, identifier)
-
-    def test_scan_error(self):
-        self._test_response_ko("404-NOTFOUND")

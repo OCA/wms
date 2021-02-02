@@ -3,7 +3,6 @@ from . import service
 
 # generic services
 from . import menu
-from . import scan_anything
 
 # process services
 from . import checkout
