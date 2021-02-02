@@ -289,6 +289,7 @@ msgid "Quantity"
 msgstr ""
 
 #. module: stock_reception_screen
+#: model_terms:ir.ui.view,arch_db:stock_reception_screen.view_move_line_tree
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.view_picking_form
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.vpicktree
 msgid "Reception"
