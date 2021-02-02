@@ -18,14 +18,15 @@ Services.
 """
 from . import base_action
 from . import data
+from . import data_detail
 from . import schema
+from . import schema_detail
 from . import message
 from . import search
 from . import savepoint
 
 # TODO: kept in shopfloor -> review if these must stay there
 # from . import change_package_lot
-# from . import data_detail
 # from . import schema_detail
 # from . import completion_info
 # from . import location_content_transfer_sorter
