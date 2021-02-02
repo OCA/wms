@@ -5,6 +5,8 @@ import logging
 from odoo.addons.component.core import AbstractComponent, Component
 from odoo.addons.component.exception import NoComponentError
 
+from ..actions.base_action import get_actions_for
+
 _logger = logging.getLogger(__name__)
 
 
@@ -167,14 +169,16 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
         """
         return {}
 
+    def _actions_for(self, usage):
+        return get_actions_for(self, usage)
+
     @property
     def schemas(self):
-        return self.actions_for("schema")
+        return self._actions_for("schema")
 
-    # TODO
-    # @property
-    # def schemas_detail(self):
-    #     return self.actions_for("schema_detail")
+    @property
+    def schemas_detail(self):
+        return self._actions_for("schema_detail")
 
     def _response_schema(self, data_schema=None, next_states=None):
         """Schema for the return validator
