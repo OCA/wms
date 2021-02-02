@@ -96,9 +96,7 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
 
         with cls.work_on_actions(cls) as work:
             cls.data = work.component(usage="data")
-        with cls.work_on_actions(cls) as work:
             cls.msg_store = work.component(usage="message")
-        with cls.work_on_services(cls) as work:
             cls.schema = work.component(usage="schema")
 
     @classmethod

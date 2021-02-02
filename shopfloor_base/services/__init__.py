@@ -1,6 +1,5 @@
 # core classes
 from . import service
-from . import schema
 from . import validator
 
 # generic services

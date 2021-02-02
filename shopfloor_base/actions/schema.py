@@ -1,20 +1,20 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2021 ACSONE SA/NV (http://www.camptocamp.com)
+# @author Simone Orsi <simahawk@gmail.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo.addons.component.core import Component
 
 
-class BaseShopfloorSchemaResponse(Component):
+class SchemaAction(Component):
     """Provide methods to share schema structures
 
     The methods should be used in Service Components, so we try to
-    have similar schema structures across scenarios.
+    have similar schema structures across scenario.
     """
 
-    _inherit = "base.rest.service"
-    _name = "base.shopfloor.schemas"
-    _collection = "shopfloor.service"
+    _inherit = "shopfloor.process.action"
+    _name = "base.shopfloor.schema"
     _usage = "schema"
-    _is_rest_service_component = False
 
     def _schema_list_of(self, schema, **kw):
         schema = {
