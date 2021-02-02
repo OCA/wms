@@ -7,8 +7,9 @@ from werkzeug.exceptions import BadRequest
 from odoo.http import request
 from odoo.tools import DotDict
 
-from odoo.addons.base_rest.controllers.main import _PseudoCollection
-from odoo.addons.component.core import AbstractComponent, WorkContext
+from odoo.addons.component.core import AbstractComponent
+
+from ..actions.base_action import get_actions_for
 
 
 class BaseShopfloorService(AbstractComponent):
@@ -17,12 +18,14 @@ class BaseShopfloorService(AbstractComponent):
     _inherit = "base.rest.service"
     _name = "base.shopfloor.service"
     _collection = "shopfloor.service"
-    _actions_collection_name = "shopfloor.action"
     _expose_model = None
 
     def dispatch(self, method_name, *args, params=None):
         self._validate_headers_update_work_context(request, method_name)
         return super().dispatch(method_name, *args, params=params)
+
+    def actions_for(self, usage):
+        return get_actions_for(self, usage)
 
     def _get_base_search_domain(self):
         return []
@@ -144,29 +147,6 @@ class BaseShopfloorService(AbstractComponent):
             ),
         defaults.extend(service_params)
         return defaults
-
-    @property
-    def actions_collection(self):
-        return _PseudoCollection(self._actions_collection_name, self.env)
-
-    def actions_for(self, usage, propagate_kwargs=None, **kw):
-        """Return an Action Component for a usage
-
-        Action Components are the components supporting the business logic of
-        the processes, so we can limit the code in Services to the minimum and
-        share methods.
-        """
-        propagate_kwargs = self.work._propagate_kwargs[:] + (propagate_kwargs or [])
-        # propagate custom arguments (such as menu ID/profile ID)
-        kwargs = {
-            attr_name: getattr(self.work, attr_name)
-            for attr_name in propagate_kwargs
-            if attr_name not in ("collection", "components_registry")
-            and hasattr(self.work, attr_name)
-        }
-        kwargs.update(kw)
-        work = WorkContext(collection=self.actions_collection, **kwargs)
-        return work.component(usage=usage)
 
     # FIXME: this is not used anymore by base_rest ->
     # all public/private methods are exposed
