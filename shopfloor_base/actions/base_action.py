@@ -48,4 +48,4 @@ class ShopFloorProcessAction(AbstractComponent):
 
     @property
     def msg_store(self):
-        return self.actions_for("message")
+        return self._actions_for("message")
