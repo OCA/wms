@@ -451,10 +451,18 @@ class StockReceptionScreen(models.Model):
         before checking the next move to process).
         """
         if self.current_move_line_id and self.current_move_id:
-            # We use the 'is_scrap' context key to avoid the generation of a
-            # backorder when validating the move (see _action_done() method in
-            # stock/models/stock_move.py).
-            self.current_move_id.with_context(is_scrap=True)._action_done()
+            moves_todo = self.picking_id.move_lines.filtered(
+                lambda m: m.state not in ["done", "cancel"]
+            )
+            # On the last move of the picking set the picking to done
+            # Otherwise set the move to done
+            if moves_todo == self.current_move_id:
+                self.picking_id.action_done()
+            else:
+                # We use the 'is_scrap' context key to avoid the generation of a
+                # backorder when validating the move (see _action_done() method in
+                # stock/models/stock_move.py).
+                self.current_move_id.with_context(is_scrap=True)._action_done()
             # A new move is automatically created if we made a partial receipt
             # and we have to update it to the 'assigned' state to generate the
             # related 'stock.move.line' (required if we want to process it)
