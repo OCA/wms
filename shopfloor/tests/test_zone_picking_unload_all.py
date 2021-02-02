@@ -297,7 +297,7 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         response = self.service.dispatch("unload_split", params={},)
         # check response
         buffer_lines = self.service._find_buffer_move_lines()
-        completion_info = self.service.actions_for("completion.info")
+        completion_info = self.service._actions_for("completion.info")
         completion_info_popup = completion_info.popup(buffer_lines)
         self.assert_response_unload_single(
             response,

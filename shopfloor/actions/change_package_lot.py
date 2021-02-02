@@ -61,7 +61,7 @@ class ChangePackageLot(Component):
         def is_lesser(value, other, rounding):
             return float_compare(value, other, precision_rounding=rounding) == -1
 
-        inventory = self.actions_for("inventory")
+        inventory = self._actions_for("inventory")
         product = move_line.product_id
         if lot.product_id != product:
             return response_error_func(

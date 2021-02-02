@@ -1,61 +1,13 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from functools import wraps
-
 from odoo import fields
 
 from odoo.addons.component.core import Component
-
-
-def ensure_model(model_name):
-    """Decorator to ensure data method is called w/ the right recordset."""
-
-    def _ensure_model(func):
-        @wraps(func)
-        def wrapped(*args, **kwargs):
-            # 1st arg is `self`
-            record = args[1]
-            if record is not None:
-                assert (
-                    record._name == model_name
-                ), f"Expected model: {model_name}. Got: {record._name}"
-            return func(*args, **kwargs)
-
-        return wrapped
-
-    return _ensure_model
+from odoo.addons.shopfloor_base.utils import ensure_model
 
 
 class DataAction(Component):
-    """Provide methods to share data structures
-
-    The methods should be used in Service Components, so we try to
-    have similar data structures across scenarios.
-    """
-
-    _name = "shopfloor.data.action"
-    _inherit = "shopfloor.process.action"
-    _usage = "data"
-
-    def _jsonify(self, recordset, parser, multi=False, **kw):
-        res = recordset.jsonify(parser)
-        if not multi:
-            return res[0] if res else None
-        return res
-
-    def _simple_record_parser(self):
-        return ["id", "name"]
-
-    @ensure_model("res.partner")
-    def partner(self, record, **kw):
-        return self._jsonify(record, self._partner_parser, **kw)
-
-    def partners(self, record, **kw):
-        return self.partner(record, multi=True)
-
-    @property
-    def _partner_parser(self):
-        return self._simple_record_parser()
+    _inherit = "shopfloor.data.action"
 
     @ensure_model("stock.location")
     def location(self, record, **kw):

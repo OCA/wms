@@ -5,9 +5,7 @@ import io
 
 from PIL import Image
 
-from odoo.tools.float_utils import float_round
-
-from .test_actions_data import ActionsDataCaseBase
+from .test_actions_data_base import ActionsDataDetailCaseBase
 
 
 def fake_colored_image(color="#4169E1", size=(800, 500)):

@@ -6,7 +6,7 @@ from odoo.osv import expression
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
 
-from .service import to_float
+from ..utils import to_float
 
 
 class ClusterPicking(Component):
@@ -442,7 +442,7 @@ class ClusterPicking(Component):
                 batch, message=self.msg_store.operation_not_found()
             )
 
-        search = self.actions_for("search")
+        search = self._actions_for("search")
 
         picking = move_line.picking_id
 
@@ -588,7 +588,7 @@ class ClusterPicking(Component):
                 message=self.msg_store.unable_to_pick_more(move_line.product_uom_qty),
             )
 
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         bin_package = search.package_from_scan(barcode)
         if not bin_package:
             return self._response_for_scan_destination(
@@ -714,7 +714,7 @@ class ClusterPicking(Component):
             )
 
         if not zero:
-            inventory = self.actions_for("inventory")
+            inventory = self._actions_for("inventory")
             inventory.create_draft_check_empty(
                 move_line.location_id,
                 move_line.product_id,
@@ -794,7 +794,7 @@ class ClusterPicking(Component):
                 batch, message=self.msg_store.operation_not_found()
             )
 
-        inventory = self.actions_for("inventory")
+        inventory = self._actions_for("inventory")
         # create a draft inventory for a user to check
         inventory.create_control_stock(
             move_line.location_id,
@@ -874,10 +874,10 @@ class ClusterPicking(Component):
             return self._pick_next_line(
                 batch, message=self.msg_store.operation_not_found()
             )
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         response_ok_func = self._response_for_scan_destination
         response_error_func = self._response_for_change_pack_lot
-        change_package_lot = self.actions_for("change.package.lot")
+        change_package_lot = self._actions_for("change.package.lot")
         lot = search.lot_from_scan(barcode)
         if lot:
             response = change_package_lot.change_lot(
@@ -929,7 +929,7 @@ class ClusterPicking(Component):
 
         first_line = fields.first(lines)
         picking_type = fields.first(batch.picking_ids).picking_type_id
-        scanned_location = self.actions_for("search").location_from_scan(barcode)
+        scanned_location = self._actions_for("search").location_from_scan(barcode)
         if not scanned_location:
             return self._response_for_unload_all(
                 batch, message=self.msg_store.no_location_found()
@@ -948,7 +948,7 @@ class ClusterPicking(Component):
                 return self._response_for_confirm_unload_all(batch)
 
         self._unload_write_destination_on_lines(lines, scanned_location)
-        completion_info = self.actions_for("completion.info")
+        completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(lines)
         return self._unload_end(batch, completion_info_popup=completion_info_popup)
 
@@ -1095,7 +1095,7 @@ class ClusterPicking(Component):
         self._lock_lines(lines)
         first_line = fields.first(lines)
         picking_type = fields.first(batch.picking_ids).picking_type_id
-        scanned_location = self.actions_for("search").location_from_scan(barcode)
+        scanned_location = self._actions_for("search").location_from_scan(barcode)
         if not scanned_location:
             return self._response_for_unload_set_destination(
                 batch, package, message=self.msg_store.no_location_found()
@@ -1116,7 +1116,7 @@ class ClusterPicking(Component):
 
         self._unload_write_destination_on_lines(lines, scanned_location)
 
-        completion_info = self.actions_for("completion.info")
+        completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(lines)
 
         return self._unload_next_package(
