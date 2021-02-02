@@ -24,7 +24,7 @@ class BaseShopfloorService(AbstractComponent):
         self._validate_headers_update_work_context(request, method_name)
         return super().dispatch(method_name, *args, params=params)
 
-    def actions_for(self, usage):
+    def _actions_for(self, usage):
         return get_actions_for(self, usage)
 
     def _get_base_search_domain(self):
@@ -148,26 +148,17 @@ class BaseShopfloorService(AbstractComponent):
         defaults.extend(service_params)
         return defaults
 
-    # FIXME: this is not used anymore by base_rest ->
-    # all public/private methods are exposed
-    def _is_public_api_method(self, method_name):
-        # do not "hide" the "actions_for" method as internal since, we'll use
-        # it in components, so exclude it from the rest API
-        if method_name == "actions_for":
-            return False
-        return super()._is_public_api_method(method_name)
-
     @property
     def data(self):
-        return self.actions_for("data")
+        return self._actions_for("data")
 
     @property
     def data_detail(self):
-        return self.actions_for("data_detail")
+        return self._actions_for("data_detail")
 
     @property
     def msg_store(self):
-        return self.actions_for("message")
+        return self._actions_for("message")
 
     # TODO: maybe to be proposed to base_rest
     # TODO: add tests
