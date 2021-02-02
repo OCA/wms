@@ -17,7 +17,7 @@ class ActionsDataCaseBase(CommonCase):
     @classmethod
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
-        cls.partner = cls.env.ref("base.res_partner_12")
+        cls.partner = cls.env.ref("base.res_partner_12").sudo()
 
     def assert_schema(self, schema, data):
         validator = Validator(schema)

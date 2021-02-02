@@ -51,3 +51,38 @@ class CommonMenuCase(CommonCase):
             "scenario": menu.scenario,
         }
         return data
+
+
+class OpenAPICommonCase(CommonCase):
+    def _test_openapi(self, **kw):
+        with self.work_on_services(**kw) as work:
+            components = work.many_components()
+            for comp in components:
+                if getattr(comp, "_is_rest_service_component", None) and comp._usage:
+                    # will raise if it fails to generate the openapi specs
+                    comp.to_openapi()
+
+
+class ScanAnythingTestMixin(object):
+    def _get_service(self):
+        with self.work_on_services() as work:
+            return work.component(usage="scan_anything")
+
+    def _test_response_ok(self, rec_type, data, identifier):
+        service = self._get_service()
+        params = {"identifier": identifier}
+        response = service.dispatch("scan", params=params)
+        self.assert_response(
+            response, data={"type": rec_type, "identifier": identifier, "record": data},
+        )
+
+    def _test_response_ko(self, identifier, tried=None):
+        service = self._get_service()
+        tried = tried or [x.record_type for x in service._scan_handlers()]
+        params = {"identifier": identifier}
+        response = service.dispatch("scan", params=params)
+        message = response["message"]
+        self.assertEqual(message["message_type"], "error")
+        self.assertIn("Record not found", message["body"])
+        for rec_type in tried:
+            self.assertIn(rec_type, message["body"])

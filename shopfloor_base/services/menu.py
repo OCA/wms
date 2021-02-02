@@ -51,30 +51,14 @@ class ShopfloorMenu(Component):
         )
 
     def _convert_one_record(self, record):
-        values = record.jsonify(self._one_record_parser, one=True)
-        counters = self._get_move_line_counters(record)
-        values.update(counters)
+        values = record.jsonify(self._one_record_parser(), one=True)
         return values
 
-    def _get_move_line_counters(self, record):
-        """Lookup for all lines per menu item and compute counters.
-        """
-        # TODO: maybe to be improved w/ raw SQL as this run for each menu item
-        # and it's called every time the menu is opened/gets refreshed
-        move_line_search = self.actions_for(
-            "search_move_line", picking_types=record.picking_type_ids
-        )
-        locations = record.picking_type_ids.mapped("default_location_src_id")
-        lines_per_menu = move_line_search.search_move_lines_by_location(locations)
-        return move_line_search.counters_for_lines(lines_per_menu)
-
-    @property
     def _one_record_parser(self):
         return [
             "id",
             "name",
             "scenario",
-            ("picking_type_ids:picking_types", ["id", "name"]),
         ]
 
 

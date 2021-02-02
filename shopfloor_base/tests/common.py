@@ -96,8 +96,10 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
 
         with cls.work_on_actions(cls) as work:
             cls.data = work.component(usage="data")
+            cls.data_detail = work.component(usage="data_detail")
             cls.msg_store = work.component(usage="message")
             cls.schema = work.component(usage="schema")
+            cls.schema_detail = work.component(usage="schema_detail")
 
     @classmethod
     def setUpClassUsers(cls):
