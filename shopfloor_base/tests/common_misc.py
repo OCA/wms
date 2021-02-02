@@ -51,3 +51,14 @@ class CommonMenuCase(CommonCase):
             "scenario": menu.scenario,
         }
         return data
+
+
+class OpenAPICommonCase(CommonCase):
+    def _test_openapi(self, **kw):
+        with self.work_on_services(**kw) as work:
+            services = work.many_components()
+            for service in services:
+                if not service._is_rest_service_component:
+                    continue
+                # will raise if it fails to generate the openapi specs
+                service.to_openapi()
