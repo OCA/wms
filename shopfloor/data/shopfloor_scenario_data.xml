@@ -2,6 +2,12 @@
     <record id="scenario_single_pack_transfer" model="shopfloor.scenario">
         <field name="name">Single Pack Transfer</field>
         <field name="key">single_pack_transfer</field>
+        <field name="options_edit">
+allow_create_moves: true,
+allow_unreserve_other_moves: true,
+allow_ignore_no_putaway_available: true,
+must_move_entire_pack: true,
+        </field>
     </record>
     <record id="scenario_zone_picking" model="shopfloor.scenario">
         <field name="name">Zone Picking</field>
@@ -18,9 +24,17 @@
     <record id="scenario_delivery" model="shopfloor.scenario">
         <field name="name">Delivery</field>
         <field name="key">delivery</field>
+        <field name="options_edit">
+must_move_entire_pack: true,
+        </field>
     </record>
     <record id="scenario_location_content_transfer" model="shopfloor.scenario">
         <field name="name">Location content transfer</field>
         <field name="key">location_content_transfer</field>
+        <field name="options_edit">
+allow_create_moves: true,
+allow_unreserve_other_moves: true,
+allow_ignore_no_putaway_available: true,
+        </field>
     </record>
 </odoo>
