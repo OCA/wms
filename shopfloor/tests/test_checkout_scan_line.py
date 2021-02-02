@@ -35,7 +35,12 @@ class CheckoutScanLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_b, 10)]
         )
-        picking.sudo().partner_id.shopfloor_packing_info = "Please do it like this!"
+        shopfloor_packing_info = (
+            self.env["shopfloor.packing.info"]
+            .sudo()
+            .create({"name": "Test", "text": "Please do it like this!"})
+        )
+        picking.sudo().partner_id.shopfloor_packing_info_id = shopfloor_packing_info
         picking.sudo().picking_type_id.shopfloor_display_packing_info = True
         move1 = picking.move_lines[0]
         move2 = picking.move_lines[1]

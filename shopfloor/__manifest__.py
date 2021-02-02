@@ -6,7 +6,7 @@
 {
     "name": "Shopfloor",
     "summary": "manage warehouse operations with barcode scanners",
-    "version": "13.0.2.5.0",
+    "version": "13.0.2.6.0",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
@@ -39,6 +39,10 @@
         # TODO: used for picking.carrier_id detail info.
         # This must be an optional dep
         "delivery",
+        # If "delivery" must be an optional dep, then sales_team must be also.
+        # Added to make normal sales users CRUD the shopfloor packing info.
+        # It is indirectly imported by "delivery".
+        "sales_team",
         #  OCA / product-attribute
         "product_packaging_type",
     ],
@@ -54,6 +58,7 @@
         "views/stock_picking_views.xml",
         "views/shopfloor_profile_views.xml",
         "views/shopfloor_log_views.xml",
+        "views/shopfloor_packing_info_views.xml",
         "views/menus.xml",
     ],
     "demo": [
@@ -61,5 +66,6 @@
         "demo/stock_picking_type_demo.xml",
         "demo/shopfloor_menu_demo.xml",
         "demo/shopfloor_profile_demo.xml",
+        "demo/shopfloor_packing_info_demo.xml",
     ],
 }

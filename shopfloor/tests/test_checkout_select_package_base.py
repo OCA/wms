@@ -20,7 +20,9 @@ class CheckoutSelectPackageMixin:
                     self._move_line_data(ml) for ml in selected_lines.sorted()
                 ],
                 "picking": self._picking_summary_data(picking),
-                "packing_info": picking.shopfloor_packing_info if packing_info else "",
+                "packing_info": picking.shopfloor_packing_info_id.text
+                if packing_info
+                else "",
                 "no_package_enabled": no_package_enabled,
             },
             message=message,

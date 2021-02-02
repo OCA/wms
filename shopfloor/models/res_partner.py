@@ -6,4 +6,8 @@ from odoo import fields, models
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    shopfloor_packing_info = fields.Text(string="Checkout Packing Information")
+    shopfloor_packing_info_id = fields.Many2one(
+        "shopfloor.packing.info",
+        ondelete="restrict",
+        string="Checkout Packing Information",
+    )

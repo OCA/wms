@@ -85,7 +85,11 @@ class Checkout(Component):
 
     def _data_for_packing_info(self, picking):
         if picking.picking_type_id.shopfloor_display_packing_info:
-            return picking.shopfloor_packing_info or ""
+            return (
+                picking.shopfloor_packing_info_id
+                and picking.shopfloor_packing_info_id.text
+                or ""
+            )
         return ""
 
     def _response_for_select_dest_package(self, picking, move_lines, message=None):

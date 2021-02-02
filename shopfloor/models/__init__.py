@@ -2,6 +2,7 @@ from . import priority_postpone_mixin
 from . import res_partner
 from . import shopfloor_menu
 from . import shopfloor_log
+from . import shopfloor_packing_info
 from . import stock_picking_type
 from . import shopfloor_profile
 from . import stock_inventory
