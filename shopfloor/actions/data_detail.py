@@ -3,14 +3,11 @@
 from odoo.tools.float_utils import float_round
 
 from odoo.addons.component.core import Component
+from odoo.addons.shopfloor_base.utils import ensure_model
 
 
 class DataDetailAction(Component):
-    """Provide extra data on top of data action."""
-
-    _name = "shopfloor.data.detail.action"
-    _inherit = "shopfloor.data.action"
-    _usage = "data_detail"
+    _inherit = "shopfloor.data.detail.action"
 
     def _select_value_to_label(self, rec, fname):
         return rec._fields[fname].convert_to_export(rec[fname], rec)
@@ -33,6 +30,7 @@ class DataDetailAction(Component):
             ),
         ]
 
+    @ensure_model("stock.picking")
     def picking_detail(self, record, **kw):
         return self._jsonify(record, self._picking_detail_parser, **kw)
 
@@ -75,6 +73,7 @@ class DataDetailAction(Component):
             ("location_id:location", ["id", "display_name:name"]),
         ]
 
+    @ensure_model("stock.production.lot")
     def lot_detail(self, record, **kw):
         # Define a new method to not overload the base one which is used in many places
         return self._jsonify(record, self._lot_detail_parser, **kw)
@@ -93,6 +92,7 @@ class DataDetailAction(Component):
             ),
         ]
 
+    @ensure_model("product.product")
     def product_detail(self, record, **kw):
         # Defined new method to not overload the base one used in many places
         data = self._jsonify(record, self._product_detail_parser, **kw)

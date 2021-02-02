@@ -235,100 +235,12 @@ class BaseShopfloorService(AbstractComponent):
     @property
     def search_move_line(self):
         # TODO: propagating `picking_types` should probably be default
-        return self.actions_for("search_move_line", propagate_kwargs=["picking_types"])
-
-    # TODO: maybe to be proposed to base_rest
-    # TODO: add tests
-    def _validate_headers_update_work_context(self, request, method_name):
-        """Validate request and update context per service.
-
-        Our services may require extra headers.
-        The service component is loaded after the ctx has been initialized
-        hence we need an hook were we can validate by component/service
-        if the request is compliant with what we need (eg: missing header)
-        """
-        if self.env.context.get("_service_skip_request_validation"):
-            return
-        extra_work_ctx = {}
-        headers = request.httprequest.environ
-        for rule, active in self._validation_rules:
-            if callable(active):
-                active = active(request, method_name)
-            if not active:
-                continue
-            header_name, coerce_func, ctx_value_handler_name, mandatory = rule
-            try:
-                header_value = coerce_func(headers.get(header_name))
-            except (TypeError, ValueError) as err:
-                if not mandatory:
-                    continue
-                raise BadRequest(
-                    "{} header validation error: {}".format(header_name, str(err))
-                )
-            ctx_value_handler = getattr(self, ctx_value_handler_name)
-            dest_key, value = ctx_value_handler(header_value)
-            if not value:
-                raise BadRequest("{} header value lookup error".format(header_name))
-            extra_work_ctx[dest_key] = value
-        for k, v in extra_work_ctx.items():
-            setattr(self.work, k, v)
-
-    @property
-    def _validation_rules(self):
-        return (
-            # rule to apply, active flag
-            (self.MENU_ID_HEADER_RULE, self._requires_header_menu),
-            (self.PROFILE_ID_HEADER_RULE, self._requires_header_profile),
-        )
-
-    MENU_ID_HEADER_RULE = (
-        # header name, coerce func, ctx handler, mandatory
-        "HTTP_SERVICE_CTX_MENU_ID",
-        int,
-        "_work_ctx_get_menu_id",
-        True,
-    )
-    PROFILE_ID_HEADER_RULE = (
-        # header name, coerce func, ctx value handler, mandatory
-        "HTTP_SERVICE_CTX_PROFILE_ID",
-        int,
-        "_work_ctx_get_profile_id",
-        True,
-    )
-
-    def _work_ctx_get_menu_id(self, rec_id):
-        return "menu", self.env["shopfloor.menu"].browse(rec_id).exists()
-
-    def _work_ctx_get_profile_id(self, rec_id):
-        return "profile", self.env["shopfloor.profile"].browse(rec_id).exists()
-
-    _options = {}
-
-    @property
-    def options(self):
-        """Compute options for current service.
-
-        If the service has a menu, options coming from the menu are injected.
-        """
-        if self._options:
-            return self._options
-
-        options = {}
-        if self._requires_header_menu and getattr(self.work, "menu", None):
-            options = self.work.menu.options or {}
-        options.update(getattr(self.work, "options", {}))
-        self._options = options
-        return self._options
+        return self._actions_for("search_move_line", propagate_kwargs=["picking_types"])
 
 
 class BaseShopfloorProcess(AbstractComponent):
-    """Base class for process rest service"""
 
-    _inherit = "base.shopfloor.service"
-    _name = "base.shopfloor.process"
-
-    _requires_header_menu = True
-    _requires_header_profile = True
+    _inherit = "base.shopfloor.process"
 
     def _get_process_picking_types(self):
         """Return picking types for the menu"""
@@ -352,7 +264,7 @@ class BaseShopfloorProcess(AbstractComponent):
         # by `_validate_headers_update_work_context` in this way
         # we can remove this override and the need to call `_get_process_picking_types`
         # every time.
-        return self.actions_for("search_move_line", picking_types=self.picking_types)
+        return self._actions_for("search_move_line", picking_types=self.picking_types)
 
     def _check_picking_status(self, pickings):
         """Check if given pickings can be processed.

@@ -9,7 +9,7 @@ from odoo.tools.float_utils import float_compare, float_is_zero
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
 
-from .service import to_float
+from ..utils import to_float
 
 
 class ZonePicking(Component):
@@ -210,7 +210,7 @@ class ZonePicking(Component):
 
     def _response_for_unload_single(self, move_line, message=None, popup=None):
         buffer_lines = self._find_buffer_move_lines()
-        completion_info = self.actions_for("completion.info")
+        completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(buffer_lines)
         return self._response(
             next_state="unload_single",
@@ -394,7 +394,7 @@ class ZonePicking(Component):
         * start: invalid barcode
         * select_picking_type: the location is valid, user has to choose a picking type
         """
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         zone_location = search.location_from_scan(barcode)
         if not zone_location:
             return self._response_for_start(message=self.msg_store.no_location_found())
@@ -429,7 +429,7 @@ class ZonePicking(Component):
         """
         response = None
         message = None
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         location = search.location_from_scan(barcode)
         if not location:
             return response, message
@@ -471,7 +471,7 @@ class ZonePicking(Component):
         """
         message = None
         response = None
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         package = search.package_from_scan(barcode)
         if not package:
             return response, message
@@ -488,7 +488,7 @@ class ZonePicking(Component):
         """
         message = None
         response = None
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         product = search.product_from_scan(barcode)
         if not product:
             return response, message
@@ -505,7 +505,7 @@ class ZonePicking(Component):
         """
         message = None
         response = None
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         lot = search.lot_from_scan(barcode)
         if not lot:
             return response, message
@@ -604,7 +604,7 @@ class ZonePicking(Component):
         # try to re-assign any split move (in case of partial qty)
         if "confirmed" in move_line.picking_id.move_lines.mapped("state"):
             move_line.picking_id.action_assign()
-        stock = self.actions_for("stock")
+        stock = self._actions_for("stock")
         stock.validate_moves(move_line.move_id)
         location_changed = True
         # Zero check
@@ -741,7 +741,7 @@ class ZonePicking(Component):
             return self._response_for_start(message=self.msg_store.record_not_found())
 
         pkg_moved = False
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         accept_only_package = not self._move_line_full_qty(move_line, quantity)
 
         if not accept_only_package:
@@ -796,7 +796,7 @@ class ZonePicking(Component):
         if not move_line.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
         if not zero:
-            inventory = self.actions_for("inventory")
+            inventory = self._actions_for("inventory")
             inventory.create_draft_check_empty(
                 move_line.location_id,
                 # FIXME as zero_check is done on the whole location, we should
@@ -859,7 +859,7 @@ class ZonePicking(Component):
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
-        inventory = self.actions_for("inventory")
+        inventory = self._actions_for("inventory")
         # create a draft inventory for a user to check
         inventory.create_control_stock(
             move_line.location_id,
@@ -911,14 +911,14 @@ class ZonePicking(Component):
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         # pre-configured callable used to generate the response as the
         # change.package.lot component is not aware of the needed response type
         # and related parameters for zone picking scenario
         response_ok_func = functools.partial(self._response_for_set_line_destination)
         response_error_func = functools.partial(self._response_for_change_pack_lot)
         response = None
-        change_package_lot = self.actions_for("change.package.lot")
+        change_package_lot = self._actions_for("change.package.lot")
         # handle lot
         lot = search.lot_from_scan(barcode)
         if lot:
@@ -1010,7 +1010,7 @@ class ZonePicking(Component):
           expected one but is valid (in picking type's default destination)
         * select_line: no remaining move lines in buffer
         """
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         location = search.location_from_scan(barcode)
         message = None
         buffer_lines = self._find_buffer_move_lines()
@@ -1045,7 +1045,7 @@ class ZonePicking(Component):
             self._write_destination_on_lines(buffer_lines, location)
             # set lines to done + refresh buffer lines (should be empty)
             moves = buffer_lines.mapped("move_id")
-            stock = self.actions_for("stock")
+            stock = self._actions_for("stock")
             stock.validate_moves(moves)
             message = self.msg_store.buffer_complete()
             buffer_lines = self._find_buffer_move_lines()
@@ -1123,7 +1123,7 @@ class ZonePicking(Component):
             return self._unload_response(
                 unload_single_message=self.msg_store.record_not_found(),
             )
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         scanned_package = search.package_from_scan(barcode)
         # the scanned barcode matches the package
         if scanned_package == package:
@@ -1166,7 +1166,7 @@ class ZonePicking(Component):
             return self._response_for_select_line(
                 move_lines, message=self.msg_store.record_not_found(),
             )
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         location = search.location_from_scan(barcode)
         if location:
             if not location.is_sublocation_of(
@@ -1201,7 +1201,7 @@ class ZonePicking(Component):
             for move in moves:
                 move.split_other_move_lines(buffer_lines & move.move_line_ids)
 
-            stock = self.actions_for("stock")
+            stock = self._actions_for("stock")
             stock.validate_moves(moves)
             buffer_lines = self._find_buffer_move_lines()
 

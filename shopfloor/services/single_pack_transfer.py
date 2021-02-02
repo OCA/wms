@@ -58,7 +58,7 @@ class SinglePackTransfer(Component):
         )
 
     def start(self, barcode, confirmation=False):
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         picking_types = self.picking_types
         location = search.location_from_scan(barcode)
 
@@ -103,7 +103,7 @@ class SinglePackTransfer(Component):
         # Start a savepoint because we are may unreserve moves of other
         # picking types. If we do and we can't create a package level after,
         # we rollback to the initial state
-        savepoint = self.actions_for("savepoint").new()
+        savepoint = self._actions_for("savepoint").new()
         unreserved_moves = self.env["stock.move"].browse()
         if not package_level:
             other_move_lines = self.env["stock.move.line"].search(
@@ -215,7 +215,7 @@ class SinglePackTransfer(Component):
 
     def validate(self, package_level_id, location_barcode, confirmation=False):
         """Validate the transfer"""
-        search = self.actions_for("search")
+        search = self._actions_for("search")
 
         package_level = self.env["stock.package_level"].browse(package_level_id)
         if not package_level.exists():
@@ -266,7 +266,7 @@ class SinglePackTransfer(Component):
 
         completion_info_popup = None
         if self._is_last_move(move):
-            completion_info = self.actions_for("completion.info")
+            completion_info = self._actions_for("completion.info")
             completion_info_popup = completion_info.popup(package_level.move_line_ids)
         return self._response_for_start(message=message, popup=completion_info_popup)
 
@@ -274,7 +274,7 @@ class SinglePackTransfer(Component):
         # when writing the destination on the package level, it writes
         # on the move lines
         move.move_line_ids.package_level_id.location_dest_id = scanned_location
-        stock = self.actions_for("stock")
+        stock = self._actions_for("stock")
         stock.validate_moves(move)
 
     def cancel(self, package_level_id):
