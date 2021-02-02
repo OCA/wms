@@ -15,6 +15,7 @@
     "license": "AGPL-3",
     "application": True,
     "depends": [
+        "shopfloor_base",
         "stock",
         "stock_picking_batch",
         "base_jsonify",
@@ -45,6 +46,7 @@
         "product_packaging_type",
     ],
     "data": [
+        "security/groups.xml",
         "security/ir.model.access.csv",
         "views/shopfloor_menu.xml",
         "views/stock_picking_type.xml",
@@ -59,5 +61,5 @@
         "demo/shopfloor_menu_demo.xml",
         "demo/shopfloor_profile_demo.xml",
     ],
-    "installable": False,
+    "demo": ["demo/stock_picking_type_demo.xml", "demo/shopfloor_menu_demo.xml"],
 }

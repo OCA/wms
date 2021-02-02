@@ -112,7 +112,7 @@ class Delivery(Component):
         * deliver: always return here with the data for the last touched
         picking or no picking if the picking has been set to done
         """
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         picking = search.picking_from_scan(barcode)
         barcode_valid = bool(picking)
         if picking:
