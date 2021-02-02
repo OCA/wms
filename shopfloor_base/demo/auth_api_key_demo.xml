@@ -1,0 +1,7 @@
+<odoo noupdate="1">
+    <record id="api_key_demo" model="auth.api.key">
+        <field name="name">Demo</field>
+        <field name="user_id" ref="base.user_demo" />
+        <field name="key">72B044F7AC780DAC</field>
+    </record>
+</odoo>

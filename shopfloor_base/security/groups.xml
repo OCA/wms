@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 ACSONE SA/NV
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo noupdate="1">
+    <record id="group_shopfloor_user" model="res.groups">
+        <field name="name">Shopfloor User</field>
+        <field name="category_id" ref="shopfloor_base.module_category_shopfloor" />
+    </record>
+    <record id="group_shopfloor_manager" model="res.groups">
+        <field name="name">Shopfloor Manager</field>
+        <field name="category_id" ref="shopfloor_base.module_category_shopfloor" />
+        <field
+            name="users"
+            eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
+        />
+        <field
+            name="implied_ids"
+            eval="[(4, ref('rest_log.group_rest_log_manager'))]"
+        />
+    </record>
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem
+        id="menu_shopfloor_root"
+        parent="base.menu_custom"
+        name="Shopfloor"
+        sequence="200"
+    />
+    <menuitem
+        action="action_shopfloor_menu"
+        id="menu_action_shopfloor_menu"
+        parent="menu_shopfloor_root"
+        sequence="10"
+    />
+    <menuitem
+        action="action_shopfloor_profile"
+        id="menu_action_shopfloor_profile"
+        parent="menu_shopfloor_root"
+        sequence="20"
+    />
+    <!-- TODO: add filtered view for shopfloor logs (add a filter and enable it) -->
+    <!--menuitem
+        action="action_shopfloor_log"
+        id="menu_action_shopfloor_log"
+        parent="menu_shopfloor_root"
+        groups="base.group_no_one"
+        sequence="30"
+    /-->
+</odoo>
