@@ -80,12 +80,20 @@ class ShopfloorScanAnythingHandler(AbstractComponent):
         return get_actions_for(self, "data")
 
     @property
+    def _data_detail(self):
+        return get_actions_for(self, "data_detail")
+
+    @property
     def _schema(self):
         return get_actions_for(self, "schema")
 
     @property
     def _schema_detail(self):
         return get_actions_for(self, "schema_detail")
+
+    @property
+    def _search(self):
+        return get_actions_for(self, "search")
 
     @property
     def record_type(self):

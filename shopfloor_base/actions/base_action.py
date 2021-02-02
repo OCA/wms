@@ -43,7 +43,7 @@ class ShopFloorProcessAction(AbstractComponent):
     _collection = "shopfloor.action"
     _usage = "actions"
 
-    def actions_for(self, usage):
+    def _actions_for(self, usage):
         return self.component(usage=usage)
 
     @property

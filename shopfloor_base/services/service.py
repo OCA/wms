@@ -4,7 +4,9 @@
 
 from werkzeug.exceptions import BadRequest
 
+from odoo import _, exceptions
 from odoo.http import request
+from odoo.osv import expression
 from odoo.tools import DotDict
 
 from odoo.addons.component.core import AbstractComponent
@@ -24,8 +26,19 @@ class BaseShopfloorService(AbstractComponent):
         self._validate_headers_update_work_context(request, method_name)
         return super().dispatch(method_name, *args, params=params)
 
-    def _actions_for(self, usage):
-        return get_actions_for(self, usage)
+    def _actions_for(self, usage, **kw):
+        return get_actions_for(self, usage, **kw)
+
+    def _get(self, _id):
+        domain = expression.normalize_domain(self._get_base_search_domain())
+        domain = expression.AND([domain, [("id", "=", _id)]])
+        record = self.env[self._expose_model].search(domain)
+        if not record:
+            raise exceptions.MissingError(
+                _("The record %s %s does not exist") % (self._expose_model, _id)
+            )
+        else:
+            return record
 
     def _get_base_search_domain(self):
         return []
