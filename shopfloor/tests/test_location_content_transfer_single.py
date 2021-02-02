@@ -348,7 +348,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         move_line = self.picking2.move_line_ids[0]
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         pickings = move_lines.mapped("picking_id")
-        sorter = self.service.actions_for("location_content_transfer.sorter")
+        sorter = self.service._actions_for("location_content_transfer.sorter")
         sorter.feed_pickings(pickings)
         content_sorted1 = list(sorter)
         self.service.dispatch(
