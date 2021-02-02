@@ -267,7 +267,7 @@ class BaseShopfloorService(AbstractComponent):
 
         options = {}
         if self._requires_header_menu and getattr(self.work, "menu", None):
-            options = self.work.menu.options or {}
+            options = self.work.menu.scenario_id.options or {}
         options.update(getattr(self.work, "options", {}))
         self._options = DotDict(options)
         return self._options
