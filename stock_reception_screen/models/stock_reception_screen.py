@@ -47,12 +47,17 @@ class StockReceptionScreen(models.Model):
         },
         "select_packaging": {
             "label": _("Select Packaging"),
-            "next_steps": [{"next": "set_location"}],
+            "next_steps": [
+                {
+                    "before": "_before_select_packaging_to_set_location",
+                    "next": "set_location",
+                }
+            ],
         },
         "set_location": {
             "label": _("Set Destination"),
             "next_steps": [{"next": "set_package"}],
-            "focus_field": "current_move_line_location_dest_id",
+            "focus_field": "current_move_line_location_dest_stored_id",
         },
         "set_package": {
             "label": _("Set Package"),
@@ -137,11 +142,11 @@ class StockReceptionScreen(models.Model):
     )
     # current move line
     current_move_line_id = fields.Many2one(comodel_name="stock.move.line", copy=False)
+    current_move_line_location_dest_stored_id = fields.Many2one(
+        comodel_name="stock.location", string="Destination",
+    )
     current_move_line_location_dest_id = fields.Many2one(
-        comodel_name="stock.location",
-        string="Destination",
-        compute="_compute_current_move_line_location_dest_id",
-        inverse="_inverse_current_move_line_location_dest_id",
+        related="current_move_line_id.location_dest_id",
     )
     current_move_line_lot_id = fields.Many2one(
         related="current_move_line_id.lot_id", string="Lot NumBer"
@@ -227,44 +232,6 @@ class StockReceptionScreen(models.Model):
                 limit=1,
             )
             wiz.current_move_product_last_lot_life_date = lot.life_date
-
-    @api.depends("current_move_line_id.location_dest_id")
-    def _compute_current_move_line_location_dest_id(self):
-        """Compute the default destination location for the processed line."""
-        for wiz in self:
-            move_line = wiz.current_move_line_id
-            destination = move_line.location_dest_id
-
-            # if a destination has been set on a move line, keep it
-            has_destination_set = (
-                move_line.location_dest_id != move_line.move_id.location_dest_id
-            )
-            if has_destination_set:
-                wiz.current_move_line_location_dest_id = destination
-                continue
-
-            # Compute default location using put-away and storage type when
-            # the location has not been chosen yet
-            destination = (
-                move_line.location_dest_id._get_putaway_strategy(move_line.product_id)
-                or destination
-            )
-
-            # If there are some allowed destinations set the field empty,
-            # the user will choose the right one among them
-            if (
-                wiz.allowed_location_dest_ids
-                and wiz.allowed_location_dest_ids != destination
-            ):
-                wiz.current_move_line_location_dest_id = False
-                continue
-
-            wiz.current_move_line_location_dest_id = destination
-
-    def _inverse_current_move_line_location_dest_id(self):
-        for wiz in self:
-            move_line = wiz.current_move_line_id
-            move_line.location_dest_id = wiz.current_move_line_location_dest_id
 
     @api.depends("current_move_line_id.qty_done")
     def _compute_current_move_line_qty_status(self):
@@ -624,14 +591,6 @@ class StockReceptionScreen(models.Model):
             return
         self.next_step()
 
-    def process_set_location(self):
-        if not self.current_move_line_location_dest_id:
-            self.env.user.notify_warning(
-                message="", title=_("You have to set the destination.")
-            )
-            return
-        self.next_step()
-
     def process_select_packaging(self):
         self.next_step()
 
@@ -651,6 +610,38 @@ class StockReceptionScreen(models.Model):
             self.next_step()
             return True
         return False
+
+    def _before_select_packaging_to_set_location(self):
+        """Set a default value for the destination."""
+        move_line = self.current_move_line_id
+        # Default location
+        self.current_move_line_location_dest_stored_id = move_line.location_dest_id
+        destination = move_line.location_dest_id._get_putaway_strategy(
+            move_line.product_id
+        )
+        if destination:
+            self.current_move_line_location_dest_stored_id = destination
+        # If there are some allowed destinations set the field empty,
+        # the user will choose the right one among them
+        if (
+            self.allowed_location_dest_ids
+            and self.allowed_location_dest_ids != destination
+        ):
+            self.current_move_line_location_dest_stored_id = False
+            return True
+        self.current_move_line_location_dest_stored_id = destination
+        return True
+
+    def process_set_location(self):
+        if not self.current_move_line_location_dest_stored_id:
+            self.env.user.notify_warning(
+                message="", title=_("You have to set the destination.")
+            )
+            return
+        self.current_move_line_id.location_dest_id = (
+            self.current_move_line_location_dest_stored_id
+        )
+        self.next_step()
 
     def _before_next_move_to_set_lot_number(self):
         """Receive next move for same product (with lot) directely."""
@@ -743,7 +734,7 @@ class StockReceptionScreen(models.Model):
         assert self.current_step == "set_package", f"step = {self.current_step}"
         # Copy relevant data for the next package
         qty_done = self.current_move_line_qty_done
-        location_dest = self.current_move_line_location_dest_id
+        location_dest = self.current_move_line_location_dest_stored_id
         product_packaging = self.product_packaging_id
         package_storage_type = self.package_storage_type_id
         package_height = self.package_height
@@ -772,7 +763,7 @@ class StockReceptionScreen(models.Model):
         self.process_select_packaging()
         #   - set the destination
         assert self.current_step == "set_location", f"step = {self.current_step}"
-        self.current_move_line_location_dest_id = location_dest
+        self.current_move_line_location_dest_stored_id = location_dest
         self.process_set_location()
         assert self.current_step == "set_package", f"step = {self.current_step}"
         return True
@@ -786,6 +777,8 @@ class StockReceptionScreen(models.Model):
         self.current_step = self._step_start
         self.current_filter_product = False
         self.current_move_id = self.current_move_line_id = False
+        # Empty destination
+        self.current_move_line_location_dest_stored_id = False
         # Empty package input data
         self.product_packaging_id = (
             self.package_storage_type_id

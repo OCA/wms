@@ -110,10 +110,13 @@ class TestReceptionScreen(SavepointCase):
         # Check that a destination location is defined by default
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_location")
-        self.screen.current_move_line_location_dest_id = self.location_dest
-        self.assertTrue(self.screen.current_move_line_location_dest_id)
-        # Set a package
+        self.screen.current_move_line_location_dest_stored_id = self.location_dest
         self.screen.button_save_step()
+        self.assertEqual(
+            self.screen.current_move_line_location_dest_id,
+            self.screen.current_move_line_location_dest_stored_id,
+        )
+        # Set a package
         self.assertEqual(self.screen.current_step, "set_package")
         self.screen.current_move_line_package = "PID-TEST-1"
         self.assertEqual(self.screen.current_move_line_package_stored, "PID-TEST-1")
@@ -147,7 +150,7 @@ class TestReceptionScreen(SavepointCase):
         # Set location
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_location")
-        self.screen.current_move_line_location_dest_id = self.location_dest
+        self.screen.current_move_line_location_dest_stored_id = self.location_dest
         # Set a package
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_package")
@@ -174,9 +177,12 @@ class TestReceptionScreen(SavepointCase):
         self.screen.package_height = 20
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_location")
-        self.screen.current_move_line_location_dest_id = self.location_dest
-        self.assertTrue(self.screen.current_move_line_location_dest_id)
+        self.screen.current_move_line_location_dest_stored_id = self.location_dest
         self.screen.button_save_step()
+        self.assertEqual(
+            self.screen.current_move_line_location_dest_id,
+            self.screen.current_move_line_location_dest_stored_id,
+        )
         self.assertEqual(self.screen.current_step, "set_package")
         self.screen.current_move_line_package = "PID-TEST-2.1"
         self.assertEqual(self.screen.current_move_line_package_stored, "PID-TEST-2.1")
@@ -213,10 +219,13 @@ class TestReceptionScreen(SavepointCase):
         # Check that a destination location is defined by default
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_location")
-        self.screen.current_move_line_location_dest_id = self.location_dest
-        self.assertTrue(self.screen.current_move_line_location_dest_id)
-        # Set a package
+        self.screen.current_move_line_location_dest_stored_id = self.location_dest
         self.screen.button_save_step()
+        self.assertEqual(
+            self.screen.current_move_line_location_dest_id,
+            self.screen.current_move_line_location_dest_stored_id,
+        )
+        # Set a package
         self.assertEqual(self.screen.current_step, "set_package")
         self.screen.current_move_line_package = "PID-TEST-1"
         self.assertEqual(self.screen.current_move_line_package_stored, "PID-TEST-1")
@@ -226,7 +235,7 @@ class TestReceptionScreen(SavepointCase):
         self.assertEqual(move_line.result_package_id.name, "PID-TEST-1")
         # Iterate on the same product/lot to scan the second package
         self.assertEqual(self.screen.current_move_line_qty_done, 4)
-        self.assertTrue(self.screen.current_move_line_location_dest_id)
+        self.assertTrue(self.screen.current_move_line_location_dest_stored_id)
         self.assertEqual(self.screen.product_packaging_id, self.product_packaging)
         self.assertEqual(self.screen.package_storage_type_id, self.storage_type_pallet)
         self.assertEqual(self.screen.package_height, self.product_packaging.height)

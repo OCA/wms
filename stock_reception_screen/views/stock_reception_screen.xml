@@ -255,10 +255,30 @@
                                     />
                                 </div>
                                 <!-- set_location -->
-                                <label for="current_move_line_location_dest_id" />
-                                <div>
+                                <label
+                                    for="current_move_line_location_dest_id"
+                                    attrs="{'invisible': [('current_step', '=', 'set_location')]}"
+                                    string="Destination"
+                                />
+                                <div
+                                    attrs="{'invisible': [('current_step', '=', 'set_location')]}"
+                                >
                                     <field
                                         name="current_move_line_location_dest_id"
+                                        class="mr8"
+                                        readonly="1"
+                                        options="{'no_open': True}"
+                                    />
+                                </div>
+                                <label
+                                    for="current_move_line_location_dest_stored_id"
+                                    attrs="{'invisible': [('current_step', '!=', 'set_location')]}"
+                                />
+                                <div
+                                    attrs="{'invisible': [('current_step', '!=', 'set_location')]}"
+                                >
+                                    <field
+                                        name="current_move_line_location_dest_stored_id"
                                         class="mr8"
                                         attrs="{
                       'required': [('current_step', '=', 'set_location')],
