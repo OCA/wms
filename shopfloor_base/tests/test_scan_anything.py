@@ -6,31 +6,10 @@
 from odoo.addons.component.core import Component
 
 from .common import CommonCase
+from .common_misc import ScanAnythingTestMixin
 
 
-class ScanAnythingCase(CommonCase):
-    def setUp(self):
-        super().setUp()
-        with self.work_on_services() as work:
-            self.service = work.component(usage="scan_anything")
-
-    def _test_response_ok(self, rec_type, data, identifier):
-        params = {"identifier": identifier}
-        response = self.service.dispatch("scan", params=params)
-        self.assert_response(
-            response, data={"type": rec_type, "identifier": identifier, "record": data},
-        )
-
-    def _test_response_ko(self, identifier, tried=None):
-        tried = tried or [x[0] for x in self.service._scan_handlers()]
-        params = {"identifier": identifier}
-        response = self.service.dispatch("scan", params=params)
-        message = response["message"]
-        self.assertEqual(message["message_type"], "error")
-        self.assertIn("Record not found", message["body"])
-        for rec_type in tried:
-            self.assertIn(rec_type, message["body"])
-
+class ScanAnythingCase(CommonCase, ScanAnythingTestMixin):
     def _get_test_handlers(self):
         class PartnerFinder(Component):
             _name = "shopfloor.scan.partner.handler"
@@ -77,10 +56,12 @@ class ScanAnythingCase(CommonCase):
         return (PartnerFinder, CurrencyFinder)
 
     def test_scan(self):
-        for finder_class in self._get_test_handlers():
-            finder_class._build_component(self.service.work.components_registry)
+        service = self._get_service()
 
-        handlers = self.service._scan_handlers()
+        for finder_class in self._get_test_handlers():
+            finder_class._build_component(service.work.components_registry)
+
+        handlers = service._scan_handlers()
         self.assertEqual(len(handlers), 2)
 
         record = self.env.ref("base.res_partner_4").sudo()
@@ -95,3 +76,6 @@ class ScanAnythingCase(CommonCase):
         identifier = record.name
         data = record.jsonify(("id", "name"), one=True)
         self._test_response_ok(rec_type, data, identifier)
+
+    def test_scan_error(self):
+        self._test_response_ko("404-NOTFOUND")
