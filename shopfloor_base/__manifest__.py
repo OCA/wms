@@ -26,12 +26,15 @@
         "security/groups.xml",
         "security/ir.model.access.csv",
         "views/shopfloor_menu.xml",
+        "views/shopfloor_scenario_views.xml",
         "views/shopfloor_profile_views.xml",
         "views/menus.xml",
     ],
     "demo": [
         "demo/auth_api_key_demo.xml",
+        "demo/shopfloor_scenario_demo.xml",
         "demo/shopfloor_menu_demo.xml",
         "demo/shopfloor_profile_demo.xml",
     ],
+    "external_dependencies": {"python": ["pyyaml"]},
 }

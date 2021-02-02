@@ -18,6 +18,12 @@
         parent="menu_shopfloor_root"
         sequence="20"
     />
+    <menuitem
+        action="action_shopfloor_scenario"
+        id="menu_action_shopfloor_scenario"
+        parent="menu_shopfloor_root"
+        sequence="30"
+    />
     <!-- TODO: add filtered view for shopfloor logs (add a filter and enable it) -->
     <!--menuitem
         action="action_shopfloor_log"

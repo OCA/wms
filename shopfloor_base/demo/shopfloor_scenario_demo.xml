@@ -1,0 +1,6 @@
+<odoo noupdate="1">
+    <record id="shopfloor_scenario_demo_1" model="shopfloor.scenario">
+        <field name="name">Demo scenario 1</field>
+        <field name="key">demo_scenario_1</field>
+    </record>
+</odoo>
