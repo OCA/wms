@@ -169,8 +169,8 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
         """
         return {}
 
-    def _actions_for(self, usage):
-        return get_actions_for(self, usage)
+    def _actions_for(self, usage, **kw):
+        return get_actions_for(self, usage, **kw)
 
     @property
     def schemas(self):
