@@ -8,7 +8,7 @@ class ZonePickingCommonCase(CommonCase):
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_zone_picking")
-        cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
+        cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
         cls.picking_type = cls.menu.picking_type_ids
         cls.wh = cls.picking_type.warehouse_id
 

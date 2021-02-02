@@ -1,130 +1,17 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from collections import namedtuple
-from contextlib import contextmanager
-from pprint import pformat
 
 from odoo import models
-from odoo.tests.common import Form, SavepointCase
+from odoo.tests.common import Form
 
-from odoo.addons.base_rest.controllers.main import _PseudoCollection
-from odoo.addons.base_rest.tests.common import RegistryMixin
-from odoo.addons.component.core import WorkContext
-from odoo.addons.component.tests.common import ComponentMixin
+from odoo.addons.shopfloor_base.tests.common import CommonCase as BaseCommonCase
 
 
-class AnyObject:
-    def __repr__(self):
-        return "ANY"
-
-    def __deepcopy__(self, memodict=None):
-        return self
-
-    def __copy__(self):
-        return self
-
-    def __eq__(self, other):
-        return True
-
-
-class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
-    """Base class for writing Shopfloor tests
-
-    All tests are run as normal stock user by default, to check that all the
-    services work without manager permissions.
-
-    The consequences on writing tests:
-
-    * Records created or written in a test setup must use sudo()
-      if the user has no permission on these models.
-    * Tests setUps should not extend setUpClass but setUpClassVars
-      and setUpClassBaseData, which already have an environment using
-      the stock user.
-    * Be wary of creating records before setUpClassUsers is called, because
-      it their "env.user" would be admin and could lead to inconsistencies
-      in tests.
-
-    This class provides several helpers which are used throughout all the tests.
-    """
-
-    # by default disable tracking suite-wise, it's a time saver :)
-    tracking_disable = True
-
-    ANY = AnyObject()  # allow accepting anything in assert_response()
-
-    maxDiff = None
-
-    @contextmanager
-    def work_on_services(self, env=None, **params):
-        params = params or {}
-        collection = _PseudoCollection("shopfloor.service", env or self.env)
-        yield WorkContext(
-            model_name="rest.service.registration", collection=collection, **params
-        )
-
-    @contextmanager
-    def work_on_actions(self, **params):
-        params = params or {}
-        collection = _PseudoCollection("shopfloor.action", self.env)
-        yield WorkContext(
-            model_name="rest.service.registration", collection=collection, **params
-        )
-
-    # pylint: disable=method-required-super
-    # super is called "the old-style way" to call both super classes in the
-    # order we want
-    def setUp(self):
-        # Have to initialize both odoo env and stuff +
-        # the Component registry of the mixin
-        SavepointCase.setUp(self)
-        ComponentMixin.setUp(self)
-
-    @classmethod
-    def setUpClass(cls):
-        super(CommonCase, cls).setUpClass()
-        cls.env = cls.env(
-            context=dict(
-                cls.env.context,
-                tracking_disable=cls.tracking_disable,
-                _service_skip_request_validation=True,
-            )
-        )
-
-        cls.setUpComponent()
-        cls.setUpRegistry()
-        cls.setUpClassUsers()
-        cls.setUpClassVars()
-        cls.setUpClassBaseData()
-
-        with cls.work_on_actions(cls) as work:
-            cls.data = work.component(usage="data")
-        with cls.work_on_actions(cls) as work:
-            cls.data_detail = work.component(usage="data_detail")
-        with cls.work_on_actions(cls) as work:
-            cls.msg_store = work.component(usage="message")
-        with cls.work_on_services(cls) as work:
-            cls.schema = work.component(usage="schema")
-        with cls.work_on_services(cls) as work:
-            cls.schema_detail = work.component(usage="schema_detail")
-
-    @classmethod
-    def setUpClassUsers(cls):
-        Users = cls.env["res.users"].with_context(
-            {"no_reset_password": True, "mail_create_nosubscribe": True}
-        )
-        cls.stock_user = Users.create(
-            {
-                "name": "Pauline Poivraisselle",
-                "login": "pauline2",
-                "email": "p.p@example.com",
-                "notification_type": "inbox",
-                "groups_id": [(6, 0, [cls.env.ref("stock.group_stock_user").id])],
-            }
-        )
-        cls.env = cls.env(user=cls.stock_user)
-
+class CommonCase(BaseCommonCase):
     @classmethod
     def setUpClassVars(cls):
+        super().setUpClassVars()
         stock_location = cls.env.ref("stock.stock_location_stock")
         cls.stock_location = stock_location
         cls.customer_location = cls.env.ref("stock.stock_location_customers")
@@ -135,7 +22,14 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
         cls.shelf2 = cls.env.ref("stock.stock_location_14")
 
     @classmethod
+    def _shopfloor_user_values(cls):
+        vals = super()._shopfloor_user_values()
+        vals["groups_id"] = [(6, 0, [cls.env.ref("stock.group_stock_user").id])]
+        return vals
+
+    @classmethod
     def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
         cls.customer = cls.env["res.partner"].sudo().create({"name": "Customer"})
 
         cls.customer_location.sudo().barcode = "CUSTOMERS"
@@ -240,32 +134,6 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
                     "barcode": "ProductDBox",
                 }
             )
-        )
-
-    def assert_response(
-        self, response, next_state=None, message=None, data=None, popup=None
-    ):
-        """Assert a response from the webservice
-
-        The data and message dictionaries can use ``self.ANY`` to accept any
-        value.
-        """
-        expected = {}
-        if message:
-            expected["message"] = message
-        if popup:
-            expected["popup"] = popup
-        if next_state:
-            expected.update(
-                {"next_state": next_state, "data": {next_state: data or {}}}
-            )
-        elif data:
-            expected["data"] = data
-        self.assertDictEqual(
-            response,
-            expected,
-            "\n\nActual:\n%s"
-            "\n\nExpected:\n%s" % (pformat(response), pformat(expected)),
         )
 
     @classmethod
