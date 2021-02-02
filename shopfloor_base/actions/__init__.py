@@ -9,7 +9,7 @@ Difference with Service components:
   Action Components are never exposed
 
 An Action component can be get from Service or Action Components using
-``self.actions_for(usage)``.
+``self._actions_for(usage)``.
 
 The goal of the Action Components is to share common actions
 and processes between Services, avoid having too much logic in
