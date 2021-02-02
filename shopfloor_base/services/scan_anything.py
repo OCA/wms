@@ -1,20 +1,18 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2021 ACSONE SA/NV (http://www.camptocamp.com)
+# @author Simone Orsi <simahawk@gmail.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _
 
-from odoo.addons.component.core import Component
+from odoo.addons.component.core import AbstractComponent, Component
+
+from ..actions.base_action import get_actions_for
 
 
 class ShopfloorScanAnything(Component):
     """Endpoints to scan any record.
 
-    Supported types of records (models):
-
-    * location (stock.location)
-    * package (stock.quant.package)
-    * product (product.product)
-    * lot (stock.production.lot)
-    * transfer (stock.picking)
+    You can register your own record scanner.
 
     NOTE for swagger docs: using `anyof_schema` for `record` response key
     does not work in swagger UI. Hence, you won't see any detail.
@@ -33,15 +31,15 @@ class ShopfloorScanAnything(Component):
         data = {}
         tried = []
         record = None
-        for rec_type, finder, converter, __ in self._scan_handlers():
-            tried.append(rec_type)
-            record = finder(identifier)
+        for handler in self._scan_handlers():
+            tried.append(handler.record_type)
+            record = handler.search(identifier)
             if record:
                 data.update(
                     {
                         "identifier": identifier,
-                        "record": converter(record),
-                        "type": rec_type,
+                        "record": handler.converter(record),
+                        "type": handler.record_type,
                     }
                 )
                 break
@@ -62,50 +60,55 @@ class ShopfloorScanAnything(Component):
         return self._response(message=message)
 
     def _scan_handlers(self):
-        """Return a tuple of tuples describing handlers for scan requests.
-
-        Tuple schema:
-
-            0. record type
-            1. finder
-            2. json detail converter
-            3. detail schema validator
-
+        """Return components to handle scan requests.
         """
-        search = self.actions_for("search")
-        schema = self.component(usage="schema_detail")
-        return (
-            (
-                "location",
-                search.location_from_scan,
-                self.data_detail.location_detail,
-                schema.location_detail,
-            ),
-            (
-                "package",
-                search.package_from_scan,
-                self.data_detail.package_detail,
-                schema.package_detail,
-            ),
-            (
-                "product",
-                search.product_from_scan,
-                self.data_detail.product_detail,
-                schema.product_detail,
-            ),
-            (
-                "lot",
-                search.lot_from_scan,
-                self.data_detail.lot_detail,
-                schema.lot_detail,
-            ),
-            (
-                "transfer",
-                search.picking_from_scan,
-                self.data_detail.picking_detail,
-                schema.picking_detail,
-            ),
-        )
+        return self.many_components(usage="scan_anything.handler")
+
+
+class ShopfloorScanAnythingHandler(AbstractComponent):
+    """Handle record search for ScanAnything service.
+    """
+
+    _name = "shopfloor.scan.anything.handler"
+    _usage = "scan_anything.handler"
+    _description = __doc__
+    _collection = "shopfloor.service"
+    _actions_collection_name = "shopfloor.action"
+
+    @property
+    def _data(self):
+        return get_actions_for(self, "data")
+
+    @property
+    def _schema(self):
+        return get_actions_for(self, "schema")
+
+    @property
+    def _schema_detail(self):
+        return get_actions_for(self, "schema_detail")
+
+    @property
+    def record_type(self):
+        """Return unique record type for this handler
+        """
+        raise NotImplementedError()
+
+    def search(self, identifier):
+        """Find and return Odoo record.
+        """
+        raise NotImplementedError()
+
+    @property
+    def converter(self):
+        """Return data converter to json.
+        """
+        raise NotImplementedError()
+
+    @property
+    def schema(self):
+        """Return schema to validate record converter.
+        """
+        raise NotImplementedError()
 
 
 class ShopfloorScanAnythingValidator(Component):
@@ -130,8 +133,8 @@ class ShopfloorScanAnythingValidatorResponse(Component):
 
     def scan(self):
         scan_service = self.component(usage="scan_anything")
-        allowed_types = [x[0] for x in scan_service._scan_handlers()]
-        allowed_schemas = [x[-1]() for x in scan_service._scan_handlers()]
+        allowed_types = [x.record_type for x in scan_service._scan_handlers()]
+        allowed_schemas = [x.schema() for x in scan_service._scan_handlers()]
         data_schema = {
             "identifier": {"type": "string", "nullable": True, "required": False},
             "type": {
