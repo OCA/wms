@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_picking_type_form" model="ir.ui.view">
+        <field name="name">Operation Types</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="shopfloor.view_picking_type_form" />
+        <field name="arch" type="xml">
+            <field name="shopfloor_zero_check" position="after">
+                <field
+                    name="shopfloor_display_packing_info"
+                    attrs="{'invisible': [('shopfloor_menu_ids', '=', [])]}"
+                />
+            </field>
+        </field>
+    </record>
+</odoo>
