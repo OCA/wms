@@ -23,6 +23,7 @@ from . import test_checkout_base
 from . import test_checkout_scan
 from . import test_checkout_select
 from . import test_checkout_scan_line
+from . import test_checkout_scan_line_base
 from . import test_checkout_select_line
 from . import test_checkout_select_package_base
 from . import test_checkout_set_qty
