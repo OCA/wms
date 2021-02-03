@@ -8,7 +8,7 @@ class CheckoutSelectPackageMixin:
         response,
         selected_lines,
         message=None,
-        packing_info=False,
+        packing_info="",
         no_package_enabled=True,
     ):
         picking = selected_lines.mapped("picking_id")
@@ -20,19 +20,14 @@ class CheckoutSelectPackageMixin:
                     self._move_line_data(ml) for ml in selected_lines.sorted()
                 ],
                 "picking": self._picking_summary_data(picking),
-                "packing_info": picking.shopfloor_packing_info if packing_info else "",
+                "packing_info": packing_info,
                 "no_package_enabled": no_package_enabled,
             },
             message=message,
         )
 
     def _assert_selected_qties(
-        self,
-        response,
-        selected_lines,
-        lines_quantities,
-        message=None,
-        packing_info=False,
+        self, response, selected_lines, lines_quantities, message=None, packing_info="",
     ):
         picking = selected_lines.mapped("picking_id")
         deselected_lines = picking.move_line_ids - selected_lines

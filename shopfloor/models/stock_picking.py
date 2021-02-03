@@ -14,13 +14,6 @@ class StockPicking(models.Model):
         compute="_compute_picking_info",
         help="Technical field. Indicates number of move lines included.",
     )
-    shopfloor_display_packing_info = fields.Boolean(
-        related="picking_type_id.shopfloor_display_packing_info",
-    )
-    shopfloor_packing_info = fields.Text(
-        string="Packing information",
-        related="partner_id.shopfloor_packing_info",
-    )
 
     @api.depends(
         "move_line_ids", "move_line_ids.product_qty", "move_line_ids.product_id.weight"
