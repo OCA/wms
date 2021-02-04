@@ -4,7 +4,7 @@
 from .test_actions_data_detail import ActionsDataDetailCaseBase
 
 
-class ScanAnythingCase(ActionsDataDetailCaseBase):
+class TestScanAnythingCase(ActionsDataDetailCaseBase):
     def setUp(self):
         super().setUp()
         with self.work_on_services() as work:
