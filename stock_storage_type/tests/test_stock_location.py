@@ -175,3 +175,49 @@ class TestStockLocation(TestStorageTypeCommon):
             location.location_will_contain_lot_ids,
             self.env["stock.production.lot"].browse(),
         )
+
+    def test_location_is_empty(self):
+        location = self.pallets_bin_1_location
+        location.allowed_location_storage_type_ids.only_empty = False
+        lot_values = {"product_id": self.product.id, "company_id": self.env.company.id}
+        lot1 = self.env["stock.production.lot"].create(lot_values)
+        lot2 = self.env["stock.production.lot"].create(lot_values)
+
+        self._update_qty_in_location(location, self.product, 10, lot=lot1)
+        self.assertTrue(location.location_is_empty)
+
+        location.allowed_location_storage_type_ids.only_empty = True
+        self.assertFalse(location.location_is_empty)
+
+        self._update_qty_in_location(location, self.product, 0, lot=lot1)
+        self.assertTrue(location.location_is_empty)
+
+        # the moves and move lines created are not really valid, but we don't care, it's
+        # only to have "in_move_ids" and "in_move_line_ids" on the location
+        ml_move = self.env["stock.move"].create(
+            {
+                "name": "test",
+                "product_id": self.product.id,
+                "location_id": self.stock_location.id,
+                "location_dest_id": location.location_id.id,
+                "product_uom": self.product2.uom_id.id,
+                "product_uom_qty": 10,
+                "state": "waiting",
+            }
+        )
+        self.env["stock.move.line"].create(
+            {
+                "product_id": self.product.id,
+                "lot_id": lot2.id,
+                "location_id": self.stock_location.id,
+                "location_dest_id": location.id,
+                "product_uom_id": self.product.uom_id.id,
+                "product_uom_qty": 10,
+                "move_id": ml_move.id,
+                "company_id": self.env.company.id,
+            }
+        )
+        self.assertFalse(location.location_is_empty)
+
+        location.allowed_location_storage_type_ids.only_empty = False
+        self.assertTrue(location.location_is_empty)

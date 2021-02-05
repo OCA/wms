@@ -153,6 +153,11 @@ class StockLocation(models.Model):
             for location in self.allowed_location_storage_type_ids
         )
 
+    def _should_compute_is_empty(self):
+        return self.usage == "internal" and any(
+            location.only_empty for location in self.allowed_location_storage_type_ids
+        )
+
     @api.depends(
         "quant_ids",
         "in_move_ids",
@@ -189,12 +194,12 @@ class StockLocation(models.Model):
         "out_move_line_ids.qty_done",
         "in_move_ids",
         "in_move_line_ids",
+        "allowed_location_storage_type_ids.only_empty",
     )
     def _compute_location_is_empty(self):
         for rec in self:
-            if rec.usage != "internal":
-                # No restriction should apply on customer/supplier/...
-                # locations.
+            if not rec._should_compute_is_empty():
+                # No restriction should apply
                 rec.location_is_empty = True
                 continue
             if (
