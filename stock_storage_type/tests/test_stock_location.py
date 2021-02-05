@@ -175,3 +175,25 @@ class TestStockLocation(TestStorageTypeCommon):
             location.location_will_contain_lot_ids,
             self.env["stock.production.lot"].browse(),
         )
+
+    def test_location_is_empty_non_internal(self):
+        location = self.env.ref("stock.stock_location_customers")
+        # we always consider an non-internal location empty, the put-away
+        # rules do not apply and we can add as many quants as we want
+        self.assertTrue(location.location_is_empty)
+        self._update_qty_in_location(location, self.product, 10)
+        self.assertTrue(location.location_is_empty)
+
+    def test_location_is_empty(self):
+        location = self.pallets_reserve_bin_1_location
+        self.assertTrue(location.allowed_location_storage_type_ids.only_empty)
+        self.assertTrue(location.location_is_empty)
+        self._update_qty_in_location(location, self.product, 10)
+        self.assertFalse(location.location_is_empty)
+
+        # When the location has no "only_empty" storage type, we don't
+        # care about if it is empty or not, we keep it as True so we
+        # can always put things inside. Not computing it prevents
+        # useless race conditions on concurrent writes.
+        location.allowed_location_storage_type_ids.only_empty = False
+        self.assertTrue(location.location_is_empty)
