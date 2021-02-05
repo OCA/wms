@@ -767,9 +767,13 @@ class LocationContentTransfer(Component):
         package_level = self.env["stock.package_level"].browse(package_level_id)
         if not location.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
-        if package_level.exists():
-            package_level.shopfloor_postponed = True
         move_lines = self._find_transfer_move_lines(location)
+        if package_level.exists():
+            pickings = move_lines.mapped("picking_id")
+            sorter = self.actions_for("location_content_transfer.sorter")
+            sorter.feed_pickings(pickings)
+            package_levels = sorter.package_levels()
+            package_level.shopfloor_postpone(move_lines, package_levels)
         return self._response_for_start_single(move_lines.mapped("picking_id"))
 
     def postpone_line(self, location_id, move_line_id):
@@ -782,9 +786,13 @@ class LocationContentTransfer(Component):
         if not location.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
         move_line = self.env["stock.move.line"].browse(move_line_id)
-        if move_line.exists():
-            move_line.shopfloor_postponed = True
         move_lines = self._find_transfer_move_lines(location)
+        if move_line.exists():
+            pickings = move_lines.mapped("picking_id")
+            sorter = self.actions_for("location_content_transfer.sorter")
+            sorter.feed_pickings(pickings)
+            package_levels = sorter.package_levels()
+            move_line.shopfloor_postpone(move_lines, package_levels)
         return self._response_for_start_single(move_lines.mapped("picking_id"))
 
     def stock_out_package(self, location_id, package_level_id):
