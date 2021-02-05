@@ -749,7 +749,7 @@ class ClusterPicking(Component):
                 batch, message=self.msg_store.operation_not_found()
             )
         # flag as postponed
-        move_line.shopfloor_postponed = True
+        move_line.shopfloor_postpone(self._lines_to_pick(batch))
         return self._pick_after_skip_line(move_line)
 
     def _pick_after_skip_line(self, move_line):
