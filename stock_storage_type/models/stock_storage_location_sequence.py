@@ -36,7 +36,7 @@ class StockStorageLocationSequence(models.Model):
                 if strat[0] == self.location_id.pack_putaway_strategy:
                     pack_storage_strat = strat[1]
                     break
-            msg = ' * <span style="color: green;">{} ({})</span>'.format(
+            msg = u' * <span style="color: green;">{} ({})</span>'.format(
                 self.location_id.name, pack_storage_strat,
             )
             if last:
