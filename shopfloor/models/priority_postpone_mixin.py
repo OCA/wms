@@ -1,15 +1,12 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import api, fields, models
+from odoo import fields, models
 
 
 class PriorityPostponeMixin(models.AbstractModel):
     _name = "shopfloor.priority.postpone.mixin"
     _description = "Adds shopfloor priority/postpone fields"
 
-    # shopfloor_priority is set to this value when postponed
-    # consider it as the max value for priority
-    _SF_PRIORITY_POSTPONED = 9999
     _SF_PRIORITY_DEFAULT = 10
 
     shopfloor_priority = fields.Integer(
@@ -17,24 +14,26 @@ class PriorityPostponeMixin(models.AbstractModel):
         copy=False,
         help="Technical field. Overrides operation priority in barcode scenario.",
     )
-
     shopfloor_postponed = fields.Boolean(
-        compute="_compute_shopfloor_postponed",
-        inverse="_inverse_shopfloor_postponed",
+        copy=False,
         help="Technical field. "
         "Indicates if the operation has been postponed in a barcode scenario.",
     )
 
-    @api.depends("shopfloor_priority")
-    def _compute_shopfloor_postponed(self):
-        for record in self:
-            record.shopfloor_postponed = bool(
-                record.shopfloor_priority == self._SF_PRIORITY_POSTPONED
-            )
+    def _get_max_shopfloor_priority(self, records):
+        self.ensure_one()
+        return max(rec.shopfloor_priority for rec in records)
 
-    def _inverse_shopfloor_postponed(self):
-        for record in self:
-            if record.shopfloor_postponed:
-                record.shopfloor_priority = self._SF_PRIORITY_POSTPONED
-            else:
-                record.shopfloor_priority = self._SF_PRIORITY_DEFAULT
+    def shopfloor_postpone(self, *recordsets):
+        """Postpone the record and update its priority based on other records.
+
+        The method accepts several recordsets as parameter (to be able to get
+        the current max priority from different types of records).
+        """
+        self.ensure_one()
+        # Set the max priority from sibling records + 1
+        max_priority = max(
+            self._get_max_shopfloor_priority(records) for records in recordsets
+        )
+        self.shopfloor_priority = max_priority + 1
+        self.shopfloor_postponed = True
