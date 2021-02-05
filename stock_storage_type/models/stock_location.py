@@ -57,7 +57,9 @@ class StockLocation(models.Model):
         compute="_compute_location_is_empty",
         store=True,
         help="technical field: True if the location is empty "
-        "and there is no pending incoming products in the location",
+        "and there is no pending incoming products in the location. "
+        " Computed only if the location needs to check for emptiness "
+        '(has an "only empty" location storage type).',
     )
 
     in_move_ids = fields.One2many(
@@ -160,6 +162,11 @@ class StockLocation(models.Model):
             for location in self.allowed_location_storage_type_ids
         )
 
+    def _should_compute_location_is_empty(self):
+        return self.usage == "internal" and any(
+            location.only_empty for location in self.allowed_location_storage_type_ids
+        )
+
     @api.depends(
         "quant_ids",
         "in_move_ids",
@@ -202,16 +209,22 @@ class StockLocation(models.Model):
         "out_move_line_ids.qty_done",
         "in_move_ids",
         "in_move_line_ids",
+        "allowed_location_storage_type_ids.only_empty",
     )
     def _compute_location_is_empty(self):
         for rec in self:
-            if rec.usage != "internal":
-                # No restriction should apply on customer/supplier/...
-                # locations.
+            # No restriction should apply on customer/supplier/...
+            # locations and we don't need to compute is empty
+            # if there is no limit on the location
+            if not rec._should_compute_location_is_empty():
+                # avoid write if not required
                 if not rec.location_is_empty:
-                    # avoid write if not required
                     rec.location_is_empty = True
                 continue
+            # we do want to keep a write here even if the value is the same
+            # to enforce concurrent transaction safety: 2 moves taking
+            # quantities in a location have to be executed sequentially
+            # or the location could remain "not empty"
             if (
                 sum(rec.quant_ids.mapped("quantity"))
                 - sum(rec.out_move_line_ids.mapped("qty_done"))
