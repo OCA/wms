@@ -168,13 +168,16 @@ class StockLocation(models.Model):
     )
     def _compute_location_will_contain_product_ids(self):
         for rec in self:
-            products = self.env["product.product"].browse()
-            if rec._should_compute_will_contain_product_ids():
-                products = (
-                    rec.mapped("quant_ids.product_id")
-                    | rec.mapped("in_move_ids.product_id")
-                    | rec.mapped("in_move_line_ids.product_id")
-                )
+            if not rec._should_compute_will_contain_product_ids():
+                if rec.location_will_contain_product_ids:
+                    no_product = self.env["product.product"].browse()
+                    rec.location_will_contain_product_ids = no_product
+                continue
+            products = (
+                rec.mapped("quant_ids.product_id")
+                | rec.mapped("in_move_ids.product_id")
+                | rec.mapped("in_move_line_ids.product_id")
+            )
             rec.location_will_contain_product_ids = products
 
     @api.depends(
@@ -184,11 +187,14 @@ class StockLocation(models.Model):
     )
     def _compute_location_will_contain_lot_ids(self):
         for rec in self:
-            lots = self.env["stock.production.lot"].browse()
-            if rec._should_compute_will_contain_lot_ids():
-                lots = rec.mapped("quant_ids.lot_id") | rec.mapped(
-                    "in_move_line_ids.lot_id"
-                )
+            if not rec._should_compute_will_contain_lot_ids():
+                if rec.location_will_contain_lot_ids:
+                    no_lot = self.env["stock.production.lot"].browse()
+                    rec.location_will_contain_lot_ids = no_lot
+                continue
+            lots = rec.mapped("quant_ids.lot_id") | rec.mapped(
+                "in_move_line_ids.lot_id"
+            )
             rec.location_will_contain_lot_ids = lots
 
     @api.depends(
@@ -202,7 +208,9 @@ class StockLocation(models.Model):
             if rec.usage != "internal":
                 # No restriction should apply on customer/supplier/...
                 # locations.
-                rec.location_is_empty = True
+                if not rec.location_is_empty:
+                    # avoid write if not required
+                    rec.location_is_empty = True
                 continue
             if (
                 sum(rec.quant_ids.mapped("quantity"))
