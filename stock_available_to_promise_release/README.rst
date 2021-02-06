@@ -23,7 +23,7 @@ Stock Available to Promise Release
     :target: https://runbot.odoo-community.org/runbot/285/13.0
     :alt: Try me on Runbot
 
-|badge1| |badge2| |badge3| |badge4| |badge5|
+|badge1| |badge2| |badge3| |badge4| |badge5| 
 
 Currently the reservation is performed by adding reserved quantities on quants,
 which is fine as long as the reservation is made right after the order
