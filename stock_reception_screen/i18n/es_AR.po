@@ -6,13 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2021-02-07 02:44+0000\n"
+"Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.3.2\n"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__picking_state
@@ -39,7 +41,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__barcode
 #, python-format
 msgid "Barcode"
-msgstr ""
+msgstr "Código de Barras"
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
@@ -75,13 +77,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__create_uid
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Creado por"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__create_date
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Creado el"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_id
@@ -118,7 +120,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__display_name
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Mostrar Nombre"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
@@ -156,17 +158,19 @@ msgstr ""
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__package_storage_type_height_required
 msgid "Height is mandatory for packages configured with this storage type."
 msgstr ""
+"La Altura es obligatoria para paquetes configurados con este tipo de "
+"almacenamiento."
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__package_storage_type_height_required
 msgid "Height required for packages"
-msgstr ""
+msgstr "Altura requerida para paquetes"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__id
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_uom_qty
@@ -177,7 +181,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode____last_update
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Última Modificación el"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move__last_move_line_lot_id
@@ -188,13 +192,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__write_uid
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Última Actualización por"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__write_date
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Última Actualización el"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_lot_id
@@ -239,7 +243,7 @@ msgstr ""
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__package_storage_type_id
 msgid "Package Storage Type"
-msgstr ""
+msgstr "Tipo de Paquete de Almacenamiento"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__picking_filtered_move_lines
@@ -271,7 +275,7 @@ msgstr ""
 #: model:ir.model,name:stock_reception_screen.model_product_packaging
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__product_packaging_id
 msgid "Product Packaging"
-msgstr ""
+msgstr "Empaqueta del Producto"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
@@ -382,7 +386,7 @@ msgstr ""
 #. module: stock_reception_screen
 #: model:ir.model,name:stock_reception_screen.model_stock_move
 msgid "Stock Move"
-msgstr ""
+msgstr "Movimiento de Inventario"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__picking_move_lines
