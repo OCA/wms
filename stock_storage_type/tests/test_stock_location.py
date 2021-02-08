@@ -105,6 +105,51 @@ class TestStockLocation(TestStorageTypeCommon):
             self.env["product.product"].browse(),
         )
 
+    def test_will_contain_product_ids_2(self):
+        """
+        Test that canceled move and are not taken into account
+
+        Before the use of stock_operation_cleaner, when a move was cancelled
+        the pack operation was not deleted. Therefore the incoming qty on the
+        stock location was not right since it also take into account the
+        pack operations linked to the location
+        """
+        location = self.pallets_bin_1_location
+        location.allowed_location_storage_type_ids.only_empty = False
+        location.allowed_location_storage_type_ids.do_not_mix_products = True
+
+        self._update_qty_in_location(location, self.product, 10)
+        self.assertEqual(location.location_will_contain_product_ids, self.product)
+
+        loc_supplier_id = self.env.ref("stock.stock_location_suppliers").id
+        StockMove = self.env["stock.move"]
+        StockPicking = self.env["stock.picking"]
+        self.picking = StockPicking.create(
+            {
+                "picking_type_id": self.env.ref("stock.picking_type_in").id,
+                "location_id": loc_supplier_id,
+                "location_dest_id": location.id,
+            }
+        )
+        sm = StockMove.create(
+            {
+                "name": "/",
+                "picking_id": self.picking.id,
+                "product_uom": self.product2.uom_id.id,
+                "location_id": loc_supplier_id,
+                "location_dest_id": location.id,
+                "product_id": self.product2.id,
+                "product_uom_qty": 10,
+            }
+        )
+        self.picking.action_confirm()
+        self.assertEqual(
+            location.location_will_contain_product_ids, self.product | self.product2
+        )
+
+        sm.action_cancel()
+        self.assertEqual(location.location_will_contain_product_ids, self.product)
+
     def test_will_contain_lot_ids(self):
         location = self.pallets_bin_1_location
         location.allowed_location_storage_type_ids.only_empty = False

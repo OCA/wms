@@ -160,7 +160,9 @@ class StockLocation(models.Model):
     @api.depends(
         "quant_ids",
         "in_move_ids",
+        "in_move_ids.state",
         "in_move_line_ids",
+        "in_move_line_ids.state",
         "allowed_location_storage_type_ids.do_not_mix_products",
     )
     def _compute_location_will_contain_product_ids(self):
@@ -175,6 +177,7 @@ class StockLocation(models.Model):
     @api.depends(
         "quant_ids",
         "in_move_line_ids",
+        "in_move_line_ids.state",
         "allowed_location_storage_type_ids.do_not_mix_lots",
     )
     def _compute_location_will_contain_lot_ids(self):
@@ -189,8 +192,11 @@ class StockLocation(models.Model):
     @api.depends(
         "quant_ids.qty",
         "out_move_line_ids.qty_done",
+        "out_move_line_ids.state",
         "in_move_ids",
+        "in_move_ids.state",
         "in_move_line_ids",
+        "in_move_line_ids.state",
     )
     def _compute_location_is_empty(self):
         for rec in self:

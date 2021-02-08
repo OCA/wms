@@ -4,7 +4,7 @@
 {
     "name": "Stock Storage Type",
     "summary": "Manage packages and locations storage types",
-    "version": "10.0.1.8.0",
+    "version": "10.0.1.8.1",
     "development_status": "Alpha",
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",
@@ -15,6 +15,7 @@
     "depends": [
         "base_m2m_custom_field",
         "stock_quant_package_dimension",
+        "stock_operation_cleaner",
         "web_domain_field",
     ],
     "data": [
@@ -38,4 +39,5 @@
         "demo/stock_location.xml",
         "demo/stock_storage_location_sequence.xml",
     ],
+    "pre_init_hook": "pre_init_hook",
 }

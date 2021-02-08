@@ -33,6 +33,14 @@ class StockPackOperation(models.Model):
         help="technical field: list of lots implied by the pack operation",
     )
 
+    # in odoo > 10, this field is a stored related on stock.move.line.
+    # Even id the state here has not the same meaning as in odoo > 10,
+    # we also need to store it to have a simple way to filter stock packaging
+    # already processed or not more valid. If the picking is done or cancelled
+    # the pack operation is no more relevant to know if a qty will reach or
+    # quit a stock.location
+    state = fields.Selection(store=True, index=True)
+
     @api.depends("product_id", "package_id", "pack_lot_ids")
     def _compute_implied_products_and_lots(self):
         ProductProduct = self.env["product.product"]
