@@ -143,19 +143,20 @@ class StockLocation(models.Model):
 
     def _should_compute_will_contain_product_ids(self):
         return self.usage == "internal" and any(
-            location.do_not_mix_products
-            for location in self.allowed_location_storage_type_ids
+            location_storage_type.do_not_mix_products
+            for location_storage_type in self.allowed_location_storage_type_ids
         )
 
     def _should_compute_will_contain_lot_ids(self):
         return self.usage == "internal" and any(
-            location.do_not_mix_lots
-            for location in self.allowed_location_storage_type_ids
+            location_storage_type.do_not_mix_lots
+            for location_storage_type in self.allowed_location_storage_type_ids
         )
 
     def _should_compute_is_empty(self):
         return self.usage == "internal" and any(
-            location.only_empty for location in self.allowed_location_storage_type_ids
+            location_storage_type.only_empty
+            for location_storage_type in self.allowed_location_storage_type_ids
         )
 
     @api.depends(
