@@ -16,26 +16,21 @@
 # process:
 #     1. pre-init will copy, in a temporary column, the contents
 #        of the column that is going to be removed when the update
-#        on 'shopfloor' is done. Since updating & installing at the
-#        same time sometimes yields to problems in databases having
-#        already installed the module that has the field to be removed
-#        defined in some views, it deletes it from the views defined
-#        in the original module.
+#        on 'shopfloor' is done.
 #     2. post-init will get the values from that temporary column,
 #        (because the update would have removed the original column)
 #        and use them to populate the new records for the new model,
 #        and link them to the corresponding customers. The temporal
 #        column will be removed afterwards.
 
-
-import hashlib
 import os
 
 from odoo.api import SUPERUSER_ID, Environment
+from odoo.tools.sql import column_exists
 
 
 def pre_init_hook(cr):
-    if _column_exists(cr, "res_partner", "shopfloor_packing_info"):
+    if column_exists(cr, "res_partner", "shopfloor_packing_info"):
         cr.execute(
             """
             ALTER TABLE res_partner
@@ -44,21 +39,10 @@ def pre_init_hook(cr):
             UPDATE res_partner
             SET shopfloor_packing_info_tmp=shopfloor_packing_info;"""
         )
-        cr.execute(
-            """
-            DELETE FROM ir_ui_view WHERE id IN (
-              SELECT v.id
-              FROM ir_ui_view v, ir_model_data m
-              WHERE v.arch_db ILIKE '%shopfloor_packing_info%'
-                AND m.res_id = v.id
-                AND m.module = 'shopfloor'
-                AND m.model = 'ir.ui.view');
-            """
-        )
 
 
 def post_init_hook(cr, registry):
-    if _column_exists(cr, "res_partner", "shopfloor_packing_info_tmp"):
+    if column_exists(cr, "res_partner", "shopfloor_packing_info_tmp"):
         copy_into_new_model(cr)
         cr.execute(
             """
@@ -67,24 +51,10 @@ def post_init_hook(cr, registry):
         )
 
 
-def _column_exists(cr, table_name, column_name):
-    # See https://stackoverflow.com/a/9991073
-    cr.execute(
-        """
-        SELECT count(attname)
-        FROM pg_attribute
-        WHERE attrelid = ( SELECT oid FROM pg_class WHERE relname = %s )
-          AND attname = %s;""",
-        (table_name, column_name),
-    )
-    return cr.fetchone()[0] == 1
-
-
 def copy_into_new_model(cr):
     env = Environment(cr, SUPERUSER_ID, {})
     shopfloor_packing_info = env["shopfloor.packing.info"]
     res_partner = env["res.partner"]
-    ir_model_data = env["ir.model.data"]
 
     env.cr.execute(
         """
@@ -119,13 +89,3 @@ def copy_into_new_model(cr):
                     {"name": packing_info_name, "text": packing_info_full}
                 )
                 partner.shopfloor_packing_info_id = packing_info_record
-                xml_id = hashlib.md5(packing_info_full.encode("utf-8")).hexdigest()
-                ir_model_data._update_xmlids(
-                    [
-                        {
-                            "xml_id": "shopfloor.packing_info_{}".format(xml_id),
-                            "record": packing_info_record,
-                            "noupdate": True,
-                        }
-                    ]
-                )

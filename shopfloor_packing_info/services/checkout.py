@@ -12,9 +12,9 @@ class CheckoutExt(Checkout):
         res = super()._data_for_packing_info(picking)
         if picking.picking_type_id.shopfloor_display_packing_info:
             shopfloor_packing_info = (
-                picking.shopfloor_packing_info_id
-                and picking.shopfloor_packing_info_id.text
-                or ""
+                picking.shopfloor_packing_info_id.text
+                if picking.shopfloor_packing_info_id
+                else ""
             )
             if shopfloor_packing_info:
                 res += "{}{}".format(os.linesep, shopfloor_packing_info).strip()
