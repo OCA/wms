@@ -24,11 +24,11 @@
         "base_sparse_field",
         "auth_api_key",
         #  OCA / stock-logistics-warehouse
+        "stock_helper",
         "stock_picking_completion_info",
+        "stock_quant_package_product_packaging",
         #  OCA / stock-logistics-workflow
         "stock_quant_package_dimension",
-        #  OCA / stock-logistics-warehouse
-        "stock_quant_package_product_packaging",
         # TODO: used for manuf info on prod detail.
         # This must be an optional dep
         "product_manufacturer",
