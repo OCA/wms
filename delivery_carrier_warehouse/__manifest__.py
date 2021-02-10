@@ -3,7 +3,7 @@
 {
     "name": "Delivery Carrier Warehouse",
     "summary": "Get delivery method used in sales orders from warehouse",
-    "version": "13.0.1.2.0",
+    "version": "14.0.1.2.0",
     "category": "Operations/Inventory/Delivery",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",

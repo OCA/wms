@@ -8,7 +8,7 @@
             <field name="partner_id" position="after">
                 <field
                     name="delivery_carrier_id"
-                    domain="['|', ('company_id', '=', False), ('company_id', '=', company_id.id)]"
+                    domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]"
                 />
             </field>
         </field>
