@@ -16,6 +16,7 @@ setuptools.setup(
         'odoo13-addon-shopfloor_checkout_sync',
         'odoo13-addon-shopfloor_mobile',
         'odoo13-addon-shopfloor_mobile_custom_example',
+        'odoo13-addon-shopfloor_packing_info',
         'odoo13-addon-stock_available_to_promise_release',
         'odoo13-addon-stock_available_to_promise_release_dynamic_routing',
         'odoo13-addon-stock_checkout_sync',
