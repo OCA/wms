@@ -158,7 +158,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
 
     def test_data_picking(self):
         picking = self.picking
-        carrier = picking.carrier_id.search([])[0]
+        carrier = picking.carrier_id.search([], limit=1)
         picking.write(
             {
                 "origin": "created by test",
@@ -178,12 +178,12 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "origin": "created by test",
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
+            "carrier": {"id": picking.carrier_id.id, "name": picking.carrier_id.name},
             "priority": "Very Urgent",
             "operation_type": {
                 "id": picking.picking_type_id.id,
                 "name": picking.picking_type_id.name,
             },
-            "carrier": {"id": carrier.id, "name": carrier.name},
             "move_lines": self.data_detail.move_lines(picking.move_line_ids),
             "picking_type_code": "outgoing",
         }
