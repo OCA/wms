@@ -18,13 +18,13 @@
     <menuitem
         id="menu_action_shopfloor_app"
         action="action_shopfloor_app"
-        parent="shopfloor.menu_shopfloor_settings"
+        parent="shopfloor.menu_shopfloor_root"
         sequence="99"
     />
     <menuitem
         id="menu_action_shopfloor_app_demo"
         action="action_shopfloor_app_demo"
-        parent="shopfloor.menu_shopfloor_settings"
+        parent="shopfloor.menu_shopfloor_root"
         sequence="99"
         groups="base.group_no_one"
     />
