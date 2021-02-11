@@ -6,6 +6,7 @@
     "version": "13.0.1.9.2",
     "summary": "Release Operations based on available to promise",
     "author": "Camptocamp,Odoo Community Association (OCA)",
+    "website": "https://github.com/OCA/wms",
     "category": "Stock Management",
     "website": "https://github.com/OCA/wms",
     "depends": ["stock"],
