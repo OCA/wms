@@ -78,13 +78,6 @@ msgid "Are you sure?"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.actions.server,name:shopfloor.ir_cron_autovacuum_shopfloor_log_ir_actions_server
-#: model:ir.cron,cron_name:shopfloor.ir_cron_autovacuum_shopfloor_log
-#: model:ir.cron,name:shopfloor.ir_cron_autovacuum_shopfloor_log
-msgid "Auto-vacuum Shopfloor Logs"
-msgstr ""
-
-#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Barcode does not match with {}."
@@ -138,12 +131,6 @@ msgid "Checkout"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_res_partner__shopfloor_packing_info
-#: model:ir.model.fields,field_description:shopfloor.field_res_users__shopfloor_packing_info
-msgid "Checkout Packing Information"
-msgstr ""
-
-#. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_cluster_picking
 #: model:stock.picking.type,name:shopfloor.picking_type_cluster_picking_demo
 msgid "Cluster Picking"
@@ -153,11 +140,6 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Confirm location change from %s to %s?"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model,name:shopfloor.model_res_partner
-msgid "Contact"
 msgstr ""
 
 #. module: shopfloor
@@ -207,11 +189,6 @@ msgid "Creation of moves is not allowed for menu {}."
 msgstr ""
 
 #. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
-msgid "Date"
-msgstr ""
-
-#. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_delivery
 #: model:stock.picking.type,name:shopfloor.picking_type_delivery_demo
 msgid "Delivery"
@@ -226,40 +203,6 @@ msgid "Display Name"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_stock_picking__shopfloor_display_packing_info
-#: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__shopfloor_display_packing_info
-msgid "Display customer packing info"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__error
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_form_view
-msgid "Error"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__exception_name
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
-msgid "Exception"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__exception_message
-msgid "Exception Message"
-msgstr ""
-
-#. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
-msgid "Exception message"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_log__state__failed
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
-msgid "Failed"
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking_type__shopfloor_zero_check
 msgid ""
 "For Shopfloor scenarios using it (Cluster Picking, Zone Picking, Discrete "
@@ -268,37 +211,13 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,help:shopfloor.field_stock_picking__shopfloor_display_packing_info
-#: model:ir.model.fields,help:shopfloor.field_stock_picking_type__shopfloor_display_packing_info
-msgid ""
-"For the Shopfloor Checkout/Packing scenarios to display the customer packing"
-" info."
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__location_id
 msgid "From"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_log__severity__functional
-msgid "Functional"
-msgstr ""
-
-#. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
-msgid "Functional errors"
-msgstr ""
-
-#. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
 #: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_search_view
 msgid "Group By"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__headers
-msgid "Headers"
 msgstr ""
 
 #. module: shopfloor
@@ -380,6 +299,11 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model,name:shopfloor.model_shopfloor_log
+msgid "Legacy model for tracking REST calls: replacedy by rest.log"
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid "Line cancelled"
@@ -413,11 +337,6 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Location {} empty"
-msgstr ""
-
-#. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
-msgid "Logs generated today"
 msgstr ""
 
 #. module: shopfloor
@@ -733,21 +652,6 @@ msgid "Packaging changed on package {}"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_stock_picking__shopfloor_packing_info
-msgid "Packing information"
-msgstr ""
-
-#. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_form_view
-msgid "Parameters"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__params
-msgid "Params"
-msgstr ""
-
-#. module: shopfloor
 #: code:addons/shopfloor/actions/change_package_lot.py:0
 #, python-format
 msgid "Pick: stock issue on lot: {} found in {}"
@@ -864,17 +768,6 @@ msgid "Remaining raw product not packed, proceed anyway?"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__request_method
-msgid "Request Method"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__request_url
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
-msgid "Request URL"
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_location__reserved_move_line_ids
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__reserved_move_line_ids
 msgid "Reserved Move Line"
@@ -884,12 +777,6 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Restart the operation, someone has canceled it."
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__result
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_form_view
-msgid "Result"
 msgstr ""
 
 #. module: shopfloor
@@ -985,24 +872,7 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_log__severity__severe
-msgid "Severe"
-msgstr ""
-
-#. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
-msgid "Severe errors"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__severity
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
-msgid "Severity"
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.ui.menu,name:shopfloor.menu_shopfloor_settings
-#: model_terms:ir.ui.view,arch_db:shopfloor.res_partner_shopfloor_form
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_location_form
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_picking_type_form
 msgid "Shopfloor"
@@ -1011,17 +881,6 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__shopfloor_checkout_done
 msgid "Shopfloor Checkout Done"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model,name:shopfloor.model_shopfloor_log
-msgid "Shopfloor Logging"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.actions.act_window,name:shopfloor.action_shopfloor_log
-#: model:ir.ui.menu,name:shopfloor.menu_action_shopfloor_log
-msgid "Shopfloor Logs"
 msgstr ""
 
 #. module: shopfloor
@@ -1093,16 +952,6 @@ msgid "Source Package"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__state
-msgid "State"
-msgstr ""
-
-#. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
-msgid "Status"
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_move
 msgid "Stock Move"
 msgstr ""
@@ -1115,11 +964,6 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__picking_id
 msgid "Stock Picking"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_log__state__success
-msgid "Success"
 msgstr ""
 
 #. module: shopfloor
@@ -1318,11 +1162,6 @@ msgid "This transfer does not exist or is not available anymore."
 msgstr ""
 
 #. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
-msgid "Today"
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__total_weight
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_batch__total_weight
 msgid "Total Weight"
@@ -1369,23 +1208,8 @@ msgid "Unreserve Other Moves Is Possible"
 msgstr ""
 
 #. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
-msgid "User"
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__profile_id
 msgid "Visible on this profile only"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_log__severity__warning
-msgid "Warning"
-msgstr ""
-
-#. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_log_search_view
-msgid "Warning errors"
 msgstr ""
 
 #. module: shopfloor
