@@ -361,3 +361,53 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         self.assertTrue(
             package_level.location_dest_id in self.cardboxes_location.child_ids
         )
+
+    def test_storage_strategy_do_not_mix_products_reuse_location(self):
+        """Location with restriction 'do_not_mix_products' should have priority
+
+        When locations are configured with 'do_not_mix_products' the strategy
+        must give priority to location that already contains the product
+        (less qty first).
+        """
+        StockLocation = self.env["stock.location"]
+        self.cardboxes_location_storage_type.write({"do_not_mix_products": True})
+        product = self.product
+        packaging = self.product_cardbox_product_packaging
+        dest_location = self.cardboxes_location
+        package = self.env["stock.quant.package"].create(
+            {"name": "TEST1", "product_packaging_id": packaging.id}
+        )
+        quant = self.env["stock.quant"].create(
+            {
+                "product_id": product.id,
+                "package_id": package.id,
+                "location_id": self.input_location.id,
+            }
+        )
+
+        location = StockLocation._get_pack_putaway_strategy(
+            dest_location, quant, product
+        )
+
+        # No location with given product -> the first bin should be returned
+        self.assertEqual(location, self.cardboxes_bin_1_location)
+
+        # Set a quantity in cardbox bin 4 to trigger the priority on the
+        # location that already contains the product
+        self.env["stock.quant"]._update_available_quantity(
+            product, self.cardboxes_bin_3_location, 10.0,
+        )
+        location = StockLocation._get_pack_putaway_strategy(
+            dest_location, quant, product
+        )
+        self.assertEqual(location, self.cardboxes_bin_3_location)
+
+        # Set less quantity on bin 4. Since it's the location with less quantity
+        # that should have priority
+        self.env["stock.quant"]._update_available_quantity(
+            product, self.cardboxes_bin_4_location, 1.0,
+        )
+        location = StockLocation._get_pack_putaway_strategy(
+            dest_location, quant, product
+        )
+        self.assertEqual(location, self.cardboxes_bin_4_location)
