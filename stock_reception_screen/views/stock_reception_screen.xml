@@ -91,27 +91,62 @@
                 <field name="current_step_focus_field" invisible="1" />
                 <field name="picking_location_dest_id" invisible="1" />
                 <field name="current_move_id" invisible="1" />
+                <field name="current_move_has_tracking" invisible="1" />
                 <field name="current_move_product_id" invisible="1" />
                 <field name="current_move_line_id" invisible="1" />
                 <field name="package_storage_type_height_required" invisible="1" />
+                <field name="allowed_location_dest_ids" invisible="1" />
                 <div class="o_screen_data">
                     <div class="o_screen_data_content" name="data">
-                        <group attrs="{'invisible': [('current_move_id', '=', False)]}">
-                            <label for="current_move_product_display_name" />
-                            <div>
-                                <field
-                                    name="current_move_product_display_name"
-                                    class="mr8"
+                        <group
+                            attrs="{'invisible': [('current_move_id', '=', False)]}"
+                            col="4"
+                        >
+                            <group colspan="2">
+                                <label for="current_move_product_display_name" />
+                                <div>
+                                    <field
+                                        name="current_move_product_display_name"
+                                        class="mr8"
+                                    />
+                                </div>
+                                <label for="current_move_product_vendor_code" />
+                                <div>
+                                    <field
+                                        name="current_move_product_vendor_code"
+                                        class="mr8"
+                                    />
+                                </div>
+                            </group>
+                            <group colspan="2">
+                                <label for="current_move_product_qty_available" />
+                                <div>
+                                    <field
+                                        name="current_move_product_qty_available"
+                                        class="mr8"
+                                    />
+                                </div>
+                                <label for="current_move_product_outgoing_qty" />
+                                <div>
+                                    <field
+                                        name="current_move_product_outgoing_qty"
+                                        class="mr8"
+                                    />
+                                </div>
+                                <label
+                                    for="current_move_product_last_lot_life_date"
+                                    attrs="{'invisible': [('current_move_has_tracking', '=', 'none')]}"
                                 />
-                            </div>
-                            <label for="current_move_product_vendor_code" />
-                            <div>
-                                <field
-                                    name="current_move_product_vendor_code"
-                                    class="mr8"
-                                />
-                            </div>
-                            <hr colspan="2" />
+                                <div
+                                    attrs="{'invisible': [('current_move_has_tracking', '=', 'none')]}"
+                                >
+                                    <field
+                                        name="current_move_product_last_lot_life_date"
+                                        class="mr8"
+                                    />
+                                </div>
+                            </group>
+                            <hr colspan="4" />
                         </group>
                         <group
                             attrs="{'invisible': [('current_move_line_id', '=', False)]}"
@@ -178,20 +213,6 @@
                                         attrs="{'invisible': [('current_move_line_qty_status', '!=', 'gt')]}"
                                     />
                                 </div>
-                                <!-- set_location -->
-                                <label for="current_move_line_location_dest_id" />
-                                <div>
-                                    <field
-                                        name="current_move_line_location_dest_id"
-                                        class="mr8"
-                                        attrs="{
-                      'required': [('current_step', '=', 'set_location')],
-                      'readonly': [('current_step', '!=', 'set_location')],
-                    }"
-                                        options="{'no_open': True, 'no_create_edit': True}"
-                                        domain="[('id', 'child_of', picking_location_dest_id), ('usage', '!=', 'view')]"
-                                    />
-                                </div>
                                 <!-- select_packaging -->
                                 <label for="package_storage_type_id" />
                                 <div>
@@ -231,6 +252,40 @@
                                         attrs="{
                             'readonly': [('current_step', '!=', 'select_packaging')],
                           }"
+                                    />
+                                </div>
+                                <!-- set_location -->
+                                <label
+                                    for="current_move_line_location_dest_id"
+                                    attrs="{'invisible': [('current_step', '=', 'set_location')]}"
+                                    string="Destination"
+                                />
+                                <div
+                                    attrs="{'invisible': [('current_step', '=', 'set_location')]}"
+                                >
+                                    <field
+                                        name="current_move_line_location_dest_id"
+                                        class="mr8"
+                                        readonly="1"
+                                        options="{'no_open': True}"
+                                    />
+                                </div>
+                                <label
+                                    for="current_move_line_location_dest_stored_id"
+                                    attrs="{'invisible': [('current_step', '!=', 'set_location')]}"
+                                />
+                                <div
+                                    attrs="{'invisible': [('current_step', '!=', 'set_location')]}"
+                                >
+                                    <field
+                                        name="current_move_line_location_dest_stored_id"
+                                        class="mr8"
+                                        attrs="{
+                      'required': [('current_step', '=', 'set_location')],
+                      'readonly': [('current_step', '!=', 'set_location')],
+                    }"
+                                        options="{'no_open': True, 'no_create_edit': True}"
+                                        domain="[('usage', '!=', 'view'), ('id', 'in', allowed_location_dest_ids)]"
                                     />
                                 </div>
                                 <!-- set_package -->
