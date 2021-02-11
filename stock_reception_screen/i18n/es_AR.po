@@ -58,6 +58,16 @@ msgid "Action to input a barcode"
 msgstr "Acción para Ingresar un Código de Barras"
 
 #. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__allowed_location_dest_ids
+msgid "Allowed destination locations"
+msgstr ""
+
+#. module: stock_reception_screen
+#: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__allowed_location_dest_ids
+msgid "Allowed destination locations based on the package storage type."
+msgstr ""
+
+#. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__barcode
 #, python-format
@@ -128,7 +138,22 @@ msgid "Current Step"
 msgstr "Paso Actual"
 
 #. module: stock_reception_screen
-#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_location_dest_id
+#: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__current_move_product_qty_available
+msgid ""
+"Current quantity of products.\n"
+"In a context with a single Stock Location, this includes goods stored at "
+"this Location, or any of its children.\n"
+"In a context with a single Warehouse, this includes goods stored in the "
+"Stock Location of this Warehouse, or any of its children.\n"
+"stored in the Stock Location of the Warehouse of this Shop, or any of its "
+"children.\n"
+"Otherwise, this includes goods stored in any Stock Location with 'internal' "
+"type."
+msgstr ""
+
+#. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_location_dest_stored_id
+#: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
 msgid "Destination"
 msgstr "Destino"
 
@@ -154,6 +179,11 @@ msgstr "Hecho"
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_lot_life_date
 msgid "End of Life Date"
 msgstr "Fecha de Fin de Vida"
+
+#. module: stock_reception_screen
+#: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__current_move_has_tracking
+msgid "Ensure the traceability of a storable product in your warehouse."
+msgstr ""
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
@@ -232,6 +262,11 @@ msgid "Manual Barcode Input"
 msgstr "Ingreso Manual de Código de Barras"
 
 #. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_last_lot_life_date
+msgid "Most recent exp. date"
+msgstr ""
+
+#. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_id
 msgid "Move's product"
 msgstr "Producto de Movimiento"
@@ -250,6 +285,11 @@ msgstr "Siguiente PAQUETE"
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_step_descr
 msgid "Operation"
 msgstr "Operación"
+
+#. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_outgoing_qty
+msgid "Outgoing"
+msgstr ""
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__package_height
@@ -307,6 +347,11 @@ msgstr ""
 "CUBISCAN."
 
 #. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_has_tracking
+msgid "Product with Tracking"
+msgstr ""
+
+#. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_qty_status
 msgid "Qty Status"
 msgstr "Estado de la Cantidad"
@@ -315,6 +360,23 @@ msgstr "Estado de la Cantidad"
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_qty_done
 msgid "Quantity"
 msgstr "Cantidad"
+
+#. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_qty_available
+msgid "Quantity On Hand"
+msgstr ""
+
+#. module: stock_reception_screen
+#: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__current_move_product_outgoing_qty
+msgid ""
+"Quantity of planned outgoing products.\n"
+"In a context with a single Stock Location, this includes goods leaving this "
+"Location, or any of its children.\n"
+"In a context with a single Warehouse, this includes goods leaving the Stock "
+"Location of this Warehouse, or any of its children.\n"
+"Otherwise, this includes goods leaving any Stock Location with 'internal' "
+"type."
+msgstr ""
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.view_move_line_tree
@@ -474,6 +536,11 @@ msgstr ""
 "cantidad de producto que se planea mover. Bajar esta cantidad no genera un "
 "pedido pendiente. Cambiar esta cantidad en los movimientos asignados afecta "
 "la reserva del producto y debe hacerse con cuidado."
+
+#. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_location_dest_id
+msgid "To"
+msgstr ""
 
 #. module: stock_reception_screen
 #: model:ir.model,name:stock_reception_screen.model_stock_picking
