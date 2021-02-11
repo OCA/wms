@@ -238,7 +238,10 @@ class ActionsDataCase(ActionsDataCaseBase):
         self.assertDictEqual(data, expected)
 
     def test_data_picking(self):
-        self.picking.write({"origin": "created by test", "note": "read me"})
+        carrier = self.picking.carrier_id.search([], limit=1)
+        self.picking.write(
+            {"origin": "created by test", "note": "read me", "carrier_id": carrier.id}
+        )
         data = self.data.picking(self.picking)
         self.assert_schema(self.schema.picking(), data)
         expected = {
@@ -249,6 +252,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "origin": "created by test",
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
+            "carrier": {"id": carrier.id, "name": carrier.name},
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-08-03")
         self.assertDictEqual(data, expected)
