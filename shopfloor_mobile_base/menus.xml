@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+    @author Sébastien Alix <sebastien.alix@camptocamp.com>
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+-->
+<odoo>
+    <record id="action_shopfloor_app" model="ir.actions.act_url">
+        <field name="name">Shopfloor mobile app</field>
+        <field name="url">/shopfloor_mobile/app/#</field>
+        <field name="target">new</field>
+    </record>
+    <record id="action_shopfloor_app_demo" model="ir.actions.act_url">
+        <field name="name">Shopfloor mobile app DEMO</field>
+        <field name="url">/shopfloor_mobile/app/demo/#</field>
+        <field name="target">new</field>
+    </record>
+    <menuitem
+        id="menu_action_shopfloor_app"
+        action="action_shopfloor_app"
+        parent="shopfloor_base.menu_shopfloor_root"
+        sequence="99"
+    />
+    <menuitem
+        id="menu_action_shopfloor_app_demo"
+        action="action_shopfloor_app_demo"
+        parent="shopfloor_base.menu_shopfloor_root"
+        sequence="99"
+        groups="base.group_no_one"
+    />
+</odoo>
