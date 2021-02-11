@@ -115,6 +115,47 @@ class StockLocation(models.Model):
         store=True,
         help="The max height supported among allowed location storage types.",
     )
+    do_not_mix_products = fields.Boolean(
+        compute="_compute_do_not_mix_products", store=True,
+    )
+    do_not_mix_lots = fields.Boolean(compute="_compute_do_not_mix_lots", store=True,)
+    only_empty = fields.Boolean(compute="_compute_only_empty", store=True,)
+
+    @api.depends(
+        "usage",
+        "allowed_location_storage_type_ids",
+        "allowed_location_storage_type_ids.do_not_mix_products",
+    )
+    def _compute_do_not_mix_products(self):
+        for rec in self:
+            rec.do_not_mix_products = rec.usage == "internal" and any(
+                storage_type.do_not_mix_products
+                for storage_type in rec.allowed_location_storage_type_ids
+            )
+
+    @api.depends(
+        "usage",
+        "allowed_location_storage_type_ids",
+        "allowed_location_storage_type_ids.do_not_mix_lots",
+    )
+    def _compute_do_not_mix_lots(self):
+        for rec in self:
+            rec.do_not_mix_lots = rec.usage == "internal" and any(
+                storage_type.do_not_mix_lots
+                for storage_type in rec.allowed_location_storage_type_ids
+            )
+
+    @api.depends(
+        "usage",
+        "allowed_location_storage_type_ids",
+        "allowed_location_storage_type_ids.only_empty",
+    )
+    def _compute_only_empty(self):
+        for rec in self:
+            rec.only_empty = rec.usage == "internal" and any(
+                storage_type.only_empty
+                for storage_type in rec.allowed_location_storage_type_ids
+            )
 
     max_height_in_m = fields.Float(
         string="Max height (m)",
@@ -151,28 +192,16 @@ class StockLocation(models.Model):
             loc.leaf_location_ids = leaves
 
     def _should_compute_will_contain_product_ids(self):
-        return self.usage == "internal" and any(
-            storage_type.do_not_mix_products
-            for storage_type in self.allowed_location_storage_type_ids
-        )
+        return self.do_not_mix_products
 
     def _should_compute_will_contain_lot_ids(self):
-        return self.usage == "internal" and any(
-            storage_type.do_not_mix_lots
-            for storage_type in self.allowed_location_storage_type_ids
-        )
+        return self.do_not_mix_lots
 
     def _should_compute_location_is_empty(self):
-        return self.usage == "internal" and any(
-            storage_type.only_empty
-            for storage_type in self.allowed_location_storage_type_ids
-        )
+        return self.only_empty
 
     @api.depends(
-        "quant_ids",
-        "in_move_ids",
-        "in_move_line_ids",
-        "allowed_location_storage_type_ids.do_not_mix_products",
+        "quant_ids", "in_move_ids", "in_move_line_ids", "do_not_mix_products",
     )
     def _compute_location_will_contain_product_ids(self):
         for rec in self:
@@ -189,9 +218,7 @@ class StockLocation(models.Model):
             rec.location_will_contain_product_ids = products
 
     @api.depends(
-        "quant_ids",
-        "in_move_line_ids",
-        "allowed_location_storage_type_ids.do_not_mix_lots",
+        "quant_ids", "in_move_line_ids", "do_not_mix_lots",
     )
     def _compute_location_will_contain_lot_ids(self):
         for rec in self:
@@ -210,7 +237,7 @@ class StockLocation(models.Model):
         "out_move_line_ids.qty_done",
         "in_move_ids",
         "in_move_line_ids",
-        "allowed_location_storage_type_ids.only_empty",
+        "only_empty",
     )
     def _compute_location_is_empty(self):
         for rec in self:
@@ -466,12 +493,7 @@ class StockLocation(models.Model):
             )
         )
 
-        # NOTE: self.ids is ordered as expected, so we want to filter the valid
-        # locations while preserving the initial order
-        valid_location_ids = set(valid_locations.ids)
-        valid_locations = self.browse(
-            id_ for id_ in self.ids if id_ in valid_location_ids
-        )
+        valid_locations = self._order_allowed_locations(valid_locations)
         valid_locations = valid_locations._select_final_valid_putaway_locations(
             limit=limit
         )
@@ -485,6 +507,55 @@ class StockLocation(models.Model):
             len(valid_locations),
         )
         return valid_locations
+
+    def _order_allowed_locations(self, valid_locations):
+        """Return the ordered list of valid_locations
+
+        By default the order should be the same as self. However, if the
+        valid_locations list contains locations configured to not mix products,
+        we must give priority to locations that already contains products
+        (the ones with less qty first)
+        """
+        valid_no_mix = valid_locations.filtered("do_not_mix_products")
+        qty_by_loc = {}
+        if valid_no_mix:
+            StockQuant = self.env["stock.quant"]
+            domain_quant = [("location_id", "in", valid_no_mix.ids)]
+            qty_by_loc = {
+                item["location_id"][0]: item["quantity"]
+                for item in StockQuant.read_group(
+                    domain_quant,
+                    ["location_id", "quantity"],
+                    ["location_id"],
+                    orderby="id",
+                )
+            }
+        return valid_locations.sorted(self._get_allowed_location_sorter(qty_by_loc))
+
+    def _get_allowed_location_sorter(self, qty_by_loc):
+        """ Return a method used to order valid_locations
+
+        The order is defined as follow: locations with less qty first;
+        if no qty or same qty, we preserve the initial order as in self
+        """
+        locations = self
+
+        def sorter(location):
+            qty = qty_by_loc.get(location.id)
+            # we construct a tuple to define the sort order priority
+            # Since tuple are sorted item by item, this means that the first
+            # element will come first, etc...
+            # In the first element we check if we have qty. since False < True,
+            # all elements with qty will come first
+            # The second element is qty or 0 for loc without computed qty. The
+            # element with the less qty will come first
+            # The third element is the position into the initial list of
+            # locations. This third element ensure that the original order
+            # is preserved for all the locations without computed qty (the ones
+            # where do_not_mix_products is False)
+            return (qty is None or qty <= 0, qty or 0, locations.ids.index(location.id))
+
+        return sorter
 
     def _get_ordered_leaf_locations(self):
         """Return ordered leaf sub-locations
