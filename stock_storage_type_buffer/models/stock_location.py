@@ -3,13 +3,41 @@
 
 import logging
 
-from odoo import models
+from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
 
 
 class StockLocation(models.Model):
     _inherit = "stock.location"
+
+    storage_buffer_ids = fields.Many2many(
+        comodel_name="stock.location.storage.buffer",
+        relation="stock_location_storage_buffer_stock_location_buffer_rel",
+    )
+    is_in_storage_buffer = fields.Boolean(
+        compute="_compute_is_in_storage_buffer", store=True,
+    )
+
+    @api.depends("storage_buffer_ids", "location_id.is_in_storage_buffer")
+    def _compute_is_in_storage_buffer(self):
+        for location in self:
+            if self.storage_buffer_ids:
+                location.is_in_storage_buffer = True
+            else:
+                location.is_in_storage_buffer = (
+                    location.location_id.is_in_storage_buffer
+                )
+
+    def _should_compute_location_is_empty(self):
+        if super()._should_compute_location_is_empty():
+            return True
+        return self.is_in_storage_buffer
+
+    # add dependency
+    @api.depends("is_in_storage_buffer")
+    def _compute_location_is_empty(self):
+        super()._compute_location_is_empty()
 
     def _select_final_valid_putaway_locations(self, limit=None):
         """Return the valid locations using the provided limit

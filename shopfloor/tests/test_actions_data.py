@@ -162,7 +162,7 @@ class ActionsDataCaseBase(CommonCase):
         data = {
             "id": record.id,
             "name": record.name,
-            "weight": record.pack_weight,
+            "weight": record.pack_weight or record.estimated_pack_weight,
             "storage_type": None,
         }
         data.update(kw)
@@ -213,7 +213,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "storage_type": self._expected_storage_type(
                 package.package_storage_type_id
             ),
-            "weight": 0.0,
+            "weight": 20.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -296,16 +296,14 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
                 "move_line_count": 1,
-                # TODO
-                "weight": 0.0,
+                "weight": 20.0,
                 "storage_type": None,
             },
             "package_dest": {
                 "id": result_package.id,
                 "name": result_package.name,
                 "move_line_count": 0,
-                # TODO
-                "weight": 0.0,
+                "weight": 6.0,
                 "storage_type": None,
             },
             "location_src": self._expected_location(move_line.location_id),
@@ -354,15 +352,13 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
                 "move_line_count": 1,
-                # TODO
-                "weight": 0,
+                "weight": 30,
                 "storage_type": None,
             },
             "package_dest": {
                 "id": move_line.result_package_id.id,
                 "name": move_line.result_package_id.name,
                 "move_line_count": 1,
-                # TODO
                 "weight": 0,
                 "storage_type": None,
             },

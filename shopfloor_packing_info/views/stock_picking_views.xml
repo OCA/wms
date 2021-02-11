@@ -12,7 +12,7 @@
                 <group name="shopfloor">
                     <field name="shopfloor_display_packing_info" invisible="1" />
                     <field
-                        name="shopfloor_packing_info"
+                        name="shopfloor_packing_info_id"
                         attrs="{'invisible':[('shopfloor_display_packing_info', '=', False)]}"
                     />
                 </group>
@@ -24,7 +24,7 @@
                 <group name="shopfloor">
                     <field name="shopfloor_display_packing_info" invisible="1" />
                     <field
-                        name="shopfloor_packing_info"
+                        name="shopfloor_packing_info_id"
                         attrs="{'invisible':[('shopfloor_display_packing_info', '=', False)]}"
                     />
                 </group>

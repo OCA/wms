@@ -58,7 +58,9 @@ class StockLocation(models.Model):
         compute="_compute_location_is_empty",
         store=True,
         help="technical field: True if the location is empty "
-        "and there is no pending incoming products in the location",
+        "and there is no pending incoming products in the location. "
+        " Computed only if the location needs to check for emptiness "
+        '(has an "only empty" location storage type).',
     )
 
     in_move_ids = fields.One2many(
@@ -147,14 +149,20 @@ class StockLocation(models.Model):
 
     def _should_compute_will_contain_product_ids(self):
         return self.usage == "internal" and any(
-            location.do_not_mix_products
-            for location in self.allowed_location_storage_type_ids
+            storage_type.do_not_mix_products
+            for storage_type in self.allowed_location_storage_type_ids
         )
 
     def _should_compute_will_contain_lot_ids(self):
         return self.usage == "internal" and any(
-            location.do_not_mix_lots
-            for location in self.allowed_location_storage_type_ids
+            storage_type.do_not_mix_lots
+            for storage_type in self.allowed_location_storage_type_ids
+        )
+
+    def _should_compute_location_is_empty(self):
+        return self.usage == "internal" and any(
+            storage_type.only_empty
+            for storage_type in self.allowed_location_storage_type_ids
         )
 
     @api.depends(
@@ -167,12 +175,17 @@ class StockLocation(models.Model):
     )
     def _compute_location_will_contain_product_ids(self):
         for rec in self:
-            if rec._should_compute_will_contain_product_ids():
-                rec.location_will_contain_product_ids = (
-                    rec.mapped("quant_ids.product_id")
-                    | rec.mapped("in_move_ids.product_id")
-                    | rec.mapped("in_move_line_ids.implied_product_ids")
-                )
+            if not rec._should_compute_will_contain_product_ids():
+                if rec.location_will_contain_product_ids:
+                    no_product = self.env["product.product"].browse()
+                    rec.location_will_contain_product_ids = no_product
+                continue
+            products = (
+                rec.mapped("quant_ids.product_id")
+                | rec.mapped("in_move_ids.product_id")
+                | rec.mapped("in_move_line_ids.implied_product_ids")
+            )
+            rec.location_will_contain_product_ids = products
 
     @api.depends(
         "quant_ids",
@@ -182,11 +195,14 @@ class StockLocation(models.Model):
     )
     def _compute_location_will_contain_lot_ids(self):
         for rec in self:
-            lots = self.env["stock.production.lot"].browse()
-            if rec._should_compute_will_contain_lot_ids():
-                lots = rec.mapped("quant_ids.lot_id") | rec.mapped(
-                    "in_move_line_ids.implied_lot_ids"
-                )
+            if not rec._should_compute_will_contain_lot_ids():
+                if rec.location_will_contain_lot_ids:
+                    no_lot = self.env["stock.production.lot"].browse()
+                    rec.location_will_contain_lot_ids = no_lot
+                continue
+            lots = rec.mapped("quant_ids.lot_id") | rec.mapped(
+                "in_move_line_ids.implied_lot_ids"
+            )
             rec.location_will_contain_lot_ids = lots
 
     @api.depends(
@@ -197,14 +213,22 @@ class StockLocation(models.Model):
         "in_move_ids.state",
         "in_move_line_ids",
         "in_move_line_ids.state",
+        "allowed_location_storage_type_ids.only_empty",
     )
     def _compute_location_is_empty(self):
         for rec in self:
-            if rec.usage != "internal":
-                # No restriction should apply on customer/supplier/...
-                # locations.
-                rec.location_is_empty = True
+            # No restriction should apply on customer/supplier/...
+            # locations and we don't need to compute is empty
+            # if there is no limit on the location
+            if not rec._should_compute_location_is_empty():
+                # avoid write if not required
+                if not rec.location_is_empty:
+                    rec.location_is_empty = True
                 continue
+            # we do want to keep a write here even if the value is the same
+            # to enforce concurrent transaction safety: 2 moves taking
+            # quantities in a location have to be executed sequentially
+            # or the location could remain "not empty"
             if (
                 sum(rec.quant_ids.mapped("qty"))
                 - sum(rec.out_move_line_ids.mapped("qty_done"))
@@ -347,11 +371,12 @@ class StockLocation(models.Model):
                 ("max_height", "=", 0),
                 ("max_height", ">=", quants.package_id.height),
             ]
-        if quants.package_id.pack_weight:
+        package_weight = quants.package_id.pack_weight
+        if package_weight:
             pertinent_loc_storagetype_domain += [
                 "|",
                 ("max_weight", "=", 0),
-                ("max_weight", ">=", quants.package_id.pack_weight),
+                ("max_weight", ">=", package_weight),
             ]
         _logger.debug(
             "pertinent storage type domain: %s", pertinent_loc_storagetype_domain

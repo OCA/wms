@@ -84,8 +84,11 @@ class Checkout(Component):
         )
 
     def _data_for_packing_info(self, picking):
-        if picking.picking_type_id.shopfloor_display_packing_info:
-            return picking.shopfloor_packing_info or ""
+        """Return the packing information
+
+        Intended to be extended.
+        """
+        # TODO: This could be avoided if included in the picking parser.
         return ""
 
     def _response_for_select_dest_package(self, picking, move_lines, message=None):
@@ -103,7 +106,9 @@ class Checkout(Component):
             )
         picking_data = self.data.picking(picking)
         packages_data = self.data.packages(
-            packages.sorted(), picking=picking, with_packaging=True
+            packages.with_context(picking_id=picking.id).sorted(),
+            picking=picking,
+            with_packaging=True,
         )
         return self._response(
             next_state="select_dest_package",

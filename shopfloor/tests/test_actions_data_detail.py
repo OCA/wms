@@ -80,7 +80,7 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
         return dict(**self._expected_product(record), **detail)
 
 
-class ActionsDataDetailCase(ActionsDataDetailCaseBase):
+class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
     def test_data_location(self):
         location = self.stock_location
         data = self.data_detail.location_detail(location)
@@ -139,10 +139,14 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
         pickings = lines.mapped("picking_id")
         expected = {
             "id": package.id,
+            "location": {
+                "id": package.location_id.id,
+                "name": package.location_id.display_name,
+            },
             "name": package.name,
             "move_line_count": 1,
             "packaging": self.data_detail.packaging(package.packaging_id),
-            "weight": 0,
+            "weight": 20.0,
             "pickings": self.data_detail.pickings(pickings),
             "move_lines": self.data_detail.move_lines(lines),
             "storage_type": {
@@ -205,14 +209,14 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
                 "move_line_count": 1,
-                "weight": 0.0,
+                "weight": 20.0,
                 "storage_type": None,
             },
             "package_dest": {
                 "id": result_package.id,
                 "name": result_package.name,
                 "move_line_count": 0,
-                "weight": 0.0,
+                "weight": 6.0,
                 "storage_type": None,
             },
             "location_src": self._expected_location(move_line.location_id),
@@ -263,7 +267,7 @@ class ActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
                 "move_line_count": 1,
-                "weight": 0.0,
+                "weight": 30.0,
                 "storage_type": None,
             },
             "package_dest": {
