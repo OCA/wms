@@ -34,6 +34,39 @@ class TestStorageTypeBuffer(TestStorageTypeCommon):
         )
         return move
 
+    def test_location_field_is_in_storage_buffer(self):
+        self.assertTrue(self.buffer_location.is_in_storage_buffer)
+
+        area = self.env["stock.location"].create(
+            {"name": "Pallet Area", "location_id": self.warehouse.lot_stock_id.id}
+        )
+        self.assertFalse(area.is_in_storage_buffer)
+        leaf = self.env["stock.location"].create(
+            {"name": "Pallet Leaf", "location_id": area.id}
+        )
+        self.assertFalse(area.is_in_storage_buffer)
+
+        area.location_id = self.buffer_location.id
+        self.assertTrue(area.is_in_storage_buffer)
+        self.assertTrue(leaf.is_in_storage_buffer)
+
+        self.storage_buffer.unlink()
+        self.assertFalse(self.buffer_location.is_in_storage_buffer)
+        self.assertFalse(area.is_in_storage_buffer)
+        self.assertFalse(leaf.is_in_storage_buffer)
+
+    def test_location_field_is_empty(self):
+        """Do not compute "location_is_empty" if there is no buffer"""
+        # we have a buffer on the location: compute location_is_empty
+        self.assertTrue(self.buffer_location.location_is_empty)
+        self._update_qty_in_location(self.buffer_location, self.product, 1)
+        self.assertFalse(self.buffer_location.location_is_empty)
+        self.storage_buffer.unlink()
+        # when we have no buffer, we don't care about the field
+        # "location_is_empty", we prefer not to compute it to prevent
+        # concurrent writes
+        self.assertTrue(self.buffer_location.location_is_empty)
+
     def test_buffer_with_capacity(self):
         """The buffer is empty so we can move to the pallet locations"""
         move = self._create_pallet_move_to_putaway()
