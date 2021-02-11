@@ -20,13 +20,18 @@ msgstr ""
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__picking_state
 msgid ""
 " * Draft: The transfer is not confirmed yet. Reservation doesn't apply.\n"
-" * Waiting another operation: This transfer is waiting for another operation before being ready.\n"
+" * Waiting another operation: This transfer is waiting for another operation "
+"before being ready.\n"
 " * Waiting: The transfer is waiting for the availability of some products.\n"
-"(a) The shipping policy is \"As soon as possible\": no product could be reserved.\n"
-"(b) The shipping policy is \"When all products are ready\": not all the products could be reserved.\n"
+"(a) The shipping policy is \"As soon as possible\": no product could be "
+"reserved.\n"
+"(b) The shipping policy is \"When all products are ready\": not all the "
+"products could be reserved.\n"
 " * Ready: The transfer is ready to be processed.\n"
-"(a) The shipping policy is \"As soon as possible\": at least one product has been reserved.\n"
-"(b) The shipping policy is \"When all products are ready\": all product have been reserved.\n"
+"(a) The shipping policy is \"As soon as possible\": at least one product has "
+"been reserved.\n"
+"(b) The shipping policy is \"When all products are ready\": all product have "
+"been reserved.\n"
 " * Done: The transfer has been processed.\n"
 " * Cancelled: The transfer has been cancelled."
 msgstr ""
@@ -312,6 +317,7 @@ msgid "Quantity"
 msgstr "Cantidad"
 
 #. module: stock_reception_screen
+#: model_terms:ir.ui.view,arch_db:stock_reception_screen.view_move_line_tree
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.view_picking_form
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.vpicktree
 msgid "Reception"
@@ -425,11 +431,11 @@ msgstr "Tipo de Almacenamiento"
 #: code:addons/stock_reception_screen/models/stock_picking.py:0
 #, python-format
 msgid ""
-"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
-"id=\"%d\">%s</a> has been created."
+"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-id=\"%d"
+"\">%s</a> has been created."
 msgstr ""
-"Se ha creado el pedido pendiente <a href=\"#\" data-oe-model=\"stock."
-"picking\" data-oe-id=\"%d\">%s</a>."
+"Se ha creado el pedido pendiente <a href=\"#\" data-oe-model=\"stock.picking"
+"\" data-oe-id=\"%d\">%s</a>."
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
