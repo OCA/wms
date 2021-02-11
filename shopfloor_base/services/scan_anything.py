@@ -26,12 +26,18 @@ class ShopfloorScanAnything(Component):
     _usage = "scan_anything"
     _description = __doc__
 
-    def scan(self, identifier):
-        # TODO: shall we add constrains by profile etc?
+    def scan(self, identifier, record_types=None):
+        """Scan an item identifier and return its info if found.
+
+        :param identifier: a string, normally a barcode or name
+        :param record_types: limit scan to specific record types
+        """
         data = {}
         tried = []
         record = None
         for handler in self._scan_handlers():
+            if record_types and handler.record_type not in record_types:
+                continue
             tried.append(handler.record_type)
             record = handler.search(identifier)
             if record:
@@ -129,6 +135,7 @@ class ShopfloorScanAnythingValidator(Component):
     def scan(self):
         return {
             "identifier": {"type": "string", "nullable": False, "required": True},
+            "record_types": {"type": "list", "nullable": True, "required": False},
         }
 
 
