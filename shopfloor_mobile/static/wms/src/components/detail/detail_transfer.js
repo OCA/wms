@@ -77,7 +77,7 @@ Vue.component("detail-transfer", {
             >
             <!-- TODO: this actions should come from a registry -->
             <template v-slot:actions>
-                <speed-dial :fab_btn_attrs="{small: true}" :options="{fab_btn_icon: 'mdi-pencil'}">
+                <speed-dial :fab_btn_attrs="{small: true}" :options="{fab_btn_icon: 'mdi-pencil'}" v-if="record.carrier">
                     <v-btn
                         fab
                         dark
