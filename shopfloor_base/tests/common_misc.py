@@ -55,18 +55,18 @@ class ScanAnythingTestMixin(object):
         with self.work_on_services() as work:
             return work.component(usage="scan_anything")
 
-    def _test_response_ok(self, rec_type, data, identifier):
+    def _test_response_ok(self, rec_type, data, identifier, record_types=None):
         service = self._get_service()
-        params = {"identifier": identifier}
+        params = {"identifier": identifier, "record_types": record_types}
         response = service.dispatch("scan", params=params)
         self.assert_response(
             response, data={"type": rec_type, "identifier": identifier, "record": data},
         )
 
-    def _test_response_ko(self, identifier, tried=None):
+    def _test_response_ko(self, identifier, record_types=None):
         service = self._get_service()
-        tried = tried or [x.record_type for x in service._scan_handlers()]
-        params = {"identifier": identifier}
+        tried = record_types or [x.record_type for x in service._scan_handlers()]
+        params = {"identifier": identifier, "record_types": record_types}
         response = service.dispatch("scan", params=params)
         message = response["message"]
         self.assertEqual(message["message_type"], "error")
