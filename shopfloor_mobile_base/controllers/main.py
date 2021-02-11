@@ -16,7 +16,7 @@ APP_VERSIONS = {}
 class ShopfloorMobileAppMixin(object):
 
     module_path = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
-    main_template = "shopfloor_mobile.shopfloor_app_main"
+    main_template = "shopfloor_mobile_base.shopfloor_app_main"
 
     def _load_app(self, demo=False, **kw):
         return http.request.render(
@@ -46,7 +46,7 @@ class ShopfloorMobileAppMixin(object):
             return "dev"
 
     def _get_app_version(self):
-        return self._get_version("shopfloor_mobile", module_path=self.module_path)
+        return self._get_version("shopfloor_mobile_base", module_path=self.module_path)
 
     def _serve_assets(self, path_fragment="", **kw):
         # TODO Should be authorized via api.key except for the login ?
@@ -68,7 +68,7 @@ class ShopfloorMobileAppMixin(object):
         app_version = self._get_app_version()
         all_icons = []
         url_pattern = url_pattern or (
-            "/shopfloor_mobile/assets/"
+            "/shopfloor_mobile_base/assets/"
             "src/assets/icons/{fname}-{size}.png?{app_version}"
         )
         for size in sizes:

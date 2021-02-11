@@ -16,10 +16,10 @@
         </link>
     </template>
     <template id="shopfloor_app_main" name="Shopfloor app main">
-        <t t-call="shopfloor_mobile.shopfloor_app_layout">
+        <t t-call="shopfloor_mobile_base.shopfloor_app_layout">
             <t
                 t-set="x_icon"
-                t-value="'/shopfloor_mobile/assets/src/assets/icons/favicon-32x32.png?' + app_version"
+                t-value="'/shopfloor_mobile_base/assets/src/assets/icons/favicon-32x32.png?' + app_version"
             />
             <t t-set="html_data" t-value="{'app_version': app_version}" />
             <t t-set="title">Shopfloor WMS app</t>
@@ -30,9 +30,9 @@
             demo_mode: <t t-esc="'true' if demo_mode else 'false'" />,
           };
         </script>
-                <t t-call="shopfloor_mobile.shopfloor_app_assets" />
+                <t t-call="shopfloor_mobile_base.shopfloor_app_assets" />
                 <t
-                    t-call="shopfloor_mobile.shopfloor_app_demo_assets"
+                    t-call="shopfloor_mobile_base.shopfloor_app_demo_assets"
                     t-if="demo_mode"
                 />
             </t>
