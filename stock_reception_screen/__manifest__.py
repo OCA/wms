@@ -18,8 +18,6 @@
         "stock_quant_package_dimension",
         # OCA/wms
         "stock_storage_type",
-        # OCA/web
-        "web_notify",
     ],
     "data": [
         "security/ir.model.access.csv",

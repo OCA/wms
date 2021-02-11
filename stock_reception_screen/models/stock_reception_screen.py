@@ -194,6 +194,23 @@ class StockReceptionScreen(models.Model):
     package_height = fields.Integer()
     # == / Packaging fields ==
 
+    warn_notification = fields.Char(default=False)
+    warn_notification_html = fields.Html(compute="_compute_warn_notification")
+
+    @api.depends("warn_notification")
+    def _compute_warn_notification(self):
+        warn_massage_html = """
+        <div class="alert alert-warning" role="alert">
+            {}
+        </div>
+        """
+        if self.warn_notification:
+            self.warn_notification_html = warn_massage_html.format(
+                self.warn_notification
+            )
+        else:
+            self.warn_notification_html = False
+
     @api.depends("picking_id.move_lines", "current_filter_product")
     def _compute_picking_filtered_move_lines(self):
         for screen in self:
@@ -354,6 +371,7 @@ class StockReceptionScreen(models.Model):
 
     def on_barcode_scanned_select_product(self, barcode):
         """Try to find the corresponding product based on the barcode."""
+        self.warn_notification = False
         moves = self.picking_id.move_lines
         # First find a moves corresponding to the barcode
         move = moves.filtered(lambda o: o.product_id.barcode == barcode)
@@ -364,9 +382,7 @@ class StockReceptionScreen(models.Model):
         if not move:
             move = moves.filtered(lambda o: barcode in o.product_id.name)
         if not move:
-            self.env.user.notify_warning(
-                message="", title=_("Product '{}' not found.").format(barcode)
-            )
+            self.warn_notification = _("Product '{}' not found.").format(barcode)
             return
         # If there are several moves/products corresponding to the search
         # criteria we want to propose the user to choose the right one
@@ -399,9 +415,7 @@ class StockReceptionScreen(models.Model):
             ]
         )
         if lot:
-            self.env.user.notify_info(
-                message="", title=_("Reuse the existing lot {}.").format(barcode)
-            )
+            self.warn_notification = _("Reuse the existing lot {}.").format(barcode)
         else:
             lot_vals = {
                 "name": barcode,
@@ -558,10 +572,9 @@ class StockReceptionScreen(models.Model):
         return self.current_move_id.has_tracking != "none"
 
     def process_set_lot_number(self):
+        self.warn_notification = False
         if not self.current_move_line_id.lot_id:
-            self.env.user.notify_warning(
-                message="", title=_("You have to fill the lot number.")
-            )
+            self.warn_notification = _("You have to fill the lot number.")
             return
         # Saving the lot number for next operation
         self.current_move_id.last_move_line_lot_id = self.current_move_line_id.lot_id
@@ -569,10 +582,9 @@ class StockReceptionScreen(models.Model):
 
     def process_set_expiry_date(self):
         """Set the lot life date on a move line."""
+        self.warn_notification = False
         if not self.current_move_line_lot_life_date:
-            self.env.user.notify_warning(
-                message="", title=_("You have to set an expiry date.")
-            )
+            self.warn_notification = _("You have to set an expiry date.")
             return
         if (
             self.current_move_line_lot_id.life_date
@@ -583,13 +595,10 @@ class StockReceptionScreen(models.Model):
             previous_life_date_str = self.current_move_line_lot_id.life_date.strftime(
                 lang.date_format
             )
-            self.env.user.notify_warning(
-                message="",
-                title=_(
-                    "You cannot set a date prior to previous one ({})".format(
-                        previous_life_date_str
-                    )
-                ),
+            self.warn_notification = _(
+                "You cannot set a date prior to previous one ({})".format(
+                    previous_life_date_str
+                )
             )
             return
         self.current_move_line_lot_id.life_date = self.current_move_line_lot_life_date
@@ -597,9 +606,7 @@ class StockReceptionScreen(models.Model):
 
     def process_set_quantity(self):
         if not self.current_move_line_qty_done:
-            self.env.user.notify_warning(
-                message="", title=_("You have to set the received quantity.")
-            )
+            self.warn_notification = _("You have to set the received quantity.")
             return
         self.next_step()
 
@@ -645,10 +652,9 @@ class StockReceptionScreen(models.Model):
         return True
 
     def process_set_location(self):
+        self.warn_notification = False
         if not self.current_move_line_location_dest_stored_id:
-            self.env.user.notify_warning(
-                message="", title=_("You have to set the destination.")
-            )
+            self.warn_notification = _("You have to set the destination.")
             return
         self.current_move_line_id.location_dest_id = (
             self.current_move_line_location_dest_stored_id
@@ -692,9 +698,11 @@ class StockReceptionScreen(models.Model):
         (allowing to quit the reception screen via the exit button and resume
         the step later).
         """
+        self.warn_notification = False
         if not self.package_storage_type_id:
-            msg = _("The storage type is mandatory before going further.")
-            self.env.user.notify_warning(message="", title=msg)
+            self.warn_notification = _(
+                "The storage type is mandatory before going further."
+            )
             return False
         if (
             self.product_packaging_id
@@ -710,8 +718,9 @@ class StockReceptionScreen(models.Model):
                 or not self.product_packaging_id.max_weight
             )
         ):
-            msg = _("Product packaging info are missing. Please use the CUBISCAN.")
-            self.env.user.notify_warning(message="", title=msg)
+            self.warn_notification = _(
+                "Product packaging info are missing. Please use the CUBISCAN."
+            )
             return False
         return True
 

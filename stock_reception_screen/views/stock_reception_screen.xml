@@ -26,8 +26,12 @@
                             <field name="picking_origin" readonly="1" />
                         </group>
                     </div>
-                    <div class="o_screen_header_right o_screen_header_content">
-                        <field name="picking_state" />
+                    <div class="o_screen_header_right o_screen_header_content ">
+                        <field name="warn_notification_html" readonly="1" />
+                        <field
+                            name="picking_state"
+                            attrs="{'invisible': [('warn_notification_html', '!=', False)]}"
+                        />
                     </div>
                 </div>
                 <div class="o_screen_actions">
