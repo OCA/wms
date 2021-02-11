@@ -62,15 +62,8 @@ class BaseShopfloorSchemaResponse(Component):
             "note": {"type": "string", "nullable": True, "required": False},
             "move_line_count": {"type": "integer", "nullable": True, "required": True},
             "weight": {"required": True, "nullable": True, "type": "float"},
-            "partner": {
-                "type": "dict",
-                "nullable": True,
-                "required": True,
-                "schema": {
-                    "id": {"required": True, "type": "integer"},
-                    "name": {"type": "string", "nullable": False, "required": True},
-                },
-            },
+            "partner": self._schema_dict_of(self._simple_record()),
+            "carrier": self._schema_dict_of(self._simple_record(), required=False),
             "scheduled_date": {"type": "string", "nullable": False, "required": True},
         }
 
