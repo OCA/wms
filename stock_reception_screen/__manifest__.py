@@ -7,7 +7,7 @@
     "category": "Stock",
     "license": "AGPL-3",
     "author": "Camptocamp, Odoo Community Association (OCA)",
-    "website": "https://github.com/OCA/stock-logistics-warehouse",
+    "website": "https://github.com/OCA/wms",
     "depends": [
         "stock",
         "product_expiry",
