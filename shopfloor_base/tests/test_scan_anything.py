@@ -15,7 +15,7 @@ class ScanAnythingCase(CommonCase, ScanAnythingTestMixin):
             _name = "shopfloor.scan.partner.handler"
             _inherit = "shopfloor.scan.anything.handler"
 
-            record_type = "partner"
+            record_type = "testpartner"
 
             def search(self, identifier):
                 return (
@@ -35,7 +35,7 @@ class ScanAnythingCase(CommonCase, ScanAnythingTestMixin):
             _name = "shopfloor.scan.currency.handler"
             _inherit = "shopfloor.scan.anything.handler"
 
-            record_type = "currency"
+            record_type = "testcurrency"
 
             def search(self, identifier):
                 return (
@@ -57,25 +57,33 @@ class ScanAnythingCase(CommonCase, ScanAnythingTestMixin):
 
     def test_scan(self):
         service = self._get_service()
+        test_handlers = self._get_test_handlers()
 
-        for finder_class in self._get_test_handlers():
+        for finder_class in test_handlers:
             finder_class._build_component(service.work.components_registry)
 
         handlers = service._scan_handlers()
-        self.assertEqual(len(handlers), 2)
+        for handler_cls in test_handlers:
+            self.assertIn(handler_cls._name, [x._name for x in handlers])
 
         record = self.env.ref("base.res_partner_4").sudo()
         record.ref = "1234"
-        rec_type = "partner"
+        rec_type = "testpartner"
         identifier = record.ref
-        data = record.jsonify(("id", "name"), one=True)
-        self._test_response_ok(rec_type, data, identifier)
+        data = record.jsonify(["id", "name"], one=True)
+        self._test_response_ok(
+            rec_type, data, identifier, record_types=("testpartner", "testcurrency")
+        )
 
         record = self.env.ref("base.EUR").sudo()
-        rec_type = "currency"
+        rec_type = "testcurrency"
         identifier = record.name
-        data = record.jsonify(("id", "name"), one=True)
-        self._test_response_ok(rec_type, data, identifier)
+        data = record.jsonify(["id", "name"], one=True)
+        self._test_response_ok(
+            rec_type, data, identifier, record_types=("testpartner", "testcurrency")
+        )
 
     def test_scan_error(self):
-        self._test_response_ko("404-NOTFOUND")
+        self._test_response_ko(
+            "404-NOTFOUND", record_types=("testpartner", "testcurrency")
+        )
