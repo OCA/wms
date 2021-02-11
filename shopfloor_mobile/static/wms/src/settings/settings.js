@@ -8,6 +8,9 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
     data: function() {
         return {
             profile_name: this.$root.has_profile ? this.$root.profile.name : "?",
+            workstation_name: this.$root.workstation
+                ? this.$root.workstation.name
+                : "?",
         };
     },
     methods: {
@@ -49,6 +52,14 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
                         <v-btn @click="$router.push({'name': 'profile'})">
                             <v-icon>mdi-account-cog</v-icon>
                             <span>{{ $t("screen.settings.profile.name") }} - {{ profile_name }}</span>
+                        </v-btn>
+                    </v-col>
+                </v-row>
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <v-btn @click="$router.push({'name': 'workstation'})">
+                            <v-icon>mdi-printer</v-icon>
+                            <span>{{ $t("screen.settings.workstation.name") }} - {{ workstation_name }}</span>
                         </v-btn>
                     </v-col>
                 </v-row>
