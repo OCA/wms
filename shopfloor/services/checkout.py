@@ -77,7 +77,7 @@ class Checkout(Component):
                 "picking": self.data.picking(picking),
                 "packing_info": self._data_for_packing_info(picking),
                 "no_package_enabled": not self.options.get(
-                    "checkout:disable_no_package"
+                    "checkout__disable_no_package"
                 ),
             },
             message=message,
@@ -790,7 +790,7 @@ class Checkout(Component):
         Transitions:
         * select_line: goes back to selection of lines to work on next lines
         """
-        if self.options.get("checkout:disable_no_package"):
+        if self.options.get("checkout__disable_no_package"):
             raise BadRequest("`checkout.no_package` endpoint is not enabled")
         picking = self.env["stock.picking"].browse(picking_id)
         message = self._check_picking_status(picking)

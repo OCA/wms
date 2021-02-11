@@ -33,7 +33,7 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
 
     def test_select_line_no_package_disabled(self):
         selected_lines = self.moves_pack.move_line_ids
-        self.service.work.options = {"checkout:disable_no_package": True}
+        self.service.work.options = {"checkout__disable_no_package": True}
         response = self.service.dispatch(
             "select_line",
             params={
