@@ -8,20 +8,20 @@ class SelectDestPackageMixin:
     def _assert_response_select_dest_package(
         self, response, picking, selected_lines, packages, message=None
     ):
+        picking_data = self.data.picking(picking)
+        picking_data.update(
+            {
+                "note": None,
+                "origin": None,
+                "weight": 110.0,
+                "move_line_count": len(picking.move_line_ids),
+            }
+        )
         self.assert_response(
             response,
             next_state="select_dest_package",
             data={
-                "picking": {
-                    "id": picking.id,
-                    "name": picking.name,
-                    "note": None,
-                    "origin": None,
-                    "weight": 110.0,
-                    "move_line_count": len(picking.move_line_ids),
-                    "partner": {"id": self.customer.id, "name": self.customer.name},
-                    "scheduled_date": picking.scheduled_date.isoformat() + "+00:00",
-                },
+                "picking": picking_data,
                 "packages": [
                     self._package_data(
                         package.with_context(picking_id=picking.id), picking

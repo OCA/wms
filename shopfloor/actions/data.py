@@ -85,6 +85,7 @@ class DataAction(Component):
             "origin",
             "note",
             ("partner_id:partner", self._partner_parser),
+            ("carrier_id:carrier", self._simple_record_parser()),
             "move_line_count",
             "total_weight:weight",
             "scheduled_date",
