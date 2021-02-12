@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <menuitem
-        id="menu_shopfloor_root"
-        parent="base.menu_custom"
-        name="Shopfloor"
-        sequence="200"
-    />
+
+
+    <menuitem id="menu_shopfloor_root" name="Shopfloor" sequence="300" />
+    <!-- TODO: create a good icon + favicons -->
+        <!-- web_icon="shopfloor_base,static/description/icon.png" -->
     <menuitem
         action="action_shopfloor_menu"
         id="menu_action_shopfloor_menu"
@@ -24,12 +23,22 @@
         parent="menu_shopfloor_root"
         sequence="30"
     />
-    <!-- TODO: add filtered view for shopfloor logs (add a filter and enable it) -->
-    <!--menuitem
+
+    <record id="action_shopfloor_log" model="ir.actions.act_window">
+        <field name="name">Logs</field>
+        <field name="res_model">rest.log</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+        <!-- TODO: maybe add `collection_name` to `rest.log` model? -->
+        <field name="domain">[('request_url', 'like', '%shopfloor%')]</field>
+        <field name="search_view_id" ref="rest_log.rest_log_search_view" />
+    </record>
+
+    <menuitem
         action="action_shopfloor_log"
         id="menu_action_shopfloor_log"
         parent="menu_shopfloor_root"
         groups="base.group_no_one"
         sequence="30"
-    /-->
+    />
 </odoo>
