@@ -4,20 +4,13 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-/**
- * A "process" represents a barcode app process (eg: pick goods for reception).
- *
- * A process registry is responsible for collecting all the processes
- * and ease their registration, lookup and override.
- *
- * The router will use this registry to register processes routes.
- */
-export class ProcessRegistry {
+export class BaseRegistry {
     /**
      * Initialize registry as an empty key array.
      */
     constructor() {
         this._data = {};
+        this._make_path_pattern = null;
     }
 
     /**
@@ -61,7 +54,7 @@ export class ProcessRegistry {
      * @param {*} metadata : additional information for the process.
      */
     replace(key, component, metadata) {
-        console.log("Replacing process", key);
+        console.log("Replacing component", key);
         return this.add(key, component, metadata, true);
     }
     /**
@@ -109,65 +102,6 @@ export class ProcessRegistry {
      * @param {*} key : process's key.
      */
     make_path(key) {
-        return _.template("/${ key }/:menu_id/:state?")({key: key});
-    }
-}
-
-export class ColorRegistry {
-    constructor(theme, _default = "light") {
-        this.themes = {};
-        this.default_theme = _default;
-    }
-
-    add_theme(colors, theme) {
-        if (_.isUndefined(theme)) theme = this.default_theme;
-        this.themes[theme] = colors;
-    }
-
-    color_for(key, theme) {
-        if (_.isUndefined(theme)) theme = this.default_theme;
-        if (!this.themes[theme]) {
-            console.log("Theme", theme, "not registered.");
-            return null;
-        }
-        return this.themes[theme][key];
-    }
-
-    get_themes() {
-        return this.themes;
-    }
-}
-
-export class TranslationRegistry {
-    constructor() {
-        this._data = {};
-        this._default_lang = "en-US";
-    }
-
-    get(path) {
-        return _.result(this._data, path);
-    }
-
-    add(path, value) {
-        _.set(this._data, path, value);
-    }
-
-    all() {
-        return this._data;
-    }
-
-    available_langs() {
-        return Object.keys(this._data);
-    }
-
-    set_default_lang(lang) {
-        if (_.isEmpty(this._data[lang])) {
-            throw "Language not available: " + lang;
-        }
-        this._default_lang = lang;
-    }
-
-    get_default_lang() {
-        return this._default_lang;
+        return _.template(this._make_path_pattern || "/${ key }")({key: key});
     }
 }

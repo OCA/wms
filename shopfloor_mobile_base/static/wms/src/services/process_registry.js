@@ -4,6 +4,21 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {ProcessRegistry} from "./registry.js";
+import {BaseRegistry} from "./registry.js";
 
+/**
+ * A "process" represents a barcode app process (eg: pick goods for reception).
+ *
+ * A process registry is responsible for collecting all the processes
+ * and ease their registration, lookup and override.
+ *
+ * The router will use this registry to register processes routes.
+ */
+
+class ProcessRegistry extends BaseRegistry {
+    constructor() {
+        super();
+        this._make_path_pattern = "/${ key }/:menu_id/:state?";
+    }
+}
 export var process_registry = new ProcessRegistry();
