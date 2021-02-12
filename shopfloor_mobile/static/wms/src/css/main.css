@@ -1,1 +1,72 @@
-/* FIXME: cherry-pick rules belonging to shopfloor_mobile_base */
+ul.packaging {
+    list-style: none;
+}
+ul.packaging span:first-child {
+    width: 33%;
+    float: left;
+}
+.summary-content {
+    max-width: 100%;
+}
+.summary-content .v-list-item__title {
+    max-width: 100%;
+    white-space: normal;
+    font-size: 90%;
+    line-height: 130%;
+}
+.summary-content .v-list-item__subtitle {
+    font-size: 85%;
+    line-height: 125%;
+}
+.summary-content .summary-content-item {
+    margin-bottom: 0.4em;
+    padding-bottom: 0.4em;
+}
+.summary-content .v-expansion-panel-content .summary-content-item:not(:last-child) {
+    border-bottom: 1px dotted #ccc;
+}
+.packaging-qty-picker * {
+    text-align: center;
+}
+.packaging-qty-picker .unit-value input {
+    font-size: 130%;
+}
+.packaging-qty-picker .unit-value .col {
+    padding-bottom: 0;
+}
+.packaging-qty-picker .packaging-value .col {
+    padding-top: 0;
+    padding-bottom: 5px;
+}
+.packaging-qty-picker .packaging-value .col:not(:last-child) {
+    padding-right: 0;
+}
+.packaging-qty-picker .pkg-qty {
+    font-size: 80%;
+}
+.packaging-qty-picker input.pkg-value {
+    max-width: 90px;
+    padding: 0.5rem 0.5rem 0;
+    font-size: 130%;
+    border-bottom: 1px solid;
+}
+.packaging-qty-picker .inner-wrapper {
+    padding-bottom: 8px;
+}
+.packaging-qty-picker .input-wrapper {
+    margin-bottom: 8px;
+}
+
+/*
+TODO: this is probably to be applied to all .manual-select.
+I tested only w/ checkout/select_package for now
+ */
+.detail-picking-select .manual-select .v-list-item .v-list-item__action--stack {
+    flex-direction: column-reverse;
+}
+
+.v-list-item.location-will-be-empty .field-detail.location_will_be_empty {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
