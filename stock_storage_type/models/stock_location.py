@@ -530,7 +530,26 @@ class StockLocation(models.Model):
                     orderby="id",
                 )
             }
-        return valid_locations.sorted(self._get_allowed_location_sorter(qty_by_loc))
+        loc_by_qty = []
+        if valid_no_mix:
+            StockQuant = self.env["stock.quant"]
+            domain_quant = [("location_id", "in", valid_no_mix.ids)]
+            loc_by_qty = [
+                item["location_id"][0]
+                for item in StockQuant.read_group(
+                    domain_quant,
+                    ["location_id", "quantity"],
+                    ["location_id"],
+                    orderby="quantity",
+                )
+                if (float_compare(item["quantity"], 0) > 1)
+             ]
+        valid_location_ids = set(valid_locations.ids) - set(loc_by_qty)
+        valid_locations = self.browse(loc_by_qty)
+        valid_locations |= self.browse(
+            id_ for id_ in self.ids if id_ in valid_location_ids
+        )
+        return valid_locations
 
     def _get_allowed_location_sorter(self, qty_by_loc):
         """ Return a method used to order valid_locations
