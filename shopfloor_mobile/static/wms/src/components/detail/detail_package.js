@@ -4,7 +4,7 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {ItemDetailMixin} from "./detail_mixin.js";
+import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
 
 Vue.component("detail-package", {
     mixins: [ItemDetailMixin],
