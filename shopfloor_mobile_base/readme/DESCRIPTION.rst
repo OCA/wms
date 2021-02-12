@@ -1,7 +1,7 @@
-Frontend for Shopfloor app.
+Base frontend for Shopfloor applications.
 
 The work is organized in scenario.
-A scenario represents a process in the warehouse (eg: receive, deliver).
+A scenario represents a process in the workplace (eg: for WMS -> receive, deliver).
 The app allows to start each process through the main menu.
 
 Each scenario is linked to a specific menu item which can be configured in the backend.
@@ -15,7 +15,7 @@ Tech details
   and relies on `shopfloor` module that exposes REST API in Odoo
   (based in turn on `base_rest <https://github.com/OCA/rest-framework/tree/13.0/base_rest>`_).
 
-* The whole business logic comes from `shopfloor` module,
+* The whole business logic comes from `shopfloor_base` module,
   this module takes care of providing a nice and reactive UI to work with.
 
 * No Odoo JS is used, no assets machinery used.
