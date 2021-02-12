@@ -3,6 +3,7 @@
 import logging
 
 from odoo import api, fields, models
+from odoo.tools import float_compare
 
 _logger = logging.getLogger(__name__)
 
@@ -517,24 +518,11 @@ class StockLocation(models.Model):
         (the ones with less qty first)
         """
         valid_no_mix = valid_locations.filtered("do_not_mix_products")
-        qty_by_loc = {}
+        loc_ordered_by_qty = []
         if valid_no_mix:
             StockQuant = self.env["stock.quant"]
             domain_quant = [("location_id", "in", valid_no_mix.ids)]
-            qty_by_loc = {
-                item["location_id"][0]: item["quantity"]
-                for item in StockQuant.read_group(
-                    domain_quant,
-                    ["location_id", "quantity"],
-                    ["location_id"],
-                    orderby="id",
-                )
-            }
-        loc_by_qty = []
-        if valid_no_mix:
-            StockQuant = self.env["stock.quant"]
-            domain_quant = [("location_id", "in", valid_no_mix.ids)]
-            loc_by_qty = [
+            loc_ordered_by_qty = [
                 item["location_id"][0]
                 for item in StockQuant.read_group(
                     domain_quant,
@@ -542,39 +530,14 @@ class StockLocation(models.Model):
                     ["location_id"],
                     orderby="quantity",
                 )
-                if (float_compare(item["quantity"], 0) > 1)
-             ]
-        valid_location_ids = set(valid_locations.ids) - set(loc_by_qty)
-        valid_locations = self.browse(loc_by_qty)
+                if (float_compare(item["quantity"], 0, precision_digits=2) > 0)
+            ]
+        valid_location_ids = set(valid_locations.ids) - set(loc_ordered_by_qty)
+        valid_locations = self.browse(loc_ordered_by_qty)
         valid_locations |= self.browse(
             id_ for id_ in self.ids if id_ in valid_location_ids
         )
         return valid_locations
-
-    def _get_allowed_location_sorter(self, qty_by_loc):
-        """ Return a method used to order valid_locations
-
-        The order is defined as follow: locations with less qty first;
-        if no qty or same qty, we preserve the initial order as in self
-        """
-        locations = self
-
-        def sorter(location):
-            qty = qty_by_loc.get(location.id)
-            # we construct a tuple to define the sort order priority
-            # Since tuple are sorted item by item, this means that the first
-            # element will come first, etc...
-            # In the first element we check if we have qty. since False < True,
-            # all elements with qty will come first
-            # The second element is qty or 0 for loc without computed qty. The
-            # element with the less qty will come first
-            # The third element is the position into the initial list of
-            # locations. This third element ensure that the original order
-            # is preserved for all the locations without computed qty (the ones
-            # where do_not_mix_products is False)
-            return (qty is None or qty <= 0, qty or 0, locations.ids.index(location.id))
-
-        return sorter
 
     def _get_ordered_leaf_locations(self):
         """Return ordered leaf sub-locations
