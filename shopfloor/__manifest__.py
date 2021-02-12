@@ -48,18 +48,9 @@
     "data": [
         "security/groups.xml",
         "security/ir.model.access.csv",
-        "views/shopfloor_menu.xml",
         "views/stock_picking_type.xml",
         "views/stock_location.xml",
         "views/stock_move_line.xml",
-        "views/shopfloor_profile_views.xml",
-        "views/menus.xml",
-    ],
-    "demo": [
-        "demo/auth_api_key_demo.xml",
-        "demo/stock_picking_type_demo.xml",
-        "demo/shopfloor_menu_demo.xml",
-        "demo/shopfloor_profile_demo.xml",
     ],
     "demo": ["demo/stock_picking_type_demo.xml", "demo/shopfloor_menu_demo.xml"],
 }
