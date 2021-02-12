@@ -5,7 +5,7 @@
  */
 
 /* eslint-disable strict */
-import {ItemDetailMixin} from "./detail/detail_mixin.js";
+import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
 
 Vue.component("reset-screen-button", {
     props: ["show_reset_button"],
