@@ -140,6 +140,7 @@ class ShopfloorMobileAppController(http.Controller, ShopfloorMobileAppMixin):
         # Backward compat redirect (url changed from /scanner to /app)
         return http.redirect_with_hash("/shopfloor_mobile/app", code=301)
 
+    # TODO: do we really need this?
     @http.route(
         ["/shopfloor_mobile/assets/<path:path_fragment>"], auth="public",
     )
