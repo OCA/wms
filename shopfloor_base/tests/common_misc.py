@@ -35,7 +35,7 @@ class MenuTestMixin(object):
         data = {
             "id": menu.id,
             "name": menu.name,
-            "scenario": menu.scenario,
+            "scenario": menu.scenario_id.key,
         }
         return data
 

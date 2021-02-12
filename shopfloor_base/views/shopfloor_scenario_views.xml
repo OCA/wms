@@ -4,7 +4,7 @@
         <field name="name">shopfloor.scenario tree</field>
         <field name="model">shopfloor.scenario</field>
         <field name="arch" type="xml">
-            <tree editable="bottom">
+            <tree>
                 <field name="name" />
                 <field name="key" />
             </tree>
