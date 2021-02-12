@@ -34,7 +34,7 @@
                         <field name="scenario" invisible="1" />
                         <field name="profile_id" options="{'no_create': 1}" />
                     </group>
-                    <group name="options" string="Scenario Options">
+                    <group name="options" string="Menu Options">
                     </group>
                 </sheet>
             </form>
