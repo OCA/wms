@@ -6,4 +6,6 @@ from odoo import SUPERUSER_ID, api
 def post_init_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})
     # Ensure scenario are linked to menu items
-    env["shopfloor.menu"].search([("scenario_id", "=", False)])._compute_scenario_id()
+    env["shopfloor.menu"].with_context(active_test=False).search(
+        [("scenario_id", "=", False)]
+    )._compute_scenario_id()
