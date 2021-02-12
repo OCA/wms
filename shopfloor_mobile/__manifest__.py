@@ -5,7 +5,7 @@
 {
     "name": "Shopfloor mobile",
     "summary": "Mobile frontend for WMS Shopfloor app",
-    "version": "13.0.1.10.0",
+    "version": "13.0.1.11.0",
     "development_status": "Alpha",
     "depends": ["shopfloor"],
     "author": "Camptocamp, BCIM, Akretion, Odoo Community Association (OCA)",
