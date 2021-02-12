@@ -25,3 +25,13 @@
   For starting we should provide `on_back` property to all states where we want to display it
   (no more specific check on the state to display this button).
   This part is also related to "Refactor states definition".
+
+* Load modules/components dependencies
+
+  As of today we are using bare ES6 imports which requires devs to know the exact path
+  of the resource. If the resource changes name or path dependent files will be broken.
+  It would be nice to have a way to declare modules by name as Odoo JS does.
+
+* Get rid of custom assets controller?
+
+  A controller takes care of loading static assets but seems to not be needed anymore.
