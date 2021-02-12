@@ -16,7 +16,29 @@ class ShopfloorMenu(models.Model):
         "shopfloor.profile", string="Profile", help="Visible on this profile only"
     )
     scenario_id = fields.Many2one(
-        comodel_name="shopfloor.scenario", required=True, ondelete="cascade"
+        comodel_name="shopfloor.scenario",
+        required=True,
+        ondelete="cascade",
+        compute="_compute_scenario_id",
+        store=True,
+        readonly=False,
+        inverse="_inverse_scenario_id",
     )
-    scenario = fields.Char(related="scenario_id.key")
+    # TODO: on next versions we could remove this field and drop the compute on m2o.
+    # ATM is kept only to have a smooth transition to the m2o field.
+    scenario = fields.Char(string="Legacy scenario field")
     active = fields.Boolean(default=True)
+
+    def _compute_scenario_id(self):
+        for rec in self:
+            if not rec.scenario_id and rec.scenario:
+                rec.with_context(
+                    set_by_compute=True
+                ).scenario_id = rec.scenario_id.search(
+                    [("key", "=", rec.scenario)], limit=1
+                )
+
+    def _inverse_scenario_id(self):
+        if not self.env.context.get("set_by_compute"):
+            for rec in self:
+                rec.scenario = rec.scenario_id.key
