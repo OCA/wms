@@ -43,7 +43,7 @@ class PromiseReleaseCommonCase(common.SavepointCase):
         """Create picking chain
 
         It runs the procurement group to create the moves required for
-        a product. According to the WH, it creates the pick/pack/ship
+        a product. According to the WH, it creates the pick+ship
         moves.
 
         Products must be a list of tuples (product, quantity) or

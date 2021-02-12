@@ -124,6 +124,44 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         # previous qty should still match as former test
         self.assertEqual(picking3.move_lines.previous_promised_qty, 8)
 
+    def test_ordered_available_to_promise_value_consider_canceled_move(self):
+        """Test the release process when some previous out moves have been canceled.
+
+        This happens if we cancel the related sale order for instance, in such
+        case the previous promised qty should be well computed + we should be
+        able to release operations having canceled moves (no error).
+        """
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        picking1 = self._out_picking(
+            self._create_picking_chain(
+                self.wh,
+                [(self.product1, 3), (self.product2, 5)],
+                date=datetime(2019, 9, 2, 16, 0),
+            )
+        )
+        picking2 = self._out_picking(
+            self._create_picking_chain(
+                self.wh,
+                [(self.product1, 5), (self.product2, 10)],
+                date=datetime(2019, 9, 3, 16, 0),
+            )
+        )
+        self._update_qty_in_location(self.loc_bin1, self.product1, 8.0)
+        self._update_qty_in_location(self.loc_bin1, self.product2, 15.0)
+        # cancel one of the moves of picking 1
+        p1_move2 = picking1.move_lines.filtered(lambda m: m.product_id == self.product2)
+        p1_move2._action_cancel()
+        # release picking 1
+        picking1.move_lines.release_available_to_promise()
+        # release picking 2
+        picking2.move_lines.release_available_to_promise()
+        p2_move1 = picking2.move_lines.filtered(lambda m: m.product_id == self.product1)
+        p2_move2 = picking2.move_lines.filtered(lambda m: m.product_id == self.product2)
+        # Canceled qty of picking 1 for product2 hasn't been promised while
+        # the qty of product1 is the one we are expecting
+        self.assertEqual(p2_move1.previous_promised_qty, 3)
+        self.assertEqual(p2_move2.previous_promised_qty, 0)
+
     def test_ordered_available_to_promise_uom_qty_search(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         picking, picking2, picking3, picking4, picking5 = self._create_pickings()
