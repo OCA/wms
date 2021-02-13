@@ -12,7 +12,6 @@ export class BaseRegistry {
         this._data = {};
         this._make_path_pattern = null;
     }
-
     /**
      * Retrieve and existing process
      * @param {*} key

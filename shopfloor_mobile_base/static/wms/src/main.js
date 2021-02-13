@@ -10,6 +10,7 @@ import {router} from "./router.js";
 import {i18n} from "./i18n.js";
 import {GlobalMixin} from "./mixin.js";
 import {process_registry} from "./services/process_registry.js";
+import {page_registry} from "./services/page_registry.js";
 import {color_registry} from "./services/color_registry.js";
 import {Odoo, OdooMocked} from "./services/odoo.js";
 import VueSuperMethod from "./lib/vue-super-call.js";
@@ -29,12 +30,18 @@ var EventHub = new Vue();
 
 Vue.mixin(GlobalMixin);
 
-let app_components = {};
-_.forEach(process_registry.all(), function(process, key) {
-    app_components[process.key] = process.component;
-});
-if (app_components.length)
-    console.log("Registered component:", app_components.join(", "));
+let APP_COMPONENTS = {};
+
+const register_app_components = function(components) {
+    _.forEach(components, function(process, key) {
+        APP_COMPONENTS[process.key] = process.component;
+    });
+    if (APP_COMPONENTS.length)
+        console.log("Registered component:", APP_COMPONENTS.join(", "));
+};
+
+register_app_components(process_registry.all());
+register_app_components(page_registry.all());
 
 const app = new Vue({
     i18n,
@@ -44,7 +51,7 @@ const app = new Vue({
             themes: color_registry.get_themes(),
         },
     }),
-    components: app_components,
+    components: APP_COMPONENTS,
     data: function() {
         return {
             demo_mode: false,
