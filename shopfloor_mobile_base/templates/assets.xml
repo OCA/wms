@@ -124,6 +124,21 @@
             t-attf-src="/shopfloor_mobile_base/static/wms/src/loginpage.js?v=#{app_version}"
             type="module"
         />
+        <script
+            id="script_page_language"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/settings/language.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_page_profile"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/settings/profile.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_page_workstation"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/settings/workstation.js?v=#{app_version}"
+            type="module"
+        />
         <!-- Global/generic components -->
         <script
             id="script_component_screen"

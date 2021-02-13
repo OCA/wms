@@ -30,5 +30,17 @@ export var GlobalMixin = {
                 colors: color_registry,
             };
         },
+        available_languages() {
+            return this.$root.available_languages;
+        },
+        active_language_code() {
+            return this.$i18n.locale || "en-US";
+        },
+        active_language() {
+            const language = this.available_languages.find(
+                ({id}) => id === this.active_language_code
+            );
+            return language ? language.name : "?";
+        },
     },
 };
