@@ -11,6 +11,7 @@ import {Language} from "./settings/language.js";
 import {Workstation} from "./settings/workstation.js";
 import {LoginPage} from "./loginpage.js";
 import {process_registry} from "./services/process_registry.js";
+import {page_registry} from "./services/page_registry.js";
 // Const NotFound = { template: '<div>Lost in the scanner app.</div>' }
 
 // TODO: handle routes via registry
@@ -18,23 +19,26 @@ let routes = [
     {path: "/", component: HomePage, name: "home"},
     {path: "/login", component: LoginPage, name: "login"},
     {path: "/settings", component: SettingsControlPanel, name: "settings"},
-    {path: "/profile", component: Profile, name: "profile"},
-    {path: "/language", component: Language, name: "language"},
-    {path: "/workstation", component: Workstation, name: "workstation"},
     // TODO Fix this it needs to be the last route, but I think it is not anymore with the dynamic one added.
     // { path: '*', component: NotFound },
 ];
-let registered = [];
-_.forEach(process_registry.all(), function(process, key) {
-    routes.push({
-        name: process.key,
-        path: process.path,
-        component: process.component,
+
+const register_routes = function(route_records) {
+    let registered = [];
+    _.forEach(route_records, function(process, key) {
+        routes.push({
+            name: process.key,
+            path: process.path,
+            component: process.component,
+        });
+        registered.push(key);
     });
-    registered.push(key);
-});
-if (registered.length)
-    console.log("Registered component routes:", registered.join(", "));
+    if (registered.length)
+        console.log("Registered component routes:", registered.join(", "));
+};
+
+register_routes(process_registry.all());
+register_routes(page_registry.all());
 
 const router = new VueRouter({
     routes: routes,

@@ -85,6 +85,11 @@
             type="module"
         />
         <script
+            id="script_registry_page"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/services/page_registry.js?v=#{app_version}"
+            type="module"
+        />
+        <script
             id="script_registry_translation"
             t-attf-src="/shopfloor_mobile_base/static/wms/src/services/translation_registry.js?v=#{app_version}"
             type="module"
