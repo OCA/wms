@@ -3,7 +3,11 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-export var Workstation = Vue.component("workstation", {
+// TODO: this should be moved to its own module
+
+import {page_registry} from "../services/page_registry.js";
+
+export var Workstation = {
     data: function() {
         return {
             usage: "workstation",
@@ -64,4 +68,19 @@ export var Workstation = Vue.component("workstation", {
             });
         },
     },
+};
+
+page_registry.add("workstation", Workstation, {
+    tag: "settings",
+    icon: "mdi-printer",
+    display_name: function(instance, rec) {
+        const workstation_name = instance.$root.workstation
+            ? instance.$root.workstation.name
+            : "?";
+        return [instance.$t("screen.settings.workstation.name"), workstation_name].join(
+            " - "
+        );
+    },
 });
+
+export default Workstation;

@@ -4,7 +4,9 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-export var Profile = Vue.component("profile", {
+import {page_registry} from "../services/page_registry.js";
+
+export var Profile = {
     data: function() {
         return {
             current_profile_id: this.$root.has_profile ? this.$root.profile.id : null,
@@ -53,4 +55,17 @@ export var Profile = Vue.component("profile", {
             }
         },
     },
+};
+
+page_registry.add("profile", Profile, {
+    tag: "settings",
+    icon: "mdi-account-cog",
+    display_name: function(instance, rec) {
+        const profile_name = instance.$root.has_profile
+            ? instance.$root.profile.name
+            : "?";
+        return [instance.$t("screen.settings.profile.name"), profile_name].join(" - ");
+    },
 });
+
+export default Profile;
