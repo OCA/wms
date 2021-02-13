@@ -6,9 +6,6 @@
  */
 import {HomePage} from "./homepage.js";
 import {SettingsControlPanel} from "./settings/settings.js";
-import {Profile} from "./settings/profile.js";
-import {Language} from "./settings/language.js";
-import {Workstation} from "./settings/workstation.js";
 import {LoginPage} from "./loginpage.js";
 import {process_registry} from "./services/process_registry.js";
 import {page_registry} from "./services/page_registry.js";

@@ -1,15 +1,17 @@
 /**
  * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * Copyright 2021 ACSONE SA/NV (http://www.acsone.eu)
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
+import {page_registry} from "../services/page_registry.js";
 
-export var Language = Vue.component("language", {
+export var Language = {
     template: `
         <Screen :screen_info="{title: $t('screen.settings.language.title'), klass: 'settings settings-language'}">
             <manual-select
                 :records="available_languages"
-                :options="{initValue: current_language_code, showActions: false}"
+                :options="{initValue: active_language_code, showActions: false}"
                 v-on:select="on_select"
                 />
 
@@ -30,12 +32,17 @@ export var Language = Vue.component("language", {
             self.$root.$router.push({name: "home"});
         },
     },
-    computed: {
-        available_languages() {
-            return this.$root.available_languages;
-        },
-        current_language_code() {
-            return this.$i18n.locale || "en-US";
-        },
+};
+
+page_registry.add("language", Language, {
+    tag: "settings",
+    icon: "mdi-flag",
+    display_name: function(instance, rec) {
+        return [
+            instance.$t("screen.settings.language.name"),
+            instance.active_language,
+        ].join(" - ");
     },
 });
+
+export default Language;
