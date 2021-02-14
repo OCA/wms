@@ -1,13 +1,14 @@
 /**
  * Copyright 2021 Camptocamp SA (http://www.camptocamp.com)
+ * @author Thierry Ducrest <thierry.ducrest@camptocamp.com>
+ * Copyright 2021 ACSONE SA/NV (http://www.acsone.eu)
+ * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-// TODO: this should be moved to its own module
+import {page_registry} from "/shopfloor_mobile_base/static/wms/src/services/page_registry.js";
 
-import {page_registry} from "../services/page_registry.js";
-
-export var Workstation = {
+var Workstation = {
     data: function() {
         return {
             usage: "workstation",
