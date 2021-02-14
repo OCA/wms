@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+    @author Simone Orsi <simahawk@gmail.com>
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+-->
+<odoo>
+    <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_mobile_base.shopfloor_app_assets"
+    >
+        <script id="script_page_profile" position="after">
+          <script
+                id="script_page_workstation"
+                t-attf-src="/shopfloor_workstation_mobile/static/wms/src/settings/workstation.js?v=#{app_version}"
+                type="module"
+            />
+        </script>
+    </template>
+</odoo>
