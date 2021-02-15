@@ -652,6 +652,12 @@ msgid "Packaging changed on package {}"
 msgstr ""
 
 #. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Packaging {} does not match carrier {}."
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/actions/change_package_lot.py:0
 #, python-format
 msgid "Pick: stock issue on lot: {} found in {}"
