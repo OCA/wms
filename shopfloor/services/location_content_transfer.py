@@ -770,7 +770,7 @@ class LocationContentTransfer(Component):
         move_lines = self._find_transfer_move_lines(location)
         if package_level.exists():
             pickings = move_lines.mapped("picking_id")
-            sorter = self.actions_for("location_content_transfer.sorter")
+            sorter = self._actions_for("location_content_transfer.sorter")
             sorter.feed_pickings(pickings)
             package_levels = sorter.package_levels()
             package_level.shopfloor_postpone(move_lines, package_levels)
@@ -789,7 +789,7 @@ class LocationContentTransfer(Component):
         move_lines = self._find_transfer_move_lines(location)
         if move_line.exists():
             pickings = move_lines.mapped("picking_id")
-            sorter = self.actions_for("location_content_transfer.sorter")
+            sorter = self._actions_for("location_content_transfer.sorter")
             sorter.feed_pickings(pickings)
             package_levels = sorter.package_levels()
             move_line.shopfloor_postpone(move_lines, package_levels)
