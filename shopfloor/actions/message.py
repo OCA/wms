@@ -506,3 +506,11 @@ class MessageAction(Component):
             "message_type": "info",
             "body": _("Package has been opened. You can move partial quantities."),
         }
+
+    def packaging_invalid_for_carrier(self, packaging, carrier):
+        return {
+            "message_type": "error",
+            "body": _("Packaging {} does not match carrier {}.").format(
+                packaging.name, carrier.name
+            ),
+        }
