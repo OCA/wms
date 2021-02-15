@@ -31,7 +31,6 @@ class ShopfloorSchemaDetailAction(Component):
                 },
                 "priority": {"type": "string", "nullable": True, "required": False},
                 "operation_type": self._schema_dict_of(self._simple_record()),
-                "carrier": self._schema_dict_of(self._simple_record()),
                 "move_lines": self._schema_list_of(self.move_line()),
             }
         )
