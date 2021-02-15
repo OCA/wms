@@ -25,7 +25,7 @@ class ShopfloorWorkstationCase(CommonCase):
         cls.printer2 = cls.env["printing.printer"].sudo().create(printer_vals)
         cls.ws1 = cls.env.ref("shopfloor_workstation.ws_pollux")
         cls.ws1.sudo().printing_printer_id = cls.printer1
-        cls.profile1 = cls.env.ref("shopfloor.shopfloor_profile_hb_truck_demo")
+        cls.profile1 = cls.env.ref("shopfloor_base.profile_demo_1")
         cls.ws1.sudo().shopfloor_profile_id = cls.profile1
 
     def setUp(self):
@@ -56,7 +56,7 @@ class ShopfloorWorkstationCase(CommonCase):
                 "barcode": "ws-1",
                 "profile": {
                     "id": self.ws1.shopfloor_profile_id.id,
-                    "name": "Highbay Truck",
+                    "name": self.ws1.shopfloor_profile_id.name,
                 },
             },
         )
