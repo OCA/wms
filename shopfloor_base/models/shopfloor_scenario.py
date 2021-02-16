@@ -1,6 +1,7 @@
 # Copyright 2021 ACSONE SA/NV (http://www.acsone.eu)
 # @author Simone Orsi <simahawk@gmail.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+import json
 import logging
 
 from odoo import api, fields, models
@@ -10,20 +11,21 @@ from odoo.addons.http_routing.models.ir_http import slugify
 
 _logger = logging.getLogger(__name__)
 
-try:
-    import yaml
-except ImportError:
-    _logger.debug("`yaml` lib is missing")
-
 
 class ShopfloorScenario(models.Model):
     _name = "shopfloor.scenario"
     _description = "Shopfloor Scenario"
 
     name = fields.Char(required=True, translate=True)
-    key = fields.Char(required=True)
+    key = fields.Char(
+        required=True,
+        help="Identify scenario univocally. "
+        "This value must match a service component's `usage`.",
+    )
     options = Serialized(compute="_compute_options", default={})
-    options_edit = fields.Char(help="Configure options via YAML")
+    options_edit = fields.Text(
+        help="Configure options via JSON", inverse="_inverse_options_edit"
+    )
 
     _sql_constraints = [("key", "unique(key)", "Scenario key must be unique")]
 
@@ -32,8 +34,13 @@ class ShopfloorScenario(models.Model):
         for rec in self:
             rec.options = rec._load_options()
 
+    def _inverse_options_edit(self):
+        for rec in self:
+            # Make sure options_edit is always readable
+            rec.options_edit = json.dumps(rec.options or {}, indent=4, sort_keys=True)
+
     def _load_options(self):
-        return yaml.safe_load(self.options_edit or "") or {}
+        return json.loads(self.options_edit or "{}")
 
     @api.onchange("name")
     def _onchange_name_for_key(self):

@@ -36,6 +36,5 @@
         "demo/shopfloor_menu_demo.xml",
         "demo/shopfloor_profile_demo.xml",
     ],
-    "external_dependencies": {"python": ["pyyaml"]},
     "post_init_hook": "post_init_hook",
 }
