@@ -13,9 +13,5 @@
             name="users"
             eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
         />
-        <field
-            name="implied_ids"
-            eval="[(4, ref('rest_log.group_rest_log_manager'))]"
-        />
     </record>
 </odoo>
