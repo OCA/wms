@@ -14,13 +14,7 @@
     "maintainers": ["guewen", "simahawk", "sebalix"],
     "license": "AGPL-3",
     "application": True,
-    "depends": [
-        "base_jsonify",
-        "base_rest",
-        "rest_log",
-        "base_sparse_field",
-        "auth_api_key",
-    ],
+    "depends": ["base_jsonify", "base_rest", "base_sparse_field", "auth_api_key"],
     "data": [
         "data/module_category_data.xml",
         "security/groups.xml",
