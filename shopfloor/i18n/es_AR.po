@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-02-06 22:45+0000\n"
+"PO-Revision-Date: 2021-02-16 21:45+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -315,7 +315,7 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_log
 msgid "Legacy model for tracking REST calls: replacedy by rest.log"
-msgstr ""
+msgstr "Modelo heredado para rastrear llamadas REST: reemplazado por rest.log"
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
@@ -679,7 +679,7 @@ msgstr "El Empaquetado cambió en el paquete {}"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Packaging {} does not match carrier {}."
-msgstr ""
+msgstr "El Empaquetado {} no coincide con el transportista {}."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/change_package_lot.py:0
