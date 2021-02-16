@@ -1,7 +1,13 @@
+Shopfloor config menu
+~~~~~~~~~~~~~~~~~~~~~
+
+In the main menu (or home screen) click on "Shopfloor".
+
+
 Profiles
 ~~~~~~~~
 
-In Inventory / Configuration / Shopfloor / Profiles.
+In Shopfloor / Profiles.
 
 The profiles are used to restrict which menus are shown on the frontend
 application. When a user logs in the scanner application, they have to
@@ -10,29 +16,23 @@ select their profile, so the correct menus are shown.
 Menus
 ~~~~~
 
-In Inventory / Configuration / Shopfloor / Menus.
+In Shopfloor / Menus.
 
-The menus are displayed on the frontend application and store the configuration
-of the scenarios. Each menu must use a scenario and defines which Operation Types
-they are allowed to process.
+The menus are displayed on the frontend application.
+The configuration may come from the menu itself
+and/or from the scenario linked to it.
 
 Their profile will restrict the visibility to the profile chosen on the device.
 If a menu has no profile, it is shown in every profile.
 
-Some scenarios may have additional options, which are explained in tooltips.
+Some scenario may have additional options.
 
-Logs retention
-~~~~~~~~~~~~~~
 
-Logs are kept in database for every REST requests made by a client application.
-They can be used for debugging and monitoring of the activity.
+Scenario
+~~~~~~~~
 
-The Logs menu is shown only with Developer tools (``?debug=1``) activated.
+In Shopfloor / Scenario.
 
-By default, Shopfloor logs are kept 30 days.
-You can change the duration of the retention by changing the System Parameter
-``shopfloor.log.retention.days``.
-
-If the value is set to 0, the logs are not stored at all.
-
-Logged data is: request URL and method, parameters, headers, result or error.
+A Scenario represents a flow (or more basically "something to do" with the app.
+Each scenario must have a name and a unique key.
+The key must match a registered shopfloor service component.
