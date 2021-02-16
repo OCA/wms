@@ -390,62 +390,25 @@ Only for development or testing purpose, do not use in production.
 <p><strong>Table of contents</strong></p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#configuration" id="id2">Configuration</a><ul>
-<li><a class="reference internal" href="#profiles" id="id3">Profiles</a></li>
-<li><a class="reference internal" href="#menus" id="id4">Menus</a></li>
-<li><a class="reference internal" href="#logs-retention" id="id5">Logs retention</a></li>
+<li><a class="reference internal" href="#usage" id="id2">Usage</a></li>
+<li><a class="reference internal" href="#known-issues-roadmap" id="id3">Known issues / Roadmap</a></li>
+<li><a class="reference internal" href="#changelog" id="id4">Changelog</a><ul>
+<li><a class="reference internal" href="#id1" id="id5">13.0.1.0.0</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#usage" id="id6">Usage</a></li>
-<li><a class="reference internal" href="#known-issues-roadmap" id="id7">Known issues / Roadmap</a></li>
-<li><a class="reference internal" href="#changelog" id="id8">Changelog</a><ul>
-<li><a class="reference internal" href="#id1" id="id9">13.0.1.0.0</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#bug-tracker" id="id10">Bug Tracker</a></li>
-<li><a class="reference internal" href="#credits" id="id11">Credits</a><ul>
-<li><a class="reference internal" href="#authors" id="id12">Authors</a></li>
-<li><a class="reference internal" href="#contributors" id="id13">Contributors</a></li>
-<li><a class="reference internal" href="#design" id="id14">Design</a></li>
-<li><a class="reference internal" href="#other-credits" id="id15">Other credits</a></li>
-<li><a class="reference internal" href="#maintainers" id="id16">Maintainers</a></li>
+<li><a class="reference internal" href="#bug-tracker" id="id6">Bug Tracker</a></li>
+<li><a class="reference internal" href="#credits" id="id7">Credits</a><ul>
+<li><a class="reference internal" href="#authors" id="id8">Authors</a></li>
+<li><a class="reference internal" href="#contributors" id="id9">Contributors</a></li>
+<li><a class="reference internal" href="#design" id="id10">Design</a></li>
+<li><a class="reference internal" href="#other-credits" id="id11">Other credits</a></li>
+<li><a class="reference internal" href="#maintainers" id="id12">Maintainers</a></li>
 </ul>
 </li>
 </ul>
-</div>
-<div class="section" id="configuration">
-<h1><a class="toc-backref" href="#id2">Configuration</a></h1>
-<div class="section" id="profiles">
-<h2><a class="toc-backref" href="#id3">Profiles</a></h2>
-<p>In Inventory / Configuration / Shopfloor / Profiles.</p>
-<p>The profiles are used to restrict which menus are shown on the frontend
-application. When a user logs in the scanner application, they have to
-select their profile, so the correct menus are shown.</p>
-</div>
-<div class="section" id="menus">
-<h2><a class="toc-backref" href="#id4">Menus</a></h2>
-<p>In Inventory / Configuration / Shopfloor / Menus.</p>
-<p>The menus are displayed on the frontend application and store the configuration
-of the scenarios. Each menu must use a scenario and defines which Operation Types
-they are allowed to process.</p>
-<p>Their profile will restrict the visibility to the profile chosen on the device.
-If a menu has no profile, it is shown in every profile.</p>
-<p>Some scenarios may have additional options, which are explained in tooltips.</p>
-</div>
-<div class="section" id="logs-retention">
-<h2><a class="toc-backref" href="#id5">Logs retention</a></h2>
-<p>Logs are kept in database for every REST requests made by a client application.
-They can be used for debugging and monitoring of the activity.</p>
-<p>The Logs menu is shown only with Developer tools (<tt class="docutils literal"><span class="pre">?debug=1</span></tt>) activated.</p>
-<p>By default, Shopfloor logs are kept 30 days.
-You can change the duration of the retention by changing the System Parameter
-<tt class="docutils literal">shopfloor.log.retention.days</tt>.</p>
-<p>If the value is set to 0, the logs are not stored at all.</p>
-<p>Logged data is: request URL and method, parameters, headers, result or error.</p>
-</div>
 </div>
 <div class="section" id="usage">
-<h1><a class="toc-backref" href="#id6">Usage</a></h1>
+<h1><a class="toc-backref" href="#id2">Usage</a></h1>
 <p>An API key is created in the Demo data (for development), using
 the Demo user. The key to use in the HTTP header <tt class="docutils literal"><span class="pre">API-KEY</span></tt> is: 72B044F7AC780DAC</p>
 <p>Curl example:</p>
@@ -454,21 +417,21 @@ curl -X POST &quot;http://localhost:8069/shopfloor/user/menu&quot; -H  &quot;acc
 </pre>
 </div>
 <div class="section" id="known-issues-roadmap">
-<h1><a class="toc-backref" href="#id7">Known issues / Roadmap</a></h1>
+<h1><a class="toc-backref" href="#id3">Known issues / Roadmap</a></h1>
 <ul class="simple">
 <li>improve documentation</li>
 <li>split out scenario components to their own modules</li>
 </ul>
 </div>
 <div class="section" id="changelog">
-<h1><a class="toc-backref" href="#id8">Changelog</a></h1>
+<h1><a class="toc-backref" href="#id4">Changelog</a></h1>
 <div class="section" id="id1">
-<h2><a class="toc-backref" href="#id9">13.0.1.0.0</a></h2>
+<h2><a class="toc-backref" href="#id5">13.0.1.0.0</a></h2>
 <p>First official version.</p>
 </div>
 </div>
 <div class="section" id="bug-tracker">
-<h1><a class="toc-backref" href="#id10">Bug Tracker</a></h1>
+<h1><a class="toc-backref" href="#id6">Bug Tracker</a></h1>
 <p>Bugs are tracked on <a class="reference external" href="https://github.com/OCA/wms/issues">GitHub Issues</a>.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us smashing it by providing a detailed and welcomed
@@ -476,9 +439,9 @@ If you spotted it first, help us smashing it by providing a detailed and welcome
 <p>Do not contact contributors directly about support or help with technical issues.</p>
 </div>
 <div class="section" id="credits">
-<h1><a class="toc-backref" href="#id11">Credits</a></h1>
+<h1><a class="toc-backref" href="#id7">Credits</a></h1>
 <div class="section" id="authors">
-<h2><a class="toc-backref" href="#id12">Authors</a></h2>
+<h2><a class="toc-backref" href="#id8">Authors</a></h2>
 <ul class="simple">
 <li>Camptocamp</li>
 <li>BCIM</li>
@@ -486,7 +449,7 @@ If you spotted it first, help us smashing it by providing a detailed and welcome
 </ul>
 </div>
 <div class="section" id="contributors">
-<h2><a class="toc-backref" href="#id13">Contributors</a></h2>
+<h2><a class="toc-backref" href="#id9">Contributors</a></h2>
 <ul class="simple">
 <li>Guewen Baconnier &lt;<a class="reference external" href="mailto:guewen.baconnier&#64;camptocamp.com">guewen.baconnier&#64;camptocamp.com</a>&gt;</li>
 <li>Simone Orsi &lt;<a class="reference external" href="mailto:simahawk&#64;gmail.com">simahawk&#64;gmail.com</a>&gt;</li>
@@ -497,14 +460,14 @@ If you spotted it first, help us smashing it by providing a detailed and welcome
 </ul>
 </div>
 <div class="section" id="design">
-<h2><a class="toc-backref" href="#id14">Design</a></h2>
+<h2><a class="toc-backref" href="#id10">Design</a></h2>
 <ul class="simple">
 <li>Joël Grand-Guillaume &lt;<a class="reference external" href="mailto:joel.grandguillaume&#64;camptocamp.com">joel.grandguillaume&#64;camptocamp.com</a>&gt;</li>
 <li>Jacques-Etienne Baudoux &lt;<a class="reference external" href="mailto:je&#64;bcim.be">je&#64;bcim.be</a>&gt;</li>
 </ul>
 </div>
 <div class="section" id="other-credits">
-<h2><a class="toc-backref" href="#id15">Other credits</a></h2>
+<h2><a class="toc-backref" href="#id11">Other credits</a></h2>
 <p><strong>Financial support</strong></p>
 <ul class="simple">
 <li>Cosanum</li>
@@ -513,7 +476,7 @@ If you spotted it first, help us smashing it by providing a detailed and welcome
 </ul>
 </div>
 <div class="section" id="maintainers">
-<h2><a class="toc-backref" href="#id16">Maintainers</a></h2>
+<h2><a class="toc-backref" href="#id12">Maintainers</a></h2>
 <p>This module is maintained by the OCA.</p>
 <a class="reference external image-reference" href="https://odoo-community.org"><img alt="Odoo Community Association" src="https://odoo-community.org/logo.png" /></a>
 <p>OCA, or the Odoo Community Association, is a nonprofit organization whose
