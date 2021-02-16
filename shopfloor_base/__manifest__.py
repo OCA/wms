@@ -1,7 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020 Akretion (http://www.akretion.com)
 # Copyright 2020 BCIM
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 {
     "name": "Shopfloor Base",
@@ -12,7 +12,7 @@
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, BCIM, Akretion, Odoo Community Association (OCA)",
     "maintainers": ["guewen", "simahawk", "sebalix"],
-    "license": "AGPL-3",
+    "license": "LGPL-3",
     "application": True,
     "depends": ["base_jsonify", "base_rest", "base_sparse_field", "auth_api_key"],
     "data": [
