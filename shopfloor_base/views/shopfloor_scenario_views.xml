@@ -22,11 +22,9 @@
                             <field name="key" />
                         </group>
                         <group name="options">
-                            <field
-                                name="options_edit"
-                                widget="ace"
-                                options="{'mode': 'yaml'}"
-                            />
+                            <!-- JSON supoport is not available :/ -->
+                            <!-- options="{'mode': 'json'}" -->
+                            <field name="options_edit" widget="ace" />
                         </group>
                     </group>
                 </sheet>
