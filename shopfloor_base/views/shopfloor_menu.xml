@@ -65,7 +65,7 @@
                         string="Scenario"
                         name="groupby_scenario"
                         domain="[]"
-                        context="{'group_by': 'scenario'}"
+                        context="{'group_by': 'scenario_id'}"
                     />
                 </group>
             </search>
