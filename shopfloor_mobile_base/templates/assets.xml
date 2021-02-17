@@ -195,6 +195,12 @@
             t-attf-src="/shopfloor_mobile_base/static/wms/src/scenario/form.js?v=#{app_version}"
             type="module"
         />
+
+        <t
+            id="new_scenario_hook"
+            t-if="0"
+        >Hook to this element to inject your own scenario</t>
+
         <script id="script_devtools" t-if="debug or demo_mode">
             Vue.config.devtools = true
         </script>
