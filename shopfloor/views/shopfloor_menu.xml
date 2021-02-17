@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shopfloor_menu_form_view" model="ir.ui.view">
+        <field name="model">shopfloor.menu</field>
+        <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_form_view" />
+        <field name="arch" type="xml">
+            <field name="profile_id" position="after">
+              <field
+                    name="picking_type_ids"
+                    widget="many2many_tags"
+                    options="{'no_create': 1}"
+                />
+            </field>
+            <group name="options" position="inside">
+              <group
+                    name="move_create"
+                    attrs="{'invisible': [('move_create_is_possible', '=', False)]}"
+                >
+                  <field name="move_create_is_possible" invisible="1" />
+                  <field name="allow_move_create" />
+              </group>
+              <group
+                    name="unreserve_other_moves"
+                    attrs="{'invisible': [('unreserve_other_moves_is_possible', '=', False)]}"
+                >
+                  <field name="unreserve_other_moves_is_possible" invisible="1" />
+                  <field name="allow_unreserve_other_moves" />
+              </group>
+              <group
+                    name="ignore_no_putaway_available"
+                    attrs="{'invisible': [('ignore_no_putaway_available_is_possible', '=', False)]}"
+                >
+                  <field name="ignore_no_putaway_available_is_possible" invisible="1" />
+                  <field name="ignore_no_putaway_available" />
+              </group>
+            </group>
+        </field>
+    </record>
+    <record id="shopfloor_menu_search_view" model="ir.ui.view">
+        <field name="model">shopfloor.menu</field>
+        <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_search_view" />
+        <field name="arch" type="xml">
+            <field name="profile_id" position="after">
+                <field name="picking_type_ids" />
+            </field>
+        </field>
+    </record>
+    <record id="shopfloor_menu_tree_view" model="ir.ui.view">
+        <field name="model">shopfloor.menu</field>
+        <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_tree_view" />
+        <field name="arch" type="xml">
+            <field name="profile_id" position="after">
+              <field
+                    name="picking_type_ids"
+                    widget="many2many_tags"
+                    options="{'no_create': 1}"
+                />
+            </field>
+        </field>
+    </record>
+</odoo>
