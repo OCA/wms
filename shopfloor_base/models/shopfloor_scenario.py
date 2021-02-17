@@ -17,6 +17,9 @@ class ShopfloorScenario(models.Model):
     _description = "Shopfloor Scenario"
 
     name = fields.Char(required=True, translate=True)
+    # TODO: make it readonly in UI?
+    # Make it a Selection field?
+    # Normally this will be used only by dev implementing new scenario.
     key = fields.Char(
         required=True,
         help="Identify scenario univocally. "
