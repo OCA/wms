@@ -49,6 +49,7 @@
         "data/shopfloor_scenario_data.xml",
         "security/groups.xml",
         "security/ir.model.access.csv",
+        "views/shopfloor_menu.xml",
         "views/stock_picking_type.xml",
         "views/stock_location.xml",
         "views/stock_move_line.xml",
