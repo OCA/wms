@@ -38,7 +38,6 @@ class ShopfloorMenu(models.Model):
         "if the put-away can find a sublocation (when putaway destination "
         "is different from the operation type's destination).",
     )
-    active = fields.Boolean(default=True)
 
     @api.depends("scenario_id", "picking_type_ids")
     def _compute_move_create_is_possible(self):
