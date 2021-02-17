@@ -301,7 +301,7 @@ class StockMove(models.Model):
         for move in self:
             if not move.need_release:
                 continue
-            if move.state not in ("confirmed", "waiting"):
+            if move.state not in ("confirmed", "waiting", "done", "cancel"):
                 continue
             available_quantity = move.ordered_available_to_promise_qty
             if float_compare(available_quantity, 0, precision_digits=precision) <= 0:
@@ -337,6 +337,8 @@ class StockMove(models.Model):
         released_pickings = pulled_moves.picking_id
         unreleased_moves = released_pickings.move_lines - pulled_moves
         for unreleased_move in unreleased_moves:
+            if unreleased_move.state in ("done", "cancel"):
+                continue
             # no split will occur as we keep the same qty, but the move
             # will be assigned to a new stock.picking
             original_picking = unreleased_move.picking_id
