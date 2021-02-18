@@ -371,7 +371,6 @@ class StockReceptionScreen(models.Model):
 
     def on_barcode_scanned_select_product(self, barcode):
         """Try to find the corresponding product based on the barcode."""
-        self.warn_notification = False
         moves = self.picking_id.move_lines
         # First find a moves corresponding to the barcode
         move = moves.filtered(lambda o: o.product_id.barcode == barcode)
@@ -572,7 +571,6 @@ class StockReceptionScreen(models.Model):
         return self.current_move_id.has_tracking != "none"
 
     def process_set_lot_number(self):
-        self.warn_notification = False
         if not self.current_move_line_id.lot_id:
             self.warn_notification = _("You have to fill the lot number.")
             return
@@ -582,7 +580,6 @@ class StockReceptionScreen(models.Model):
 
     def process_set_expiry_date(self):
         """Set the lot life date on a move line."""
-        self.warn_notification = False
         if not self.current_move_line_lot_life_date:
             self.warn_notification = _("You have to set an expiry date.")
             return
@@ -652,7 +649,6 @@ class StockReceptionScreen(models.Model):
         return True
 
     def process_set_location(self):
-        self.warn_notification = False
         if not self.current_move_line_location_dest_stored_id:
             self.warn_notification = _("You have to set the destination.")
             return
@@ -698,7 +694,6 @@ class StockReceptionScreen(models.Model):
         (allowing to quit the reception screen via the exit button and resume
         the step later).
         """
-        self.warn_notification = False
         if not self.package_storage_type_id:
             self.warn_notification = _(
                 "The storage type is mandatory before going further."
@@ -736,6 +731,8 @@ class StockReceptionScreen(models.Model):
         self.ensure_one()
         if not self.current_move_id and not self.current_move_line_id:
             return
+        # Reset warning
+        self.warn_notification = False
         method = "process_{}".format(self.current_step)
         getattr(self, method)()
         return True
@@ -753,6 +750,8 @@ class StockReceptionScreen(models.Model):
         if not self.current_move_id and not self.current_move_line_id:
             return
         assert self.current_step == "set_package", f"step = {self.current_step}"
+        # Reset warning
+        self.warn_notification = False
         # Copy relevant data for the next package
         qty_done = self.current_move_line_qty_done
         location_dest = self.current_move_line_location_dest_stored_id
