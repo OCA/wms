@@ -533,10 +533,10 @@ class StockLocation(models.Model):
                 if (float_compare(item["quantity"], 0, precision_digits=2) > 0)
             ]
         valid_location_ids = set(valid_locations.ids) - set(loc_ordered_by_qty)
-        valid_locations = self.browse(loc_ordered_by_qty)
-        valid_locations |= self.browse(
+        ordered_valid_location_ids = loc_ordered_by_qty + [
             id_ for id_ in self.ids if id_ in valid_location_ids
-        )
+        ]
+        valid_locations = self.browse(ordered_valid_location_ids)
         return valid_locations
 
     def _get_ordered_leaf_locations(self):
