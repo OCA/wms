@@ -1045,6 +1045,11 @@ class ZonePicking(Component):
             self._write_destination_on_lines(buffer_lines, location)
             # set lines to done + refresh buffer lines (should be empty)
             moves = buffer_lines.mapped("move_id")
+            # split move lines to a backorder move
+            # if quantity is not fully satisfied
+            # TODO: update tests
+            for move in moves:
+                move.split_other_move_lines(buffer_lines & move.move_line_ids)
             stock = self._actions_for("stock")
             stock.validate_moves(moves)
             message = self.msg_store.buffer_complete()
