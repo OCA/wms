@@ -593,6 +593,16 @@ msgid "Vendor Code"
 msgstr "Código del Vendedor"
 
 #. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__warn_notification
+msgid "Warn Notification"
+msgstr ""
+
+#. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__warn_notification_html
+msgid "Warn Notification Html"
+msgstr ""
+
+#. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "You cannot set a date prior to previous one ({})"
