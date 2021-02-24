@@ -9,7 +9,7 @@ class LocationContentTransferCommonCase(CommonCase):
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_location_content_transfer")
-        cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
+        cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
         cls.picking_type = cls.menu.picking_type_ids
         cls.wh = cls.picking_type.warehouse_id
 
@@ -87,7 +87,7 @@ class LocationContentTransferCommonCase(CommonCase):
     def assert_response_start_single(
         self, response, pickings, message=None, popup=None
     ):
-        sorter = self.service.actions_for("location_content_transfer.sorter")
+        sorter = self.service._actions_for("location_content_transfer.sorter")
         sorter.feed_pickings(pickings)
         location = pickings.mapped("location_id")
         self.assert_response(

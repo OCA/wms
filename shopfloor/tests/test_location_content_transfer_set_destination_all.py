@@ -207,7 +207,7 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
             params={"location_id": self.content_loc.id, "barcode": sub_shelf1.barcode},
         )
         self.assertEqual(next_move.state, "assigned")
-        completion_info = self.service.actions_for("completion.info")
+        completion_info = self.service._actions_for("completion.info")
         completion_info_popup = completion_info.popup(move_lines)
         self.assert_response_start(
             response,

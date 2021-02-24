@@ -26,7 +26,7 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
         response = self.service.dispatch(
             "unload_scan_pack", params={"package_id": 1234567890, "barcode": "UNKNOWN"},
         )
-        completion_info = self.service.actions_for("completion.info")
+        completion_info = self.service._actions_for("completion.info")
         completion_info_popup = completion_info.popup(move_line)
         self.assert_response_unload_single(
             response,

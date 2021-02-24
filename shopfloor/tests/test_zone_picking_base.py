@@ -8,7 +8,7 @@ class ZonePickingCommonCase(CommonCase):
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_zone_picking")
-        cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
+        cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
         cls.picking_type = cls.menu.picking_type_ids
         cls.wh = cls.picking_type.warehouse_id
 
@@ -219,7 +219,10 @@ class ZonePickingCommonCase(CommonCase):
             lines=[(cls.product_b, 10), (cls.product_f, 10)]
         )
         cls._fill_stock_for_moves(
-            picking5.move_lines, in_package=True, location=cls.zone_sublocation4
+            picking5.move_lines,
+            in_package=True,
+            same_package=False,
+            location=cls.zone_sublocation4,
         )
         # 2 products available in zone_sublocation5, but one is partially available
         cls.picking6 = picking6 = cls._create_picking(
