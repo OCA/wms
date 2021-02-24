@@ -219,7 +219,10 @@ class ZonePickingCommonCase(CommonCase):
             lines=[(cls.product_b, 10), (cls.product_f, 10)]
         )
         cls._fill_stock_for_moves(
-            picking5.move_lines, in_package=True, location=cls.zone_sublocation4
+            picking5.move_lines,
+            in_package=True,
+            same_package=False,
+            location=cls.zone_sublocation4,
         )
         # 2 products available in zone_sublocation5, but one is partially available
         cls.picking6 = picking6 = cls._create_picking(
