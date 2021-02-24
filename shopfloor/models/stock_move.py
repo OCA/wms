@@ -88,7 +88,9 @@ class StockMove(models.Model):
                 moves_todo.move_line_ids.package_level_id.write(
                     {"picking_id": new_picking.id}
                 )
-                new_picking.action_assign()
+                # NOTE: at this stage all the operations should be assigned already
+                # hence the new picking must be assigned already.
+                # DO NOT CALL `new_picking.action_assign` or you'll wipe qty_done.
                 assert new_picking.state == "assigned"
             new_picking.action_done()
         return True
