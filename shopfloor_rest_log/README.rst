@@ -7,11 +7,11 @@ Shopfloor REST log
    !! changes will be overwritten.                   !!
    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-.. |badge1| image:: https://img.shields.io/badge/maturity-Alpha-red.png
+.. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
-    :alt: Alpha
+    :alt: Beta
 .. |badge2| image:: https://img.shields.io/badge/licence-LGPL--3-blue.png
-    :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
+    :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
     :alt: License: LGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fwms-lightgray.png?logo=github
     :target: https://github.com/OCA/wms/tree/13.0/shopfloor_rest_log
@@ -27,12 +27,8 @@ Shopfloor REST log
 
 Integrate `rest_log` with `shopfloor_base`.
 
-As of today simply provide a shortcut to `rest.log` records from the `Shopfloor` app.
-
-.. IMPORTANT::
-   This is an alpha version, the data model and design can change at any time without warning.
-   Only for development or testing purpose, do not use in production.
-   `More details on development status <https://odoo-community.org/page/development-status>`_
+As of today simply provide a shortcut to `rest.log` records from the `Shopfloor` app
+and allows Shopfloor managers to see logs.
 
 **Table of contents**
 
