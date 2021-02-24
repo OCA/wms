@@ -167,8 +167,21 @@ class CommonCase(BaseCommonCase):
 
     @classmethod
     def _fill_stock_for_moves(
-        cls, moves, in_package=False, in_lot=False, location=False
+        cls, moves, in_package=False, same_package=True, in_lot=False, location=False
     ):
+        """Satisfy stock for given moves.
+
+        :param moves: stock.move recordset
+        :param in_package: stock.quant.package record or simple boolean
+            If a package record is given, it will be used as package.
+            If a boolean true is given, a new package will be created for each move.
+        :param same_package:
+            modify the behavior of `in_package` to use the same package for all moves.
+        :param in_lot: stock.production.lot record or simple boolean
+            If a lot record is given, it will be used as lot.
+            If a boolean true is given, a new lot will be created.
+        """
+        product_packages = {}
         product_locations = {}
         package = None
         if in_package:
@@ -180,6 +193,12 @@ class CommonCase(BaseCommonCase):
             key = (move.product_id, location or move.location_id)
             product_locations.setdefault(key, 0)
             product_locations[key] += move.product_qty
+            if in_package:
+                if isinstance(in_package, models.BaseModel):
+                    package = in_package
+                if not package or package and not same_package:
+                    package = cls.env["stock.quant.package"].create({})
+                product_packages[key] = package
         for (product, location), qty in product_locations.items():
             lot = None
             if in_lot:
