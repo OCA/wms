@@ -80,7 +80,7 @@ Scenario
 In Shopfloor / Scenario.
 
 A Scenario represents a flow (or more basically "something to do" with the app.
-Each scenario must have a name and a unique key. 
+Each scenario must have a name and a unique key.
 The key must match a registered shopfloor service component.
 
 Usage
@@ -97,6 +97,7 @@ Known issues / Roadmap
 ======================
 
 * improve documentation
+* change shopfloor.scenario.key to selection? See comment in model
 
 Changelog
 =========
