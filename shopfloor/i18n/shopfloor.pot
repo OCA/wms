@@ -14,12 +14,6 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: shopfloor
-#: code:addons/shopfloor/services/forms/form_mixin.py:0
-#, python-format
-msgid "%s updated."
-msgstr ""
-
-#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "A destination package is required."
@@ -34,12 +28,6 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__shopfloor_zero_check
 msgid "Activate Zero Check"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__active
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__active
-msgid "Active"
 msgstr ""
 
 #. module: shopfloor
@@ -61,14 +49,6 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_unreserve_other_moves
 msgid "Allow to process reserved quantities"
-msgstr ""
-
-#. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_search_view
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_profile_form_view
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_profile_search_view
-msgid "Archived"
 msgstr ""
 
 #. module: shopfloor
@@ -126,12 +106,14 @@ msgstr ""
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_checkout
+#: model:shopfloor.scenario,name:shopfloor.scenario_checkout
 #: model:stock.picking.type,name:shopfloor.picking_type_checkout_demo
 msgid "Checkout"
 msgstr ""
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_cluster_picking
+#: model:shopfloor.scenario,name:shopfloor.scenario_cluster_picking
 #: model:stock.picking.type,name:shopfloor.picking_type_cluster_picking_demo
 msgid "Cluster Picking"
 msgstr ""
@@ -162,8 +144,6 @@ msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__create_uid
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__create_uid
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__create_uid
 msgid "Created by"
 msgstr ""
 
@@ -177,8 +157,6 @@ msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__create_date
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__create_date
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__create_date
 msgid "Created on"
 msgstr ""
 
@@ -190,15 +168,14 @@ msgstr ""
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_delivery
+#: model:shopfloor.scenario,name:shopfloor.scenario_delivery
 #: model:stock.picking.type,name:shopfloor.picking_type_delivery_demo
 msgid "Delivery"
 msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__display_name
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__display_name
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__display_name
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -216,15 +193,8 @@ msgid "From"
 msgstr ""
 
 #. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_search_view
-msgid "Group By"
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__id
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__id
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__id
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__id
 msgid "ID"
 msgstr ""
 
@@ -271,23 +241,17 @@ msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log____last_update
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu____last_update
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin____last_update
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile____last_update
 msgid "Last Modified on"
 msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__write_uid
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__write_uid
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__write_date
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__write_date
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__write_date
 msgid "Last Updated on"
 msgstr ""
 
@@ -325,6 +289,11 @@ msgstr ""
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_location_content_transfer
 #: model:stock.picking.type,name:shopfloor.picking_type_location_content_transfer_demo
 msgid "Location Content Transfer"
+msgstr ""
+
+#. module: shopfloor
+#: model:shopfloor.scenario,name:shopfloor.scenario_location_content_transfer
+msgid "Location content transfer"
 msgstr ""
 
 #. module: shopfloor
@@ -375,18 +344,6 @@ msgid "Menu displayed in the scanner application"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.actions.act_window,name:shopfloor.action_shopfloor_menu
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__menu_ids
-#: model:ir.ui.menu,name:shopfloor.menu_action_shopfloor_menu
-msgid "Menus"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,help:shopfloor.field_shopfloor_profile__menu_ids
-msgid "Menus visible for this profile"
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_create_is_possible
 msgid "Move Create Is Possible"
 msgstr ""
@@ -406,12 +363,6 @@ msgstr ""
 #: code:addons/shopfloor/models/stock_move_line.py:0
 #, python-format
 msgid "Move lines processed have to share the same source location."
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__name
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__name
-msgid "Name"
 msgstr ""
 
 #. module: shopfloor
@@ -542,11 +493,6 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Operation's already running. Would you like to take it over?"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__options
-msgid "Options"
 msgstr ""
 
 #. module: shopfloor
@@ -732,18 +678,6 @@ msgid "Product(s) processed as raw product(s)"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__profile_id
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_search_view
-msgid "Profile"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.actions.act_window,name:shopfloor.action_shopfloor_profile
-#: model:ir.ui.menu,name:shopfloor.menu_action_shopfloor_profile
-msgid "Profiles"
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_quant
 msgid "Quants"
 msgstr ""
@@ -751,14 +685,6 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_quant_package__shopfloor_weight
 msgid "Real pack weight or the estimated one."
-msgstr ""
-
-#. module: shopfloor
-#: code:addons/shopfloor/services/scan_anything.py:0
-#, python-format
-msgid ""
-"Record not found.\n"
-"We've tried with the following types: {}"
 msgstr ""
 
 #. module: shopfloor
@@ -820,17 +746,6 @@ msgid "Scan the package"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scenario
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_search_view
-msgid "Scenario"
-msgstr ""
-
-#. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
-msgid "Scenario Options"
-msgstr ""
-
-#. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid ""
@@ -838,11 +753,6 @@ msgid ""
 "These type(s) do not satisfy this constraint: \n"
 "{}.\n"
 "Please, adjust your configuration."
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__sequence
-msgid "Sequence"
 msgstr ""
 
 #. module: shopfloor
@@ -878,7 +788,6 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.ui.menu,name:shopfloor.menu_shopfloor_settings
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_location_form
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_picking_type_form
 msgid "Shopfloor"
@@ -924,13 +833,13 @@ msgid "Shopfloor User"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model,name:shopfloor.model_shopfloor_profile
-msgid "Shopfloor profile settings"
+#: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__shopfloor_weight
+msgid "Shopfloor weight (kg)"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__shopfloor_weight
-msgid "Shopfloor weight (kg)"
+#: model:shopfloor.scenario,name:shopfloor.scenario_single_pack_transfer
+msgid "Single Pack Transfer"
 msgstr ""
 
 #. module: shopfloor
@@ -1061,12 +970,6 @@ msgid ""
 "side-level'. Pay attention to the padding ('09' is before '19', '9' is not)."
 " It is recommended to use an Export then an Import to populate this field "
 "using a spreadsheet."
-msgstr ""
-
-#. module: shopfloor
-#: code:addons/shopfloor/services/service.py:0
-#, python-format
-msgid "The record %s %s does not exist"
 msgstr ""
 
 #. module: shopfloor
@@ -1214,11 +1117,6 @@ msgid "Unreserve Other Moves Is Possible"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__profile_id
-msgid "Visible on this profile only"
-msgstr ""
-
-#. module: shopfloor
 #: code:addons/shopfloor/services/cluster_picking.py:0
 #, python-format
 msgid "Wrong bin"
@@ -1262,6 +1160,7 @@ msgstr ""
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_zone_picking
+#: model:shopfloor.scenario,name:shopfloor.scenario_zone_picking
 #: model:stock.picking.type,name:shopfloor.picking_type_zone_picking_demo
 msgid "Zone Picking"
 msgstr ""
