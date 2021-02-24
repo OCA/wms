@@ -11,6 +11,6 @@
     "license": "AGPL-3",
     "application": False,
     "installable": True,
-    "depends": ["stock"],
+    "depends": ["stock", "stock_helper"],
     "data": ["views/stock_source_relocate_views.xml", "security/ir.model.access.csv"],
 }
