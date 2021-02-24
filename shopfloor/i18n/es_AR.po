@@ -17,12 +17,6 @@ msgstr ""
 "X-Generator: Weblate 4.3.2\n"
 
 #. module: shopfloor
-#: code:addons/shopfloor/services/forms/form_mixin.py:0
-#, python-format
-msgid "%s updated."
-msgstr "%s actualizado."
-
-#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "A destination package is required."
@@ -38,12 +32,6 @@ msgstr "Se ha creado un borrador de inventario para su control."
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__shopfloor_zero_check
 msgid "Activate Zero Check"
 msgstr "Activar Verificación Cero"
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__active
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__active
-msgid "Active"
-msgstr "Activo"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_priority_postpone_mixin
@@ -65,14 +53,6 @@ msgstr "Permitir Creación de Movimiento"
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_unreserve_other_moves
 msgid "Allow to process reserved quantities"
 msgstr "Permitir procesar cantidades reservadas"
-
-#. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_search_view
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_profile_form_view
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_profile_search_view
-msgid "Archived"
-msgstr "Archivado"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -129,12 +109,14 @@ msgstr "No se puede cambiar al lote {} ya que está completamente recogido."
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_checkout
+#: model:shopfloor.scenario,name:shopfloor.scenario_checkout
 #: model:stock.picking.type,name:shopfloor.picking_type_checkout_demo
 msgid "Checkout"
 msgstr "Checkout"
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_cluster_picking
+#: model:shopfloor.scenario,name:shopfloor.scenario_cluster_picking
 #: model:stock.picking.type,name:shopfloor.picking_type_cluster_picking_demo
 msgid "Cluster Picking"
 msgstr "Grupo de Picking"
@@ -165,8 +147,6 @@ msgstr "Error en control de inventario en ubicación {} para {}"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__create_uid
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__create_uid
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__create_uid
 msgid "Created by"
 msgstr "Creado por"
 
@@ -182,8 +162,6 @@ msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__create_date
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__create_date
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__create_date
 msgid "Created on"
 msgstr "Creado el"
 
@@ -195,15 +173,14 @@ msgstr "La creación de movimientos no está permitida para el menú {}."
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_delivery
+#: model:shopfloor.scenario,name:shopfloor.scenario_delivery
 #: model:stock.picking.type,name:shopfloor.picking_type_delivery_demo
 msgid "Delivery"
 msgstr "Entrega"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__display_name
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__display_name
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__display_name
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__display_name
 msgid "Display Name"
 msgstr "Mostrar Nombre"
 
@@ -224,15 +201,8 @@ msgid "From"
 msgstr "Desde"
 
 #. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_search_view
-msgid "Group By"
-msgstr "Agrupar por"
-
-#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__id
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__id
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__id
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__id
 msgid "ID"
 msgstr "ID"
 
@@ -284,23 +254,17 @@ msgstr "Ubicaciones de Inventario"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log____last_update
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu____last_update
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin____last_update
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile____last_update
 msgid "Last Modified on"
 msgstr "Última Modificación el"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__write_uid
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__write_uid
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__write_uid
 msgid "Last Updated by"
 msgstr "Última Actualización por"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__write_date
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__write_date
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__write_date
 msgid "Last Updated on"
 msgstr "Última Actualización el"
 
@@ -340,6 +304,11 @@ msgstr "La Ubicación %s no contiene ningún paquete."
 #: model:stock.picking.type,name:shopfloor.picking_type_location_content_transfer_demo
 msgid "Location Content Transfer"
 msgstr "Transferencia de Contenido de Ubicación"
+
+#. module: shopfloor
+#: model:shopfloor.scenario,name:shopfloor.scenario_location_content_transfer
+msgid "Location content transfer"
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -389,18 +358,6 @@ msgid "Menu displayed in the scanner application"
 msgstr "Menú mostrado en la aplicación de escaner"
 
 #. module: shopfloor
-#: model:ir.actions.act_window,name:shopfloor.action_shopfloor_menu
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__menu_ids
-#: model:ir.ui.menu,name:shopfloor.menu_action_shopfloor_menu
-msgid "Menus"
-msgstr "Menús"
-
-#. module: shopfloor
-#: model:ir.model.fields,help:shopfloor.field_shopfloor_profile__menu_ids
-msgid "Menus visible for this profile"
-msgstr "Menús visibles para este perfil"
-
-#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_create_is_possible
 msgid "Move Create Is Possible"
 msgstr "Crear Movimiento es Posible"
@@ -422,12 +379,6 @@ msgstr "Cuenta de Línea de Movimiento"
 msgid "Move lines processed have to share the same source location."
 msgstr ""
 "Movimiento de líneas procesadas tienen que compartir la misma ubicación."
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__name
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_profile__name
-msgid "Name"
-msgstr "Nombre"
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
@@ -563,11 +514,6 @@ msgstr "Operación ya procesada."
 #, python-format
 msgid "Operation's already running. Would you like to take it over?"
 msgstr "La operación ya está en marcha. ¿Le gustaría hacerse cargo?"
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__options
-msgid "Options"
-msgstr "Opciones"
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
@@ -758,18 +704,6 @@ msgid "Product(s) processed as raw product(s)"
 msgstr "Producto(s) procesado(s) como producto(s) crudo(s)"
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__profile_id
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_search_view
-msgid "Profile"
-msgstr "Perfil"
-
-#. module: shopfloor
-#: model:ir.actions.act_window,name:shopfloor.action_shopfloor_profile
-#: model:ir.ui.menu,name:shopfloor.menu_action_shopfloor_profile
-msgid "Profiles"
-msgstr "Perfiles"
-
-#. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_quant
 msgid "Quants"
 msgstr "Cantidades"
@@ -778,16 +712,6 @@ msgstr "Cantidades"
 #: model:ir.model.fields,help:shopfloor.field_stock_quant_package__shopfloor_weight
 msgid "Real pack weight or the estimated one."
 msgstr "Peso real del paquete o estimado."
-
-#. module: shopfloor
-#: code:addons/shopfloor/services/scan_anything.py:0
-#, python-format
-msgid ""
-"Record not found.\n"
-"We've tried with the following types: {}"
-msgstr ""
-"Registro no encontrado.\n"
-"Hemos tratado con los siguientes tipos: {}"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -848,17 +772,6 @@ msgid "Scan the package"
 msgstr "Escanear el paquete"
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scenario
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_search_view
-msgid "Scenario"
-msgstr "Escenario"
-
-#. module: shopfloor
-#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
-msgid "Scenario Options"
-msgstr "Opciones de Escenario"
-
-#. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid ""
@@ -871,11 +784,6 @@ msgstr ""
 "Estos tipos no satisfacen esta restricción:\n"
 "{}.\n"
 "Por favor, ajuste su configuración."
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__sequence
-msgid "Sequence"
-msgstr "Secuencia"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -911,7 +819,6 @@ msgstr ""
 "transferencia manualmente."
 
 #. module: shopfloor
-#: model:ir.ui.menu,name:shopfloor.menu_shopfloor_settings
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_location_form
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_picking_type_form
 msgid "Shopfloor"
@@ -957,14 +864,14 @@ msgid "Shopfloor User"
 msgstr "Usuario del Taller"
 
 #. module: shopfloor
-#: model:ir.model,name:shopfloor.model_shopfloor_profile
-msgid "Shopfloor profile settings"
-msgstr "Ajustes del perfil de taller"
-
-#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__shopfloor_weight
 msgid "Shopfloor weight (kg)"
 msgstr "Peso del taller (kg)"
+
+#. module: shopfloor
+#: model:shopfloor.scenario,name:shopfloor.scenario_single_pack_transfer
+msgid "Single Pack Transfer"
+msgstr ""
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_single_pallet_transfer
@@ -1112,12 +1019,6 @@ msgstr ""
 "este campo usando una hoja de cálculo."
 
 #. module: shopfloor
-#: code:addons/shopfloor/services/service.py:0
-#, python-format
-msgid "The record %s %s does not exist"
-msgstr "El registro %s %s no existe"
-
-#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The record you were working on does not exist anymore."
@@ -1263,11 +1164,6 @@ msgid "Unreserve Other Moves Is Possible"
 msgstr "Es posible Anular la Reserva de Otros Movimientos"
 
 #. module: shopfloor
-#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__profile_id
-msgid "Visible on this profile only"
-msgstr "Visible en este perfil solo"
-
-#. module: shopfloor
 #: code:addons/shopfloor/services/cluster_picking.py:0
 #, python-format
 msgid "Wrong bin"
@@ -1311,6 +1207,7 @@ msgstr "Error de verificación cero en la ubicación {} ({})"
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_zone_picking
+#: model:shopfloor.scenario,name:shopfloor.scenario_zone_picking
 #: model:stock.picking.type,name:shopfloor.picking_type_zone_picking_demo
 msgid "Zone Picking"
 msgstr "Zona de Entreda"
@@ -1330,6 +1227,61 @@ msgstr ""
 #, python-format
 msgid "{} {} put in {}"
 msgstr "{} {} poner en {}"
+
+#~ msgid "%s updated."
+#~ msgstr "%s actualizado."
+
+#~ msgid "Active"
+#~ msgstr "Activo"
+
+#~ msgid "Archived"
+#~ msgstr "Archivado"
+
+#~ msgid "Group By"
+#~ msgstr "Agrupar por"
+
+#~ msgid "Menus"
+#~ msgstr "Menús"
+
+#~ msgid "Menus visible for this profile"
+#~ msgstr "Menús visibles para este perfil"
+
+#~ msgid "Name"
+#~ msgstr "Nombre"
+
+#~ msgid "Options"
+#~ msgstr "Opciones"
+
+#~ msgid "Profile"
+#~ msgstr "Perfil"
+
+#~ msgid "Profiles"
+#~ msgstr "Perfiles"
+
+#~ msgid ""
+#~ "Record not found.\n"
+#~ "We've tried with the following types: {}"
+#~ msgstr ""
+#~ "Registro no encontrado.\n"
+#~ "Hemos tratado con los siguientes tipos: {}"
+
+#~ msgid "Scenario"
+#~ msgstr "Escenario"
+
+#~ msgid "Scenario Options"
+#~ msgstr "Opciones de Escenario"
+
+#~ msgid "Sequence"
+#~ msgstr "Secuencia"
+
+#~ msgid "Shopfloor profile settings"
+#~ msgstr "Ajustes del perfil de taller"
+
+#~ msgid "The record %s %s does not exist"
+#~ msgstr "El registro %s %s no existe"
+
+#~ msgid "Visible on this profile only"
+#~ msgstr "Visible en este perfil solo"
 
 #~ msgid "Auto-vacuum Shopfloor Logs"
 #~ msgstr "Eliminación Automática de Registros del Taller"
