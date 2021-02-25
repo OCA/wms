@@ -21,6 +21,18 @@ class ActionsDataCase(ActionsDataCaseBase):
         }
         self.assertDictEqual(data, expected)
 
+    def test_data_location_no_barcode(self):
+        location = self.stock_location
+        location.sudo().barcode = None
+        data = self.data.location(location)
+        self.assert_schema(self.schema.location(), data)
+        expected = {
+            "id": location.id,
+            "name": location.name,
+            "barcode": location.name,
+        }
+        self.assertDictEqual(data, expected)
+
     def test_data_lot(self):
         lot = self.env["stock.production.lot"].create(
             {
