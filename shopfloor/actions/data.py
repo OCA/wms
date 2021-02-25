@@ -20,7 +20,12 @@ class DataAction(Component):
 
     @property
     def _location_parser(self):
-        return ["id", "name", "barcode"]
+        return [
+            "id",
+            "name",
+            # Fallback to name if barcode is not valued.
+            ("barcode", lambda rec, fname: rec[fname] if rec[fname] else rec.name),
+        ]
 
     @ensure_model("stock.picking")
     def picking(self, record, **kw):
