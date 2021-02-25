@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-02-14 18:45+0000\n"
+"PO-Revision-Date: 2021-02-25 06:45+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -595,12 +595,12 @@ msgstr "Código del Vendedor"
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__warn_notification
 msgid "Warn Notification"
-msgstr ""
+msgstr "Notificación de Alerta"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__warn_notification_html
 msgid "Warn Notification Html"
-msgstr ""
+msgstr "Html de la Notificación de Alerta"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
