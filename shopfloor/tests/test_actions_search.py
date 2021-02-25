@@ -18,6 +18,7 @@ class TestSearchCase(TestSearchBaseCase):
         rec = self.customer_location
         handler = self.search.location_from_scan
         self.assertEqual(handler(rec.barcode), rec)
+        self.assertEqual(handler(rec.name), rec)
         self.assertEqual(handler(False), rec.browse())
         self.assertEqual(handler("NONE"), rec.browse())
 
