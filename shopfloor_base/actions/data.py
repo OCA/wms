@@ -37,4 +37,4 @@ class DataAction(Component):
 
     @property
     def _partner_parser(self):
-        return self._simple_record_parser()
+        return ["id", "display_name:name"]
