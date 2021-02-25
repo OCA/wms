@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-02-16 21:45+0000\n"
+"PO-Revision-Date: 2021-02-25 06:45+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -308,7 +308,7 @@ msgstr "Transferencia de Contenido de Ubicación"
 #. module: shopfloor
 #: model:shopfloor.scenario,name:shopfloor.scenario_location_content_transfer
 msgid "Location content transfer"
-msgstr ""
+msgstr "Transferencia de contenido de ubicación"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -871,7 +871,7 @@ msgstr "Peso del taller (kg)"
 #. module: shopfloor
 #: model:shopfloor.scenario,name:shopfloor.scenario_single_pack_transfer
 msgid "Single Pack Transfer"
-msgstr ""
+msgstr "Transferencia de Paquete Individual"
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_single_pallet_transfer
