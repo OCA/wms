@@ -25,6 +25,7 @@
         "views/menus.xml",
     ],
     "demo": [
+        "demo/res_users_demo.xml",
         "demo/auth_api_key_demo.xml",
         "demo/shopfloor_scenario_demo.xml",
         "demo/shopfloor_menu_demo.xml",
