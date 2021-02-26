@@ -174,7 +174,7 @@ class TestReceptionScreen(SavepointCase):
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "select_packaging")
         self.screen.package_storage_type_id = self.storage_type_pallet
-        self.screen.package_height = 20
+        self.screen.package_height = 20  # Received more than expected, 20 instead of 10
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_location")
         self.screen.current_move_line_location_dest_stored_id = self.location_dest

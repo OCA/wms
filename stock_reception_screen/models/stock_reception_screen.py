@@ -1,7 +1,12 @@
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
-from odoo import _, api, exceptions, fields, models
+from odoo import _, api, exceptions, fields, models, tools
+
+
+def gt(value1, value2, digits):
+    """Return True if value1 is greater than value2"""
+    return tools.float_compare(value1, value2, precision_digits=digits) == 1
 
 
 class StockReceptionScreen(models.Model):
@@ -490,12 +495,19 @@ class StockReceptionScreen(models.Model):
             self.process_select_move()
 
     def _validate_current_move(self):
-        """Split the current move with the move line qty done and
-        validate it.
-        It is performed right after the processing of the current move (so
-        before checking the next move to process).
-        """
+        """Split the current move with the move line qty done and validate it."""
         if self.current_move_line_id and self.current_move_id:
+            remaining_qty = (
+                self.current_move_id.product_uom_qty
+                - self.current_move_line_id.qty_done
+            )
+            # We don't want to create a new move with a negative qty if we
+            # receive more than expected.
+            digits = self.env["decimal.precision"].precision_get(
+                "Product Unit of Measure"
+            )
+            if gt(remaining_qty, 0, digits=digits):
+                self.current_move_id._split(remaining_qty)
             moves_todo = self.picking_id.move_lines.filtered(
                 lambda m: m.state not in ["done", "cancel"]
             )
@@ -520,7 +532,6 @@ class StockReceptionScreen(models.Model):
         """Check if there is remaining moves to process for the
         selected product.
         """
-        # self._validate_current_move()
         if not self.current_filter_product:
             return False
         moves_to_process_ok = any(
