@@ -365,13 +365,14 @@ class StockLocation(models.Model):
             ("id", "in", compatible_location_storage_types.ids),
             ("package_storage_type_ids", "=", package_storage_type.id),
         ]
-        if quants.package_id.height:
+        height = quants and max(quants.mapped("package_id.height") or [False])
+        if height:
             pertinent_loc_storagetype_domain += [
                 "|",
                 ("max_height", "=", 0),
-                ("max_height", ">=", quants.package_id.height),
+                ("max_height", ">=", height),
             ]
-        package_weight = quants.package_id.pack_weight
+        package_weight = quants and max(quants.mapped("package_id.pack_weight") or [False])
         if package_weight:
             pertinent_loc_storagetype_domain += [
                 "|",
