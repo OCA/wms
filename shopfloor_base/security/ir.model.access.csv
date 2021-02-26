@@ -1,0 +1,7 @@
+"id","name","model_id/id","group_id/id","perm_read","perm_write","perm_create","perm_unlink"
+"access_shopfloor_menu_users","shopfloor menu","model_shopfloor_menu","shopfloor_base.group_shopfloor_user",1,0,0,0
+"access_shopfloor_menu_manager","shopfloor menu manager","model_shopfloor_menu","shopfloor_base.group_shopfloor_manager",1,1,1,1
+"access_shopfloor_profile_users","shopfloor profile","model_shopfloor_profile","shopfloor_base.group_shopfloor_user",1,0,0,0
+"access_shopfloor_profile_manager","shopfloor profile manager","model_shopfloor_profile","shopfloor_base.group_shopfloor_manager",1,1,1,1
+"access_shopfloor_scenario_users","shopfloor scenario","model_shopfloor_scenario","shopfloor_base.group_shopfloor_user",1,0,0,0
+"access_shopfloor_scenario_manager","shopfloor scenario manager","model_shopfloor_scenario","shopfloor_base.group_shopfloor_manager",1,1,1,1

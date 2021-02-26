@@ -3,7 +3,7 @@
     <menuitem
         action="action_shopfloor_packing_info"
         id="menu_action_shopfloor_packing_info"
-        parent="shopfloor.menu_shopfloor_settings"
+        parent="shopfloor_base.menu_shopfloor_root"
         sequence="25"
     />
 </odoo>

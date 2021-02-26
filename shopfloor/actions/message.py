@@ -6,18 +6,7 @@ from odoo.addons.component.core import Component
 
 
 class MessageAction(Component):
-    """Provide message templates
-
-    The methods should be used in Service Components, in order to share as much
-    as possible the messages for similar events.
-
-    Before adding a message, please look if no message already exists,
-    and consider making an existing message more generic.
-    """
-
-    _name = "shopfloor.message.action"
-    _inherit = "shopfloor.process.action"
-    _usage = "message"
+    _inherit = "shopfloor.message.action"
 
     def no_picking_type(self):
         return {
@@ -505,4 +494,12 @@ class MessageAction(Component):
         return {
             "message_type": "info",
             "body": _("Package has been opened. You can move partial quantities."),
+        }
+
+    def packaging_invalid_for_carrier(self, packaging, carrier):
+        return {
+            "message_type": "error",
+            "body": _("Packaging {} does not match carrier {}.").format(
+                packaging.name, carrier.name
+            ),
         }

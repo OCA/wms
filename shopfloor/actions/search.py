@@ -14,6 +14,8 @@ class SearchAction(Component):
     _inherit = "shopfloor.process.action"
     _usage = "search"
 
+    # TODO: these methods shall be probably replaced by scan anything handlers
+
     def location_from_scan(self, barcode):
         if not barcode:
             return self.env["stock.location"].browse()

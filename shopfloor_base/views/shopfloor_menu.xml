@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shopfloor_menu_tree_view" model="ir.ui.view">
+        <field name="name">shopfloor menu tree</field>
+        <field name="model">shopfloor.menu</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="scenario_id" widget="selection" />
+                <field name="profile_id" options="{'no_create': 1}" />
+            </tree>
+        </field>
+    </record>
+    <record id="shopfloor_menu_form_view" model="ir.ui.view">
+        <field name="name">shopfloor menu form</field>
+        <field name="model">shopfloor.menu</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}"
+                    />
+                    <label for="name" class="oe_edit_only" />
+                    <h1>
+                        <field name="name" />
+                    </h1>
+                    <group name="main">
+                        <field name="active" invisible="1" />
+                        <field name="scenario_id" widget="selection" />
+                        <field name="scenario" invisible="1" />
+                        <field name="profile_id" options="{'no_create': 1}" />
+                    </group>
+                    <group name="options" string="Menu Options">
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="shopfloor_menu_search_view" model="ir.ui.view">
+        <field name="name">shopfloor menu search</field>
+        <field name="model">shopfloor.menu</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="scenario_id" />
+                <field name="profile_id" />
+                <separator />
+                <filter
+                    string="Archived"
+                    name="inactive"
+                    domain="[('active', '=', False)]"
+                />
+                <group expand="0" string="Group By">
+                    <filter
+                        string="Profile"
+                        name="groupby_profile_id"
+                        domain="[]"
+                        context="{'group_by': 'profile_id'}"
+                    />
+                    <filter
+                        string="Scenario"
+                        name="groupby_scenario"
+                        domain="[]"
+                        context="{'group_by': 'scenario_id'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_shopfloor_menu" model="ir.actions.act_window">
+        <field name="name">Menus</field>
+        <field name="res_model">shopfloor.menu</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

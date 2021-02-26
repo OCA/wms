@@ -1,0 +1,15 @@
+# Do NOT update manually; changes here will be overwritten by Copier
+_commit: v1.1.3
+_src_path: https://github.com/OCA/oca-addons-repo-template.git
+dependency_installation_mode: PIP
+generate_requirements_txt: true
+include_wkhtmltopdf: false
+odoo_version: 13.0
+rebel_module_groups: []
+repo_description: Warehouse Management System for advance logistic with Odoo
+repo_name: WMS
+repo_slug: wms
+travis_apt_packages:
+  - cups
+  - libcups2-dev
+travis_apt_sources: []

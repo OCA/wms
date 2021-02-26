@@ -8,7 +8,7 @@ from odoo import _
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
-from .service import to_float
+from ..utils import to_float
 
 
 class Checkout(Component):
@@ -77,7 +77,7 @@ class Checkout(Component):
                 "picking": self.data.picking(picking),
                 "packing_info": self._data_for_packing_info(picking),
                 "no_package_enabled": not self.options.get(
-                    "checkout:disable_no_package"
+                    "checkout__disable_no_package"
                 ),
             },
             message=message,
@@ -159,7 +159,7 @@ class Checkout(Component):
         * summary: stock.picking is selected and all its lines have a
           destination pack set
         """
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         picking = search.picking_from_scan(barcode)
         if not picking:
             location = search.location_from_scan(barcode)
@@ -336,7 +336,7 @@ class Checkout(Component):
         if message:
             return self._response_for_select_document(message=message)
 
-        search = self.actions_for("search")
+        search = self._actions_for("search")
 
         selection_lines = self._lines_to_pack(picking)
         if not selection_lines:
@@ -710,7 +710,7 @@ class Checkout(Component):
         message = self._check_picking_status(picking)
         if message:
             return self._response_for_select_document(message=message)
-        search = self.actions_for("search")
+        search = self._actions_for("search")
 
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
 
@@ -734,8 +734,19 @@ class Checkout(Component):
         if package:
             return self._put_lines_in_package(picking, selected_lines, package)
 
+        # Scan delivery packaging
         packaging = search.generic_packaging_from_scan(barcode)
         if packaging:
+            carrier = picking.carrier_id
+            # Validate against carrier
+            if carrier and not self._packaging_good_for_carrier(packaging, carrier):
+                return self._response_for_select_package(
+                    picking,
+                    selected_lines,
+                    message=self.msg_store.packaging_invalid_for_carrier(
+                        packaging, carrier
+                    ),
+                )
             return self._create_and_assign_new_packaging(
                 picking, selected_lines, packaging
             )
@@ -743,6 +754,9 @@ class Checkout(Component):
         return self._response_for_select_package(
             picking, selected_lines, message=self.msg_store.barcode_not_found()
         )
+
+    def _packaging_good_for_carrier(self, packaging, carrier):
+        return packaging.package_carrier_type in ("none", carrier.delivery_type)
 
     def new_package(self, picking_id, selected_line_ids):
         """Add all selected lines in a new package
@@ -774,7 +788,7 @@ class Checkout(Component):
         Transitions:
         * select_line: goes back to selection of lines to work on next lines
         """
-        if self.options.get("checkout:disable_no_package"):
+        if self.options.get("checkout__disable_no_package"):
             raise BadRequest("`checkout.no_package` endpoint is not enabled")
         picking = self.env["stock.picking"].browse(picking_id)
         message = self._check_picking_status(picking)
@@ -845,7 +859,7 @@ class Checkout(Component):
         if message:
             return self._response_for_select_document(message=message)
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         package = search.package_from_scan(barcode)
         return self._set_dest_package_from_selection(picking, lines, package)
 

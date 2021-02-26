@@ -47,6 +47,12 @@ const Checkout = {
                 </div>
             </div>
             <div v-if="state_is('select_line')">
+                <item-detail-card
+                    v-if="state.data.picking.carrier"
+                    :key="make_state_component_key(['picking-carrier', state.data.picking.id])"
+                    :record="state.data.picking.carrier"
+                    :options="{main: true, key_title: 'name', title_icon: 'mdi-truck-outline'}"
+                    />
                 <detail-picking-select
                     :record="state.data.picking"
                     :select_records="state.data.picking.move_lines"
@@ -67,6 +73,12 @@ const Checkout = {
                 <v-alert type="info" tile v-if="state.data.packing_info" class="packing-info">
                     <p v-text="state.data.packing_info" />
                 </v-alert>
+                <item-detail-card
+                    v-if="state.data.picking.carrier"
+                    :key="make_state_component_key(['picking-carrier', state.data.picking.id])"
+                    :record="state.data.picking.carrier"
+                    :options="{main: true, key_title: 'name', title_icon: 'mdi-truck-outline'}"
+                    />
                 <detail-picking-select
                     :record="state.data.picking"
                     :select_records="state.data.selected_move_lines"
@@ -233,6 +245,7 @@ const Checkout = {
                     fields: [
                         {path: "partner.name"},
                         {path: "origin"},
+                        {path: "carrier.name", label: "Carrier"},
                         {path: "move_line_count", label: "Lines"},
                     ],
                 },
