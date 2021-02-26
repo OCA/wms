@@ -170,6 +170,14 @@ class BaseShopfloorService(AbstractComponent):
         return self._actions_for("data_detail")
 
     @property
+    def schema(self):
+        return self._actions_for("schema")
+
+    @property
+    def schema_detail(self):
+        return self._actions_for("schema_detail")
+
+    @property
     def msg_store(self):
         return self._actions_for("message")
 
