@@ -1,6 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
-# from odoo import _
+from odoo import _
 
 from odoo.addons.component.core import Component
 
@@ -18,6 +18,12 @@ class MessageAction(Component):
     _name = "shopfloor.message.action"
     _inherit = "shopfloor.process.action"
     _usage = "message"
+
+    def generic_record_not_found(self):
+        return {
+            "message_type": "error",
+            "body": _("Record not found."),
+        }
 
     # TODO: we should probably have `shopfloor.message` records
     # and here we can simply lookup for a message using its identifier
