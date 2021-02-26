@@ -4,8 +4,8 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {translation_registry} from "/shopfloor_mobile/assets/src/services/translation_registry.js";
-import {process_registry} from "/shopfloor_mobile/assets/src/services/process_registry.js";
+import {translation_registry} from "/shopfloor_mobile_base/static/wms/src/services/translation_registry.js";
+import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
 
 // Clone the original component
 const DemoCheckout = process_registry.extend("checkout", {

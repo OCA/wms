@@ -1,0 +1,8 @@
+<odoo>
+    <record id="shopfloor_menu_partners_demo" model="shopfloor.menu">
+        <field name="name">Manage partners</field>
+        <field name="sequence">20</field>
+        <field name="profile_id" ref="shopfloor_profile_partner_manager_demo" />
+        <field name="scenario_id" ref="shopfloor_scenario_partners_demo" />
+    </record>
+</odoo>
