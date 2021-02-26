@@ -1,1 +1,1 @@
-Example on how to override the frontend for Shopfloor app.
+Example on how to create your own scenario.
