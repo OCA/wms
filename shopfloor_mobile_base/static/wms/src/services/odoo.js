@@ -19,6 +19,20 @@ export class OdooMixin {
         const endpoint = fullpath ? path : this.usage + "/" + path;
         return this._call(endpoint, method, data);
     }
+    post(path, data, fullpath = false) {
+        if (_.isArray(path)) {
+            path = path.join("/");
+        }
+        const endpoint = fullpath ? path : this.usage + "/" + path;
+        return this._call(endpoint, "POST", data);
+    }
+    get(path, data, fullpath = false) {
+        if (_.isArray(path)) {
+            path = path.join("/");
+        }
+        const endpoint = fullpath ? path : this.usage + "/" + path;
+        return this._call(endpoint, "GET", data);
+    }
     _call(endpoint, method, data) {
         if (this.debug) {
             console.log("CALL", endpoint);
