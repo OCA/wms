@@ -18,7 +18,11 @@
         "views/res_config_settings.xml",
         "wizards/stock_release_views.xml",
     ],
+<<<<<<< HEAD
     "installable": False,
+=======
+    "installable": True,
+>>>>>>> Change license of stock_available_to_promise_release to LGPL-3
     "license": "LGPL-3",
     "application": False,
     "development_status": "Alpha",
