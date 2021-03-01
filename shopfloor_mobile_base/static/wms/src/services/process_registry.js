@@ -19,6 +19,7 @@ class ProcessRegistry extends BaseRegistry {
     constructor() {
         super();
         this._make_route_path_pattern = "/${ key }/:menu_id/:state?";
+        this._profileRequired = true;
     }
 }
 export var process_registry = new ProcessRegistry();

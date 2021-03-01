@@ -126,6 +126,9 @@ const ScanAnything = {
 
 process_registry.add("scan_anything", ScanAnything, {
     path: "/scan_anything/:identifier?",
+    meta: {
+        profileRequired: false,
+    },
 });
 
 export default ScanAnything;
