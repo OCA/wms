@@ -57,12 +57,8 @@ Vue.component("Screen", {
         show_profile_not_ready() {
             return (
                 this.$root.authenticated &&
-                !this.$root.has_profile &&
-                // TODO: Routes should have a metadata flag `profile_required` ?
-                // to replace the following check.
-                this.$route.name != "profile" &&
-                this.$route.name != "settings" &&
-                this.$route.name != "workstation"
+                this.$route.meta.requiresProfile &&
+                !this.$root.has_profile
             );
         },
     },
