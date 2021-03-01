@@ -13,9 +13,14 @@ import {page_registry} from "./services/page_registry.js";
 
 // TODO: handle routes via registry
 let routes = [
-    {path: "/", component: HomePage, name: "home"},
+    {path: "/", component: HomePage, name: "home", meta: {requiresAuth: true}},
     {path: "/login", component: LoginPage, name: "login"},
-    {path: "/settings", component: SettingsControlPanel, name: "settings"},
+    {
+        path: "/settings",
+        component: SettingsControlPanel,
+        name: "settings",
+        meta: {requiresAuth: true},
+    },
     // TODO Fix this it needs to be the last route, but I think it is not anymore with the dynamic one added.
     // { path: '*', component: NotFound },
 ];
@@ -23,11 +28,17 @@ let routes = [
 const register_routes = function(route_records) {
     let registered = [];
     _.forEach(route_records, function(process, key) {
-        routes.push({
+        let route = {
             name: process.key,
-            path: process.path,
             component: process.component,
-        });
+            path: process.route.path,
+            meta: process.route.meta || {},
+        };
+        if (_.isUndefined(route.meta.requiresAuth)) {
+            // By default, unless explicitly specified, require auth
+            route.meta.requiresAuth = true;
+        }
+        routes.push(route);
         registered.push(key);
     });
     if (registered.length)
@@ -42,7 +53,7 @@ const router = new VueRouter({
 });
 router.beforeEach(async (to, from, next) => {
     await Vue.nextTick();
-    if (!router.app.authenticated && to.name != "login" && !router.app.demo_mode) {
+    if (!router.app.authenticated && to.meta.requiresAuth && !router.app.demo_mode) {
         next("login");
     }
     if (router.app.global_state_key && to.name != from.name) {
