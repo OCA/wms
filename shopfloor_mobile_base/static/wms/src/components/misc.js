@@ -300,7 +300,7 @@ Vue.component("btn-reset-config", {
     methods: {
         reset_data: function() {
             this.$root._clearConfig();
-            this.$root._loadMenu();
+            this.$root.loadMenu(true);
             this.$root.$router.push(this.$props.redirect);
         },
     },

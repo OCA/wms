@@ -226,7 +226,7 @@ const app = new Vue({
             this._clearConfig(false);
         },
         loadMenu: function(force) {
-            if (this.appmenu && !force) {
+            if ((this.appmenu && !force) || !this.has_profile) {
                 return this.appmenu;
             }
             this._loadMenu();
