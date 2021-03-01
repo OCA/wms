@@ -258,6 +258,9 @@ const app = new Vue({
                 document.getElementsByTagName("head")[0].appendChild(script);
             }
         },
+        getNav: function() {
+            return _.result(this, "appmenu.menus", []);
+        },
         /*
         Trigger and event on the event hub.
         If a state is available, prefix event name w/ it.
