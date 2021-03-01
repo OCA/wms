@@ -36,7 +36,7 @@ Vue.component("Screen", {
             return screen_info;
         },
         navigation() {
-            return this.$root.appmenu.menus;
+            return this.$root.getNav();
         },
         screen_app_class() {
             return [
