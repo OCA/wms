@@ -13,7 +13,12 @@ import {page_registry} from "./services/page_registry.js";
 
 // TODO: handle routes via registry
 let routes = [
-    {path: "/", component: HomePage, name: "home", meta: {requiresAuth: true}},
+    {
+        path: "/",
+        component: HomePage,
+        name: "home",
+        meta: {requiresAuth: true, requiresProfile: true},
+    },
     {path: "/login", component: LoginPage, name: "login"},
     {
         path: "/settings",

@@ -11,6 +11,7 @@ export class BaseRegistry {
     constructor() {
         this._data = {};
         this._make_route_path_pattern = null;
+        this._profileRequired = false;
     }
     /**
      * Retrieve and existing process
@@ -38,6 +39,9 @@ export class BaseRegistry {
         const _route = route || {};
         _.defaults(_route, {
             path: _route.path || this.make_route_path(key),
+            meta: {
+                requiresProfile: this._profileRequired,
+            },
         });
         this._data[key] = {
             key: key,
