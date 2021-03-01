@@ -57,15 +57,22 @@ export var Profile = {
     },
 };
 
-page_registry.add("profile", Profile, {
-    tag: "settings",
-    icon: "mdi-account-cog",
-    display_name: function(instance, rec) {
-        const profile_name = instance.$root.has_profile
-            ? instance.$root.profile.name
-            : "?";
-        return [instance.$t("screen.settings.profile.name"), profile_name].join(" - ");
-    },
-});
+page_registry.add(
+    "profile",
+    Profile,
+    {},
+    {
+        tag: "settings",
+        icon: "mdi-account-cog",
+        display_name: function(instance, rec) {
+            const profile_name = instance.$root.has_profile
+                ? instance.$root.profile.name
+                : "?";
+            return [instance.$t("screen.settings.profile.name"), profile_name].join(
+                " - "
+            );
+        },
+    }
+);
 
 export default Profile;
