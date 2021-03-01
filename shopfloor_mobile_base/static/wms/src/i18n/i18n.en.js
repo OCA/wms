@@ -44,6 +44,7 @@ const messages_en = {
                 title: "Select profile",
                 profile_updated: "Profile updated",
             },
+            // TODO: move to it's own module all workstation stuff
             workstation: {
                 name: "Workstation",
                 title: "Select workstation",
