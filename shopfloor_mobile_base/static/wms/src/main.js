@@ -9,6 +9,7 @@
 import {router} from "./router.js";
 import {i18n} from "./i18n.js";
 import {GlobalMixin} from "./mixin.js";
+import {config_registry} from "./services/config_registry.js";
 import {process_registry} from "./services/process_registry.js";
 import {page_registry} from "./services/page_registry.js";
 import {color_registry} from "./services/color_registry.js";
@@ -43,6 +44,10 @@ const register_app_components = function(components) {
 register_app_components(process_registry.all());
 register_app_components(page_registry.all());
 
+config_registry.add("apikey", {default: "", reset_on_clear: true});
+config_registry.add("profile", {default: {}, reset_on_clear: true});
+config_registry.add("appmenu", {default: [], reset_on_clear: true});
+
 const app = new Vue({
     i18n,
     router: router,
@@ -53,20 +58,20 @@ const app = new Vue({
     }),
     components: APP_COMPONENTS,
     data: function() {
-        return {
+        let data = {
             demo_mode: false,
             global_state_key: "",
             // collect global events
             event_hub: EventHub,
-            current_profile: {},
-            current_workstation: {},
-            profile_menu: null,
-            current_apikey: null,
             loading: false,
             appconfig: null,
             authenticated: false,
-            registry: process_registry,
         };
+        _.merge(data, config_registry.generare_data_keys());
+        return data;
+    },
+    beforeCreate: function() {
+        config_registry._set_root(this);
     },
     created: function() {
         const self = this;
@@ -92,6 +97,7 @@ const app = new Vue({
         });
     },
     computed: {
+        ...config_registry.generate_computed_properties(),
         app_info: function() {
             return shopfloor_app_info;
         },
@@ -116,18 +122,11 @@ const app = new Vue({
         has_profile: function() {
             return !_.isEmpty(this.profile);
         },
-        // TODO: we can add an handler for this and avoid duplicate code
-        profile: {
-            get: function() {
-                if (_.isEmpty(this.current_profile)) {
-                    this.current_profile = this.$storage.get("profile");
-                }
-                return this.current_profile;
-            },
-            set: function(v) {
-                this.current_profile = v;
-                this.$storage.set("profile", v);
-            },
+        profiles: function() {
+            return this.appconfig ? this.appconfig.profiles || [] : [];
+        },
+        user: function() {
+            return this.appconfig ? this.appconfig.user_info || {} : {};
         },
         workstation: {
             get: function() {
@@ -139,36 +138,6 @@ const app = new Vue({
             set: function(v) {
                 this.current_workstation = v;
                 this.$storage.set("workstation", v);
-            },
-        },
-        profiles: function() {
-            return this.appconfig ? this.appconfig.profiles || [] : [];
-        },
-        user: function() {
-            return this.appconfig ? this.appconfig.user_info || {} : {};
-        },
-        appmenu: {
-            get: function() {
-                if (_.isEmpty(this.profile_menu)) {
-                    this.profile_menu = this.$storage.get("menu");
-                }
-                return this.profile_menu || [];
-            },
-            set: function(v) {
-                this.profile_menu = v;
-                this.$storage.set("menu", v);
-            },
-        },
-        apikey: {
-            get: function() {
-                if (!this.current_apikey) {
-                    this.current_apikey = this.$storage.get("apikey");
-                }
-                return this.current_apikey;
-            },
-            set: function(v) {
-                this.current_apikey = v;
-                this.$storage.set("apikey", v);
             },
         },
     },
@@ -220,9 +189,7 @@ const app = new Vue({
             if (reload) return this._loadConfig();
         },
         _clearAppData: function() {
-            this.apikey = "";
-            this.appmenu = [];
-            this.profile = null;
+            config_registry.reset_on_clear();
             this._clearConfig(false);
         },
         loadMenu: function(force) {
