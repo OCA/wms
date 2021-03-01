@@ -71,17 +71,23 @@ var Workstation = {
     },
 };
 
-page_registry.add("workstation", Workstation, {
-    tag: "settings",
-    icon: "mdi-printer",
-    display_name: function(instance, rec) {
-        const workstation_name = instance.$root.workstation
-            ? instance.$root.workstation.name
-            : "?";
-        return [instance.$t("screen.settings.workstation.name"), workstation_name].join(
-            " - "
-        );
-    },
-});
+page_registry.add(
+    "workstation",
+    Workstation,
+    {},
+    {
+        tag: "settings",
+        icon: "mdi-printer",
+        display_name: function(instance, rec) {
+            const workstation_name = instance.$root.workstation
+                ? instance.$root.workstation.name
+                : "?";
+            return [
+                instance.$t("screen.settings.workstation.name"),
+                workstation_name,
+            ].join(" - ");
+        },
+    }
+);
 
 export default Workstation;
