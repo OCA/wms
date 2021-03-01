@@ -48,7 +48,7 @@ export var LoginPage = Vue.component("login-page", {
                 });
         },
         _handle_invalid_key() {
-            this.error = this.$("screen.login.error.api_key_invalid");
+            this.error = this.$t("screen.login.error.api_key_invalid");
             this.$root.apikey = "";
         },
     },
