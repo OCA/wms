@@ -174,15 +174,9 @@ Vue.component("Screen", {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn @click="$router.push({'name': 'profile'})">
-                                <v-icon>mdi-account-cog</v-icon>
+                            <v-btn @click="$router.push({'name': 'settings'})">
+                                <v-icon>mdi-cog</v-icon>
                                 <span>{{ $t('app.profile_configure') }}</span>
-                            </v-btn>
-                        </v-col>
-                        <v-col class="text-center" cols="12">
-                            <v-btn @click="$router.push({'name': 'workstation'})">
-                                <v-icon>mdi-account-cog-outline</v-icon>
-                                <span>{{ $t('app.workstation_scan') }}</span>
                             </v-btn>
                         </v-col>
                     </v-row>
