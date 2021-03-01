@@ -34,15 +34,20 @@ export var Language = {
     },
 };
 
-page_registry.add("language", Language, {
-    tag: "settings",
-    icon: "mdi-flag",
-    display_name: function(instance, rec) {
-        return [
-            instance.$t("screen.settings.language.name"),
-            instance.active_language,
-        ].join(" - ");
-    },
-});
+page_registry.add(
+    "language",
+    Language,
+    {},
+    {
+        tag: "settings",
+        icon: "mdi-flag",
+        display_name: function(instance, rec) {
+            return [
+                instance.$t("screen.settings.language.name"),
+                instance.active_language,
+            ].join(" - ");
+        },
+    }
+);
 
 export default Language;
