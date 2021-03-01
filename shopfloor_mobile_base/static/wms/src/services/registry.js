@@ -10,7 +10,7 @@ export class BaseRegistry {
      */
     constructor() {
         this._data = {};
-        this._make_path_pattern = null;
+        this._make_route_path_pattern = null;
     }
     /**
      * Retrieve and existing process
@@ -30,16 +30,20 @@ export class BaseRegistry {
      * Eg: `path` is used to override automatic computation of the route path.
      * @param {*} override : bypass validation for existing process.
      */
-    add(key, component, metadata, override = false) {
+    add(key, component, route, metadata, override = false) {
         if (!_.isEmpty(this._data[key]) && !override) {
             throw "Component already existing: " + key;
         }
         const meta = metadata || {};
+        const _route = route || {};
+        _.defaults(_route, {
+            path: _route.path || this.make_route_path(key),
+        });
         this._data[key] = {
             key: key,
             component: component,
             metadata: meta,
-            path: meta.path || this.make_path(key),
+            route: _route,
         };
         return this._data[key];
     }
@@ -100,7 +104,7 @@ export class BaseRegistry {
      *
      * @param {*} key : process's key.
      */
-    make_path(key) {
-        return _.template(this._make_path_pattern || "/${ key }")({key: key});
+    make_route_path(key) {
+        return _.template(this._make_route_path_pattern || "/${ key }")({key: key});
     }
 }

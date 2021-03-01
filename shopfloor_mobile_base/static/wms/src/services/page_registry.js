@@ -15,8 +15,8 @@ class PageRegistry extends BaseRegistry {
         super(arguments);
     }
 
-    add(key, component, metadata, override = false) {
-        const rec = super.add(key, component, metadata, override);
+    add(key, component, route, metadata, override = false) {
+        const rec = super.add(key, component, route, metadata, override);
         if (!_.result(rec, "metadata.tag")) {
             throw "`tag` is required for pages!";
         }
