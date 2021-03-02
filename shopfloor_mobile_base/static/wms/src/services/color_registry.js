@@ -3,6 +3,7 @@
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
+import {utils_registry} from "./utils_registry.js";
 
 export class ColorRegistry {
     constructor(theme, _default = "light") {
@@ -30,6 +31,8 @@ export class ColorRegistry {
 }
 
 export var color_registry = new ColorRegistry();
+
+utils_registry.add("colors", color_registry);
 
 color_registry.add_theme(
     {

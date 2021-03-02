@@ -4,8 +4,8 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {utils} from "./utils.js";
-import {color_registry} from "./services/color_registry.js";
+import {utils_registry} from "./services/utils_registry.js";
+
 export var GlobalMixin = {
     methods: {
         /*
@@ -25,10 +25,7 @@ export var GlobalMixin = {
         Provide utils to all components
         */
         utils: function() {
-            return {
-                misc: utils,
-                colors: color_registry,
-            };
+            return utils_registry.all();
         },
         available_languages() {
             return this.$root.available_languages;
