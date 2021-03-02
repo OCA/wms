@@ -19,6 +19,7 @@ import VueSuperMethod from "./lib/vue-super-call.js";
 Vue.prototype.$super = VueSuperMethod;
 
 // TODO: we need a local storage handler too, to store device/profile specific data
+// Maybe replace w/ https://github.com/ankurk91/vue-web-storage
 Vue.use(Vue2Storage, {
     prefix: "shopfloor_",
     driver: "session", // local|session|memory
