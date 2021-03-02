@@ -5,7 +5,7 @@
 {
     "name": "Shopfloor REST log",
     "summary": "Integrate rest_log into Shopfloor app",
-    "version": "13.0.1.0.0",
+    "version": "13.0.1.0.1",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
