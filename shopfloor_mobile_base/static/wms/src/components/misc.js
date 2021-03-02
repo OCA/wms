@@ -205,7 +205,7 @@ Vue.component("picking-list-item-progress-bar", {
     mixins: [ItemDetailMixin],
     computed: {
         value() {
-            return this.utils.misc.picking_completeness(this.record);
+            return this.utils.wms.picking_completeness(this.record);
         },
     },
     template: `
