@@ -17,6 +17,11 @@
                 rel="stylesheet"
             />
             <script
+                id="script_wms_utils"
+                t-attf-src="/shopfloor_mobile/static/wms/src/wms_utils.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
                 id="script_component_packaging_qty_picker"
                 t-attf-src="/shopfloor_mobile/static/wms/src/components/packaging-qty-picker.js?v=#{mod_version}"
                 type="module"
