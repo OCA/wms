@@ -7,6 +7,8 @@
  */
 
 import {page_registry} from "/shopfloor_mobile_base/static/wms/src/services/page_registry.js";
+import {config_registry} from "/shopfloor_mobile_base/static/wms/src/services/config_registry.js";
+import {translation_registry} from "/shopfloor_mobile_base/static/wms/src/services/translation_registry.js";
 
 var Workstation = {
     data: function () {
@@ -15,7 +17,7 @@ var Workstation = {
             workstation_scanned: false,
             scan_data: {},
             scan_message: {},
-            search_input_placeholder: "Scan workstation code",
+            search_input_placeholder: this.$t("screen.settings.workstation.scan"),
         };
     },
     template: `
@@ -71,6 +73,7 @@ var Workstation = {
     },
 };
 
+// Register settings page
 page_registry.add(
     "workstation",
     Workstation,
@@ -89,5 +92,30 @@ page_registry.add(
         },
     }
 );
+
+// Register global config property
+config_registry.add("workstation", {default: {}, reset_on_clear: true});
+
+// Add new translations
+translation_registry.add("en-US.screen.settings.workstation", {
+    name: "Workstation",
+    title: "Select workstation",
+    updated: "Workstation updated",
+    scan: "Scan workstation",
+});
+translation_registry.add("fr-FR.screen.settings.workstation", {
+    name: "Station de travail",
+    title: "Choisissez une station de travail",
+    updated: "Station de travail mise à jour",
+    scan: "Scan station de travail",
+});
+// TODO
+// translation_registry.add(
+//     "de-DE.screen.settings.workstation", {
+//         name: "Station de travail",
+//         title: "Choisissez une station de travail",
+//         updated: "Station de travail mise à jour",
+//     },
+// );
 
 export default Workstation;
