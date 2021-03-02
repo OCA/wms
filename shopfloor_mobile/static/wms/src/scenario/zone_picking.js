@@ -67,7 +67,7 @@ const template_mobile = `
                 <template v-slot:item.quantity="{ item }">
                     <packaging-qty-picker-display
                         :key="make_state_component_key(['qty-picker-widget', item['_origin'].id])"
-                        :options="utils.misc.move_line_qty_picker_options(item['_origin'])"
+                        :options="utils.wms.move_line_qty_picker_options(item['_origin'])"
                         />
                 </template>
                 <template v-slot:item.priority="{ item }">
@@ -118,7 +118,7 @@ const template_mobile = `
             v-if="state_in(['set_line_destination', 'stock_issue', 'change_pack_lot'])"
             :key="make_state_component_key(['detail-move-line-product', state.data.move_line.id])"
             :record="state.data.move_line"
-            :options="utils.misc.move_line_product_detail_options(state.data.move_line, {fields: [{path: 'picking.name', label: 'Picking'}]})"
+            :options="utils.wms.move_line_product_detail_options(state.data.move_line, {fields: [{path: 'picking.name', label: 'Picking'}]})"
             :card_color="utils.colors.color_for(state_in(['set_line_destination']) ? 'screen_step_done': 'screen_step_todo')"
             />
         <item-detail-card
@@ -132,7 +132,7 @@ const template_mobile = `
                 class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
             <packaging-qty-picker
                 :key="make_state_component_key(['packaging-qty-picker', state.data.move_line.id])"
-                :options="utils.misc.move_line_qty_picker_options(state.data.move_line)"
+                :options="utils.wms.move_line_qty_picker_options(state.data.move_line)"
                 />
         </v-card>
         <item-detail-card
@@ -407,16 +407,16 @@ const ZonePicking = {
                     path: "quantity",
                     label: "Qty",
                     render_component: "packaging-qty-picker-display",
-                    render_options: function (record) {
-                        return self.utils.misc.move_line_qty_picker_options(record);
+                    render_options: function(record) {
+                        return self.utils.wms.move_line_qty_picker_options(record);
                     },
                 },
                 {path: "package_src.weight", label: "Weight"},
                 {
                     path: "picking.scheduled_date",
                     label: "Date",
-                    renderer: function (rec, field) {
-                        return self.utils.misc.render_field_date(rec, field);
+                    renderer: function(rec, field) {
+                        return self.utils.display.render_field_date(rec, field);
                     },
                 },
                 {
@@ -439,7 +439,7 @@ const ZonePicking = {
             return fields;
         },
         select_line_move_line_records_grouped(move_lines) {
-            return this.utils.misc.group_lines_by_location(move_lines, {});
+            return this.utils.wms.group_lines_by_location(move_lines, {});
         },
         toggle_sort_lines_by() {
             this.order_lines_by =
@@ -462,11 +462,11 @@ const ZonePicking = {
         },
         picking_summary_records_grouped(move_lines) {
             const self = this;
-            return this.utils.misc.group_lines_by_location(move_lines, {
+            return this.utils.wms.group_lines_by_location(move_lines, {
                 group_key: "location_dest",
                 // group_no_title: true,
                 prepare_records: _.partialRight(
-                    this.utils.misc.group_by_pack,
+                    this.utils.wms.group_by_pack,
                     "package_dest"
                 ),
                 group_color_maker: function (lines) {
@@ -482,7 +482,7 @@ const ZonePicking = {
                 list_item_options: {
                     actions: [],
                     fields: this.picking_summary_move_line_detail_fields(),
-                    list_item_klass_maker: this.utils.misc.move_line_color_klass,
+                    list_item_klass_maker: this.utils.wms.move_line_color_klass,
                 },
             };
         },

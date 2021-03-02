@@ -15,7 +15,7 @@ Vue.component("detail-location", {
                 card_klass: "loud-labels",
                 list_item_options: {
                     fields: this.product_list_fields(),
-                    list_item_klass_maker: this.utils.misc.move_line_color_klass,
+                    list_item_klass_maker: this.utils.wms.move_line_color_klass,
                 },
             };
         },

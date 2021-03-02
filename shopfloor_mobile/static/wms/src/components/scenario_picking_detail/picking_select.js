@@ -39,7 +39,7 @@ Vue.component("picking-select-line-content", {
     },
     methods: {
         no_pack_list_item_options(record) {
-            let opts = this.utils.misc.move_line_product_detail_options(record);
+            let opts = this.utils.wms.move_line_product_detail_options(record);
             opts.fields.unshift({
                 path: "product.display_name",
                 action_val_path: "product.barcode",

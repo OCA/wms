@@ -15,8 +15,8 @@ Vue.component("detail-transfer", {
                 {
                     path: "scheduled_date",
                     label: "Scheduled on",
-                    renderer: function (rec, field) {
-                        return self.utils.misc.render_field_date(rec, field);
+                    renderer: function(rec, field) {
+                        return self.utils.display.render_field_date(rec, field);
                     },
                 },
                 {
@@ -41,7 +41,7 @@ Vue.component("detail-transfer", {
                 key_title: "",
                 list_item_options: {
                     fields: this.line_list_fields(),
-                    list_item_klass_maker: this.utils.misc.move_line_color_klass,
+                    list_item_klass_maker: this.utils.wms.move_line_color_klass,
                 },
             };
         },
@@ -63,7 +63,7 @@ Vue.component("detail-transfer", {
             ];
         },
         grouped_lines() {
-            return this.utils.misc.group_lines_by_locations(this.record.move_lines);
+            return this.utils.wms.group_lines_by_locations(this.record.move_lines);
         },
     },
     template: `

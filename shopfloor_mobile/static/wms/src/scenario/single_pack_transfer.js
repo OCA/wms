@@ -71,7 +71,7 @@ const SinglePackTransfer = {
                 <item-detail-card
                     :key="make_state_component_key(['product', state.data.id])"
                     :record="state.data"
-                    :options="utils.misc.move_line_product_detail_options()"
+                    :options="utils.wms.move_line_product_detail_options()"
                     :card_color="utils.colors.color_for('screen_step_done')"
                     />
                 <item-detail-card
