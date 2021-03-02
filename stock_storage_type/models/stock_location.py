@@ -62,6 +62,7 @@ class StockLocation(models.Model):
         "and there is no pending incoming products in the location. "
         " Computed only if the location needs to check for emptiness "
         '(has an "only empty" location storage type).',
+        default=True,
     )
 
     in_move_ids = fields.One2many(
@@ -199,11 +200,12 @@ class StockLocation(models.Model):
         return self.only_empty
 
     @api.depends(
-        "quant_ids",
-        "in_move_ids",
-        "in_move_ids.state",
-        "in_move_line_ids",
-        "in_move_line_ids.state",
+        # commented fields are manually triggered from the related model
+        # "quant_ids"
+        # "in_move_ids",
+        # "in_move_ids.state",
+        # "in_move_line_ids",
+        # "in_move_line_ids.state",
         "do_not_mix_products",
     )
     def _compute_location_will_contain_product_ids(self):
@@ -221,7 +223,11 @@ class StockLocation(models.Model):
             rec.location_will_contain_product_ids = products
 
     @api.depends(
-        "quant_ids", "in_move_line_ids", "in_move_line_ids.state", "do_not_mix_lots",
+        # commented fields are manually triggered from the related model
+        # "quant_ids",
+        # "in_move_line_ids",
+        # "in_move_line_ids.state",
+        "do_not_mix_lots",
     )
     def _compute_location_will_contain_lot_ids(self):
         for rec in self:
@@ -236,13 +242,14 @@ class StockLocation(models.Model):
             rec.location_will_contain_lot_ids = lots
 
     @api.depends(
-        "quant_ids.qty",
-        "out_move_line_ids.qty_done",
-        "out_move_line_ids.state",
-        "in_move_ids",
-        "in_move_ids.state",
-        "in_move_line_ids",
-        "in_move_line_ids.state",
+        # commented fields are manually triggered from the related model
+        # "quant_ids.qty",
+        # "out_move_line_ids.qty_done",
+        # "out_move_line_ids.state",
+        # "in_move_ids",
+        # "in_move_ids.state",
+        # "in_move_line_ids",
+        # "in_move_line_ids.state",
         "only_empty",
     )
     def _compute_location_is_empty(self):
@@ -566,3 +573,76 @@ class StockLocation(models.Model):
         self.env["stock.pack.operation"].invalidate_cache(
             fnames=["allowed_location_dest_domain"]
         )
+
+    def _tigger_cache_recompute_if_required(self):
+        """
+        HACK ODOO 10!!!!
+        In Odoo < 13, a computed field is written everytime a field defined
+        as trigger changes EVEN if the value should not be updated...
+        To avoid to always write on stock.location linked to the quants or
+        a stock.move or a stock.pack.operation on every changes on these
+        related models even if the values are not modified by the compute we
+        manually recompute the fields location_will_contain_product_ids,
+        location_is_empty and location_will_contain_lot_ids in memory. If
+        the value computed in memory is not the same as the one into the db
+        we force the recompute by the orm.
+        The method is called on create and write from the related models
+        """
+        fields_name = [
+            "location_will_contain_product_ids",
+            "location_is_empty",
+            "location_will_contain_lot_ids",
+        ]
+        fields_to_preload_in_cache = [
+            "quant_ids.qty",
+            "out_move_line_ids.qty_done",
+            "out_move_line_ids.state",
+            "in_move_ids",
+            "in_move_ids.state",
+            "in_move_line_ids",
+            "in_move_line_ids.state",
+            "only_empty",
+            "do_not_mix_lots",
+            "do_not_mix_products",
+        ]
+        # initialize the current env cache with all
+        # the data required to compute fields in fields_name
+        for f in fields_to_preload_in_cache:
+            self.mapped(f)
+        # ensure the initiale value for fields in fields_name are loaded
+        # into the current env
+        for f in fields_name:
+            self.mapped(f)
+
+        fs = [self._fields[name] for name in fields_name]
+
+        # create an new env used to recompute the value without triggering
+        # a write into the database. To improve performances, we initialize
+        # the cache of the new env with a copy of the current cache
+        tmp_recs = self.with_context(__trigger_recompute=True)
+        fields.copy_cache(self, tmp_recs.env)
+
+        # invalidate fields in tmp cache and force recompute
+        for field in fs:
+            tmp_recs.env.cache.pop(field, None)
+            tmp_recs._recompute_todo(field)
+
+        # recompute fields into the tmp envs
+        with tmp_recs.env.do_in_onchange():
+            for name in fields_name:
+                tmp_recs.mapped(name)
+            map(tmp_recs._recompute_done, fs)
+
+        # Compare the value into the current env (the one loaded from the db)
+        # to the value into the tmp_env (the new one computed into memory)
+        # If the value is different, mark the field to be recomputed into the
+        # current env to trigger an update into the database. The update
+        # into the database is therefore only done if the values change
+        for rec in self:
+            tmp = tmp_recs.browse(rec.id)
+            for field in fs:
+                name = field.name
+                if tmp[name] != rec[name]:
+                    rec.invalidate_cache([name], rec.ids)
+                    rec._recompute_todo(field)
+        self.recompute()

@@ -119,3 +119,24 @@ class TestStockLocation2(TestStorageTypeCommon):
         # 3
         self.picking.move_lines.write({"state": "draft"})
         self.assertFalse(location.location_will_contain_product_ids)
+
+    def test_location_is_empty(self):
+        location = self.pallets_reserve_bin_1_location
+        self.assertTrue(location.allowed_location_storage_type_ids.only_empty)
+        self.assertTrue(location.location_is_empty)
+        self._update_qty_in_location(location, self.product, 10)
+        self.assertFalse(location.location_is_empty)
+
+        quant = location.quant_ids
+        # update the quant qty...
+        quant.qty = 0
+        self.assertTrue(location.location_is_empty)
+        quant.qty = 10
+        self.assertFalse(location.location_is_empty)
+
+        # update the quant location
+        location2 = self.pallets_reserve_bin_2_location
+        self.assertTrue(location2.location_is_empty)
+        quant.location_id = location2
+        self.assertFalse(location2.location_is_empty)
+        self.assertTrue(location.location_is_empty)

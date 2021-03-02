@@ -135,14 +135,27 @@ class StockQuant(models.Model):
                 )
 
     def write(self, vals):
+        location_ids = []
+        if "location_id" in vals:
+            location_ids.extend(self.mapped("location_id").ids)
         res = super(StockQuant, self).write(vals)
-        self._invalidate_package_level_allowed_location_dest_domain()
+        location_ids.extend(self.mapped("location_id").ids)
+        self.env["stock.location"].browse(
+            location_ids
+        )._tigger_cache_recompute_if_required()
         return res
 
     @api.model
     def create(self, vals):
         res = super(StockQuant, self).create(vals)
         self._invalidate_package_level_allowed_location_dest_domain()
+        res.location_id._tigger_cache_recompute_if_required()
+        return res
+
+    def unlink(self):
+        locations = self.mapped("location_id")
+        res = super(StockQuant, self).unlink()
+        locations._tigger_cache_recompute_if_required()
         return res
 
     def _invalidate_package_level_allowed_location_dest_domain(self):

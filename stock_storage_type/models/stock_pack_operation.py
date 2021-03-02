@@ -178,4 +178,33 @@ class StockPackOperation(models.Model):
     @api.model
     def create(self, vals):
         self._finalize_pack_putaway_strategy(vals)
-        return super(StockPackOperation, self).create(vals)
+        res = super(StockPackOperation, self).create(vals)
+        locations = res.location_id | res.location_dest_id
+        locations.invalidate_cache(
+            ["in_move_line_ids", "out_move_line_ids"], locations.ids
+        )
+        locations._tigger_cache_recompute_if_required()
+        return res
+
+    def write(self, vals):
+        location_ids = []
+        if "location_id" in vals:
+            location_ids.extend(self.mapped("location_id").ids)
+        if "location_dest_id" in vals:
+            location_ids.extend(self.mapped("location_dest_id").ids)
+        res = super(StockPackOperation, self).write(vals)
+        location_ids.extend(self.mapped("location_id").ids)
+        location_ids.extend(self.mapped("location_dest_id").ids)
+        locations = self.env["stock.location"].browse(location_ids)
+        if "state" in vals:
+            locations.invalidate_cache(
+                ["in_move_line_ids", "out_move_line_ids"], locations.ids
+            )
+        locations._tigger_cache_recompute_if_required()
+        return res
+
+    def unlink(self):
+        locations = self.mapped("location_id") | self.mapped("location_dest_id")
+        res = super(StockPackOperation, self).unlink()
+        locations._tigger_cache_recompute_if_required()
+        return res
