@@ -129,18 +129,6 @@ const app = new Vue({
         user: function() {
             return this.appconfig ? this.appconfig.user_info || {} : {};
         },
-        workstation: {
-            get: function() {
-                if (_.isEmpty(this.current_workstation)) {
-                    this.current_workstation = this.$storage.get("workstation");
-                }
-                return this.current_workstation;
-            },
-            set: function(v) {
-                this.current_workstation = v;
-                this.$storage.set("workstation", v);
-            },
-        },
     },
     methods: {
         getOdoo: function(odoo_params) {
