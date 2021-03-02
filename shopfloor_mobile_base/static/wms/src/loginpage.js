@@ -63,7 +63,7 @@ export var LoginPage = Vue.component("login-page", {
                         <v-form v-on:submit="login">
                             <v-text-field
                                 v-model="apikey"
-                                label="API Key"
+                                :label="$t('screen.login.api_key_label')"
                                 :placeholder="$t('screen.login.api_key_placeholder')"
                                 autofocus
                                 autocomplete="off"></v-text-field>

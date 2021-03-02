@@ -138,7 +138,7 @@ Vue.component("list", {
             <v-list v-if="!has_records">
                 <v-list-item>
                     <v-list-item-content>
-                        <p class="secondary--text">No item to list.</p>
+                        <p class="secondary--text">{{ $t('list.no_items') }}</p>
                     </v-list-item-content>
                 </v-list-item>
             </v-list>
