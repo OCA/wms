@@ -30,7 +30,7 @@ addon | version | summary
 [shopfloor_mobile](shopfloor_mobile/) | 13.0.1.12.0 | Mobile frontend for WMS Shopfloor app
 [shopfloor_mobile_custom_example](shopfloor_mobile_custom_example/) | 13.0.1.0.0 | Show how to customize the Shopfloor app frontend.
 [shopfloor_packing_info](shopfloor_packing_info/) | 13.0.1.0.0 | Allows to predefine packing information messages per partner.
-[shopfloor_rest_log](shopfloor_rest_log/) | 13.0.1.0.0 | Integrate rest_log into Shopfloor app
+[shopfloor_rest_log](shopfloor_rest_log/) | 13.0.1.0.1 | Integrate rest_log into Shopfloor app
 [shopfloor_workstation](shopfloor_workstation/) | 13.0.1.1.0 | Manage warehouse workstation with barcode scanners
 [stock_available_to_promise_release](stock_available_to_promise_release/) | 13.0.1.11.1 | Release Operations based on available to promise
 [stock_available_to_promise_release_dynamic_routing](stock_available_to_promise_release_dynamic_routing/) | 13.0.1.0.1 | Glue between moves release and dynamic routing
