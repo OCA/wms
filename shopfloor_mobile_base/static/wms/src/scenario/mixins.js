@@ -393,7 +393,7 @@ export var ScenarioBaseMixin = {
                 body: parts.join(" "),
                 message_type: "error",
                 support_url: error.log_entry_url,
-                support_url_text: "View / share log entry",
+                support_url_text: this.$t("app.log_entry_link"),
             });
         },
         _state_bind_events: function() {

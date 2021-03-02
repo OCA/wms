@@ -297,8 +297,8 @@ Vue.component("manual-select", {
             <v-list>
                 <v-list-item>
                     <v-list-item-content>
-                        <p class="secondary--text">No item to select.</p>
-                    </v-list-item-content>
+                        <p class="secondary--text">{{ $t('select.no_items') }}</p>
+                        </v-list-item-content>
                 </v-list-item>
             </v-list>
         </v-card>

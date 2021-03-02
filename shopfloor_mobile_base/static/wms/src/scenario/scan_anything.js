@@ -40,7 +40,7 @@ const ScanAnything = {
             scan_full_data: {},
             scan_data: {},
             scan_message: {},
-            search_input_placeholder: "Scan anything",
+            search_input_placeholder: this.$t("screen.scan_anything.scan_placeholder"),
         };
     },
     mounted() {
@@ -104,10 +104,6 @@ const ScanAnything = {
             };
         },
         screen_title: function() {
-            let title = "Scan";
-            if (this.$route.params.identifier) {
-                title = "Scanned: " + this.$route.params.identifier;
-            }
             return this.$t("screen.scan_anything.title", {
                 what: this.$route.params.identifier,
             });

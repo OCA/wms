@@ -11,6 +11,7 @@ const messages_en = {
         login: {
             title: "Login",
             api_key_placeholder: "YOUR_API_KEY_HERE",
+            api_key_label: "API key",
             action: {
                 login: "Login",
             },
@@ -28,6 +29,7 @@ const messages_en = {
         },
         scan_anything: {
             title: "Scan {what}",
+            scan_placeholder: "Scan anything",
         },
         settings: {
             title: "Settings",
@@ -61,6 +63,7 @@ const messages_en = {
             scenario: "Scenario:",
             op_types: "Op Types:",
         },
+        log_entry_link: "View / share log entry",
     },
     language: {
         name: {
@@ -103,6 +106,12 @@ const messages_en = {
         lines_count_extended: "{priority_lines_count}/{lines_count} position(s)",
         picking_count: "{priority_picking_count}/{picking_count}",
         picking_count_extended: "{priority_picking_count}/{picking_count} picking(s)",
+    },
+    list: {
+        no_items: "No item to list.",
+    },
+    select: {
+        no_items: "No item to select.",
     },
     order_lines_by: {
         priority: "Order by priority",

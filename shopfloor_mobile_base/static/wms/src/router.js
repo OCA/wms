@@ -11,7 +11,6 @@ import {process_registry} from "./services/process_registry.js";
 import {page_registry} from "./services/page_registry.js";
 // Const NotFound = { template: '<div>Lost in the scanner app.</div>' }
 
-// TODO: handle routes via registry
 let routes = [
     {
         path: "/",
