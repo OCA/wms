@@ -10,9 +10,7 @@ class SearchAction(Component):
     have the same result in all scenarios.
     """
 
-    _name = "shopfloor.search.action"
-    _inherit = "shopfloor.process.action"
-    _usage = "search"
+    _inherit = "shopfloor.search.action"
 
     # TODO: these methods shall be probably replaced by scan anything handlers
 
