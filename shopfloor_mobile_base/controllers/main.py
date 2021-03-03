@@ -68,8 +68,8 @@ class ShopfloorMobileAppMixin(object):
         app_version = self._get_app_version()
         all_icons = []
         url_pattern = url_pattern or (
-            "/shopfloor_mobile_base/assets/"
-            "src/assets/icons/{fname}-{size}.png?{app_version}"
+            "/shopfloor_mobile_base/static/wms/src/assets/icons/"
+            "{fname}-{size}.png?v={app_version}"
         )
         for size in sizes:
             all_icons.append(
