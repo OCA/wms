@@ -45,6 +45,11 @@ class StockQuantPackage(models.Model):
 
     def _sync_storage_type_from_packaging(self):
         for package in self:
+            if package.packaging_id:
+                # Do not set package storage type for delivery packages
+                # to not trigger constraint like height requirement
+                # (we are delivering them, not storing them)
+                continue
             storage_type = package.product_packaging_id.package_storage_type_id
             if not storage_type:
                 continue
@@ -52,6 +57,11 @@ class StockQuantPackage(models.Model):
 
     def _sync_storage_type_from_single_product(self):
         for package in self:
+            if package.packaging_id:
+                # Do not set package storage type for delivery packages
+                # to not trigger constraint like height requirement
+                # (we are delivering them, not storing them)
+                continue
             storage_type = package.single_product_id.product_package_storage_type_id
             if not storage_type:
                 continue
