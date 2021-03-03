@@ -755,8 +755,9 @@ class StockReceptionScreen(models.Model):
         package_storage_type = self.package_storage_type_id
         package_height = self.package_height
         # Validate the current package
-        if not self.process_set_package():
+        if not self.process_set_package() or self.current_step == "done":
             # Package data may be missing the first time, aborting operation
+            # OR, button Next Package was pressed when we had nothing pending.
             return
         # Stop when the current product/lot has been fully processed
         if self.current_step in ("select_product", "select_move"):
