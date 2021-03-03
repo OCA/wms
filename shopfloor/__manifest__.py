@@ -20,7 +20,6 @@
         "stock_picking_batch",
         "base_jsonify",
         "base_rest",
-        "rest_log",
         "base_sparse_field",
         "auth_api_key",
         #  OCA / stock-logistics-warehouse
