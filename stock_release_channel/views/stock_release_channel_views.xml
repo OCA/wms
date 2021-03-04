@@ -241,10 +241,14 @@
 
                                         <div class="col-12 middle_block">
                                             <field
+                                                name="count_picking_full_progress"
+                                                invisible="1"
+                                            />
+                                            <field
                                                 name="count_picking_done"
                                                 widget="progressbar"
                                                 title="Overall Progress"
-                                                options="{'current_value': 'count_picking_done', 'max_value': 'count_picking_release_ready', 'editable': false}"
+                                                options="{'show_fractional': true, 'current_value': 'count_picking_done', 'max_value': 'count_picking_full_progress', 'editable': false}"
                                             />
                                         </div>
 
