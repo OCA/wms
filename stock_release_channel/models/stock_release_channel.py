@@ -97,6 +97,11 @@ class StockReleaseChannel(models.Model):
     count_picking_done = fields.Integer(
         string="Transfers Done Today", compute="_compute_picking_count"
     )
+    count_picking_full_progress = fields.Integer(
+        string="Full Progress",
+        compute="_compute_picking_count",
+        help="The total number of pickings to achieve 100% of progress.",
+    )
 
     picking_chain_ids = fields.Many2many(
         comodel_name="stock.picking",
@@ -236,6 +241,13 @@ class StockReleaseChannel(models.Model):
                     move_count.get(picking_id, 0) for picking_id in picking_ids
                 )
                 record[move_field] = move_estimate
+
+        for record in self:
+            record.count_picking_full_progress = (
+                record.count_picking_release_ready
+                + record.count_picking_released
+                + record.count_picking_done
+            )
 
     def _query_get_chain(self, pickings):
         """Get all stock.picking before an outgoing one
