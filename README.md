@@ -37,7 +37,7 @@ addon | version | summary
 [stock_checkout_sync](stock_checkout_sync/) | 13.0.1.1.0 | Sync location for Checkout operations
 [stock_dynamic_routing](stock_dynamic_routing/) | 13.0.1.1.0 | Dynamic routing of stock moves
 [stock_dynamic_routing_checkout_sync](stock_dynamic_routing_checkout_sync/) | 13.0.1.1.0 | Glue module for tests when dynamic routing and checkout sync are used
-[stock_dynamic_routing_reserve_rule](stock_dynamic_routing_reserve_rule/) | 13.0.1.0.0 | Glue module between dynamic routing and reservation rules
+[stock_dynamic_routing_reserve_rule](stock_dynamic_routing_reserve_rule/) | 13.0.1.0.1 | Glue module between dynamic routing and reservation rules
 [stock_move_source_relocate](stock_move_source_relocate/) | 13.0.1.1.0 | Change source location of unavailable moves
 [stock_move_source_relocate_dynamic_routing](stock_move_source_relocate_dynamic_routing/) | 13.0.1.1.1 | Glue module
 [stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 13.0.1.0.0 | Define different shipping policies according to picking type
