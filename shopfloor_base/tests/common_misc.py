@@ -60,7 +60,8 @@ class ScanAnythingTestMixin(object):
         params = {"identifier": identifier, "record_types": record_types}
         response = service.dispatch("scan", params=params)
         self.assert_response(
-            response, data={"type": rec_type, "identifier": identifier, "record": data},
+            response,
+            data={"type": rec_type, "identifier": identifier, "record": data},
         )
 
     def _test_response_ko(self, identifier, record_types=None):

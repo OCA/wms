@@ -4,8 +4,7 @@ from odoo.addons.component.core import Component
 
 
 class SchemaDetailAction(Component):
-    """Provide advanced details.
-    """
+    """Provide advanced details."""
 
     _inherit = "shopfloor.schema.action"
     _name = "shopfloor.schema.detail.action"
