@@ -1,0 +1,9 @@
+<odoo>
+    <!-- TODO: demo module? -->
+    <record id="profile_demo_1" model="shopfloor.profile">
+        <field name="name">Demo Profile 1</field>
+    </record>
+    <record id="profile_demo_2" model="shopfloor.profile">
+        <field name="name">Demo Profile 2</field>
+    </record>
+</odoo>
