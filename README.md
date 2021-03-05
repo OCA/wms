@@ -15,6 +15,13 @@ TODO: add repo description.
 
 [//]: # (addons)
 
+Available addons
+----------------
+addon | version | summary
+--- | --- | ---
+[shopfloor_base](shopfloor_base/) | 14.0.1.0.0 | Core module for creating mobile apps
+
+
 Unported addons
 ---------------
 addon | version | summary
