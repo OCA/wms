@@ -66,14 +66,12 @@ class ShopfloorScanAnything(Component):
         return self._response(message=message)
 
     def _scan_handlers(self):
-        """Return components to handle scan requests.
-        """
+        """Return components to handle scan requests."""
         return self.many_components(usage="scan_anything.handler")
 
 
 class ShopfloorScanAnythingHandler(AbstractComponent):
-    """Handle record search for ScanAnything service.
-    """
+    """Handle record search for ScanAnything service."""
 
     _name = "shopfloor.scan.anything.handler"
     _usage = "scan_anything.handler"
@@ -103,25 +101,21 @@ class ShopfloorScanAnythingHandler(AbstractComponent):
 
     @property
     def record_type(self):
-        """Return unique record type for this handler
-        """
+        """Return unique record type for this handler"""
         raise NotImplementedError()
 
     def search(self, identifier):
-        """Find and return Odoo record.
-        """
+        """Find and return Odoo record."""
         raise NotImplementedError()
 
     @property
     def converter(self):
-        """Return data converter to json.
-        """
+        """Return data converter to json."""
         raise NotImplementedError()
 
     @property
     def schema(self):
-        """Return schema to validate record converter.
-        """
+        """Return schema to validate record converter."""
         raise NotImplementedError()
 
 
