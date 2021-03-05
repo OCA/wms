@@ -5,8 +5,7 @@ from odoo.addons.component.core import Component
 
 
 class DataDetailAction(Component):
-    """Provide extra data on top of data action.
-    """
+    """Provide extra data on top of data action."""
 
     _name = "shopfloor.data.detail.action"
     _inherit = "shopfloor.data.action"
