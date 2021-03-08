@@ -93,6 +93,7 @@ const messages_en = {
         },
     },
     misc: {
+        // TODO: split out WMS messages
         btn_get_work: "Get work",
         btn_manual_selection: "Manual selection",
         stock_zero_check: {
