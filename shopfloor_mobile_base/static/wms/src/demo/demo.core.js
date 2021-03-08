@@ -6,6 +6,8 @@
 
 import {process_registry} from "../services/process_registry.js";
 
+// TODO: split out WMS code
+
 export class DemoTools {
     constructor(demo_cases) {
         this.demo_cases = demo_cases.length ? demo_cases : {};
