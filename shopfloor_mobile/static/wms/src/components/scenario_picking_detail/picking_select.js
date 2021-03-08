@@ -76,8 +76,19 @@ Vue.component("picking-select-package-content", {
             <div class="lot" v-if="record.lot">
                 <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
             </div>
-            <div class="qty">
-                <span class="label">Qty:</span> <span>{{ record.qty_done }} / {{ record.quantity }}</span>
+            <div class="qty done">
+                <span class="label">Taken:</span>
+                <packaging-qty-picker-display
+                    :key="make_component_key(['qty-picker-widget', 'taken', record.id])"
+                    :options="utils.misc.move_line_qty_picker_options(record, {init_value: record.qty_done, non_zero_only: true, pkg_name_key: 'code'})"
+                    />
+            </div>
+            <div class="qty requested">
+                <span class="label">Requested:</span>
+                <packaging-qty-picker-display
+                    :key="make_component_key(['qty-picker-widget', 'requested', record.id])"
+                    :options="utils.misc.move_line_qty_picker_options(record, {non_zero_only: true, pkg_name_key: 'code'})"
+                    />
             </div>
             <div class="vendor-code">
                 <span class="label">Vendor code:</span> <span>{{ record.product.supplier_code }}</span>
