@@ -135,8 +135,16 @@ class ShopfloorSchemaAction(Component):
 
     def move_lines_counters(self):
         return {
-            "lines_count": {"type": "float", "required": True},
-            "picking_count": {"type": "float", "required": True},
-            "priority_lines_count": {"type": "float", "required": True},
-            "priority_picking_count": {"type": "float", "required": True},
+            "lines_count": {"type": "float", "required": False, "nullable": True},
+            "picking_count": {"type": "float", "required": False, "nullable": True},
+            "priority_lines_count": {
+                "type": "float",
+                "required": False,
+                "nullable": True,
+            },
+            "priority_picking_count": {
+                "type": "float",
+                "required": False,
+                "nullable": True,
+            },
         }
