@@ -20,5 +20,8 @@ class TestMenuCountersCommonCase(MenuCountersCommonCase):
             },
         }
         response = self.service.dispatch("search")
-        menus = self.env["shopfloor.menu"].search([])
-        self._assert_menu_response(response, menus, expected_counters=expected_counters)
+        self._assert_menu_response(
+            response,
+            self.menu_items.sorted("sequence"),
+            expected_counters=expected_counters,
+        )
