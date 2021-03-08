@@ -92,15 +92,17 @@ class Checkout(Component):
         return ""
 
     def _response_for_select_dest_package(self, picking, move_lines, message=None):
-        packages = picking.mapped("move_line_ids.result_package_id")
+        packages = picking.mapped("move_line_ids.result_package_id").filtered("packaging_id")
         if not packages:
+            # FIXME: do we want to move from 'select_dest_package' to
+            # 'select_package' state? Until now (before enforcing the use of
+            # delivery package) this part of code was never reached as we
+            # always had a package on the picking (source or result)
+            # Also the response validator did not support this state...
             return self._response_for_select_package(
                 picking,
                 move_lines,
-                message={
-                    "message_type": "warning",
-                    "body": _("No valid package to select."),
-                },
+                message=self.msg_store.no_valid_package_to_select(),
             )
         picking_data = self.data.picking(picking)
         packages_data = self.data.packages(
@@ -619,26 +621,30 @@ class Checkout(Component):
         return move_line.qty_done > 0 and move_line.shopfloor_checkout_done
 
     def _is_package_allowed(self, picking, package):
-        existing_packages = picking.mapped("move_line_ids.result_package_id")
+        """Check if a package is allowed as a destination/delivery package.
+
+        A package is allowed as a destination one if it is present among
+        `picking` lines and qualified as a "delivery package" (having a
+        delivery packaging set on it).
+        """
+        existing_packages = picking.mapped("move_line_ids.result_package_id").filtered(
+            "packaging_id"
+        )
         return package in existing_packages
 
     def _put_lines_in_package(self, picking, selected_lines, package):
         """Put the current selected lines with a qty_done in a package
 
-        Note: only packages which are already a destination package for another
+        Note: only packages which are already a delivery package for another
         line of the stock picking can be selected. Packages which are the
-        source packages are allowed too (we keep the current package), but
-        since Odoo set the value of the result package to the source package by
-        default, it works by default.
+        source packages are allowed too only if it is a delivery package (we
+        keep the current package).
         """
         if not self._is_package_allowed(picking, package):
             return self._response_for_select_package(
                 picking,
                 selected_lines,
-                message={
-                    "message_type": "error",
-                    "body": _("Not a valid destination package").format(package.name),
-                },
+                message=self.msg_store.dest_package_not_valid(package),
             )
         return self._put_lines_in_allowed_package(picking, selected_lines, package)
 
@@ -678,10 +684,10 @@ class Checkout(Component):
     def scan_package_action(self, picking_id, selected_line_ids, barcode):
         """Scan a package, a lot, a product or a package to handle a line
 
-        When a package is scanned, if the package is known as the destination
-        package of one of the lines or is the source package of a selected
-        line, the package is set to be the destination package of all then
-        lines to pack.
+        When a package is scanned (only delivery ones), if the package is known
+        as the destination package of one of the lines or is the source package
+        of a selected line, the package is set to be the destination package of
+        all the lines to pack.
 
         When a product is scanned, it selects (set qty_done = reserved qty) or
         deselects (set qty_done = 0) the move lines for this product. Only
@@ -732,6 +738,12 @@ class Checkout(Component):
 
         package = search.package_from_scan(barcode)
         if package:
+            if not package.packaging_id:
+                return self._response_for_select_package(
+                    picking,
+                    selected_lines,
+                    message=self.msg_store.dest_package_not_valid(package),
+                )
             return self._put_lines_in_package(picking, selected_lines, package)
 
         # Scan delivery packaging
@@ -824,16 +836,11 @@ class Checkout(Component):
         return self._response_for_select_dest_package(picking, lines)
 
     def _set_dest_package_from_selection(self, picking, selected_lines, package):
-        if not package:
-            return self._response_for_select_dest_package(picking, selected_lines)
         if not self._is_package_allowed(picking, package):
             return self._response_for_select_dest_package(
                 picking,
                 selected_lines,
-                message={
-                    "message_type": "error",
-                    "body": _("Not a valid destination package").format(package.name),
-                },
+                message=self.msg_store.dest_package_not_valid(package),
             )
         return self._put_lines_in_allowed_package(picking, selected_lines, package)
 
@@ -861,6 +868,12 @@ class Checkout(Component):
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         search = self._actions_for("search")
         package = search.package_from_scan(barcode)
+        if not package:
+            return self._response_for_select_dest_package(
+                picking,
+                lines,
+                message=self.msg_store.package_not_found_for_barcode(barcode),
+            )
         return self._set_dest_package_from_selection(picking, lines, package)
 
     def set_dest_package(self, picking_id, selected_line_ids, package_id):
@@ -881,6 +894,10 @@ class Checkout(Component):
             return self._response_for_select_document(message=message)
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         package = self.env["stock.quant.package"].browse(package_id).exists()
+        if not package:
+            return self._response_for_select_dest_package(
+                picking, lines, message=self.msg_store.record_not_found(),
+            )
         return self._set_dest_package_from_selection(picking, lines, package)
 
     def summary(self, picking_id):
@@ -1349,12 +1366,22 @@ class ShopfloorCheckoutValidatorResponse(Component):
 
     def scan_dest_package(self):
         return self._response_schema(
-            next_states={"select_dest_package", "select_line", "summary"}
+            next_states={
+                "select_dest_package",
+                "select_package",
+                "select_line",
+                "summary",
+            }
         )
 
     def set_dest_package(self):
         return self._response_schema(
-            next_states={"select_dest_package", "select_line", "summary"}
+            next_states={
+                "select_dest_package",
+                "select_package",
+                "select_line",
+                "summary",
+            }
         )
 
     def summary(self):
