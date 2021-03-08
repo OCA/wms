@@ -10,7 +10,23 @@ class CommonMenuCase(CommonCase, MenuTestMixin):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
-        cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
+        ref = cls.env.ref
+        profile1 = ref("shopfloor_base.profile_demo_1")
+        cls.profile = profile1.sudo().copy()
+        menu_xid_pref = "shopfloor.shopfloor_menu_"
+        cls.menu_items = (
+            ref(menu_xid_pref + "single_pallet_transfer")
+            | ref(menu_xid_pref + "zone_picking")
+            | ref(menu_xid_pref + "cluster_picking")
+            | ref(menu_xid_pref + "checkout")
+            | ref(menu_xid_pref + "delivery")
+            | ref(menu_xid_pref + "location_content_transfer")
+        )
+        # Isolate menu items
+        cls.menu_items.sudo().write({"profile_id": cls.profile.id})
+        cls.env["shopfloor.menu"].search(
+            [("id", "not in", cls.menu_items.ids)]
+        ).sudo().write({"profile_id": profile1.id})
 
     def setUp(self):
         super().setUp()
