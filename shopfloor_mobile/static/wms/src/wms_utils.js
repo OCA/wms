@@ -31,8 +31,9 @@ export class WMSUtils {
             "id"
         );
         const grouped = _.groupBy(lines, options.group_key + ".id");
+        // TODO: grouped.forEach?
         _.forEach(grouped, function(value, loc_id) {
-            const location = _.first(_.filter(locations, {id: parseInt(loc_id)}));
+            const location = _.first(_.filter(locations, {id: parseInt(loc_id, 10)}));
             const title = options.group_no_title
                 ? ""
                 : options.name_prefix
