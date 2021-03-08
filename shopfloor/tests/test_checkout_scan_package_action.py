@@ -115,7 +115,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 tracking, barcode
             )
 
-    def test_scan_package_action_scan_package_keep_source_package_ok(self):
+    def test_scan_package_action_scan_package_keep_source_package_error(self):
         picking = self._create_picking(
             lines=[
                 (self.product_a, 10),
@@ -145,33 +145,39 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             params={
                 "picking_id": picking.id,
                 "selected_line_ids": selected_lines.ids,
-                # we keep the goods in the same package, so we scan the source package
+                # we try to keep the goods in the same package, so we scan the
+                # source package but this isn't allowed as it is not a delivery
+                # package (i.e. having a delivery packaging set)
                 "barcode": pack1.name,
             },
         )
 
         self.assertRecordValues(
             move_line1,
-            [{"result_package_id": pack1.id, "shopfloor_checkout_done": True}],
+            [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
         )
         self.assertRecordValues(
             move_line2,
-            [{"result_package_id": pack1.id, "shopfloor_checkout_done": True}],
+            [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
         )
         self.assertRecordValues(
             move_line3,
-            # qty_done was zero so we don't set it as packed
+            # qty_done was zero so it hasn't been done anyway
             [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
         )
         self.assert_response(
             response,
             # go pack to the screen to select lines to put in packages
-            next_state="select_line",
-            data={"picking": self._stock_picking_data(picking)},
-            message={
-                "message_type": "success",
-                "body": "Product(s) packed in {}".format(pack1.name),
+            next_state="select_package",
+            data={
+                "picking": self.data.picking(picking),
+                "selected_move_lines": self.data.move_lines(selected_lines),
+                "packing_info": self.service._data_for_packing_info(picking),
+                "no_package_enabled": not self.service.options.get(
+                    "checkout__disable_no_package"
+                ),
             },
+            message=self.service.msg_store.dest_package_not_valid(pack1),
         )
 
     def test_scan_package_action_scan_package_error_invalid(self):
@@ -206,10 +212,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self._assert_selected_response(
             response,
             selected_line,
-            message={
-                "message_type": "error",
-                "body": "Not a valid destination package",
-            },
+            message=self.service.msg_store.dest_package_not_valid(other_package),
         )
 
     def test_scan_package_action_scan_package_use_existing_package_ok(self):
@@ -228,7 +231,12 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self._fill_stock_for_moves(pack2_moves, in_package=True)
         picking.action_assign()
 
-        package = self.env["stock.quant.package"].create({})
+        delivery_packaging = self.env.ref(
+            "stock_storage_type.product_product_9_packaging_single_bag"
+        )
+        package = self.env["stock.quant.package"].create(
+            {"packaging_id": delivery_packaging.id}
+        )
 
         # assume that product d was already put in a package,
         # we must be able to put the lines of pack1 inside the same
