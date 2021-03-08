@@ -499,7 +499,19 @@ class MessageAction(Component):
     def packaging_invalid_for_carrier(self, packaging, carrier):
         return {
             "message_type": "error",
-            "body": _("Packaging {} does not match carrier {}.").format(
+            "body": _("Packaging {} is not allowed for carrier {}.").format(
                 packaging.name, carrier.name
             ),
+        }
+
+    def dest_package_not_valid(self, package):
+        return {
+            "message_type": "error",
+            "body": _("{} is not a valid destination package.").format(package.name),
+        }
+
+    def no_valid_package_to_select(self):
+        return {
+            "message_type": "warning",
+            "body": _("No valid package to select."),
         }
