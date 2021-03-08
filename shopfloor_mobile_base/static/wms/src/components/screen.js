@@ -217,30 +217,60 @@ Vue.component("nav-items", {
             :color="$route.params.menu_id == item.id ? 'v-item-active' : null"
             >
             <v-list-item-content>
-                <v-list-item-title class="primary--text">
-                    {{ item.name }}
-                </v-list-item-title>
-                <v-list-item-subtitle v-if="show_full_info">
-                    <small class="font-weight-light"><strong>{{ $t('app.nav.scenario') }}</strong> {{ item.scenario }}</small>
-                    <br />
-                    <small class="font-weight-light text-wrap pr-2">
-                        <strong>{{ $t('app.nav.op_types') }}</strong>
-                        <span v-for="(pt, index) in item.picking_types"
-                              :key="'pt-' + item.id + '-' + pt.id"
-                              >{{ pt.name }}<span v-if="index != (item.picking_types.length - 1)">,</span>
-                        </span>
-                    </small>
-                </v-list-item-subtitle>
+                <nav-item-content :item="item" :show_full_info="show_full_info" />
             </v-list-item-content>
-            <v-list-item-action v-if="item.lines_count">
-                <div class="pa-4 secondary text-no-wrap rounded-pill">
-                    {{ $t('misc.lines_count', item) }}
-                </div>
+            <v-list-item-action>
+                <nav-item-action :item="item" />
             </v-list-item-action>
         </v-list-item>
     </div>
     `,
 });
+
+Vue.component("nav-item-content", {
+    props: {
+        item: Array,
+        show_full_info: {
+            type: Boolean,
+            default: true,
+        },
+        options: {
+            type: Object,
+            default: function() {
+                return {};
+            },
+        },
+    },
+    // NOTE: activation via router won't work because we can use the same route w/ several menu items.
+    // Hence we match via menu id.
+    template: `
+        <div :class="$options._componentTag">
+            <v-list-item-title class="primary--text">
+                {{ item.name }}
+            </v-list-item-title>
+            <v-list-item-subtitle v-if="show_full_info">
+                <small class="font-weight-light"><strong>{{ $t('app.nav.scenario') }}</strong> {{ item.scenario }}</small>
+            </v-list-item-subtitle>
+        </div>
+    `,
+});
+
+Vue.component("nav-item-action", {
+    props: {
+        item: Array,
+        options: {
+            type: Object,
+            default: function() {
+                return {};
+            },
+        },
+    },
+    template: `
+        <div :class="$options._componentTag">
+        </div>
+    `,
+});
+
 Vue.component("nav-items-extra", {
     methods: {
         navigation: function() {
