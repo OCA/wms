@@ -17,6 +17,11 @@
                 rel="stylesheet"
             />
             <script
+                id="script_scren_override"
+                t-attf-src="/shopfloor_mobile/static/wms/src/screen.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
                 id="script_wms_utils"
                 t-attf-src="/shopfloor_mobile/static/wms/src/wms_utils.js?v=#{mod_version}"
                 type="module"
