@@ -252,16 +252,6 @@ Vue.component("manual-select", {
                                 />
                         </v-list-item-content>
                         <v-list-item-action>
-                            <component
-                                v-for="(action, action_index) in opts.list_item_actions"
-                                :is="action.comp_name"
-                                v-if="action.enabled(rec, action)"
-                                :options="_.merge({}, list_item_options, action.get_options(rec, action))"
-                                :record="action.get_record(rec, action)"
-                                :index="index"
-                                :count="group.records.length"
-                                :key="make_component_key([action.comp_name, index, action_index, rec.id])"
-                                />
                             <div class="action action-select">
                                 <v-btn icon x-large rounded>
                                     <input
@@ -277,6 +267,16 @@ Vue.component("manual-select", {
                                         />
                                 </v-btn>
                             </div>
+                            <component
+                                v-for="(action, action_index) in opts.list_item_actions"
+                                :is="action.comp_name"
+                                v-if="action.enabled(rec, action)"
+                                :options="_.merge({}, list_item_options, action.get_options(rec, action))"
+                                :record="action.get_record(rec, action)"
+                                :index="index"
+                                :count="group.records.length"
+                                :key="make_component_key([action.comp_name, index, action_index, rec.id])"
+                                />
                         </v-list-item-action>
                     </v-list-item>
                     <div class="extra" v-if="opts.list_item_extra_component">
