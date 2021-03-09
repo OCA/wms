@@ -75,8 +75,8 @@ export class WMSUtils {
             .value();
         _.forEach(grouped, function(value, loc_ids) {
             const [src_id, dest_id] = loc_ids.split("--");
-            const src_loc = _.first(_.filter(locations, {id: parseInt(src_id)}));
-            const dest_loc = _.first(_.filter(locations, {id: parseInt(dest_id)}));
+            const src_loc = _.first(_.filter(locations, {id: parseInt(src_id, 10)}));
+            const dest_loc = _.first(_.filter(locations, {id: parseInt(dest_id, 10)}));
             res.push({
                 _is_group: true,
                 key: loc_ids,
@@ -110,7 +110,7 @@ export class WMSUtils {
             let pack = null;
             if (key.startsWith("pack")) {
                 pack = _.first(
-                    _.filter(packs, {id: parseInt(key.split("-").slice(-1)[0])})
+                    _.filter(packs, {id: parseInt(key.split("-").slice(-1)[0], 10)})
                 );
             }
             res.push({
