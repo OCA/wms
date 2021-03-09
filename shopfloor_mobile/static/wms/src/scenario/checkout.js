@@ -1,5 +1,11 @@
-import {ScenarioBaseMixin} from "./mixins.js";
-import {process_registry} from "../services/process_registry.js";
+/**
+ * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * @author Simone Orsi <simahawk@gmail.com>
+ * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+ */
+
+import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
+import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
 
 const Checkout = {
     mixins: [ScenarioBaseMixin],
@@ -56,7 +62,7 @@ const Checkout = {
                 <detail-picking-select
                     :record="state.data.picking"
                     :select_records="state.data.picking.move_lines"
-                    :select_records_grouped="utils.misc.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.misc.only_one_package})"
+                    :select_records_grouped="utils.wms.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.wms.only_one_package})"
                     :select_options="select_line_manual_select_opts()"
                     :key="make_state_component_key(['detail-picking-select'])"
                     />
@@ -136,12 +142,12 @@ const Checkout = {
                 <item-detail-card :card_color="utils.colors.color_for('screen_step_done')"
                     :key="make_state_component_key(['product'])"
                     :record="state.data.line"
-                    :options="utils.misc.move_line_product_detail_options(state.data.line)"
+                    :options="utils.wms.move_line_product_detail_options(state.data.line)"
                     />
                 <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
                     <packaging-qty-picker
                         :key="make_state_component_key(['packaging-qty-picker', state.data.line.id])"
-                        :options="utils.misc.move_line_qty_picker_options(state.data.line)"
+                        :options="utils.wms.move_line_qty_picker_options(state.data.line)"
                         />
                 </v-card>
                 <div class="button-list button-vertical-list full">
@@ -175,7 +181,7 @@ const Checkout = {
             <div v-if="state_is('summary')">
                 <picking-summary
                     :record="state.data.picking"
-                    :records_grouped="utils.misc.group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': utils.misc.group_by_pack})"
+                    :records_grouped="utils.wms.group_lines_by_location(state.data.picking.move_lines, {'group_key': 'location_dest', 'prepare_records': utils.wms.group_by_pack})"
                     :list_options="{list_item_options: {actions: ['action_change_pkg', 'action_cancel_line']}}"
                     :key="make_state_component_key(['picking-summary'])"
                     />

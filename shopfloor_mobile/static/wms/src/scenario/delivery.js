@@ -1,5 +1,11 @@
-import {ScenarioBaseMixin} from "./mixins.js";
-import {process_registry} from "../services/process_registry.js";
+/**
+ * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * @author Simone Orsi <simahawk@gmail.com>
+ * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+ */
+
+import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
+import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
 
 const Delivery = {
     mixins: [ScenarioBaseMixin],
@@ -79,13 +85,13 @@ const Delivery = {
         },
         deliver_picking_summary_records_grouped(picking) {
             const self = this;
-            return this.utils.misc.group_lines_by_location(picking.move_lines, {
+            return this.utils.wms.group_lines_by_location(picking.move_lines, {
                 prepare_records: _.partialRight(
-                    this.utils.misc.group_by_pack,
+                    this.utils.wms.group_by_pack,
                     "package_src"
                 ),
                 group_color_maker: function(lines) {
-                    return self.utils.misc.move_lines_completeness(lines) == 100
+                    return self.utils.wms.move_lines_completeness(lines) == 100
                         ? "screen_step_done"
                         : "screen_step_todo";
                 },
@@ -96,7 +102,7 @@ const Delivery = {
                 list_item_options: {
                     actions: ["action_cancel_line"],
                     fields: this.move_line_detail_fields(),
-                    list_item_klass_maker: this.utils.misc.move_line_color_klass,
+                    list_item_klass_maker: this.utils.wms.move_line_color_klass,
                 },
             };
         },
@@ -126,7 +132,7 @@ const Delivery = {
                     label: "Lines",
                     renderer: function(rec, field) {
                         return (
-                            self.utils.misc.completed_move_lines(rec.move_lines) +
+                            self.utils.wms.completed_move_lines(rec.move_lines) +
                             " / " +
                             rec.move_lines.length
                         );
@@ -230,7 +236,7 @@ const Delivery = {
                     },
                     visible_records: records => {
                         const self = this;
-                        let visible_records = this.utils.misc.order_picking_by_completeness(
+                        let visible_records = this.utils.wms.order_picking_by_completeness(
                             records
                         );
                         if (this.state.data.filtered) {

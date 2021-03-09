@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright 2021 ACSONE SA/NV (http://www.acsone.eu)
+    @author Simone Orsi <simahawk@gmail.com>
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+-->
+<odoo>
+    <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_mobile_base.shopfloor_app_assets"
+    >
+        <!-- TODO: move to new module `shopfloor_example_override` -->
+        <!-- <script id="script_scenario_checkout" position="after">
+            <script
+                id="script_scenario_checkout"
+                t-attf-src="/#{mod_name}/static/wms/src/scenario/checkout.js?v=#{get_version(mod_name)}"
+                type="module"
+            />
+        </script> -->
+        <t id="new_scenario_hook" position="before">
+            <t t-set="mod_name" t-value="'shopfloor_example'" />
+            <script
+                id="script_detail_partner"
+                t-attf-src="/#{mod_name}/static/wms/src/components/detail/detail_partner.js?v=#{get_version(mod_name)}"
+                type="module"
+            />
+            <script
+                id="script_scenario_partner"
+                t-attf-src="/#{mod_name}/static/wms/src/scenario/partner.js?v=#{get_version(mod_name)}"
+                type="module"
+            />
+        </t>
+    </template>
+</odoo>

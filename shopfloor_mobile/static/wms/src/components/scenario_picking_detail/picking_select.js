@@ -6,7 +6,7 @@
 /* eslint-disable strict */
 /* eslint-disable no-implicit-globals */
 import {PickingDetailSelectMixin} from "./mixins.js";
-import {ItemDetailMixin} from "../detail/detail_mixin.js";
+import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
 
 Vue.component("detail-picking-select", {
     mixins: [PickingDetailSelectMixin],
@@ -39,7 +39,7 @@ Vue.component("picking-select-line-content", {
     },
     methods: {
         no_pack_list_item_options(record) {
-            let opts = this.utils.misc.move_line_product_detail_options(record);
+            let opts = this.utils.wms.move_line_product_detail_options(record);
             opts.fields.unshift({
                 path: "product.display_name",
                 action_val_path: "product.barcode",
