@@ -1,6 +1,5 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* shopfloor_mobile
 #
 msgid ""
 msgstr ""
@@ -12,29 +11,3 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
-
-#. module: shopfloor_mobile
-#: model_terms:ir.ui.view,arch_db:shopfloor_mobile.shopfloor_app_main
-msgid ""
-"<strong>\n"
-"          We're sorry but wms doesn't work properly without JavaScript enabled.\n"
-"          Please enable it to continue.\n"
-"        </strong>"
-msgstr ""
-
-#. module: shopfloor_mobile
-#: model_terms:ir.ui.view,arch_db:shopfloor_mobile.shopfloor_app_main
-msgid "Shopfloor WMS app"
-msgstr ""
-
-#. module: shopfloor_mobile
-#: model:ir.actions.act_url,name:shopfloor_mobile.action_shopfloor_app
-#: model:ir.ui.menu,name:shopfloor_mobile.menu_action_shopfloor_app
-msgid "Shopfloor mobile app"
-msgstr ""
-
-#. module: shopfloor_mobile
-#: model:ir.actions.act_url,name:shopfloor_mobile.action_shopfloor_app_demo
-#: model:ir.ui.menu,name:shopfloor_mobile.menu_action_shopfloor_app_demo
-msgid "Shopfloor mobile app DEMO"
-msgstr ""
