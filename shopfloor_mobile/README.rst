@@ -136,6 +136,8 @@ Known issues / Roadmap
   (no more specific check on the state to display this button).
   This part is also related to "Refactor states definition".
 
+* Go through `_.forEach` and similar calls to replace them w/ vanilla JS (eg: `.map()`)
+
 Changelog
 =========
 
