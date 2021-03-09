@@ -14,10 +14,10 @@ Shopfloor mobile
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fwms-lightgray.png?logo=github
-    :target: https://github.com/OCA/wms/tree/13.0/shopfloor_mobile
+    :target: https://github.com/OCA/wms/tree/13.0/shopfloor_mobile_base
     :alt: OCA/wms
 .. |badge4| image:: https://img.shields.io/badge/weblate-Translate%20me-F47D42.png
-    :target: https://translation.odoo-community.org/projects/wms-13-0/wms-13-0-shopfloor_mobile
+    :target: https://translation.odoo-community.org/projects/wms-13-0/wms-13-0-shopfloor_mobile_base
     :alt: Translate me on Weblate
 .. |badge5| image:: https://img.shields.io/badge/runbot-Try%20me-875A7B.png
     :target: https://runbot.odoo-community.org/runbot/285/13.0
@@ -25,10 +25,10 @@ Shopfloor mobile
 
 |badge1| |badge2| |badge3| |badge4| |badge5| 
 
-Frontend for Shopfloor app.
+Base frontend for Shopfloor applications.
 
 The work is organized in scenario.
-A scenario represents a process in the warehouse (eg: receive, deliver).
+A scenario represents a process in the workplace (eg: for WMS -> receive, deliver).
 The app allows to start each process through the main menu.
 
 Each scenario is linked to a specific menu item which can be configured in the backend.
@@ -42,7 +42,7 @@ Tech details
   and relies on `shopfloor` module that exposes REST API in Odoo
   (based in turn on `base_rest <https://github.com/OCA/rest-framework/tree/13.0/base_rest>`_).
 
-* The whole business logic comes from `shopfloor` module,
+* The whole business logic comes from `shopfloor_base` module,
   this module takes care of providing a nice and reactive UI to work with.
 
 * No Odoo JS is used, no assets machinery used.
@@ -136,6 +136,16 @@ Known issues / Roadmap
   (no more specific check on the state to display this button).
   This part is also related to "Refactor states definition".
 
+* Load modules/components dependencies
+
+  As of today we are using bare ES6 imports which requires devs to know the exact path
+  of the resource. If the resource changes name or path dependent files will be broken.
+  It would be nice to have a way to declare modules by name as Odoo JS does.
+
+* Get rid of custom assets controller?
+
+  A controller takes care of loading static assets but seems to not be needed anymore.
+
 Changelog
 =========
 
@@ -150,7 +160,7 @@ Bug Tracker
 Bugs are tracked on `GitHub Issues <https://github.com/OCA/wms/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us smashing it by providing a detailed and welcomed
-`feedback <https://github.com/OCA/wms/issues/new?body=module:%20shopfloor_mobile%0Aversion:%2013.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/OCA/wms/issues/new?body=module:%20shopfloor_mobile_base%0Aversion:%2013.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -209,6 +219,6 @@ Current `maintainer <https://odoo-community.org/page/maintainer-role>`__:
 
 |maintainer-simahawk| 
 
-This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/13.0/shopfloor_mobile>`_ project on GitHub.
+This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/13.0/shopfloor_mobile_base>`_ project on GitHub.
 
 You are welcome to contribute. To learn how please visit https://odoo-community.org/page/Contribute.
