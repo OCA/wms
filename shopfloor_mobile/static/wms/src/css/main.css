@@ -65,7 +65,7 @@ TODO: this is probably to be applied to all .manual-select.
 I tested only w/ checkout/select_package for now
  */
 .detail-picking-select .manual-select .v-list-item .v-list-item__action--stack {
-    flex-direction: column-reverse;
+    flex-direction: column;
 }
 
 .v-list-item.location-will-be-empty .field-detail.location_will_be_empty {
