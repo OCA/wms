@@ -1,0 +1,45 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_mobile_base
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: shopfloor_mobile_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base.shopfloor_app_main
+msgid ""
+"<strong>\n"
+"          We're sorry but wms doesn't work properly without JavaScript enabled.\n"
+"          Please enable it to continue.\n"
+"        </strong>"
+msgstr ""
+
+#. module: shopfloor_mobile_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base.shopfloor_app_assets
+msgid "Hook to this element to inject your own scenario"
+msgstr ""
+
+#. module: shopfloor_mobile_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base.shopfloor_app_main
+msgid "Shopfloor WMS app"
+msgstr ""
+
+#. module: shopfloor_mobile_base
+#: model:ir.actions.act_url,name:shopfloor_mobile_base.action_shopfloor_app
+#: model:ir.ui.menu,name:shopfloor_mobile_base.menu_action_shopfloor_app
+msgid "Shopfloor mobile app"
+msgstr ""
+
+#. module: shopfloor_mobile_base
+#: model:ir.actions.act_url,name:shopfloor_mobile_base.action_shopfloor_app_demo
+#: model:ir.ui.menu,name:shopfloor_mobile_base.menu_action_shopfloor_app_demo
+msgid "Shopfloor mobile app DEMO"
+msgstr ""
