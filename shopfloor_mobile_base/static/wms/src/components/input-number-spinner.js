@@ -88,8 +88,8 @@ export var NumberSpinner = Vue.component("input-number-spinner", {
         },
     },
     created: function() {
-        this.original_value = parseInt(this.init_value);
-        this.value = parseInt(this.init_value);
+        this.original_value = parseInt(this.init_value, 10);
+        this.value = parseInt(this.init_value, 10);
     },
     mounted: function() {
         if (this.$props.select_value_on_load) {
