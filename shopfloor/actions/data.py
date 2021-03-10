@@ -100,6 +100,25 @@ class DataAction(Component):
             "qty",
         ]
 
+    @ensure_model("product.packaging")
+    def delivery_packaging(self, record, **kw):
+        return self._jsonify(record, self._delivery_packaging_parser, **kw)
+
+    def delivery_packaging_list(self, records, **kw):
+        return self.delivery_packaging(records, multi=True)
+
+    @property
+    def _delivery_packaging_parser(self):
+        return [
+            "id",
+            "name",
+            (
+                "packaging_type_id:packaging_type",
+                lambda rec, fname: rec.packaging_type_id.display_name,
+            ),
+            "barcode",
+        ]
+
     @ensure_model("stock.production.lot")
     def lot(self, record, **kw):
         return self._jsonify(record, self._lot_parser, **kw)
