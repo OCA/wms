@@ -10,6 +10,13 @@ class ActionsDataCase(ActionsDataCaseBase):
         self.assert_schema(self.schema.packaging(), data)
         self.assertDictEqual(data, self._expected_packaging(self.packaging))
 
+    def test_data_delivery_packaging(self):
+        data = self.data.delivery_packaging(self.delivery_packaging)
+        self.assert_schema(self.schema.delivery_packaging(), data)
+        self.assertDictEqual(
+            data, self._expected_delivery_packaging(self.delivery_packaging)
+        )
+
     def test_data_location(self):
         location = self.stock_location
         data = self.data.location(location)

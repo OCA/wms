@@ -515,3 +515,9 @@ class MessageAction(Component):
             "message_type": "warning",
             "body": _("No valid package to select."),
         }
+
+    def no_delivery_packaging_available(self):
+        return {
+            "message_type": "warning",
+            "body": _("No delivery package type available."),
+        }
