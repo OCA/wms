@@ -118,6 +118,26 @@ const Checkout = {
                     </v-row>
                 </div>
             </div>
+            <div v-if="state_is('select_delivery_packaging')">
+                <item-detail-card
+                    v-if="current_doc().record.carrier"
+                    :key="make_state_component_key(['picking-carrier', current_doc().record.id])"
+                    :record="current_doc().record.carrier"
+                    :options="{main: true, key_title: 'name', title_icon: 'mdi-truck-outline'}"
+                    />
+                <manual-select
+                    :records="state.data.packaging"
+                    :options="select_delivery_packaging_manual_select_options()"
+                    :key="make_state_component_key(['checkout', 'select-delivery-packaging'])"
+                    />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back />
+                        </v-col>
+                    </v-row>
+                </div>
+            </div>
             <div v-if="state_is('select_dest_package')">
                 <detail-picking-select
                     :record="state.data.picking"
@@ -254,6 +274,15 @@ const Checkout = {
                         {path: "carrier.name", label: "Carrier"},
                         {path: "move_line_count", label: "Lines"},
                     ],
+                },
+            };
+        },
+        select_delivery_packaging_manual_select_options: function() {
+            return {
+                showActions: false,
+                list_item_options: {
+                    loud_title: true,
+                    fields: [{path: "packaging_type"}],
                 },
             };
         },
@@ -455,7 +484,7 @@ const Checkout = {
                     },
                     on_new_pack: () => {
                         this.wait_call(
-                            this.odoo.call("new_package", {
+                            this.odoo.call("list_delivery_packaging", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_ids: this.selectable_line_ids(),
                             })
@@ -480,6 +509,29 @@ const Checkout = {
                     on_back: () => {
                         this.state_to("select_line");
                         this.reset_notification();
+                    },
+                },
+                select_delivery_packaging: {
+                    display_info: {
+                        title: "Select delivery packaging",
+                        scan_placeholder: "Scan package type",
+                    },
+                    events: {
+                        select: "on_select",
+                        back: "on_back",
+                    },
+                    on_select: selected => {
+                        this.state.on_scan({text: selected.barcode});
+                    },
+                    on_scan: scanned => {
+                        const picking = this.current_doc().record;
+                        this.wait_call(
+                            this.odoo.call("scan_package_action", {
+                                picking_id: picking.id,
+                                selected_line_ids: this.selected_line_ids(),
+                                barcode: scanned.text,
+                            })
+                        );
                     },
                 },
                 change_quantity: {
