@@ -134,3 +134,19 @@ class TestStorageType(SavepointCase):
         self.assertEqual(test_location.max_height, 0)
         self.cardboxes_location_storage_type.max_height = 1
         self.assertEqual(test_location.max_height, 3)
+
+    def test_archive_package_storage_type(self):
+        target = self.env.ref("stock_storage_type.package_storage_type_pallets")
+        all_package_storage_types = self.env["stock.package.storage.type"].search([])
+        self.assertIn(target, all_package_storage_types)
+        target.active = False
+        all_package_storage_types = self.env["stock.package.storage.type"].search([])
+        self.assertNotIn(target, all_package_storage_types)
+
+    def test_archive_location_storage_type(self):
+        target = self.env.ref("stock_storage_type.location_storage_type_pallets")
+        all_location_storage_types = self.env["stock.location.storage.type"].search([])
+        self.assertIn(target, all_location_storage_types)
+        target.active = False
+        all_location_storage_types = self.env["stock.location.storage.type"].search([])
+        self.assertNotIn(target, all_location_storage_types)
