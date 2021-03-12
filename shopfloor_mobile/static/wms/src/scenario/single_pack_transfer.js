@@ -36,12 +36,14 @@ export var SinglePackStatesMixin = {
                         show_cancel_button: true,
                     },
                     on_scan: (scanned, confirmation = false) => {
+                        const data = this.state.data;
                         this.state_set_data({location_barcode: scanned.text});
                         this.wait_call(
                             this.odoo.call("validate", {
-                                package_level_id: this.state.data.id,
+                                package_level_id: data.id,
                                 location_barcode: scanned.text,
-                                confirmation: confirmation,
+                                confirmation:
+                                    confirmation || data.confirmation_required,
                             })
                         );
                     },
