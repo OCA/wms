@@ -1,10 +1,20 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, models
+from odoo.tools.float_utils import float_compare
 
 
 class StockMove(models.Model):
     _inherit = "stock.move"
+
+    def _qty_is_satisfied(self):
+        compare = float_compare(
+            self.quantity_done,
+            self.product_uom_qty,
+            precision_rounding=self.product_uom.rounding,
+        )
+        # greater or equal
+        return compare in (0, 1)
 
     def split_other_move_lines(self, move_lines, intersection=False):
         """Substract `move_lines` from `move.move_line_ids`, put the result
