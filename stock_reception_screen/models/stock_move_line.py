@@ -20,3 +20,8 @@ class StockMoveLine(models.Model):
         self.picking_id.reception_screen_id.next_step()
         # FIXME: don't know how to close the pop-up and refresh the screen
         return self.picking_id.action_reception_screen_open()
+
+    def action_reception_screen_open(self):
+        """Open reception screen from specific move line."""
+        self.picking_id.action_reception_screen_open()
+        return self.action_select_move_line()

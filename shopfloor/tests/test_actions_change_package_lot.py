@@ -1167,3 +1167,23 @@ class TestActionsChangePackageLot(CommonCase):
         self.assertEqual(package1.quant_ids.reserved_quantity, 4)
         self.assertEqual(package2.quant_ids.reserved_quantity, 0)
         self.assertEqual(package3.quant_ids.reserved_quantity, 6)
+
+    def test_change_pack_same(self):
+        initial_package = self._create_package_in_location(
+            self.shelf1, [self.PackageContent(self.product_a, 100, lot=None)]
+        )
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        picking.action_assign()
+        line = picking.move_line_ids
+        self.assertEqual(line.package_id, initial_package)
+        self.change_package_lot.change_package(
+            line,
+            initial_package,
+            # success callback
+            self.unreachable_func,
+            # failure callback
+            lambda move_line, message=None: self.assertEqual(
+                message,
+                self.msg_store.package_change_error_same_package(initial_package),
+            ),
+        )

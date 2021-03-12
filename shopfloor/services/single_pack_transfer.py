@@ -8,7 +8,13 @@ from odoo.addons.component.core import Component
 
 
 class SinglePackTransfer(Component):
-    """Methods for the Single Pack Transfer Process"""
+    """Methods for the Single Pack Transfer Process
+
+    You will find a sequence diagram describing states and endpoints
+    relationships [here](../docs/single_pack_transfer_diag_seq.png).
+    Keep [the sequence diagram](../docs/single_pack_transfer_diag_seq.plantuml)
+    up-to-date if you change endpoints.
+    """
 
     _inherit = "base.shopfloor.process"
     _name = "shopfloor.single.pack.transfer"
@@ -43,11 +49,8 @@ class SinglePackTransfer(Component):
         data["confirmation_required"] = confirmation_required
         return self._response(next_state="scan_location", data=data, message=message,)
 
-    def _response_for_show_completion_info(self, message=None):
-        return self._response(next_state="show_completion_info", message=message)
-
     def start(self, barcode, confirmation=False):
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         picking_types = self.picking_types
         location = search.location_from_scan(barcode)
 
@@ -92,7 +95,7 @@ class SinglePackTransfer(Component):
         # Start a savepoint because we are may unreserve moves of other
         # picking types. If we do and we can't create a package level after,
         # we rollback to the initial state
-        savepoint = self.actions_for("savepoint").new()
+        savepoint = self._actions_for("savepoint").new()
         unreserved_moves = self.env["stock.move"].browse()
         if not package_level:
             other_move_lines = self.env["stock.move.line"].search(
@@ -123,16 +126,20 @@ class SinglePackTransfer(Component):
         package_level = package_level.filtered(
             lambda pl: pl.state not in ("cancel", "done")
         )
-        if not package_level:
-            if self.work.menu.allow_move_create:
-                package_level = self._create_package_level(package)
+        message = self.msg_store.no_pending_operation_for_pack(package)
+        if not package_level and self.work.menu.allow_move_create:
+            package_level = self._create_package_level(package)
+            if not package_level.location_dest_id.is_sublocation_of(
+                picking_types.default_location_dest_id
+            ):
+                package_level = None
+                savepoint.rollback()
+                message = self.msg_store.package_unable_to_transfer(package)
 
         if not package_level:
             # restore any unreserved move/package level
             savepoint.rollback()
-            return self._response_for_start(
-                message=self.msg_store.no_pending_operation_for_pack(package)
-            )
+            return self._response_for_start(message=message)
         if self.work.menu.ignore_no_putaway_available and self._no_putaway_available(
             package_level
         ):
@@ -200,7 +207,7 @@ class SinglePackTransfer(Component):
 
     def validate(self, package_level_id, location_barcode, confirmation=False):
         """Validate the transfer"""
-        search = self.actions_for("search")
+        search = self._actions_for("search")
 
         package_level = self.env["stock.package_level"].browse(package_level_id)
         if not package_level.exists():
@@ -251,7 +258,7 @@ class SinglePackTransfer(Component):
 
         completion_info_popup = None
         if self._is_last_move(move):
-            completion_info = self.actions_for("completion.info")
+            completion_info = self._actions_for("completion.info")
             completion_info_popup = completion_info.popup(package_level.move_line_ids)
         return self._response_for_start(message=message, popup=completion_info_popup)
 
@@ -259,7 +266,8 @@ class SinglePackTransfer(Component):
         # when writing the destination on the package level, it writes
         # on the move lines
         move.move_line_ids.package_level_id.location_dest_id = scanned_location
-        move.extract_and_action_done()
+        stock = self._actions_for("stock")
+        stock.validate_moves(move)
 
     def cancel(self, package_level_id):
         package_level = self.env["stock.package_level"].browse(package_level_id)

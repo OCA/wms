@@ -52,13 +52,9 @@ class ZonePickingUnloadSetDestinationSync(ZonePickingCommonCase, SyncMixin):
         )
 
     def test_unload_set_destination_sync(self):
-        zone_location = self.zone_location
-        picking_type = self.picking1.picking_type_id
-
+        self.service.work.current_picking_type = self.picking1.picking_type_id
         # set the destination package
         self.service._set_destination_package(
-            zone_location,
-            picking_type,
             self.move1.move_line_ids,
             self.move1.move_line_ids.product_uom_qty,
             self.free_package,
@@ -66,8 +62,6 @@ class ZonePickingUnloadSetDestinationSync(ZonePickingCommonCase, SyncMixin):
         self.service.dispatch(
             "unload_set_destination",
             params={
-                "zone_location_id": zone_location.id,
-                "picking_type_id": picking_type.id,
                 "package_id": self.free_package.id,
                 "barcode": self.packing_sublocation.barcode,
                 "confirmation": True,

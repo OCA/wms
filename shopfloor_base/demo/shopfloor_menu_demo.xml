@@ -1,0 +1,7 @@
+<odoo noupdate="1">
+    <record id="shopfloor_menu_demo_1" model="shopfloor.menu">
+        <field name="name">Simple Thing To Do</field>
+        <field name="sequence">20</field>
+        <field name="scenario_id" ref="shopfloor_base.shopfloor_scenario_demo_1" />
+    </record>
+</odoo>

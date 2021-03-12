@@ -38,6 +38,7 @@
                                 widget="many2many_tags"
                             />
                             <field name="height_required" />
+                            <field name="barcode" />
                         </group>
                         <group name="msg">
                             <div colspan="2">

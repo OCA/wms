@@ -2,6 +2,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from itertools import product
 
+import mock
+
 from .test_checkout_base import CheckoutCommonCase
 from .test_checkout_select_package_base import CheckoutSelectPackageMixin
 
@@ -351,7 +353,6 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         )
         self.assert_response(
             response,
-            # go pack to the screen to select lines to put in packages
             next_state="select_line",
             data={"picking": self._stock_picking_data(picking)},
             message={
@@ -359,6 +360,79 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 "body": "Product(s) packed in {}".format(new_package.name),
             },
         )
+
+    def test_scan_package_action_scan_packaging_bad_carrier(self):
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        picking.carrier_id = picking.carrier_id.search([], limit=1)
+        pack1_moves = picking.move_lines
+        # put in 2 packs, for this test, we'll work on pack1
+        self._fill_stock_for_moves(pack1_moves, in_package=True)
+        picking.action_assign()
+        selected_lines = pack1_moves.move_line_ids
+        selected_lines.qty_done = selected_lines.product_uom_qty
+
+        packaging = (
+            self.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "DeliverX",
+                    "barcode": "XXX",
+                    "height": 12,
+                    "width": 13,
+                    "lngth": 14,
+                }
+            )
+        )
+        # Delivery type and package_carrier_type values
+        # depend on specific implementations that we don't have as dependency.
+        # What is important here is to simulate their value when mismatching.
+        mock1 = mock.patch.object(
+            type(packaging), "package_carrier_type", new_callable=mock.PropertyMock,
+        )
+        mock2 = mock.patch.object(
+            type(picking.carrier_id), "delivery_type", new_callable=mock.PropertyMock,
+        )
+        with mock1 as mocked_package_carrier_type, mock2 as mocked_delivery_type:
+            # Not matching at all -> bad
+            mocked_package_carrier_type.return_value = "DHL"
+            mocked_delivery_type.return_value = "UPS"
+            response = self.service.dispatch(
+                "scan_package_action",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_ids": selected_lines.ids,
+                    # create a new package using this packaging
+                    "barcode": packaging.barcode,
+                },
+            )
+            self._assert_selected_response(
+                response,
+                selected_lines,
+                message=self.msg_store.packaging_invalid_for_carrier(
+                    packaging, picking.carrier_id
+                ),
+            )
+            # No carrier type set on the packaging -> good
+            mocked_package_carrier_type.return_value = "none"
+            response = self.service.dispatch(
+                "scan_package_action",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_ids": selected_lines.ids,
+                    # create a new package using this packaging
+                    "barcode": packaging.barcode,
+                },
+            )
+            self.assertEqual(
+                response["message"],
+                {
+                    "message_type": "success",
+                    "body": "Product(s) packed in {}".format(
+                        selected_lines.result_package_id.name
+                    ),
+                },
+            )
 
     def test_scan_package_action_scan_not_found(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])

@@ -1,0 +1,103 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_workstation
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__active
+msgid "Active"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model_terms:ir.ui.view,arch_db:shopfloor_workstation.shopfloor_workstation_form_view
+#: model_terms:ir.ui.view,arch_db:shopfloor_workstation.shopfloor_workstation_search_view
+msgid "Archived"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__barcode
+msgid "Barcode"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: code:addons/shopfloor_workstation/services/workstation.py:0
+#, python-format
+msgid "Default workstation set to {}"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__id
+msgid "ID"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__name
+msgid "Name"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__shopfloor_profile_id
+msgid "Shopfloor Profile"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model,name:shopfloor_workstation.model_shopfloor_workstation
+msgid "Shopfloor workstation settings"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__printing_printer_id
+msgid "Standard Printer"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.actions.act_window,name:shopfloor_workstation.action_shopfloor_workstation
+#: model:ir.ui.menu,name:shopfloor_workstation.menu_action_shopfloor_workstation
+msgid "Workstation"
+msgstr ""
+
+#. module: shopfloor_workstation
+#: code:addons/shopfloor_workstation/services/workstation.py:0
+#, python-format
+msgid "Workstation not found"
+msgstr ""

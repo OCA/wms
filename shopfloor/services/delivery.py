@@ -17,6 +17,11 @@ class Delivery(Component):
 
     Multiple operators could be processing a same delivery order.
 
+    You will find a sequence diagram describing states and endpoints
+    relationships [here](../docs/delivery_diag_seq.png).
+    Keep [the sequence diagram](../docs/delivery_diag_seq.plantuml)
+    up-to-date if you change endpoints.
+
     Expected:
 
     * Existing packages are moved to customer location
@@ -107,7 +112,7 @@ class Delivery(Component):
         * deliver: always return here with the data for the last touched
         picking or no picking if the picking has been set to done
         """
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         picking = search.picking_from_scan(barcode)
         barcode_valid = bool(picking)
         if picking:
