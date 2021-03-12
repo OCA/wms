@@ -92,9 +92,7 @@ class Checkout(Component):
         return ""
 
     def _response_for_select_dest_package(self, picking, move_lines, message=None):
-        packages = picking.mapped("move_line_ids.package_id") | picking.mapped(
-            "move_line_ids.result_package_id"
-        )
+        packages = picking.mapped("move_line_ids.result_package_id")
         if not packages:
             return self._response_for_select_package(
                 picking,

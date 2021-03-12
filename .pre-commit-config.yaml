@@ -10,10 +10,10 @@ exclude: |
   ^shopfloor_batch_automatic_creation/|
   ^shopfloor_checkout_sync/|
   ^shopfloor_mobile/|
-  ^shopfloor_mobile_custom_example/|
   ^shopfloor_packing_info/|
   ^shopfloor_rest_log/|
   ^shopfloor_workstation/|
+  ^shopfloor_workstation_mobile/|
   ^stock_available_to_promise_release/|
   ^stock_available_to_promise_release_dynamic_routing/|
   ^stock_checkout_sync/|
@@ -91,7 +91,7 @@ repos:
         # SPECIAL CASE: barcode scanner app use Vue.js +
         # advanced JS (modules, classes, etc)
         # which are not supported by OCA rules yet.
-        exclude: shopfloor_mobile*/*
+        exclude: shopfloor_*/*
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.4.0
     hooks:

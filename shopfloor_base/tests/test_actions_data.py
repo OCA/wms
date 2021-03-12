@@ -13,4 +13,6 @@ class ActionsDataCase(CommonCase, ActionsDataTestMixin):
     def test_data_partner(self):
         data = self.data.partner(self.partner)
         self.assert_schema(self.schema._simple_record(), data)
-        self.assertDictEqual(data, {"id": self.partner.id, "name": self.partner.name})
+        self.assertDictEqual(
+            data, {"id": self.partner.id, "name": self.partner.display_name}
+        )

@@ -1,0 +1,5 @@
+<odoo>
+    <record id="shopfloor_profile_partner_manager_demo" model="shopfloor.profile">
+        <field name="name">Partner manager</field>
+    </record>
+</odoo>

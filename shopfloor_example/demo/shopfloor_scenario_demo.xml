@@ -1,0 +1,6 @@
+<odoo>
+    <record id="shopfloor_scenario_partners_demo" model="shopfloor.scenario">
+        <field name="name">Manage partners</field>
+        <field name="key">partner_example</field>
+    </record>
+</odoo>

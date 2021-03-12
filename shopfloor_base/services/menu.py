@@ -51,10 +51,10 @@ class ShopfloorMenu(Component):
         )
 
     def _convert_one_record(self, record):
-        values = record.jsonify(self._one_record_parser(), one=True)
+        values = record.jsonify(self._one_record_parser(record), one=True)
         return values
 
-    def _one_record_parser(self):
+    def _one_record_parser(self, record):
         return [
             "id",
             "name",
