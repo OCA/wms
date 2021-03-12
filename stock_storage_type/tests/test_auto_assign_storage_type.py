@@ -6,7 +6,7 @@ from .common import TestStorageTypeCommon
 class TestAutoAssignStorageType(TestStorageTypeCommon):
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestAutoAssignStorageType, cls).setUpClass()
         cls.product_packaging = cls.product_lot_pallets_product_packaging
         cls.package_storage_type = cls.product_packaging.package_storage_type_id
 
