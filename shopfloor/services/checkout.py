@@ -1030,7 +1030,8 @@ class Checkout(Component):
         so they have to be processed again.
 
         Transitions:
-        * summary
+        * summary: if package or line are not found
+        * select_line: when package or line has been canceled
         """
         picking = self.env["stock.picking"].browse(picking_id)
         message = self._check_picking_status(picking)
@@ -1061,7 +1062,7 @@ class Checkout(Component):
         if line:
             line.write({"qty_done": 0, "shopfloor_checkout_done": False})
             msg = _("Line cancelled")
-        return self._response_for_summary(
+        return self._response_for_select_line(
             picking, message={"message_type": "success", "body": msg}
         )
 
@@ -1475,7 +1476,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
         return self._response_schema(next_states={"change_packaging", "summary"})
 
     def cancel_line(self):
-        return self._response_schema(next_states={"summary"})
+        return self._response_schema(next_states={"summary", "select_line"})
 
     def done(self):
         return self._response_schema(next_states={"summary", "confirm_done"})
