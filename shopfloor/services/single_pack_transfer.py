@@ -132,7 +132,7 @@ class SinglePackTransfer(Component):
         # use a sub-search on stock.picking: we shouldn't have dozens of package levels
         # for a package.
         package_level = package_level.filtered(
-            lambda pl: pl.state not in ("cancel", "done")
+            lambda pl: pl.state not in ("cancel", "done", "draft")
         )
         message = self.msg_store.no_pending_operation_for_pack(package)
         if not package_level and self.work.menu.allow_move_create:
