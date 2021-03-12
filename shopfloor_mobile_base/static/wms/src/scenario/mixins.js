@@ -232,6 +232,7 @@ export var ScenarioBaseMixin = {
         _reload_current_state: function() {
             // Force re-computation of current state data.
             this.state = this.state_get_data();
+            this.$root.trigger("screen:reload", {}, true);
         },
         state_reset_data_all() {
             const self = this;
