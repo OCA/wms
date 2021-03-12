@@ -322,15 +322,30 @@ class Delivery(Component):
             )
         return self._response_for_deliver(new_picking)
 
-    def _action_picking_done(self, picking):
-        """Try to validate the stock picking if all its lines have been processed.
+    def _action_picking_done(self, picking, force=False):
+        """Try to validate the stock picking if all quantities are satisfied.
 
         Return `True` if the picking has been validated successfully.
+
+        :param picking: stock.picking recordset
+        :param force: bypass check and set picking as done no matter if satisfied.
+            You will likely get a backorder for not processed lines.
         """
-        move_lines_done = all(
-            [line.qty_done >= line.product_uom_qty for line in picking.move_line_ids]
-        )
-        if move_lines_done:
+
+        if picking.state == "done":
+            return True
+        if force:
+            picking.action_done()
+            return True
+        all_done = False
+        for move in picking.move_lines:
+            if move.state in ("done", "cancel"):
+                continue
+            all_done = move._qty_is_satisfied()
+            if not all_done:
+                # At least one move not satisfied, cannot mark as done automatically
+                break
+        if all_done:
             picking.action_done()
             return True
         return False
@@ -513,7 +528,7 @@ class Delivery(Component):
                 return self._response_for_deliver(
                     message=self.msg_store.transfer_no_qty_done()
                 )
-            picking.action_done()
+            self._action_picking_done(picking, force=True)
             return self._response_for_deliver(
                 message=self.msg_store.transfer_complete(picking)
             )
