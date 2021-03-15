@@ -35,6 +35,7 @@ class StockPackageStorageType(models.Model):
         default=False,
     )
     barcode = fields.Char("Barcode", copy=False)
+    active = fields.Boolean(default=True)
 
     @api.depends("storage_location_sequence_ids")
     def _compute_storage_type_message(self):
