@@ -380,6 +380,12 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "No delivery package type available."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "No lines to process."
 msgstr ""
 
@@ -450,16 +456,9 @@ msgid "No quantity has been processed, unable to complete the transfer."
 msgstr ""
 
 #. module: shopfloor
-#: code:addons/shopfloor/services/checkout.py:0
+#: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No valid package to select."
-msgstr ""
-
-#. module: shopfloor
-#: code:addons/shopfloor/services/checkout.py:0
-#: code:addons/shopfloor/services/checkout.py:0
-#, python-format
-msgid "Not a valid destination package"
 msgstr ""
 
 #. module: shopfloor
@@ -600,7 +599,7 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Packaging {} does not match carrier {}."
+msgid "Packaging {} is not allowed for carrier {}."
 msgstr ""
 
 #. module: shopfloor
@@ -1171,6 +1170,12 @@ msgstr ""
 msgid ""
 "{picking.name} stock correction in location {location.name} for "
 "{product_desc}"
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "{} is not a valid destination package."
 msgstr ""
 
 #. module: shopfloor
