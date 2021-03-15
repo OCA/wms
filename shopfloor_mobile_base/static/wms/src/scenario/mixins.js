@@ -356,6 +356,8 @@ export var ScenarioBaseMixin = {
         },
         // Specific states methods
         on_scan: function(scanned) {
+            // Prevent scanning twice
+            if (this.$root.loading) return;
             const state = this._get_state_spec();
             if (state.on_scan) {
                 state.on_scan(scanned);
