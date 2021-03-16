@@ -35,7 +35,7 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
             <div class="button-list button-vertical-list full">
                 <v-row align="center" v-for="page in get_pages()" :key="make_component_key([page.key])">
                     <v-col class="text-center" cols="12">
-                        <v-btn @click="$router.push({'name': page.key})">
+                        <v-btn @click="$router.push({'name': page.key})" :data-action="'setting-' + page.key">
                             <v-icon v-text="page.metadata.icon || 'mdi-account-cog'"/>
                             <span>{{ page.metadata.display_name(_self, page) }}</span>
                         </v-btn>
