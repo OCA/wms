@@ -62,6 +62,7 @@ export var LoginPage = Vue.component("login-page", {
                     <div class="login-wrapper">
                         <v-form v-on:submit="login">
                             <v-text-field
+                                name="apikey"
                                 v-model="apikey"
                                 :label="$t('screen.login.api_key_label')"
                                 :placeholder="$t('screen.login.api_key_placeholder')"
