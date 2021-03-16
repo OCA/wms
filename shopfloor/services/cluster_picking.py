@@ -596,9 +596,11 @@ class ClusterPicking(Component):
             )
 
         # the scanned package can contain only move lines of the same picking
-        if any(
+        if bin_package.quant_ids or any(
             ml.picking_id != move_line.picking_id
-            for ml in bin_package.planned_move_line_ids
+            for ml in bin_package.planned_move_line_ids.filtered(
+                lambda x: x.state not in ("done", "cancel")
+            )
         ):
             return self._response_for_scan_destination(
                 move_line,
