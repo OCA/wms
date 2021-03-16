@@ -789,7 +789,10 @@ class Checkout(Component):
         return packaging.package_carrier_type in ("none", carrier.delivery_type)
 
     def _get_available_delivery_packaging(self, picking):
-        return self.env["product.packaging"].search(
+        model = self.env["product.packaging"]
+        if not picking.carrier_id:
+            return model.browse()
+        return model.search(
             [
                 ("product_id", "=", False),
                 (
