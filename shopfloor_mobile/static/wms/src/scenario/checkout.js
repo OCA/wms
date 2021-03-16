@@ -104,7 +104,7 @@ const Checkout = {
                         <v-col class="text-center" cols="12">
                             <btn-action
                                    @click="state.on_new_pack"
-                                   :disabled="_.isEmpty(selected_lines())"
+                                   :disabled="_.isEmpty(selected_lines()) || _.isEmpty(state.data.picking.carrier)"
                                    >New pack</btn-action>
                         </v-col>
                     </v-row>
