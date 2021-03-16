@@ -1,0 +1,7 @@
+{
+  "projectId": "shopfloor_mobile_base",
+  "baseUrl": "http://localhost:9069/shopfloor_mobile/app/",
+  "viewportHeight": 740,
+  "viewportWidth": 360,
+  "TEST_API_KEY": "72B044F7AC780DAC"
+}
