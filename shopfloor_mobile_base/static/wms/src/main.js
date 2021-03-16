@@ -48,6 +48,7 @@ register_app_components(page_registry.all());
 config_registry.add("apikey", {default: "", reset_on_clear: true});
 config_registry.add("profile", {default: {}, reset_on_clear: true});
 config_registry.add("appmenu", {default: [], reset_on_clear: true});
+config_registry.add("authenticated", {default: false, reset_on_clear: true});
 
 const app = new Vue({
     i18n,
@@ -66,7 +67,6 @@ const app = new Vue({
             event_hub: EventHub,
             loading: false,
             appconfig: null,
-            authenticated: false,
         };
         _.merge(data, config_registry.generare_data_keys());
         return data;
@@ -152,8 +152,6 @@ const app = new Vue({
             const stored = this.$storage.get("appconfig");
             if (stored) {
                 this.appconfig = stored;
-                // Storage is by session, hence we assume we are authenticated.
-                // TODO: any better way?
                 this.authenticated = true;
                 return this.appconfig;
             }
