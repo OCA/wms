@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 from .common import CommonCase
@@ -7,7 +8,7 @@ from .common_misc import ActionsDataTestMixin
 class ActionsDataCase(CommonCase, ActionsDataTestMixin):
     @classmethod
     def setUpClassBaseData(cls):
-        super().setUpClassBaseData()
+        super(ActionsDataCase, cls).setUpClassBaseData()
         cls.partner = cls.env.ref("base.res_partner_12").sudo()
 
     def test_data_partner(self):

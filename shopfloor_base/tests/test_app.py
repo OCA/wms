@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 from .common import CommonCase
@@ -6,12 +7,12 @@ from .common import CommonCase
 class AppCase(CommonCase):
     @classmethod
     def setUpClassVars(cls):
-        super().setUpClassVars()
+        super(AppCase, cls).setUpClassVars()
         cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
         cls.profile2 = cls.env.ref("shopfloor_base.profile_demo_2")
 
     def setUp(self):
-        super().setUp()
+        super(AppCase, self).setUp()
         with self.work_on_services(profile=self.profile) as work:
             self.service = work.component(usage="app")
 

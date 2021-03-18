@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
@@ -6,7 +7,7 @@ from .common import CommonCase
 
 class ProfileCase(CommonCase):
     def setUp(self):
-        super().setUp()
+        super(ProfileCase, self).setUp()
         with self.work_on_services() as work:
             self.service = work.component(usage="profile")
 

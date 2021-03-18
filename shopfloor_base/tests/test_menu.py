@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
@@ -8,7 +9,7 @@ from .common_misc import MenuTestMixin
 class MenuCase(CommonCase, MenuTestMixin):
     @classmethod
     def setUpClassVars(cls):
-        super().setUpClassVars()
+        super(MenuCase, cls).setUpClassVars()
         cls.profile = cls.env.ref("shopfloor_base.profile_demo_2")
 
     def test_menu_search(self):

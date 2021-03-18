@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 from contextlib import contextmanager
@@ -52,18 +53,20 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
 
     maxDiff = None
 
+    @classmethod
     @contextmanager
-    def work_on_services(self, env=None, **params):
+    def work_on_services(cls, env=None, **params):
         params = params or {}
-        collection = _PseudoCollection("shopfloor.service", env or self.env)
+        collection = _PseudoCollection("shopfloor.service", env or cls.env)
         yield WorkContext(
             model_name="rest.service.registration", collection=collection, **params
         )
 
+    @classmethod
     @contextmanager
-    def work_on_actions(self, **params):
+    def work_on_actions(cls, **params):
         params = params or {}
-        collection = _PseudoCollection("shopfloor.action", self.env)
+        collection = _PseudoCollection("shopfloor.action", cls.env)
         yield WorkContext(
             model_name="rest.service.registration", collection=collection, **params
         )
@@ -94,7 +97,7 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
         cls.setUpClassVars()
         cls.setUpClassBaseData()
 
-        with cls.work_on_actions(cls) as work:
+        with cls.work_on_actions() as work:
             cls.data = work.component(usage="data")
             cls.data_detail = work.component(usage="data_detail")
             cls.msg_store = work.component(usage="message")

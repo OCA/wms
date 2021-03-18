@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020 Akretion (http://www.akretion.com)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
@@ -7,11 +8,11 @@ from werkzeug.exceptions import BadRequest
 from odoo import _, exceptions
 from odoo.http import request
 from odoo.osv import expression
-from odoo.tools import DotDict
 
 from odoo.addons.component.core import AbstractComponent
 
 from ..actions.base_action import get_actions_for
+from ..utils import DotDict
 
 
 class BaseShopfloorService(AbstractComponent):
@@ -22,9 +23,11 @@ class BaseShopfloorService(AbstractComponent):
     _collection = "shopfloor.service"
     _expose_model = None
 
-    def dispatch(self, method_name, *args, params=None):
+    def dispatch(self, method_name, _id=None, params=None):
         self._validate_headers_update_work_context(request, method_name)
-        return super().dispatch(method_name, *args, params=params)
+        return super(BaseShopfloorService, self).dispatch(
+            method_name, _id=_id, params=params
+        )
 
     def _actions_for(self, usage, **kw):
         return get_actions_for(self, usage, **kw)
@@ -52,6 +55,20 @@ class BaseShopfloorService(AbstractComponent):
         for record in records:
             res.append(self._convert_one_record(record))
         return res
+
+    def _get_input_validator(self, method_name):
+        # override the method to get the validator in a component
+        # instead of a method, to keep things apart
+        validator_component = self.component(usage="%s.validator" % self._usage)
+        return validator_component._get_validator(method_name)
+
+    def _get_output_validator(self, method_name):
+        # override the method to get the validator in a component
+        # instead of a method, to keep things apart
+        validator_component = self.component(
+            usage="%s.validator.response" % self._usage
+        )
+        return validator_component._get_validator(method_name)
 
     def _response(
         self, base_response=None, data=None, next_state=None, message=None, popup=None
@@ -107,7 +124,7 @@ class BaseShopfloorService(AbstractComponent):
     _requires_header_profile = False
 
     def _get_openapi_default_parameters(self):
-        defaults = super()._get_openapi_default_parameters()
+        defaults = super(BaseShopfloorService, self)._get_openapi_default_parameters()
         # Normal users can't read an API key, ignore it using sudo() only
         # because it's a demo key.
         demo_api_key = self.env.ref("shopfloor.api_key_demo", raise_if_not_found=False)

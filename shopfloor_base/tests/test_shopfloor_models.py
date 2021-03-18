@@ -1,9 +1,8 @@
+# -*- coding: utf-8 -*-
 # Copyright 2021 ACSONE SA/NV (http://www.acsone.eu)
 # @author Simone Orsi <simahawk@gmail.com>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 import json
-
-from odoo.tests.common import Form
 
 from .common import CommonCase
 
@@ -11,7 +10,7 @@ from .common import CommonCase
 class TestShopfloorRecords(CommonCase):
     @classmethod
     def setUpClassUsers(cls):
-        super().setUpClassUsers()
+        super(TestShopfloorRecords, cls).setUpClassUsers()
         cls.env = cls.env(user=cls.shopfloor_manager)
 
     def test_scenario(self):
@@ -44,8 +43,5 @@ class TestShopfloorRecords(CommonCase):
         self.assertEqual(
             rec.options_edit, json.dumps(expected, indent=4, sort_keys=True)
         )
-        with Form(self.env["shopfloor.scenario"]) as form:
-            form.name = "Test Onchange"
-            self.assertEqual(form.key, "test_onchange")
 
     # TODO: test other records (menu, profile)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 from odoo.osv import expression
@@ -21,7 +22,7 @@ class ShopfloorMenu(Component):
     _description = __doc__
 
     def _get_base_search_domain(self):
-        base_domain = super()._get_base_search_domain()
+        base_domain = super(ShopfloorMenu, self)._get_base_search_domain()
         return expression.AND(
             [
                 base_domain,

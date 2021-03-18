@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020 Akretion (http://www.akretion.com)
 # Copyright 2020 BCIM
@@ -6,7 +7,7 @@
 {
     "name": "Shopfloor Base",
     "summary": "Core module for creating mobile apps",
-    "version": "13.0.1.1.0",
+    "version": "10.0.1.1.0",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
@@ -14,7 +15,7 @@
     "maintainers": ["guewen", "simahawk", "sebalix"],
     "license": "LGPL-3",
     "application": True,
-    "depends": ["base_jsonify", "base_rest", "base_sparse_field", "auth_api_key"],
+    "depends": ["base_jsonify", "base_rest", "auth_api_key"],
     "data": [
         "data/module_category_data.xml",
         "security/groups.xml",
@@ -32,5 +33,6 @@
         "demo/shopfloor_profile_demo.xml",
     ],
     "post_init_hook": "post_init_hook",
-    "installable": False,
+    "installable": True,
+    "external_dependencies": {"python": ["slugify"]},
 }

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 from .common import CommonCase
@@ -7,7 +8,7 @@ from .common_misc import MenuTestMixin
 class UserCase(CommonCase, MenuTestMixin):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
-        super().setUpClassVars(*args, **kwargs)
+        super(UserCase, cls).setUpClassVars(*args, **kwargs)
         ref = cls.env.ref
         profile1 = ref("shopfloor_base.profile_demo_1")
         cls.profile = profile1.sudo().copy()
@@ -21,7 +22,7 @@ class UserCase(CommonCase, MenuTestMixin):
         ).sudo().write({"profile_id": profile1.id})
 
     def setUp(self):
-        super().setUp()
+        super(UserCase, self).setUp()
         with self.work_on_services(profile=self.profile) as work:
             self.service = work.component(usage="user")
 
@@ -41,7 +42,9 @@ class UserCase(CommonCase, MenuTestMixin):
         menus = self.menu_items.sudo()
         menu = menus[0]
         menu.profile_id = self.profile
-        (menus - menu).profile_id = self.profile2
+        menus = menus - menu
+        if menus:
+            menus.profile_id = self.profile2
 
         response = self.service.dispatch("menu")
         self.assert_response(

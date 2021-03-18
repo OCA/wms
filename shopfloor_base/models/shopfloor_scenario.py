@@ -1,13 +1,15 @@
+# -*- coding: utf-8 -*-
 # Copyright 2021 ACSONE SA/NV (http://www.acsone.eu)
 # @author Simone Orsi <simahawk@gmail.com>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 import json
 import logging
 
-from odoo import api, fields, models
+import slugify
 
-from odoo.addons.base_sparse_field.models.fields import Serialized
-from odoo.addons.http_routing.models.ir_http import slugify
+from odoo import api, fields, models
+from odoo.fields import Serialized
+from odoo.tools import ustr
 
 _logger = logging.getLogger(__name__)
 
@@ -26,9 +28,7 @@ class ShopfloorScenario(models.Model):
         "This value must match a service component's `usage`.",
     )
     options = Serialized(compute="_compute_options", default={})
-    options_edit = fields.Text(
-        help="Configure options via JSON", inverse="_inverse_options_edit"
-    )
+    options_edit = fields.Text(help="Configure options via JSON")
 
     _sql_constraints = [("key", "unique(key)", "Scenario key must be unique")]
 
@@ -36,11 +36,6 @@ class ShopfloorScenario(models.Model):
     def _compute_options(self):
         for rec in self:
             rec.options = rec._load_options()
-
-    def _inverse_options_edit(self):
-        for rec in self:
-            # Make sure options_edit is always readable
-            rec.options_edit = json.dumps(rec.options or {}, indent=4, sort_keys=True)
 
     def _load_options(self):
         return json.loads(self.options_edit or "{}")
@@ -61,11 +56,14 @@ class ShopfloorScenario(models.Model):
     @api.model
     def create(self, vals):
         self._handle_key(vals)
-        return super().create(vals)
+        self._ensure_options_edit_readability(vals)
+        return super(ShopfloorScenario, self).create(vals)
 
     def write(self, vals):
         self._handle_key(vals)
-        return super().write(vals)
+        if "options_edit" in vals:
+            self._ensure_options_edit_readability(vals)
+        return super(ShopfloorScenario, self).write(vals)
 
     def _handle_key(self, vals):
         # make sure technical names are always there
@@ -74,7 +72,11 @@ class ShopfloorScenario(models.Model):
 
     @staticmethod
     def _normalize_key(name):
-        return slugify(name).replace("-", "_")
+        return slugify.slugify(ustr(name)).replace("-", "_")
 
     def has_option(self, key):
         return self.options.get(key, False)
+
+    def _ensure_options_edit_readability(self, vals):
+        value = json.loads(vals.get("options_edit", "{}"))
+        vals["options_edit"] = json.dumps(value, indent=4, sort_keys=True)
