@@ -1,18 +1,16 @@
 context("Profile mgmt", () => {
     before(() => {
         cy.fake_login();
-        cy.reset_profile();
+        cy.reset_app_data("profile");
     });
 
     it("Open profile settings", () => {
-        cy.visit("#/settings");
-        cy.get("button[data-action=setting-profile]").click();
+        cy.go_to_profile_settings();
         cy.url().should("include", "#/profile");
     });
 
     it("Select profile", () => {
-        cy.get(".list-item-wrapper:first :checkbox").as("profile");
-        cy.get("@profile").then(profile => {
+        cy.set_profile().then(profile => {
             let profile_id = profile.val();
             profile.click();
             cy.location().should(loc => {

@@ -6,8 +6,7 @@ context("Test 1st access to app", () => {
     it("Load app as anon and login", () => {
         cy.visit("#/");
         cy.url().should("include", "#/login");
-        cy.get("input[name=apikey]").type(Cypress.config("TEST_API_KEY"));
-        cy.get("form").submit();
+        cy.manual_login();
         cy.get("[data-ref=profile-not-ready]").should("exist");
     });
 
