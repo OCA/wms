@@ -1,8 +1,9 @@
+# -*- coding: utf-8 -*-
 # Copyright 2021 ACSONE SA/NV (http://www.acsone.eu)
 # @author Simone Orsi <simahawk@gmail.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo.addons.base_rest import restapi
+from odoo.addons.base_rest.components.service import skip_secure_params
 from odoo.addons.component.core import Component
 
 
@@ -14,32 +15,26 @@ class PartnerExampleService(Component):
     _usage = "partner_example"
     _description = __doc__
 
-    @restapi.method(
-        [(["/scan/<string:identifier>"], "GET")], auth="api_key",
-    )
-    def scan(self, identifier):
+    @skip_secure_params
+    def scan(self, _id):
         """Scan a partner ref and return its data.
         """
         search = self._actions_for("search")
-        record = search.partner_from_scan(identifier)
+        record = search.partner_from_scan(_id)
         return self._response_for_scan(record)
 
-    @restapi.method(
-        [(["/partner_list"], "GET")], auth="api_key",
-    )
+    @skip_secure_params
     def partner_list(self, **params):
         """Return list of available partners.
         """
         records = self.env["res.partner"].search([])
         return self._response_for_partner_list(records)
 
-    @restapi.method(
-        [(["/detail/<int:partner_id>"], "GET")], auth="api_key",
-    )
-    def detail(self, partner_id):
+    @skip_secure_params
+    def detail(self, _id):
         """Retrieve full detail for partner ID.
         """
-        record = self.env["res.partner"].browse(partner_id).exists()
+        record = self.env["res.partner"].browse(_id).exists()
         if not record:
             message = self.msg_store.generic_record_not_found()
             records = self.env["res.partner"].search([])
@@ -65,17 +60,17 @@ class ShopfloorCheckoutValidator(Component):
     _name = "shopfloor.partner_example.validator"
     _usage = "partner_example.validator"
 
-    def _validator_scan(self):
+    def scan(self):
         return {
             "identifier": {"type": "string", "nullable": False, "required": True},
         }
 
-    def _detail(self):
+    def detail(self):
         return {
             "partner_id": {"required": True, "type": "integer"},
         }
 
-    def _partner_list(self):
+    def partner_list(self):
         return {}
 
 
@@ -85,11 +80,24 @@ class ShopfloorCheckoutValidatorResponse(Component):
     _name = "shopfloor.partner_example.validator.response"
     _usage = "partner_example.validator.response"
 
-    def _scan(self):
-        return self._detail()
+    def _states(self):
+        """List of possible next states
 
-    def _detail(self):
-        return self._schema.partner_detail()
+        With the schema of the data send to the client to transition
+        to the next state.
+        """
+        return {
+            "start": {},
+            "listing": {
+                "records": self.schemas._schema_list_of(self.schemas.partner()),
+            },
+        }
 
-    def _partner_list(self):
-        return self.schema._schema_list_of(self._schema.partner())
+    def scan(self):
+        return self.detail()
+
+    def detail(self):
+        return self.schemas_detail.partner_detail()
+
+    def partner_list(self):
+        return self._response_schema(next_states=["listing"])

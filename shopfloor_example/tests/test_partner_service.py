@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2021 ACSONE SA/NV (http://www.acsone.eu)
 # @author Simone Orsi <simahawk@gmail.com>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
@@ -8,12 +9,12 @@ from odoo.addons.shopfloor_base.tests.common import CommonCase
 class TestCustomServiceCase(CommonCase):
     @classmethod
     def setUpClassUsers(cls):
-        super().setUpClassUsers()
+        super(TestCustomServiceCase, cls).setUpClassUsers()
         cls.shopfloor_user.groups_id += cls.env.ref("base.group_partner_manager")
 
     @classmethod
     def setUpClassBaseData(cls):
-        super().setUpClassBaseData()
+        super(TestCustomServiceCase, cls).setUpClassBaseData()
         cls.record = cls.env.ref("base.res_partner_4")
         cls.record.ref = "1234"
 
