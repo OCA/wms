@@ -109,18 +109,7 @@ Vue.component("Screen", {
             </v-list>
             <template v-slot:append>
                 <v-divider></v-divider>
-                <v-list v-if="$root.user.id">
-                    <v-list-item>
-                        <v-list-item-avatar>
-                            <v-avatar color="primary" size="36">
-                                <v-icon dark>mdi-account-circle</v-icon>
-                            </v-avatar>
-                        </v-list-item-avatar>
-                        <v-list-item-content>
-                            <span v-text="$root.user.name" />
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list>
+                <user-session-detail />
             </template>
         </v-navigation-drawer>
         <v-app-bar
@@ -199,7 +188,6 @@ Vue.component("nav-items", {
             :key="'nav-item-' + item.id"
             :to="{name: item.scenario, params: {menu_id: item.id, state: 'init'}}"
             link
-            active-class="'v-item-active"
             :color="$route.params.menu_id == item.id ? 'v-item-active' : null"
             >
             <v-list-item-content>

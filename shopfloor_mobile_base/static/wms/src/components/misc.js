@@ -366,3 +366,49 @@ Vue.component("profile-not-ready", {
     </div>
     `,
 });
+
+Vue.component("user-session-detail", {
+    props: {
+        show_user: {
+            type: Boolean,
+            default: true,
+        },
+        show_profile: {
+            type: Boolean,
+            default: true,
+        },
+    },
+    template: `
+  <div :class="$options._componentTag" data-ref="user-session-detail">
+    <v-list>
+        <v-list-item v-if="show_user && $root.user.id"
+                data-ref="session-detail-user"
+                :data-id="$root.user.id"
+                >
+            <v-list-item-avatar>
+                <v-avatar color="primary" size="36">
+                    <v-icon dark>mdi-account-circle</v-icon>
+                </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-content>
+                <span v-text="$root.user.name" />
+            </v-list-item-content>
+        </v-list-item>
+        <v-list-item v-if="show_profile && $root.has_profile"
+                data-ref="session-detail-profile"
+                :data-id="$root.profile.id"
+                :to="{name: 'profile'}"
+                >
+            <v-list-item-avatar>
+                <v-avatar color="primary" size="36">
+                    <v-icon dark>mdi-account-multiple-check</v-icon>
+                </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-content>
+                <span v-text="$root.profile.name" />
+            </v-list-item-content>
+        </v-list-item>
+    </v-list>
+  </div>
+  `,
+});
