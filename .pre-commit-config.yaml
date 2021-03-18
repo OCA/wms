@@ -9,7 +9,9 @@ exclude: |
   ^shopfloor_base/|
   ^shopfloor_batch_automatic_creation/|
   ^shopfloor_checkout_sync/|
+  ^shopfloor_example/|
   ^shopfloor_mobile/|
+  ^shopfloor_mobile_base/|
   ^shopfloor_packing_info/|
   ^shopfloor_rest_log/|
   ^shopfloor_workstation/|

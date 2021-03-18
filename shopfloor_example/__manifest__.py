@@ -11,7 +11,7 @@
     "website": "https://github.com/OCA/wms",
     "category": "Hidden",
     "license": "AGPL-3",
-    "installable": True,
+    "installable": False,
     # fmt: off
     "demo": [
         "demo/shopfloor_scenario_demo.xml",
