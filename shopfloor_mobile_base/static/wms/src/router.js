@@ -59,12 +59,13 @@ router.beforeEach(async (to, from, next) => {
     await Vue.nextTick();
     if (!router.app.authenticated && to.meta.requiresAuth && !router.app.demo_mode) {
         next("login");
+    } else {
+        if (router.app.global_state_key && to.name != from.name) {
+            // If we switch away from a process / scenario, we must reset global state.
+            router.app.$emit("state:change", "");
+        }
+        next();
     }
-    if (router.app.global_state_key && to.name != from.name) {
-        // If we switch away from a process / scenario, we must reset global state.
-        router.app.$emit("state:change", "");
-    }
-    next();
 });
 
 export {router};
