@@ -163,21 +163,7 @@ Vue.component("Screen", {
                 <slot name="header"></slot>
             </div>
 
-            <div class="profile-not-ready" v-if="show_profile_not_ready">
-                <v-alert type="warning" tile>
-                    <p>{{ $t('app.profile_not_configured') }}</p>
-                </v-alert>
-                <div class="button-list button-vertical-list full">
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <v-btn @click="$router.push({'name': 'settings'})">
-                                <v-icon>mdi-cog</v-icon>
-                                <span>{{ $t('app.profile_configure') }}</span>
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-                </div>
-            </div>
+            <profile-not-ready v-if="show_profile_not_ready" />
 
             <v-container>
                 <screen-loading :loading="$root.loading" />
