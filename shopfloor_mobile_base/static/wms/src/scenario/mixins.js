@@ -232,6 +232,7 @@ export var ScenarioBaseMixin = {
         _reload_current_state: function() {
             // Force re-computation of current state data.
             this.state = this.state_get_data();
+            this.$root.trigger("screen:reload", {}, true);
         },
         state_reset_data_all() {
             const self = this;
@@ -355,6 +356,8 @@ export var ScenarioBaseMixin = {
         },
         // Specific states methods
         on_scan: function(scanned) {
+            // Prevent scanning twice
+            if (this.$root.loading) return;
             const state = this._get_state_spec();
             if (state.on_scan) {
                 state.on_scan(scanned);

@@ -52,11 +52,13 @@ class CheckoutListDestPackageCase(
         self._fill_stock_for_moves(picking.move_lines[2], in_package=True)
         self._fill_stock_for_moves(picking.move_lines[3], in_package=True)
         picking.action_assign()
-        new_package = self.env["stock.quant.package"].create({})
-        picking.move_lines[1].move_line_ids.result_package_id = new_package
-
-        packages = picking.mapped("move_line_ids.package_id") | new_package
-
+        delivery_packaging = self.env.ref(
+            "stock_storage_type.product_product_9_packaging_single_bag"
+        )
+        delivery_package = self.env["stock.quant.package"].create(
+            {"packaging_id": delivery_packaging.id}
+        )
+        picking.move_lines[1].move_line_ids.result_package_id = delivery_package
         response = self.service.dispatch(
             "list_dest_package",
             params={
@@ -65,7 +67,7 @@ class CheckoutListDestPackageCase(
             },
         )
         self._assert_response_select_dest_package(
-            response, picking, picking.move_line_ids, packages
+            response, picking, picking.move_line_ids, delivery_package
         )
 
     def test_list_dest_package_error_no_package(self):
@@ -115,29 +117,42 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
 
         cls.selected_lines = pack1_moves.move_line_ids
         cls.pack1 = pack1_moves.move_line_ids.package_id
-        cls.allowed_packages = picking.mapped(
-            "move_line_ids.package_id"
-        ) | picking.mapped("move_line_ids.result_package_id")
-
+        cls.delivery_packaging = cls.env.ref(
+            "stock_storage_type.product_product_9_packaging_single_bag"
+        )
+        cls.delivery_package = cls.env["stock.quant.package"].create(
+            {"packaging_id": cls.delivery_packaging.id}
+        )
         cls.move_line1, cls.move_line2, cls.move_line3 = cls.selected_lines
+        # The 'scan_dest_package' and 'set_dest_package' methods can not be
+        # used at all if there is no valid delivery package on the picking
+        # (the user is redirected to the 'select_package' step in that case),
+        # so we need at least to set one to pass this check in order to test
+        # them
+        cls.move_line1.result_package_id = cls.delivery_package
         # We'll put only product A and B in the destination package
         cls.move_line1.qty_done = cls.move_line1.product_uom_qty
         cls.move_line2.qty_done = cls.move_line2.product_uom_qty
         cls.move_line3.qty_done = 0
 
         cls.picking = picking
-        cls.package = cls.move_line1.result_package_id
+
+    def _get_allowed_packages(self, picking):
+        return (
+            picking.mapped("move_line_ids.package_id")
+            | picking.mapped("move_line_ids.result_package_id")
+        ).filtered("packaging_id")
 
     def _assert_package_set(self, response):
         self.assertRecordValues(
             self.move_line1 + self.move_line2 + self.move_line3,
             [
                 {
-                    "result_package_id": self.package.id,
+                    "result_package_id": self.delivery_package.id,
                     "shopfloor_checkout_done": True,
                 },
                 {
-                    "result_package_id": self.package.id,
+                    "result_package_id": self.delivery_package.id,
                     "shopfloor_checkout_done": True,
                 },
                 # qty_done was zero so we don't set it as packed
@@ -151,7 +166,7 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             data={"picking": self._stock_picking_data(self.picking)},
             message={
                 "message_type": "success",
-                "body": "Product(s) packed in {}".format(self.pack1.name),
+                "body": "Product(s) packed in {}".format(self.delivery_package.name),
             },
         )
 
@@ -162,22 +177,27 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
                 "picking_id": self.picking.id,
                 "selected_line_ids": self.selected_lines.ids,
                 # we keep the goods in the same package, so we scan the source package
-                "barcode": self.package.name,
+                "barcode": self.delivery_package.name,
             },
         )
         self._assert_package_set(response)
 
     def test_scan_dest_package_error_not_found(self):
+        barcode = "NO BARCODE"
         response = self.service.dispatch(
             "scan_dest_package",
             params={
                 "picking_id": self.picking.id,
                 "selected_line_ids": self.selected_lines.ids,
-                "barcode": "NO BARCODE",
+                "barcode": barcode,
             },
         )
         self._assert_response_select_dest_package(
-            response, self.picking, self.selected_lines, self.allowed_packages
+            response,
+            self.picking,
+            self.selected_lines,
+            self._get_allowed_packages(self.picking),
+            message=self.service.msg_store.package_not_found_for_barcode(barcode),
         )
 
     def test_scan_dest_package_error_not_allowed(self):
@@ -194,11 +214,8 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             response,
             self.picking,
             self.selected_lines,
-            self.allowed_packages,
-            message={
-                "message_type": "error",
-                "body": "Not a valid destination package",
-            },
+            self._get_allowed_packages(self.picking),
+            message=self.service.msg_store.dest_package_not_valid(package),
         )
 
     def test_set_dest_package_ok(self):
@@ -207,7 +224,7 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             params={
                 "picking_id": self.picking.id,
                 "selected_line_ids": self.selected_lines.ids,
-                "package_id": self.package.id,
+                "package_id": self.delivery_package.id,
             },
         )
         self._assert_package_set(response)
@@ -222,7 +239,11 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             },
         )
         self._assert_response_select_dest_package(
-            response, self.picking, self.selected_lines, self.allowed_packages
+            response,
+            self.picking,
+            self.selected_lines,
+            self._get_allowed_packages(self.picking),
+            message=self.service.msg_store.record_not_found(),
         )
 
     def test_set_dest_package_error_not_allowed(self):
@@ -239,9 +260,6 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             response,
             self.picking,
             self.selected_lines,
-            self.allowed_packages,
-            message={
-                "message_type": "error",
-                "body": "Not a valid destination package",
-            },
+            self._get_allowed_packages(self.picking),
+            message=self.service.msg_store.dest_package_not_valid(package),
         )

@@ -23,13 +23,13 @@ addon | version | summary
 [delivery_carrier_warehouse](delivery_carrier_warehouse/) | 13.0.1.2.0 | Get delivery method used in sales orders from warehouse
 [delivery_preference_glue_stock_picking_group](delivery_preference_glue_stock_picking_group/) | 13.0.1.0.0 | Fix Delivery preferences module on grouping picking
 [sale_stock_available_to_promise_release](sale_stock_available_to_promise_release/) | 13.0.1.5.0 | Integration between Sales and Available to Promise Release
-[shopfloor](shopfloor/) | 13.0.4.3.1 | manage warehouse operations with barcode scanners
+[shopfloor](shopfloor/) | 13.0.4.4.1 | manage warehouse operations with barcode scanners
 [shopfloor_base](shopfloor_base/) | 13.0.1.1.0 | Core module for creating mobile apps
 [shopfloor_batch_automatic_creation](shopfloor_batch_automatic_creation/) | 13.0.1.0.1 | Create batch transfers for Cluster Picking
 [shopfloor_checkout_sync](shopfloor_checkout_sync/) | 13.0.1.0.0 | Glue module
 [shopfloor_example](shopfloor_example/) | 13.0.1.0.0 | Show how to customize the Shopfloor app frontend.
-[shopfloor_mobile](shopfloor_mobile/) | 13.0.2.0.1 | Mobile frontend for WMS Shopfloor app
-[shopfloor_mobile_base](shopfloor_mobile_base/) | 13.0.1.8.1 | Mobile frontend for WMS Shopfloor app
+[shopfloor_mobile](shopfloor_mobile/) | 13.0.2.2.1 | Mobile frontend for WMS Shopfloor app
+[shopfloor_mobile_base](shopfloor_mobile_base/) | 13.0.1.9.2 | Mobile frontend for WMS Shopfloor app
 [shopfloor_packing_info](shopfloor_packing_info/) | 13.0.1.0.0 | Allows to predefine packing information messages per partner.
 [shopfloor_rest_log](shopfloor_rest_log/) | 13.0.1.0.1 | Integrate rest_log into Shopfloor app
 [shopfloor_workstation](shopfloor_workstation/) | 13.0.1.1.1 | Manage warehouse workstation with barcode scanners
@@ -45,7 +45,7 @@ addon | version | summary
 [stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 13.0.1.0.0 | Define different shipping policies according to picking type
 [stock_picking_type_shipping_policy_group_by](stock_picking_type_shipping_policy_group_by/) | 13.0.1.0.0 | Glue module for Picking Type Shipping Policy and Group Transfers by Partner and Carrier
 [stock_reception_screen](stock_reception_screen/) | 13.0.1.6.1 | Dedicated screen to receive/scan goods.
-[stock_storage_type](stock_storage_type/) | 13.0.1.11.0 | Manage packages and locations storage types
+[stock_storage_type](stock_storage_type/) | 13.0.1.12.0 | Manage packages and locations storage types
 [stock_storage_type_buffer](stock_storage_type_buffer/) | 13.0.1.2.0 | Exclude storage locations from put-away if their buffer is full
 [stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 13.0.1.1.0 | Advanced storage strategy ABC for WMS
 
