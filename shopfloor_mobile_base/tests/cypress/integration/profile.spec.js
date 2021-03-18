@@ -1,17 +1,7 @@
 context("Profile mgmt", () => {
     before(() => {
-        // TODO: move this to common action
-        // Fake login
-        window.sessionStorage.setItem(
-            "shopfloor_apikey",
-            JSON.stringify({value: Cypress.config("TEST_API_KEY")})
-        );
-        window.sessionStorage.setItem(
-            "shopfloor_authenticated",
-            JSON.stringify({value: Cypress.config("TEST_API_KEY")})
-        );
-        // Reset profile
-        window.sessionStorage.removeItem("shopfloor_profile");
+        cy.fake_login();
+        cy.reset_profile();
     });
 
     it("Open profile settings", () => {

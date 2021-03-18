@@ -1,25 +1,26 @@
 // ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
 // https://on.cypress.io/custom-commands
 // ***********************************************
 //
 //
-// -- This is a parent command --
-// Cypress.Commands.add("login", (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add("drag", { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add("dismiss", { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This is will overwrite an existing command --
-// Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+Cypress.Commands.add("reset_storage", () => {
+    // Reset app state
+    window.sessionStorage.removeItem("shopfloor_apikey");
+    window.sessionStorage.removeItem("shopfloor_authenticated");
+    window.sessionStorage.removeItem("shopfloor_appconfig");
+});
+
+Cypress.Commands.add("fake_login", key => {
+    key = key || Cypress.config("TEST_API_KEY");
+    // Fake login
+    window.sessionStorage.setItem("shopfloor_apikey", JSON.stringify({value: key}));
+    window.sessionStorage.setItem(
+        "shopfloor_authenticated",
+        JSON.stringify({value: true})
+    );
+});
+
+Cypress.Commands.add("reset_profile", () => {
+    window.sessionStorage.removeItem("shopfloor_profile");
+});

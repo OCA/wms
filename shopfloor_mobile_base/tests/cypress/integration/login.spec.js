@@ -1,10 +1,6 @@
 context("Test 1st access to app", () => {
     before(() => {
-        // Reset app state
-        // TODO: move this to common action
-        window.sessionStorage.removeItem("shopfloor_apikey");
-        window.sessionStorage.removeItem("shopfloor_authenticated");
-        window.sessionStorage.removeItem("shopfloor_appconfig");
+        cy.reset_storage();
     });
 
     it("Load app as anon and login", () => {
