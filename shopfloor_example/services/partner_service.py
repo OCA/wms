@@ -23,11 +23,13 @@ class PartnerExampleService(Component):
         record = search.partner_from_scan(_id)
         return self._response_for_scan(record)
 
-    @skip_secure_params
     def partner_list(self, **params):
         """Return list of available partners.
         """
-        records = self.env["res.partner"].search([])
+        domain = []
+        if "name" in params:
+            domain.append(("name", "like", params["name"]))
+        records = self.env["res.partner"].search(domain)
         return self._response_for_partner_list(records)
 
     @skip_secure_params
@@ -60,18 +62,10 @@ class ShopfloorCheckoutValidator(Component):
     _name = "shopfloor.partner_example.validator"
     _usage = "partner_example.validator"
 
-    def scan(self):
-        return {
-            "identifier": {"type": "string", "nullable": False, "required": True},
-        }
-
-    def detail(self):
-        return {
-            "partner_id": {"required": True, "type": "integer"},
-        }
-
     def partner_list(self):
-        return {}
+        return {
+            "name": {"required": False, "type": "string"},
+        }
 
 
 class ShopfloorCheckoutValidatorResponse(Component):
@@ -88,6 +82,11 @@ class ShopfloorCheckoutValidatorResponse(Component):
         """
         return {
             "start": {},
+            "detail": {
+                "record": self.schemas._schema_dict_of(
+                    self.schemas_detail.partner_detail()
+                )
+            },
             "listing": {
                 "records": self.schemas._schema_list_of(self.schemas.partner()),
             },
@@ -97,7 +96,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
         return self.detail()
 
     def detail(self):
-        return self.schemas_detail.partner_detail()
+        return self._response_schema(next_states=["detail"])
 
     def partner_list(self):
         return self._response_schema(next_states=["listing"])
