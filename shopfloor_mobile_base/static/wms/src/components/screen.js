@@ -215,7 +215,12 @@ Vue.component("nav-items", {
 
 Vue.component("nav-item-content", {
     props: {
-        item: Array,
+        item: {
+            type: Object,
+            default: function() {
+                return {};
+            },
+        },
         show_full_info: {
             type: Boolean,
             default: true,
@@ -243,7 +248,12 @@ Vue.component("nav-item-content", {
 
 Vue.component("nav-item-action", {
     props: {
-        item: Array,
+        item: {
+            type: Object,
+            default: function() {
+                return {};
+            },
+        },
         options: {
             type: Object,
             default: function() {
