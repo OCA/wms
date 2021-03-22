@@ -674,10 +674,7 @@ class Checkout(Component):
         # go back to the screen to select the next lines to pack
         return self._response_for_select_line(
             picking,
-            message={
-                "message_type": "success",
-                "body": _("Product(s) packed in {}").format(package.name),
-            },
+            message=self.msg_store.goods_packed_in(package),
         )
 
     def _prepare_vals_package_from_packaging(self, packaging):
