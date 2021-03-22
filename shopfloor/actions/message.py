@@ -527,3 +527,12 @@ class MessageAction(Component):
             "message_type": "info",
             "body": _("Goods packed into {0.name}").format(package),
         }
+
+    def picking_without_carrier_cannot_pack(self, picking):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Pick + Pack mode ON: the picking {0.name} has no carrier set. "
+                "The system couldn't pack goods automatically."
+            ).format(picking),
+        }
