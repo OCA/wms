@@ -14,13 +14,19 @@ class PackagingAction(Component):
         return packaging.package_carrier_type in ("none", carrier.delivery_type)
 
     def create_delivery_package(self, carrier):
-        delivery_type = carrier.delivery_type
+        default_packaging = self._get_default_packaging(carrier)
+        return self.create_package_from_packaging(default_packaging)
+
+    def _get_default_packaging(self, carrier):
         # TODO: refactor `delivery_[carrier_name]` modules
         # to have always the same field named `default_packaging_id`
         # to unify lookup of this field.
         # As alternative add a computed field.
-        default_packaging = carrier[delivery_type + "_default_packaging_id"]
-        return self.create_package_from_packaging(default_packaging)
+        # AFAIS there's no reason to have 1 field per carrier type.
+        fname = carrier.delivery_type + "_default_packaging_id"
+        if fname not in carrier._fields:
+            return self.env["product.packaging"].browse()
+        return carrier[fname]
 
     def create_package_from_packaging(self, packaging=None):
         if packaging:

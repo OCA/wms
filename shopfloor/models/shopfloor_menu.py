@@ -2,6 +2,15 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, api, exceptions, fields, models
 
+PICK_PACK_SAME_TIME_HELP = """
+If you tick this box, while picking goods from a location
+(eg: zone picking) set destination will work as follow:
+
+* if a location is scanned, a new delivery package is created;
+* if a package is scanned, the package is validated against the carrier
+* in both cases, if the picking has no carrier the operation fails.",
+"""
+
 
 class ShopfloorMenu(models.Model):
     _inherit = "shopfloor.menu"
@@ -38,6 +47,21 @@ class ShopfloorMenu(models.Model):
         "if the put-away can find a sublocation (when putaway destination "
         "is different from the operation type's destination).",
     )
+    # TODO: refactor handling of these options.
+    # Possible solution:
+    # * field should stay on the scenario and get stored in options
+    # * field should use `sf_scenario` (eg: sf_scenario=("zone_picking", ))
+    #   to control for which scenario it will be available
+    # * on the menu form, display a button to edit configurations
+    #   and display a summary
+    pick_pack_same_time = fields.Boolean(
+        string="Pick and pack at the same time",
+        default=False,
+        help=PICK_PACK_SAME_TIME_HELP,
+    )
+    pick_pack_same_time_is_possible = fields.Boolean(
+        compute="_compute_pick_pack_same_time_is_possible"
+    )
 
     @api.depends("scenario_id", "picking_type_ids")
     def _compute_move_create_is_possible(self):
@@ -64,6 +88,13 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.unreserve_other_moves_is_possible = menu.scenario_id.has_option(
                 "allow_unreserve_other_moves"
+            )
+
+    @api.depends("scenario_id")
+    def _compute_pick_pack_same_time_is_possible(self):
+        for menu in self:
+            menu.pick_pack_same_time_is_possible = menu.scenario_id.has_option(
+                "pick_pack_same_time"
             )
 
     @api.onchange("unreserve_other_moves_is_possible")
