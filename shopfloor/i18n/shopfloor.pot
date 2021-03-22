@@ -667,7 +667,7 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
-msgid "Product(s) packed in {}"
+msgid "Goods packed in {}"
 msgstr ""
 
 #. module: shopfloor

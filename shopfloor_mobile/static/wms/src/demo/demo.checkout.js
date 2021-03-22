@@ -135,7 +135,7 @@ const DEMO_CHECKOUT = {
         },
         message: {
             message_type: "info",
-            body: "Product(s) packed in XYZ",
+            body: "Goods packed in XYZ",
         },
     },
     scan_dest_package: {
@@ -145,7 +145,7 @@ const DEMO_CHECKOUT = {
         },
         message: {
             message_type: "info",
-            body: "Product(s) packed in XYZ",
+            body: "Goods packed in XYZ",
         },
     },
     new_package: {
@@ -155,7 +155,7 @@ const DEMO_CHECKOUT = {
         },
         message: {
             message_type: "info",
-            body: "Product(s) packed in XYZ",
+            body: "Goods packed in XYZ",
         },
     },
     no_package: {
@@ -165,7 +165,7 @@ const DEMO_CHECKOUT = {
         },
         message: {
             message_type: "info",
-            body: "Product(s) packed in XYZ",
+            body: "Goods packed in XYZ",
         },
     },
     summary: {
