@@ -11,3 +11,4 @@ from . import inventory
 from . import savepoint
 from . import move_line_search
 from . import stock
+from . import packaging
