@@ -164,10 +164,7 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             # go pack to the screen to select lines to put in packages
             next_state="select_line",
             data={"picking": self._stock_picking_data(self.picking)},
-            message={
-                "message_type": "success",
-                "body": "Product(s) packed in {}".format(self.delivery_package.name),
-            },
+            message=self.msg_store.goods_packed_in(self.delivery_package),
         )
 
     def test_scan_dest_package_ok(self):

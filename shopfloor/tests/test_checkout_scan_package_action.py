@@ -275,10 +275,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 "picking": self._stock_picking_data(picking, done=True),
                 "all_processed": True,
             },
-            message={
-                "message_type": "success",
-                "body": "Product(s) packed in {}".format(package.name),
-            },
+            message=self.msg_store.goods_packed_in(package),
         )
 
     def test_scan_package_action_scan_packaging_ok(self):
@@ -363,10 +360,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             response,
             next_state="select_line",
             data={"picking": self._stock_picking_data(picking)},
-            message={
-                "message_type": "success",
-                "body": "Product(s) packed in {}".format(new_package.name),
-            },
+            message=self.msg_store.goods_packed_in(new_package),
         )
 
     def test_scan_package_action_scan_packaging_bad_carrier(self):
@@ -434,12 +428,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             )
             self.assertEqual(
                 response["message"],
-                {
-                    "message_type": "success",
-                    "body": "Product(s) packed in {}".format(
-                        selected_lines.result_package_id.name
-                    ),
-                },
+                self.msg_store.goods_packed_in(selected_lines.result_package_id),
             )
 
     def test_scan_package_action_scan_not_found(self):

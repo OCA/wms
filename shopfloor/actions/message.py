@@ -521,3 +521,9 @@ class MessageAction(Component):
             "message_type": "warning",
             "body": _("No delivery package type available."),
         }
+
+    def goods_packed_in(self, package):
+        return {
+            "message_type": "info",
+            "body": _("Goods packed into {0.name}").format(package),
+        }
