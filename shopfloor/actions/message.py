@@ -499,8 +499,8 @@ class MessageAction(Component):
     def packaging_invalid_for_carrier(self, packaging, carrier):
         return {
             "message_type": "error",
-            "body": _("Packaging {} is not allowed for carrier {}.").format(
-                packaging.name, carrier.name
+            "body": _("Packaging '{}' is not allowed for carrier {}.").format(
+                packaging.name if packaging else _("No value"), carrier.name
             ),
         }
 
