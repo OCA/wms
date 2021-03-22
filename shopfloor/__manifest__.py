@@ -6,7 +6,7 @@
 {
     "name": "Shopfloor",
     "summary": "manage warehouse operations with barcode scanners",
-    "version": "13.0.4.4.3",
+    "version": "13.0.4.5.0",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
@@ -43,6 +43,8 @@
         "delivery",
         #  OCA / product-attribute
         "product_packaging_type",
+        #  OCA / delivery
+        "stock_picking_delivery_link",
     ],
     "data": [
         "data/shopfloor_scenario_data.xml",

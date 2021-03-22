@@ -149,6 +149,9 @@ class ZonePicking(Component):
     def lines_order(self):
         return getattr(self.work, "current_lines_order", "priority")
 
+    def _pick_pack_same_time(self):
+        return self.work.menu.pick_pack_same_time
+
     def _response_for_start(self, message=None):
         zones = self.work.menu.picking_type_ids.mapped(
             "default_location_src_id.child_ids"
@@ -744,19 +747,45 @@ class ZonePicking(Component):
         search = self._actions_for("search")
         accept_only_package = not self._move_line_full_qty(move_line, quantity)
 
+        extra_message = ""
         if not accept_only_package:
             # When the barcode is a location
             location = search.location_from_scan(barcode)
             if location:
+                if self._pick_pack_same_time():
+                    (
+                        good_for_packing,
+                        message,
+                    ) = self._handle_pick_pack_same_time_for_location(move_line)
+                    # TODO: we should append the msg instead.
+                    # To achieve this, we should refactor `response.message` to a list
+                    # or, to no break backward compat, we could add `extra_messages`
+                    # to allow backend to send a main message and N additional messages.
+                    extra_message = message
+                    if not good_for_packing:
+                        return self._response_for_set_line_destination(
+                            move_line, message=message
+                        )
                 pkg_moved, response = self._set_destination_location(
                     move_line, quantity, confirmation, location,
                 )
                 if response:
+                    if extra_message:
+                        response["message"]["body"] += "\n" + extra_message["body"]
                     return response
 
         # When the barcode is a package
         package = search.package_from_scan(barcode)
         if package:
+            if self._pick_pack_same_time():
+                (
+                    good_for_packing,
+                    message,
+                ) = self._handle_pick_pack_same_time_for_package(move_line, package)
+                if not good_for_packing:
+                    return self._response_for_set_line_destination(
+                        move_line, message=message
+                    )
             location = move_line.location_dest_id
             pkg_moved, response = self._set_destination_package(
                 move_line, quantity, package
@@ -776,10 +805,55 @@ class ZonePicking(Component):
 
         if pkg_moved:
             message = self.msg_store.confirm_pack_moved()
+            if extra_message:
+                message["body"] += "\n" + extra_message["body"]
 
         # Process the next line
         response = self.list_move_lines()
         return self._response(base_response=response, message=message)
+
+    def _handle_pick_pack_same_time_for_location(self, move_line):
+        """Automatically put product in carrier-specific package.
+
+        :param move_line: current move line to process
+        :return: tuple like ($succes_flag, $success_or_failure_message)
+        """
+        good_for_packing = False
+        message = ""
+        picking = move_line.picking_id
+        carrier = picking.ship_carrier_id or picking.carrier_id
+        if carrier:
+            actions = self._actions_for("packaging")
+            pkg = actions.create_delivery_package(carrier)
+            move_line.write({"result_package_id": pkg.id})
+            message = self.msg_store.goods_packed_in(pkg)
+            good_for_packing = True
+        else:
+            message = self.msg_store.picking_without_carrier_cannot_pack(picking)
+        return good_for_packing, message
+
+    def _handle_pick_pack_same_time_for_package(self, move_line, package):
+        """Validate package for packing at the same time.
+
+        :param move_line: current move line to process
+        :param package: package to validate
+        :return: tuple like ($succes_flag, $success_or_failure_message)
+        """
+        good_for_packing = False
+        message = None
+        picking = move_line.picking_id
+        carrier = picking.ship_carrier_id or picking.carrier_id
+        if carrier:
+            actions = self._actions_for("packaging")
+            if actions.packaging_valid_for_carrier(package.packaging_id, carrier):
+                good_for_packing = True
+            else:
+                message = self.msg_store.packaging_invalid_for_carrier(
+                    package.packaging_id, carrier
+                )
+        else:
+            message = self.msg_store.picking_without_carrier_cannot_pack(picking)
+        return good_for_packing, message
 
     def is_zero(self, move_line_id, zero):
         """Confirm or not if the source location of a move has zero qty
