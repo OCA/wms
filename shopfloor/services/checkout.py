@@ -673,27 +673,12 @@ class Checkout(Component):
         )
         # go back to the screen to select the next lines to pack
         return self._response_for_select_line(
-            picking,
-            message=self.msg_store.goods_packed_in(package),
+            picking, message=self.msg_store.goods_packed_in(package),
         )
 
-    def _prepare_vals_package_from_packaging(self, packaging):
-        return {
-            "packaging_id": packaging.id,
-            "lngth": packaging.lngth,
-            "width": packaging.width,
-            "height": packaging.height,
-        }
-
-    def _prepare_vals_package_without_packaging(self):
-        return {}
-
     def _create_and_assign_new_packaging(self, picking, selected_lines, packaging=None):
-        if packaging:
-            vals = self._prepare_vals_package_from_packaging(packaging)
-        else:
-            vals = self._prepare_vals_package_without_packaging()
-        package = self.env["stock.quant.package"].create(vals)
+        actions = self._actions_for("packaging")
+        package = actions.create_package_from_packaging(packaging=packaging)
         return self._put_lines_in_allowed_package(picking, selected_lines, package)
 
     def scan_package_action(self, picking_id, selected_line_ids, barcode):
@@ -783,7 +768,8 @@ class Checkout(Component):
         )
 
     def _packaging_good_for_carrier(self, packaging, carrier):
-        return packaging.package_carrier_type in ("none", carrier.delivery_type)
+        actions = self._actions_for("packaging")
+        return actions.packaging_valid_for_carrier(packaging, carrier)
 
     def _get_available_delivery_packaging(self, picking):
         model = self.env["product.packaging"]
