@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_stock_release_form" model="ir.ui.view">
+        <field name="name">Stock Allocations Release</field>
+        <field name="model">stock.release</field>
+        <field name="arch" type="xml">
+            <form string="Stock Allocations Release">
+                <p class="oe_grey">
+                    The selected records will be released.
+                </p>
+                <footer>
+                    <button
+                        name="release"
+                        string="Release"
+                        type="object"
+                        class="btn-primary"
+                    />
+                    <button string="Cancel" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_view_stock_move_release_form" model="ir.actions.act_window">
+        <field name="name">Release Move Allocations</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.release</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="groups_id" eval="[(4,ref('stock.group_stock_user'))]" />
+        <field name="binding_model_id" ref="stock.model_stock_move" />
+    </record>
+    <record id="action_view_stock_picking_release_form" model="ir.actions.act_window">
+        <field name="name">Release Transfers Allocations</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.release</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="groups_id" eval="[(4,ref('stock.group_stock_user'))]" />
+        <field name="binding_model_id" ref="stock.model_stock_picking" />
+    </record>
+</odoo>

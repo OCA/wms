@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record id="package_20kg" model="shopfloor.packing.info">
+        <field name="name">Package 20kg</field>
+        <field name="text">Max weight per package 20kg</field>
+    </record>
+    <record id="pallet_170cm" model="shopfloor.packing.info">
+        <field name="name">Pallet 1.7m</field>
+        <field name="text">Pallet height limit 1.7m</field>
+    </record>
+</odoo>

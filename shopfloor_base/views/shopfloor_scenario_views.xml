@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shopfloor_scenario_tree_view" model="ir.ui.view">
+        <field name="name">shopfloor.scenario tree</field>
+        <field name="model">shopfloor.scenario</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="key" />
+            </tree>
+        </field>
+    </record>
+    <record id="shopfloor_scenario_form_view" model="ir.ui.view">
+        <field name="name">shopfloor.scenario form</field>
+        <field name="model">shopfloor.scenario</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group name="main">
+                            <field name="name" />
+                            <field name="key" />
+                        </group>
+                        <group name="options">
+                            <!-- JSON supoport is not available :/ -->
+                            <!-- options="{'mode': 'json'}" -->
+                            <field name="options_edit" widget="ace" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="shopfloor_scenario_search_view" model="ir.ui.view">
+        <field name="name">shopfloor.scenario search</field>
+        <field name="model">shopfloor.scenario</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="key" />
+            </search>
+        </field>
+    </record>
+    <record id="action_shopfloor_scenario" model="ir.actions.act_window">
+        <field name="name">Scenario</field>
+        <field name="res_model">shopfloor.scenario</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

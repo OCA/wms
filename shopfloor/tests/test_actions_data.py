@@ -1,172 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-import logging
-
-from .common import CommonCase, PickingBatchMixin
-
-_logger = logging.getLogger(__name__)
-
-
-try:
-    from cerberus import Validator
-except ImportError:
-    _logger.debug("Can not import cerberus")
-
-
-class ActionsDataCaseBase(CommonCase):
-    @classmethod
-    def setUpClassVars(cls):
-        super().setUpClassVars()
-        cls.wh = cls.env.ref("stock.warehouse0")
-        cls.picking_type = cls.wh.out_type_id
-        cls.storage_type_pallet = cls.env.ref(
-            "stock_storage_type.package_storage_type_pallets"
-        )
-
-    @classmethod
-    def setUpClassBaseData(cls):
-        super().setUpClassBaseData()
-        cls.packaging_type = (
-            cls.env["product.packaging.type"]
-            .sudo()
-            .create({"name": "Transport Box", "code": "TB", "sequence": 0})
-        )
-        cls.packaging = (
-            cls.env["product.packaging"]
-            .sudo()
-            .create({"name": "Pallet", "packaging_type_id": cls.packaging_type.id})
-        )
-        cls.product_b.tracking = "lot"
-        cls.product_c.tracking = "lot"
-        cls.picking = cls._create_picking(
-            lines=[
-                (cls.product_a, 10),
-                (cls.product_b, 10),
-                (cls.product_c, 10),
-                (cls.product_d, 10),
-            ]
-        )
-        cls.picking.scheduled_date = "2020-08-03"
-        # put product A in a package
-        cls.move_a = cls.picking.move_lines[0]
-        cls._fill_stock_for_moves(cls.move_a, in_package=True)
-        # product B has a lot
-        cls.move_b = cls.picking.move_lines[1]
-        cls._fill_stock_for_moves(cls.move_b, in_lot=True)
-        # product C has a lot and package
-        cls.move_c = cls.picking.move_lines[2]
-        cls._fill_stock_for_moves(cls.move_c, in_package=True, in_lot=True)
-        # product D is raw
-        cls.move_d = cls.picking.move_lines[3]
-        cls._fill_stock_for_moves(cls.move_d)
-        (cls.move_a + cls.move_b + cls.move_c + cls.move_d).write({"priority": "1"})
-        cls.picking.action_assign()
-
-        cls.supplier = cls.env["res.partner"].sudo().create({"name": "Supplier"})
-        cls.product_a_vendor = (
-            cls.env["product.supplierinfo"]
-            .sudo()
-            .create(
-                {
-                    "name": cls.supplier.id,
-                    "price": 8.0,
-                    "product_code": "VENDOR_CODE_A",
-                    "product_id": cls.product_a.id,
-                    "product_tmpl_id": cls.product_a.product_tmpl_id.id,
-                }
-            )
-        )
-        cls.product_a_variant = cls.product_a.copy(
-            {
-                "name": "Product A variant 1",
-                "type": "product",
-                "default_code": "A-VARIANT",
-                "barcode": "A-VARIANT",
-            }
-        )
-        # create another supplier info w/ lower sequence
-        cls.product_a_vendor = (
-            cls.env["product.supplierinfo"]
-            .sudo()
-            .create(
-                {
-                    "name": cls.supplier.id,
-                    "price": 12.0,
-                    "product_code": "VENDOR_CODE_VARIANT",
-                    "product_id": cls.product_a_variant.id,
-                    "product_tmpl_id": cls.product_a.product_tmpl_id.id,
-                    "sequence": 0,
-                }
-            )
-        )
-        cls.product_a_variant.flush()
-        cls.product_a_vendor.flush()
-
-    def assert_schema(self, schema, data):
-        validator = Validator(schema)
-        self.assertTrue(validator.validate(data), validator.errors)
-
-    def _expected_location(self, record, **kw):
-        data = {
-            "id": record.id,
-            "name": record.name,
-            "barcode": record.barcode,
-        }
-        data.update(kw)
-        return data
-
-    def _expected_product(self, record, **kw):
-        data = {
-            "id": record.id,
-            "name": record.name,
-            "display_name": record.display_name,
-            "default_code": record.default_code,
-            "barcode": record.barcode,
-            "packaging": [
-                self._expected_packaging(x) for x in record.packaging_ids if x.qty
-            ],
-            "uom": {
-                "factor": record.uom_id.factor,
-                "id": record.uom_id.id,
-                "name": record.uom_id.name,
-                "rounding": record.uom_id.rounding,
-            },
-            "supplier_code": self._expected_supplier_code(record),
-        }
-        data.update(kw)
-        return data
-
-    def _expected_supplier_code(self, product):
-        supplier_info = product.seller_ids.filtered(lambda x: x.product_id == product)
-        return supplier_info[0].product_code if supplier_info else ""
-
-    def _expected_packaging(self, record, **kw):
-        data = {
-            "id": record.id,
-            "name": record.packaging_type_id.name,
-            "code": record.packaging_type_id.code,
-            "qty": record.qty,
-        }
-        data.update(kw)
-        return data
-
-    def _expected_storage_type(self, record, **kw):
-        data = {
-            "id": record.id,
-            "name": record.name,
-        }
-        data.update(kw)
-        return data
-
-    def _expected_package(self, record, **kw):
-        data = {
-            "id": record.id,
-            "name": record.name,
-            "weight": record.pack_weight,
-            "storage_type": None,
-        }
-        data.update(kw)
-        return data
+from .common import PickingBatchMixin
+from .test_actions_data_base import ActionsDataCaseBase
 
 
 class ActionsDataCase(ActionsDataCaseBase):
@@ -174,6 +9,13 @@ class ActionsDataCase(ActionsDataCaseBase):
         data = self.data.packaging(self.packaging)
         self.assert_schema(self.schema.packaging(), data)
         self.assertDictEqual(data, self._expected_packaging(self.packaging))
+
+    def test_data_delivery_packaging(self):
+        data = self.data.delivery_packaging(self.delivery_packaging)
+        self.assert_schema(self.schema.delivery_packaging(), data)
+        self.assertDictEqual(
+            data, self._expected_delivery_packaging(self.delivery_packaging)
+        )
 
     def test_data_location(self):
         location = self.stock_location
@@ -183,6 +25,18 @@ class ActionsDataCase(ActionsDataCaseBase):
             "id": location.id,
             "name": location.name,
             "barcode": location.barcode,
+        }
+        self.assertDictEqual(data, expected)
+
+    def test_data_location_no_barcode(self):
+        location = self.stock_location
+        location.sudo().barcode = None
+        data = self.data.location(location)
+        self.assert_schema(self.schema.location(), data)
+        expected = {
+            "id": location.id,
+            "name": location.name,
+            "barcode": location.name,
         }
         self.assertDictEqual(data, expected)
 
@@ -213,7 +67,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "storage_type": self._expected_storage_type(
                 package.package_storage_type_id
             ),
-            "weight": 0.0,
+            "weight": 20.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -238,7 +92,10 @@ class ActionsDataCase(ActionsDataCaseBase):
         self.assertDictEqual(data, expected)
 
     def test_data_picking(self):
-        self.picking.write({"origin": "created by test", "note": "read me"})
+        carrier = self.picking.carrier_id.search([], limit=1)
+        self.picking.write(
+            {"origin": "created by test", "note": "read me", "carrier_id": carrier.id}
+        )
         data = self.data.picking(self.picking)
         self.assert_schema(self.schema.picking(), data)
         expected = {
@@ -249,6 +106,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "origin": "created by test",
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
+            "carrier": {"id": carrier.id, "name": carrier.name},
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-08-03")
         self.assertDictEqual(data, expected)
@@ -296,16 +154,14 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
                 "move_line_count": 1,
-                # TODO
-                "weight": 0.0,
+                "weight": 20.0,
                 "storage_type": None,
             },
             "package_dest": {
                 "id": result_package.id,
                 "name": result_package.name,
                 "move_line_count": 0,
-                # TODO
-                "weight": 0.0,
+                "weight": 6.0,
                 "storage_type": None,
             },
             "location_src": self._expected_location(move_line.location_id),
@@ -354,15 +210,13 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
                 "move_line_count": 1,
-                # TODO
-                "weight": 0,
+                "weight": 30,
                 "storage_type": None,
             },
             "package_dest": {
                 "id": move_line.result_package_id.id,
                 "name": move_line.result_package_id.name,
                 "move_line_count": 1,
-                # TODO
                 "weight": 0,
                 "storage_type": None,
             },

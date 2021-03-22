@@ -6,7 +6,7 @@ from odoo.osv import expression
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
 
-from .service import to_float
+from ..utils import to_float
 
 
 class ClusterPicking(Component):
@@ -64,7 +64,10 @@ class ClusterPicking(Component):
       (picking) to the second one (unload). The scenario will go
       back to the first phase if some lines remain in the queue of lines to pick.
 
-    Flow Diagram: https://www.draw.io/#G1qRenBcezk50ggIazDuu2qOfkTsoIAxXP
+    You will find a sequence diagram describing states and endpoints
+    relationships [here](../docs/cluster_picking_diag_seq.png).
+    Keep [the sequence diagram](../docs/cluster_picking_diag_seq.plantuml)
+    up-to-date if you change endpoints.
     """
 
     _inherit = "base.shopfloor.process"
@@ -101,7 +104,12 @@ class ClusterPicking(Component):
         last_picked_line = self._last_picked_line(move_line.picking_id)
         if last_picked_line:
             # suggest pack to be used for the next line
-            data["package_dest"] = self.data.package(last_picked_line.result_package_id)
+            data["package_dest"] = self.data.package(
+                last_picked_line.result_package_id.with_context(
+                    picking_id=move_line.picking_id.id
+                ),
+                picking=move_line.picking_id,
+            )
         return self._response(next_state="scan_destination", data=data, message=message)
 
     def _response_for_change_pack_lot(self, move_line, message=None):
@@ -434,7 +442,7 @@ class ClusterPicking(Component):
                 batch, message=self.msg_store.operation_not_found()
             )
 
-        search = self.actions_for("search")
+        search = self._actions_for("search")
 
         picking = move_line.picking_id
 
@@ -468,10 +476,10 @@ class ClusterPicking(Component):
                 move_line, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
             )
 
-        # if we scanned a product and it's part of several packages, we can't be
-        # sure the user scanned the correct one, in such case, ask to scan a package
+        # If scanned product is part of several packages in the same location,
+        # we can't be sure it's the correct one, in such case, ask to scan a package
         other_product_lines = picking.move_line_ids.filtered(
-            lambda l: l.product_id == product
+            lambda l: l.product_id == product and l.location_id == move_line.location_id
         )
         packages = other_product_lines.mapped("package_id")
         # Do not use mapped here: we want to see if we have more than one package,
@@ -580,7 +588,7 @@ class ClusterPicking(Component):
                 message=self.msg_store.unable_to_pick_more(move_line.product_uom_qty),
             )
 
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         bin_package = search.package_from_scan(barcode)
         if not bin_package:
             return self._response_for_scan_destination(
@@ -706,7 +714,7 @@ class ClusterPicking(Component):
             )
 
         if not zero:
-            inventory = self.actions_for("inventory")
+            inventory = self._actions_for("inventory")
             inventory.create_draft_check_empty(
                 move_line.location_id,
                 move_line.product_id,
@@ -741,7 +749,7 @@ class ClusterPicking(Component):
                 batch, message=self.msg_store.operation_not_found()
             )
         # flag as postponed
-        move_line.shopfloor_postponed = True
+        move_line.shopfloor_postpone(self._lines_to_pick(batch))
         return self._pick_after_skip_line(move_line)
 
     def _pick_after_skip_line(self, move_line):
@@ -786,7 +794,7 @@ class ClusterPicking(Component):
                 batch, message=self.msg_store.operation_not_found()
             )
 
-        inventory = self.actions_for("inventory")
+        inventory = self._actions_for("inventory")
         # create a draft inventory for a user to check
         inventory.create_control_stock(
             move_line.location_id,
@@ -866,10 +874,10 @@ class ClusterPicking(Component):
             return self._pick_next_line(
                 batch, message=self.msg_store.operation_not_found()
             )
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         response_ok_func = self._response_for_scan_destination
         response_error_func = self._response_for_change_pack_lot
-        change_package_lot = self.actions_for("change.package.lot")
+        change_package_lot = self._actions_for("change.package.lot")
         lot = search.lot_from_scan(barcode)
         if lot:
             response = change_package_lot.change_lot(
@@ -920,7 +928,7 @@ class ClusterPicking(Component):
 
         first_line = fields.first(lines)
         picking_type = fields.first(batch.picking_ids).picking_type_id
-        scanned_location = self.actions_for("search").location_from_scan(barcode)
+        scanned_location = self._actions_for("search").location_from_scan(barcode)
         if not scanned_location:
             return self._response_for_unload_all(
                 batch, message=self.msg_store.no_location_found()
@@ -939,7 +947,7 @@ class ClusterPicking(Component):
                 return self._response_for_confirm_unload_all(batch)
 
         self._unload_write_destination_on_lines(lines, scanned_location)
-        completion_info = self.actions_for("completion.info")
+        completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(lines)
         return self._unload_end(batch, completion_info_popup=completion_info_popup)
 
@@ -957,6 +965,11 @@ class ClusterPicking(Component):
                 picking.action_done()
 
     def _unload_end(self, batch, completion_info_popup=None):
+        """Try to close the batch if all transfers are done.
+
+        Returns to `start_line` transition if some lines could still be processed,
+        otherwise try to validate all the transfers of the batch.
+        """
         if all(picking.state == "done" for picking in batch.picking_ids):
             # do not use the 'done()' method because it does many things we
             # don't care about
@@ -979,6 +992,12 @@ class ClusterPicking(Component):
             # produce backorders)
             batch.mapped("picking_ids").action_done()
             batch.state = "done"
+            # Unassign not validated pickings from the batch, they will be
+            # processed in another batch automatically later on
+            pickings_not_done = batch.mapped("picking_ids").filtered(
+                lambda p: p.state != "done"
+            )
+            pickings_not_done.batch_id = False
             return self._response_for_start(
                 message=self.msg_store.batch_transfer_complete(),
                 popup=completion_info_popup,
@@ -1075,7 +1094,7 @@ class ClusterPicking(Component):
         self._lock_lines(lines)
         first_line = fields.first(lines)
         picking_type = fields.first(batch.picking_ids).picking_type_id
-        scanned_location = self.actions_for("search").location_from_scan(barcode)
+        scanned_location = self._actions_for("search").location_from_scan(barcode)
         if not scanned_location:
             return self._response_for_unload_set_destination(
                 batch, package, message=self.msg_store.no_location_found()
@@ -1096,7 +1115,7 @@ class ClusterPicking(Component):
 
         self._unload_write_destination_on_lines(lines, scanned_location)
 
-        completion_info = self.actions_for("completion.info")
+        completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(lines)
 
         return self._unload_next_package(

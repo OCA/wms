@@ -17,4 +17,25 @@
             </field>
         </field>
     </record>
+    <record id="view_move_line_tree" model="ir.ui.view">
+        <field name="name">stock.move.line.tree.stock.reception.screen</field>
+        <field name="inherit_id" ref="stock.view_move_line_tree" />
+        <field name="model">stock.move.line</field>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="picking_code" invisible="1" />
+                <button
+                    name="action_reception_screen_open"
+                    type="object"
+                    string="Reception"
+                    class="oe_highlight"
+                    attrs="{'invisible': [
+                      '|',
+                      ('picking_code', '!=', 'incoming'),
+                      ('state', 'in', ('cancel', 'done')),
+                    ]}"
+                />
+            </field>
+        </field>
+    </record>
 </odoo>

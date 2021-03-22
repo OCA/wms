@@ -3,11 +3,11 @@
 {
     "name": "Stock - Reception screen",
     "summary": "Dedicated screen to receive/scan goods.",
-    "version": "13.0.1.1.1",
+    "version": "13.0.1.6.1",
     "category": "Stock",
     "license": "AGPL-3",
     "author": "Camptocamp, Odoo Community Association (OCA)",
-    "website": "https://github.com/OCA/stock-logistics-warehouse",
+    "website": "https://github.com/OCA/wms",
     "depends": [
         "stock",
         "product_expiry",
@@ -18,8 +18,6 @@
         "stock_quant_package_dimension",
         # OCA/wms
         "stock_storage_type",
-        # OCA/web
-        "web_notify",
     ],
     "data": [
         "security/ir.model.access.csv",

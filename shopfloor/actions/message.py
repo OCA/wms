@@ -6,18 +6,7 @@ from odoo.addons.component.core import Component
 
 
 class MessageAction(Component):
-    """Provide message templates
-
-    The methods should be used in Service Components, in order to share as much
-    as possible the messages for similar events.
-
-    Before adding a message, please look if no message already exists,
-    and consider making an existing message more generic.
-    """
-
-    _name = "shopfloor.message.action"
-    _inherit = "shopfloor.process.action"
-    _usage = "message"
+    _inherit = "shopfloor.message.action"
 
     def no_picking_type(self):
         return {
@@ -227,6 +216,13 @@ class MessageAction(Component):
             "body": _("No putaway destination is available."),
         }
 
+    def package_unable_to_transfer(self, pack):
+        return {
+            "message_type": "error",
+            "body": _("The package %s cannot be transferred with this scenario.")
+            % pack.name,
+        }
+
     def unrecoverable_error(self):
         return {
             "message_type": "error",
@@ -237,6 +233,12 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Package {} has a different content.").format(package.name),
+        }
+
+    def package_change_error_same_package(self, package):
+        return {
+            "message_type": "error",
+            "body": _("Same package {} is already assigned.").format(package.name),
         }
 
     def x_units_put_in_package(self, qty, product, package):
@@ -277,10 +279,8 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                _(
-                    "This product is part of a package with other products, "
-                    "please scan a package."
-                )
+                "This product is part of a package with other products, "
+                "please scan a package."
             ),
         }
 
@@ -300,10 +300,8 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                _(
-                    "This lot is part of a package with other products, "
-                    "please scan a package."
-                )
+                "This lot is part of a package with other products, "
+                "please scan a package."
             ),
         }
 
@@ -355,6 +353,14 @@ class MessageAction(Component):
             "body": _("Content transferred from {} to {}.").format(
                 location_src.name, location_dest.name
             ),
+        }
+
+    def location_content_unable_to_transfer(self, location_dest):
+        return {
+            "message_type": "error",
+            "body": _(
+                "The content of {} cannot be transferred with this scenario."
+            ).format(location_dest.name),
         }
 
     def picking_already_started_in_location(self, pickings):
@@ -430,7 +436,7 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _(
-                _("Package {} cannot be picked, already moved by transfer {}.")
+                "Package {} cannot be picked, already moved by transfer {}."
             ).format(package.name, picking.name),
         }
 
@@ -488,4 +494,30 @@ class MessageAction(Component):
         return {
             "message_type": "info",
             "body": _("Package has been opened. You can move partial quantities."),
+        }
+
+    def packaging_invalid_for_carrier(self, packaging, carrier):
+        return {
+            "message_type": "error",
+            "body": _("Packaging {} is not allowed for carrier {}.").format(
+                packaging.name, carrier.name
+            ),
+        }
+
+    def dest_package_not_valid(self, package):
+        return {
+            "message_type": "error",
+            "body": _("{} is not a valid destination package.").format(package.name),
+        }
+
+    def no_valid_package_to_select(self):
+        return {
+            "message_type": "warning",
+            "body": _("No valid package to select."),
+        }
+
+    def no_delivery_packaging_available(self):
+        return {
+            "message_type": "warning",
+            "body": _("No delivery package type available."),
         }
