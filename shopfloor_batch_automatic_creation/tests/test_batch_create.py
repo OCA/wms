@@ -74,11 +74,30 @@ class TestBatchCreate(CommonCase):
         self.product_c.weight = 2
         self.product_d.weight = 2
 
-        # with a max weight of 20, we can take the first picking, but the
+        # with a max weight of 40, we can take the first picking, but the
         # second one would exceed the max, the third can be added because it's
         # still in the limit
         batch = self.auto_batch.create_batch(self.picking_type, max_weight=40)
         self.assertEqual(batch.picking_ids, self.picking1 + self.picking3)
+
+    def test_create_batch_max_weight_all_exceed(self):
+        """Test batch creation with all pickings exceeding the max weight.
+
+        In such case the batch is anyway created with the first picking in it
+        because it's ok to have one picking exceeding the max weight (otherwise
+        those pickings will never be processed).
+        """
+        # each picking has 2 lines of 10 units, set weight of 1kg per unit,
+        # we'll have a total weight of 20kg per picking
+        self.product_a.weight = 1
+        self.product_b.weight = 1
+        self.product_c.weight = 1
+        self.product_d.weight = 1
+
+        # with a max weight of 10, we can normally take no picking, but as we
+        # need to process them we take at least the first one.
+        batch = self.auto_batch.create_batch(self.picking_type, max_weight=10)
+        self.assertEqual(batch.picking_ids, self.picking1)
 
     def test_create_batch_max_volume(self):
         # each picking has 2 lines of 10 units, set volume of 0.1m3 per unit,
@@ -95,6 +114,25 @@ class TestBatchCreate(CommonCase):
         # still in the limit
         batch = self.auto_batch.create_batch(self.picking_type, max_volume=4)
         self.assertEqual(batch.picking_ids, self.picking1 + self.picking3)
+
+    def test_create_batch_max_volume_all_exceed(self):
+        """Test batch creation with all pickings exceeding the max volume.
+
+        In such case the batch is anyway created with the first picking in it
+        because it's ok to have one picking exceeding the max volume (otherwise
+        those pickings will never be processed).
+        """
+        # each picking has 2 lines of 10 units, set volume of 0.1m3 per unit,
+        # we'll have a total volume of 2m3 per picking
+        self.product_a.volume = 0.1
+        self.product_b.volume = 0.1
+        self.product_c.volume = 0.1
+        self.product_d.volume = 0.1
+
+        # with a max volume of 1, we can normally take no picking, but as we
+        # need to process them we take at least the first one.
+        batch = self.auto_batch.create_batch(self.picking_type, max_volume=1)
+        self.assertEqual(batch.picking_ids, self.picking1)
 
     def test_volume(self):
         # varying volumes because of the packing
