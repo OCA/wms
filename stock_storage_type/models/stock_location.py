@@ -601,26 +601,29 @@ class StockLocation(models.Model):
             "in_move_ids.state",
             "in_move_line_ids",
             "in_move_line_ids.state",
-            "only_empty",
-            "do_not_mix_lots",
-            "do_not_mix_products",
         ]
+        # keeps only record to compute....
+        records = self.filtered(
+            lambda l: l.only_empty or l.do_not_mix_lots or l.do_not_mix_products
+        )
+        if not records:
+            return
         # initialize the current env cache with all
         # the data required to compute fields in fields_name
         for f in fields_to_preload_in_cache:
-            self.mapped(f)
+            records.mapped(f)
         # ensure the initiale value for fields in fields_name are loaded
         # into the current env
         for f in fields_name:
-            self.mapped(f)
+            records.mapped(f)
 
         fs = [self._fields[name] for name in fields_name]
 
         # create an new env used to recompute the value without triggering
         # a write into the database. To improve performances, we initialize
         # the cache of the new env with a copy of the current cache
-        tmp_recs = self.with_context(__trigger_recompute=True)
-        fields.copy_cache(self, tmp_recs.env)
+        tmp_recs = records.with_context(__trigger_recompute=True)
+        fields.copy_cache(records, tmp_recs.env)
 
         # invalidate fields in tmp cache and force recompute
         for field in fs:
@@ -638,11 +641,11 @@ class StockLocation(models.Model):
         # If the value is different, mark the field to be recomputed into the
         # current env to trigger an update into the database. The update
         # into the database is therefore only done if the values change
-        for rec in self:
+        for rec in records:
             tmp = tmp_recs.browse(rec.id)
             for field in fs:
                 name = field.name
                 if tmp[name] != rec[name]:
                     rec.invalidate_cache([name], rec.ids)
                     rec._recompute_todo(field)
-        self.recompute()
+        records.recompute()
