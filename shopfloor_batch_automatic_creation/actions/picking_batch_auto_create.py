@@ -98,8 +98,12 @@ class PickingBatchAutoCreateAction(Component):
         )
 
     def _apply_limits(self, pickings, max_pickings, max_weight, max_volume):
-        current_priority = fields.first(pickings).priority or "1"
-        selected_pickings = self.env["stock.picking"].browse()
+        first_picking = fields.first(pickings)
+        current_priority = first_picking.priority or "1"
+        # Always take the first picking even if it doesn't fullfill the
+        # weight/volume criteria. This allows to always process at least
+        # one picking which won't be processed otherwise
+        selected_pickings = first_picking
 
         precision_weight = self._precision_weight()
         precision_volume = self._precision_volume()
@@ -108,9 +112,12 @@ class PickingBatchAutoCreateAction(Component):
             """Return True if value1 is greater than value2"""
             return tools.float_compare(value1, value2, precision_digits=digits) == 1
 
-        total_weight = 0.0
-        total_volume = 0.0
-        for picking in pickings:
+        total_weight = self._picking_weight(first_picking)
+        total_volume = self._picking_volume(first_picking)
+        for picking in pickings[1:]:
+            if max_pickings and len(selected_pickings) == max_pickings:
+                # selected enough!
+                break
             if (picking.priority or "1") != current_priority:
                 # as we sort by priority, exit as soon as the priority changes,
                 # we do not mix priorities to make delivery of high priority
@@ -128,10 +135,6 @@ class PickingBatchAutoCreateAction(Component):
             selected_pickings |= picking
             total_weight += weight
             total_volume += volume
-
-            if max_pickings and len(selected_pickings) == max_pickings:
-                # selected enough!
-                break
 
         return selected_pickings
 
