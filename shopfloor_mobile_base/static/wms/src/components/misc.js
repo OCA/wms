@@ -346,3 +346,69 @@ Vue.component("speed-dial", {
     </v-speed-dial>
   `,
 });
+
+Vue.component("profile-not-ready", {
+    template: `
+    <div :class="$options._componentTag" data-ref="profile-not-ready">
+        <v-alert type="warning" tile>
+            <p>{{ $t('app.profile_not_configured') }}</p>
+        </v-alert>
+        <div class="button-list button-vertical-list full">
+            <v-row align="center">
+                <v-col class="text-center" cols="12">
+                    <v-btn @click="$router.push({'name': 'settings'})">
+                        <v-icon>mdi-cog</v-icon>
+                        <span>{{ $t('app.profile_configure') }}</span>
+                    </v-btn>
+                </v-col>
+            </v-row>
+        </div>
+    </div>
+    `,
+});
+
+Vue.component("user-session-detail", {
+    props: {
+        show_user: {
+            type: Boolean,
+            default: true,
+        },
+        show_profile: {
+            type: Boolean,
+            default: true,
+        },
+    },
+    template: `
+  <div :class="$options._componentTag" data-ref="user-session-detail">
+    <v-list>
+        <v-list-item v-if="show_user && $root.user.id"
+                data-ref="session-detail-user"
+                :data-id="$root.user.id"
+                >
+            <v-list-item-avatar>
+                <v-avatar color="primary" size="36">
+                    <v-icon dark>mdi-account-circle</v-icon>
+                </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-content>
+                <span v-text="$root.user.name" />
+            </v-list-item-content>
+        </v-list-item>
+        <v-list-item v-if="show_profile && $root.has_profile"
+                data-ref="session-detail-profile"
+                :data-id="$root.profile.id"
+                :to="{name: 'profile'}"
+                >
+            <v-list-item-avatar>
+                <v-avatar color="primary" size="36">
+                    <v-icon dark>mdi-account-multiple-check</v-icon>
+                </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-content>
+                <span v-text="$root.profile.name" />
+            </v-list-item-content>
+        </v-list-item>
+    </v-list>
+  </div>
+  `,
+});

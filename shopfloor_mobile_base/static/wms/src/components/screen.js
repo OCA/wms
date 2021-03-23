@@ -109,18 +109,7 @@ Vue.component("Screen", {
             </v-list>
             <template v-slot:append>
                 <v-divider></v-divider>
-                <v-list v-if="$root.user.id">
-                    <v-list-item>
-                        <v-list-item-avatar>
-                            <v-avatar color="primary" size="36">
-                                <v-icon dark>mdi-account-circle</v-icon>
-                            </v-avatar>
-                        </v-list-item-avatar>
-                        <v-list-item-content>
-                            <span v-text="$root.user.name" />
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list>
+                <user-session-detail />
             </template>
         </v-navigation-drawer>
         <v-app-bar
@@ -163,21 +152,7 @@ Vue.component("Screen", {
                 <slot name="header"></slot>
             </div>
 
-            <div class="profile-not-ready" v-if="show_profile_not_ready">
-                <v-alert type="warning" tile>
-                    <p>{{ $t('app.profile_not_configured') }}</p>
-                </v-alert>
-                <div class="button-list button-vertical-list full">
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <v-btn @click="$router.push({'name': 'settings'})">
-                                <v-icon>mdi-cog</v-icon>
-                                <span>{{ $t('app.profile_configure') }}</span>
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-                </div>
-            </div>
+            <profile-not-ready v-if="show_profile_not_ready" />
 
             <v-container>
                 <screen-loading :loading="$root.loading" />
@@ -213,7 +188,6 @@ Vue.component("nav-items", {
             :key="'nav-item-' + item.id"
             :to="{name: item.scenario, params: {menu_id: item.id, state: 'init'}}"
             link
-            active-class="'v-item-active"
             :color="$route.params.menu_id == item.id ? 'v-item-active' : null"
             >
             <v-list-item-content>
@@ -229,7 +203,12 @@ Vue.component("nav-items", {
 
 Vue.component("nav-item-content", {
     props: {
-        item: Array,
+        item: {
+            type: Object,
+            default: function() {
+                return {};
+            },
+        },
         show_full_info: {
             type: Boolean,
             default: true,
@@ -257,7 +236,12 @@ Vue.component("nav-item-content", {
 
 Vue.component("nav-item-action", {
     props: {
-        item: Array,
+        item: {
+            type: Object,
+            default: function() {
+                return {};
+            },
+        },
         options: {
             type: Object,
             default: function() {
