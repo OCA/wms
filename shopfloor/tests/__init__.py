@@ -49,6 +49,12 @@ from . import test_location_content_transfer_single
 from . import test_location_content_transfer_set_destination_package_or_line
 from . import test_location_content_transfer_putaway
 from . import test_location_content_transfer_mix
+from . import test_manual_product_transfer_base
+from . import test_manual_product_transfer_start
+from . import test_manual_product_transfer_scan_product
+from . import test_manual_product_transfer_confirm_quantity
+from . import test_manual_product_transfer_scan_destination_location
+from . import test_manual_product_transfer_misc
 from . import test_zone_picking_base
 from . import test_zone_picking_start
 from . import test_zone_picking_select_picking_type
