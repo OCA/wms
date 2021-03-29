@@ -69,3 +69,10 @@ class StockLocation(models.Model):
         planned = remaining - sum(move_lines.mapped(move_line_qty_field))
         compare = float_compare(planned, 0, precision_rounding=0.01)
         return compare <= 0
+
+    def should_bypass_reservation(self):
+        self.ensure_one()
+        # TODO: This could be set as an option on shopfloor.menu
+        if self.env.context.get("force_reservation"):
+            return False
+        return super().should_bypass_reservation()
