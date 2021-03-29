@@ -139,8 +139,9 @@ class SinglePackTransfer(Component):
             # restore any unreserved move/package level
             savepoint.rollback()
             return self._response_for_start(message=message)
-        if self.work.menu.ignore_no_putaway_available and self._no_putaway_available(
-            package_level
+        stock = self._actions_for("stock")
+        if self.work.menu.ignore_no_putaway_available and stock.no_putaway_available(
+            self.picking_types, package_level.move_line_ids
         ):
             # the putaway created a move line but no putaway was possible, so revert
             # to the initial state
@@ -161,13 +162,6 @@ class SinglePackTransfer(Component):
         savepoint.release()
 
         return self._response_for_scan_location(package_level)
-
-    def _no_putaway_available(self, package_level):
-        move_lines = package_level.move_line_ids
-        base_locations = self.picking_types.default_location_dest_id
-        # when no putaway is found, the move line destination stays the
-        # default's of the picking type
-        return any(line.location_dest_id in base_locations for line in move_lines)
 
     def _create_package_level(self, package):
         # this method can be called only if we have one picking type
