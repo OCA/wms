@@ -1,0 +1,41 @@
+# Diagram to generate with PlantUML (https://plantuml.com/)
+#
+#   $ sudo apt install plantuml
+#   $ plantuml delivery_diag_seq.plantuml
+#
+
+@startuml
+
+skinparam roundcorner 20
+skinparam sequence {
+
+ParticipantBorderColor #875A7B
+ParticipantBackgroundColor #875A7B
+ParticipantFontSize 17
+ParticipantFontColor white
+
+LifeLineBorderColor #875A7B
+
+ArrowColor #00A09D
+}
+
+header <img:oca_logo.png>
+title <size:35>Manual Product Transfer scenario</size>
+
+== /scan_source_location ==
+start -> scan_product: **/scan_source_location**(barcode)
+
+== /scan_product ==
+scan_product -> confirm_quantity: **/scan_product**(location_id, barcode)
+scan_product -> scan_destination_location: **/scan_product**(location_id, barcode) \n(session recovering if there were existing move lines linked to the current operator for this source location and product)
+
+== /set_quantity (optional) ==
+confirm_quantity -> confirm_quantity: **/set_quantity**(location_id, product_id, quantity, lot_id=None)
+
+== /confirm_quantity ==
+confirm_quantity -> scan_destination_location: **/confirm_quantity**(location_id, product_id, quantity, lot_id=None, barcode=None, confirm=False) \n(create the move and assign it)
+
+== /scan_destination_location ==
+scan_destination_location -> start: **/scan_destination_location**(move_id, barcode) \n(post the move)
+
+@enduml
