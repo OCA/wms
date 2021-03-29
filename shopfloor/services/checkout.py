@@ -749,7 +749,7 @@ class Checkout(Component):
         # Scan delivery packaging
         packaging = search.generic_packaging_from_scan(barcode)
         if packaging:
-            carrier = picking.carrier_id
+            carrier = picking.ship_carrier_id or picking.carrier_id
             # Validate against carrier
             if carrier and not self._packaging_good_for_carrier(packaging, carrier):
                 return self._response_for_select_package(
@@ -773,16 +773,13 @@ class Checkout(Component):
 
     def _get_available_delivery_packaging(self, picking):
         model = self.env["product.packaging"]
-        if not picking.carrier_id:
+        carrier = picking.ship_carrier_id or picking.carrier_id
+        if not carrier:
             return model.browse()
         return model.search(
             [
                 ("product_id", "=", False),
-                (
-                    "package_carrier_type",
-                    "=",
-                    picking.carrier_id.delivery_type or "none",
-                ),
+                ("package_carrier_type", "=", carrier.delivery_type or "none"),
             ],
             order="name",
         )

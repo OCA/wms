@@ -43,6 +43,8 @@
         "delivery",
         #  OCA / product-attribute
         "product_packaging_type",
+        #  OCA / delivery
+        "stock_picking_delivery_link",
     ],
     "data": [
         "data/shopfloor_scenario_data.xml",
