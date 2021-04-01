@@ -5,10 +5,8 @@ exclude: |
   ^delivery_carrier_warehouse/|
   ^delivery_preference_glue_stock_picking_group/|
   ^sale_stock_available_to_promise_release/|
-  ^shopfloor/|
   ^shopfloor_batch_automatic_creation/|
   ^shopfloor_checkout_sync/|
-  ^shopfloor_mobile/|
   ^shopfloor_packing_info/|
   ^shopfloor_rest_log/|
   ^shopfloor_workstation/|

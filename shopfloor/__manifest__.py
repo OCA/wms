@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020 Akretion (http://www.akretion.com)
 # Copyright 2020 BCIM
@@ -6,7 +7,7 @@
 {
     "name": "Shopfloor",
     "summary": "manage warehouse operations with barcode scanners",
-    "version": "13.0.4.4.1",
+    "version": "10.0.4.4.1",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
@@ -17,14 +18,13 @@
     "depends": [
         "shopfloor_base",
         "stock",
-        "stock_picking_batch",
+        # TODO 10 "stock_picking_batch",
         "base_jsonify",
         "base_rest",
-        "base_sparse_field",
         "auth_api_key",
         #  OCA / stock-logistics-warehouse
-        "stock_helper",
-        "stock_picking_completion_info",
+        # TODO 10 "stock_helper",
+        # TODO 10 "stock_picking_completion_info",
         "stock_quant_package_product_packaging",
         #  OCA / stock-logistics-workflow
         "stock_quant_package_dimension",
@@ -45,14 +45,13 @@
         "product_packaging_type",
     ],
     "data": [
-        "data/shopfloor_scenario_data.xml",
+        # TODO 10 "data/shopfloor_scenario_data.xml",
         "security/groups.xml",
-        "security/ir.model.access.csv",
-        "views/shopfloor_menu.xml",
-        "views/stock_picking_type.xml",
-        "views/stock_location.xml",
-        "views/stock_move_line.xml",
+        # TODO 10 "views/shopfloor_menu.xml",
+        # TODO 10"views/stock_picking_type.xml",
+        # TODO 10 "views/stock_location.xml",
+        # TODO 10 "views/stock_move_line.xml",
     ],
-    "installable": False,
-    "demo": ["demo/stock_picking_type_demo.xml", "demo/shopfloor_menu_demo.xml"],
+    "installable": True,
+    # TODO 10 "demo": ["demo/stock_picking_type_demo.xml", "demo/shopfloor_menu_demo.xml"],
 }

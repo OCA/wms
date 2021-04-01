@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020 BCIM (http://www.bcim.be)
 # Copyright 2020 Akretion (http://www.akretion.com)
@@ -5,7 +6,7 @@
 {
     "name": "Shopfloor mobile",
     "summary": "Mobile frontend for WMS Shopfloor app",
-    "version": "13.0.2.2.1",
+    "version": "10.0.2.2.1",
     "development_status": "Alpha",
     "depends": ["shopfloor", "shopfloor_mobile_base"],
     "author": "Camptocamp, BCIM, Akretion, Odoo Community Association (OCA)",
@@ -13,6 +14,6 @@
     "website": "https://github.com/OCA/wms",
     "category": "Warehouse Management",
     "license": "AGPL-3",
-    "installable": False,
+    "installable": True,
     "data": ["templates/assets.xml"],
 }

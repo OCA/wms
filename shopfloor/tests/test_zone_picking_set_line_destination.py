@@ -1,5 +1,5 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# -*- coding: utf-8 -*-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from .test_zone_picking_base import ZonePickingCommonCase
 
 
