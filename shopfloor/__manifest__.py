@@ -23,7 +23,7 @@
         "base_rest",
         "auth_api_key",
         #  OCA / stock-logistics-warehouse
-        # TODO 10 "stock_helper",
+        "stock_helper",
         # TODO 10 "stock_picking_completion_info",
         "stock_quant_package_product_packaging",
         #  OCA / stock-logistics-workflow
