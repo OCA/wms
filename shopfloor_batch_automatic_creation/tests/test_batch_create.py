@@ -151,3 +151,36 @@ class TestBatchCreate(CommonCase):
         self.assert_response(
             response, next_state="confirm_start", data=data,
         )
+
+    def test_create_batch_group_by_commercial_partner(self):
+        """Test batch creation by grouping all operations of the same
+        commercial entity, ignoring priorities and limits.
+        """
+        partner_model = self.env["res.partner"].sudo()
+        partner1_com = partner_model.create(
+            {"name": "COM PARTNER 1", "is_company": True}
+        )
+        partner1_contact = partner_model.create(
+            {
+                "name": "CONTACT PARTNER 1",
+                "parent_id": partner1_com.id,
+                "is_company": False,
+            }
+        )
+        partner2_com = partner_model.create(
+            {"name": "COM PARTNER 2", "is_company": True}
+        )
+        partner2_contact = partner_model.create(
+            {
+                "name": "CONTACT PARTNER 2",
+                "parent_id": partner2_com.id,
+                "is_company": False,
+            }
+        )
+        self.picking1.write({"priority": "2", "partner_id": partner1_contact.id})
+        self.picking2.write({"priority": "2", "partner_id": partner2_contact.id})
+        self.picking3.write({"priority": "3", "partner_id": partner2_contact.id})
+        batch = self.auto_batch.create_batch(
+            self.picking_type, group_by_commercial_partner=True
+        )
+        self.assertEqual(batch.picking_ids, self.picking2 | self.picking3)

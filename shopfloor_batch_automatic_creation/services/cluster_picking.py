@@ -19,6 +19,7 @@ class ClusterPicking(Component):
         menu = self.work.menu
         return auto_batch.create_batch(
             self.picking_types,
+            group_by_commercial_partner=menu.batch_group_by_commercial_partner,
             max_pickings=menu.batch_create_max_picking,
             max_volume=menu.batch_create_max_volume,
             max_weight=menu.batch_create_max_weight,
