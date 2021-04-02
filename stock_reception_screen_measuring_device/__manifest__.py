@@ -1,8 +1,8 @@
 # Copyright 2021 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html)
 {
-    "name": "Stock Zippcube on Reception Screen",
-    "summary": "Allow to use the zippcube from a reception screen."
+    "name": "Stock Measuring Device on Reception Screen",
+    "summary": "Allow to use a measuring device from a reception screen."
     "for packaging measurement",
     "version": "13.0.1.0.0",
     "category": "Warehouse",
