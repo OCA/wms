@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 ACSONE SA/NV
+     @author Simone Orsi <simahawk@gmail.com>
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo noupdate="1">
+    <record id="shopfloor_base.group_shopfloor_manager" model="res.groups">
+        <field
+            name="implied_ids"
+            eval="[(4, ref('rest_log.group_rest_log_manager'))]"
+        />
+    </record>
+</odoo>

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from .test_checkout_base import CheckoutCommonCase
@@ -30,6 +31,18 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             },
         )
         self._assert_selected(response, selected_lines)
+
+    def test_select_line_no_package_disabled(self):
+        selected_lines = self.moves_pack.move_line_ids
+        self.service.work.options = {"checkout__disable_no_package": True}
+        response = self.service.dispatch(
+            "select_line",
+            params={
+                "picking_id": self.picking.id,
+                "package_id": selected_lines.package_id.id,
+            },
+        )
+        self._assert_selected(response, selected_lines, no_package_enabled=False)
 
     def test_select_line_move_line_package_ok(self):
         selected_lines = self.moves_pack.move_line_ids

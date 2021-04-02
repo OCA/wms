@@ -22,6 +22,7 @@
                     optional="hide"
                     groups="base.group_no_one"
                 />
+                <field name="release_ready" optional="show" />
                 <field name="date_priority" />
                 <field name="priority" />
             </field>
@@ -59,8 +60,8 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <filter
-                    string="Qty Available to Release"
-                    name="qty_available_to_release"
+                    string="Release Ready"
+                    name="release_ready"
                     domain="[('release_ready', '=', True)]"
                 />
                 <separator />
@@ -68,7 +69,7 @@
         </field>
     </record>
     <record id="stock_move_release_action" model="ir.actions.act_window">
-        <field name="name">Stock Allocation</field>
+        <field name="name">Moves Allocations</field>
         <field name="res_model">stock.move</field>
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">tree,kanban,form</field>
@@ -83,7 +84,7 @@
         />
         <field
             name="context"
-        >{'search_default_groupby_picking_id': 1, 'search_default_qty_available_to_release': 1}</field>
+        >{'search_default_groupby_picking_id': 1, 'search_default_release_ready': 1}</field>
         <field name="domain">[('need_release', '=' , True)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -99,7 +100,7 @@
     <menuitem
         action="stock_move_release_action"
         id="stock_move_release_menu"
-        parent="stock.menu_stock_warehouse_mgmt"
+        parent="stock.menu_warehouse_report"
         sequence="10"
         groups="stock.group_stock_manager,stock.group_stock_user"
     />

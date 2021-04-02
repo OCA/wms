@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from .test_checkout_base import CheckoutCommonCase
@@ -86,11 +87,8 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
 
         self.assert_response(
             response,
-            next_state="summary",
-            data={
-                "picking": self._stock_picking_data(picking, done=True),
-                "all_processed": False,
-            },
+            next_state="select_line",
+            data={"picking": self._stock_picking_data(picking)},
             message={"body": "Package cancelled", "message_type": "success"},
         )
 
@@ -112,11 +110,8 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
 
         self.assert_response(
             response,
-            next_state="summary",
-            data={
-                "picking": self._stock_picking_data(picking, done=True),
-                "all_processed": False,
-            },
+            next_state="select_line",
+            data={"picking": self._stock_picking_data(picking)},
             message={"body": "Line cancelled", "message_type": "success"},
         )
 

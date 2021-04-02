@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020 Akretion (http://www.akretion.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
@@ -652,7 +653,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             },
         )
 
-        message = self.service.actions_for("message").confirm_location_changed(
+        message = self.service._actions_for("message").confirm_location_changed(
             sub_shelf1, sub_shelf2
         )
         self.assert_response(

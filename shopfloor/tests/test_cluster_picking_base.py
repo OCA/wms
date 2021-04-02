@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
@@ -9,9 +10,9 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
-        cls.profile = cls.env.ref("shopfloor.shopfloor_profile_shelf_1_demo")
-        cls.wh = cls.profile.warehouse_id
+        cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
         cls.picking_type = cls.menu.picking_type_ids
+        cls.wh = cls.picking_type.warehouse_id
 
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):

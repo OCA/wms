@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
@@ -214,7 +215,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         self.assertEqual(next_move.state, "assigned")
         # Check the response
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
-        completion_info = self.service.actions_for("completion.info")
+        completion_info = self.service._actions_for("completion.info")
         completion_info_popup = completion_info.popup(package_level.move_line_ids)
         self.assert_response_start_single(
             response,
@@ -403,7 +404,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         self.assertEqual(next_move.state, "assigned")
         # Check the response
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
-        completion_info = self.service.actions_for("completion.info")
+        completion_info = self.service._actions_for("completion.info")
         completion_info_popup = completion_info.popup(move_line)
         self.assert_response_start_single(
             response,

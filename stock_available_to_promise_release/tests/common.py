@@ -1,5 +1,5 @@
 # Copyright 2019 Camptocamp (https://www.camptocamp.com)
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 from odoo import fields
 from odoo.tests import common
@@ -38,11 +38,12 @@ class PromiseReleaseCommonCase(common.SavepointCase):
             {"name": "Bin1", "location_id": cls.loc_stock.id}
         )
 
-    def _create_picking_chain(self, wh, products=None, date=None, move_type="direct"):
+    @classmethod
+    def _create_picking_chain(cls, wh, products=None, date=None, move_type="direct"):
         """Create picking chain
 
         It runs the procurement group to create the moves required for
-        a product. According to the WH, it creates the pick/pack/ship
+        a product. According to the WH, it creates the pick+ship
         moves.
 
         Products must be a list of tuples (product, quantity) or
@@ -53,11 +54,11 @@ class PromiseReleaseCommonCase(common.SavepointCase):
         if products is None:
             products = []
 
-        group = self.env["procurement.group"].create(
+        group = cls.env["procurement.group"].create(
             {
                 "name": "TEST",
                 "move_type": move_type,
-                "partner_id": self.partner_delta.id,
+                "partner_id": cls.partner_delta.id,
             }
         )
         values = {
@@ -78,13 +79,13 @@ class PromiseReleaseCommonCase(common.SavepointCase):
                     "Expect (product, quantity, uom) or (product, quantity)"
                 )
 
-            self.env["procurement.group"].run(
+            cls.env["procurement.group"].run(
                 [
-                    self.env["procurement.group"].Procurement(
+                    cls.env["procurement.group"].Procurement(
                         product,
                         qty,
                         uom,
-                        self.loc_customer,
+                        cls.loc_customer,
                         "TEST",
                         "TEST",
                         wh.company_id,
@@ -92,18 +93,23 @@ class PromiseReleaseCommonCase(common.SavepointCase):
                     )
                 ]
             )
-        pickings = self._pickings_in_group(group)
+        pickings = cls._pickings_in_group(group)
         pickings.mapped("move_lines").write(
             {"date_priority": date or fields.Datetime.now()}
         )
         return pickings
 
-    def _pickings_in_group(self, group):
-        return self.env["stock.picking"].search([("group_id", "=", group.id)])
+    @classmethod
+    def _pickings_in_group(cls, group):
+        return cls.env["stock.picking"].search([("group_id", "=", group.id)])
 
-    def _update_qty_in_location(self, location, product, quantity):
-        self.env["stock.quant"]._update_available_quantity(product, location, quantity)
-        self.env["product.product"].invalidate_cache(
+    @classmethod
+    def _update_qty_in_location(cls, location, product, quantity):
+        quants = cls.env["stock.quant"]._gather(product, location, strict=True)
+        # this method adds the quantity to the current quantity, so remove it
+        quantity -= sum(quants.mapped("quantity"))
+        cls.env["stock.quant"]._update_available_quantity(product, location, quantity)
+        cls.env["product.product"].invalidate_cache(
             fnames=[
                 "qty_available",
                 "virtual_available",

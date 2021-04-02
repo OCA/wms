@@ -10,9 +10,9 @@ Stock Available to Promise Release
 .. |badge1| image:: https://img.shields.io/badge/maturity-Alpha-red.png
     :target: https://odoo-community.org/page/development-status
     :alt: Alpha
-.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
-    :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
-    :alt: License: AGPL-3
+.. |badge2| image:: https://img.shields.io/badge/licence-LGPL--3-blue.png
+    :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
+    :alt: License: LGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fwms-lightgray.png?logo=github
     :target: https://github.com/OCA/wms/tree/13.0/stock_available_to_promise_release
     :alt: OCA/wms
@@ -112,6 +112,7 @@ Contributors
 
 * Guewen Baconnier <guewen.baconnier@camptocamp.com>
 * Simone Orsi <simone.orsi@camptocamp.com>
+* Jacques-Etienne Baudoux <je@bcim.be>
 
 Maintainers
 ~~~~~~~~~~~

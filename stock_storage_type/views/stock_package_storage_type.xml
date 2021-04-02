@@ -25,6 +25,13 @@
                             type="object"
                         />
                     </div>
+                    <field name="active" invisible="1" />
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}"
+                    />
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only" />
                         <h1>
@@ -38,6 +45,7 @@
                                 widget="many2many_tags"
                             />
                             <field name="height_required" />
+                            <field name="barcode" />
                         </group>
                         <group name="msg">
                             <div colspan="2">
@@ -50,6 +58,19 @@
                     </group>
                 </sheet>
             </form>
+        </field>
+    </record>
+    <record id="stock_package_storage_type_search_view" model="ir.ui.view">
+        <field name="name">stock.package.storage.type search</field>
+        <field name="model">stock.package.storage.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter
+                    string="Archived"
+                    name="inactive"
+                    domain="[('active', '=', False)]"
+                />
+            </search>
         </field>
     </record>
     <record id="package_storage_type_action" model="ir.actions.act_window">

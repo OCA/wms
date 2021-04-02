@@ -4,7 +4,7 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {ItemDetailMixin} from "./detail_mixin.js";
+import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
 
 // TODO: this should be probably merged or combined w/ detail-product
 Vue.component("detail-lot", {
@@ -25,14 +25,14 @@ Vue.component("detail-lot", {
                     path: "expire_date",
                     label: "Expiry date",
                     renderer: function(rec, field) {
-                        return self.utils.misc.render_field_date(rec, field);
+                        return self.utils.display.render_field_date(rec, field);
                     },
                 },
                 {
                     path: "removal_date",
                     label: "Removal date",
                     renderer: function(rec, field) {
-                        return self.utils.misc.render_field_date(rec, field);
+                        return self.utils.display.render_field_date(rec, field);
                     },
                 },
             ];
