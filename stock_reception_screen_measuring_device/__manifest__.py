@@ -14,5 +14,5 @@
     "installable": True,
     "auto_install": True,
     "development_status": "Alpha",
-    "maintainer": "Alexandre Fayolle <alexandre.fayolle@camptocamp.com>",
+    "maintainers": ["gurneyalex"],
 }
