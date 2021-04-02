@@ -12,16 +12,26 @@
                 >
                     <field name="batch_create" />
                     <field
-                        name="batch_create_max_picking"
+                        name="batch_group_by_commercial_partner"
                         attrs="{'invisible': [('batch_create', '=', False)]}"
+                    />
+                    <field
+                        name="batch_create_max_picking"
+                        attrs="{
+                          'invisible': ['|', ('batch_create', '=', False), ('batch_group_by_commercial_partner', '=', True)],
+                        }"
                     />
                     <field
                         name="batch_create_max_volume"
-                        attrs="{'invisible': [('batch_create', '=', False)]}"
+                        attrs="{
+                          'invisible': ['|', ('batch_create', '=', False), ('batch_group_by_commercial_partner', '=', True)],
+                        }"
                     />
                     <field
                         name="batch_create_max_weight"
-                        attrs="{'invisible': [('batch_create', '=', False)]}"
+                        attrs="{
+                          'invisible': ['|', ('batch_create', '=', False), ('batch_group_by_commercial_partner', '=', True)],
+                        }"
                     />
                 </group>
             </group>
