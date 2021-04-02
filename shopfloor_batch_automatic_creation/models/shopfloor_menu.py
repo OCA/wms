@@ -18,6 +18,12 @@ class ShopfloorMenu(models.Model):
         " and a max quantity of 3, the batch will only contain the 2"
         " priority transfers.",
     )
+    batch_group_by_commercial_partner = fields.Boolean(
+        string="Group by commercial entity",
+        default=False,
+        help="If enabled, transfers will be grouped by commercial entity."
+        "This could mix priorities and will ignore the constraints to apply.",
+    )
     batch_create_max_picking = fields.Integer(
         string="Max transfers",
         default=0,
