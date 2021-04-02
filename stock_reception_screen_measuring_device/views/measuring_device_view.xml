@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<odoo>
+    <record id="view_zippcube_device_form" model="ir.ui.view">
+        <field name="name">zippcube.device.form</field>
+        <field name="model">zippcube.device</field>
+        <field
+            name="inherit_id"
+            ref="stock_measuring_device_zippcube.view_zippcube_device_form"
+        />
+        <field name="arch" type="xml">
+            <field name="warehouse_id" position="after">
+                <field name="is_default" />
+            </field>
+        </field>
+    </record>
+    <record id="view_zippcube_device_tree" model="ir.ui.view">
+        <field name="name">zippcube.device.tree</field>
+        <field name="model">zippcube.device</field>
+        <field
+            name="inherit_id"
+            ref="stock_measuring_device_zippcube.view_zippcube_device_tree"
+        />
+        <field name="arch" type="xml">
+            <field name="warehouse_id" position="after">
+                <field name="is_default" />
+            </field>
+        </field>
+    </record>
+</odoo>
