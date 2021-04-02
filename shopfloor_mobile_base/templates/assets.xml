@@ -217,10 +217,13 @@
             t-attf-src="/shopfloor_mobile_base/static/wms/src/demo/demo.core.js?v=#{app_version}"
             type="module"
         />
+        <!--
+        TODO add demo data for non wms stuff
         <script
             id="script_demo_scan_anything"
             t-attf-src="/shopfloor_mobile_base/static/wms/src/demo/demo.scan_anything.js?v=#{app_version}"
             type="module"
         />
+        -->
     </template>
 </odoo>
