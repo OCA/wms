@@ -6,3 +6,4 @@ odoo10-addon-product_packaging_dimension @ git+https://github.com/OCA/product-at
 odoo10-addon-product_packaging_type @ git+https://github.com/OCA/product-attribute@refs/pull/693/head#subdirectory=setup/product_packaging_type
 odoo10-addon-stock_operation_cleaner @ git+https://github.com/OCA/stock-logistics-workflow@refs/pull/782/head#subdirectory=setup/stock_operation_cleaner
 odoo_test_helper
+unittest2
