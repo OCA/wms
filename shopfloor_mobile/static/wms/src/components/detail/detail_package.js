@@ -38,7 +38,7 @@ Vue.component("detail-package", {
                 {path: "product.barcode", label: "Barcode"},
                 {path: "product.supplier_code", label: "Vendor code"},
                 {path: "lot.name", label: "Lot"},
-                {path: "product.qty_reserved", label: "Reserved"},
+                {path: "quantity", label: "Reserved"},
                 {path: "product.qty_available", label: "In stock"},
             ];
         },
