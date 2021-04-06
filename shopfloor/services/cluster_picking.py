@@ -468,16 +468,19 @@ class ClusterPicking(Component):
         )
 
     def _scan_line_by_package(self, picking, move_line, package):
+        """Package scanned, just work with it."""
         return self._response_for_scan_destination(move_line)
 
     def _scan_line_by_product(self, picking, move_line, product):
+        """Product scanned, check if we can work with it.
+
+        If scanned product is part of several packages in the same location,
+        we can't be sure it's the correct one, in such case, ask to scan a package
+        """
         if move_line.product_id.tracking in ("lot", "serial"):
             return self._response_for_start_line(
                 move_line, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
             )
-
-        # If scanned product is part of several packages in the same location,
-        # we can't be sure it's the correct one, in such case, ask to scan a package
         other_product_lines = picking.move_line_ids.filtered(
             lambda l: l.product_id == product and l.location_id == move_line.location_id
         )
@@ -494,8 +497,11 @@ class ClusterPicking(Component):
         return self._response_for_scan_destination(move_line)
 
     def _scan_line_by_lot(self, picking, move_line, lot):
-        # if we scanned a lot and it's part of several packages, we can't be
-        # sure the user scanned the correct one, in such case, ask to scan a package
+        """Lot scanned, check if we can work with it.
+
+        If we scanned a lot and it's part of several packages, we can't be
+        sure the user scanned the correct one, in such case, ask to scan a package
+        """
         other_lot_lines = picking.move_line_ids.filtered(lambda l: l.lot_id == lot)
         packages = other_lot_lines.mapped("package_id")
         # Do not use mapped here: we want to see if we have more than one
@@ -509,11 +515,14 @@ class ClusterPicking(Component):
         return self._response_for_scan_destination(move_line)
 
     def _scan_line_by_location(self, picking, move_line, location):
-        # When a user scan a location, we accept only when we knows that
-        # they scanned the good thing, so if in the location we have
-        # several lots (on a package or a product), several packages,
-        # several products or a mix of several products and packages, we
-        # ask to scan a more precise barcode.
+        """Location scanned, check if we can work on goods contained into it.
+
+        When a user scan a location, we accept only when we knows that
+        they scanned the good thing, so if in the location we have
+        several lots (on a package or a product), several packages,
+        several products or a mix of several products and packages, we
+        ask to scan a more precise barcode.
+        """
         location = move_line.location_id
         ml_search = self.search_move_line
         pending_lines = ml_search.search_move_lines_by_location(location)
