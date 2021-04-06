@@ -222,12 +222,22 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         line = self.batch.picking_ids.move_line_ids
         location = line.location_id
         # add a second package in the location
-        self._update_qty_in_location(
-            location,
-            self.product_b,
-            10,
-            package=self.env["stock.quant.package"].create({}),
+        new_move = line.move_id.copy()
+        self._fill_stock_for_moves(new_move, in_package=True, same_package=False)
+        new_move._action_confirm(merge=False)
+        new_move._action_assign()
+        loc_lines = self.env["stock.move.line"].search(
+            [
+                ("picking_id.picking_type_id", "=", self.picking_type.id),
+                ("location_id", "=", location.id),
+            ]
         )
+        # Ensure lines have different packages and no qty done
+        self.assertEqual(len(loc_lines), 2)
+        self.assertEqual(len(loc_lines.mapped("package_id")), 2)
+        self.assertEqual(loc_lines.mapped("qty_done"), [0.0, 0.0])
+        # All lines have to be processed,
+        # we cannot go further without scanning a specific package
         self._scan_line_error(
             line,
             location.barcode,
@@ -236,6 +246,10 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
                 "body": "Several packages found in Stock, please scan a package.",
             },
         )
+        # Although, if one line is already processed,
+        # we can work automatically on the next one
+        line.qty_done = line.product_uom_qty
+        self._scan_line_ok(new_move.move_line_ids[0], line.location_id.barcode)
 
     def test_scan_line_location_error_several_products(self):
         """Scan to check if user scans a correct location for current line
@@ -247,6 +261,22 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         location = line.location_id
         # add a second product in the location
         self._update_qty_in_location(location, self.product_b, 10)
+        # add a second product in the location
+        new_move = line.move_id.copy({"product_id": self.product_c.id})
+        self._fill_stock_for_moves(new_move)
+        new_move._action_confirm(merge=False)
+        new_move._action_assign()
+        loc_lines = self.env["stock.move.line"].search(
+            [
+                ("picking_id.picking_type_id", "=", self.picking_type.id),
+                ("location_id", "=", location.id),
+            ]
+        )
+        # Ensure lines have no package, 2 products and no qty done
+        self.assertEqual(len(loc_lines), 2)
+        self.assertEqual(len(loc_lines.mapped("package_id")), 0)
+        self.assertEqual(len(loc_lines.mapped("product_id")), 2)
+        self.assertEqual(loc_lines.mapped("qty_done"), [0.0, 0.0])
         self._scan_line_error(
             line,
             location.barcode,
@@ -255,6 +285,10 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
                 "body": "Several products found in Stock, please scan a product.",
             },
         )
+        # Although, if one line is already processed,
+        # we can work automatically on the next one
+        line.qty_done = line.product_uom_qty
+        self._scan_line_ok(new_move.move_line_ids[0], line.location_id.barcode)
 
     def test_scan_line_location_error_several_lots(self):
         """Scan to check if user scans a correct location for current line
@@ -264,11 +298,23 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._simulate_batch_selected(self.batch, in_lot=True)
         line = self.batch.picking_ids.move_line_ids
         location = line.location_id
-        lot = self.env["stock.production.lot"].create(
-            {"product_id": self.product_a.id, "company_id": self.env.company.id}
-        )
         # add a second lot in the location
-        self._update_qty_in_location(location, self.product_a, 10, lot=lot)
+        new_move = line.move_id.copy()
+        self._fill_stock_for_moves(new_move, in_lot=True)
+        new_move._action_confirm(merge=False)
+        new_move._action_assign()
+        loc_lines = self.env["stock.move.line"].search(
+            [
+                ("picking_id.picking_type_id", "=", self.picking_type.id),
+                ("location_id", "=", location.id),
+            ]
+        )
+        # Ensure lines have no package, 1 product, 2 lots and no qty done
+        self.assertEqual(len(loc_lines), 2)
+        self.assertEqual(len(loc_lines.mapped("package_id")), 0)
+        self.assertEqual(len(loc_lines.mapped("product_id")), 1)
+        self.assertEqual(len(loc_lines.mapped("lot_id")), 2)
+        self.assertEqual(loc_lines.mapped("qty_done"), [0.0, 0.0])
         self._scan_line_error(
             line,
             location.barcode,
@@ -277,6 +323,10 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
                 "body": "Several lots found in Stock, please scan a lot.",
             },
         )
+        # Although, if one line is already processed,
+        # we can work automatically on the next one
+        line.qty_done = line.product_uom_qty
+        self._scan_line_ok(new_move.move_line_ids[0], line.location_id.barcode)
 
     def test_scan_line_error_not_found(self):
         """Nothing found for the barcode"""
