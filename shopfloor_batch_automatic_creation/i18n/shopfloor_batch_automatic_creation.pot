@@ -30,6 +30,18 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_group_by_commercial_partner
+msgid "Group by commercial entity"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_group_by_commercial_partner
+msgid ""
+"If enabled, transfers will be grouped by commercial entity.This could mix "
+"priorities and will ignore the constraints to apply."
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
 #: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_weight
 msgid "Max Weight (kg)"
 msgstr ""
