@@ -22,6 +22,11 @@ class TestChannelReleaseBatch(ChannelReleaseCase):
         cls._update_qty_in_location(cls.loc_bin1, cls.product1, 1000.0)
         cls._update_qty_in_location(cls.loc_bin1, cls.product2, 1000.0)
 
+    def test_release_auto_forbidden(self):
+        self.channel.release_forbidden = True
+        with self.assertRaises(exceptions.UserError):
+            self.channel.release_next_batch()
+
     def test_release_auto_max_next_batch_no_config(self):
         self.channel.max_auto_release = 0
         with self.assertRaises(exceptions.UserError):

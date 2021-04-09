@@ -35,6 +35,13 @@ class TestChannelAction(ChannelReleaseCase):
             {"search_default_release_ready": 1},
         )
 
+    def test_action_release_forbidden(self):
+        self.channel.release_forbidden = True
+        with self.assertRaises(exceptions.UserError):
+            self.picking.release_available_to_promise()
+        self.channel.release_forbidden = False
+        self.picking.release_available_to_promise()
+
     def test_action_release_ready(self):
         self._update_qty_in_location(self.loc_bin1, self.product1, 10.0)
         self._update_qty_in_location(self.loc_bin1, self.product2, 10.0)
