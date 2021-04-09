@@ -21,10 +21,14 @@
                         <field name="name" />
                     </h1>
                     <group name="options" groups="stock.group_stock_manager">
-                        <field name="auto_release" />
+                        <field name="release_forbidden" />
+                        <field
+                            name="auto_release"
+                            attrs="{'invisible': [('release_forbidden', '=', True)]}"
+                        />
                         <field
                             name="max_auto_release"
-                            attrs="{'invisible': [('auto_release', '!=', 'max')]}"
+                            attrs="{'invisible': ['|', ('release_forbidden', '=', True), ('auto_release', '!=', 'max')]}"
                         />
                         <field
                             name="rule_domain"

@@ -30,6 +30,7 @@ class StockReleaseChannel(models.Model):
     )
 
     name = fields.Char(required=True)
+    release_forbidden = fields.Boolean(string="Forbid to release this channel")
     sequence = fields.Integer(default=lambda self: self._default_sequence())
     color = fields.Integer()
     rule_domain = fields.Char(
