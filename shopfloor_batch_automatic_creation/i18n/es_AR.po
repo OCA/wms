@@ -27,9 +27,9 @@ msgid ""
 "Automatically create a batch when an operator uses the \"Get Work\" button "
 "and no existing batch has been found. The system will first look for "
 "priority transfers and fill up the batch till the defined constraints (max "
-"of transfers, volume, weight, ...). It never mixes priorities, so if you get"
-" 2 available priority transfers and a max quantity of 3, the batch will only"
-" contain the 2 priority transfers."
+"of transfers, volume, weight, ...). It never mixes priorities, so if you get "
+"2 available priority transfers and a max quantity of 3, the batch will only "
+"contain the 2 priority transfers."
 msgstr ""
 "Crea automáticamente un lote cuando un operador utilice el botón \"Obtener "
 "trabajo\" y no se haya encontrado ningún lote existente. El sistema primero "
@@ -38,6 +38,18 @@ msgstr ""
 "Nunca mezcla prioridades, por lo que si obtiene 2 transferencias "
 "prioritarias disponibles y una cantidad máxima de 3, el lote solo contendrá "
 "las 2 transferencias prioritarias."
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_group_by_commercial_partner
+msgid "Group by commercial entity"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_group_by_commercial_partner
+msgid ""
+"If enabled, transfers will be grouped by commercial entity.This could mix "
+"priorities and will ignore the constraints to apply."
+msgstr ""
 
 #. module: shopfloor_batch_automatic_creation
 #: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_weight
