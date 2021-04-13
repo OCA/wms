@@ -6,25 +6,27 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2021-04-13 11:46+0000\n"
+"Last-Translator: jabelchi <jabelchi@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.3.2\n"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "A destination package is required."
-msgstr ""
+msgstr "Es requereix un paquet destí."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/change_package_lot.py:0
 #, python-format
 msgid "A draft inventory has been created for control."
-msgstr ""
+msgstr "S'ha creat un inventari esborrany per a control."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__shopfloor_zero_check
