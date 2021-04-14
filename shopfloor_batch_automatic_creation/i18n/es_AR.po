@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-02-06 22:45+0000\n"
+"PO-Revision-Date: 2021-04-14 20:46+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -42,7 +42,7 @@ msgstr ""
 #. module: shopfloor_batch_automatic_creation
 #: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_group_by_commercial_partner
 msgid "Group by commercial entity"
-msgstr ""
+msgstr "Agrupar por entidad comercial"
 
 #. module: shopfloor_batch_automatic_creation
 #: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_group_by_commercial_partner
@@ -50,6 +50,8 @@ msgid ""
 "If enabled, transfers will be grouped by commercial entity.This could mix "
 "priorities and will ignore the constraints to apply."
 msgstr ""
+"Si está habilitado, las transferencias se agruparán por entidad comercial. "
+"Esto podría mezclar prioridades e ignorar las restricciones a ser aplicadas."
 
 #. module: shopfloor_batch_automatic_creation
 #: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_weight
