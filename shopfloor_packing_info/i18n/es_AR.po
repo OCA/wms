@@ -6,67 +6,71 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2021-04-16 06:46+0000\n"
+"Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.3.2\n"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__active
 msgid "Active"
-msgstr ""
+msgstr "Activo"
 
 #. module: shopfloor_packing_info
 #: model_terms:ir.ui.view,arch_db:shopfloor_packing_info.shopfloor_packing_info_form_view
 #: model_terms:ir.ui.view,arch_db:shopfloor_packing_info.shopfloor_packing_info_search_view
 msgid "Archived"
-msgstr ""
+msgstr "Archivado"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_res_partner__shopfloor_packing_info_id
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_res_users__shopfloor_packing_info_id
 msgid "Checkout Packing Information"
-msgstr ""
+msgstr "Información de Embalaje de Pago"
 
 #. module: shopfloor_packing_info
 #: model:ir.actions.act_window,name:shopfloor_packing_info.action_shopfloor_packing_info
 #: model:ir.ui.menu,name:shopfloor_packing_info.menu_action_shopfloor_packing_info
 msgid "Checkout Packing Informations"
-msgstr ""
+msgstr "Informaciones de Embalaje de Pago"
 
 #. module: shopfloor_packing_info
 #: model:ir.model,name:shopfloor_packing_info.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "Contacto"
 
 #. module: shopfloor_packing_info
 #: model_terms:ir.actions.act_window,help:shopfloor_packing_info.action_shopfloor_packing_info
 msgid "Create a shopfloor packing information to be reused among customers."
 msgstr ""
+"Cree la información de embalaje en el taller para reutilizarla entre los "
+"clientes."
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Creado por"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Creado el"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Mostrar Nombre"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_stock_picking__shopfloor_display_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_stock_picking_type__shopfloor_display_packing_info
 msgid "Display customer packing info"
-msgstr ""
+msgstr "Mostrar información de embalaje del cliente"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,help:shopfloor_packing_info.field_stock_picking__shopfloor_display_packing_info
@@ -75,58 +79,60 @@ msgid ""
 "For the Shopfloor Checkout/Packing scenarios to display the customer packing"
 " info."
 msgstr ""
+"Para que los escenarios de Caja/Embalaje en el taller muestren la "
+"información de embalaje del cliente."
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Última Modificación el"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Última Actualización por"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Última Actualización el"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__name
 msgid "Name"
-msgstr ""
+msgstr "Nombre"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_stock_picking__shopfloor_packing_info_id
 msgid "Packing information"
-msgstr ""
+msgstr "Información de Embalaje"
 
 #. module: shopfloor_packing_info
 #: model:ir.model,name:shopfloor_packing_info.model_stock_picking_type
 msgid "Picking Type"
-msgstr ""
+msgstr "Tipo de Entrega"
 
 #. module: shopfloor_packing_info
 #: model_terms:ir.ui.view,arch_db:shopfloor_packing_info.view_partner_form
 msgid "Shopfloor"
-msgstr ""
+msgstr "Taller"
 
 #. module: shopfloor_packing_info
 #: model:ir.model,name:shopfloor_packing_info.model_shopfloor_packing_info
 msgid "Shopfloor Packing Information"
-msgstr ""
+msgstr "Información de Embalaje del Taller"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__text
 msgid "Text"
-msgstr ""
+msgstr "Texto"
 
 #. module: shopfloor_packing_info
 #: model:ir.model,name:shopfloor_packing_info.model_stock_picking
 msgid "Transfer"
-msgstr ""
+msgstr "Transferencia"
