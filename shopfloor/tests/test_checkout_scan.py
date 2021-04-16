@@ -13,7 +13,7 @@ class CheckoutScanCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_line",
-            data={"picking": self._stock_picking_data(picking)},
+            data={"picking": self._stock_picking_data(picking), "skip": 0},
         )
 
     def test_scan_document_stock_picking_ok(self):
@@ -127,6 +127,20 @@ class CheckoutScanCase(CheckoutCommonCase):
                 "body": "Several transfers found, please scan a package"
                 " or select a transfer manually.",
             },
+        )
+
+        # if mode scan and pack is active,
+        # we can paginate when scan_document
+        # returns multiple documents
+        picking.picking_type_id.sudo().shopfloor_scan_and_pack = True
+        response = self.service.dispatch(
+            "scan_document",
+            params={"barcode": picking.move_line_ids.location_id.barcode, "skip": 1},
+        )
+        self.assert_response(
+            response,
+            next_state="scan_products",
+            data={"picking": self._stock_picking_data(pickings[1]), "skip": 1},
         )
 
     def test_scan_document_recover(self):

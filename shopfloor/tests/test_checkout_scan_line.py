@@ -117,7 +117,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self.assert_response(
             response,
             next_state="select_line",
-            data={"picking": self._stock_picking_data(picking)},
+            data={"picking": self._stock_picking_data(picking), "skip": None},
             message=message,
         )
 

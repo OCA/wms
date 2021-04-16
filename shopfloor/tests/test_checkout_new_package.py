@@ -56,7 +56,7 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             response,
             # go pack to the screen to select lines to put in packages
             next_state="select_line",
-            data={"picking": self._stock_picking_data(picking)},
+            data={"picking": self._stock_picking_data(picking), "skip": None},
             message={
                 "message_type": "success",
                 "body": "Product(s) packed in {}".format(new_package.name),

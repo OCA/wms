@@ -28,6 +28,18 @@ const Checkout = {
                 v-if="state.on_scan"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
+                :fields="state.fields"
+                :refocusInput="true"
+                />
+            <scan-products
+                v-if="state_is('scan_products')"
+                :products="state.data.picking.move_lines"
+                :fields="state.fields"
+                :lastScanned="lastScanned"
+                :packing="state.data.picking"
+                v-on:shippedFinished="state.shipFinished"
+                v-on:shippedUnfinished="state.shipUnfinished"
+                v-on:skipPack="state.skipPack"
                 />
             <div v-if="state_is('select_document')">
                 <div class="button-list button-vertical-list full">
@@ -244,6 +256,12 @@ const Checkout = {
                 {path: "packaging.name"},
             ];
         },
+        product_fields() {
+            return [
+                {path: "qty", label: "Quantity"},
+                {path: "qtyDone", label: "Done"},
+            ];
+        },
     },
     methods: {
         screen_title: function() {
@@ -320,7 +338,91 @@ const Checkout = {
         return {
             usage: "checkout",
             initial_state_key: "select_document",
+            lastScanned: null,
             states: {
+                scan_products: {
+                    on_scan: scanned => {
+                        const intInText = parseInt(scanned.text);
+                        if (
+                            !isNaN(intInText) &&
+                            intInText < 10000 &&
+                            this.lastScanned
+                        ) {
+                            const moveLinesSelected = this.state.data.picking.move_lines.filter(
+                                line =>
+                                    line.product.barcode === this.lastScanned &&
+                                    !line.done
+                            );
+
+                            if (moveLinesSelected.length > 0) {
+                                this.wait_call(
+                                    this.odoo.call("set_quantity", {
+                                        barcode: this.lastScanned,
+                                        picking_id: this.state.data.picking.id,
+                                        move_line_id: moveLinesSelected[0].id,
+                                        qty: intInText,
+                                    })
+                                );
+
+                                if (intInText === 0) {
+                                    this.lastScanned = null;
+                                }
+                            } else {
+                                this.set_message({
+                                    message_type: "error",
+                                    body: "An error as occured please scan a product",
+                                });
+                                this.lastScanned = null;
+                            }
+                        } else {
+                            this.wait_call(
+                                this.odoo.call("scan_product", {
+                                    barcode: scanned.text,
+                                    picking_id: this.state.data.picking.id,
+                                }),
+                                ({message}) => {
+                                    if (!message || message.message_type !== "error") {
+                                        this.lastScanned = scanned.text;
+                                    }
+                                }
+                            );
+                        }
+                    },
+                    shipFinished: () => {
+                        this.wait_call(
+                            this.odoo.call("done", {
+                                picking_id: this.state.data.picking.id,
+                            })
+                        );
+                        this.lastScanned = null;
+                    },
+                    shipUnfinished: () => {
+                        this.wait_call(
+                            this.odoo.call("done", {
+                                picking_id: this.state.data.picking.id,
+                            })
+                        );
+                        this.lastScanned = null;
+                    },
+                    skipPack: () => {
+                        this.wait_call(
+                            this.odoo.call("scan_document", {
+                                barcode: this.state.data.picking.move_lines[0]
+                                    .location_src.barcode,
+                                skip: parseInt(this.state.data.skip || 0) + 1,
+                            })
+                        );
+                        this.lastScanned = null;
+                    },
+                    display_info: {
+                        scan_placeholder: "Barcode or quantity",
+                    },
+                    fields: [
+                        {path: "supplierCode", label: "Vendor code", klass: "loud"},
+                        {path: "qty", label: "Quantity"},
+                        {path: "qtyDone", label: "Done"},
+                    ],
+                },
                 select_document: {
                     display_info: {
                         title: "Choose an order to pack",
@@ -328,7 +430,10 @@ const Checkout = {
                     },
                     on_scan: scanned => {
                         this.wait_call(
-                            this.odoo.call("scan_document", {barcode: scanned.text})
+                            this.odoo.call("scan_document", {
+                                barcode: scanned.text,
+                                skip: this.$route.query.skip,
+                            })
                         );
                     },
                     on_manual_selection: evt => {

@@ -362,7 +362,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self.assert_response(
             response,
             next_state="select_line",
-            data={"picking": self._stock_picking_data(picking)},
+            data={"picking": self._stock_picking_data(picking), "skip": None},
             message={
                 "message_type": "success",
                 "body": "Product(s) packed in {}".format(new_package.name),

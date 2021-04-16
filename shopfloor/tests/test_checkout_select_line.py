@@ -79,7 +79,7 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         self.assert_response(
             response,
             next_state="select_line",
-            data={"picking": self._stock_picking_data(self.picking)},
+            data={"picking": self._stock_picking_data(self.picking), "skip": None},
             message=message,
         )
 
