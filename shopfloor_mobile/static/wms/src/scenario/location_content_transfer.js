@@ -146,7 +146,7 @@ const LocationContentTransfer = {
             res.location_dest = res.has_records ? res.records[0].location_dest : null;
             return res;
         },
-        move_line_detail_list_options: function(move_line) {
+        move_line_detail_list_options: function (move_line) {
             return this.utils.wms.move_line_product_detail_options(move_line, {
                 loud_labels: true,
                 fields_blacklist: ["product.qty_available"],

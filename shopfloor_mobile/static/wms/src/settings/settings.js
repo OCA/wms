@@ -5,7 +5,7 @@
  */
 
 export var SettingsControlPanel = Vue.component("settings-control-panel", {
-    data: function() {
+    data: function () {
         return {
             profile_name: this.$root.has_profile ? this.$root.profile.name : "?",
             workstation_name: this.$root.workstation
@@ -14,7 +14,7 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
         };
     },
     methods: {
-        logout: function() {
+        logout: function () {
             this.$root.logout();
         },
     },

@@ -222,7 +222,7 @@ const ZonePicking = {
         /**
          * Override to inject headers for zone location and picking type when needed.
          */
-        _get_odoo_params: function() {
+        _get_odoo_params: function () {
             const params = this.$super(ScenarioBaseMixin)._get_odoo_params();
             const zone = this.current_zone_location();
             const picking_type = this.current_picking_type();
@@ -244,7 +244,7 @@ const ZonePicking = {
          * @param {*} zone_id: ID of current zone
          * @param {*} picking_type_id: ID of selected picking type
          */
-        _get_zone_picking_headers: function(zone_id, picking_type_id) {
+        _get_zone_picking_headers: function (zone_id, picking_type_id) {
             let res = {};
             if (_.isInteger(zone_id)) {
                 res["SERVICE-CTX-ZONE-LOCATION-ID"] = zone_id;
@@ -255,7 +255,7 @@ const ZonePicking = {
             res["SERVICE-CTX-LINES-ORDER"] = this.order_lines_by;
             return res;
         },
-        screen_klass: function() {
+        screen_klass: function () {
             return (
                 this.$super(ScenarioBaseMixin).screen_klass() +
                 " device-mode-" +
@@ -407,7 +407,7 @@ const ZonePicking = {
                     path: "quantity",
                     label: "Qty",
                     render_component: "packaging-qty-picker-display",
-                    render_options: function(record) {
+                    render_options: function (record) {
                         return self.utils.wms.move_line_qty_picker_options(record);
                     },
                 },
@@ -415,7 +415,7 @@ const ZonePicking = {
                 {
                     path: "picking.scheduled_date",
                     label: "Date",
-                    renderer: function(rec, field) {
+                    renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
                 },

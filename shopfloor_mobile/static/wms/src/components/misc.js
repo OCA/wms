@@ -9,7 +9,7 @@ import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/
 
 // TODO: could be merged w/ userConfirmation
 Vue.component("last-operation", {
-    data: function() {
+    data: function () {
         return {info: {}};
     },
     template: `
@@ -100,7 +100,7 @@ Vue.component("cancel-move-line-action", {
         },
         options: {
             type: Object,
-            default: function() {
+            default: function () {
                 // Take control of which package key (source or destination) is used
                 // to cancel the line when cancel line action is available.
                 return {
@@ -115,7 +115,7 @@ Vue.component("cancel-move-line-action", {
         };
     },
     methods: {
-        on_user_confirm: function(answer) {
+        on_user_confirm: function (answer) {
             this.dialog = false;
             if (answer === "yes") {
                 let data = {};
@@ -130,10 +130,10 @@ Vue.component("cancel-move-line-action", {
     },
     computed: {
         // `package` is a reserved identifier!
-        the_package: function() {
+        the_package: function () {
             return _.result(this.record, this.$props.options.package_cancel_key);
         },
-        message: function() {
+        message: function () {
             const item = this.the_package
                 ? this.the_package.name
                 : this.record.product.name;

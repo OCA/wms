@@ -88,7 +88,7 @@ const app = new Vue({
         app_info: function () {
             return shopfloor_app_info;
         },
-        available_languages: function() {
+        available_languages: function () {
             // FIXME: this should come from odoo and from app config
             // They will match w/ $i18n.availableLocales
             return [
@@ -106,7 +106,7 @@ const app = new Vue({
                 },
             ];
         },
-        has_profile: function() {
+        has_profile: function () {
             return !_.isEmpty(this.profile);
         },
         // TODO: we can add an handler for this and avoid duplicate code
@@ -123,21 +123,21 @@ const app = new Vue({
             },
         },
         workstation: {
-            get: function() {
+            get: function () {
                 if (_.isEmpty(this.current_workstation)) {
                     this.current_workstation = this.$storage.get("workstation");
                 }
                 return this.current_workstation;
             },
-            set: function(v) {
+            set: function (v) {
                 this.current_workstation = v;
                 this.$storage.set("workstation", v);
             },
         },
-        profiles: function() {
+        profiles: function () {
             return this.appconfig ? this.appconfig.profiles || [] : [];
         },
-        user: function() {
+        user: function () {
             return this.appconfig ? this.appconfig.user_info || {} : {};
         },
         appmenu: {

@@ -53,7 +53,7 @@ const Form = {
             let form_values = form_data.values;
             this.odoo
                 .call(this.record.id + "/update", form_values)
-                .then(function(result) {
+                .then(function (result) {
                     self._load_form_data(result);
                     /**
                      * TODO: dirty hack to be able to display the message to the user
@@ -63,7 +63,7 @@ const Form = {
                      * by form as you might want to stay in the same place on save.
                      *  */
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         self.$root.trigger("go_back");
                         self.$router.back();
                     }, 1500);

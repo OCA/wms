@@ -7,7 +7,6 @@ exclude: |
   ^shopfloor/|
   ^shopfloor_batch_automatic_creation/|
   ^shopfloor_checkout_sync/|
-  ^shopfloor_mobile/|
   ^shopfloor_mobile_custom_example/|
   ^stock_available_to_promise_release/|
   ^stock_available_to_promise_release_dynamic_routing/|

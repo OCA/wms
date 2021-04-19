@@ -270,12 +270,12 @@ export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-displ
         this._init_readonly();
     },
     methods: {
-        display_pkg: function(pkg) {
+        display_pkg: function (pkg) {
             return this.opts.non_zero_only ? this.qty_by_pkg[pkg.id] || 0 > 0 : true;
         },
     },
     computed: {
-        visible_packaging: function() {
+        visible_packaging: function () {
             return _.filter(this.sorted_packaging, this.display_pkg);
         },
     },
