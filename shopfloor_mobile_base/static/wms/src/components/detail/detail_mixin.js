@@ -72,7 +72,7 @@ export var ItemDetailMixin = {
         },
     },
     computed: {
-        wrapper_klass: function() {
+        wrapper_klass: function () {
             return [
                 "detail",
                 this.$options._componentTag,

@@ -8,10 +8,10 @@ import {page_registry} from "../services/page_registry.js";
 
 export var SettingsControlPanel = Vue.component("settings-control-panel", {
     methods: {
-        logout: function() {
+        logout: function () {
             this.$root.logout();
         },
-        get_pages: function() {
+        get_pages: function () {
             return page_registry.by_tag("settings");
         },
     },

@@ -12,13 +12,13 @@ Vue.component("list", {
     props: {
         records: {
             type: Array,
-            default: function() {
+            default: function () {
                 return [];
             },
         },
         grouped_records: {
             type: Array,
-            default: function() {
+            default: function () {
                 return [];
             },
         },
@@ -30,7 +30,7 @@ Vue.component("list", {
         },
         list_item_fields: {
             type: Array,
-            default: function() {
+            default: function () {
                 return [];
             },
         },
@@ -82,7 +82,7 @@ Vue.component("list", {
         },
         klass() {
             const bits = ["list"];
-            _.forEach(this.opts, function(v, k) {
+            _.forEach(this.opts, function (v, k) {
                 if (v) {
                     let bit = "with-" + k;
                     if (typeof v === "string") {

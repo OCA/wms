@@ -21,7 +21,7 @@ class PageRegistry extends BaseRegistry {
             throw "`tag` is required for pages!";
         }
         _.defaults(rec.metadata, {
-            display_name: function(instance, rec) {
+            display_name: function (instance, rec) {
                 return rec.key;
             },
         });
@@ -33,7 +33,7 @@ class PageRegistry extends BaseRegistry {
      * @param {*} tag: metadata tag to filter with
      */
     by_tag(tag) {
-        return _.filter(this._data, function(x) {
+        return _.filter(this._data, function (x) {
             return x.metadata.tag == tag;
         });
     }

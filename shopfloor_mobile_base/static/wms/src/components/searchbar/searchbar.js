@@ -8,7 +8,7 @@
  */
 
 Vue.component("searchbar", {
-    data: function() {
+    data: function () {
         return {
             entered: "",
         };
@@ -34,11 +34,11 @@ Vue.component("searchbar", {
             default: true,
         },
     },
-    mounted: function() {
+    mounted: function () {
         this.$root.event_hub.$on("screen:reload", this.on_screen_reload);
     },
     methods: {
-        search: function(e) {
+        search: function (e) {
             e.preventDefault();
             // Talk to parent
             this.$emit("found", {
@@ -47,14 +47,12 @@ Vue.component("searchbar", {
             });
             if (this.reset_on_submit) this.reset();
         },
-        reset: function() {
+        reset: function () {
             this.entered = "";
         },
-        on_screen_reload: function(evt) {
+        on_screen_reload: function (evt) {
             if (this.reload_steal_focus)
-                $(this.$el)
-                    .find(":input[name=searchbar]")
-                    .focus();
+                $(this.$el).find(":input[name=searchbar]").focus();
         },
     },
 

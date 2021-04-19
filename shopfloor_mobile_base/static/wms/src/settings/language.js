@@ -25,7 +25,7 @@ export var Language = {
         </Screen>
     `,
     methods: {
-        on_select: function(selected) {
+        on_select: function (selected) {
             const self = this;
             this.$i18n.locale = selected.id;
             // this.$root.trigger("language:selected", selected, true);
@@ -41,7 +41,7 @@ page_registry.add(
     {
         tag: "settings",
         icon: "mdi-flag",
-        display_name: function(instance, rec) {
+        display_name: function (instance, rec) {
             return [
                 instance.$t("screen.settings.language.name"),
                 instance.active_language,

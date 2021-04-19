@@ -7,7 +7,7 @@
 import {page_registry} from "../services/page_registry.js";
 
 export var Profile = {
-    data: function() {
+    data: function () {
         return {
             current_profile_id: this.$root.has_profile ? this.$root.profile.id : null,
             profile_selected: false,
@@ -48,7 +48,7 @@ export var Profile = {
         </Screen>
     `,
     methods: {
-        on_select: function(selected) {
+        on_select: function (selected) {
             if (!_.isEmpty(selected)) {
                 this.$root.trigger("profile:selected", selected, true);
                 this.$root.$router.push({name: "home"});
@@ -64,7 +64,7 @@ page_registry.add(
     {
         tag: "settings",
         icon: "mdi-account-cog",
-        display_name: function(instance, rec) {
+        display_name: function (instance, rec) {
             const profile_name = instance.$root.has_profile
                 ? instance.$root.profile.name
                 : "?";

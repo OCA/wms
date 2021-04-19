@@ -9,7 +9,7 @@
 Vue.component("reset-screen-button", {
     props: ["show_reset_button"],
     methods: {
-        reset: function() {
+        reset: function () {
             this.$emit("reset");
         },
     },
@@ -35,7 +35,7 @@ Vue.component("state-display-info", {
         info: Object,
     },
     computed: {
-        title: function() {
+        title: function () {
             return _.isFunction(this.info.title) ? this.info.title() : this.info.title;
         },
     },
@@ -53,7 +53,7 @@ Vue.component("edit-action", {
         record: Object,
         options: {
             type: Object,
-            default: function() {
+            default: function () {
                 return {
                     click_event: "edit",
                 };
@@ -74,7 +74,7 @@ Vue.component("separator-title", {
 `,
 });
 
-// handy component to place UI todos
+// Handy component to place UI todos
 Vue.component("todo", {
     template: `
 <div :class="$options._componentTag">
@@ -135,7 +135,7 @@ Vue.component("btn-back", {
         },
     },
     methods: {
-        on_back: function() {
+        on_back: function () {
             this.$root.trigger("go_back");
             if (this.router_back) this.$router.back();
         },
@@ -151,13 +151,13 @@ Vue.component("btn-reset-config", {
     props: {
         redirect: {
             type: Object,
-            default: function() {
+            default: function () {
                 return {name: "home"};
             },
         },
     },
     methods: {
-        reset_data: function() {
+        reset_data: function () {
             this.$root._clearConfig();
             this.$root.loadMenu(true);
             this.$root.$router.push(this.$props.redirect);
@@ -174,7 +174,7 @@ Vue.component("line-actions-popup", {
         },
         actions: {
             type: Array,
-            default: function() {
+            default: function () {
                 return [];
             },
         },
@@ -242,19 +242,19 @@ Vue.component("screen-loading", {
 });
 
 Vue.component("btn-fullscreen", {
-    data: function() {
+    data: function () {
         return {
-            fullscreen_on: document.fullscreenElement ? true : false,
+            fullscreen_on: Boolean(document.fullscreenElement),
         };
     },
     computed: {
-        btn_label: function() {
+        btn_label: function () {
             const transition = this.fullscreen_on ? "exit" : "enter";
             return this.$t("screen.settings.fullscreen." + transition);
         },
     },
     methods: {
-        go_fullscreen: function() {
+        go_fullscreen: function () {
             const elem = document.documentElement;
             if (elem.requestFullscreen) {
                 elem.requestFullscreen();
@@ -270,7 +270,7 @@ Vue.component("btn-fullscreen", {
             }
             this.fullscreen_on = true;
         },
-        leave_fullscreen: function() {
+        leave_fullscreen: function () {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             } else if (document.mozCancelFullScreen) {
