@@ -28,7 +28,7 @@ export var Language = {
         on_select: function (selected) {
             const self = this;
             this.$i18n.locale = selected.id;
-            // this.$root.trigger("language:selected", selected, true);
+            // This.$root.trigger("language:selected", selected, true);
             self.$root.$router.push({name: "home"});
         },
     },

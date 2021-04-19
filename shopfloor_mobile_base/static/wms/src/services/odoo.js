@@ -63,7 +63,7 @@ export class OdooMixin {
     }
     _error_info(response, json) {
         return _.extend({}, json, {
-            // strip html
+            // Strip html
             description: $(json.description).text(),
             // TODO: this might be superfluous as we get error data wrapper by rest api
             error: response.statusText,
@@ -86,7 +86,7 @@ export class OdooMixin {
         // /!\ IMPORTANT /!\ Always use headers w/out underscores.
         // https://www.nginx.com/resources/wiki/start/
         // topics/tutorials/config_pitfalls/#missing-disappearing-http-headers
-        let headers = {
+        const headers = {
             "SERVICE-CTX-MENU-ID": this.process_menu_id,
             "SERVICE-CTX-PROFILE-ID": this.profile_id,
             "API-KEY": this.apikey,
@@ -132,7 +132,7 @@ export class OdooMocked extends OdooMixin {
             // Provide your own mock by enpoint and specific process
             return this[this.usage + "_" + path].call(this, data);
         }
-        let result;
+        let result = null;
         const barcode = data
             ? data.barcode || data.identifier || data.location_barcode
             : null;
@@ -157,7 +157,7 @@ export class OdooMocked extends OdooMixin {
             // Pick the case were the 1st step is decide by the barcode
             result = result[path];
         }
-        if (typeof result == "function") {
+        if (typeof result === "function") {
             result = result(data);
         }
         if (_.has(result, "ok")) {
@@ -177,7 +177,7 @@ export class OdooMocked extends OdooMixin {
         return Promise.resolve({data: {menus: demotools.getAppMenus()}});
     }
     scan(params) {
-        let result = {};
+        const result = {};
         const data = demotools.get_indexed(params.identifier);
         if (data) {
             result.data = data;

@@ -74,7 +74,7 @@ const ScanAnything = {
         },
         on_scan: function (scanned) {
             if (this.$route.params.identifier == scanned.text) {
-                // scanned same resource, just reload
+                // Scanned same resource, just reload
                 this.getData(scanned.text);
             } else {
                 this.$router.push({
@@ -88,7 +88,7 @@ const ScanAnything = {
                 return null;
             }
             const name = "detail-" + this.scan_data.type;
-            if (!name in Vue.options.components) {
+            if (!(name in Vue.options.components)) {
                 console.error("Detail component ", name, " not found.");
                 return null;
             }

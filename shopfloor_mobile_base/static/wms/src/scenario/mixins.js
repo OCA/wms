@@ -80,7 +80,7 @@ export var ScenarioBaseMixin = {
         },
         screen_info: function () {
             return {
-                // you can provide a different screen title
+                // You can provide a different screen title
                 title: this.screen_title ? this.screen_title() : this.menu_item().name,
                 current_doc: this.current_doc ? this.current_doc() : null,
                 klass: this.screen_klass(),
@@ -185,7 +185,6 @@ export var ScenarioBaseMixin = {
         Switch state to given one.
         */
         state_to: function (state_key) {
-            const self = this;
             return this.$router
                 .push({
                     name: this.usage,
@@ -195,7 +194,7 @@ export var ScenarioBaseMixin = {
                     },
                 })
                 .catch(() => {
-                    // see https://github.com/quasarframework/quasar/issues/5672
+                    // See https://github.com/quasarframework/quasar/issues/5672
                     console.error("No new route found");
                 });
         },
@@ -289,7 +288,7 @@ export var ScenarioBaseMixin = {
                 this.on_state_enter();
             }
             this._state_bind_events();
-            // notify root
+            // Notify root
             this.$root.$emit("state:change", this._global_state_key(state_key));
         },
         _global_state_key: function (state_key) {
@@ -388,7 +387,7 @@ export var ScenarioBaseMixin = {
             this.$set(this.messages, "popup", {body: null});
         },
         display_app_error: function (error) {
-            let parts = [error.status, error.name];
+            const parts = [error.status, error.name];
             if (error.description) {
                 parts.push("\n" + error.description);
             }
@@ -420,7 +419,7 @@ export var ScenarioBaseMixin = {
                 */
                 const self = this;
                 _.each(state.events, function (handler, name) {
-                    if (typeof handler == "string") handler = state[handler];
+                    if (typeof handler === "string") handler = state[handler];
                     const event_name =
                         self._global_state_key(self.state.key) + ":" + name;
                     const existing = self.$root.event_hub._events[event_name];

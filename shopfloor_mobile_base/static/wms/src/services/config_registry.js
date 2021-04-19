@@ -22,7 +22,7 @@ class StoredConfig {
         this.reset_on_clear = meta.reset_on_clear;
     }
     _safe_value(v) {
-        return v == null ? this.default : v;
+        return v === null ? this.default : v;
     }
 }
 
@@ -155,7 +155,7 @@ export class ConfigRegistry {
      */
     generate_computed_properties() {
         const self = this;
-        let result = {};
+        const result = {};
         _.each(this.all(), function (config) {
             result[config.key] = self._make_computed_prop(config.key);
         });
@@ -170,7 +170,7 @@ export class ConfigRegistry {
      */
     generare_data_keys() {
         const self = this;
-        let data = {};
+        const data = {};
         _.each(self.all(), function (config) {
             data[self._current_value_prefix + config.key] = config.default || null;
         });

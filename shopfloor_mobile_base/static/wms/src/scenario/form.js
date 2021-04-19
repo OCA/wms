@@ -50,7 +50,7 @@ const Form = {
                 return;
             }
             const self = this;
-            let form_values = form_data.values;
+            const form_values = form_data.values;
             this.odoo
                 .call(this.record.id + "/update", form_values)
                 .then(function (result) {
@@ -84,7 +84,7 @@ const Form = {
             }
             const name = this.usage.split("_").join("-");
             // FIXME: this check does not work
-            if (!name in Vue.options.components) {
+            if (!(name in Vue.options.components)) {
                 console.error("Form component ", name, " not found.");
                 return null;
             }

@@ -37,7 +37,7 @@ utils_registry.add("colors", color_registry);
 color_registry.add_theme(
     {
         /**
-         * standard keys
+         * Standard keys
          */
         primary: "#491966",
         secondary: "#CFD2FF",
@@ -45,20 +45,20 @@ color_registry.add_theme(
         error: "#c22a4a",
         info: "#5e60ab",
         success: "#8fbf44",
-        // warning: "#FFC107",
+        // Warning: "#FFC107",
         warning: "#e5ab00",
         /**
-         * app specific
+         * App specific
          */
         content_bg: "grey lighten-3",
         screen_step_done: "#8fbf44",
         screen_step_todo: "#FFE3AC",
         /**
-         * icons
+         * Icons
          */
         info_icon: "info darken-2",
         /**
-         * buttons / actions
+         * Buttons / actions
          */
         btn_action: "primary lighten-2",
         btn_action_cancel: "error",
@@ -67,15 +67,15 @@ color_registry.add_theme(
         btn_action_todo: "screen_step_todo",
         btn_action_back: "info lighten-1",
         /**
-         * selection
+         * Selection
          */
         item_selected: "success",
         /**
-         * spinner
+         * Spinner
          */
         spinner: "#491966",
         /**
-         * details
+         * Details
          */
         detail_main_card: "info lighten-4",
     },

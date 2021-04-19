@@ -7,7 +7,6 @@
 import {utils_registry} from "./services/utils_registry.js";
 
 export class DisplayUtils {
-    constructor() {}
     format_date_display(date_string, options = {}) {
         _.defaults(options, {
             locale: navigator ? navigator.language : "en-US",

@@ -4,8 +4,6 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {process_registry} from "../services/process_registry.js";
-
 // TODO: split out WMS code
 
 export class DemoTools {
@@ -69,10 +67,9 @@ export class DemoTools {
         if (!key) {
             console.error("Cannot index", rec, "with key_path", key_path);
             return false;
-        } else {
-            this.indexed[key] = {record: rec, type: type};
-            return true;
         }
+        this.indexed[key] = {record: rec, type: type};
+        return true;
     }
 
     get_indexed(key) {
@@ -88,7 +85,7 @@ export class DemoTools {
     randomFutureDate(days) {
         days = days ? days : this.getRandomInt(30);
         const start = new Date();
-        let stop = new Date();
+        const stop = new Date();
         stop.setDate(start.getDate() + days);
         return stop;
     }
@@ -102,14 +99,14 @@ export class DemoTools {
     }
 
     randomItemFromArray(an_array, cloned = true) {
-        // using clone ensures we don't reference the same object every time
+        // Using clone ensures we don't reference the same object every time
         // which can break storage w/ cyclic refs.
         const rec = an_array[Math.floor(Math.random() * an_array.length)];
         return cloned ? _.cloneDeep(rec) : rec;
     }
 
     randomSetFromArray(an_array, count, cloned = true) {
-        // using clone ensures we don't reference the same object every time
+        // Using clone ensures we don't reference the same object every time
         // which can break storage w/ cyclic refs.
         const recs = _.sampleSize(an_array, this.getRandomInt(count));
         return cloned ? _.cloneDeep(recs) : recs;
@@ -139,7 +136,7 @@ export class DemoTools {
         const self = this;
         const loc = this.makeSimpleRecord(defaults, options);
         if (options.full_detail) {
-            let move_lines = [];
+            const move_lines = [];
             _.forEach(
                 _.range(1, options.move_lines_count || this.getRandomInt(10)),
                 function () {
@@ -188,7 +185,6 @@ export class DemoTools {
     }
 
     makePack(defaults = {}, options = {}) {
-        const self = this;
         _.defaults(options, {name_prefix: "PACK", padding: 10});
         _.defaults(defaults, {
             barcode: "pack",
@@ -205,9 +201,9 @@ export class DemoTools {
     makePackFullDetail(defaults = {}, options = {}) {
         _.defaults(options, {lines_count: 1});
         let move_lines = [];
-        let pickings = [];
+        const pickings = [];
         for (let i = 1; i < options.lines_count + 1; i++) {
-            let lines = this.makePickingLines(
+            const lines = this.makePickingLines(
                 {},
                 {
                     productFactory: _.bind(this.makeProductFullDetail, this),
@@ -265,7 +261,6 @@ export class DemoTools {
     makeProductFullDetail(defaults = {}, options = {}) {
         _.defaults(defaults, {
             qty_available: this.getRandomInt(),
-            qty_available: this.getRandomInt(),
             qty_reserved: this.getRandomInt(),
             expiry_date: "2020-12-01",
             // TODO: load some random images
@@ -275,9 +270,9 @@ export class DemoTools {
             }),
         });
         const product = this.makeProduct(defaults, options);
-        let suppliers = [];
+        const suppliers = [];
         for (let i = 1; i < this.getRandomInt(3) + 1; i++) {
-            let supp = this.makeSimpleRecord({
+            const supp = this.makeSimpleRecord({
                 id: i,
                 name: this.randomItemFromArray(this.partnerNames()),
                 product_code: "SUP/" + product.default_code,
@@ -301,16 +296,16 @@ export class DemoTools {
         const lines = [];
         for (let i = 1; i < options.lines_count + 1; i++) {
             let pack = this.makePack();
-            if (options.line_random_pack && i % 3 == 0) {
+            if (options.line_random_pack && i % 3 === 0) {
                 // No pack every 3 items
                 pack = null;
             }
             let loc_dest = this.randomItemFromArray(this.locations_dest);
-            if (options.line_random_dest && i % 3 == 0) {
+            if (options.line_random_dest && i % 3 === 0) {
                 // No pack every 3 items
                 loc_dest = null;
             }
-            let line = _.defaults(
+            const line = _.defaults(
                 this.makeMoveLine({
                     id: i,
                     product: options.productFactory(),
@@ -518,7 +513,7 @@ export class DemoTools {
         // Find insert index to keep items w/ same scenario grouped
         let index = 0;
         this.app_menus.every(function (item, i) {
-            if (item.scenario == new_item.scenario) {
+            if (item.scenario === new_item.scenario) {
                 index = i;
                 return false;
             }

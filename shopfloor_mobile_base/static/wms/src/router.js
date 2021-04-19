@@ -11,7 +11,7 @@ import {process_registry} from "./services/process_registry.js";
 import {page_registry} from "./services/page_registry.js";
 // Const NotFound = { template: '<div>Lost in the scanner app.</div>' }
 
-let routes = [
+const routes = [
     {
         path: "/",
         component: HomePage,
@@ -30,9 +30,9 @@ let routes = [
 ];
 
 const register_routes = function (route_records) {
-    let registered = [];
+    const registered = [];
     _.forEach(route_records, function (process, key) {
-        let route = {
+        const route = {
             name: process.key,
             component: process.component,
             path: process.route.path,

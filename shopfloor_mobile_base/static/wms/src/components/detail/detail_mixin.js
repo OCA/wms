@@ -90,7 +90,7 @@ export var ItemDetailMixin = {
                 key_title: "name",
                 fields: this.detail_fields(),
                 full_detail: false,
-                // customize action per all detail fields
+                // Customize action per all detail fields
                 detail_action: null,
             });
             return opts;

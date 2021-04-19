@@ -75,7 +75,7 @@ Vue.component("list", {
                 key_title: this.opts.key_title,
                 loud_title: false,
                 showCounters: this.opts.showCounters,
-                // customize fields
+                // Customize fields
                 fields: this.opts.list_item_fields,
             });
             return opts;
