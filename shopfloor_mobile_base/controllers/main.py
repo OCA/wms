@@ -128,13 +128,15 @@ class ShopfloorMobileAppMixin(object):
 
 class ShopfloorMobileAppController(http.Controller, ShopfloorMobileAppMixin):
     @http.route(
-        ["/shopfloor_mobile/app", "/shopfloor_mobile/app/<string:demo>"], auth="public",
+        ["/shopfloor_mobile/app", "/shopfloor_mobile/app/<string:demo>"],
+        auth="public",
     )
     def load_app(self, demo=False, **kw):
         return self._load_app(demo=True if demo else False, **kw)
 
     @http.route(
-        ["/shopfloormobile/scanner"], auth="public",
+        ["/shopfloormobile/scanner"],
+        auth="public",
     )
     def load_app_backward(self, demo=False):
         # Backward compat redirect (url changed from /scanner to /app)
@@ -142,7 +144,8 @@ class ShopfloorMobileAppController(http.Controller, ShopfloorMobileAppMixin):
 
     # TODO: do we really need this?
     @http.route(
-        ["/shopfloor_mobile/assets/<path:path_fragment>"], auth="public",
+        ["/shopfloor_mobile/assets/<path:path_fragment>"],
+        auth="public",
     )
     def load_assets(self, path_fragment="", **kw):
         return self._serve_assets(path_fragment=path_fragment, **kw)

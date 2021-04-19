@@ -34,8 +34,8 @@ Vue.mixin(GlobalMixin);
 
 let APP_COMPONENTS = {};
 
-const register_app_components = function(components) {
-    _.forEach(components, function(process, key) {
+const register_app_components = function (components) {
+    _.forEach(components, function (process, key) {
         APP_COMPONENTS[process.key] = process.component;
     });
     if (APP_COMPONENTS.length)
@@ -59,7 +59,7 @@ const app = new Vue({
         },
     }),
     components: APP_COMPONENTS,
-    data: function() {
+    data: function () {
         let data = {
             demo_mode: false,
             global_state_key: "",
@@ -71,38 +71,38 @@ const app = new Vue({
         _.merge(data, config_registry.generare_data_keys());
         return data;
     },
-    beforeCreate: function() {
+    beforeCreate: function () {
         config_registry._set_root(this);
     },
-    created: function() {
+    created: function () {
         const self = this;
         this.demo_mode = this.app_info.demo_mode;
         this.loadConfig();
-        document.addEventListener("fetchStart", function() {
+        document.addEventListener("fetchStart", function () {
             self.loading = true;
         });
-        document.addEventListener("fetchEnd", function() {
+        document.addEventListener("fetchEnd", function () {
             self.loading = false;
         });
     },
-    mounted: function() {
+    mounted: function () {
         const self = this;
         // components can trigger `state:change` on the root
         // and the current state gets stored into `global_state_key`
-        this.$root.$on("state:change", function(key) {
+        this.$root.$on("state:change", function (key) {
             self.global_state_key = key;
         });
-        this.$root.event_hub.$on("profile:selected", function(profile) {
+        this.$root.event_hub.$on("profile:selected", function (profile) {
             self.profile = profile;
             self.loadMenu(true);
         });
     },
     computed: {
         ...config_registry.generate_computed_properties(),
-        app_info: function() {
+        app_info: function () {
             return shopfloor_app_info;
         },
-        available_languages: function() {
+        available_languages: function () {
             // FIXME: this should come from odoo and from app config
             // They will match w/ $i18n.availableLocales
             return [
@@ -120,18 +120,18 @@ const app = new Vue({
                 },
             ];
         },
-        has_profile: function() {
+        has_profile: function () {
             return !_.isEmpty(this.profile);
         },
-        profiles: function() {
+        profiles: function () {
             return this.appconfig ? this.appconfig.profiles || [] : [];
         },
-        user: function() {
+        user: function () {
             return this.appconfig ? this.appconfig.user_info || {} : {};
         },
     },
     methods: {
-        getOdoo: function(odoo_params) {
+        getOdoo: function (odoo_params) {
             const params = _.defaults({}, odoo_params, {
                 apikey: this.apikey,
                 debug: this.demo_mode,
@@ -144,7 +144,7 @@ const app = new Vue({
             }
             return new OdooClass(params);
         },
-        loadConfig: function(force) {
+        loadConfig: function (force) {
             if (this.appconfig && !force) {
                 return this.appconfig;
             }
@@ -157,10 +157,10 @@ const app = new Vue({
             }
             this._loadConfig();
         },
-        _loadConfig: function() {
+        _loadConfig: function () {
             const self = this;
             const odoo = self.getOdoo({usage: "app"});
-            return odoo.call("user_config").then(function(result) {
+            return odoo.call("user_config").then(function (result) {
                 if (!_.isUndefined(result.data)) {
                     self.appconfig = result.data;
                     self.authenticated = true;
@@ -171,38 +171,38 @@ const app = new Vue({
                 }
             });
         },
-        _clearConfig: function(reload = true) {
+        _clearConfig: function (reload = true) {
             this.$storage.remove("appconfig");
             if (reload) return this._loadConfig();
         },
-        _clearAppData: function() {
+        _clearAppData: function () {
             config_registry.reset_on_clear();
             this._clearConfig(false);
         },
-        loadMenu: function(force) {
+        loadMenu: function (force) {
             if ((this.appmenu && !force) || !this.has_profile) {
                 return this.appmenu;
             }
             this._loadMenu();
             return this.appmenu;
         },
-        _loadMenu: function() {
+        _loadMenu: function () {
             const self = this;
             const odoo = self.getOdoo({
                 usage: "user",
                 profile_id: this.profile.id,
             });
-            return odoo.call("menu").then(function(result) {
+            return odoo.call("menu").then(function (result) {
                 self.appmenu = result.data;
             });
         },
-        logout: function() {
+        logout: function () {
             this.authenticated = false;
             this._clearAppData();
             this.$router.push({name: "login"});
         },
         // Likely not needed anymore
-        loadJS: function(url, script_id) {
+        loadJS: function (url, script_id) {
             if (script_id && !document.getElementById(script_id)) {
                 console.debug("Load JS", url);
                 var script = document.createElement("script");
@@ -212,7 +212,7 @@ const app = new Vue({
                 document.getElementsByTagName("head")[0].appendChild(script);
             }
         },
-        getNav: function() {
+        getNav: function () {
             return _.result(this, "appmenu.menus", []);
         },
         /*

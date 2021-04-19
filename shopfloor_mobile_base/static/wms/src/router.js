@@ -29,9 +29,9 @@ let routes = [
     // { path: '*', component: NotFound },
 ];
 
-const register_routes = function(route_records) {
+const register_routes = function (route_records) {
     let registered = [];
-    _.forEach(route_records, function(process, key) {
+    _.forEach(route_records, function (process, key) {
         let route = {
             name: process.key,
             component: process.component,

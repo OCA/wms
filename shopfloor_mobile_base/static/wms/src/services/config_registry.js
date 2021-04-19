@@ -86,7 +86,7 @@ export class ConfigRegistry {
      */
     reset_on_clear() {
         const self = this;
-        this.to_reset_on_clear.forEach(function(key) {
+        this.to_reset_on_clear.forEach(function (key) {
             self.reset(key);
         });
     }
@@ -156,7 +156,7 @@ export class ConfigRegistry {
     generate_computed_properties() {
         const self = this;
         let result = {};
-        _.each(this.all(), function(config) {
+        _.each(this.all(), function (config) {
             result[config.key] = self._make_computed_prop(config.key);
         });
         return result;
@@ -171,7 +171,7 @@ export class ConfigRegistry {
     generare_data_keys() {
         const self = this;
         let data = {};
-        _.each(self.all(), function(config) {
+        _.each(self.all(), function (config) {
             data[self._current_value_prefix + config.key] = config.default || null;
         });
         return data;

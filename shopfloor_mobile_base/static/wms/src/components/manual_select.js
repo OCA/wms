@@ -9,13 +9,13 @@ Vue.component("manual-select", {
     props: {
         records: {
             type: Array,
-            default: function() {
+            default: function () {
                 return [];
             },
         },
         grouped_records: {
             type: Array,
-            default: function() {
+            default: function () {
                 return [];
             },
         },
@@ -28,7 +28,7 @@ Vue.component("manual-select", {
         },
         list_item_fields: {
             type: Array,
-            default: function() {
+            default: function () {
                 return [];
             },
         },
@@ -37,7 +37,7 @@ Vue.component("manual-select", {
             default: "select",
         },
     },
-    data: function() {
+    data: function () {
         return {
             selected: null,
         };
@@ -54,7 +54,7 @@ Vue.component("manual-select", {
                 selected = initValue ? initValue : [];
                 if (this.opts.initSelectAll) {
                     selected = [];
-                    _.each(this.records, function(rec, __) {
+                    _.each(this.records, function (rec, __) {
                         selected.push(rec.id);
                     });
                 }
@@ -67,12 +67,12 @@ Vue.component("manual-select", {
             const self = this;
             let selected_records = null;
             if (this.opts.multiple) {
-                selected_records = _.filter(self.records, function(o) {
+                selected_records = _.filter(self.records, function (o) {
                     return self.selected.includes(o.id);
                 });
             } else {
                 selected_records = _.head(
-                    _.filter(self.records, function(o) {
+                    _.filter(self.records, function (o) {
                         return self.selected === o.id;
                     })
                 );
@@ -209,7 +209,7 @@ Vue.component("manual-select", {
         },
         klass() {
             const bits = ["manual-select"];
-            _.forEach(this.opts, function(v, k) {
+            _.forEach(this.opts, function (v, k) {
                 if (v) {
                     let bit = "with-" + k;
                     if (typeof v === "string") {

@@ -13,7 +13,7 @@ export var HomePage = Vue.component("home-page", {
         },
     },
     methods: {
-        nuke_data_and_reload: function() {
+        nuke_data_and_reload: function () {
             if (!this.$root.demo_mode) {
                 return;
             }
