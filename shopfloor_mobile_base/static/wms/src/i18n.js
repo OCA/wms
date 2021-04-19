@@ -11,9 +11,9 @@ const available_langs = translation_registry.available_langs();
 const messages = translation_registry.all();
 
 export const i18n = new VueI18n({
-    locale: default_lang, // set locale
+    locale: default_lang, // Set locale
     availableLocales: available_langs,
-    messages, // set locale messages
+    messages, // Set locale messages
 });
 
 /*

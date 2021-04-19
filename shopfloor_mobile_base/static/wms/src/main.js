@@ -22,7 +22,7 @@ Vue.prototype.$super = VueSuperMethod;
 // Maybe replace w/ https://github.com/ankurk91/vue-web-storage
 Vue.use(Vue2Storage, {
     prefix: "shopfloor_",
-    driver: "session", // local|session|memory
+    driver: "session", // Local|session|memory
     ttl: 60 * 60 * 24 * 1000, // 24 hours
 });
 
@@ -32,7 +32,7 @@ var EventHub = new Vue();
 
 Vue.mixin(GlobalMixin);
 
-let APP_COMPONENTS = {};
+const APP_COMPONENTS = {};
 
 const register_app_components = function (components) {
     _.forEach(components, function (process, key) {
@@ -50,7 +50,7 @@ config_registry.add("profile", {default: {}, reset_on_clear: true});
 config_registry.add("appmenu", {default: [], reset_on_clear: true});
 config_registry.add("authenticated", {default: false, reset_on_clear: true});
 
-const app = new Vue({
+new Vue({
     i18n,
     router: router,
     vuetify: new Vuetify({
@@ -60,10 +60,10 @@ const app = new Vue({
     }),
     components: APP_COMPONENTS,
     data: function () {
-        let data = {
+        const data = {
             demo_mode: false,
             global_state_key: "",
-            // collect global events
+            // Collect global events
             event_hub: EventHub,
             loading: false,
             appconfig: null,
@@ -87,7 +87,7 @@ const app = new Vue({
     },
     mounted: function () {
         const self = this;
-        // components can trigger `state:change` on the root
+        // Components can trigger `state:change` on the root
         // and the current state gets stored into `global_state_key`
         this.$root.$on("state:change", function (key) {
             self.global_state_key = key;
@@ -136,7 +136,7 @@ const app = new Vue({
                 apikey: this.apikey,
                 debug: this.demo_mode,
             });
-            let OdooClass;
+            let OdooClass = null;
             if (this.demo_mode) {
                 OdooClass = OdooMocked;
             } else {
