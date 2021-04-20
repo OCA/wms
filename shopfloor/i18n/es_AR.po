@@ -17,6 +17,18 @@ msgstr ""
 "X-Generator: Weblate 4.3.2\n"
 
 #. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__pick_pack_same_time
+msgid ""
+"\n"
+"If you tick this box, while picking goods from a location\n"
+"(eg: zone picking) set destination will work as follow:\n"
+"\n"
+"* if a location is scanned, a new delivery package is created;\n"
+"* if a package is scanned, the package is validated against the carrier\n"
+"* in both cases, if the picking has no carrier the operation fails.\",\n"
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "A destination package is required."
@@ -199,6 +211,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__location_id
 msgid "From"
 msgstr "Desde"
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Goods packed into {0.name}"
+msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__id
@@ -482,6 +500,12 @@ msgstr "No hay paquete válido para seleccionar."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "No value"
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid ""
 "Not all lines have been processed with full quantity. Do you confirm partial "
 "operation?"
@@ -616,6 +640,12 @@ msgid "Packages"
 msgstr "Paquetes"
 
 #. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Packaging '{}' is not allowed for carrier {}."
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid "Packaging changed on package {}"
@@ -624,8 +654,20 @@ msgstr "El Empaquetado cambió en el paquete {}"
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Packaging {} is not allowed for carrier {}."
-msgstr "Empaquetado {} no está permitido para en transportista {}."
+msgid ""
+"Pick + Pack mode ON: the picking {0.name} has no carrier set. The system "
+"couldn't pack goods automatically."
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__pick_pack_same_time_is_possible
+msgid "Pick Pack Same Time Is Possible"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__pick_pack_same_time
+msgid "Pick and pack at the same time"
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/change_package_lot.py:0
@@ -690,12 +732,6 @@ msgstr "Producto rastreado por lote, por favor escanée uno."
 #, python-format
 msgid "Product {} belongs to a picking without a valid state."
 msgstr "Producto {} pertenece a una entrega sin estado válido."
-
-#. module: shopfloor
-#: code:addons/shopfloor/services/checkout.py:0
-#, python-format
-msgid "Goods packed in {}"
-msgstr "Producto(s) empaquetado(s) en {}"
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
@@ -1233,6 +1269,12 @@ msgstr "{} no es un paquete de destino válido."
 #, python-format
 msgid "{} {} put in {}"
 msgstr "{} {} poner en {}"
+
+#~ msgid "Packaging {} is not allowed for carrier {}."
+#~ msgstr "Empaquetado {} no está permitido para en transportista {}."
+
+#~ msgid "Goods packed in {}"
+#~ msgstr "Producto(s) empaquetado(s) en {}"
 
 #~ msgid "Not a valid destination package"
 #~ msgstr "No es un paquete de destino válido"
