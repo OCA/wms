@@ -79,7 +79,7 @@ class ShopfloorRestCerberusValidator(Component):
             )
         except NoComponentError:
             _logger.warning("no component found for %s method %s", service, method_name)
-            return {}
+            return None
 
         try:
             return getattr(validator_component, method_name)
@@ -87,7 +87,7 @@ class ShopfloorRestCerberusValidator(Component):
             _logger.warning(
                 "no validator method found for %s method %s", service, method_name
             )
-            return {}
+            return None
 
     def has_validator_handler(self, service, method_name, direction):
         """Return if the service has a validator handler for a method
