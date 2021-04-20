@@ -1,10 +1,12 @@
 /**
  * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * Copyright 2021 ACSONE SA/NV (http://www.acsone.eu)
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
+import {utils_registry} from "/shopfloor_mobile_base/static/wms/src/services/utils_registry.js";
 
-export class Utils {
+export class WMSUtils {
     constructor() {}
 
     group_lines_by_location(lines, options) {
@@ -29,8 +31,9 @@ export class Utils {
             "id"
         );
         const grouped = _.groupBy(lines, options.group_key + ".id");
+        // TODO: grouped.forEach?
         _.forEach(grouped, function (value, loc_id) {
-            const location = _.first(_.filter(locations, {id: parseInt(loc_id)}));
+            const location = _.first(_.filter(locations, {id: parseInt(loc_id, 10)}));
             const title = options.group_no_title
                 ? ""
                 : options.name_prefix
@@ -72,8 +75,8 @@ export class Utils {
             .value();
         _.forEach(grouped, function (value, loc_ids) {
             const [src_id, dest_id] = loc_ids.split("--");
-            const src_loc = _.first(_.filter(locations, {id: parseInt(src_id)}));
-            const dest_loc = _.first(_.filter(locations, {id: parseInt(dest_id)}));
+            const src_loc = _.first(_.filter(locations, {id: parseInt(src_id, 10)}));
+            const dest_loc = _.first(_.filter(locations, {id: parseInt(dest_id, 10)}));
             res.push({
                 _is_group: true,
                 key: loc_ids,
@@ -107,7 +110,7 @@ export class Utils {
             let pack = null;
             if (key.startsWith("pack")) {
                 pack = _.first(
-                    _.filter(packs, {id: parseInt(key.split("-").slice(-1)[0])})
+                    _.filter(packs, {id: parseInt(key.split("-").slice(-1)[0], 10)})
                 );
             }
             res.push({
@@ -181,29 +184,6 @@ export class Utils {
         return _.reverse(ordered);
     }
 
-    // Display utils: TODO: split them to their own place
-
-    format_date_display(date_string, options = {}) {
-        _.defaults(options, {
-            locale: navigator ? navigator.language : "en-US",
-            format: {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-            },
-        });
-        return new Date(Date.parse(date_string)).toLocaleString(
-            options.locale,
-            options.format
-        );
-    }
-
-    render_field_date(record, field) {
-        return this.format_date_display(_.result(record, field.path));
-    }
-
     move_line_color_klass(rec) {
         let line = rec;
         if (line._is_group) {
@@ -219,7 +199,6 @@ export class Utils {
         }
         return "move-line-" + klass;
     }
-
     /**
      * Provide display options for rendering move line product's info.
      *
@@ -270,4 +249,4 @@ export class Utils {
     }
 }
 
-export const utils = new Utils();
+utils_registry.add("wms", new WMSUtils());
