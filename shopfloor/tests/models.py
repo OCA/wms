@@ -14,6 +14,9 @@ class DeliveryCarrierTest(models.Model):
     _inherit = "delivery.carrier"
 
     delivery_type = fields.Selection(selection_add=[("test", "TEST")])
+    test_default_packaging_id = fields.Many2one(
+        "product.packaging", string="Default Package Type"
+    )
 
 
 class ProductPackagingTest(models.Model):

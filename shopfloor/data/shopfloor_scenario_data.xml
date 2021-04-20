@@ -14,6 +14,11 @@
     <record id="scenario_zone_picking" model="shopfloor.scenario">
         <field name="name">Zone Picking</field>
         <field name="key">zone_picking</field>
+        <field name="options_edit">
+{
+    "pick_pack_same_time": true
+}
+        </field>
     </record>
     <record id="scenario_cluster_picking" model="shopfloor.scenario">
         <field name="name">Cluster Picking</field>

@@ -499,8 +499,8 @@ class MessageAction(Component):
     def packaging_invalid_for_carrier(self, packaging, carrier):
         return {
             "message_type": "error",
-            "body": _("Packaging {} is not allowed for carrier {}.").format(
-                packaging.name, carrier.name
+            "body": _("Packaging '{}' is not allowed for carrier {}.").format(
+                packaging.name if packaging else _("No value"), carrier.name
             ),
         }
 
@@ -520,4 +520,19 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("No delivery package type available."),
+        }
+
+    def goods_packed_in(self, package):
+        return {
+            "message_type": "info",
+            "body": _("Goods packed into {0.name}").format(package),
+        }
+
+    def picking_without_carrier_cannot_pack(self, picking):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Pick + Pack mode ON: the picking {0.name} has no carrier set. "
+                "The system couldn't pack goods automatically."
+            ).format(picking),
         }

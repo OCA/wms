@@ -694,7 +694,7 @@ msgstr "Producto {} pertenece a una entrega sin estado válido."
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
-msgid "Product(s) packed in {}"
+msgid "Goods packed in {}"
 msgstr "Producto(s) empaquetado(s) en {}"
 
 #. module: shopfloor
