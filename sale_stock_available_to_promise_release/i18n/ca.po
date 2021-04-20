@@ -1,0 +1,85 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sale_stock_available_to_promise_release
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: ca\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_move__carrier_id
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_picking_release_search
+msgid "Carrier"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_procurement_group__date_expected
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_move__sale_date_expected
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_picking__sale_date_expected
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_search
+msgid "Delivery Date"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_tree
+msgid "Delivery Method"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_search
+msgid "Further Shipment"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_search
+msgid "Late Shipment"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order__move_need_release_count
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_order_form
+msgid "Moves Need Release"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model,name:sale_stock_available_to_promise_release.model_procurement_group
+msgid "Procurement Group"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model,name:sale_stock_available_to_promise_release.model_sale_order
+msgid "Sales Order"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model,name:sale_stock_available_to_promise_release.model_sale_order_line
+msgid "Sales Order Line"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model,name:sale_stock_available_to_promise_release.model_stock_move
+msgid "Stock Move"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_search
+msgid "Today Shipment"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model,name:sale_stock_available_to_promise_release.model_stock_picking
+msgid "Transfer"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_tree
+msgid "Weight"
+msgstr ""
