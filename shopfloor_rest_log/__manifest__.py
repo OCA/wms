@@ -5,8 +5,8 @@
 {
     "name": "Shopfloor REST log",
     "summary": "Integrate rest_log into Shopfloor app",
-    "version": "13.0.1.0.1",
-    "development_status": "Alpha",
+    "version": "13.0.1.1.0",
+    "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
     "author": "ACSONE, Odoo Community Association (OCA)",
