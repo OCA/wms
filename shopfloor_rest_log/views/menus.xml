@@ -7,7 +7,7 @@
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">tree,form</field>
         <!-- TODO: maybe add `collection_name` to `rest.log` model? -->
-        <field name="domain">[('request_url', 'like', '%shopfloor%')]</field>
+        <field name="domain">[('collection', '=', 'shopfloor.service')]</field>
         <field name="search_view_id" ref="rest_log.rest_log_search_view" />
     </record>
 
