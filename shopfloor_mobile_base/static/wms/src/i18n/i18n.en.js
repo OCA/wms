@@ -64,6 +64,13 @@ const messages_en = {
             op_types: "Op Types:",
         },
         log_entry_link: "View / share log entry",
+        running_env: {
+            prod: "Production",
+            integration: "Integration",
+            staging: "Staging",
+            test: "Test",
+            dev: "Development",
+        },
     },
     language: {
         name: {

@@ -27,6 +27,7 @@
                 <script type="text/javascript">
           var shopfloor_app_info = {
             app_version: "<t t-esc="app_version" />",
+            running_env: "<t t-esc="running_env" />",
             demo_mode: <t t-esc="'true' if demo_mode else 'false'" />,
           };
         </script>

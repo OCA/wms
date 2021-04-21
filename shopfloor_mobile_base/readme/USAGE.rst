@@ -32,3 +32,20 @@ Customization
 ~~~~~~~~~~~~~
 
 Please refer to `shopfloor_mobile_custom_example`.
+
+
+Working environment
+~~~~~~~~~~~~~~~~~~~
+
+You can control which running env is considerd by Odoo config or env vars.
+
+
+For Odoo config: `running_env` or `shopfloor_running_env`.
+
+For env var: `RUNNING_ENV` or `SHOPFLOOR_RUNNING_ENV`.
+
+Expected key `RUNNING_ENV` is compliant w/ `server_environment` naming but is not depending on it.
+
+Additionally, as specific key for Shopfloor is supported.
+
+**You don't need `server_environment` module to use this feature.**
