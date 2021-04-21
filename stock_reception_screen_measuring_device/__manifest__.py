@@ -9,7 +9,10 @@
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "license": "AGPL-3",
     "depends": ["stock_reception_screen", "stock_measuring_device"],
-    "data": ["views/stock_reception_screen_view.xml", "views/measuring_device_view.xml"],
+    "data": [
+        "views/stock_reception_screen_view.xml",
+        "views/measuring_device_view.xml",
+    ],
     "website": "https://github.com/OCA/wms",
     "installable": True,
     "auto_install": True,

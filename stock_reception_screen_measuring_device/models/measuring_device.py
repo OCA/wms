@@ -18,4 +18,6 @@ class MeasuringDevice(models.Model):
     def _check_is_default(self):
         self.ensure_one()
         if self.search_count([("is_default", "=", True)]) > 1:
-            raise ValidationError(_("Only one measuring device can be the default one."))
+            raise ValidationError(
+                _("Only one measuring device can be the default one.")
+            )
