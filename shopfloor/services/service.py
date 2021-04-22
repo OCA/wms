@@ -14,7 +14,6 @@ from odoo.osv import expression
 
 from odoo.addons.base_rest.controllers.main import _PseudoCollection
 from odoo.addons.component.core import AbstractComponent, WorkContext
-from odoo.addons.component.exception import NoComponentError
 
 
 def to_float(val):
@@ -196,43 +195,6 @@ class BaseShopfloorService(AbstractComponent):
         for record in records:
             res.append(self._convert_one_record(record))
         return res
-
-    def _get_validator_schema(self, method_name, usage_suffix):
-        validator_component = self.component(
-            usage="{}.{}".format(self._usage, usage_suffix)
-        )
-        return getattr(validator_component, method_name)
-
-    # FIXME: must be replaced by a cleaner way to customize the validator
-    # handler, using: https://github.com/OCA/rest-framework/pull/99
-    def __getattr__(self, item):
-        # We have delegated the validator / return validators to dedicated
-        # components. In the new base_rest API, validator schemas are handled
-        # differently, but a backward compatibility layer adds
-        # "_validator_<method>" and "_validator_return_<method>" in the
-        # "routing" of the endpoints, which are automatically called on the
-        # service. As we have no way to replace the current service by the
-        # validator upstream, catch calls to these methods and get the schema
-        # from the validator services.
-        if item.startswith("_validator_return_"):
-            method_name = item.replace("_validator_return_", "")
-            try:
-                schema_handler = self._get_validator_schema(
-                    method_name, "validator.response"
-                )
-            except NoComponentError:
-                return super().__getattr__(item)
-            return schema_handler
-
-        if item.startswith("_validator_"):
-            method_name = item.replace("_validator_", "")
-            try:
-                schema_handler = self._get_validator_schema(method_name, "validator")
-            except NoComponentError:
-                return super().__getattr__(item)
-            return schema_handler
-
-        return super().__getattr__(item)
 
     def _response(
         self, base_response=None, data=None, next_state=None, message=None, popup=None
