@@ -1,1 +1,6 @@
 freezegun
+odoo14-addon-product-total-weight-from-packaging @git+https://github.com/akretion/product-attribute@14.0-mig-product_total_weight_from_packaging#subdirectory=setup/product_total_weight_from_packaging
+odoo14-addon-stock-picking-group-by-partner-by-carrier @git+https://github.com/phuctranerp/stock-logistics-workflow@14.0-mig-stock_picking_group_by_partner_by_carrier#subdirectory=setup/stock_picking_group_by_partner_by_carrier
+odoo14-addon-stock-available-to-promise-release @git+https://github.com/dzungtran89/wms@14.0-mig-stock_available_to_promise_release#subdirectory=setup/stock_available_to_promise_release
+odoo14-addon-stock-move-assign-picking-hook @git+https://github.com/phuctranerp/stock-logistics-workflow@14.0-mig-stock_move_assign_picking_hook#subdirectory=setup/stock_move_assign_picking_hook
+odoo14-addon-product-packaging-dimension @git+https://github.com/dzungtran89/product-attribute@14.0-mig-product_packaging_dimension#subdirectory=setup/product_packaging_dimension
