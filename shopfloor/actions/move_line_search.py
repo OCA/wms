@@ -92,13 +92,13 @@ class MoveLineSearch(Component):
             # make prority negative to keep sorting ascending
             return lambda line: (
                 -int(line.move_id.priority or "0"),
-                line.move_id.date_expected,
+                line.move_id.date,
             )
         elif order == "location":
             return lambda line: (
                 line.location_id.shopfloor_picking_sequence or "",
                 line.location_id.name,
-                line.move_id.date_expected,
+                line.move_id.date,
             )
         return lambda line: line
 

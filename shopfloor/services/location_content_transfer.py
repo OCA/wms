@@ -410,7 +410,7 @@ class LocationContentTransfer(Component):
 
     def _set_all_destination_lines_and_done(self, pickings, move_lines, dest_location):
         self._write_destination_on_lines(move_lines, dest_location)
-        pickings.action_done()
+        pickings._action_done()
 
     def _lock_lines(self, lines):
         """Lock move lines"""
@@ -721,8 +721,9 @@ class LocationContentTransfer(Component):
             # (by splitting the current one)
             move_line.product_uom_qty = move_line.qty_done = quantity
             current_move = move_line.move_id
-            new_move_id = current_move._split(quantity)
-            new_move = self.env["stock.move"].browse(new_move_id)
+            new_move_vals = current_move._split(quantity)
+            new_move = self.env["stock.move"].create(new_move_vals)
+            new_move._action_confirm(merge=False)
             new_move.move_line_ids = move_line
             # Ensure that the remaining qty to process is reserved as before
             (new_move | current_move)._recompute_state()
@@ -806,6 +807,9 @@ class LocationContentTransfer(Component):
             # split the move to process only the lines related to the package.
             package_move.split_other_move_lines(package_move_lines)
             lot = package_move.move_line_ids.lot_id
+            # We need to set qty_done at 0 because otherwise
+            # the move_line will not be deleted
+            package_move.move_line_ids.write({"qty_done": 0})
             package_move._do_unreserve()
             package_move._recompute_state()
             # Create an inventory at 0 in the move's source location
@@ -861,6 +865,9 @@ class LocationContentTransfer(Component):
         move = move_line.move_id
         package = move_line.package_id
         lot = move_line.lot_id
+        # We need to set qty_done at 0 because otherwise
+        # the move_line will not be deleted
+        move_line.qty_done = 0
         move._do_unreserve()
         move._recompute_state()
         # Create an inventory at 0 in the move's source location

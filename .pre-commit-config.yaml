@@ -4,7 +4,6 @@ exclude: |
   ^delivery_carrier_preference/|
   ^delivery_carrier_warehouse/|
   ^sale_stock_available_to_promise_release/|
-  ^shopfloor/|
   ^shopfloor_batch_automatic_creation/|
   ^shopfloor_checkout_sync/|
   ^shopfloor_mobile/|

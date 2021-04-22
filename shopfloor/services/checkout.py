@@ -390,7 +390,7 @@ class Checkout(Component):
         # but also if we have one product as a package and the same product as
         # a unit in another line. In both cases, we want the user to scan the
         # package.
-        if packages and len({l.package_id for l in lines}) > 1:
+        if packages and len({line.package_id for line in lines}) > 1:
             return self._response_for_select_line(
                 picking, message=self.msg_store.product_multiple_packages_scan_package()
             )
@@ -422,7 +422,7 @@ class Checkout(Component):
         # package, but also if we have one lot as a package and the same lot as
         # a unit in another line. In both cases, we want the user to scan the
         # package.
-        if packages and len({l.package_id for l in lines}) > 1:
+        if packages and len({line.package_id for line in lines}) > 1:
             return self._response_for_select_line(
                 picking, message=self.msg_store.lot_multiple_packages_scan_package()
             )
@@ -1002,7 +1002,7 @@ class Checkout(Component):
                         "body": _("Remaining raw product not packed, proceed anyway?"),
                     },
                 )
-        picking.action_done()
+        picking._action_done()
         return self._response_for_select_document(
             message=self.msg_store.transfer_done_success(picking)
         )
