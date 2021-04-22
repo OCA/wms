@@ -83,7 +83,7 @@ class StockMove(models.Model):
                 AND p_type.code = 'outgoing'
                 AND loc.parent_path LIKE ANY(%(location_paths)s)
                 AND (
-                    m.need_release = true
+                    COALESCE(m.need_release, False) = COALESCE(move.need_release, False)
                     AND (
                         m.priority > move.priority
                         OR
@@ -98,7 +98,8 @@ class StockMove(models.Model):
                         )
                     )
                     OR (
-                        m.need_release IS false OR m.need_release IS null
+                        move.need_release IS true
+                        AND (m.need_release IS false OR m.need_release IS null)
                     )
                 )
                 AND m.state IN (
@@ -112,7 +113,10 @@ class StockMove(models.Model):
         }
         horizon_date = self._promise_reservation_horizon_date()
         if horizon_date:
-            sql += " AND m.date_expected <= %(horizon)s "
+            sql += (
+                " AND (m.need_release IS true AND m.date_deadline <= %(horizon)s "
+                "      OR m.need_release IS false)"
+            )
             params["horizon"] = horizon_date
         return sql, params
 
@@ -155,7 +159,7 @@ class StockMove(models.Model):
             if not move.need_release:
                 move.release_ready = False
                 continue
-            if move.picking_id.move_type == "one":
+            if move.picking_id._get_shipping_policy() == "one":
                 move.release_ready = move.picking_id.release_ready
             else:
                 move.release_ready = move.ordered_available_to_promise_uom_qty > 0
@@ -182,7 +186,7 @@ class StockMove(models.Model):
             }
         )
 
-        locations = self._ordered_available_to_promise_locations()
+        locations = moves._ordered_available_to_promise_locations()
 
         # Compute On-Hand quantity (equivalent of qty_available) for all "view
         # locations" of all the warehouses: we may release as soon as we have
@@ -197,7 +201,7 @@ class StockMove(models.Model):
                 ]
             )
         domain_quant = expression.AND(
-            [[("product_id", "in", self.product_id.ids)], location_domain]
+            [[("product_id", "in", moves.product_id.ids)], location_domain]
         )
         location_quants = self.env["stock.quant"].read_group(
             domain_quant, ["product_id", "quantity"], ["product_id"], orderby="id"
@@ -205,7 +209,7 @@ class StockMove(models.Model):
         quants_available = {
             item["product_id"][0]: item["quantity"] for item in location_quants
         }
-        for move in self:
+        for move in moves:
             product_uom = move.product_id.uom_id
             previous_promised_qty = move.previous_promised_qty
 
@@ -252,7 +256,6 @@ class StockMove(models.Model):
     def _should_compute_ordered_available_to_promise(self):
         return (
             self.picking_code == "outgoing"
-            and self.need_release
             and not self.product_id.type == "consu"
             and not self.location_id.should_bypass_reservation()
         )
@@ -303,7 +306,7 @@ class StockMove(models.Model):
         for move in self:
             if not move.need_release:
                 continue
-            if move.state not in ("confirmed", "waiting"):
+            if move.state not in ("confirmed", "waiting", "done", "cancel"):
                 continue
             available_quantity = move.ordered_available_to_promise_qty
             if float_compare(available_quantity, 0, precision_digits=precision) <= 0:
@@ -313,7 +316,7 @@ class StockMove(models.Model):
             remaining = move.product_qty - quantity
 
             if float_compare(remaining, 0, precision_digits=precision) > 0:
-                if move.picking_id.move_type == "one":
+                if move.picking_id._get_shipping_policy() == "one":
                     # we don't want to deliver unless we can deliver all at
                     # once
                     continue
@@ -339,6 +342,8 @@ class StockMove(models.Model):
         released_pickings = pulled_moves.picking_id
         unreleased_moves = released_pickings.move_lines - pulled_moves
         for unreleased_move in unreleased_moves:
+            if unreleased_move.state in ("done", "cancel"):
+                continue
             # no split will occur as we keep the same qty, but the move
             # will be assigned to a new stock.picking
             original_picking = unreleased_move.picking_id
@@ -387,9 +392,11 @@ class StockMove(models.Model):
         # `stock.move._search_picking_for_assignation`.
         if not self.picking_id.printed:
             self.picking_id.printed = True
-        new_move = self.browse(self._split(remaining_qty))
+
+        new_move = self.create(self._split(remaining_qty))
         # Picking assignment is needed here because `_split` copies the move
         # thus the `_should_be_assigned` condition is not satisfied
         # and the move is not assigned.
         new_move._assign_picking()
+
         return new_move.with_context(context)

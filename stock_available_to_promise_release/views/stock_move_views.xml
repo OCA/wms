@@ -44,7 +44,7 @@
         <field name="inherit_id" ref="stock.view_move_form" />
         <field eval="900" name="priority" />
         <field name="arch" type="xml">
-            <field name="date_expected" position="attributes">
+            <field name="date_deadline" position="attributes">
                 <attribute name="string">Shipment date</attribute>
             </field>
             <group name="main_grp_col2" position="inside">
@@ -78,7 +78,7 @@
             name="view_ids"
             eval="[(5, 0, 0),
                      (0, 0, {'view_mode': 'tree', 'view_id': ref('view_move_release_tree')}),
-                     (0, 0, {'view_mode': 'kanban', 'view_id': ref('stock.stock_move_view_kanban')}),
+                     (0, 0, {'view_mode': 'kanban', 'view_id': ref('stock.view_move_kandan')}),
                      (0, 0, {'view_mode': 'form', 'view_id': ref('view_move_release_form')}),
                      ]"
         />
