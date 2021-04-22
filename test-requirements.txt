@@ -1,1 +1,5 @@
 freezegun
+
+odoo14-addon-stock_picking_type_shipping_policy @ git+https://github.com/phuctranerp/wms.git@14.0-mig-stock_picking_type_shipping_policy#subdirectory=setup/stock_picking_type_shipping_policy
+odoo14-addon-stock_picking_group_by_partner_by_carrier @ git+https://github.com/phuctranerp/stock-logistics-workflow.git@14.0-mig-stock_picking_group_by_partner_by_carrier#subdirectory=setup/stock_picking_group_by_partner_by_carrier
+odoo14-addon-stock_move_assign_picking_hook @ git+https://github.com/phuctranerp/stock-logistics-workflow.git@14.0-mig-stock_move_assign_picking_hook#subdirectory=setup/stock_move_assign_picking_hook
