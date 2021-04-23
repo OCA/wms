@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<odoo>
+    <record id="view_measuring_device_form" model="ir.ui.view">
+        <field name="name">measuring.device.form</field>
+        <field name="model">measuring.device</field>
+        <field
+            name="inherit_id"
+            ref="stock_measuring_device.view_measuring_device_form"
+        />
+        <field name="arch" type="xml">
+            <field name="warehouse_id" position="after">
+                <field name="is_default" />
+            </field>
+        </field>
+    </record>
+    <record id="view_measuringdevice_tree" model="ir.ui.view">
+        <field name="name">measuring.device.tree</field>
+        <field name="model">measuring.device</field>
+        <field
+            name="inherit_id"
+            ref="stock_measuring_device.view_measuring_device_tree"
+        />
+        <field name="arch" type="xml">
+            <field name="warehouse_id" position="after">
+                <field name="is_default" />
+            </field>
+        </field>
+    </record>
+</odoo>
