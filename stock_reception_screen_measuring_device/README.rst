@@ -47,7 +47,7 @@ In the reception screen, click on the "Measure Current Packaging" button
 weight/dimensions), and use the measuring device. The values should be directly
 updated on the packaging.
 
-Known limitation: this only works on the measuring device flagges as default. 
+Known limitation: this only works on the measuring device flagges as default.
 
 Bug Tracker
 ===========
@@ -85,6 +85,14 @@ This module is maintained by the OCA.
 OCA, or the Odoo Community Association, is a nonprofit organization whose
 mission is to support the collaborative development of Odoo features and
 promote its widespread use.
+
+.. |maintainer-gurneyalex| image:: https://github.com/gurneyalex.png?size=40px
+    :target: https://github.com/gurneyalex
+    :alt: gurneyalex
+
+Current `maintainer <https://odoo-community.org/page/maintainer-role>`__:
+
+|maintainer-gurneyalex| 
 
 This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/13.0/stock_reception_screen_measuring_device>`_ project on GitHub.
 
