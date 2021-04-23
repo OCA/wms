@@ -65,12 +65,12 @@ class StockReceptionScreen(models.Model):
             self._notify(error_msg)
             return UserError(error_msg)
 
-        self.product_packaging_id._assign_measuring_device(device)
+        self.product_packaging_id._measuring_device_assign(device)
         return True
 
     def cancel_measure_current_packaging(self):
         self.ensure_one()
-        self.product_packaging_id._release_measuring_device()
+        self.product_packaging_id._measuring_device_release()
         return True
 
     def _notify(self, message):
