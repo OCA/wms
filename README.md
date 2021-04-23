@@ -45,6 +45,7 @@ addon | version | summary
 [stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 13.0.1.0.0 | Define different shipping policies according to picking type
 [stock_picking_type_shipping_policy_group_by](stock_picking_type_shipping_policy_group_by/) | 13.0.1.0.0 | Glue module for Picking Type Shipping Policy and Group Transfers by Partner and Carrier
 [stock_reception_screen](stock_reception_screen/) | 13.0.1.6.2 | Dedicated screen to receive/scan goods.
+[stock_reception_screen_measuring_device](stock_reception_screen_measuring_device/) | 13.0.1.0.0 | Allow to use a measuring device from a reception screen.for packaging measurement
 [stock_storage_type](stock_storage_type/) | 13.0.1.12.0 | Manage packages and locations storage types
 [stock_storage_type_buffer](stock_storage_type_buffer/) | 13.0.1.2.0 | Exclude storage locations from put-away if their buffer is full
 [stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 13.0.1.1.0 | Advanced storage strategy ABC for WMS
