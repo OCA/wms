@@ -74,8 +74,9 @@ class StockMoveLine(models.Model):
             new_move = move_line.move_id.split_other_move_lines(
                 move_line, intersection=True
             )
-            new_move._recompute_state()
-            new_move_ids.append(new_move.id)
+            if new_move:
+                new_move._recompute_state()
+                new_move_ids.append(new_move.id)
         # If we have new moves, create the backorder picking
         # NOTE: code copy/pasted & adapted from OCA module 'stock_split_picking'
         new_moves = self.env["stock.move"].browse(new_move_ids)
