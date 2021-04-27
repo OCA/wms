@@ -1,6 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 
 
 class StockPicking(models.Model):
@@ -51,3 +51,53 @@ class StockPicking(models.Model):
         ):
             return False
         return super()._check_move_lines_map_quant_package(package)
+
+    def split_assigned_move_lines(self, move_lines=None):
+        """Put all reserved quantities (move lines) in their own moves and transfer.
+
+        As a result, the current transfer will contain only confirmed moves.
+        """
+        self.ensure_one()
+        # Check in the picking all the moves which are partially available or confirmed
+        moves = self.move_lines.filtered(
+            lambda m: m.state in ("partially_available", "confirmed")
+        )
+        # If one of these moves has an ancestor, split the moves
+        # then extract all the assigned moves in a new transfer.
+        # Indeed, a move without ancestor won't see its reserved qty changed
+        # automatically over time.
+        has_ancestors = bool(
+            moves.move_orig_ids.filtered(lambda m: m.state not in ("cancel", "done"))
+        )
+        if not has_ancestors:
+            return self.id
+        # Get only transfers composed of moves assigned or confirmed
+        moves.split_other_move_lines(moves.move_line_ids)
+        # Put assigned moves related to processed move lines into a separate transfer
+        if move_lines:
+            assigned_moves = self.move_lines & move_lines.move_id
+        else:
+            assigned_moves = self.move_lines.filtered(lambda m: m.state == "assigned")
+        if assigned_moves == self.move_lines:
+            return self.id
+        new_picking = self.copy(
+            {
+                "name": "/",
+                "move_lines": [],
+                "move_line_ids": [],
+                "backorder_id": self.id,
+            }
+        )
+        message = _(
+            'The backorder <a href="#" '
+            'data-oe-model="stock.picking" '
+            'data-oe-id="%d">%s</a> has been created.'
+        ) % (new_picking.id, new_picking.name)
+        self.message_post(body=message)
+        assigned_moves.write({"picking_id": new_picking.id})
+        assigned_moves.mapped("move_line_ids").write({"picking_id": new_picking.id})
+        assigned_moves.move_line_ids.package_level_id.write(
+            {"picking_id": new_picking.id}
+        )
+        assigned_moves._action_assign()
+        return new_picking.id
