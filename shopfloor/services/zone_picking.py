@@ -1,4 +1,5 @@
-# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 import functools
 from collections import defaultdict
@@ -407,9 +408,7 @@ class ZonePicking(Component):
         zone_location = search.location_from_scan(barcode)
         if not zone_location:
             return self._response_for_start(message=self.msg_store.no_location_found())
-        if not zone_location.is_sublocation_of(
-            self.work.menu.picking_type_ids.mapped("default_location_src_id")
-        ):
+        if not self.is_src_location_valid(zone_location):
             return self._response_for_start(
                 message=self.msg_store.location_not_allowed()
             )
@@ -602,19 +601,14 @@ class ZonePicking(Component):
         # if `confirmation is True
         # Ask confirmation to the user if the scanned location is not in the
         # expected ones but is valid (in picking type's default destination)
-        if not location.is_sublocation_of(
-            self.picking_type.default_location_dest_id
-        ) or not location.is_sublocation_of(
-            move_line.move_id.location_dest_id, func=all
-        ):
+        if not self.is_dest_location_valid(move_line.move_id, location):
             response = self._response_for_set_line_destination(
                 move_line, message=self.msg_store.dest_location_not_allowed(),
             )
             return (location_changed, response)
 
-        if (
-            not location.is_sublocation_of(move_line.location_dest_id)
-            and not confirmation
+        if not confirmation and self.is_dest_location_to_confirm(
+            move_line.location_dest_id, location
         ):
             response = self._response_for_set_line_destination(
                 move_line,
@@ -1132,9 +1126,8 @@ class ZonePicking(Component):
             if len(location_dest) != 1:
                 error = self.msg_store.lines_different_dest_location()
             # check if the scanned location is allowed
-            if not location.is_sublocation_of(
-                self.picking_type.default_location_dest_id
-            ):
+            moves = buffer_lines.mapped("move_id")
+            if not self.is_dest_location_valid(moves, location):
                 error = self.msg_store.location_not_allowed()
             if error:
                 return self._set_destination_all_response(buffer_lines, message=error)
@@ -1143,19 +1136,19 @@ class ZonePicking(Component):
             #     destination set on buffer lines
             #   - To confirm if the scanned destination is not a child of the
             #     current destination set on buffer lines
-            if not location.is_sublocation_of(buffer_lines.location_dest_id):
-                if not confirmation:
-                    return self._response_for_unload_all(
-                        buffer_lines,
-                        message=self.msg_store.confirm_location_changed(
-                            first(buffer_lines.location_dest_id), location
-                        ),
-                        confirmation_required=True,
-                    )
+            if not confirmation and self.is_dest_location_to_confirm(
+                buffer_lines.location_dest_id, location
+            ):
+                return self._response_for_unload_all(
+                    buffer_lines,
+                    message=self.msg_store.confirm_location_changed(
+                        first(buffer_lines.location_dest_id), location
+                    ),
+                    confirmation_required=True,
+                )
             # the scanned location is still valid, use it
             self._write_destination_on_lines(buffer_lines, location)
             # set lines to done + refresh buffer lines (should be empty)
-            moves = buffer_lines.mapped("move_id")
             # split move lines to a backorder move
             # if quantity is not fully satisfied
             # TODO: update tests
@@ -1285,11 +1278,8 @@ class ZonePicking(Component):
         search = self._actions_for("search")
         location = search.location_from_scan(barcode)
         if location:
-            if not location.is_sublocation_of(
-                self.picking_type.default_location_dest_id
-            ) or not location.is_sublocation_of(
-                buffer_lines.move_id.location_dest_id, func=all
-            ):
+            moves = buffer_lines.mapped("move_id")
+            if not self.is_dest_location_valid(moves, location):
                 return self._response_for_unload_set_destination(
                     first(buffer_lines),
                     message=self.msg_store.dest_location_not_allowed(),
@@ -1299,19 +1289,19 @@ class ZonePicking(Component):
             #     destination set on buffer lines
             #   - To confirm if the scanned destination is not a child of the
             #     current destination set on buffer lines
-            if not location.is_sublocation_of(buffer_lines.location_dest_id):
-                if not confirmation:
-                    return self._response_for_unload_set_destination(
-                        first(buffer_lines),
-                        message=self.msg_store.confirm_location_changed(
-                            first(buffer_lines.location_dest_id), location
-                        ),
-                        confirmation_required=True,
-                    )
+            if not confirmation and self.is_dest_location_to_confirm(
+                buffer_lines.location_dest_id, location
+            ):
+                return self._response_for_unload_set_destination(
+                    first(buffer_lines),
+                    message=self.msg_store.confirm_location_changed(
+                        first(buffer_lines.location_dest_id), location
+                    ),
+                    confirmation_required=True,
+                )
             # the scanned location is valid, use it
             self._write_destination_on_lines(buffer_lines, location)
             # set lines to done + refresh buffer lines (should be empty)
-            moves = buffer_lines.mapped("move_id")
             # split move lines to a backorder move
             # if quantity is not fully satisfied
             for move in moves:

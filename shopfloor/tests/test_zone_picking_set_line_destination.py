@@ -98,13 +98,13 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         )
 
     def test_set_destination_location_move_invalid_location(self):
-        # Confirm the destination with a wrong destination, outside of move's
-        # move line (should not happen)
+        # Confirm the destination with a wrong destination, outside of picking
+        # and move's move line (should not happen)
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
         move_line = self.picking1.move_line_ids
-        move_line.location_dest_id = self.packing_sublocation_a
         move_line.move_id.location_dest_id = self.packing_sublocation_a
+        move_line.picking_id.location_dest_id = self.packing_sublocation_a
         response = self.service.dispatch(
             "set_destination",
             params={
