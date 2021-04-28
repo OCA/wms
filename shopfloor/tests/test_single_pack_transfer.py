@@ -525,7 +525,8 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         )
 
     def test_validate_location_forbidden(self):
-        """Test a call on /validate on a forbidden location (not child of type)
+        """Test a call on /validate on a forbidden location (not child of
+        picking or move)
 
         The pre-conditions:
 
@@ -536,7 +537,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         * No change in odoo, Transition with a message
 
         Note: the location is forbidden when a location is not a child
-        of the destination location of the picking type used for the process
+        of the destination location of the picking used for the process
         """
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
@@ -558,8 +559,8 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             message={"message_type": "error", "body": "You cannot place it here"},
         )
 
-    def test_validate_location_forbidden_move_invalid(self):
-        """Test a call on /validate on a forbidden location (not child of move)
+    def test_validate_location_move_not_child_of_picking_allowed(self):
+        """Test a call on /validate on a location not child of picking but child of move
 
         The pre-conditions:
 
@@ -569,34 +570,32 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
 
         * No change in odoo, Transition with a message
 
-        Note: the location is forbidden when a location is not a child
-        of the destination location of the move
+        Note: the location is allowed when the move location has changed and
+        that location is a child of the destination location of the move
         """
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
         package_level = self._simulate_started()
 
-        move = package_level.move_line_ids.move_id
-        # take the parent of the expected dest.: not allowed
-        location = move.location_dest_id.location_id
-        # allow this location to be used in the picking type, otherwise,
-        # we check the wrong condition
-        self.picking_type.sudo().default_location_dest_id = location
+        location = package_level.location_dest_id.location_id
+        package_level.location_dest_id = location
+        package_level.move_line_ids.move_id.location_dest_id = location
 
         response = self.service.dispatch(
             "validate",
             params={
                 "package_level_id": package_level.id,
-                # this location is outside of the expected destination
                 "location_barcode": location.barcode,
             },
         )
 
         self.assert_response(
             response,
-            next_state="scan_location",
-            data=self.ANY,
-            message={"message_type": "error", "body": "You cannot place it here"},
+            next_state="start",
+            message={
+                "message_type": "success",
+                "body": "The pack has been moved, you can scan a new pack.",
+            },
         )
 
     def test_validate_location_to_confirm(self):

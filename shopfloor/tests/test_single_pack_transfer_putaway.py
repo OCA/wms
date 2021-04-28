@@ -77,9 +77,11 @@ class TestSinglePackTransferPutaway(SinglePackTransferCommonBase):
         # no package level created to move the package
         self.assertFalse(package_levels)
 
-    def test_putaway_move_dest_not_child_of_picking_type_dest(self):
+    def test_putaway_move_dest_not_child_of_picking_dest(self):
         """Putaway is applied on move but the destination location is not a
         child of the default picking type destination location.
+        Case where the picking is created by scanning a package level. Then the
+        move destination is according to the putaway and valid.
         """
         # Change the default destination location of the picking type
         # to get it outside of the putaway destination
@@ -94,19 +96,7 @@ class TestSinglePackTransferPutaway(SinglePackTransferCommonBase):
             }
         )
         # Check the result
-        existing_package_levels = self.env["stock.package_level"].search(
-            [("package_id", "=", self.package.id)]
-        )
         response = self.service.dispatch(
             "start", params={"barcode": self.shelf1.barcode}
         )
-        self.assert_response(
-            response,
-            next_state="start",
-            data=self.ANY,
-            message=self.service.msg_store.package_unable_to_transfer(self.package),
-        )
-        current_package_levels = self.env["stock.package_level"].search(
-            [("package_id", "=", self.package.id)]
-        )
-        self.assertEqual(existing_package_levels, current_package_levels)
+        self.assert_response(response, next_state="scan_location", data=self.ANY)

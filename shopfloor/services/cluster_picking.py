@@ -1,4 +1,5 @@
-# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, fields
 from odoo.osv import expression
@@ -934,24 +935,20 @@ class ClusterPicking(Component):
             return self._unload_end(batch)
 
         first_line = fields.first(lines)
-        picking_type = fields.first(batch.picking_ids).picking_type_id
         scanned_location = self._actions_for("search").location_from_scan(barcode)
         if not scanned_location:
             return self._response_for_unload_all(
                 batch, message=self.msg_store.no_location_found()
             )
-        if not scanned_location.is_sublocation_of(
-            picking_type.default_location_dest_id
-        ) or not scanned_location.is_sublocation_of(
-            lines.mapped("move_id.location_dest_id"), func=all
-        ):
+        if not self.is_dest_location_valid(lines.move_id, scanned_location):
             return self._response_for_unload_all(
                 batch, message=self.msg_store.dest_location_not_allowed()
             )
 
-        if not scanned_location.is_sublocation_of(first_line.location_dest_id):
-            if not confirmation:
-                return self._response_for_confirm_unload_all(batch)
+        if not confirmation and self.is_dest_location_to_confirm(
+            first_line.location_dest_id, scanned_location
+        ):
+            return self._response_for_confirm_unload_all(batch)
 
         self._unload_write_destination_on_lines(lines, scanned_location)
         completion_info = self._actions_for("completion.info")
@@ -1100,25 +1097,19 @@ class ClusterPicking(Component):
         # Lock move lines that will be updated
         self._lock_lines(lines)
         first_line = fields.first(lines)
-        picking_type = fields.first(batch.picking_ids).picking_type_id
         scanned_location = self._actions_for("search").location_from_scan(barcode)
         if not scanned_location:
             return self._response_for_unload_set_destination(
                 batch, package, message=self.msg_store.no_location_found()
             )
-
-        if not scanned_location.is_sublocation_of(
-            picking_type.default_location_dest_id
-        ) or not scanned_location.is_sublocation_of(
-            lines.mapped("move_id.location_dest_id"), func=all
-        ):
+        if not self.is_dest_location_valid(lines.move_id, scanned_location):
             return self._response_for_unload_set_destination(
                 batch, package, message=self.msg_store.dest_location_not_allowed()
             )
-
-        if not scanned_location.is_sublocation_of(first_line.location_dest_id):
-            if not confirmation:
-                return self._response_for_confirm_unload_set_destination(batch, package)
+        if not confirmation and self.is_dest_location_to_confirm(
+            first_line.location_dest_id, scanned_location
+        ):
+            return self._response_for_confirm_unload_set_destination(batch, package)
 
         self._unload_write_destination_on_lines(lines, scanned_location)
 
