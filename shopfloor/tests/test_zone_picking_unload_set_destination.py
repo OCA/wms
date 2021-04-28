@@ -97,6 +97,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         picking_type = self.picking1.picking_type_id
         move_line = self.picking1.move_line_ids
         move_line[0].move_id.location_dest_id = self.packing_sublocation_a
+        move_line[0].picking_id.location_dest_id = self.packing_sublocation_a
         # set the destination package
         self.service._set_destination_package(
             move_line, move_line.product_uom_qty, self.free_package,

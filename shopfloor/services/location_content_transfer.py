@@ -1,4 +1,5 @@
-# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _
 
@@ -203,7 +204,7 @@ class LocationContentTransfer(Component):
             [("location_id", "=", location.id), ("quantity", ">", 0)]
         )
         # create moves for each quant
-        picking_type = self.work.menu.picking_type_ids
+        picking_type = self.picking_types
         move_vals_list = []
         for quant in quants:
             move_vals_list.append(
@@ -338,16 +339,14 @@ class LocationContentTransfer(Component):
         #   - no move lines have been found
         #   - the menu is configured to allow the creation of moves
         #   - the menu is bind to one picking type
-        #   - scanned location is a child of the picking type source location
+        #   - scanned location is a valid source for one the menu's picking types
         # then prepare new stock moves to move goods from the scanned location.
         menu = self.work.menu
         if (
             not move_lines
             and menu.allow_move_create
-            and len(menu.picking_type_ids) == 1
-            and location.is_sublocation_of(
-                menu.picking_type_ids.default_location_src_id
-            )
+            and len(self.picking_types) == 1
+            and self.is_src_location_valid(location)
         ):
             new_moves = self._create_moves_from_location(location)
             if not new_moves:
@@ -364,8 +363,8 @@ class LocationContentTransfer(Component):
             pickings = new_moves.mapped("picking_id")
             move_lines = new_moves.move_line_ids
             for move_line in move_lines:
-                if not move_line.location_dest_id.is_sublocation_of(
-                    menu.picking_type_ids.default_location_dest_id
+                if not self.is_dest_location_valid(
+                    move_line.move_id, move_line.location_dest_id
                 ):
                     savepoint.rollback()
 
@@ -463,19 +462,13 @@ class LocationContentTransfer(Component):
                 pickings, message=self.msg_store.barcode_not_found()
             )
 
-        if not scanned_location.is_sublocation_of(
-            self.picking_types.mapped("default_location_dest_id")
-        ) or not scanned_location.is_sublocation_of(
-            move_lines.mapped("move_id.location_dest_id"), func=all
-        ):
+        if not self.is_dest_location_valid(move_lines.move_id, scanned_location):
             return self._response_for_scan_destination_all(
                 pickings, message=self.msg_store.dest_location_not_allowed()
             )
-        if not confirmation and not scanned_location.is_sublocation_of(
-            move_lines.mapped("location_dest_id")
+        if not confirmation and self.is_dest_location_to_confirm(
+            move_lines.location_dest_id, scanned_location
         ):
-            # the scanned location is valid (child of picking type's destination)
-            # but not the expected one: ask for confirmation
             return self._response_for_scan_destination_all(
                 pickings, confirmation_required=True
             )
@@ -652,26 +645,21 @@ class LocationContentTransfer(Component):
             return self._response_for_scan_destination(
                 location, package_level, message=self.msg_store.no_location_found()
             )
-        if not scanned_location.is_sublocation_of(
-            package_level.picking_id.picking_type_id.default_location_dest_id
-        ) or not scanned_location.is_sublocation_of(
-            # beware, package_level.move_id is not always set
-            package_level.move_line_ids.move_id.location_dest_id,
-            func=all,
-        ):
+        package_moves = package_level.move_line_ids.move_id
+        if not self.is_dest_location_valid(package_moves, scanned_location):
             return self._response_for_scan_destination(
                 location,
                 package_level,
                 message=self.msg_store.dest_location_not_allowed(),
             )
-        if not scanned_location.is_sublocation_of(package_level.location_dest_id):
-            if not confirmation:
-                return self._response_for_scan_destination(
-                    location, package_level, confirmation_required=True
-                )
+        if not confirmation and self.is_dest_location_to_confirm(
+            package_level.location_dest_id, scanned_location
+        ):
+            return self._response_for_scan_destination(
+                location, package_level, confirmation_required=True
+            )
         package_move_lines = package_level.move_line_ids
         self._lock_lines(package_move_lines)
-        package_moves = package_move_lines.mapped("move_id")
         for package_move in package_moves:
             # Check if there is no other lines linked to the move others than
             # the lines related to the package itself. In such case we have to
@@ -721,19 +709,16 @@ class LocationContentTransfer(Component):
             return self._response_for_scan_destination(
                 location, move_line, message=self.msg_store.no_location_found()
             )
-        if not scanned_location.is_sublocation_of(
-            move_line.picking_id.picking_type_id.default_location_dest_id
-        ) or not scanned_location.is_sublocation_of(
-            move_line.move_id.location_dest_id, func=all
-        ):
+        if not self.is_dest_location_valid(move_line.move_id, scanned_location):
             return self._response_for_scan_destination(
                 location, move_line, message=self.msg_store.dest_location_not_allowed()
             )
-        if not scanned_location.is_sublocation_of(move_line.location_dest_id):
-            if not confirmation:
-                return self._response_for_scan_destination(
-                    location, move_line, confirmation_required=True
-                )
+        if not confirmation and self.is_dest_location_to_confirm(
+            move_line.location_dest_id, scanned_location
+        ):
+            return self._response_for_scan_destination(
+                location, move_line, confirmation_required=True
+            )
 
         self._lock_lines(move_line)
 
