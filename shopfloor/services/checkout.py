@@ -1,4 +1,5 @@
-# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from werkzeug.exceptions import BadRequest
@@ -179,9 +180,7 @@ class Checkout(Component):
         if not picking:
             location = search.location_from_scan(barcode)
             if location:
-                if not location.is_sublocation_of(
-                    self.picking_types.mapped("default_location_src_id")
-                ):
+                if not self.is_src_location_valid(location):
                     return self._response_for_select_document(
                         message=self.msg_store.location_not_allowed()
                     )

@@ -289,10 +289,14 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         )
 
     def test_set_destination_all_dest_location_move_invalid(self):
-        """The scanned destination location is not in the move's dest location"""
-        # if we have at least one move which does not match the scanned location
+        """The scanned destination location is not in the picking and move's
+        dest location
+        """
+        # if we have at least one move which does not match the scanned
+        # location
         # we forbid the action
         self.pickings.move_lines[0].location_dest_id = self.shelf1
+        self.pickings[0].location_dest_id = self.shelf1
         response = self.service.dispatch(
             "set_destination_all",
             params={
