@@ -1,0 +1,50 @@
+<odoo>
+    <template id="storage_buffer_help_message">
+        <span>The buffer locations</span>
+        <ul class="mt8">
+            <t t-foreach="buffer_locations" t-as="loc_text">
+                <li>
+                    <span itemprop="name" t-esc="loc_text" />
+                </li>
+            </t>
+            <t t-if="buffer_locations_remaining">
+                <t
+                    t-call="stock_storage_type_buffer.storage_buffer_help_message_other_locations"
+                >
+                    <t t-set="remaining" t-value="buffer_locations_remaining" />
+                </t>
+            </t>
+        </ul>
+        <span t-if="buffers_have_capacity">
+            currently <strong>have capacity</strong>,
+            so the following locations
+            <strong>can receive putaways</strong>:
+        </span>
+        <span t-if="not buffers_have_capacity">
+            currently <strong>have no capacity</strong>,
+            so the following locations
+            <strong>cannot receive putaways</strong>:
+        </span>
+        <ul class="mt8">
+            <t t-foreach="locations" t-as="loc_text">
+                <li>
+                    <span itemprop="name" t-esc="loc_text" />
+                </li>
+            </t>
+            <t t-if="locations_remaining">
+                <t
+                    t-call="stock_storage_type_buffer.storage_buffer_help_message_other_locations"
+                >
+                    <t t-set="remaining" t-value="locations_remaining" />
+                </t>
+            </t>
+        </ul>
+        <p t-if="not buffers_have_capacity">
+            The buffers have no capacity because they all contain
+            goods or will contain goods due to move lines reaching them.
+        </p>
+    </template>
+    <template id="storage_buffer_help_message_other_locations">
+        <li>... and <span t-esc="remaining" /> other locations.</li>
+    </template>
+</odoo>

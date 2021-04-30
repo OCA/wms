@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 import logging
@@ -65,6 +66,7 @@ class StockLocationStorageType(models.Model):
         "allowed if the packaging wight is lower than this maximum.",
     )
     has_restrictions = fields.Boolean(compute="_compute_has_restrictions")
+    active = fields.Boolean(default=True)
 
     @api.constrains("only_empty", "do_not_mix_lots", "do_not_mix_products")
     def _check_empty_mix(self):
@@ -133,7 +135,7 @@ class StockLocationStorageType(models.Model):
         # configuration (only_empty, do_not_mix_products, do_not_mix_lots) and
         # do a single query per set of options
         if self.only_empty:
-            location_domain.append(("location_is_empty", "=", True))
+            location_domain += [("location_is_empty", "=", True)]
         if self.do_not_mix_products:
             location_domain += [
                 "|",

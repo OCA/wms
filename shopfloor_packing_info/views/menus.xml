@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem
+        action="action_shopfloor_packing_info"
+        id="menu_action_shopfloor_packing_info"
+        parent="shopfloor_base.menu_shopfloor_root"
+        sequence="25"
+    />
+</odoo>

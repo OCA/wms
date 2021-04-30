@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo import _, fields, models
@@ -12,7 +13,7 @@ class StockStorageLocationSequence(models.Model):
     package_storage_type_id = fields.Many2one(
         "stock.package.storage.type", required=True
     )
-    sequence = fields.Integer(required=True)
+    sequence = fields.Integer(required=True, default=1)
     location_id = fields.Many2one("stock.location", required=True,)
     location_putaway_strategy = fields.Selection(
         related="location_id.pack_putaway_strategy"
@@ -35,7 +36,7 @@ class StockStorageLocationSequence(models.Model):
                 if strat[0] == self.location_id.pack_putaway_strategy:
                     pack_storage_strat = strat[1]
                     break
-            msg = ' * <span style="color: green;">{} ({})</span>'.format(
+            msg = u' * <span style="color: green;">{} ({})</span>'.format(
                 self.location_id.name, pack_storage_strat,
             )
             if last:

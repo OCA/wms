@@ -1,5 +1,11 @@
-import {ScenarioBaseMixin} from "./mixins.js";
-import {process_registry} from "../services/process_registry.js";
+/**
+ * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * @author Simone Orsi <simahawk@gmail.com>
+ * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+ */
+
+import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
+import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
 
 const LocationContentTransfer = {
     mixins: [ScenarioBaseMixin],
@@ -41,7 +47,7 @@ const LocationContentTransfer = {
                     <item-detail-card
                         :key="make_state_component_key(['detail-move-line-product', rec.id])"
                         :record="rec"
-                        :options="utils.misc.move_line_product_detail_options(rec, {fields: [{path: 'picking.name', label: 'Picking'}]})"
+                        :options="utils.wms.move_line_product_detail_options(rec, {fields: [{path: 'picking.name', label: 'Picking'}]})"
                         :card_color="utils.colors.color_for(state_in(['scan_destination', 'scan_destination_all']) ? 'screen_step_done': 'screen_step_todo')"
                         />
 
@@ -49,7 +55,7 @@ const LocationContentTransfer = {
                             class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
                         <packaging-qty-picker
                             :key="make_state_component_key(['packaging-qty-picker', rec.id])"
-                            :options="utils.misc.move_line_qty_picker_options(rec)"
+                            :options="utils.wms.move_line_qty_picker_options(rec)"
                             />
                     </v-card>
 
@@ -141,7 +147,7 @@ const LocationContentTransfer = {
             return res;
         },
         move_line_detail_list_options: function(move_line) {
-            return this.utils.misc.move_line_product_detail_options(move_line, {
+            return this.utils.wms.move_line_product_detail_options(move_line, {
                 loud_labels: true,
                 fields_blacklist: ["product.qty_available"],
                 fields: [{path: "location_src.name", label: "From"}],
