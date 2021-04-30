@@ -46,6 +46,6 @@ class Savepoint(object):
 
     def _clear_env(self):
         for env in list(Environment.envs):
-            if env.cr is self.cr:
+            if env.cr is self._cr:
                 env.clear()
                 break
