@@ -317,12 +317,22 @@ class LocationContentTransfer(Component):
                         ),
                     }
                 )
-        # Ensure we process move lines related to pickings having only one source
-        # location among all their move lines. If there are different source
-        # locations, we put the move lines we are interested in in a separate picking.
+        # If there are different source locations, we put the move lines we are
+        # interested in in a separate picking.
         # This is required as we can only deal within this scenario with pickings
         # that share the same source location.
         pickings = move_lines._split_pickings_from_source_location()
+        # Ensure we process move lines related to transfers having only one source
+        # location among all their move lines.
+        # We need to put the unreserved qty into separate moves as a new move
+        # line could be created in the middle of the process.
+        new_picking_ids = []
+        for picking in pickings:
+            #   -> put move lines to process in their own move/transfer
+            new_picking_id = picking.split_assigned_move_lines(move_lines)
+            new_picking_ids.append(new_picking_id)
+        if new_picking_ids != pickings.ids:
+            pickings = pickings.browse(new_picking_ids)
 
         # If the following criteria are met:
         #   - no move lines have been found
