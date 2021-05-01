@@ -961,6 +961,7 @@ msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/stock_move_line.py:0
+#: code:addons/shopfloor/models/stock_picking.py:0
 #, python-format
 msgid ""
 "The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
