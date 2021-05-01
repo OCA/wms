@@ -23,7 +23,7 @@ addon | version | summary
 [delivery_carrier_warehouse](delivery_carrier_warehouse/) | 13.0.1.2.0 | Get delivery method used in sales orders from warehouse
 [delivery_preference_glue_stock_picking_group](delivery_preference_glue_stock_picking_group/) | 13.0.1.0.0 | Fix Delivery preferences module on grouping picking
 [sale_stock_available_to_promise_release](sale_stock_available_to_promise_release/) | 13.0.1.5.0 | Integration between Sales and Available to Promise Release
-[shopfloor](shopfloor/) | 13.0.4.7.0 | manage warehouse operations with barcode scanners
+[shopfloor](shopfloor/) | 13.0.4.7.1 | manage warehouse operations with barcode scanners
 [shopfloor_base](shopfloor_base/) | 13.0.1.1.0 | Core module for creating mobile apps
 [shopfloor_batch_automatic_creation](shopfloor_batch_automatic_creation/) | 13.0.1.1.0 | Create batch transfers for Cluster Picking
 [shopfloor_checkout_sync](shopfloor_checkout_sync/) | 13.0.1.0.0 | Glue module
