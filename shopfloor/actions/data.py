@@ -165,10 +165,17 @@ class DataAction(Component):
             "id",
             "qty_done",
             "product_uom_qty:quantity",
+            "shopfloor_checkout_done:done",
             ("product_id:product", self._product_parser),
             ("lot_id:lot", self._lot_parser),
             ("location_id:location_src", self._location_parser),
             ("location_dest_id:location_dest", self._location_parser),
+            (
+                "result_package_id:package_dest",
+                lambda rec, fname: self.package(
+                    rec.result_package_id, rec.picking_id, with_packaging=True
+                ),
+            ),
             ("move_id:priority", lambda rec, fname: rec.move_id.priority or "",),
         ]
 
@@ -243,9 +250,13 @@ class DataAction(Component):
     @ensure_model("stock.picking.batch")
     def picking_batch(self, record, with_pickings=False, **kw):
         parser = self._picking_batch_parser
+
         if with_pickings:
             parser.append(("picking_ids:pickings", self._picking_parser))
-        return self._jsonify(record, parser, **kw)
+
+        data = self._jsonify(record, parser, **kw)
+
+        return data
 
     def picking_batches(self, record, with_pickings=False, **kw):
         return self.picking_batch(record, with_pickings=with_pickings, multi=True)
