@@ -18,9 +18,7 @@
                     string="Measure Current Packaging"
                     icon="fa-tachometer"
                     class="btn btn-secondary"
-                    attrs="{'invisible': ['|', ('current_step', '!=', 'select_packaging'),
-                                          '|', ('product_packaging_id', '=', False),
-                                               ('package_has_missing_dimensions', '=', False)]}"
+                    attrs="{'invisible': [('package_has_missing_dimensions', '=', False)]}"
                 />
                 <field name="scan_requested" invisible="1" />
                 <button
@@ -39,6 +37,20 @@
                     attrs="{'invisible': [('scan_requested', '=', False)]}"
                 />
             </button>
+            <xpath
+                expr="//field[@name='current_move_line_package']/.."
+                position="after"
+            >
+                <label for="display_package_dimensions" />
+                <div>
+                    <field
+                        name="display_package_dimensions"
+                        class="mr8"
+                        style="width: 15em;"
+                        readonly="1"
+                    />
+                </div>
+            </xpath>
         </field>
     </record>
 </odoo>

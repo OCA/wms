@@ -18,6 +18,11 @@ class StockReceptionScreen(models.Model):
         store=True,
         help="Indicates if the package have any measurement missing.",
     )
+    display_package_dimensions = fields.Char(
+        string="Dimensions (lxhxw)",
+        compute="_compute_package_dimensions",
+        help="Dimensions of the package in mm (length x height x width)",
+    )
     scan_requested = fields.Boolean(
         help="A scan from the measuring device was requested",
         default=False,
@@ -34,6 +39,22 @@ class StockReceptionScreen(models.Model):
             )
 
     @api.depends(
+        "product_packaging_id.lngth",
+        "product_packaging_id.width",
+        "product_packaging_id.height",
+    )
+    def _compute_package_dimensions(self):
+        for record in self:
+            pack = record.product_packaging_id
+            dimension_values = [pack.lngth, pack.height, pack.width]
+            if all(dimension_values):
+                record.display_package_dimensions = " x ".join(
+                    [f"{str(val)}mm" for val in dimension_values]
+                )
+            else:
+                record.display_package_dimensions = False
+
+    @api.depends(
         "product_packaging_id.max_weight",
         "product_packaging_id.lngth",
         "product_packaging_id.width",
@@ -42,12 +63,13 @@ class StockReceptionScreen(models.Model):
     def _compute_package_has_missing_dimensions(self):
         for record in self:
             pack = record.product_packaging_id
-            record.package_has_missing_dimensions = (
-                not pack.max_weight
-                or not pack.lngth
-                or not pack.width
-                or not pack.height
-            )
+            if pack:
+                record.package_has_missing_dimensions = not pack.type_is_pallet and (
+                    not (pack.lngth and pack.width and pack.height)
+                    or not pack.max_weight
+                )
+            else:
+                record.package_has_missing_dimensions = False
 
     def measure_current_packaging(self):
         self.ensure_one()
@@ -65,12 +87,12 @@ class StockReceptionScreen(models.Model):
             self._notify(error_msg)
             return UserError(error_msg)
 
-        self.product_packaging_id._assign_measuring_device(device)
+        self.product_packaging_id._measuring_device_assign(device)
         return True
 
     def cancel_measure_current_packaging(self):
         self.ensure_one()
-        self.product_packaging_id._release_measuring_device()
+        self.product_packaging_id._measuring_device_release()
         return True
 
     def _notify(self, message):
