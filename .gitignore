@@ -73,3 +73,5 @@ docs/_build/
 
 # OCA rules
 !static/lib/
+
+node_modules
