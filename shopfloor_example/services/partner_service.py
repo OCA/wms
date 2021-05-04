@@ -15,7 +15,9 @@ class PartnerExampleService(Component):
     _description = __doc__
 
     @restapi.method(
-        [(["/scan/<string:identifier>"], "GET")], auth="api_key",
+        [(["/scan/<string:identifier>"], "GET")],
+        output_param=restapi.CerberusValidator("scan"),
+        auth="api_key",
     )
     def scan(self, identifier):
         """Scan a partner ref and return its data.
@@ -25,16 +27,24 @@ class PartnerExampleService(Component):
         return self._response_for_scan(record)
 
     @restapi.method(
-        [(["/partner_list"], "GET")], auth="api_key",
+        [(["/partner_list"], "GET")],
+        input_param=restapi.CerberusValidator("partner_list"),
+        output_param=restapi.CerberusValidator("partner_list"),
+        auth="api_key",
     )
     def partner_list(self, **params):
         """Return list of available partners.
         """
-        records = self.env["res.partner"].search([])
+        domain = []
+        if "name" in params:
+            domain.append(("name", "like", params["name"]))
+        records = self.env["res.partner"].search(domain)
         return self._response_for_partner_list(records)
 
     @restapi.method(
-        [(["/detail/<int:partner_id>"], "GET")], auth="api_key",
+        [(["/detail/<int:partner_id>"], "GET")],
+        output_param=restapi.CerberusValidator("detail"),
+        auth="api_key",
     )
     def detail(self, partner_id):
         """Retrieve full detail for partner ID.
@@ -65,18 +75,10 @@ class ShopfloorCheckoutValidator(Component):
     _name = "shopfloor.partner_example.validator"
     _usage = "partner_example.validator"
 
-    def _validator_scan(self):
+    def partner_list(self):
         return {
-            "identifier": {"type": "string", "nullable": False, "required": True},
+            "name": {"required": False, "type": "string"},
         }
-
-    def _detail(self):
-        return {
-            "partner_id": {"required": True, "type": "integer"},
-        }
-
-    def _partner_list(self):
-        return {}
 
 
 class ShopfloorCheckoutValidatorResponse(Component):
@@ -85,11 +87,29 @@ class ShopfloorCheckoutValidatorResponse(Component):
     _name = "shopfloor.partner_example.validator.response"
     _usage = "partner_example.validator.response"
 
-    def _scan(self):
-        return self._detail()
+    def _states(self):
+        """List of possible next states
 
-    def _detail(self):
-        return self._schema.partner_detail()
+        With the schema of the data send to the client to transition
+        to the next state.
+        """
+        return {
+            "start": {},
+            "detail": {
+                "record": self.schemas._schema_dict_of(
+                    self.schemas_detail.partner_detail()
+                )
+            },
+            "listing": {
+                "records": self.schemas._schema_list_of(self.schemas.partner()),
+            },
+        }
 
-    def _partner_list(self):
-        return self.schema._schema_list_of(self._schema.partner())
+    def scan(self):
+        return self.detail()
+
+    def detail(self):
+        return self._response_schema(next_states=["detail"])
+
+    def partner_list(self):
+        return self._response_schema(next_states=["listing"])

@@ -11,7 +11,7 @@ class ShopfloorSchemaDetailAction(Component):
         schema = self._simple_record()
         schema.update(
             {
-                "ref": {"type": "string", "nullable": False, "required": True},
+                "ref": {"type": "string", "nullable": True, "required": True},
                 "email": {"type": "string", "nullable": True, "required": False},
             }
         )
