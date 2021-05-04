@@ -18,7 +18,7 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
     template: `
         <Screen :screen_info="{title: $t('screen.settings.home.title'), klass: 'settings settings-control-panel'}">
             <v-card outlined v-if="$root.user.id">
-                <user-session-detail :show_profile="false"/>
+                <user-session-detail :show_profile="false" />
             </v-card>
             <div class="button-list button-vertical-list full">
                 <v-row align="center" v-for="page in get_pages()" :key="make_component_key([page.key])">

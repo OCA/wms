@@ -377,10 +377,27 @@ Vue.component("user-session-detail", {
             type: Boolean,
             default: true,
         },
+        show_env: {
+            type: Boolean,
+            default: true,
+        },
     },
     template: `
   <div :class="$options._componentTag" data-ref="user-session-detail">
     <v-list>
+        <v-list-item v-if="show_env"
+                data-ref="session-detail-env"
+                :data-id="$root.app_info.running_env"
+                >
+            <v-list-item-avatar>
+                <v-avatar :color="$root.app_info.running_env == 'prod' ? 'primary' : 'warning'" size="36">
+                    <v-icon dark>mdi-server</v-icon>
+                </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-content>
+                <span v-text="$t('app.running_env.' + $root.app_info.running_env)" />
+            </v-list-item-content>
+        </v-list-item>
         <v-list-item v-if="show_user && $root.user.id"
                 data-ref="session-detail-user"
                 :data-id="$root.user.id"

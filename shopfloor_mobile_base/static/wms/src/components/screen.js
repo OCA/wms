@@ -43,6 +43,7 @@ Vue.component("Screen", {
                 this.$root.authenticated ? "authenticated" : "anonymous",
                 this.$root.loading ? "loading" : "",
                 this.$root.demo_mode ? "demo_mode" : "",
+                "env-" + this.$root.app_info.running_env,
             ].join(" ");
         },
         screen_content_class() {
