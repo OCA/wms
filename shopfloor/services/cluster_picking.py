@@ -1,4 +1,5 @@
-# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, fields
 from odoo.osv import expression
@@ -25,27 +26,31 @@ class ClusterPicking(Component):
 
     First phase, picking:
 
-    * Pick a good (move line) from a source location, scan it to confirm it's
-      the expected one
-    * Scan the label of a Bin (package) in a roller-cage, put the good inside
-      (physically). Once the first move line of a picking has been scanned, the
-      screen will show the same destination package for all the other lines of
-      the picking to help the user grouping goods together, and will prevent
-      lines from other pickings to be put in the same destination package.
+    * Pick a goods (move line) from a source location, scan to confirm it's
+      the expected one. You must scan a barcode that ensures the right goods
+      has been picked (could be location, product, lot, package depending on
+      what ensures the right source)
+    * Scan the collection bin (destination package) where you physically put
+      the goods inside. The collection bin is typically on a trolley or
+      rollercage and has a unique barcode. The collection bin must be empty or
+      already used for that picking. So once the first move line of a picking
+      has been scanned, the screen will show the same destination package for
+      all the other lines of the picking to help the user grouping goods
+      together.
     * If odoo thinks a source location is empty after picking the goods, a
       "zero check" is done: it asks the user to confirm if it is empty or not
-    * Repeat until the end of the batch or the roller-cage is full (there is
-      button to declare this)
+    * Repeat until the end of the batch or no collection bin is available (i.e.
+      is full) for the move line (there is button to declare this)
 
     Second phase, unload to destination:
 
-    * If all the goods (move lines) in the roller-cage go to the same destination,
-      a screen asking a single barcode for the destination is shown
-    * Otherwise, the user has to scan one destination per Bin (destination
-      package of the moves).
+    * If all the goods (move lines) go to the same destination, a single
+      confirmation is requested for all the collection bins
+    * Otherwise, the user has to scan one destination per collection bin
+      (destination package of the moves).
     * If all the goods are supposed to go to the same destination but user doesn't
       want or can't, a "split" allows to reach the screen to scan one destination
-      per Bin.
+      per collection bin.
     * When everything has a destination set and the batch is not finished yet,
       the user goes to the first phase of pickings again for the rest.
 
@@ -411,13 +416,13 @@ class ClusterPicking(Component):
         return self._response_for_start()
 
     def scan_line(self, picking_batch_id, move_line_id, barcode):
-        """Scan a location, a pack, a product or a lots
+        """Scan a location, a pack, a product or a lot
 
         There is no side-effect, it is only to check that the operator takes
         the expected pack or product.
 
         User can scan a location if there is only pack inside. Otherwise, they
-        have to precise what they want by scanning one of:
+        have to specify what they want by scanning one of:
 
         * pack
         * product
@@ -933,24 +938,21 @@ class ClusterPicking(Component):
             return self._unload_end(batch)
 
         first_line = fields.first(lines)
-        picking_type = fields.first(batch.picking_ids).picking_type_id
         scanned_location = self._actions_for("search").location_from_scan(barcode)
         if not scanned_location:
             return self._response_for_unload_all(
                 batch, message=self.msg_store.no_location_found()
             )
-        if not scanned_location.is_sublocation_of(
-            picking_type.default_location_dest_id
-        ) or not scanned_location.is_sublocation_of(
-            lines.mapped("move_id.location_dest_id"), func=all
-        ):
+        stock = self._actions_for("stock")
+        if not stock.is_dest_location_valid(lines.move_id, scanned_location):
             return self._response_for_unload_all(
                 batch, message=self.msg_store.dest_location_not_allowed()
             )
 
-        if not scanned_location.is_sublocation_of(first_line.location_dest_id):
-            if not confirmation:
-                return self._response_for_confirm_unload_all(batch)
+        if not confirmation and stock.is_dest_location_to_confirm(
+            first_line.location_dest_id, scanned_location
+        ):
+            return self._response_for_confirm_unload_all(batch)
 
         self._unload_write_destination_on_lines(lines, scanned_location)
         completion_info = self._actions_for("completion.info")
@@ -1099,25 +1101,20 @@ class ClusterPicking(Component):
         # Lock move lines that will be updated
         self._lock_lines(lines)
         first_line = fields.first(lines)
-        picking_type = fields.first(batch.picking_ids).picking_type_id
         scanned_location = self._actions_for("search").location_from_scan(barcode)
         if not scanned_location:
             return self._response_for_unload_set_destination(
                 batch, package, message=self.msg_store.no_location_found()
             )
-
-        if not scanned_location.is_sublocation_of(
-            picking_type.default_location_dest_id
-        ) or not scanned_location.is_sublocation_of(
-            lines.mapped("move_id.location_dest_id"), func=all
-        ):
+        stock = self._actions_for("stock")
+        if not stock.is_dest_location_valid(lines.move_id, scanned_location):
             return self._response_for_unload_set_destination(
                 batch, package, message=self.msg_store.dest_location_not_allowed()
             )
-
-        if not scanned_location.is_sublocation_of(first_line.location_dest_id):
-            if not confirmation:
-                return self._response_for_confirm_unload_set_destination(batch, package)
+        if not confirmation and stock.is_dest_location_to_confirm(
+            first_line.location_dest_id, scanned_location
+        ):
+            return self._response_for_confirm_unload_set_destination(batch, package)
 
         self._unload_write_destination_on_lines(lines, scanned_location)
 
