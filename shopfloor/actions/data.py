@@ -9,6 +9,13 @@ from odoo.addons.shopfloor_base.utils import ensure_model
 class DataAction(Component):
     _inherit = "shopfloor.data.action"
 
+    @property
+    def _full_partner_parser(self):
+        return [
+            "id",
+            "name",
+        ]
+
     @ensure_model("stock.location")
     def location(self, record, **kw):
         return self._jsonify(
@@ -43,6 +50,20 @@ class DataAction(Component):
             "note",
             ("partner_id:partner", self._partner_parser),
             ("carrier_id:carrier", self._simple_record_parser()),
+            "move_line_count",
+            "total_weight:weight",
+            "scheduled_date",
+        ]
+
+    @property
+    def _full_picking_parser(self):
+        return [
+            "id",
+            "name",
+            "origin",
+            "note",
+            ("partner_id:partner", self._full_partner_parser),
+            ("move_line_ids:move_lines", self._move_line_parser),
             "move_line_count",
             "total_weight:weight",
             "scheduled_date",
@@ -165,10 +186,17 @@ class DataAction(Component):
             "id",
             "qty_done",
             "product_uom_qty:quantity",
+            "shopfloor_checkout_done:done",
             ("product_id:product", self._product_parser),
             ("lot_id:lot", self._lot_parser),
             ("location_id:location_src", self._location_parser),
             ("location_dest_id:location_dest", self._location_parser),
+            (
+                "result_package_id:package_dest",
+                lambda rec, fname: self.package(
+                    rec.result_package_id, rec.picking_id, with_packaging=True
+                ),
+            ),
             ("move_id:priority", lambda rec, fname: rec.move_id.priority or "",),
         ]
 
@@ -243,9 +271,27 @@ class DataAction(Component):
     @ensure_model("stock.picking.batch")
     def picking_batch(self, record, with_pickings=False, **kw):
         parser = self._picking_batch_parser
-        if with_pickings:
+        if with_pickings is True:
             parser.append(("picking_ids:pickings", self._picking_parser))
-        return self._jsonify(record, parser, **kw)
+        if with_pickings == "full":
+            parser.append(("picking_ids:pickings", self._full_picking_parser))
+
+        data = self._jsonify(record, parser, **kw)
+
+        if with_pickings == "full":
+            pickings = record.picking_ids
+
+            for i, picking in enumerate(pickings):
+                data["pickings"][i].update(
+                    {
+                        "move_lines": [
+                            self.move_line(move_line)
+                            for move_line in picking.move_line_ids
+                        ]
+                    }
+                )
+
+        return data
 
     def picking_batches(self, record, with_pickings=False, **kw):
         return self.picking_batch(record, with_pickings=with_pickings, multi=True)

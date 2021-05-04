@@ -146,6 +146,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         self.assert_schema(self.schema.move_line(), data)
         expected = {
             "id": move_line.id,
+            "done": False,
             "qty_done": 3.0,
             "quantity": move_line.product_uom_qty,
             "product": self._expected_product(self.product_a),
@@ -176,6 +177,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         self.assert_schema(self.schema.move_line(), data)
         expected = {
             "id": move_line.id,
+            "done": False,
             "qty_done": 0.0,
             "quantity": move_line.product_uom_qty,
             "product": self._expected_product(self.product_b),
@@ -198,6 +200,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         self.assert_schema(self.schema.move_line(), data)
         expected = {
             "id": move_line.id,
+            "done": False,
             "qty_done": 0.0,
             "quantity": move_line.product_uom_qty,
             "product": self._expected_product(self.product_c),
@@ -232,6 +235,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         self.assert_schema(self.schema.move_line(), data)
         expected = {
             "id": move_line.id,
+            "done": False,
             "qty_done": 0.0,
             "quantity": move_line.product_uom_qty,
             "product": self._expected_product(self.product_d),
@@ -250,6 +254,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         self.assert_schema(self.schema.move_line(with_picking=True), data)
         expected = {
             "id": move_line.id,
+            "done": False,
             "qty_done": 0.0,
             "quantity": move_line.product_uom_qty,
             "product": self._expected_product(self.product_d),
