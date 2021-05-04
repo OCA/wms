@@ -494,32 +494,46 @@ class StockReceptionScreen(models.Model):
             # Go to the next step automatically if only one move has been found
             self.process_select_move()
 
+    def _split_move(self, move, qty):
+        # Hook intended to be overridden
+        return move._split(qty)
+
+    def _action_done_picking(self):
+        """Called by '_validate_current_move' when processing the last move
+        to perform the validation at the picking level.
+        """
+        return self.picking_id.action_done()
+
+    def _action_done_move(self, move):
+        """Called by '_validate_current_move' when processing a partial qty to
+        perform the validation at the move level.
+        """
+        # We use the 'is_scrap' context key to avoid the generation of a
+        # backorder when validating the move (see _action_done() method in
+        # stock/models/stock_move.py).
+        return move.with_context(is_scrap=True)._action_done()
+
     def _validate_current_move(self):
         """Split the current move with the move line qty done and validate it."""
         if self.current_move_line_id and self.current_move_id:
-            remaining_qty = (
-                self.current_move_id.product_uom_qty
-                - self.current_move_line_id.qty_done
-            )
+            qty_done = self.current_move_line_id.qty_done
+            qty_remaining = self.current_move_id.product_uom_qty - qty_done
             # We don't want to create a new move with a negative qty if we
             # receive more than expected.
             digits = self.env["decimal.precision"].precision_get(
                 "Product Unit of Measure"
             )
-            if gt(remaining_qty, 0, digits=digits):
-                self.current_move_id._split(remaining_qty)
+            if gt(qty_remaining, 0, digits=digits):
+                self._split_move(self.current_move_id, qty_remaining)
             moves_todo = self.picking_id.move_lines.filtered(
                 lambda m: m.state not in ["done", "cancel"]
             )
             # On the last move of the picking set the picking to done
             # Otherwise set the move to done
             if moves_todo == self.current_move_id:
-                self.picking_id.action_done()
+                self._action_done_picking()
             else:
-                # We use the 'is_scrap' context key to avoid the generation of a
-                # backorder when validating the move (see _action_done() method in
-                # stock/models/stock_move.py).
-                self.current_move_id.with_context(is_scrap=True)._action_done()
+                self._action_done_move(self.current_move_id)
             # A new move is automatically created if we made a partial receipt
             # and we have to update it to the 'assigned' state to generate the
             # related 'stock.move.line' (required if we want to process it)
