@@ -693,6 +693,7 @@ class ZonePicking(Component):
         # the field ``shopfloor_user_id`` is updated with the current user
         move_line.shopfloor_user_id = user or self.env.user
 
+    # flake8: noqa: C901
     def set_destination(
         self, move_line_id, barcode, quantity, confirmation=False,
     ):
@@ -771,7 +772,10 @@ class ZonePicking(Component):
                 )
                 if response:
                     if extra_message:
-                        response["message"]["body"] += "\n" + extra_message["body"]
+                        if response.get("message"):
+                            response["message"]["body"] += "\n" + extra_message["body"]
+                        else:
+                            response["message"] = extra_message
                     return response
 
         # When the barcode is a package
