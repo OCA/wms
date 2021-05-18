@@ -155,21 +155,11 @@ msgid "Control stock issue in location {} for {}"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__create_uid
-msgid "Created by"
-msgstr ""
-
-#. module: shopfloor
 #: code:addons/shopfloor/models/stock_move.py:0
 #, python-format
 msgid ""
 "Created from backorder <a href=# data-oe-model=stock.picking data-oe-"
 "id=%d>%s</a>."
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__create_date
-msgid "Created on"
 msgstr ""
 
 #. module: shopfloor
@@ -186,7 +176,6 @@ msgid "Delivery"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__display_name
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__display_name
 msgid "Display Name"
 msgstr ""
@@ -211,7 +200,6 @@ msgid "Goods packed into {0.name}"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__id
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__id
 msgid "ID"
 msgstr ""
@@ -258,19 +246,8 @@ msgid "Inventory Locations"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log____last_update
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin____last_update
 msgid "Last Modified on"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__write_uid
-msgid "Last Updated by"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__write_date
-msgid "Last Updated on"
 msgstr ""
 
 #. module: shopfloor
@@ -278,11 +255,6 @@ msgstr ""
 #, python-format
 msgid ""
 "Last operation of transfer {}. Next operation ({}) is ready to proceed."
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model,name:shopfloor.model_shopfloor_log
-msgid "Legacy model for tracking REST calls: replacedy by rest.log"
 msgstr ""
 
 #. module: shopfloor
