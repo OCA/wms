@@ -158,11 +158,6 @@ msgid "Control stock issue in location {} for {}"
 msgstr "Error en control de inventario en ubicación {} para {}"
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__create_uid
-msgid "Created by"
-msgstr "Creado por"
-
-#. module: shopfloor
 #: code:addons/shopfloor/models/stock_move.py:0
 #, python-format
 msgid ""
@@ -171,11 +166,6 @@ msgid ""
 msgstr ""
 "Creado desde pedido pendiente <a href=# data-oe-model=stock.picking data-oe-"
 "id=%d>%s</a>."
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__create_date
-msgid "Created on"
-msgstr "Creado el"
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
@@ -191,7 +181,6 @@ msgid "Delivery"
 msgstr "Entrega"
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__display_name
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__display_name
 msgid "Display Name"
 msgstr "Mostrar Nombre"
@@ -219,7 +208,6 @@ msgid "Goods packed into {0.name}"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__id
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__id
 msgid "ID"
 msgstr "ID"
@@ -271,20 +259,9 @@ msgid "Inventory Locations"
 msgstr "Ubicaciones de Inventario"
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log____last_update
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin____last_update
 msgid "Last Modified on"
 msgstr "Última Modificación el"
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__write_uid
-msgid "Last Updated by"
-msgstr "Última Actualización por"
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_log__write_date
-msgid "Last Updated on"
-msgstr "Última Actualización el"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/completion_info.py:0
@@ -293,11 +270,6 @@ msgid "Last operation of transfer {}. Next operation ({}) is ready to proceed."
 msgstr ""
 "Última operación de transferencia: {}. Siguiente operación ({}) está lista "
 "para proceder."
-
-#. module: shopfloor
-#: model:ir.model,name:shopfloor.model_shopfloor_log
-msgid "Legacy model for tracking REST calls: replacedy by rest.log"
-msgstr "Modelo heredado para rastrear llamadas REST: reemplazado por rest.log"
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
@@ -1270,6 +1242,22 @@ msgstr "{} no es un paquete de destino válido."
 #, python-format
 msgid "{} {} put in {}"
 msgstr "{} {} poner en {}"
+
+#~ msgid "Created by"
+#~ msgstr "Creado por"
+
+#~ msgid "Created on"
+#~ msgstr "Creado el"
+
+#~ msgid "Last Updated by"
+#~ msgstr "Última Actualización por"
+
+#~ msgid "Last Updated on"
+#~ msgstr "Última Actualización el"
+
+#~ msgid "Legacy model for tracking REST calls: replacedy by rest.log"
+#~ msgstr ""
+#~ "Modelo heredado para rastrear llamadas REST: reemplazado por rest.log"
 
 #~ msgid "Packaging {} is not allowed for carrier {}."
 #~ msgstr "Empaquetado {} no está permitido para en transportista {}."
