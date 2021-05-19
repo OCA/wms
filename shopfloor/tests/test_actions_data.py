@@ -109,6 +109,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
             "carrier": {"id": carrier.id, "name": carrier.name},
+            "ship_carrier": None,
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-08-03")
         self.assertDictEqual(data, expected)
