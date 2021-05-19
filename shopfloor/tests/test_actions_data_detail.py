@@ -113,6 +113,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "name": picking.name,
             "note": "read me",
             "origin": "created by test",
+            "ship_carrier": None,
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
             "carrier": {"id": picking.carrier_id.id, "name": picking.carrier_id.name},

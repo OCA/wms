@@ -23,6 +23,7 @@ class ShopfloorSchemaAction(Component):
             "weight": {"required": True, "nullable": True, "type": "float"},
             "partner": self._schema_dict_of(self._simple_record()),
             "carrier": self._schema_dict_of(self._simple_record(), required=False),
+            "ship_carrier": self._schema_dict_of(self._simple_record(), required=False),
             "scheduled_date": {"type": "string", "nullable": False, "required": True},
         }
 
