@@ -11,7 +11,9 @@ class SaleOrderLine(models.Model):
         result = super()._action_launch_stock_rule(
             previous_product_uom_qty=previous_product_uom_qty
         )
-        pickings = self.move_ids.picking_id
+        # As the user who confirms the order might not have access right to assign
+        # a release channel, we use sudo here, to avoid errors
+        pickings = self.move_ids.picking_id.sudo()
         # ensure we assign a channel on any picking OUT generated for the sale,
         # if moves are assigned to an existing transfer, we recompute the
         # channel
