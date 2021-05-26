@@ -32,6 +32,7 @@ start -> select_picking_type: **/scan_location**
 select_picking_type -> select_line: **/list_move_lines**
 
 == /scan_source ==
+select_line -> select_line: **/scan_source** \n(scanned package not expected but valid, confirmation required)
 select_line -> set_line_destination: **/scan_source**
 
 == /set_destination ==
