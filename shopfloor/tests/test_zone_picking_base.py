@@ -299,11 +299,13 @@ class ZonePickingCommonCase(CommonCase):
         move_lines,
         message=None,
         popup=None,
+        confirmation_required=False,
     ):
         data = {
             "zone_location": self.data.location(zone_location),
             "picking_type": self.data.picking_type(picking_type),
             "move_lines": self.data.move_lines(move_lines, with_picking=True),
+            "confirmation_required": confirmation_required,
         }
         for data_move_line in data["move_lines"]:
             move_line = self.env["stock.move.line"].browse(data_move_line["id"])
@@ -322,6 +324,7 @@ class ZonePickingCommonCase(CommonCase):
         move_lines,
         message=None,
         popup=None,
+        confirmation_required=False,
     ):
         self._assert_response_select_line(
             "select_line",
@@ -331,6 +334,7 @@ class ZonePickingCommonCase(CommonCase):
             move_lines,
             message=message,
             popup=popup,
+            confirmation_required=confirmation_required,
         )
 
     def _assert_response_set_line_destination(
