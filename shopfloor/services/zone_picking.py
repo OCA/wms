@@ -43,7 +43,10 @@ class ZonePicking(Component):
        * location, if only a single move line there; if a location is scanned
          and it contains several move lines, the view is updated to show only
          them
-       * package
+       * package, if it is linked to a move line. If the package is not linked
+         to an existing move line but can be a replacement for one, the view is
+         updated to show only the fitting move lines. And the user can confirm
+         the change of package by scanning it a second time.
        * product
        * lot
 
@@ -171,12 +174,15 @@ class ZonePicking(Component):
             message=message,
         )
 
-    def _response_for_select_line(self, move_lines, message=None, popup=None):
+    def _response_for_select_line(
+        self, move_lines, message=None, popup=None, confirmation_required=False
+    ):
+        if confirmation_required and not message:
+            message = self.msg_store.need_confirmation()
+        data = self._data_for_move_lines(move_lines)
+        data["confirmation_required"] = confirmation_required
         return self._response(
-            next_state="select_line",
-            data=self._data_for_move_lines(move_lines),
-            message=message,
-            popup=popup,
+            next_state="select_line", data=data, message=message, popup=popup,
         )
 
     def _response_for_set_line_destination(
@@ -427,7 +433,7 @@ class ZonePicking(Component):
         move_lines = self._find_location_move_lines(location)
         return self._response_for_select_line(move_lines)
 
-    def _scan_source_location(self, barcode):
+    def _scan_source_location(self, barcode, confirmation=False):
         """Search a location and find available lines into it.
         """
         response = None
@@ -469,8 +475,12 @@ class ZonePicking(Component):
         package = quants.package_id
         return product, lot, package
 
-    def _scan_source_package(self, barcode):
+    def _scan_source_package(self, barcode, confirmation=False):
         """Search a package and find available lines for it.
+
+        Fist search for lines that have the specific package.
+        If none are found search for lines whose package could be replaced
+        by the one selected and in that case ask for confirmation.
         """
         message = None
         response = None
@@ -481,12 +491,34 @@ class ZonePicking(Component):
         move_lines = self._find_location_move_lines(package=package)
         if move_lines:
             response = self._response_for_set_line_destination(first(move_lines))
+            return response, message
+        pack_location = package.location_id
+        if pack_location and pack_location.is_sublocation_of(self.zone_location):
+            # Check if the package selected can be a substitute on a move line
+            move_lines = self._find_location_move_lines(
+                locations=pack_location,
+                product=package.product_packaging_id.product_id,
+            )
+        if move_lines:
+            if not confirmation:
+                message = self.msg_store.package_different_change()
+                response = self._response_for_select_line(
+                    move_lines, message, confirmation_required=True
+                )
+            else:
+                change_package_lot = self._actions_for("change.package.lot")
+                response = change_package_lot.change_package(
+                    first(move_lines),
+                    package,
+                    self._response_for_set_line_destination,
+                    self._response_for_change_pack_lot,
+                )
         else:
             response = self._list_move_lines(self.zone_location)
-            message = self.msg_store.package_not_found()
+            message = self.msg_store.package_has_no_product_to_take(barcode)
         return response, message
 
-    def _scan_source_product(self, barcode):
+    def _scan_source_product(self, barcode, confirmation=False):
         """Search a product and find available lines for it.
         """
         message = None
@@ -503,7 +535,7 @@ class ZonePicking(Component):
             message = self.msg_store.product_not_found()
         return response, message
 
-    def _scan_source_lot(self, barcode):
+    def _scan_source_lot(self, barcode, confirmation=False):
         """Search a lot and find available lines for it.
         """
         message = None
@@ -520,7 +552,7 @@ class ZonePicking(Component):
             message = self.msg_store.lot_not_found()
         return response, message
 
-    def scan_source(self, barcode):
+    def scan_source(self, barcode, confirmation=False):
         """Select a move line or narrow the list of move lines
 
         When the barcode is a location and we can unambiguously know which move
@@ -540,6 +572,7 @@ class ZonePicking(Component):
         * select_line: barcode not found or narrow the list on a location
         * set_line_destination: a line has been selected for picking
         """
+
         # select corresponding move line from barcode (location, package, product, lot)
         handlers = (
             # search by location 1st
@@ -552,7 +585,7 @@ class ZonePicking(Component):
             self._scan_source_lot,
         )
         for handler in handlers:
-            response, message = handler(barcode)
+            response, message = handler(barcode, confirmation=confirmation)
             if response:
                 return self._response(base_response=response, message=message)
         response = self.list_move_lines()
@@ -1328,6 +1361,7 @@ class ShopfloorZonePickingValidator(Component):
     def scan_source(self):
         return {
             "barcode": {"required": False, "nullable": True, "type": "string"},
+            "confirmation": {"type": "boolean", "nullable": True, "required": False},
         }
 
     def set_destination(self):
