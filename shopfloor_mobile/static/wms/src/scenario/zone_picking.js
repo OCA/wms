@@ -457,6 +457,7 @@ const ZonePicking = {
             return this.wait_call(
                 this.odoo.call("scan_source", {
                     barcode: barcode,
+                    confirmation: this.state.data.confirmation_required,
                 })
             );
         },
