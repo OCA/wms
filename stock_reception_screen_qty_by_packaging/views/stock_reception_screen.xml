@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2020 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+  <record id="stock_reception_screen_view_form" model="ir.ui.view">
+    <field name="name">stock.reception.screen.form.inherit</field>
+    <field name="model">stock.reception.screen</field>
+    <field
+            name="inherit_id"
+            ref="stock_reception_screen.stock_reception_screen_view_form"
+        />
+    <field name="arch" type="xml">
+      <xpath
+                expr="//field[@name='picking_filtered_move_lines']/tree/field[@name='product_uom']"
+                position="after"
+            >
+        <field name="product_qty_by_packaging_display" />
+      </xpath>
+    </field>
+  </record>
+
+</odoo>
