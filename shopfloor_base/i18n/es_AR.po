@@ -171,6 +171,12 @@ msgid "Profiles"
 msgstr "Perfiles"
 
 #. module: shopfloor_base
+#: code:addons/shopfloor_base/actions/message.py:0
+#, python-format
+msgid "Record not found."
+msgstr ""
+
+#. module: shopfloor_base
 #: code:addons/shopfloor_base/services/scan_anything.py:0
 #, python-format
 msgid ""
