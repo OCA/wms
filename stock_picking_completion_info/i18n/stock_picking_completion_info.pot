@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 13.0\n"
+"Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -24,6 +24,13 @@ msgid "Display Completion Info"
 msgstr ""
 
 #. module: stock_picking_completion_info
+#: model:ir.model.fields,field_description:stock_picking_completion_info.field_stock_move__display_name
+#: model:ir.model.fields,field_description:stock_picking_completion_info.field_stock_picking__display_name
+#: model:ir.model.fields,field_description:stock_picking_completion_info.field_stock_picking_type__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: stock_picking_completion_info
 #: model:ir.model.fields.selection,name:stock_picking_completion_info.selection__stock_picking__completion_info__full_order_picking
 msgid ""
 "Full order picking: You are processing a full order picking that will allow "
@@ -31,9 +38,23 @@ msgid ""
 msgstr ""
 
 #. module: stock_picking_completion_info
+#: model:ir.model.fields,field_description:stock_picking_completion_info.field_stock_move__id
+#: model:ir.model.fields,field_description:stock_picking_completion_info.field_stock_picking__id
+#: model:ir.model.fields,field_description:stock_picking_completion_info.field_stock_picking_type__id
+msgid "ID"
+msgstr ""
+
+#. module: stock_picking_completion_info
 #: model:ir.model.fields,help:stock_picking_completion_info.field_stock_picking_type__display_completion_info
 msgid ""
 "Inform operator of a completed operation at processing and at completion"
+msgstr ""
+
+#. module: stock_picking_completion_info
+#: model:ir.model.fields,field_description:stock_picking_completion_info.field_stock_move____last_update
+#: model:ir.model.fields,field_description:stock_picking_completion_info.field_stock_picking____last_update
+#: model:ir.model.fields,field_description:stock_picking_completion_info.field_stock_picking_type____last_update
+msgid "Last Modified on"
 msgstr ""
 
 #. module: stock_picking_completion_info
