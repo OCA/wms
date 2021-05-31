@@ -9,6 +9,7 @@ setuptools.setup(
     version=version,
     install_requires=[
         'odoo14-addon-shopfloor_base',
+        'odoo14-addon-stock_picking_completion_info',
     ],
     classifiers=[
         'Programming Language :: Python',
