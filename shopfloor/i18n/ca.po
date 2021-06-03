@@ -967,6 +967,12 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "The package %s doesn't contain any product to take."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "The package %s doesn't exist"
 msgstr ""
 
@@ -1151,6 +1157,14 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "You must not pick more than {} units."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"You scanned a different package with the same product, do you want to change "
+"pack? Scan it again to confirm"
 msgstr ""
 
 #. module: shopfloor
