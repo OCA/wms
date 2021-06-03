@@ -9,16 +9,13 @@ ABC_SELECTION = [("a", "A"), ("b", "B"), ("c", "C")]
 
 
 def gather_location_ids(abc_sorted, max_heights_sorted, locations_grouped):
-    """Return a list of location IDs sorted on `abc_sorted` then
-    on `max_heights_sorted`.
+    """Return a list of location IDs sorted on `max_heights` then `abc_sorted`
     """
     location_ids = []
-    for abc_key in abc_sorted:
-        group_ids_per_height = locations_grouped.get(abc_key)
-        if not group_ids_per_height:
-            continue
-        for max_height in max_heights_sorted:
-            location_ids.extend(group_ids_per_height.get(max_height, []))
+    for max_height in max_heights_sorted:
+        for abc_key in abc_sorted:
+            locations = locations_grouped.get(abc_key, {}).get(max_height, [])
+            location_ids.extend(locations)
     return location_ids
 
 
@@ -75,12 +72,9 @@ class StockLocation(models.Model):
                 locations_grouped[loc.abc_storage][line["max_height"]].append(loc.id)
             # keep a list of available max heights
             max_heights.add(line["max_height"])
-        # sort max heights and take care to put any 0 value at the end
+        # sort max heights keeping zero value at the end
         max_heights = list(max_heights)
-        max_heights.sort()
-        if 0 in max_heights:
-            max_heights.pop(max_heights.index(0))
-            max_heights.append(0)
+        max_heights.sort(key=lambda x: x if x else float("inf"))
         # shuffle each abc_storage/max_height chunk
         for line in locations_grouped.values():
             for max_height in line:
