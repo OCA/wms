@@ -8,7 +8,6 @@ class TestStockLocation(TestStorageTypeCommon):
     def setUpClass(cls):
         super().setUpClass()
         ref = cls.env.ref
-        cls.areas.write({"pack_putaway_strategy": "ordered_locations"})
         cls.pallets_reserve_bin_1_location = ref(
             "stock_storage_type.stock_location_pallets_reserve_bin_1"
         )
@@ -18,11 +17,24 @@ class TestStockLocation(TestStorageTypeCommon):
         cls.pallets_reserve_bin_3_location = ref(
             "stock_storage_type.stock_location_pallets_reserve_bin_3"
         )
+        cls.pallets_reserve_bin_4_location = ref(
+            "stock_storage_type.stock_location_pallets_reserve_bin_4"
+        )
 
     def test_get_ordered_leaf_locations(self):
+        sublocation = self.stock_location.copy(
+            {
+                "name": "Sub-location",
+                "pack_putaway_strategy": "ordered_locations",
+                "location_id": self.stock_location.id,
+            }
+        )
+        self.areas.write({"location_id": sublocation.id})
+
         # Test with the same max_height on all related storage types (0 here)
+        ordered_locations = sublocation.get_storage_locations(self.product)
         self.assertEqual(
-            self.areas._get_ordered_leaf_locations().ids,
+            ordered_locations.ids,
             (
                 self.cardboxes_bin_1_location
                 | self.cardboxes_bin_2_location
@@ -31,16 +43,19 @@ class TestStockLocation(TestStorageTypeCommon):
                 | self.pallets_bin_1_location
                 | self.pallets_bin_2_location
                 | self.pallets_bin_3_location
+                | self.pallets_bin_4_location
                 | self.pallets_reserve_bin_1_location
                 | self.pallets_reserve_bin_2_location
                 | self.pallets_reserve_bin_3_location
+                | self.pallets_reserve_bin_4_location
             ).ids,
         )
         # Set the max_height on pallets storage type higher than the others
         self.pallets_location_storage_type.max_height = 2
         self.cardboxes_location_storage_type.max_height = 1
+        ordered_locations = sublocation.get_storage_locations(self.product)
         self.assertEqual(
-            self.areas._get_ordered_leaf_locations().ids,
+            ordered_locations.ids,
             (
                 self.cardboxes_bin_1_location
                 | self.cardboxes_bin_2_location
@@ -49,23 +64,28 @@ class TestStockLocation(TestStorageTypeCommon):
                 | self.pallets_bin_1_location
                 | self.pallets_bin_2_location
                 | self.pallets_bin_3_location
+                | self.pallets_bin_4_location
                 | self.pallets_reserve_bin_1_location
                 | self.pallets_reserve_bin_2_location
                 | self.pallets_reserve_bin_3_location
+                | self.pallets_reserve_bin_4_location
             ).ids,
         )
         # Set the max_height on cardboxes storage type higher than the others
         self.pallets_location_storage_type.max_height = 1
         self.cardboxes_location_storage_type.max_height = 2
+        ordered_locations = sublocation.get_storage_locations(self.product)
         self.assertEqual(
-            self.areas._get_ordered_leaf_locations().ids,
+            ordered_locations.ids,
             (
                 self.pallets_bin_1_location
                 | self.pallets_bin_2_location
                 | self.pallets_bin_3_location
+                | self.pallets_bin_4_location
                 | self.pallets_reserve_bin_1_location
                 | self.pallets_reserve_bin_2_location
                 | self.pallets_reserve_bin_3_location
+                | self.pallets_reserve_bin_4_location
                 | self.cardboxes_bin_1_location
                 | self.cardboxes_bin_2_location
                 | self.cardboxes_bin_3_location

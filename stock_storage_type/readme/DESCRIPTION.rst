@@ -35,8 +35,13 @@ storage type.
 
 Storage locations linked to the package storage are processed sequentially, if
 said storage location is a child of the move line's destination location (i.e
-either the put-away location or the move's destination location), then it will
-be searched in order to find a children location that is allowed according to
-the restrictions defined on the stock location storage types.
+either the put-away location or the move's destination location).
+For each location, their packs storage strategy is applied as well as the
+restrictions defined on the stock location storage types.
 If no suitable location is found, the next location in the sequence will be
 searched and so on.
+
+For the packs putaway strategy "none", the location is considered as is.  For
+the "ordered children" strategy, children locations are sorted by first by max
+height which is a physical constraint to respect, then pack putaway sequence
+which allow to favor for example some level or corridor, and finally by name.

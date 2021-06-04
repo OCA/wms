@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <field name="removal_strategy_id" position="after">
                 <field name="pack_putaway_strategy" />
+                <field name="pack_putaway_sequence" />
                 <field
                     name="allowed_location_storage_type_ids"
                     widget="many2many_tags"
