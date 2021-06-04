@@ -30,6 +30,9 @@ class TestStorageType(SavepointCase):
         cls.cardboxes_bin_3 = cls.env.ref(
             "stock_storage_type.stock_location_cardboxes_bin_3"
         )
+        cls.cardboxes_bin_4 = cls.env.ref(
+            "stock_storage_type.stock_location_cardboxes_bin_4"
+        )
 
     def test_location_allowed_storage_types(self):
         # As cardboxes location storage type is defined on parent stock
