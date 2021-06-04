@@ -36,8 +36,8 @@ class TestStorageTypeCommon(SavepointCase):
         cls.cardboxes_bin_3_location = ref(
             "stock_storage_type.stock_location_cardboxes_bin_3"
         )
-        cls.cardboxes_bin_4_location = cls.cardboxes_bin_1_location.copy(
-            {"name": "Bin 4"}
+        cls.cardboxes_bin_4_location = ref(
+            "stock_storage_type.stock_location_cardboxes_bin_4"
         )
         cls.env["stock.location"]._parent_store_compute()
         cls.pallets_bin_1_location = ref(
@@ -48,6 +48,9 @@ class TestStorageTypeCommon(SavepointCase):
         )
         cls.pallets_bin_3_location = ref(
             "stock_storage_type.stock_location_pallets_bin_3"
+        )
+        cls.pallets_bin_4_location = ref(
+            "stock_storage_type.stock_location_pallets_bin_4"
         )
 
         cls.receipts_picking_type = ref("stock.picking_type_in")
