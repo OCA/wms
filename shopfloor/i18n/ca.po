@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-04-13 11:46+0000\n"
+"PO-Revision-Date: 2021-06-04 10:48+0000\n"
 "Last-Translator: jabelchi <jabelchi@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -43,7 +43,7 @@ msgstr "S'ha creat un inventari esborrany per a control."
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__shopfloor_zero_check
 msgid "Activate Zero Check"
-msgstr ""
+msgstr "Activar verificació zero"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_priority_postpone_mixin
@@ -54,70 +54,70 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "All packages processed."
-msgstr ""
+msgstr "Processats tots els paquets."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_move_create
 msgid "Allow Move Creation"
-msgstr ""
+msgstr "Permetre creació de moviment"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_unreserve_other_moves
 msgid "Allow to process reserved quantities"
-msgstr ""
+msgstr "Permetre processar quantitats reservades"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Are you sure?"
-msgstr ""
+msgstr "Esteu segur?"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Barcode does not match with {}."
-msgstr ""
+msgstr "Codi de barres no coincideix amb {}."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Barcode not found"
-msgstr ""
+msgstr "Codi de barres no trobat"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_picking_batch
 msgid "Batch Transfer"
-msgstr ""
+msgstr "Transferència per lots"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Batch Transfer complete"
-msgstr ""
+msgstr "Transferència per lots completa"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Batch Transfer line done"
-msgstr ""
+msgstr "Línia de transferència per lots completada"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Bin %s doesn't exist"
-msgstr ""
+msgstr "Compartiment %s no existeix"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Canceled, you can scan a new pack."
-msgstr ""
+msgstr "Cancel·lat. No es pot escanejar un nou paquet."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Cannot change to lot {} which is entirely picked."
-msgstr ""
+msgstr "No es pot canviar al lot {} que ya està recollit per complet."
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_checkout
@@ -137,25 +137,25 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Confirm location change from %s to %s?"
-msgstr ""
+msgstr "Confirmeu canvi d'ubicació de %s a %s?"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Content transfer to {} completed"
-msgstr ""
+msgstr "Transferència de contingut a {} competada"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Content transferred from {} to {}."
-msgstr ""
+msgstr "Contingut transferit de {} a {}."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/inventory.py:0
 #, python-format
 msgid "Control stock issue in location {} for {}"
-msgstr ""
+msgstr "Error de control d'estoc a la ubicació {} a {}"
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/stock_move.py:0
@@ -164,24 +164,26 @@ msgid ""
 "Created from backorder <a href=# data-oe-model=stock.picking data-oe-id=%d>"
 "%s</a>."
 msgstr ""
+"Creat des de comanda pendent <a href=# data-oe-model=stock.picking data-oe-"
+"id=%d>%s</a>."
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid "Creation of moves is not allowed for menu {}."
-msgstr ""
+msgstr "La creació de moviments no està permesa pel menú {}."
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_delivery
 #: model:shopfloor.scenario,name:shopfloor.scenario_delivery
 #: model:stock.picking.type,name:shopfloor.picking_type_delivery_demo
 msgid "Delivery"
-msgstr ""
+msgstr "Lliurament"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nom a mostrar"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking_type__shopfloor_zero_check
@@ -194,7 +196,7 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__location_id
 msgid "From"
-msgstr ""
+msgstr "Des de"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -205,7 +207,7 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__ignore_no_putaway_available
@@ -221,6 +223,8 @@ msgid ""
 "If you tick this box, this scenario will allow operator to move goods even "
 "if a reservation is made by a different operation type."
 msgstr ""
+"Si marqueu aquesta casella, aquesta configuració permetrà al operador moure "
+"mercaderies fins i tot si hi ha una reserva d'un altre tipus d'operació."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__ignore_no_putaway_available_is_possible
