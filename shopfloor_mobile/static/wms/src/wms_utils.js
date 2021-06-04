@@ -244,6 +244,7 @@ export class WMSUtils {
             init_value: line.quantity,
             available_packaging: line.product.packaging,
             uom: line.product.uom,
+            non_zero_only: true,
         };
         return _.extend(opts, override || {});
     }
