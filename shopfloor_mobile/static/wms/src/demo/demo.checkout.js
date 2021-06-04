@@ -6,6 +6,19 @@
 
 import {demotools} from "/shopfloor_mobile_base/static/wms/src/demo/demo.core.js";
 
+const DEMO_CASE = {
+    by_menu_id: {},
+};
+
+const checkout_menu_case1 = demotools.addAppMenu(
+    {
+        name: "Checkout: case 1",
+        scenario: "checkout",
+        picking_types: [{id: 27, name: "Random type"}],
+    },
+    "co_1"
+);
+
 const select_pack_picking = demotools.makePicking(
     {},
     {lines_count: 5, line_random_pack: true, line_random_dest: true}
@@ -32,6 +45,18 @@ const summary_picking = demotools.makePicking(
     },
     {no_lines: true}
 );
+
+const data_for_select_package = {
+    next_state: "select_package",
+    data: {
+        select_package: {
+            picking: select_pack_picking,
+            selected_move_lines: select_pack_picking.move_lines,
+        },
+    },
+};
+
+let data_for_set_line_qty = _.cloneDeep(data_for_select_package);
 
 const DEMO_CHECKOUT = {
     scan_document: {
@@ -78,32 +103,22 @@ const DEMO_CHECKOUT = {
             },
         },
     },
-    select_line: {
-        next_state: "select_package",
-        data: {
-            select_package: {
-                picking: select_pack_picking,
-                selected_move_lines: select_pack_picking.move_lines,
-            },
-        },
+    select_line: data_for_select_package,
+    set_line_qty: function(data) {
+        let res = data_for_set_line_qty;
+        let line = res.data.select_package.selected_move_lines.filter(function(x) {
+            return x.id == data.move_line_id;
+        })[0];
+        line.qty_done = line.quantity;
+        return res;
     },
-    select_package: {
-        data: {
-            select_package: {
-                picking: select_pack_picking,
-                selected_move_lines: select_pack_picking.move_lines,
-            },
-        },
-    },
-    reset_line_qty: {
-        next_state: "select_package",
-        data: {
-            select_package: {
-                picking: select_pack_picking,
-                // simulate unselecting 1 line
-                selected_move_lines: select_pack_picking.move_lines,
-            },
-        },
+    reset_line_qty: function(data) {
+        let res = data_for_set_line_qty;
+        let line = res.data.select_package.selected_move_lines.filter(function(x) {
+            return x.id == data.move_line_id;
+        })[0];
+        line.qty_done = 0;
+        return res;
     },
     list_dest_package: {
         next_state: "select_dest_package",
@@ -234,5 +249,7 @@ const DEMO_CHECKOUT = {
         },
     },
 };
+
+DEMO_CASE.by_menu_id[checkout_menu_case1] = DEMO_CHECKOUT;
 
 demotools.add_case("checkout", DEMO_CHECKOUT);
