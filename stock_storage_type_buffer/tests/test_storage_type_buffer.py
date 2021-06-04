@@ -168,6 +168,9 @@ class TestStorageTypeBuffer(TestStorageTypeCommon):
             <li>
                 <span>WH/Stock/Pallets storage area/Pallets Bin 3</span>
             </li>
+            <li>
+                <span>WH/Stock/Pallets storage area/Pallets Bin 4</span>
+            </li>
         </ul>
         """
         self.assertEqual(
@@ -201,6 +204,9 @@ class TestStorageTypeBuffer(TestStorageTypeCommon):
             </li>
             <li>
                 <span>WH/Stock/Pallets storage area/Pallets Bin 3</span>
+            </li>
+            <li>
+                <span>WH/Stock/Pallets storage area/Pallets Bin 4</span>
             </li>
         </ul>
         <p>

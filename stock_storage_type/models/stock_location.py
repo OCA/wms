@@ -1,6 +1,9 @@
-# Copyright 2019 Camptocamp SA
+# Copyright 2019-2021 Camptocamp SA
+# Copyright 2019-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 import logging
+
+from psycopg2 import sql
 
 from odoo import api, fields, models
 from odoo.tools import float_compare
@@ -49,6 +52,7 @@ class StockLocation(models.Model):
         "locations according to the restrictions defined on their "
         "respective location storage types.",
     )
+    pack_putaway_sequence = fields.Integer()
     storage_location_sequence_ids = fields.One2many(
         "stock.storage.location.sequence",
         "location_id",
@@ -379,9 +383,53 @@ class StockLocation(models.Model):
         locations = self.browse()
         if self.pack_putaway_strategy == "none":
             locations = self
-        elif self.pack_putaway_strategy == "ordered_locations":
-            locations = self._get_ordered_leaf_locations()
+        else:
+            locations = self._get_sorted_leaf_locations(products)
         return locations
+
+    def _get_sorted_leaf_locations_orderby(self, products):
+        """Return SQL orderby clause and params for sorting locations
+
+        First, locations are ordered by max height, knowing that a max height of 0
+        means "no limit" and as such it should be among the last locations.
+        Then, they are ordered by a sequence and name.
+        """
+        self.env["stock.location"].flush(
+            ["max_height", "pack_putaway_sequence", "name"]
+        )
+        orderby = []
+        if self.pack_putaway_strategy == "ordered_locations":
+            orderby = [
+                "CASE WHEN max_height > 0 THEN max_height ELSE 'Infinity' END",
+                "pack_putaway_sequence",
+                "name",
+            ]
+        return ", ".join(orderby), []
+
+    def _get_sorted_leaf_locations(self, products):
+        """Return sorted leaf sub-locations
+
+        The locations are candidate locations that will be evaluated one per
+        one in order to find the first available location. They must be leaf
+        locations where we can actually put goods.
+        """
+        if not self.leaf_location_ids:
+            return self.leaf_location_ids
+        query = self._where_calc([("id", "in", self.leaf_location_ids.ids)])
+        from_clause, where_clause, where_params = query.get_sql()
+        orderby_clause, orderby_params = self._get_sorted_leaf_locations_orderby(
+            products
+        )
+        query = sql.SQL(
+            "SELECT id FROM {table} WHERE {where} ORDER BY {orderby}"
+        ).format(
+            table=sql.Identifier(self._table),
+            where=sql.SQL(where_clause),
+            orderby=sql.SQL(orderby_clause),
+        )
+        self._cr.execute(query, where_params + orderby_params)
+        location_ids = [x[0] for x in self.env.cr.fetchall()]
+        return self.env["stock.location"].browse(location_ids)
 
     def select_first_allowed_location(self, package_storage_type, quants, products):
         allowed = self.select_allowed_locations(
@@ -550,20 +598,3 @@ class StockLocation(models.Model):
         ]
         valid_locations = self.browse(ordered_valid_location_ids)
         return valid_locations
-
-    def _get_ordered_leaf_locations(self):
-        """Return ordered leaf sub-locations
-
-        The locations are candidate locations that will be evaluated one per
-        one in order to find the first available location. They must be leaf
-        locations where we can actually put goods.
-
-        Locations are ordered by max height, knowing that a max height of 0
-        means "no limit" and as such it should be among the last locations.
-        """
-        if not self.leaf_location_ids:
-            return self.leaf_location_ids
-        max_height = max(self.leaf_location_ids.mapped("max_height"))
-        return self.leaf_location_ids.sorted(
-            lambda l: l.max_height if l.max_height else (max_height + 1)
-        )
