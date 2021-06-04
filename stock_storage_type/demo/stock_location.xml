@@ -25,6 +25,10 @@
         <field name="name">Bin 3</field>
         <field name="location_id" ref="stock_location_cardboxes" />
     </record>
+    <record id="stock_location_cardboxes_bin_4" model="stock.location">
+        <field name="name">Bin 4</field>
+        <field name="location_id" ref="stock_location_cardboxes" />
+    </record>
     <record id="stock_location_pallets" model="stock.location">
         <field name="name">Pallets storage area</field>
         <field
@@ -48,6 +52,10 @@
     </record>
     <record id="stock_location_pallets_bin_3" model="stock.location">
         <field name="name">Pallets Bin 3</field>
+        <field name="location_id" ref="stock_location_pallets" />
+    </record>
+    <record id="stock_location_pallets_bin_4" model="stock.location">
+        <field name="name">Pallets Bin 4</field>
         <field name="location_id" ref="stock_location_pallets" />
     </record>
     <record id="stock_location_pallets_reserve" model="stock.location">
@@ -75,6 +83,10 @@
         <field name="name">Pallets Reserve Bin 3</field>
         <field name="location_id" ref="stock_location_pallets_reserve" />
     </record>
+    <record id="stock_location_pallets_reserve_bin_4" model="stock.location">
+        <field name="name">Pallets Reserve Bin 4</field>
+        <field name="location_id" ref="stock_location_pallets_reserve" />
+    </record>
     <record id="stock_location_cardboxes_reserve" model="stock.location">
         <field name="name">Cardboxes reserve storage area</field>
         <field
@@ -98,6 +110,10 @@
     </record>
     <record id="stock_location_cardboxes_reserve_bin_3" model="stock.location">
         <field name="name">Cardboxes Reserve Bin 3</field>
+        <field name="location_id" ref="stock_location_cardboxes_reserve" />
+    </record>
+    <record id="stock_location_cardboxes_reserve_bin_4" model="stock.location">
+        <field name="name">Cardboxes Reserve Bin 4</field>
         <field name="location_id" ref="stock_location_cardboxes_reserve" />
     </record>
 </odoo>
