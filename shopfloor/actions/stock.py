@@ -43,3 +43,20 @@ class StockAction(Component):
             moves.move_orig_ids.filtered(lambda m: m.state not in ("cancel", "done"))
         )
         return moves == assigned_moves and not has_ancestors
+
+    def put_package_level_in_move(self, package_level):
+        """Ensure to put the package level in its own move.
+
+        In standard the moves linked to a package level could also be linked to
+        other unrelated move lines. This method ensures that the package level
+        will be attached to a move with only the relevant lines.
+        This is useful to process a single package, having its own move makes
+        this process easy.
+        """
+        package_move_lines = package_level.move_line_ids
+        package_moves = package_move_lines.move_id
+        for package_move in package_moves:
+            # Check if there is no other lines linked to the move others than
+            # the lines related to the package itself. In such case we have to
+            # split the move to process only the lines related to the package.
+            package_move.split_other_move_lines(package_move_lines)
