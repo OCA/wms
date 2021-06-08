@@ -256,7 +256,14 @@ class SinglePackTransfer(Component):
         # on the move lines
         package_level.location_dest_id = scanned_location
         stock = self._actions_for("stock")
-        stock.validate_moves(package_level.move_line_ids.move_id)
+        package_moves = package_level.move_line_ids.move_id
+        package_move_lines = package_level.move_line_ids
+        for package_move in package_moves:
+            # Check if there is no other lines linked to the move others than
+            # the lines related to the package itself. In such case we have to
+            # split the move to process only the lines related to the package.
+            package_move.split_other_move_lines(package_move_lines)
+        stock.validate_moves(package_moves)
 
     def cancel(self, package_level_id):
         package_level = self.env["stock.package_level"].browse(package_level_id)
