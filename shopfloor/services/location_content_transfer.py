@@ -660,13 +660,9 @@ class LocationContentTransfer(Component):
             )
         package_move_lines = package_level.move_line_ids
         self._lock_lines(package_move_lines)
-        for package_move in package_moves:
-            # Check if there is no other lines linked to the move others than
-            # the lines related to the package itself. In such case we have to
-            # split the move to process only the lines related to the package.
-            package_move.split_other_move_lines(package_move_lines)
-        self._write_destination_on_lines(package_level.move_line_ids, scanned_location)
         stock = self._actions_for("stock")
+        stock.put_package_level_in_move(package_level)
+        self._write_destination_on_lines(package_level.move_line_ids, scanned_location)
         stock.validate_moves(package_moves)
         move_lines = self._find_transfer_move_lines(location)
         message = self.msg_store.location_content_transfer_item_complete(
