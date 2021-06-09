@@ -4,7 +4,7 @@
     "name": "Stock Measuring Device on Reception Screen",
     "summary": "Allow to use a measuring device from a reception screen."
     "for packaging measurement",
-    "version": "13.0.1.0.0",
+    "version": "13.0.1.0.1",
     "category": "Warehouse",
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "license": "AGPL-3",
