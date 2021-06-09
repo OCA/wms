@@ -29,6 +29,16 @@ msgid "Default"
 msgstr ""
 
 #. module: stock_reception_screen_measuring_device
+#: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_stock_reception_screen__display_package_dimensions
+msgid "Dimensions (lxhxw)"
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: model:ir.model.fields,help:stock_reception_screen_measuring_device.field_stock_reception_screen__display_package_dimensions
+msgid "Dimensions of the package in mm (length x height x width)"
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
 #: model:ir.model.fields,help:stock_reception_screen_measuring_device.field_stock_reception_screen__package_has_missing_dimensions
 msgid "Indicates if the package have any measurement missing."
 msgstr ""
