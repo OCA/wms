@@ -6,3 +6,4 @@ stock-logistics-workflow
 web
 rest-framework
 server-auth
+community-data-files
