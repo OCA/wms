@@ -28,8 +28,8 @@ addon | version | summary
 [shopfloor_batch_automatic_creation](shopfloor_batch_automatic_creation/) | 13.0.1.1.0 | Create batch transfers for Cluster Picking
 [shopfloor_checkout_sync](shopfloor_checkout_sync/) | 13.0.1.0.0 | Glue module
 [shopfloor_example](shopfloor_example/) | 13.0.1.0.0 | Show how to customize the Shopfloor app frontend.
-[shopfloor_mobile](shopfloor_mobile/) | 13.0.2.4.0 | Mobile frontend for WMS Shopfloor app
-[shopfloor_mobile_base](shopfloor_mobile_base/) | 13.0.1.11.0 | Mobile frontend for WMS Shopfloor app
+[shopfloor_mobile](shopfloor_mobile/) | 13.0.2.4.1 | Mobile frontend for WMS Shopfloor app
+[shopfloor_mobile_base](shopfloor_mobile_base/) | 13.0.1.11.1 | Mobile frontend for WMS Shopfloor app
 [shopfloor_packing_info](shopfloor_packing_info/) | 13.0.1.0.0 | Allows to predefine packing information messages per partner.
 [shopfloor_rest_log](shopfloor_rest_log/) | 13.0.1.2.0 | Integrate rest_log into Shopfloor app
 [shopfloor_workstation](shopfloor_workstation/) | 13.0.1.1.1 | Manage warehouse workstation with barcode scanners
