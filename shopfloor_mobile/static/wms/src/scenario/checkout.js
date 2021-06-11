@@ -157,7 +157,7 @@ const Checkout = {
                 <item-detail-card :card_color="utils.colors.color_for('screen_step_done')"
                     :key="make_state_component_key(['location_src'])"
                     :record="state.data.line"
-                    :options="{main: true, key_title: 'location_src.name', title_action_field: {action_val_path: 'location_src.barcode'}}"
+                :options="{main: true, key_title: 'location_src.name', title_action_field: {action_val_path: 'location_src.barcode'}, }"
                     />
                 <item-detail-card :card_color="utils.colors.color_for('screen_step_done')"
                     :key="make_state_component_key(['product'])"
@@ -289,6 +289,7 @@ const Checkout = {
         select_line_manual_select_opts: function() {
             return {
                 group_color: this.utils.colors.color_for("screen_step_todo"),
+                card_klass: "loud-labels",
             };
         },
         select_package_manual_select_opts: function() {

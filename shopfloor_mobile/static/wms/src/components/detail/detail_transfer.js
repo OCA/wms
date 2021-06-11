@@ -46,6 +46,7 @@ Vue.component("detail-transfer", {
             };
         },
         line_list_fields() {
+            const self = this;
             return [
                 {
                     path: "product.display_name",
@@ -58,8 +59,22 @@ Vue.component("detail-transfer", {
                     action_val_path: "package_src.name",
                 },
                 {path: "lot.name", label: "Lot", action_val_path: "lot.name"},
-                {path: "product.qty_reserved", label: "Qty reserved"},
-                {path: "product.qty_available", label: "Qty in stock"},
+                {
+                    path: "product.qty_reserved",
+                    label: "Qty reserved",
+                    render_component: "packaging-qty-picker-display",
+                    render_options: function(record) {
+                        return self.utils.wms.move_line_qty_picker_options(record);
+                    },
+                },
+                {
+                    path: "product.qty_available",
+                    label: "Qty in stock",
+                    render_component: "packaging-qty-picker-display",
+                    render_options: function(record) {
+                        return self.utils.wms.move_line_qty_picker_options(record);
+                    },
+                },
             ];
         },
         grouped_lines() {
