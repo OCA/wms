@@ -369,6 +369,11 @@ msgid "Out Move Line"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__pack_putaway_sequence
+msgid "Pack Putaway Sequence"
+msgstr ""
+
+#. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_quant.py:0
 #, python-format
 msgid ""
