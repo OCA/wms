@@ -4,7 +4,7 @@
 {
     "name": "Stock Storage Type ABC Strategy",
     "summary": "Advanced storage strategy ABC for WMS",
-    "version": "13.0.2.0.0",
+    "version": "13.0.2.1.0",
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
