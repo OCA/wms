@@ -36,6 +36,7 @@ setuptools.setup(
         'odoo13-addon-stock_reception_screen',
         'odoo13-addon-stock_reception_screen_measuring_device',
         'odoo13-addon-stock_reception_screen_mrp_subcontracting',
+        'odoo13-addon-stock_reception_screen_qty_by_packaging',
         'odoo13-addon-stock_storage_type',
         'odoo13-addon-stock_storage_type_buffer',
         'odoo13-addon-stock_storage_type_putaway_abc',
