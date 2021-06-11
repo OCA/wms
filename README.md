@@ -47,9 +47,9 @@ addon | version | summary
 [stock_reception_screen](stock_reception_screen/) | 13.0.1.6.2 | Dedicated screen to receive/scan goods.
 [stock_reception_screen_measuring_device](stock_reception_screen_measuring_device/) | 13.0.1.0.1 | Allow to use a measuring device from a reception screen.for packaging measurement
 [stock_reception_screen_mrp_subcontracting](stock_reception_screen_mrp_subcontracting/) | 13.0.1.0.0 | Reception screen integrated with subcontracted productions.
-[stock_storage_type](stock_storage_type/) | 13.0.1.12.0 | Manage packages and locations storage types
+[stock_storage_type](stock_storage_type/) | 13.0.1.13.0 | Manage packages and locations storage types
 [stock_storage_type_buffer](stock_storage_type_buffer/) | 13.0.1.2.0 | Exclude storage locations from put-away if their buffer is full
-[stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 13.0.1.1.0 | Advanced storage strategy ABC for WMS
+[stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 13.0.2.0.0 | Advanced storage strategy ABC for WMS
 
 [//]: # (end addons)
 
