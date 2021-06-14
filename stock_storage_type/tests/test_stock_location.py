@@ -30,7 +30,10 @@ class TestStockLocation(TestStorageTypeCommon):
                 "location_id": self.stock_location.id,
             }
         )
+
         self.areas.write({"location_id": sublocation.id})
+
+        self.env["stock.location"]._parent_store_compute()
 
         # Test with the same max_height on all related storage types (0 here)
         ordered_locations = sublocation.get_storage_locations(self.product)
