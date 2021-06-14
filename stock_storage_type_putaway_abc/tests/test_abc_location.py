@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 # -*- coding: utf-8 -*-
-# Copyright 2019 Camptocamp SA
-=======
 # Copyright 2019-2021 Camptocamp SA
 # Copyright 2019-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
->>>>>>> Change sorting of locations in the pack putaway computation
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo.tests import SavepointCase
 
