@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_mobile.shopfloor_app_assets"
+    >
+        <script id="script_component_picking_select" position="after">
+          <script
+                id="script_component_picking_select_dangerous_goods"
+                t-attf-src="/shopfloor_dangerous_goods_mobile/static/wms/src/components/picking_select.js?v=#{app_version}"
+                type="module"
+            />
+        </script>
+        <link id="link_css_main" position="after">
+            <link
+                id="link_css_dangerous_goods"
+                t-attf-href="/shopfloor_dangerous_goods_mobile/static/wms/src/css/dangerous_goods.css?v=#{mod_version}"
+                rel="stylesheet"
+            />
+        </link>
+    </template>
+</odoo>
