@@ -385,6 +385,7 @@ class StockLocation(models.Model):
                 "CASE WHEN max_height > 0 THEN max_height ELSE 'Infinity' END",
                 "pack_putaway_sequence",
                 "name",
+                "id",
             ]
         return ", ".join(orderby), []
 
