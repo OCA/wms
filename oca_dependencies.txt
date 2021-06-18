@@ -1,9 +1,0 @@
-# NOTE: MQT=PIP is on in this repo
-
-product-attribute
-server-tools
-stock-logistics-workflow
-web
-rest-framework
-server-auth
-community-data-files
