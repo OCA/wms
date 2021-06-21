@@ -17,6 +17,7 @@
     </record>
     <menuitem
         id="menu_action_shopfloor_app"
+        name="Shopfloor mobile app"
         action="action_shopfloor_app"
         parent="shopfloor_base.menu_shopfloor_root"
         sequence="99"
@@ -24,6 +25,7 @@
     <menuitem
         id="menu_action_shopfloor_app_demo"
         action="action_shopfloor_app_demo"
+        name="Shopfloor mobile app DEMO"
         parent="shopfloor_base.menu_shopfloor_root"
         sequence="99"
         groups="base.group_no_one"
