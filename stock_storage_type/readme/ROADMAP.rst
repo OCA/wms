@@ -18,3 +18,9 @@ Everywhere the module is using ``package_id``, we would have to check this:
 
 * use the package if a package is set
 * else, use the computed packaging
+
+About Unit of Measures:
+
+In v13, there is an assumption of height to be expressed in mm and weight in kg.
+In v14, packaging can be expressed in differents units. Explicit fields are introduced
+like max_weight_in_kg in order make simple and efficient computations.

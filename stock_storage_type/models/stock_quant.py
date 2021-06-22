@@ -80,8 +80,8 @@ class StockQuant(models.Model):
                     continue
                 # Check size constraint
                 if (
-                    loc_storage_type.max_height
-                    and quant.package_id.height > loc_storage_type.max_height
+                    loc_storage_type.max_height_in_m
+                    and quant.package_id.height_in_m > loc_storage_type.max_height_in_m
                 ):
                     lst_fails.append(
                         _(
@@ -89,15 +89,16 @@ class StockQuant(models.Model):
                             " but the package is bigger: %s."
                             % (
                                 loc_storage_type.name,
-                                loc_storage_type.max_height,
-                                quant.package_id.height,
+                                loc_storage_type.max_height_in_m,
+                                quant.package_id.height_in_m,
                             )
                         )
                     )
                     continue
                 if (
-                    loc_storage_type.max_weight
-                    and quant.package_id.pack_weight > loc_storage_type.max_weight
+                    loc_storage_type.max_weight_in_kg
+                    and quant.package_id.pack_weight_in_kg
+                    > loc_storage_type.max_weight_in_kg
                 ):
                     lst_fails.append(
                         _(
@@ -105,8 +106,8 @@ class StockQuant(models.Model):
                             " but the package is heavier: %s."
                             % (
                                 loc_storage_type.name,
-                                loc_storage_type.max_weight,
-                                quant.package_id.pack_weight,
+                                loc_storage_type.max_weight_in_kg,
+                                quant.package_id.pack_weight_in_kg,
                             )
                         )
                     )
