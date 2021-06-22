@@ -15,6 +15,39 @@ class StockQuantPackage(models.Model):
         "the package contains only a single product.",
     )
 
+    pack_weight_in_kg = fields.Float(
+        string="Pack weight in kg",
+        help="Technical field, to speed up comparaisons",
+        compute="_compute_pack_weight_in_kg",
+        store=True,
+    )
+    height_in_m = fields.Float(
+        string="Height in m",
+        help="Technical field, to speed up comparaisons",
+        compute="_compute_height_in_m",
+        store=True,
+    )
+
+    @api.depends("pack_weight", "weight_uom_id")
+    def _compute_pack_weight_in_kg(self):
+        uom_kg = self.env.ref("uom.product_uom_kgm")
+        for package in self:
+            package.pack_weight_in_kg = package.weight_uom_id._compute_quantity(
+                qty=package.pack_weight,
+                to_unit=uom_kg,
+                round=False,
+            )
+
+    @api.depends("height", "length_uom_id")
+    def _compute_height_in_m(self):
+        uom_meters = self.env.ref("uom.product_uom_meter")
+        for package in self:
+            package.height_in_m = package.length_uom_id._compute_quantity(
+                qty=package.height,
+                to_unit=uom_meters,
+                round=False,
+            )
+
     @api.constrains("height", "package_storage_type_id", "product_packaging_id")
     def _check_storage_type_height_required(self):
         for package in self:
