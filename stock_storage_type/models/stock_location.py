@@ -105,6 +105,13 @@ class StockLocation(models.Model):
         help="The max height supported among allowed location storage types.",
     )
 
+    max_height_in_m = fields.Float(
+        string="Max height (m)",
+        compute="_compute_max_height",
+        store=True,
+        help="The max height supported among allowed location storage types.",
+    )
+
     @api.depends("child_ids.leaf_location_ids")
     def _compute_leaf_location_ids(self):
         query = """
@@ -193,9 +200,8 @@ class StockLocation(models.Model):
             ).sorted("max_height", reverse=True)
             types_without_max_height = allowed_types - types_with_max_height
             types_sorted = types_without_max_height + types_with_max_height
-            location.max_height = (
-                types_sorted.mapped("max_height")[0] if types_sorted else 0
-            )
+            location.max_height = types_sorted[:1].max_height or 0
+            location.max_height_in_m = types_sorted[:1].max_height_in_m or 0
 
     # method provided by "stock_putaway_hook"
     def _putaway_strategy_finalizer(self, putaway_location, product):
@@ -300,14 +306,14 @@ class StockLocation(models.Model):
         if quants.package_id.height:
             pertinent_loc_storagetype_domain += [
                 "|",
-                ("max_height", "=", 0),
-                ("max_height", ">=", quants.package_id.height),
+                ("max_height_in_m", "=", 0),
+                ("max_height_in_m", ">=", quants.package_id.height_in_m),
             ]
         if quants.package_id.pack_weight:
             pertinent_loc_storagetype_domain += [
                 "|",
-                ("max_weight", "=", 0),
-                ("max_weight", ">=", quants.package_id.pack_weight),
+                ("max_weight_in_kg", "=", 0),
+                ("max_weight_in_kg", ">=", quants.package_id.pack_weight_in_kg),
             ]
         _logger.debug(
             "pertinent storage type domain: %s", pertinent_loc_storagetype_domain
