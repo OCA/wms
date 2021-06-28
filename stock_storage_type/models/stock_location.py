@@ -639,10 +639,24 @@ class StockLocation(models.Model):
         # the data required to compute fields in fields_name
         for f in fields_to_preload_in_cache:
             records.mapped(f)
-        # ensure the initiale value for fields in fields_name are loaded
+            # reset prefetch to avoid loading useless records and perf issue
+            # It's safe to reset the prefetch since we only need to process
+            # data required into our computations and we don't want
+            # these loaded by transitivity
+            records = records.with_prefetch(None)
+        # ensure the initial value for fields in fields_name are loaded
         # into the current env
         for f in fields_name:
             records.mapped(f)
+            # reset prefetch to avoid loading useless records and perf issue
+            records = records.with_prefetch(None)
+
+        # At this stage we've all the data required to compute all our
+        # computed fields and the initial values of these fields. The prefetch
+        # is empty to avoid recomputing values outside of the current scope.
+        # In tne next step, we'll recompute the computed values and compare
+        # the new value with the existing ones to determine if the database
+        # must be updated.
 
         fs = [self._fields[name] for name in fields_name]
 
