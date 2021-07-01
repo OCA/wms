@@ -3,7 +3,8 @@ env:
 
 # See https://github.com/OCA/odoo-community.org/issues/37#issuecomment-470686449
 parserOptions:
-  ecmaVersion: 2017
+  ecmaVersion: 2018
+  sourceType: "module"
 
 # Globals available in Odoo that shouldn't produce errorings
 globals:
@@ -15,6 +16,12 @@ globals:
   odoo: readonly
   openerp: readonly
   Promise: readonly
+  Vue: readonly
+  VueI18n: readonly
+  VueRouter: readonly
+  Vue2Storage: readonly
+  Vuetify: readonly
+  shopfloor_app_info: readonly # defined templates/main.xml
 
 # Styling is handled by Prettier, so we only need to enable AST rules;
 # see https://github.com/OCA/maintainer-quality-tools/pull/618#issuecomment-558576890
@@ -132,7 +139,7 @@ rules:
   no-unsafe-finally: error
   no-unused-expressions: error
   no-unused-labels: error
-  no-unused-vars: error
+  no-unused-vars: [error, {"args": "none"}]
   no-use-before-define: error
   no-useless-call: warn
   no-useless-computed-key: warn
