@@ -101,6 +101,8 @@ class ActionsDataCase(ActionsDataCaseBase):
         expected = {
             "id": self.picking.id,
             "move_line_count": 4,
+            "package_level_count": 2,
+            "bulk_line_count": 2,
             "name": self.picking.name,
             "note": "read me",
             "origin": "created by test",

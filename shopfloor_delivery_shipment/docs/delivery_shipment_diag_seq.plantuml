@@ -1,0 +1,49 @@
+# Diagram to generate with PlantUML (https://plantuml.com/)
+#
+#   $ sudo apt install plantuml
+#   $ plantuml delivery_diag_seq.plantuml
+#
+
+@startuml
+
+skinparam roundcorner 20
+skinparam sequence {
+
+ParticipantBorderColor #875A7B
+ParticipantBackgroundColor #875A7B
+ParticipantFontSize 17
+ParticipantFontColor white
+
+LifeLineBorderColor #875A7B
+
+ArrowColor #00A09D
+}
+
+header <img:oca_logo.png>
+title <size:35>Delivery with Shipment Advice scenario</size>
+
+== /scan_dock (with an available shipment) ==
+scan_dock -> scan_document: **/scan_dock(barcode)**
+
+== /scan_dock (without available shipment) ==
+scan_dock -> scan_dock: **/scan_dock(barcode)**\n(asking for confirmation to create a new shipment)
+scan_dock -> scan_document: **/scan_dock(barcode, confirmation=True)**
+
+== /scan_document ==
+scan_document -> scan_document: **/scan_document**(shipment_advice_id, barcode, picking_id=None)
+scan_document -> loading_list: **/scan_document**(shipment_advice_id, barcode, picking_id=None)
+
+== /unload_move_line ==
+scan_document -> scan_document: **/unload_move_line**(shipment_advice_id, move_line_id)
+
+== /unload_package_level ==
+scan_document -> scan_document: **/unload_package_level**(shipment_advice_id, package_level_id)
+
+== /loading_list ==
+scan_document -> loading_list: **/loading_list**(shipment_advice_id)
+
+== /validate==
+loading_list -> validate: **/validate**(shipment_advice_id)
+validate-> scan_dock: **/validate**(shipment_advice_id, confirmation=True)
+
+@enduml
