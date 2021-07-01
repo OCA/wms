@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 13.0\n"
+"Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -87,9 +87,21 @@ msgid ""
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__length_uom_id
+msgid "Dimensions Units of Measure"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_product_packaging__display_name
+#: model:ir.model.fields,field_description:stock_storage_type.field_product_template__display_name
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__display_name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_package_storage_type_rel__display_name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__display_name
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_move__display_name
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_level__display_name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__display_name
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant__display_name
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant_package__display_name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__display_name
 msgid "Display Name"
 msgstr ""
@@ -110,6 +122,11 @@ msgid "Has Restrictions"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant_package__height_in_m
+msgid "Height in m"
+msgstr ""
+
+#. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_package_storage_type__height_required
 msgid "Height is mandatory for packages configured with this storage type."
 msgstr ""
@@ -120,9 +137,16 @@ msgid "Height required for packages"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_product_packaging__id
+#: model:ir.model.fields,field_description:stock_storage_type.field_product_template__id
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__id
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_package_storage_type_rel__id
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__id
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_move__id
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_level__id
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__id
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant__id
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant_package__id
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__id
 msgid "ID"
 msgstr ""
@@ -178,9 +202,16 @@ msgid "Inventory Locations"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_product_packaging____last_update
+#: model:ir.model.fields,field_description:stock_storage_type.field_product_template____last_update
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location____last_update
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_package_storage_type_rel____last_update
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type____last_update
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_move____last_update
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_level____last_update
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type____last_update
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant____last_update
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant_package____last_update
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence____last_update
 msgid "Last Modified on"
 msgstr ""
@@ -204,6 +235,11 @@ msgstr ""
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__leaf_location_ids
 msgid "Leaf Location"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__length_uom_name
+msgid "Length unit of measure label"
 msgstr ""
 
 #. module: stock_storage_type
@@ -310,14 +346,29 @@ msgid ""
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__max_height_in_m
+msgid "Max height (m)"
+msgstr ""
+
+#. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__max_height
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__max_height
 msgid "Max height (mm)"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__max_height_in_m
+msgid "Max height in m"
+msgstr ""
+
+#. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__max_weight
 msgid "Max weight (kg)"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__max_weight_in_kg
+msgid "Max weight in kg"
 msgstr ""
 
 #. module: stock_storage_type
@@ -339,6 +390,11 @@ msgstr ""
 #. module: stock_storage_type
 #: model:ir.model.fields.selection,name:stock_storage_type.selection__stock_location__pack_putaway_strategy__ordered_locations
 msgid "Ordered Children Locations"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant_package__pack_weight_in_kg
+msgid "Pack weight in kg"
 msgstr ""
 
 #. module: stock_storage_type
@@ -488,6 +544,14 @@ msgid "Storage locations sequences"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,help:stock_storage_type.field_stock_location_storage_type__max_height_in_m
+#: model:ir.model.fields,help:stock_storage_type.field_stock_location_storage_type__max_weight_in_kg
+#: model:ir.model.fields,help:stock_storage_type.field_stock_quant_package__height_in_m
+#: model:ir.model.fields,help:stock_storage_type.field_stock_quant_package__pack_weight_in_kg
+msgid "Technical field, to speed up comparaisons"
+msgstr ""
+
+#. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_quant_package.py:0
 #, python-format
 msgid "The height is mandatory on package {}."
@@ -495,6 +559,7 @@ msgstr ""
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__max_height
+#: model:ir.model.fields,help:stock_storage_type.field_stock_location__max_height_in_m
 msgid "The max height supported among allowed location storage types."
 msgstr ""
 
@@ -512,6 +577,26 @@ msgid ""
 "This defines the storage strategy to use when packs are put away in this location.\n"
 "None: when a pack is moved to this location, it will not be put away any further.\n"
 "Ordered Children Locations: when a pack is moved to this location, a suitable location will be searched in its children locations according to the restrictions defined on their respective location storage types."
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,help:stock_storage_type.field_stock_location_storage_type__length_uom_id
+msgid "UoM for height"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,help:stock_storage_type.field_stock_location_storage_type__weight_uom_id
+msgid "Weight Unit of Measure"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__weight_uom_id
+msgid "Weight Units of Measure"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__weight_uom_name
+msgid "Weight unit of measure label"
 msgstr ""
 
 #. module: stock_storage_type
@@ -540,6 +625,23 @@ msgstr ""
 msgid ""
 "You cannot set 'Do not mix lots' without setting 'Do not mix products' "
 "constraint."
+msgstr ""
+
+#. module: stock_storage_type
+#: model:product.packaging,weight_uom_name:stock_storage_type.product_product_9_packaging_48_pallet
+#: model:product.packaging,weight_uom_name:stock_storage_type.product_product_9_packaging_4_cardbox
+#: model:product.packaging,weight_uom_name:stock_storage_type.product_product_9_packaging_single_bag
+#: model:stock.location.storage.type,weight_uom_name:stock_storage_type.location_storage_type_cardboxes
+#: model:stock.location.storage.type,weight_uom_name:stock_storage_type.location_storage_type_pallets
+#: model:stock.location.storage.type,weight_uom_name:stock_storage_type.location_storage_type_pallets_uk
+msgid "kg"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:product.packaging,volume_uom_name:stock_storage_type.product_product_9_packaging_48_pallet
+#: model:product.packaging,volume_uom_name:stock_storage_type.product_product_9_packaging_4_cardbox
+#: model:product.packaging,volume_uom_name:stock_storage_type.product_product_9_packaging_single_bag
+msgid "m³"
 msgstr ""
 
 #. module: stock_storage_type
