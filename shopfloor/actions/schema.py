@@ -14,6 +14,12 @@ class ShopfloorSchemaAction(Component):
             "origin": {"type": "string", "nullable": True, "required": False},
             "note": {"type": "string", "nullable": True, "required": False},
             "move_line_count": {"type": "integer", "nullable": True, "required": True},
+            "package_level_count": {
+                "type": "integer",
+                "nullable": True,
+                "required": True,
+            },
+            "bulk_line_count": {"type": "integer", "nullable": True, "required": True},
             "weight": {"required": True, "nullable": True, "type": "float"},
             "partner": self._schema_dict_of(self._simple_record()),
             "carrier": self._schema_dict_of(self._simple_record(), required=False),
