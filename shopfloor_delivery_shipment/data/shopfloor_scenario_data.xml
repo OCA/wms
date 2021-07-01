@@ -1,0 +1,11 @@
+<odoo noupdate="1">
+    <record id="scenario_delivery_shipment" model="shopfloor.scenario">
+        <field name="name">Delivery with shipment advice</field>
+        <field name="key">delivery_shipment</field>
+        <field name="options_edit">
+{
+    "allow_create_shipment_advice": true
+}
+        </field>
+    </record>
+</odoo>
