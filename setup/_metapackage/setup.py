@@ -11,6 +11,7 @@ setuptools.setup(
         'odoo14-addon-shopfloor_base',
         'odoo14-addon-shopfloor_mobile_base',
         'odoo14-addon-stock_picking_completion_info',
+        'odoo14-addon-stock_picking_consolidation_priority',
     ],
     classifiers=[
         'Programming Language :: Python',
