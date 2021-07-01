@@ -14,6 +14,14 @@ class StockPicking(models.Model):
         compute="_compute_picking_info",
         help="Technical field. Indicates number of move lines included.",
     )
+    package_level_count = fields.Integer(
+        compute="_compute_picking_info",
+        help="Technical field. Indicates number of package_level included.",
+    )
+    bulk_line_count = fields.Integer(
+        compute="_compute_picking_info",
+        help="Technical field. Indicates number of move lines without package included.",
+    )
 
     @api.depends(
         "move_line_ids", "move_line_ids.product_qty", "move_line_ids.product_id.weight"
@@ -24,6 +32,13 @@ class StockPicking(models.Model):
                 {
                     "total_weight": item._calc_weight(),
                     "move_line_count": len(item.move_line_ids),
+                    "package_level_count": len(item.package_level_ids),
+                    # NOTE: not based on 'move_line_ids_without_package' field
+                    # on purpose as it also takes into account the
+                    # 'Move entire packs' option from the picking type.
+                    "bulk_line_count": len(
+                        item.move_line_ids.filtered(lambda ml: not ml.package_level_id)
+                    ),
                 }
             )
 
