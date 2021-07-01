@@ -20,6 +20,7 @@ Available addons
 addon | version | summary
 --- | --- | ---
 [shopfloor_base](shopfloor_base/) | 14.0.1.0.1 | Core module for creating mobile apps
+[shopfloor_mobile_base](shopfloor_mobile_base/) | 14.0.1.0.0 | Mobile frontend for WMS Shopfloor app
 [stock_picking_completion_info](stock_picking_completion_info/) | 14.0.1.0.0 | Display on current document completion information according to next operations
 
 
