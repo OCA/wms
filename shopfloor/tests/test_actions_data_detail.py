@@ -108,6 +108,8 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         expected = {
             "id": picking.id,
             "move_line_count": 4,
+            "package_level_count": 2,
+            "bulk_line_count": 2,
             "name": picking.name,
             "note": "read me",
             "origin": "created by test",
