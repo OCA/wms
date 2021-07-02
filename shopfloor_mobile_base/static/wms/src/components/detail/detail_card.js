@@ -11,15 +11,17 @@ Vue.component("item-detail-card", {
     props: ["card_color"],
     template: `
     <div :class="wrapper_klass">
-        <v-card :color="card_color" tile :class="{'main': opts.main, 'no-outline': opts.no_outline}" v-if="!_.isEmpty(record)">
+        <v-card :color="card_color" tile :class="{'theme--dark': opts.theme_dark, 'main': opts.main, 'no-outline': opts.no_outline}" v-if="!_.isEmpty(record)">
             <v-card-title v-if="!opts.no_title">
                 <slot name="title">
                     <v-icon v-if="opts.title_icon" v-text="opts.title_icon" class="mr-2" />
                     <span v-text="_.result(record, opts.key_title)" />
-                    <v-btn icon class="detail-action" link
+                    <v-btn icon class="detail-action" :class="{'theme--dark': opts.theme_dark}" link
                             v-if="opts.on_title_action || opts.title_action_field"
-                            @click="opts.on_title_action ? opts.on_title_action(): on_detail_action(record, opts.title_action_field)">
-                        <btn-info-icon />
+                            @click="opts.on_title_action ? opts.on_title_action(record): on_detail_action(record, opts.title_action_field)">
+                        <btn-info-icon v-if="!opts.title_action_icon"/>
+                        <v-icon v-if="opts.title_action_icon">{{ opts.title_action_icon }}</v-icon>
+
                     </v-btn>
                 </slot>
             </v-card-title>
