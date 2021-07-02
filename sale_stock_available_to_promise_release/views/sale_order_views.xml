@@ -25,6 +25,12 @@
                     />
                 </button>
             </xpath>
+            <xpath
+                expr="//page[@name='order_lines']//field[@name='price_unit']"
+                position="before"
+            >
+                <field name="availability_status" optional="hide" />
+            </xpath>
         </field>
     </record>
 </odoo>
