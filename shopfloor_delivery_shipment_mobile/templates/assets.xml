@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_mobile.shopfloor_app_assets"
+    >
+        <script id="script_scenario_zone_picking" position="after">
+
+          <t
+                t-set="mod_version"
+                t-value="get_version('shopfloor_delivery_shipment_mobile')"
+            />
+          <script
+                id="script_scenario_delivery_shipmnet"
+                t-attf-src="/shopfloor_delivery_shipment_mobile/static/wms/src/scenario/delivery_shipment.js?v=#{mod_version}"
+                type="module"
+            />
+
+        </script>
+    </template>
+
+    <template
+        id="shopfloor_app_demo_assets"
+        inherit_id="shopfloor_mobile.shopfloor_app_demo_assets"
+    >
+        <script id="script_demo_location_content_transfer" position="after">
+
+          <t
+                t-set="mod_version"
+                t-value="get_version('shopfloor_delivery_shipment_mobile')"
+            />
+          <script
+                id="script_demo_delivery_shipmnet"
+                t-attf-src="/shopfloor_delivery_shipment_mobile/static/wms/src/demo/demo.delivery_shipment.js?v=#{mod_version}"
+                type="module"
+            />
+
+        </script>
+    </template>
+
+
+</odoo>
