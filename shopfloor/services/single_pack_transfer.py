@@ -256,6 +256,7 @@ class SinglePackTransfer(Component):
         # on the move lines
         package_level.location_dest_id = scanned_location
         stock = self._actions_for("stock")
+        stock.put_package_level_in_move(package_level)
         stock.validate_moves(package_level.move_line_ids.move_id)
 
     def cancel(self, package_level_id):
