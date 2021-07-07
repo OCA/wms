@@ -10,7 +10,7 @@ class SaleOrderLine(models.Model):
 
     availability_status = fields.Selection(
         selection=[
-            ("mto", "On order"),
+            ("on_order", "On order"),
             ("full", "Fully Available"),
             ("partial", "Partially Available"),
             ("restock", "Restock ordered"),
@@ -23,13 +23,33 @@ class SaleOrderLine(models.Model):
         digits="Product Unit of Measure", compute="_compute_availability_status"
     )
 
+    def _on_order_route(self):
+        self.ensure_one()
+        mto_route = self.env.ref("stock.route_warehouse0_mto")
+        product_is_mto = mto_route in self.product_id.route_ids
+        line_is_mto = mto_route == self.route_id
+        return product_is_mto or line_is_mto
+
     @api.depends(
         "move_ids.ordered_available_to_promise_uom_qty",
         "product_id.route_ids",
+        "route_id",
         "product_uom_qty",
+        "display_type",
+        "is_delivery",
     )
     def _compute_availability_status(self):
         for record in self:
+            if record.display_type or not record.product_id:
+                record.availability_status = False
+                record.expected_availability_date = False
+                record.available_qty = False
+                continue
+            elif record.is_delivery:
+                record.availability_status = "full"
+                record.expected_availability_date = False
+                record.available_qty = record.product_uom_qty
+                continue
             # Fallback values
             availability_status = "no"
             expected_availability_date = False
@@ -39,13 +59,13 @@ class SaleOrderLine(models.Model):
             # required values
             product = record.product_id
             rounding = product.uom_id.rounding
-            mto_route = self.env.ref("stock.route_warehouse0_mto")
-            # MTO product
-            if mto_route in product.route_ids:
-                availability_status = "mto"
+            # on_order product
+            if record._on_order_route():
+                availability_status = "on_order"
             # Fully available
             elif (
-                float_compare(
+                product.type == "service"
+                or float_compare(
                     available_qty, record.product_uom_qty, precision_rounding=rounding
                 )
                 >= 0

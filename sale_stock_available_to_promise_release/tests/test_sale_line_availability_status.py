@@ -89,9 +89,9 @@ class TestSaleLineAvailablilityStatus(SavepointCase):
         # No matter the ordered qty, if mto route is defined on the product,
         # availability_status = "mto"
         self.sale.action_confirm()
-        self.assertNotEqual(self.line.availability_status, "mto")
+        self.assertNotEqual(self.line.availability_status, "on_order")
         self.product.route_ids = [(4, self.mto_route.id, 0)]
-        self.assertEqual(self.line.availability_status, "mto")
+        self.assertEqual(self.line.availability_status, "on_order")
 
     def test_available_full(self):
         self._set_stock(self.product, 100)

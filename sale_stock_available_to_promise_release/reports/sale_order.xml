@@ -21,31 +21,38 @@
                 name="td_is_available"
                 class="nowrap text-right"
             >
-              <span
-                    t-if="line.availability_status == 'mto'"
-                    name="availability_status_mto"
-                >On order</span>
-              <span
-                    t-elif="line.availability_status == 'full'"
-                    name="availability_status_full"
-                >Yes</span>
               <t
-                    t-elif="line.availability_status == 'partial'"
-                    name="availablility_status_partial"
+                    t-if="not (line.display_type or line.is_delivery or line.product_id.type == 'service')"
                 >
-                <span t-field="line.available_qty" />
-                <span t-field="line.product_uom" />
-              </t>
-              <span
-                    t-elif="line.availability_status == 'restock'"
-                    name="availability_status_restock"
-                    t-field="line.expected_availability_date"
-                    t-options="{'date_only': 'True'}"
-                />
-              <span
-                    t-elif="line.availability_status == 'no'"
-                    name="availability_status_no"
-                >No</span>
+                  <span
+                        t-if="line.availability_status == 'on_order'"
+                        name="availability_status_on_order"
+                    >On order</span>
+                  <span
+                        t-elif="line.availability_status == 'full'"
+                        name="availability_status_full"
+                    >Yes</span>
+                  <t
+                        t-elif="line.availability_status == 'partial'"
+                        name="availablility_status_partial"
+                    >
+                    <span t-field="line.available_qty" />
+                    <span t-field="line.product_uom" />
+                  </t>
+                  <t
+                        t-elif="line.availability_status == 'restock'"
+                        name="availability_status_restock"
+                    >
+                      As of <span
+                            t-field="line.expected_availability_date"
+                            t-options="{'date_only': 'True'}"
+                        />
+                  </t>
+                  <span
+                        t-elif="line.availability_status == 'no'"
+                        name="availability_status_no"
+                    >No</span>
+            </t>
           </td>
       </xpath>
     </template>
