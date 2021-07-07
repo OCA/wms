@@ -10,6 +10,7 @@
     "category": "Stock Management",
     "depends": ["sale_stock", "stock_available_to_promise_release", "delivery"],
     "data": [
+        "reports/sale_order.xml",
         "views/stock_move_views.xml",
         "views/stock_picking_views.xml",
         "views/product_product_views.xml",

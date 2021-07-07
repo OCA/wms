@@ -6,6 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-07-02 13:13+0000\n"
 "PO-Revision-Date: 2021-06-04 10:48+0000\n"
 "Last-Translator: jabelchi <jabelchi@gmail.com>\n"
 "Language-Team: none\n"
@@ -15,6 +16,21 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 4.3.2\n"
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__availability_status
+msgid "Availability Status"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
+msgid "Available"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__available_qty
+msgid "Available Qty"
+msgstr ""
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_move__carrier_id
@@ -36,6 +52,16 @@ msgid "Delivery Method"
 msgstr "Mètode de lliurament"
 
 #. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__expected_availability_date
+msgid "Expected Availability Date"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__full
+msgid "Fully Available"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_search
 msgid "Further Shipment"
 msgstr "Enviament addicional"
@@ -52,9 +78,40 @@ msgid "Moves Need Release"
 msgstr "Moviments que cal alliberar"
 
 #. module: sale_stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
+msgid "No"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__no
+msgid "Not available"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__mto
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
+msgid "On order"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__partial
+msgid "Partially Available"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_procurement_group
 msgid "Procurement Group"
 msgstr "Agrupament de compres"
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model,name:sale_stock_available_to_promise_release.model_product_product
+msgid "Product"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__restock
+msgid "Restock ordered"
+msgstr ""
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_sale_order
@@ -85,3 +142,8 @@ msgstr "Transferència"
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_tree
 msgid "Weight"
 msgstr "Pes"
+
+#. module: sale_stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
+msgid "Yes"
+msgstr ""
