@@ -15,8 +15,8 @@ class DataAction(Component):
             record.with_context(location=record.id), self._location_parser, **kw
         )
 
-    def locations(self, record, **kw):
-        return self.location(record, multi=True)
+    def locations(self, records, **kw):
+        return [self.location(rec, **kw) for rec in records]
 
     @property
     def _location_parser(self):
@@ -165,6 +165,7 @@ class DataAction(Component):
             "id",
             "qty_done",
             "product_uom_qty:quantity",
+            "shopfloor_checkout_done:done",
             ("product_id:product", self._product_parser),
             ("lot_id:lot", self._lot_parser),
             ("location_id:location_src", self._location_parser),
@@ -225,10 +226,17 @@ class DataAction(Component):
             "display_name",
             "default_code",
             "barcode",
+            (
+                "barcode_ids:barcodes",
+                lambda record, fname: self._product_barcode_list(record[fname]),
+            ),
             ("packaging_ids:packaging", self._product_packaging),
             ("uom_id:uom", self._simple_record_parser() + ["factor", "rounding"]),
             ("seller_ids:supplier_code", self._product_supplier_code),
         ]
+
+    def _product_barcode_list(self, rec):
+        return self._jsonify(rec, self._simple_record_parser(), multi=True,)
 
     def _product_packaging(self, rec, field):
         return self._jsonify(
