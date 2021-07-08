@@ -3,7 +3,7 @@
 div.v-application--wrap > .container {
     padding: 0;
 }
-main.v-content > .v-content__wrap > .header .container {
+main.v-main > .v-main__wrap > .header .container {
     padding-bottom: 0;
 }
 
@@ -99,6 +99,10 @@ main.v-content > .v-content__wrap > .header .container {
 }
 .detail .v-card.no-outline {
     box-shadow: none;
+}
+
+.detail .theme--light.v-sheet--outlined {
+    border: 3px solid rgba(162, 121, 0, 0.84) !important;
 }
 
 .detail.item-detail-card.loud .v-card__text.details {

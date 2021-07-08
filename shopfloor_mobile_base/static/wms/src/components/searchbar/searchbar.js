@@ -33,6 +33,7 @@ Vue.component("searchbar", {
             type: Boolean,
             default: true,
         },
+        refocusInput: Boolean,
     },
     mounted: function () {
         this.$root.event_hub.$on("screen:reload", this.on_screen_reload);
@@ -50,9 +51,13 @@ Vue.component("searchbar", {
         reset: function () {
             this.entered = "";
         },
-        on_screen_reload: function (evt) {
-            if (this.reload_steal_focus)
-                $(this.$el).find(":input[name=searchbar]").focus();
+        on_screen_reload: function(evt) {
+            if (this.reload_steal_focus) this.$refs.input.focus();
+        },
+        refocus: function() {
+            if (this.refocusInput) {
+                setTimeout(() => this.$refs.input.focus());
+            }
         },
     },
 
@@ -65,10 +70,12 @@ Vue.component("searchbar", {
       >
     <v-text-field
       name="searchbar"
+      ref="input"
       required v-model="entered"
       :placeholder="input_placeholder"
       :autofocus="autofocus ? 'autofocus' : null"
       :autocomplete="autocomplete"
+      @blur="refocus()"
       />
   </v-form>
   `,

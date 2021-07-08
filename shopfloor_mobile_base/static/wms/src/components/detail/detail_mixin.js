@@ -85,14 +85,18 @@ export var ItemDetailMixin = {
             // Defining defaults for an Object property
             // works only if you don't pass the property at all.
             // If you pass only one key, you'll lose all defaults.
-            const opts = _.defaults({}, this.$props.options, {
-                no_title: false,
-                key_title: "name",
-                fields: this.detail_fields(),
-                full_detail: false,
-                // Customize action per all detail fields
-                detail_action: null,
-            });
+            const opts = Object.assign(
+                {
+                    no_title: false,
+                    key_title: "name",
+                    fields: this.detail_fields(),
+                    full_detail: false,
+                    // customize action per all detail fields
+                    detail_action: null,
+                    on_click_action: null,
+                },
+                this.$props.options
+            );
             return opts;
         },
     },

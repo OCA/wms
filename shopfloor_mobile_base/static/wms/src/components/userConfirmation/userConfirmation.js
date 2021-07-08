@@ -10,10 +10,13 @@ Vue.component("user-confirmation", {
     template: `
 
     <div class="confirm">
-        <v-alert type="warning" prominent tile>
-            <p class="warning darken-2 title pa-5 mt-5">{{ question }}</p>
+        <v-card tile>
+            <v-card-title>{{title}}</v-card-title>
+            <v-card-text>
+                <v-alert type="warning" prominent tile>{{ question }}</v-alert>
+            </v-card-text>
             <v-form class="mt-4">
-                <div class="button-list button-vertical-list full">
+                <v-container class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
                             <btn-action @click="$emit('user-confirmation', 'yes')">Yes</btn-action>
@@ -24,9 +27,9 @@ Vue.component("user-confirmation", {
                             <btn-action action="cancel" @click="$emit('user-confirmation', 'no')">No</btn-action>
                         </v-col>
                     </v-row>
-                </div>
+                </v-container>
             </v-form>
-        </v-alert>
+        </v-card>
     </div>
 
 `,
