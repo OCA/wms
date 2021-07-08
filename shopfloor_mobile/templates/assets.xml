@@ -37,6 +37,11 @@
                 type="module"
             />
             <script
+                id="script_component_detail_simple_location"
+                t-attf-src="/shopfloor_mobile/static/wms/src/components/detail/detail_simple_location.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
                 id="script_component_detail_location"
                 t-attf-src="/shopfloor_mobile/static/wms/src/components/detail/detail_location.js?v=#{mod_version}"
                 type="module"
@@ -57,6 +62,11 @@
                 type="module"
             />
             <script
+                id="script_component_detail_simple_picking"
+                t-attf-src="/shopfloor_mobile/static/wms/src/components/detail/detail_simple_picking.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
                 id="script_component_detail_transfer"
                 t-attf-src="/shopfloor_mobile/static/wms/src/components/detail/detail_transfer.js?v=#{mod_version}"
                 type="module"
@@ -64,6 +74,11 @@
             <script
                 id="script_component_detail_operation"
                 t-attf-src="/shopfloor_mobile/static/wms/src/components/detail/detail_operation.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
+                id="script_component_detail_simple_product"
+                t-attf-src="/shopfloor_mobile/static/wms/src/components/detail/detail_simple_product.js?v=#{mod_version}"
                 type="module"
             />
             <script
