@@ -17,8 +17,8 @@ class DataDetailAction(Component):
             record.with_context(location=record.id), self._location_detail_parser, **kw
         )
 
-    def locations_detail(self, record, **kw):
-        return self.location_detail(record, multi=True)
+    def locations_detail(self, records, **kw):
+        return [self.location_detail(rec, **kw) for rec in records]
 
     @property
     def _location_detail_parser(self):

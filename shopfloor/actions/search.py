@@ -38,7 +38,10 @@ class SearchAction(Component):
         model = self.env["product.product"]
         if not barcode:
             return model.browse()
-        product = model.search([("barcode", "=", barcode)], limit=1)
+        product = model.search(
+            ["|", ("barcode", "=", barcode), ("barcode_ids.name", "=", barcode)],
+            limit=1,
+        )
         if not product:
             packaging = self.env["product.packaging"].search(
                 [("product_id", "!=", False), ("barcode", "=", barcode)], limit=1
