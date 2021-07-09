@@ -55,4 +55,14 @@
             eval="[(4, ref('shopfloor.picking_type_location_content_transfer_demo'))]"
         />
     </record>
+    <record id="shopfloor_menu_reception" model="shopfloor.menu">
+        <field name="name">Reception</field>
+        <field name="sequence">70</field>
+        <field name="allow_move_create" eval="1" />
+        <field name="scenario_id" ref="shopfloor.scenario_reception" />
+        <field
+            name="picking_type_ids"
+            eval="[(4, ref('shopfloor.picking_type_reception_demo'))]"
+        />
+    </record>
 </odoo>
