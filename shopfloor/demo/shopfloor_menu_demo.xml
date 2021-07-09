@@ -61,7 +61,7 @@
         <field name="scenario_id" ref="shopfloor.scenario_cluster_batch_picking" />
         <field
             name="picking_type_ids"
-            eval="[(4, ref('shopfloor.picking_type_cluster_picking_demo'))]"
+            eval="[(4, ref('shopfloor.picking_type_cluster_batch_picking_demo'))]"
         />
     </record>
 </odoo>
