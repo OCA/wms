@@ -27,7 +27,7 @@ Vue.component("scan-products", {
                     qty: prod.quantity,
                     qtyDone: prod.qty_done,
                     done: prod.done,
-                    barcodes: prod.product.barcodes,
+                    barcodes: prod.product.barcodes.map(b => b.name),
                     supplierCode: prod.product.supplier_code,
                 }))
                 .sort((a, b) => (a.done && !this.isLastScanned(a) ? 1 : -1));
