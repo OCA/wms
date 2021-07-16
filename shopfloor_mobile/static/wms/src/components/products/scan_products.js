@@ -9,7 +9,7 @@ Vue.component("scan-products", {
     props: ["packing", "products", "fields", "lastScanned"],
     methods: {
         isLastScanned(product) {
-            return product && product.barcode === this.lastScanned;
+            return product && product.barcodes.includes(this.lastScanned);
         },
     },
     computed: {
@@ -27,7 +27,7 @@ Vue.component("scan-products", {
                     qty: prod.quantity,
                     qtyDone: prod.qty_done,
                     done: prod.done,
-                    barcode: prod.product.barcode,
+                    barcodes: prod.product.barcodes,
                     supplierCode: prod.product.supplier_code,
                 }))
                 .sort((a, b) => (a.done && !this.isLastScanned(a) ? 1 : -1));
