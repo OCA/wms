@@ -33,7 +33,7 @@ addon | version | summary
 [delivery_carrier_preference](delivery_carrier_preference/) | 13.0.1.5.0 (unported) | Advanced selection of preferred shipping methods
 [delivery_carrier_warehouse](delivery_carrier_warehouse/) | 13.0.1.2.0 (unported) | Get delivery method used in sales orders from warehouse
 [sale_stock_available_to_promise_release](sale_stock_available_to_promise_release/) | 13.0.1.3.0 (unported) | Integration between Sales and Available to Promise Release
-[shopfloor](shopfloor/) | 13.0.1.5.1 (unported) | manage warehouse operations with barcode scanners
+[shopfloor](shopfloor/) | 13.0.4.10.2 (unported) | manage warehouse operations with barcode scanners
 [shopfloor_batch_automatic_creation](shopfloor_batch_automatic_creation/) | 13.0.1.0.0 (unported) | Create batch transfers for Cluster Picking
 [shopfloor_checkout_sync](shopfloor_checkout_sync/) | 13.0.1.0.0 (unported) | Glue module
 [shopfloor_mobile](shopfloor_mobile/) | 13.0.1.6.1 (unported) | Mobile frontend for WMS Shopfloor app
