@@ -1,10 +1,20 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, models
+from odoo.tools.float_utils import float_compare
 
 
 class StockMove(models.Model):
     _inherit = "stock.move"
+
+    def _qty_is_satisfied(self):
+        compare = float_compare(
+            self.quantity_done,
+            self.product_uom_qty,
+            precision_rounding=self.product_uom.rounding,
+        )
+        # greater or equal
+        return compare in (0, 1)
 
     def split_other_move_lines(self, move_lines, intersection=False):
         """Substract `move_lines` from `move.move_line_ids`, put the result
@@ -88,7 +98,9 @@ class StockMove(models.Model):
                 moves_todo.move_line_ids.package_level_id.write(
                     {"picking_id": new_picking.id}
                 )
-                new_picking.action_assign()
+                # NOTE: at this stage all the operations should be assigned already
+                # hence the new picking must be assigned already.
+                # DO NOT CALL `new_picking.action_assign` or you'll wipe qty_done.
                 assert new_picking.state == "assigned"
             new_picking.action_done()
         return True

@@ -10,25 +10,35 @@ class SearchAction(Component):
     have the same result in all scenarios.
     """
 
-    _name = "shopfloor.search.action"
-    _inherit = "shopfloor.process.action"
-    _usage = "search"
+    _inherit = "shopfloor.search.action"
+
+    # TODO: these methods shall be probably replaced by scan anything handlers
 
     def location_from_scan(self, barcode):
+        model = self.env["stock.location"]
         if not barcode:
-            return self.env["stock.location"].browse()
-        return self.env["stock.location"].search([("barcode", "=", barcode)], limit=1)
+            return model.browse()
+        return model.search(
+            ["|", ("barcode", "=", barcode), ("name", "=", barcode)], limit=1
+        )
 
     def package_from_scan(self, barcode):
-        return self.env["stock.quant.package"].search([("name", "=", barcode)], limit=1)
+        model = self.env["stock.quant.package"]
+        if not barcode:
+            return model.browse()
+        return model.search([("name", "=", barcode)], limit=1)
 
     def picking_from_scan(self, barcode):
-        return self.env["stock.picking"].search([("name", "=", barcode)], limit=1)
+        model = self.env["stock.picking"]
+        if not barcode:
+            return model.browse()
+        return model.search([("name", "=", barcode)], limit=1)
 
     def product_from_scan(self, barcode):
-        product = self.env["product.product"].search(
-            [("barcode", "=", barcode)], limit=1
-        )
+        model = self.env["product.product"]
+        if not barcode:
+            return model.browse()
+        product = model.search([("barcode", "=", barcode)], limit=1)
         if not product:
             packaging = self.env["product.packaging"].search(
                 [("product_id", "!=", False), ("barcode", "=", barcode)], limit=1
@@ -37,11 +47,15 @@ class SearchAction(Component):
         return product
 
     def lot_from_scan(self, barcode):
-        return self.env["stock.production.lot"].search(
-            [("name", "=", barcode)], limit=1
-        )
+        model = self.env["stock.production.lot"]
+        if not barcode:
+            return model.browse()
+        return model.search([("name", "=", barcode)], limit=1)
 
     def generic_packaging_from_scan(self, barcode):
-        return self.env["product.packaging"].search(
+        model = self.env["product.packaging"]
+        if not barcode:
+            return model.browse()
+        return model.search(
             [("barcode", "=", barcode), ("product_id", "=", False)], limit=1
         )

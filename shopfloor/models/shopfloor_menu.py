@@ -2,51 +2,22 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, api, exceptions, fields, models
 
-from odoo.addons.base_sparse_field.models.fields import Serialized
+PICK_PACK_SAME_TIME_HELP = """
+If you tick this box, while picking goods from a location
+(eg: zone picking) set destination will work as follow:
+
+* if a location is scanned, a new delivery package is created;
+* if a package is scanned, the package is validated against the carrier
+* in both cases, if the picking has no carrier the operation fails.",
+"""
 
 
 class ShopfloorMenu(models.Model):
-    _name = "shopfloor.menu"
-    _description = "Menu displayed in the scanner application"
-    _order = "sequence"
+    _inherit = "shopfloor.menu"
 
-    _scenario_allowing_create_moves = (
-        "single_pack_transfer",
-        "location_content_transfer",
-    )
-
-    _scenario_allowing_unreserve_other_moves = (
-        "single_pack_transfer",
-        "location_content_transfer",
-    )
-
-    _scenario_allowing_ignore_no_putaway_available = (
-        "single_pack_transfer",
-        "location_content_transfer",
-    )
-
-    name = fields.Char(translate=True)
-    sequence = fields.Integer()
-    profile_ids = fields.Many2many(
-        "shopfloor.profile", string="Profiles", help="Visible for these profiles"
-    )
     picking_type_ids = fields.Many2many(
         comodel_name="stock.picking.type", string="Operation Types", required=True
     )
-
-    scenario = fields.Selection(selection="_selection_scenario", required=True)
-    # TODO: `options` field allows to provide custom options for the scenario,
-    # (or for any other kind of service).
-    # Developers should probably have a way to register scenario and their options
-    # which will be computed in this field at the end.
-    # This would allow to get rid of hardcoded settings like
-    # `_scenario_allowing_create_moves` or `_scenario_allowing_unreserve_other_moves`.
-    # For now is not included in any view as it should be customizable by scenario.
-    # Maybe we can have a wizard accessible via a button on the menu tree view.
-    # There's no automation here. Developers are responsible for their usage
-    # and/or their exposure to the scenario api.
-    options = Serialized(default={})
-
     move_create_is_possible = fields.Boolean(compute="_compute_move_create_is_possible")
     # only available for some scenarios, move_create_is_possible defines if the option
     # can be used or not
@@ -76,24 +47,27 @@ class ShopfloorMenu(models.Model):
         "if the put-away can find a sublocation (when putaway destination "
         "is different from the operation type's destination).",
     )
-    active = fields.Boolean(default=True)
+    # TODO: refactor handling of these options.
+    # Possible solution:
+    # * field should stay on the scenario and get stored in options
+    # * field should use `sf_scenario` (eg: sf_scenario=("zone_picking", ))
+    #   to control for which scenario it will be available
+    # * on the menu form, display a button to edit configurations
+    #   and display a summary
+    pick_pack_same_time = fields.Boolean(
+        string="Pick and pack at the same time",
+        default=False,
+        help=PICK_PACK_SAME_TIME_HELP,
+    )
+    pick_pack_same_time_is_possible = fields.Boolean(
+        compute="_compute_pick_pack_same_time_is_possible"
+    )
 
-    def _selection_scenario(self):
-        return [
-            # these must match a REST service's '_usage'
-            ("single_pack_transfer", "Single Pack Transfer"),
-            ("zone_picking", "Zone Picking"),
-            ("cluster_picking", "Cluster Picking"),
-            ("checkout", "Checkout/Packing"),
-            ("delivery", "Delivery"),
-            ("location_content_transfer", "Location Content Transfer"),
-        ]
-
-    @api.depends("scenario", "picking_type_ids")
+    @api.depends("scenario_id", "picking_type_ids")
     def _compute_move_create_is_possible(self):
         for menu in self:
             menu.move_create_is_possible = bool(
-                menu.scenario in self._scenario_allowing_create_moves
+                menu.scenario_id.has_option("allow_create_moves")
                 and len(menu.picking_type_ids) == 1
             )
 
@@ -101,7 +75,7 @@ class ShopfloorMenu(models.Model):
     def onchange_move_create_is_possible(self):
         self.allow_move_create = self.move_create_is_possible
 
-    @api.constrains("scenario", "picking_type_ids", "allow_move_create")
+    @api.constrains("scenario_id", "picking_type_ids", "allow_move_create")
     def _check_allow_move_create(self):
         for menu in self:
             if menu.allow_move_create and not menu.move_create_is_possible:
@@ -109,29 +83,36 @@ class ShopfloorMenu(models.Model):
                     _("Creation of moves is not allowed for menu {}.").format(menu.name)
                 )
 
-    @api.depends("scenario", "picking_type_ids")
+    @api.depends("scenario_id")
     def _compute_unreserve_other_moves_is_possible(self):
         for menu in self:
-            menu.unreserve_other_moves_is_possible = (
-                menu.scenario in self._scenario_allowing_unreserve_other_moves
+            menu.unreserve_other_moves_is_possible = menu.scenario_id.has_option(
+                "allow_unreserve_other_moves"
+            )
+
+    @api.depends("scenario_id")
+    def _compute_pick_pack_same_time_is_possible(self):
+        for menu in self:
+            menu.pick_pack_same_time_is_possible = menu.scenario_id.has_option(
+                "pick_pack_same_time"
             )
 
     @api.onchange("unreserve_other_moves_is_possible")
     def onchange_unreserve_other_moves_is_possible(self):
         self.allow_unreserve_other_moves = self.unreserve_other_moves_is_possible
 
-    @api.depends("scenario", "picking_type_ids")
+    @api.depends("scenario_id")
     def _compute_ignore_no_putaway_available_is_possible(self):
         for menu in self:
-            menu.ignore_no_putaway_available_is_possible = bool(
-                menu.scenario in self._scenario_allowing_ignore_no_putaway_available
+            menu.ignore_no_putaway_available_is_possible = menu.scenario_id.has_option(
+                "allow_ignore_no_putaway_available"
             )
 
     @api.onchange("ignore_no_putaway_available_is_possible")
     def onchange_ignore_no_putaway_available_is_possible(self):
         self.ignore_no_putaway_available = self.ignore_no_putaway_available_is_possible
 
-    @api.constrains("scenario", "picking_type_ids", "ignore_no_putaway_available")
+    @api.constrains("scenario_id", "picking_type_ids", "ignore_no_putaway_available")
     def _check_ignore_no_putaway_available(self):
         for menu in self:
             if (
@@ -144,7 +125,7 @@ class ShopfloorMenu(models.Model):
                     )
                 )
 
-    @api.constrains("scenario", "picking_type_ids", "allow_unreserve_other_moves")
+    @api.constrains("scenario_id", "picking_type_ids", "allow_unreserve_other_moves")
     def _check_allow_unreserve_other_moves(self):
         for menu in self:
             if (
@@ -157,23 +138,18 @@ class ShopfloorMenu(models.Model):
                     ).format(menu.name)
                 )
 
-    # ATM the goal is to block using single_pack_transfer (SPT)
-    # w/out moving the full pkg.
-    # Is not optimal, but is mandatory as long as SPT does not work w/ moves
-    # but only w/ package levels.
-    # TODO: add tests.
-    _move_entire_packs_scenario = ("single_pack_transfer", "delivery")
-
-    @api.constrains("scenario", "picking_type_ids")
+    @api.constrains("scenario_id", "picking_type_ids")
     def _check_move_entire_packages(self):
-        _get_scenario_name = self._fields["scenario"].convert_to_export
         for menu in self:
             # TODO: these kind of checks should be provided by the scenario itself.
             bad_picking_types = [
                 x.name for x in menu.picking_type_ids if not x.show_entire_packs
             ]
-            if menu.scenario in self._move_entire_packs_scenario and bad_picking_types:
-                scenario_name = _get_scenario_name(menu["scenario"], menu)
+            if (
+                menu.scenario_id.has_option("must_move_entire_pack")
+                and bad_picking_types
+            ):
+                scenario_name = menu.scenario_id.name
                 raise exceptions.ValidationError(
                     _(
                         "Scenario `{}` require(s) "

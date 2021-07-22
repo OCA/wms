@@ -30,11 +30,19 @@ class UserCase(CommonMenuCase):
         # Simulate the client asking the menu
         menus = self.env["shopfloor.menu"].sudo().search([])
         menu = menus[0]
-        menu.profile_ids = self.profile
-        (menus - menu).profile_ids = self.profile2
+        menu.profile_id = self.profile
+        (menus - menu).profile_id = self.profile2
 
         response = self.service.dispatch("menu")
         self.assert_response(
             response,
             data={"menus": [self._data_for_menu_item(menu)]},
+        )
+
+    def test_user_info(self):
+        """Request /user/user_info"""
+        response = self.service.dispatch("user_info")
+        self.assert_response(
+            response,
+            data={"user_info": {"id": self.env.user.id, "name": self.env.user.name}},
         )

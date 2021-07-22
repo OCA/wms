@@ -26,29 +26,50 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
                 }
             )
         )
-        cls.picking = cls._create_initial_move()
+        cls.shelf1_2 = cls.shelf1.sudo().copy()
+        cls.pack_b = cls.env["stock.quant.package"].create(
+            {"location_id": cls.stock_location.id}
+        )
+        cls.quant_b = (
+            cls.env["stock.quant"]
+            .sudo()
+            .create(
+                {
+                    "product_id": cls.product_b.id,
+                    "location_id": cls.shelf1_2.id,
+                    "quantity": 1,
+                    "package_id": cls.pack_b.id,
+                }
+            )
+        )
+        cls.picking = cls._create_initial_move(
+            lines=[(cls.product_a, 1), (cls.product_b, 1)]
+        )
 
     @classmethod
-    def _create_initial_move(cls):
+    def _create_initial_move(cls, lines):
         """Create the move to satisfy the pre-condition before /start"""
         picking_form = Form(cls.env["stock.picking"])
         picking_form.picking_type_id = cls.picking_type
-        picking_form.location_id = cls.shelf1
+        picking_form.location_id = cls.stock_location
         picking_form.location_dest_id = cls.shelf2
-        with picking_form.move_ids_without_package.new() as move:
-            move.product_id = cls.product_a
-            move.product_uom_qty = 1
+        for line in lines:
+            with picking_form.move_ids_without_package.new() as move:
+                move.product_id = line[0]
+                move.product_uom_qty = line[1]
         picking = picking_form.save()
         picking.action_confirm()
         picking.action_assign()
         return picking
 
-    def _simulate_started(self):
-        """Replicate what the /start endpoint would do
+    def _simulate_started(self, package):
+        """Replicate what the /start endpoint would do on the given package.
 
         Used to test the next endpoints (/validate and /cancel)
         """
-        package_level = self.picking.move_line_ids.package_level_id
+        package_level = self.picking.move_line_ids.package_level_id.filtered(
+            lambda pl: pl.package_id == package
+        )
         package_level.is_done = True
         return package_level
 
@@ -83,7 +104,9 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         barcode = self.pack_a.name
         params = {"barcode": barcode}
 
-        package_level = self.picking.move_line_ids.package_level_id
+        package_level = self.picking.move_line_ids.package_level_id.filtered(
+            lambda pl: pl.package_id == self.pack_a
+        )
         self.assertFalse(package_level.is_done)
 
         # Simulate the client scanning a package's barcode, which
@@ -341,7 +364,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         barcode = self.pack_a.name
         params = {"barcode": barcode}
 
-        package_level = self._simulate_started()
+        package_level = self._simulate_started(self.pack_a)
         self.assertTrue(package_level.is_done)
 
         # Simulate the client scanning a package's barcode, which
@@ -376,7 +399,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         """
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
-        package_level = self._simulate_started()
+        package_level = self._simulate_started(self.pack_a)
 
         # now, call the service to proceed with validation of the
         # movement
@@ -425,10 +448,6 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         * The transition goes to the completion info screen instead of starting
           over
         """
-        # setup the picking as we need, like if the move line
-        # was already started by the first step (start operation)
-        package_level = self._simulate_started()
-
         # activate the computation of this field, so we have a chance to
         # transition to the 'show completion info' screen.
         self.picking_type.sudo().display_completion_info = True
@@ -446,17 +465,41 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         )
         next_picking.action_confirm()
 
-        # now, call the service to proceed with validation of the
-        # movement
+        # process the first package
+        package_level_a = self._simulate_started(self.pack_a)
+        # validate the first package
         response = self.service.dispatch(
             "validate",
             params={
-                "package_level_id": package_level.id,
+                "package_level_id": package_level_a.id,
                 "location_barcode": self.shelf2.barcode,
             },
         )
-        self.assertEqual(package_level.picking_id.state, "done")
-
+        self.assertEqual(package_level_a.picking_id.state, "done")
+        # check the response: still no completion info message as we still have
+        # the second package to process
+        self.assert_response(
+            response,
+            next_state="start",
+            message={
+                "message_type": "success",
+                "body": "The pack has been moved, you can scan a new pack.",
+            },
+        )
+        # process the second package
+        package_level_b = self._simulate_started(self.pack_b)
+        # validate the second package
+        response = self.service.dispatch(
+            "validate",
+            params={
+                "package_level_id": package_level_b.id,
+                "location_barcode": self.shelf2.barcode,
+            },
+        )
+        self.assertEqual(package_level_b.picking_id.state, "done")
+        self.assertNotEqual(package_level_a.picking_id, package_level_b.picking_id)
+        # check the response: the chained transfer is ready to be processed now
+        # that all the packages have been processed
         self.assert_response(
             response,
             next_state="start",
@@ -504,7 +547,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         """
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
-        package_level = self._simulate_started()
+        package_level = self._simulate_started(self.pack_a)
 
         response = self.service.dispatch(
             "validate",
@@ -525,7 +568,8 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         )
 
     def test_validate_location_forbidden(self):
-        """Test a call on /validate on a forbidden location (not child of type)
+        """Test a call on /validate on a forbidden location (not child of
+        picking or move)
 
         The pre-conditions:
 
@@ -536,11 +580,11 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         * No change in odoo, Transition with a message
 
         Note: the location is forbidden when a location is not a child
-        of the destination location of the picking type used for the process
+        of the destination location of the picking used for the process
         """
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
-        package_level = self._simulate_started()
+        package_level = self._simulate_started(self.pack_a)
 
         response = self.service.dispatch(
             "validate",
@@ -558,8 +602,8 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             message={"message_type": "error", "body": "You cannot place it here"},
         )
 
-    def test_validate_location_forbidden_move_invalid(self):
-        """Test a call on /validate on a forbidden location (not child of move)
+    def test_validate_location_move_not_child_of_picking_allowed(self):
+        """Test a call on /validate on a location not child of picking but child of move
 
         The pre-conditions:
 
@@ -569,34 +613,32 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
 
         * No change in odoo, Transition with a message
 
-        Note: the location is forbidden when a location is not a child
-        of the destination location of the move
+        Note: the location is allowed when the move location has changed and
+        that location is a child of the destination location of the move
         """
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
-        package_level = self._simulate_started()
+        package_level = self._simulate_started(self.pack_a)
 
-        move = package_level.move_line_ids.move_id
-        # take the parent of the expected dest.: not allowed
-        location = move.location_dest_id.location_id
-        # allow this location to be used in the picking type, otherwise,
-        # we check the wrong condition
-        self.picking_type.sudo().default_location_dest_id = location
+        location = package_level.location_dest_id.location_id
+        package_level.location_dest_id = location
+        package_level.move_line_ids.move_id.location_dest_id = location
 
         response = self.service.dispatch(
             "validate",
             params={
                 "package_level_id": package_level.id,
-                # this location is outside of the expected destination
                 "location_barcode": location.barcode,
             },
         )
 
         self.assert_response(
             response,
-            next_state="scan_location",
-            data=self.ANY,
-            message={"message_type": "error", "body": "You cannot place it here"},
+            next_state="start",
+            message={
+                "message_type": "success",
+                "body": "The pack has been moved, you can scan a new pack.",
+            },
         )
 
     def test_validate_location_to_confirm(self):
@@ -616,7 +658,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         """
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
-        package_level = self._simulate_started()
+        package_level = self._simulate_started(self.pack_a)
 
         sub_shelf1 = (
             self.env["stock.location"]
@@ -652,7 +694,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             },
         )
 
-        message = self.service.actions_for("message").confirm_location_changed(
+        message = self.service._actions_for("message").confirm_location_changed(
             sub_shelf1, sub_shelf2
         )
         self.assert_response(
@@ -686,7 +728,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         """
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
-        package_level = self._simulate_started()
+        package_level = self._simulate_started(self.pack_a)
 
         # expected destination is 'shelf1', we'll scan shelf2 which must
         # ask a confirmation to the user (it's still in the same picking type)
@@ -731,7 +773,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         """
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
-        package_level = self._simulate_started()
+        package_level = self._simulate_started(self.pack_a)
         self.assertTrue(package_level.is_done)
 
         # keep references for later checks
@@ -769,24 +811,22 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         """
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
-        package_level = self._simulate_started()
-
+        package_level_a = self._simulate_started(self.pack_a)
         # keep references for later checks
-        move = package_level.move_line_ids.move_id
-        move_lines = package_level.move_line_ids
-        picking = move.picking_id
-
+        move_a = package_level_a.move_line_ids.move_id
+        move_lines_a = package_level_a.move_line_ids
+        picking = move_a.picking_id
         # someone cancel the work started by our operator
-        move._action_cancel()
+        move_a._action_cancel()
 
-        # now, call the service to cancel
+        # now, call the service to cancel the first package
         response = self.service.dispatch(
-            "cancel", params={"package_level_id": package_level.id}
+            "cancel", params={"package_level_id": package_level_a.id}
         )
-        self.assertRecordValues(move, [{"state": "cancel"}])
-        self.assertRecordValues(picking, [{"state": "cancel"}])
-        self.assertFalse(package_level.move_line_ids)
-        self.assertFalse(move_lines.exists())
+        self.assertRecordValues(move_a, [{"state": "cancel"}])
+        self.assertRecordValues(picking, [{"state": "assigned"}])
+        self.assertFalse(package_level_a.move_line_ids)
+        self.assertFalse(move_lines_a.exists())
 
         self.assert_response(
             response,
@@ -796,6 +836,18 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
                 "body": "Canceled, you can scan a new pack.",
             },
         )
+        package_level_b = self._simulate_started(self.pack_b)
+        # keep references for later checks
+        move_b = package_level_b.move_line_ids.move_id
+        # someone cancel the work started by our operator
+        move_b._action_cancel()
+        # then cancel the second package
+        response = self.service.dispatch(
+            "cancel", params={"package_level_id": package_level_b.id}
+        )
+        self.assertRecordValues(move_b, [{"state": "cancel"}])
+        picking.invalidate_cache(["state"])
+        self.assertRecordValues(picking, [{"state": "cancel"}])
 
     def test_cancel_already_done(self):
         """Test a call on /cancel on move already done
@@ -811,20 +863,25 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         """
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
-        package_level = self._simulate_started()
+        package_levels = self._simulate_started(self.pack_a) | self._simulate_started(
+            self.pack_b
+        )
 
         # keep references for later checks
-        move = package_level.move_line_ids.move_id
-        picking = move.picking_id
+        moves = package_levels.move_line_ids.move_id
+        picking = moves.picking_id
 
         # someone cancel the work started by our operator
-        move.extract_and_action_done()
+        moves.extract_and_action_done()
 
         # now, call the service to cancel
         response = self.service.dispatch(
-            "cancel", params={"package_level_id": package_level.id}
+            "cancel", params={"package_level_id": package_levels[0].id}
         )
-        self.assertRecordValues(move, [{"state": "done"}])
+        response = self.service.dispatch(
+            "cancel", params={"package_level_id": package_levels[1].id}
+        )
+        self.assertRecordValues(moves, [{"state": "done"}, {"state": "done"}])
         self.assertRecordValues(picking, [{"state": "done"}])
 
         self.assert_response(

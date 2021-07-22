@@ -1,11 +1,12 @@
-# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
-from .service import to_float
+from ..utils import to_float
 
 # NOTE for the implementation: share several similarities with the "cluster
 # picking" scenario
@@ -103,7 +104,7 @@ class LocationContentTransfer(Component):
         return self._response(next_state="scan_destination", data=data, message=message)
 
     def _data_content_all_for_location(self, pickings):
-        sorter = self.actions_for("location_content_transfer.sorter")
+        sorter = self._actions_for("location_content_transfer.sorter")
         sorter.feed_pickings(pickings)
         lines = sorter.move_lines()
         package_levels = sorter.package_levels()
@@ -130,7 +131,7 @@ class LocationContentTransfer(Component):
         return {"move_line": line_data, "package_level": level_data}
 
     def _next_content(self, pickings):
-        sorter = self.actions_for("location_content_transfer.sorter")
+        sorter = self._actions_for("location_content_transfer.sorter")
         sorter.feed_pickings(pickings)
         try:
             next_content = next(sorter)
@@ -203,7 +204,7 @@ class LocationContentTransfer(Component):
             [("location_id", "=", location.id), ("quantity", ">", 0)]
         )
         # create moves for each quant
-        picking_type = self.work.menu.picking_type_ids
+        picking_type = self.picking_types
         move_vals_list = []
         for quant in quants:
             move_vals_list.append(
@@ -284,14 +285,14 @@ class LocationContentTransfer(Component):
         levels have the same destination
         * start_single: if any line or package level has a different destination
         """
-        location = self.actions_for("search").location_from_scan(barcode)
+        location = self._actions_for("search").location_from_scan(barcode)
         if not location:
             return self._response_for_start(message=self.msg_store.barcode_not_found())
         move_lines = self._find_location_move_lines(location)
         pickings = move_lines.picking_id
         picking_types = pickings.mapped("picking_type_id")
 
-        savepoint = self.actions_for("savepoint").new()
+        savepoint = self._actions_for("savepoint").new()
 
         unreserved_moves = self.env["stock.move"].browse()
         if self.work.menu.allow_unreserve_other_moves:
@@ -317,27 +318,35 @@ class LocationContentTransfer(Component):
                         ),
                     }
                 )
-        # Ensure we process move lines related to pickings having only one source
-        # location among all their move lines. If there are different source
-        # locations, we put the move lines we are interested in in a separate picking.
+        # If there are different source locations, we put the move lines we are
+        # interested in in a separate picking.
         # This is required as we can only deal within this scenario with pickings
         # that share the same source location.
         pickings = move_lines._split_pickings_from_source_location()
+        # Ensure we process move lines related to transfers having only one source
+        # location among all their move lines.
+        # We need to put the unreserved qty into separate moves as a new move
+        # line could be created in the middle of the process.
+        new_picking_ids = []
+        for picking in pickings:
+            #   -> put move lines to process in their own move/transfer
+            new_picking_id = picking.split_assigned_move_lines(move_lines)
+            new_picking_ids.append(new_picking_id)
+        if new_picking_ids != pickings.ids:
+            pickings = pickings.browse(new_picking_ids)
 
         # If the following criteria are met:
         #   - no move lines have been found
         #   - the menu is configured to allow the creation of moves
         #   - the menu is bind to one picking type
-        #   - scanned location is a child of the picking type source location
+        #   - scanned location is a valid source for one the menu's picking types
         # then prepare new stock moves to move goods from the scanned location.
         menu = self.work.menu
         if (
             not move_lines
             and menu.allow_move_create
-            and len(menu.picking_type_ids) == 1
-            and location.is_sublocation_of(
-                menu.picking_type_ids.default_location_src_id
-            )
+            and len(self.picking_types) == 1
+            and self.is_src_location_valid(location)
         ):
             new_moves = self._create_moves_from_location(location)
             if not new_moves:
@@ -353,6 +362,17 @@ class LocationContentTransfer(Component):
                 )
             pickings = new_moves.mapped("picking_id")
             move_lines = new_moves.move_line_ids
+            for move_line in move_lines:
+                if not self.is_dest_location_valid(
+                    move_line.move_id, move_line.location_dest_id
+                ):
+                    savepoint.rollback()
+
+                    return self._response_for_start(
+                        message=self.msg_store.location_content_unable_to_transfer(
+                            location
+                        )
+                    )
 
         if self.work.menu.ignore_no_putaway_available and self._no_putaway_available(
             move_lines
@@ -410,7 +430,8 @@ class LocationContentTransfer(Component):
 
     def _set_all_destination_lines_and_done(self, pickings, move_lines, dest_location):
         self._write_destination_on_lines(move_lines, dest_location)
-        pickings.action_done()
+        stock = self._actions_for("stock")
+        stock.validate_moves(move_lines.move_id)
 
     def _lock_lines(self, lines):
         """Lock move lines"""
@@ -435,25 +456,19 @@ class LocationContentTransfer(Component):
             # if we can't find the lines anymore, they likely have been done
             # by someone else
             return self._response_for_start(message=self.msg_store.already_done())
-        scanned_location = self.actions_for("search").location_from_scan(barcode)
+        scanned_location = self._actions_for("search").location_from_scan(barcode)
         if not scanned_location:
             return self._response_for_scan_destination_all(
                 pickings, message=self.msg_store.barcode_not_found()
             )
 
-        if not scanned_location.is_sublocation_of(
-            self.picking_types.mapped("default_location_dest_id")
-        ) or not scanned_location.is_sublocation_of(
-            move_lines.mapped("move_id.location_dest_id"), func=all
-        ):
+        if not self.is_dest_location_valid(move_lines.move_id, scanned_location):
             return self._response_for_scan_destination_all(
                 pickings, message=self.msg_store.dest_location_not_allowed()
             )
-        if not confirmation and not scanned_location.is_sublocation_of(
-            move_lines.mapped("location_dest_id")
+        if not confirmation and self.is_dest_location_to_confirm(
+            move_lines.location_dest_id, scanned_location
         ):
-            # the scanned location is valid (child of picking type's destination)
-            # but not the expected one: ask for confirmation
             return self._response_for_scan_destination_all(
                 pickings, confirmation_required=True
             )
@@ -461,7 +476,7 @@ class LocationContentTransfer(Component):
 
         self._set_all_destination_lines_and_done(pickings, move_lines, scanned_location)
 
-        completion_info = self.actions_for("completion.info")
+        completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(move_lines)
         return self._response_for_start(
             message=self.msg_store.location_content_transfer_complete(
@@ -512,7 +527,7 @@ class LocationContentTransfer(Component):
                 message=self.msg_store.record_not_found(),
             )
 
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         package = search.package_from_scan(barcode)
         if package and package_level.package_id == package:
             return self._response_for_scan_destination(location, package_level)
@@ -574,7 +589,7 @@ class LocationContentTransfer(Component):
                 message=self.msg_store.record_not_found(),
             )
 
-        search = self.actions_for("search")
+        search = self._actions_for("search")
 
         package = search.package_from_scan(barcode)
         if package and move_line.package_id == package:
@@ -624,45 +639,36 @@ class LocationContentTransfer(Component):
         if not package_level.exists():
             move_lines = self._find_transfer_move_lines(location)
             return self._response_for_start_single(move_lines.mapped("picking_id"))
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         scanned_location = search.location_from_scan(barcode)
         if not scanned_location:
             return self._response_for_scan_destination(
                 location, package_level, message=self.msg_store.no_location_found()
             )
-        if not scanned_location.is_sublocation_of(
-            package_level.picking_id.picking_type_id.default_location_dest_id
-        ) or not scanned_location.is_sublocation_of(
-            # beware, package_level.move_id is not always set
-            package_level.move_line_ids.move_id.location_dest_id,
-            func=all,
-        ):
+        package_moves = package_level.move_line_ids.move_id
+        if not self.is_dest_location_valid(package_moves, scanned_location):
             return self._response_for_scan_destination(
                 location,
                 package_level,
                 message=self.msg_store.dest_location_not_allowed(),
             )
-        if not scanned_location.is_sublocation_of(package_level.location_dest_id):
-            if not confirmation:
-                return self._response_for_scan_destination(
-                    location, package_level, confirmation_required=True
-                )
+        if not confirmation and self.is_dest_location_to_confirm(
+            package_level.location_dest_id, scanned_location
+        ):
+            return self._response_for_scan_destination(
+                location, package_level, confirmation_required=True
+            )
         package_move_lines = package_level.move_line_ids
         self._lock_lines(package_move_lines)
-        package_moves = package_move_lines.mapped("move_id")
-        for package_move in package_moves:
-            # Check if there is no other lines linked to the move others than
-            # the lines related to the package itself. In such case we have to
-            # split the move to process only the lines related to the package.
-            package_move.split_other_move_lines(package_move_lines)
+        stock = self._actions_for("stock")
+        stock.put_package_level_in_move(package_level)
         self._write_destination_on_lines(package_level.move_line_ids, scanned_location)
-        stock = self.actions_for("stock")
         stock.validate_moves(package_moves)
         move_lines = self._find_transfer_move_lines(location)
         message = self.msg_store.location_content_transfer_item_complete(
             scanned_location
         )
-        completion_info = self.actions_for("completion.info")
+        completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(package_moves.move_line_ids)
         return self._response_for_start_single(
             move_lines.mapped("picking_id"),
@@ -693,25 +699,22 @@ class LocationContentTransfer(Component):
         if not move_line.exists():
             move_lines = self._find_transfer_move_lines(location)
             return self._response_for_start_single(move_lines.mapped("picking_id"))
-        search = self.actions_for("search")
+        search = self._actions_for("search")
         scanned_location = search.location_from_scan(barcode)
         if not scanned_location:
             return self._response_for_scan_destination(
                 location, move_line, message=self.msg_store.no_location_found()
             )
-        if not scanned_location.is_sublocation_of(
-            move_line.picking_id.picking_type_id.default_location_dest_id
-        ) or not scanned_location.is_sublocation_of(
-            move_line.move_id.location_dest_id, func=all
-        ):
+        if not self.is_dest_location_valid(move_line.move_id, scanned_location):
             return self._response_for_scan_destination(
                 location, move_line, message=self.msg_store.dest_location_not_allowed()
             )
-        if not scanned_location.is_sublocation_of(move_line.location_dest_id):
-            if not confirmation:
-                return self._response_for_scan_destination(
-                    location, move_line, confirmation_required=True
-                )
+        if not confirmation and self.is_dest_location_to_confirm(
+            move_line.location_dest_id, scanned_location
+        ):
+            return self._response_for_scan_destination(
+                location, move_line, confirmation_required=True
+            )
 
         self._lock_lines(move_line)
 
@@ -731,13 +734,13 @@ class LocationContentTransfer(Component):
                 remaining_move_line.qty_done = remaining_move_line.product_uom_qty
         move_line.move_id.split_other_move_lines(move_line)
         self._write_destination_on_lines(move_line, scanned_location)
-        stock = self.actions_for("stock")
+        stock = self._actions_for("stock")
         stock.validate_moves(move_line.move_id)
         move_lines = self._find_transfer_move_lines(location)
         message = self.msg_store.location_content_transfer_item_complete(
             scanned_location
         )
-        completion_info = self.actions_for("completion.info")
+        completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(move_line)
         return self._response_for_start_single(
             move_lines.mapped("picking_id"),
@@ -755,9 +758,13 @@ class LocationContentTransfer(Component):
         package_level = self.env["stock.package_level"].browse(package_level_id)
         if not location.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
-        if package_level.exists():
-            package_level.shopfloor_postponed = True
         move_lines = self._find_transfer_move_lines(location)
+        if package_level.exists():
+            pickings = move_lines.mapped("picking_id")
+            sorter = self._actions_for("location_content_transfer.sorter")
+            sorter.feed_pickings(pickings)
+            package_levels = sorter.package_levels()
+            package_level.shopfloor_postpone(move_lines, package_levels)
         return self._response_for_start_single(move_lines.mapped("picking_id"))
 
     def postpone_line(self, location_id, move_line_id):
@@ -770,9 +777,13 @@ class LocationContentTransfer(Component):
         if not location.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
         move_line = self.env["stock.move.line"].browse(move_line_id)
-        if move_line.exists():
-            move_line.shopfloor_postponed = True
         move_lines = self._find_transfer_move_lines(location)
+        if move_line.exists():
+            pickings = move_lines.mapped("picking_id")
+            sorter = self._actions_for("location_content_transfer.sorter")
+            sorter.feed_pickings(pickings)
+            package_levels = sorter.package_levels()
+            move_line.shopfloor_postpone(move_lines, package_levels)
         return self._response_for_start_single(move_lines.mapped("picking_id"))
 
     def stock_out_package(self, location_id, package_level_id):
@@ -797,7 +808,7 @@ class LocationContentTransfer(Component):
         if not package_level.exists():
             move_lines = self._find_transfer_move_lines(location)
             return self._response_for_start_single(move_lines.mapped("picking_id"))
-        inventory = self.actions_for("inventory")
+        inventory = self._actions_for("inventory")
         package_move_lines = package_level.move_line_ids
         package_moves = package_move_lines.mapped("move_id")
         for package_move in package_moves:
@@ -855,7 +866,7 @@ class LocationContentTransfer(Component):
         if not move_line.exists():
             move_lines = self._find_transfer_move_lines(location)
             return self._response_for_start_single(move_lines.mapped("picking_id"))
-        inventory = self.actions_for("inventory")
+        inventory = self._actions_for("inventory")
         move_line.move_id.split_other_move_lines(move_line)
         move_line_src_location = move_line.location_id
         move = move_line.move_id

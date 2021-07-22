@@ -7,8 +7,10 @@ class StockPackageLevel(models.Model):
     _name = "stock.package_level"
     _inherit = ["stock.package_level", "shopfloor.priority.postpone.mixin"]
 
-    def shallow_unlink(self):
-        """Unlink but keep the moves
+    def explode_package(self):
+        """Unlink but keep the moves.
+
+        Original motivation:
 
         A package level has a relation to "move_ids" only when the
         package level was created first from the UI and it created
@@ -26,11 +28,18 @@ class StockPackageLevel(models.Model):
         * another case is when we "dismiss" the package level in the location
           content transfer scenario, we want to keep the "need" in moves, but
           we are no longer moving the entire package level
-        """
-        self.move_ids.package_level_id = False
-        self.unlink()
 
-    def explode_package(self):
-        move_lines = self.move_line_ids
-        move_lines.result_package_id = False
-        self.shallow_unlink()
+        Commit
+
+        https://github.com/odoo/odoo/commit/b33e72d0bf027fb2c789b1b9476f7edf1a40b0a6
+
+        introduced the handling of pkg level deletion
+        which is doing what was done by this method.
+
+        Moreover it has been fixed here https://github.com/odoo/odoo/pull/66517.
+
+        Hence, we keep this method to unify the action of "exploding a package"
+        especially to avoid to refactor many places every time the core changes.
+        """
+        # This will trigger the deletion of the pkg level
+        self.move_line_ids.result_package_id = False

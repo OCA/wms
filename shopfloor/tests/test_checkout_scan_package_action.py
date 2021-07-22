@@ -2,6 +2,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from itertools import product
 
+import mock
+
 from .test_checkout_base import CheckoutCommonCase
 from .test_checkout_select_package_base import CheckoutSelectPackageMixin
 
@@ -113,7 +115,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 tracking, barcode
             )
 
-    def test_scan_package_action_scan_package_keep_source_package_ok(self):
+    def test_scan_package_action_scan_package_keep_source_package_error(self):
         picking = self._create_picking(
             lines=[
                 (self.product_a, 10),
@@ -143,33 +145,39 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             params={
                 "picking_id": picking.id,
                 "selected_line_ids": selected_lines.ids,
-                # we keep the goods in the same package, so we scan the source package
+                # we try to keep the goods in the same package, so we scan the
+                # source package but this isn't allowed as it is not a delivery
+                # package (i.e. having a delivery packaging set)
                 "barcode": pack1.name,
             },
         )
 
         self.assertRecordValues(
             move_line1,
-            [{"result_package_id": pack1.id, "shopfloor_checkout_done": True}],
+            [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
         )
         self.assertRecordValues(
             move_line2,
-            [{"result_package_id": pack1.id, "shopfloor_checkout_done": True}],
+            [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
         )
         self.assertRecordValues(
             move_line3,
-            # qty_done was zero so we don't set it as packed
+            # qty_done was zero so it hasn't been done anyway
             [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
         )
         self.assert_response(
             response,
             # go pack to the screen to select lines to put in packages
-            next_state="select_line",
-            data={"picking": self._stock_picking_data(picking)},
-            message={
-                "message_type": "success",
-                "body": "Product(s) packed in {}".format(pack1.name),
+            next_state="select_package",
+            data={
+                "picking": self.data.picking(picking),
+                "selected_move_lines": self.data.move_lines(selected_lines),
+                "packing_info": self.service._data_for_packing_info(picking),
+                "no_package_enabled": not self.service.options.get(
+                    "checkout__disable_no_package"
+                ),
             },
+            message=self.service.msg_store.dest_package_not_valid(pack1),
         )
 
     def test_scan_package_action_scan_package_error_invalid(self):
@@ -204,10 +212,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self._assert_selected_response(
             response,
             selected_line,
-            message={
-                "message_type": "error",
-                "body": "Not a valid destination package",
-            },
+            message=self.service.msg_store.dest_package_not_valid(other_package),
         )
 
     def test_scan_package_action_scan_package_use_existing_package_ok(self):
@@ -226,7 +231,12 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self._fill_stock_for_moves(pack2_moves, in_package=True)
         picking.action_assign()
 
-        package = self.env["stock.quant.package"].create({})
+        delivery_packaging = self.env.ref(
+            "stock_storage_type.product_product_9_packaging_single_bag"
+        )
+        package = self.env["stock.quant.package"].create(
+            {"packaging_id": delivery_packaging.id}
+        )
 
         # assume that product d was already put in a package,
         # we must be able to put the lines of pack1 inside the same
@@ -265,10 +275,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 "picking": self._stock_picking_data(picking, done=True),
                 "all_processed": True,
             },
-            message={
-                "message_type": "success",
-                "body": "Product(s) packed in {}".format(package.name),
-            },
+            message=self.msg_store.goods_packed_in(package),
         )
 
     def test_scan_package_action_scan_packaging_ok(self):
@@ -351,14 +358,78 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         )
         self.assert_response(
             response,
-            # go pack to the screen to select lines to put in packages
             next_state="select_line",
             data={"picking": self._stock_picking_data(picking)},
-            message={
-                "message_type": "success",
-                "body": "Product(s) packed in {}".format(new_package.name),
-            },
+            message=self.msg_store.goods_packed_in(new_package),
         )
+
+    def test_scan_package_action_scan_packaging_bad_carrier(self):
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        picking.carrier_id = picking.carrier_id.search([], limit=1)
+        pack1_moves = picking.move_lines
+        # put in 2 packs, for this test, we'll work on pack1
+        self._fill_stock_for_moves(pack1_moves, in_package=True)
+        picking.action_assign()
+        selected_lines = pack1_moves.move_line_ids
+        selected_lines.qty_done = selected_lines.product_uom_qty
+
+        packaging = (
+            self.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "DeliverX",
+                    "barcode": "XXX",
+                    "height": 12,
+                    "width": 13,
+                    "lngth": 14,
+                }
+            )
+        )
+        # Delivery type and package_carrier_type values
+        # depend on specific implementations that we don't have as dependency.
+        # What is important here is to simulate their value when mismatching.
+        mock1 = mock.patch.object(
+            type(packaging), "package_carrier_type", new_callable=mock.PropertyMock,
+        )
+        mock2 = mock.patch.object(
+            type(picking.carrier_id), "delivery_type", new_callable=mock.PropertyMock,
+        )
+        with mock1 as mocked_package_carrier_type, mock2 as mocked_delivery_type:
+            # Not matching at all -> bad
+            mocked_package_carrier_type.return_value = "DHL"
+            mocked_delivery_type.return_value = "UPS"
+            response = self.service.dispatch(
+                "scan_package_action",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_ids": selected_lines.ids,
+                    # create a new package using this packaging
+                    "barcode": packaging.barcode,
+                },
+            )
+            self._assert_selected_response(
+                response,
+                selected_lines,
+                message=self.msg_store.packaging_invalid_for_carrier(
+                    packaging, picking.carrier_id
+                ),
+            )
+            # No carrier type set on the packaging -> good
+            mocked_package_carrier_type.return_value = "none"
+            response = self.service.dispatch(
+                "scan_package_action",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_ids": selected_lines.ids,
+                    # create a new package using this packaging
+                    "barcode": packaging.barcode,
+                },
+            )
+            self.assertEqual(
+                response["message"],
+                self.msg_store.goods_packed_in(selected_lines.result_package_id),
+            )
 
     def test_scan_package_action_scan_not_found(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])

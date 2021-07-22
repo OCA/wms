@@ -3,38 +3,13 @@
 from odoo import fields
 
 from odoo.addons.component.core import Component
+from odoo.addons.shopfloor_base.utils import ensure_model
 
 
 class DataAction(Component):
-    """Provide methods to share data structures
+    _inherit = "shopfloor.data.action"
 
-    The methods should be used in Service Components, so we try to
-    have similar data structures across scenarios.
-    """
-
-    _name = "shopfloor.data.action"
-    _inherit = "shopfloor.process.action"
-    _usage = "data"
-
-    def _jsonify(self, recordset, parser, multi=False, **kw):
-        res = recordset.jsonify(parser)
-        if not multi:
-            return res[0] if res else None
-        return res
-
-    def _simple_record_parser(self):
-        return ["id", "name"]
-
-    def partner(self, record, **kw):
-        return self._jsonify(record, self._partner_parser, **kw)
-
-    def partners(self, record, **kw):
-        return self.partner(record, multi=True)
-
-    @property
-    def _partner_parser(self):
-        return self._simple_record_parser()
-
+    @ensure_model("stock.location")
     def location(self, record, **kw):
         return self._jsonify(
             record.with_context(location=record.id), self._location_parser, **kw
@@ -45,8 +20,14 @@ class DataAction(Component):
 
     @property
     def _location_parser(self):
-        return ["id", "name", "barcode"]
+        return [
+            "id",
+            "name",
+            # Fallback to name if barcode is not valued.
+            ("barcode", lambda rec, fname: rec[fname] if rec[fname] else rec.name),
+        ]
 
+    @ensure_model("stock.picking")
     def picking(self, record, **kw):
         return self._jsonify(record, self._picking_parser, **kw)
 
@@ -61,11 +42,13 @@ class DataAction(Component):
             "origin",
             "note",
             ("partner_id:partner", self._partner_parser),
+            ("carrier_id:carrier", self._simple_record_parser()),
             "move_line_count",
             "total_weight:weight",
             "scheduled_date",
         ]
 
+    @ensure_model("stock.quant.package")
     def package(self, record, picking=None, with_packaging=False, **kw):
         """Return data for a stock.quant.package
 
@@ -91,7 +74,7 @@ class DataAction(Component):
         return [
             "id",
             "name",
-            "pack_weight:weight",
+            "shopfloor_weight:weight",
             ("package_storage_type_id:storage_type", ["id", "name"]),
         ]
 
@@ -101,6 +84,7 @@ class DataAction(Component):
             ("packaging_id:packaging", self._packaging_parser),
         ]
 
+    @ensure_model("product.packaging")
     def packaging(self, record, **kw):
         return self._jsonify(record, self._packaging_parser, **kw)
 
@@ -116,6 +100,26 @@ class DataAction(Component):
             "qty",
         ]
 
+    @ensure_model("product.packaging")
+    def delivery_packaging(self, record, **kw):
+        return self._jsonify(record, self._delivery_packaging_parser, **kw)
+
+    def delivery_packaging_list(self, records, **kw):
+        return self.delivery_packaging(records, multi=True)
+
+    @property
+    def _delivery_packaging_parser(self):
+        return [
+            "id",
+            "name",
+            (
+                "packaging_type_id:packaging_type",
+                lambda rec, fname: rec.packaging_type_id.display_name,
+            ),
+            "barcode",
+        ]
+
+    @ensure_model("stock.production.lot")
     def lot(self, record, **kw):
         return self._jsonify(record, self._lot_parser, **kw)
 
@@ -126,6 +130,7 @@ class DataAction(Component):
     def _lot_parser(self):
         return self._simple_record_parser() + ["ref"]
 
+    @ensure_model("stock.move.line")
     def move_line(self, record, with_picking=False, **kw):
         record = record.with_context(location=record.location_id.id)
         parser = self._move_line_parser
@@ -141,7 +146,11 @@ class DataAction(Component):
                         record.package_id, record.picking_id, **kw
                     ),
                     "package_dest": self.package(
-                        record.result_package_id, record.picking_id, **kw
+                        record.result_package_id.with_context(
+                            picking_id=record.picking_id.id
+                        ),
+                        record.picking_id,
+                        **kw,
                     ),
                 }
             )
@@ -166,6 +175,7 @@ class DataAction(Component):
             ),
         ]
 
+    @ensure_model("stock.package_level")
     def package_level(self, record, **kw):
         return self._jsonify(record, self._package_level_parser)
 
@@ -200,6 +210,7 @@ class DataAction(Component):
             ),
         ]
 
+    @ensure_model("product.product")
     def product(self, record, **kw):
         return self._jsonify(record, self._product_parser, **kw)
 
@@ -232,6 +243,7 @@ class DataAction(Component):
         )
         return supplier_info.product_code or ""
 
+    @ensure_model("stock.picking.batch")
     def picking_batch(self, record, with_pickings=False, **kw):
         parser = self._picking_batch_parser
         if with_pickings:
@@ -245,6 +257,7 @@ class DataAction(Component):
     def _picking_batch_parser(self):
         return ["id", "name", "picking_count", "move_line_count", "total_weight:weight"]
 
+    @ensure_model("stock.picking.type")
     def picking_type(self, record, **kw):
         parser = self._picking_type_parser
         return self._jsonify(record, parser, **kw)
