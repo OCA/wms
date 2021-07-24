@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-04-14 20:46+0000\n"
+"PO-Revision-Date: 2021-07-24 18:49+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -27,6 +27,15 @@ msgid ""
 "* if a package is scanned, the package is validated against the carrier\n"
 "* in both cases, if the picking has no carrier the operation fails.\",\n"
 msgstr ""
+"\n"
+"Si marca esta casilla, mientras recoge mercancías de una ubicación\n"
+"(por ejemplo: selección de zona) el destino establecido funcionará de la "
+"siguiente manera:\n"
+"\n"
+"* si se escanea una ubicación, se crea un nuevo paquete de entrega;\n"
+"* si se escanea un paquete, el paquete se valida con el transportista\n"
+"* en ambos casos, si el picking no tiene transportista la operación falla. \""
+",\n"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -205,7 +214,7 @@ msgstr "Desde"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Goods packed into {0.name}"
-msgstr ""
+msgstr "Mercadería empaquetada en {0.name}"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__id
@@ -473,7 +482,7 @@ msgstr "No hay paquete válido para seleccionar."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No value"
-msgstr ""
+msgstr "Sin valor"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -615,7 +624,7 @@ msgstr "Paquetes"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Packaging '{}' is not allowed for carrier {}."
-msgstr ""
+msgstr "El Paquete '{}' no está permitido para el transportista {}."
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
@@ -630,16 +639,18 @@ msgid ""
 "Pick + Pack mode ON: the picking {0.name} has no carrier set. The system "
 "couldn't pack goods automatically."
 msgstr ""
+"Modo Pick + Pack ACTIVADO: el picking {0.name} no tiene un transportista "
+"configurado. El sistema no podrá empaquetar mercadería automáticamente."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__pick_pack_same_time_is_possible
 msgid "Pick Pack Same Time Is Possible"
-msgstr ""
+msgstr "Pick / Pack al mismo tiempo es Posible"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__pick_pack_same_time
 msgid "Pick and pack at the same time"
-msgstr ""
+msgstr "Pick y pack al mismo tiempo"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/change_package_lot.py:0
@@ -1010,7 +1021,7 @@ msgstr "El paquete %s no puede ser transferido con este escenario."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The package %s doesn't contain any product to take."
-msgstr ""
+msgstr "El paquete %s no contiene un producto para empaquetar."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1215,6 +1226,8 @@ msgid ""
 "You scanned a different package with the same product, do you want to change "
 "pack? Scan it again to confirm"
 msgstr ""
+"Escaneó un paquete diferente con el mismo producto, ¿desea cambiar el "
+"paquete? Escanéalo de nuevo para confirmar"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/inventory.py:0
