@@ -4,15 +4,15 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {ItemDetailMixin} from "./detail_mixin.js";
+import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
 
 Vue.component("detail-package", {
     mixins: [ItemDetailMixin],
     methods: {
         detail_fields() {
             return [
-                {path: "location_src.name", label: "Location"},
-                {path: "weight", label: "Weight"},
+                {path: "location.name", label: "Location"},
+                {path: "weight", label: "Weight (kg)"},
                 {path: "packaging.name", label: "Packaging"},
                 {path: "storage_type.name", label: "Storage type"},
                 {path: "package_type.name", label: "Package type"},
@@ -24,7 +24,7 @@ Vue.component("detail-package", {
                 key_title: "",
                 list_item_options: {
                     fields: this.product_list_fields(),
-                    list_item_klass_maker: this.utils.misc.move_line_color_klass,
+                    list_item_klass_maker: this.utils.wms.move_line_color_klass,
                 },
             };
         },
@@ -35,9 +35,10 @@ Vue.component("detail-package", {
                     action_val_path: "product.barcode",
                     klass: "loud",
                 },
+                {path: "product.barcode", label: "Barcode"},
                 {path: "product.supplier_code", label: "Vendor code"},
                 {path: "lot.name", label: "Lot"},
-                {path: "product.qty_reserved", label: "Reserved"},
+                {path: "quantity", label: "Reserved"},
                 {path: "product.qty_available", label: "In stock"},
             ];
         },

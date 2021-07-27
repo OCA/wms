@@ -6,8 +6,8 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {ScenarioBaseMixin} from "./mixins.js";
-import {process_registry} from "../services/process_registry.js";
+import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
+import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
 
 export var SinglePackStatesMixin = {
     data: function () {
@@ -36,12 +36,14 @@ export var SinglePackStatesMixin = {
                         show_cancel_button: true,
                     },
                     on_scan: (scanned, confirmation = false) => {
+                        const data = this.state.data;
                         this.state_set_data({location_barcode: scanned.text});
                         this.wait_call(
                             this.odoo.call("validate", {
-                                package_level_id: this.state.data.id,
+                                package_level_id: data.id,
                                 location_barcode: scanned.text,
-                                confirmation: confirmation,
+                                confirmation:
+                                    confirmation || data.confirmation_required,
                             })
                         );
                     },
@@ -71,7 +73,7 @@ const SinglePackTransfer = {
                 <item-detail-card
                     :key="make_state_component_key(['product', state.data.id])"
                     :record="state.data"
-                    :options="utils.misc.move_line_product_detail_options()"
+                    :options="utils.wms.move_line_product_detail_options()"
                     :card_color="utils.colors.color_for('screen_step_done')"
                     />
                 <item-detail-card

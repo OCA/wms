@@ -155,6 +155,7 @@ export var PackagingQtyPickerMixin = {
                 mode: "",
                 available_packaging: [],
                 uom: {},
+                pkg_name_key: "code", // This comes from packaging type
             });
             return opts;
         },
@@ -269,14 +270,23 @@ export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-displ
     mounted: function () {
         this._init_readonly();
     },
+    methods: {
+        display_pkg: function(pkg) {
+            return this.opts.non_zero_only ? this.qty_by_pkg[pkg.id] || 0 > 0 : true;
+        },
+    },
+    computed: {
+        visible_packaging: function() {
+            return _.filter(this.sorted_packaging, this.display_pkg);
+        },
+    },
     template: `
 <div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode: '', 'd-inline']">
-    <span class="packaging" v-for="(pkg, index) in sorted_packaging" :key="make_component_key([pkg.id])">
+    <span class="packaging" v-for="(pkg, index) in visible_packaging" :key="make_component_key([pkg.id])">
         <span class="pkg-qty" v-text="qty_by_pkg[pkg.id] || 0" />
-        <span class="pkg-name" v-text="pkg.name" /><span class="sep" v-if="index != Object.keys(sorted_packaging).length - 1">, </span>
+        <span class="pkg-name" v-text="pkg[opts.pkg_name_key]" /><span class="sep" v-if="index != Object.keys(visible_packaging).length - 1">, </span>
     </span>
-    <!-- TOOO: use product uom -->
-    <span class="min-unit">({{ opts.init_value }} Units)</span>
+    <span class="min-unit">({{ opts.init_value }} {{ unit_uom.name }})</span>
 </div>
 `,
 });

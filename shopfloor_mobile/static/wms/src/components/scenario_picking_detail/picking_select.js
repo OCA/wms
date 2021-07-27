@@ -6,7 +6,7 @@
 /* eslint-disable strict */
 /* eslint-disable no-implicit-globals */
 import {PickingDetailSelectMixin} from "./mixins.js";
-import {ItemDetailMixin} from "../detail/detail_mixin.js";
+import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
 
 Vue.component("detail-picking-select", {
     mixins: [PickingDetailSelectMixin],
@@ -39,7 +39,7 @@ Vue.component("picking-select-line-content", {
     },
     methods: {
         no_pack_list_item_options(record) {
-            let opts = this.utils.misc.move_line_product_detail_options(record);
+            let opts = this.utils.wms.move_line_product_detail_options(record);
             opts.fields.unshift({
                 path: "product.display_name",
                 action_val_path: "product.barcode",
@@ -76,8 +76,22 @@ Vue.component("picking-select-package-content", {
             <div class="lot" v-if="record.lot">
                 <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
             </div>
-            <div class="qty">
-                <span class="label">Qty:</span> <span>{{ record.qty_done }} / {{ record.quantity }}</span>
+            <div class="qty done">
+                <span class="label">Taken:</span>
+                <packaging-qty-picker-display
+                    :key="make_component_key(['qty-picker-widget', 'taken', record.id])"
+                    :options="utils.wms.move_line_qty_picker_options(record, {init_value: record.qty_done})"
+                    />
+            </div>
+            <div class="qty requested">
+                <span class="label">Requested:</span>
+                <packaging-qty-picker-display
+                    :key="make_component_key(['qty-picker-widget', 'requested', record.id])"
+                    :options="utils.wms.move_line_qty_picker_options(record)"
+                    />
+            </div>
+            <div class="vendor-code">
+                <span class="label">Vendor code:</span> <span>{{ record.product.supplier_code }}</span>
             </div>
         </div>
     </div>

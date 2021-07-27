@@ -1,10 +1,12 @@
 /**
  * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * Copyright 2021 ACSONE SA/NV (http://www.acsone.eu)
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
+import {utils_registry} from "/shopfloor_mobile_base/static/wms/src/services/utils_registry.js";
 
-export class Utils {
+export class WMSUtils {
     constructor() {}
 
     group_lines_by_location(lines, options) {
@@ -14,23 +16,24 @@ export class Utils {
             group_key: "location_src",
             group_no_title: false,
             name_prefix: "Location",
-            prepare_records: function (recs) {
+            prepare_records: function(recs) {
                 return recs;
             },
-            group_color_maker: function (recs) {
+            group_color_maker: function(recs) {
                 return "";
             },
         });
         const res = [];
         const locations = _.uniqBy(
-            _.map(lines, function (x) {
+            _.map(lines, function(x) {
                 return x[options.group_key];
             }),
             "id"
         );
         const grouped = _.groupBy(lines, options.group_key + ".id");
-        _.forEach(grouped, function (value, loc_id) {
-            const location = _.first(_.filter(locations, {id: parseInt(loc_id)}));
+        // TODO: grouped.forEach?
+        _.forEach(grouped, function(value, loc_id) {
+            const location = _.first(_.filter(locations, {id: parseInt(loc_id, 10)}));
             const title = options.group_no_title
                 ? ""
                 : options.name_prefix
@@ -51,29 +54,29 @@ export class Utils {
         let self = this;
         // {key: 'no-group', location_src: {}, location_dest: {} records: []}
         options = _.defaults(options || {}, {
-            prepare_records: function (recs) {
+            prepare_records: function(recs) {
                 return recs;
             },
         });
         const res = [];
         const locations = _.uniqBy(
             _.concat(
-                _.map(lines, function (x) {
+                _.map(lines, function(x) {
                     return x.location_src;
                 }),
-                _.map(lines, function (x) {
+                _.map(lines, function(x) {
                     return x.location_dest;
                 })
             ),
             "id"
         );
         const grouped = _.chain(lines)
-            .groupBy((item) => `${item.location_src.id}--${item.location_dest.id}`)
+            .groupBy(item => `${item.location_src.id}--${item.location_dest.id}`)
             .value();
-        _.forEach(grouped, function (value, loc_ids) {
+        _.forEach(grouped, function(value, loc_ids) {
             const [src_id, dest_id] = loc_ids.split("--");
-            const src_loc = _.first(_.filter(locations, {id: parseInt(src_id)}));
-            const dest_loc = _.first(_.filter(locations, {id: parseInt(dest_id)}));
+            const src_loc = _.first(_.filter(locations, {id: parseInt(src_id, 10)}));
+            const dest_loc = _.first(_.filter(locations, {id: parseInt(dest_id, 10)}));
             res.push({
                 _is_group: true,
                 key: loc_ids,
@@ -89,12 +92,12 @@ export class Utils {
         let self = this;
         const res = [];
         const packs = _.uniqBy(
-            _.map(lines, function (x) {
+            _.map(lines, function(x) {
                 return _.result(x, package_key);
             }),
             "id"
         );
-        const grouped = _.groupBy(lines, function (l) {
+        const grouped = _.groupBy(lines, function(l) {
             const pack_id = _.result(l, package_key + ".id");
             if (pack_id) {
                 return "pack-" + pack_id;
@@ -102,12 +105,12 @@ export class Utils {
             return "raw-" + l.id + l.product.id;
         });
         let counter = 0;
-        _.forEach(grouped, function (products, key) {
+        _.forEach(grouped, function(products, key) {
             counter++;
             let pack = null;
             if (key.startsWith("pack")) {
                 pack = _.first(
-                    _.filter(packs, {id: parseInt(key.split("-").slice(-1)[0])})
+                    _.filter(packs, {id: parseInt(key.split("-").slice(-1)[0], 10)})
                 );
             }
             res.push({
@@ -126,7 +129,7 @@ export class Utils {
     group_by_package_type(lines) {
         const res = [];
         const grouped = _.groupBy(lines, "package_dest.packaging.name");
-        _.forEach(grouped, function (products, packaging_name) {
+        _.forEach(grouped, function(products, packaging_name) {
             res.push({
                 _is_group: true,
                 // groupBy gives undefined as string
@@ -141,7 +144,7 @@ export class Utils {
     only_one_package(lines) {
         let res = [];
         let pkg_seen = [];
-        lines.forEach(function (line) {
+        lines.forEach(function(line) {
             if (line.package_dest) {
                 if (!pkg_seen.includes(line.package_dest.id)) {
                     // got a pack
@@ -157,7 +160,7 @@ export class Utils {
     }
 
     completed_move_lines(move_lines) {
-        return _.filter(move_lines, function (l) {
+        return _.filter(move_lines, function(l) {
             return l.qty_done > 0;
         }).length;
     }
@@ -175,33 +178,10 @@ export class Utils {
 
     order_picking_by_completeness(pickings) {
         const self = this;
-        const ordered = _.sortBy(pickings, function (rec) {
+        const ordered = _.sortBy(pickings, function(rec) {
             return self.picking_completeness(rec);
         });
         return _.reverse(ordered);
-    }
-
-    // Display utils: TODO: split them to their own place
-
-    format_date_display(date_string, options = {}) {
-        _.defaults(options, {
-            locale: navigator ? navigator.language : "en-US",
-            format: {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-            },
-        });
-        return new Date(Date.parse(date_string)).toLocaleString(
-            options.locale,
-            options.format
-        );
-    }
-
-    render_field_date(record, field) {
-        return this.format_date_display(_.result(record, field.path));
     }
 
     move_line_color_klass(rec) {
@@ -219,7 +199,6 @@ export class Utils {
         }
         return "move-line-" + klass;
     }
-
     /**
      * Provide display options for rendering move line product's info.
      *
@@ -239,7 +218,7 @@ export class Utils {
                 path: "quantity",
                 label: "Qty",
                 render_component: "packaging-qty-picker-display",
-                render_options: function (record) {
+                render_options: function(record) {
                     return self.move_line_qty_picker_options(record);
                 },
             },
@@ -255,7 +234,7 @@ export class Utils {
         options.fields = options.fields_extend_default
             ? default_fields.concat(options.fields || [])
             : options.fields || [];
-        options.fields = _.filter(options.fields, function (field) {
+        options.fields = _.filter(options.fields, function(field) {
             return !options.fields_blacklist.includes(field.path);
         });
         return options;
@@ -265,9 +244,10 @@ export class Utils {
             init_value: line.quantity,
             available_packaging: line.product.packaging,
             uom: line.product.uom,
+            non_zero_only: true,
         };
         return _.extend(opts, override || {});
     }
 }
 
-export const utils = new Utils();
+utils_registry.add("wms", new WMSUtils());

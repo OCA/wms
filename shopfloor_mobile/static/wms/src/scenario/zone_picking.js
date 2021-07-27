@@ -1,5 +1,11 @@
-import {ScenarioBaseMixin} from "./mixins.js";
-import {process_registry} from "../services/process_registry.js";
+/**
+ * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * @author Simone Orsi <simahawk@gmail.com>
+ * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+ */
+
+import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
+import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
 
 const template_mobile = `
     <Screen :screen_info="screen_info">
@@ -60,14 +66,19 @@ const template_mobile = `
 
                 <template v-slot:item.quantity="{ item }">
                     <packaging-qty-picker-display
-                        :options="utils.misc.move_line_qty_picker_options(item['_origin'])"
+                        :key="make_state_component_key(['qty-picker-widget', item['_origin'].id])"
+                        :options="utils.wms.move_line_qty_picker_options(item['_origin'])"
                         />
                 </template>
                 <template v-slot:item.priority="{ item }">
-                    <priority-widget :options="{priority: parseInt(item.priority || '0', 10)}" />
+                    <priority-widget
+                        :key="make_state_component_key(['priority-widget', item['_origin'].id])"
+                        :options="{priority: parseInt(item.priority || '0', 10)}" />
                 </template>
                 <template v-slot:item.location_will_be_empty="{ item }">
-                    <empty-location-icon :record="item" />
+                    <empty-location-icon :record="item"
+                        :key="make_state_component_key(['empty-location-icon', item['_origin'].id])"
+                        />
                 </template>
             </v-data-table>
 
@@ -107,7 +118,7 @@ const template_mobile = `
             v-if="state_in(['set_line_destination', 'stock_issue', 'change_pack_lot'])"
             :key="make_state_component_key(['detail-move-line-product', state.data.move_line.id])"
             :record="state.data.move_line"
-            :options="utils.misc.move_line_product_detail_options(state.data.move_line, {fields: [{path: 'picking.name', label: 'Picking'}]})"
+            :options="utils.wms.move_line_product_detail_options(state.data.move_line, {fields: [{path: 'picking.name', label: 'Picking'}]})"
             :card_color="utils.colors.color_for(state_in(['set_line_destination']) ? 'screen_step_done': 'screen_step_todo')"
             />
         <item-detail-card
@@ -121,7 +132,7 @@ const template_mobile = `
                 class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
             <packaging-qty-picker
                 :key="make_state_component_key(['packaging-qty-picker', state.data.move_line.id])"
-                :options="utils.misc.move_line_qty_picker_options(state.data.move_line)"
+                :options="utils.wms.move_line_qty_picker_options(state.data.move_line)"
                 />
         </v-card>
         <item-detail-card
@@ -208,7 +219,43 @@ const TEMPLATES = {
 const ZonePicking = {
     mixins: [ScenarioBaseMixin],
     methods: {
-        screen_klass: function () {
+        /**
+         * Override to inject headers for zone location and picking type when needed.
+         */
+        _get_odoo_params: function() {
+            const params = this.$super(ScenarioBaseMixin)._get_odoo_params();
+            const zone = this.current_zone_location();
+            const picking_type = this.current_picking_type();
+            if (_.isUndefined(params.headers)) {
+                params["headers"] = {};
+            }
+            _.defaults(
+                params.headers,
+                this._get_zone_picking_headers(zone.id, picking_type.id)
+            );
+            return params;
+        },
+        /**
+         * Retrieve zone_picking scenario specific headers.
+         *
+         * The zone picking scenario requires some special headers
+         * to share some key parameters accross all methods.
+         *
+         * @param {*} zone_id: ID of current zone
+         * @param {*} picking_type_id: ID of selected picking type
+         */
+        _get_zone_picking_headers: function(zone_id, picking_type_id) {
+            let res = {};
+            if (_.isInteger(zone_id)) {
+                res["SERVICE-CTX-ZONE-LOCATION-ID"] = zone_id;
+            }
+            if (_.isInteger(picking_type_id)) {
+                res["SERVICE-CTX-PICKING-TYPE-ID"] = picking_type_id;
+            }
+            res["SERVICE-CTX-LINES-ORDER"] = this.order_lines_by;
+            return res;
+        },
+        screen_klass: function() {
             return (
                 this.$super(ScenarioBaseMixin).screen_klass() +
                 " device-mode-" +
@@ -360,16 +407,16 @@ const ZonePicking = {
                     path: "quantity",
                     label: "Qty",
                     render_component: "packaging-qty-picker-display",
-                    render_options: function (record) {
-                        return self.utils.misc.move_line_qty_picker_options(record);
+                    render_options: function(record) {
+                        return self.utils.wms.move_line_qty_picker_options(record);
                     },
                 },
                 {path: "package_src.weight", label: "Weight"},
                 {
                     path: "picking.scheduled_date",
                     label: "Date",
-                    renderer: function (rec, field) {
-                        return self.utils.misc.render_field_date(rec, field);
+                    renderer: function(rec, field) {
+                        return self.utils.display.render_field_date(rec, field);
                     },
                 },
                 {
@@ -392,7 +439,7 @@ const ZonePicking = {
             return fields;
         },
         select_line_move_line_records_grouped(move_lines) {
-            return this.utils.misc.group_lines_by_location(move_lines, {});
+            return this.utils.wms.group_lines_by_location(move_lines, {});
         },
         toggle_sort_lines_by() {
             this.order_lines_by =
@@ -400,30 +447,27 @@ const ZonePicking = {
             return this.list_move_lines(this.current_picking_type().id);
         },
         list_move_lines(picking_type_id) {
-            return this.wait_call(
-                this.odoo.call("list_move_lines", {
-                    zone_location_id: this.current_zone_location().id,
-                    picking_type_id: picking_type_id,
-                    order: this.order_lines_by,
-                })
+            const zone_id = this.current_zone_location().id;
+            this.odoo._update_headers(
+                this._get_zone_picking_headers(zone_id, picking_type_id)
             );
+            return this.wait_call(this.odoo.call("list_move_lines", {}));
         },
         scan_source(barcode) {
             return this.wait_call(
                 this.odoo.call("scan_source", {
-                    zone_location_id: this.current_zone_location().id,
-                    picking_type_id: this.current_picking_type().id,
                     barcode: barcode,
+                    confirmation: this.state.data.confirmation_required,
                 })
             );
         },
         picking_summary_records_grouped(move_lines) {
             const self = this;
-            return this.utils.misc.group_lines_by_location(move_lines, {
+            return this.utils.wms.group_lines_by_location(move_lines, {
                 group_key: "location_dest",
                 // group_no_title: true,
                 prepare_records: _.partialRight(
-                    this.utils.misc.group_by_pack,
+                    this.utils.wms.group_by_pack,
                     "package_dest"
                 ),
                 group_color_maker: function (lines) {
@@ -439,7 +483,7 @@ const ZonePicking = {
                 list_item_options: {
                     actions: [],
                     fields: this.picking_summary_move_line_detail_fields(),
-                    list_item_klass_maker: this.utils.misc.move_line_color_klass,
+                    list_item_klass_maker: this.utils.wms.move_line_color_klass,
                 },
             };
         },
@@ -547,12 +591,7 @@ const ZonePicking = {
                         this.scan_source(barcode);
                     },
                     on_unload_at_destination: () => {
-                        this.wait_call(
-                            this.odoo.call("prepare_unload", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
-                            })
-                        );
+                        this.wait_call(this.odoo.call("prepare_unload", {}));
                     },
                 },
                 set_line_destination: {
@@ -577,8 +616,6 @@ const ZonePicking = {
                         const data = this.state.data;
                         this.wait_call(
                             this.odoo.call("set_destination", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 move_line_id: data.move_line.id,
                                 barcode: scanned.text,
                                 quantity: this.scan_destination_qty,
@@ -609,20 +646,13 @@ const ZonePicking = {
                         this.state_set_data({location_barcode: scanned.text});
                         this.wait_call(
                             this.odoo.call("set_destination_all", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 barcode: scanned.text,
                                 confirmation: this.state.data.confirmation_required,
                             })
                         );
                     },
                     on_action_split: () => {
-                        this.wait_call(
-                            this.odoo.call("unload_split", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
-                            })
-                        );
+                        this.wait_call(this.odoo.call("unload_split", {}));
                     },
                 },
                 unload_single: {
@@ -633,8 +663,6 @@ const ZonePicking = {
                     on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("unload_scan_pack", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 package_id: this.state.data.move_line.package_dest.id,
                                 barcode: scanned.text,
                             })
@@ -649,8 +677,6 @@ const ZonePicking = {
                     on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("unload_set_destination", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 package_id: this.state.data.move_line.package_dest.id,
                                 barcode: scanned.text,
                                 confirmation: this.state.data.confirmation_required,
@@ -666,8 +692,6 @@ const ZonePicking = {
                     on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("change_pack_lot", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 move_line_id: this.state.data.move_line.id,
                                 barcode: scanned.text,
                             })
@@ -684,8 +708,6 @@ const ZonePicking = {
                     on_confirm_stock_issue: () => {
                         this.wait_call(
                             this.odoo.call("stock_issue", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 move_line_id: this.state.data.move_line.id,
                             })
                         );
@@ -703,8 +725,6 @@ const ZonePicking = {
                     is_zero: (zero_flag) => {
                         this.wait_call(
                             this.odoo.call("is_zero", {
-                                zone_location_id: this.current_zone_location().id,
-                                picking_type_id: this.current_picking_type().id,
                                 move_line_id: this.state.data.move_line.id,
                                 zero: zero_flag,
                             })
