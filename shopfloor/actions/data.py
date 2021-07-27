@@ -286,3 +286,28 @@ class DataAction(Component):
             "id",
             "name",
         ]
+
+    def purchase_order(self, record, **kw):
+        parser = self._purchase_order_parser
+        data = self._jsonify(record, parser, **kw)
+
+        if data:
+            for order in data:
+                order.update({"order_line_count": len(order["order_line"])})
+                order.pop("order_line")
+
+        return data
+
+    def purchase_orders(self, record, **kw):
+        return self.purchase_order(record, multi=True)
+
+    @property
+    def _purchase_order_parser(self):
+        return [
+            "id",
+            "name",
+            "date_order",
+            "date_planned",
+            ("partner_id:partner", self._partner_parser),
+            "order_line",
+        ]
