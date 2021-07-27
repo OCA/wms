@@ -2,6 +2,7 @@ from functools import wraps
 
 from odoo import _
 
+
 class ScenarioError(Exception):
     def __init__(self, response):
         super().__init__("")

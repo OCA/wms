@@ -22,6 +22,12 @@ const Reception = {
                 @select-picking="state.onSelectPicking"
                 :stateData="state"
                 />
+            <choosing-purchase-order
+                v-if="state_is('choose_purchase_order')"
+                @select-order="state.onSelectOrder"
+                :orders="state.data.purchase_orders"
+                :fields="state.fields"
+            />
             <reception-scanning-product
                 v-if="state_is('scan_products')"
                 :stateData="state"
@@ -63,7 +69,11 @@ const Reception = {
             states: {
                 start: {
                     onSelectContact: partner_id => {
-                        this.wait_call(this.odoo.call("list_move_lines", {partner_id}));
+                        this.wait_call(
+                            this.odoo.call("list_purchase_order_for_vendor", {
+                                partner_id,
+                            })
+                        );
                     },
                     fields: [
                         {
@@ -76,6 +86,34 @@ const Reception = {
                             this.wait_call(this.odoo.call("list_vendor_with_pickings"));
                         }
                     },
+                },
+                choose_purchase_order: {
+                    onSelectOrder: purchase_order_id => {
+                        this.wait_call(
+                            this.odoo.call("list_move_lines", {
+                                partner_id: this.state.data.id,
+                                purchase_order_id,
+                            })
+                        );
+                    },
+                    fields: [
+                        {
+                            label: "Partner",
+                            path: "partner.name",
+                            loud: true,
+                        },
+                        {
+                            label: "Number of order lines",
+                            path: "order_line_count",
+                        },
+                        {
+                            label: "Date planned",
+                            path: "date_order",
+                            renderer: (rec, field) => {
+                                return this.utils.display.render_field_date(rec, field);
+                            },
+                        },
+                    ],
                 },
                 scan_products: {
                     scanned: [],
