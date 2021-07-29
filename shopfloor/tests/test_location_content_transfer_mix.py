@@ -120,7 +120,10 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
             dest_location = move_line.location_dest_id
         qty = move_line.product_uom_qty
         response = self.zp_service.set_destination(
-            move_line.id, dest_location.barcode, qty, confirmation=True,
+            move_line.id,
+            dest_location.barcode,
+            qty,
+            confirmation=True,
         )
         assert response["message"]["message_type"] == "success"
         self.assertEqual(move_line.state, "done")
@@ -477,7 +480,8 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         self.assert_response_start(
             response,
             message=self.service.msg_store.location_content_transfer_complete(
-                pack_first_pallet.location_id, pack_first_pallet.location_dest_id,
+                pack_first_pallet.location_id,
+                pack_first_pallet.location_dest_id,
             ),
         )
         self.assertEqual(pack_first_pallet.qty_done, 6)

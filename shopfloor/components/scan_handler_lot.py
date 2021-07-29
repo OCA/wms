@@ -7,8 +7,7 @@ from odoo.addons.component.core import Component
 
 
 class LotHandler(Component):
-    """Scan anything handler for stock.production.lot.
-    """
+    """Scan anything handler for stock.production.lot."""
 
     _name = "shopfloor.scan.lot.handler"
     _inherit = "shopfloor.scan.anything.handler"

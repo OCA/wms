@@ -27,14 +27,19 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         move_line2.location_dest_id = self.zone_sublocation3
         # set the destination package on lines
         self.service._set_destination_package(
-            move_line1, move_line1.product_uom_qty, self.free_package,
+            move_line1,
+            move_line1.product_uom_qty,
+            self.free_package,
         )
         self.service._set_destination_package(
-            move_line2, move_line2.product_uom_qty, another_package,
+            move_line2,
+            move_line2.product_uom_qty,
+            another_package,
         )
         # set destination location for all lines in the buffer
         response = self.service.dispatch(
-            "set_destination_all", params={"barcode": self.packing_location.barcode},
+            "set_destination_all",
+            params={"barcode": self.packing_location.barcode},
         )
         # check response
         buffer_lines = self.service._find_buffer_move_lines()
@@ -78,10 +83,14 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         )
         # set the destination package on lines
         self.service._set_destination_package(
-            move_line1, move_line1.product_uom_qty, self.free_package,
+            move_line1,
+            move_line1.product_uom_qty,
+            self.free_package,
         )
         self.service._set_destination_package(
-            move_line2, move_line2.product_uom_qty, another_package,
+            move_line2,
+            move_line2.product_uom_qty,
+            another_package,
         )
         # set an allowed destination location (inside the picking type default
         # destination location) for all lines in the buffer with a non-expected
@@ -89,7 +98,8 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         # lines destination
         (move_line1 | move_line2).location_dest_id = packing_sublocation1
         response = self.service.dispatch(
-            "set_destination_all", params={"barcode": packing_sublocation2.barcode},
+            "set_destination_all",
+            params={"barcode": packing_sublocation2.barcode},
         )
         # check response: this destination needs the user confirmation
         buffer_lines = self.service._find_buffer_move_lines()
@@ -99,7 +109,8 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             picking_type,
             buffer_lines,
             message=self.service.msg_store.confirm_location_changed(
-                packing_sublocation1, packing_sublocation2,
+                packing_sublocation1,
+                packing_sublocation2,
             ),
             confirmation_required=True,
         )
@@ -108,7 +119,8 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         # meaning a destination which is a child of the current buffer lines
         # destination
         response = self.service.dispatch(
-            "set_destination_all", params={"barcode": packing_sublocation1.barcode},
+            "set_destination_all",
+            params={"barcode": packing_sublocation1.barcode},
         )
         # check response: OK
         move_lines = self.service._find_location_move_lines()
@@ -130,14 +142,19 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         )
         # set the destination package on lines
         self.service._set_destination_package(
-            move_line1, move_line1.product_uom_qty, self.free_package,
+            move_line1,
+            move_line1.product_uom_qty,
+            self.free_package,
         )
         self.service._set_destination_package(
-            move_line2, move_line2.product_uom_qty, another_package,
+            move_line2,
+            move_line2.product_uom_qty,
+            another_package,
         )
         # set destination location for all lines in the buffer
         response = self.service.dispatch(
-            "set_destination_all", params={"barcode": self.packing_location.barcode},
+            "set_destination_all",
+            params={"barcode": self.packing_location.barcode},
         )
         # check data
         self.assertEqual(self.picking5.state, "done")
@@ -172,14 +189,19 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         )
         # set the destination package on lines
         self.service._set_destination_package(
-            move_line_g, move_line_g.product_uom_qty, self.free_package,
+            move_line_g,
+            move_line_g.product_uom_qty,
+            self.free_package,
         )
         self.service._set_destination_package(
-            move_line_h, move_line_h.product_uom_qty, another_package,  # partial qty
+            move_line_h,
+            move_line_h.product_uom_qty,
+            another_package,  # partial qty
         )
         # set destination location for all lines in the buffer
         response = self.service.dispatch(
-            "set_destination_all", params={"barcode": self.packing_location.barcode},
+            "set_destination_all",
+            params={"barcode": self.packing_location.barcode},
         )
         # check data
         #   picking validated
@@ -215,10 +237,13 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         move_line = self.picking1.move_line_ids
         # set the destination package on lines
         self.service._set_destination_package(
-            move_line, move_line.product_uom_qty, self.free_package,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
         )
         response = self.service.dispatch(
-            "set_destination_all", params={"barcode": self.customer_location.barcode},
+            "set_destination_all",
+            params={"barcode": self.customer_location.barcode},
         )
         # check response
         buffer_lines = self.service._find_buffer_move_lines()
@@ -236,10 +261,13 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         move_line = self.picking1.move_line_ids
         # set the destination package on lines
         self.service._set_destination_package(
-            move_line, move_line.product_uom_qty, self.free_package,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
         )
         response = self.service.dispatch(
-            "set_destination_all", params={"barcode": "UNKNOWN"},
+            "set_destination_all",
+            params={"barcode": "UNKNOWN"},
         )
         # check response
         buffer_lines = self.service._find_buffer_move_lines()
@@ -254,7 +282,10 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
     def test_unload_split_buffer_empty(self):
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
-        response = self.service.dispatch("unload_split", params={},)
+        response = self.service.dispatch(
+            "unload_split",
+            params={},
+        )
         # check response
         move_lines = self.service._find_location_move_lines()
         self.assert_response_select_line(
@@ -271,13 +302,21 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         move_line = self.picking1.move_line_ids
         # put one line in the buffer
         self.service._set_destination_package(
-            move_line, move_line.product_uom_qty, self.free_package,
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
         )
-        response = self.service.dispatch("unload_split", params={},)
+        response = self.service.dispatch(
+            "unload_split",
+            params={},
+        )
         # check response
         buffer_lines = self.service._find_buffer_move_lines()
         self.assert_response_unload_set_destination(
-            response, zone_location, picking_type, buffer_lines,
+            response,
+            zone_location,
+            picking_type,
+            buffer_lines,
         )
 
     def test_unload_split_buffer_multi_lines(self):
@@ -292,9 +331,14 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             self.picking5.move_line_ids, self.free_package | self.another_package
         ):
             self.service._set_destination_package(
-                move_line, move_line.product_uom_qty, package_dest,
+                move_line,
+                move_line.product_uom_qty,
+                package_dest,
             )
-        response = self.service.dispatch("unload_split", params={},)
+        response = self.service.dispatch(
+            "unload_split",
+            params={},
+        )
         # check response
         buffer_lines = self.service._find_buffer_move_lines()
         completion_info = self.service._actions_for("completion.info")
