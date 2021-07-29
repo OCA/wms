@@ -8,6 +8,7 @@ setuptools.setup(
     description="Meta package for oca-wms Odoo addons",
     version=version,
     install_requires=[
+        'odoo14-addon-shopfloor',
         'odoo14-addon-shopfloor_base',
         'odoo14-addon-shopfloor_mobile_base',
         'odoo14-addon-stock_picking_completion_info',
