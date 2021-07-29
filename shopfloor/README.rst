@@ -105,6 +105,7 @@ Contributors
 * Alexandre Fayolle <alexandre.fayolle@camptocamp.com>
 * Benoit Guillot <benoit.guillot@akretion.com>
 * Thierry Ducrest <thierry.ducrest@camptocamp.com>
+* Raphaël Reverdy <raphael.reverdy@akretion.com>
 * Jacques-Etienne Baudoux <je@bcim.be>
 
 Design
