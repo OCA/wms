@@ -18,7 +18,7 @@ Vue.component("detail-product", {
         },
         full_detail_fields() {
             return [
-                // image TODO
+                // Image TODO
                 {path: "lot.name", label: "Lot"},
                 {path: "expiry_date", label: "Expiry date"},
                 {path: "default_code", label: "Internal ref"},
@@ -37,11 +37,7 @@ Vue.component("detail-product", {
             ];
         },
         render_packaging(record, field) {
-            return [
-                record["name"],
-                "(" + record["code"] + ")",
-                "= " + record["qty"],
-            ].join(" ");
+            return [record.name, "(" + record.code + ")", "= " + record.qty].join(" ");
         },
     },
     template: `

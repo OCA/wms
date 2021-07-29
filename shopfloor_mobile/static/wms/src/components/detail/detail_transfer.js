@@ -15,7 +15,7 @@ Vue.component("detail-transfer", {
                 {
                     path: "scheduled_date",
                     label: "Scheduled on",
-                    renderer: function(rec, field) {
+                    renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
                 },
@@ -63,7 +63,7 @@ Vue.component("detail-transfer", {
                     path: "product.qty_reserved",
                     label: "Qty reserved",
                     render_component: "packaging-qty-picker-display",
-                    render_options: function(record) {
+                    render_options: function (record) {
                         return self.utils.wms.move_line_qty_picker_options(record);
                     },
                 },
@@ -71,7 +71,7 @@ Vue.component("detail-transfer", {
                     path: "product.qty_available",
                     label: "Qty in stock",
                     render_component: "packaging-qty-picker-display",
-                    render_options: function(record) {
+                    render_options: function (record) {
                         return self.utils.wms.move_line_qty_picker_options(record);
                     },
                 },

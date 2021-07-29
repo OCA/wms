@@ -222,12 +222,12 @@ const ZonePicking = {
         /**
          * Override to inject headers for zone location and picking type when needed.
          */
-        _get_odoo_params: function() {
+        _get_odoo_params: function () {
             const params = this.$super(ScenarioBaseMixin)._get_odoo_params();
             const zone = this.current_zone_location();
             const picking_type = this.current_picking_type();
             if (_.isUndefined(params.headers)) {
-                params["headers"] = {};
+                params.headers = {};
             }
             _.defaults(
                 params.headers,
@@ -244,8 +244,8 @@ const ZonePicking = {
          * @param {*} zone_id: ID of current zone
          * @param {*} picking_type_id: ID of selected picking type
          */
-        _get_zone_picking_headers: function(zone_id, picking_type_id) {
-            let res = {};
+        _get_zone_picking_headers: function (zone_id, picking_type_id) {
+            const res = {};
             if (_.isInteger(zone_id)) {
                 res["SERVICE-CTX-ZONE-LOCATION-ID"] = zone_id;
             }
@@ -255,7 +255,7 @@ const ZonePicking = {
             res["SERVICE-CTX-LINES-ORDER"] = this.order_lines_by;
             return res;
         },
-        screen_klass: function() {
+        screen_klass: function () {
             return (
                 this.$super(ScenarioBaseMixin).screen_klass() +
                 " device-mode-" +
@@ -345,11 +345,11 @@ const ZonePicking = {
         },
         select_line_table_headers: function () {
             // Convert to v-data-table keys
-            let headers = _.map(this.move_line_list_fields(true), function (field) {
+            const headers = _.map(this.move_line_list_fields(true), function (field) {
                 return {
                     text: field.label,
                     value: field.path,
-                    // sorting delegated to button
+                    // Sorting delegated to button
                     sortable: false,
                 };
             });
@@ -358,21 +358,21 @@ const ZonePicking = {
         select_line_table_items: function () {
             const self = this;
             // Convert to v-data-table keys
-            let items = _.map(this.state.data.move_lines, function (record) {
-                let item_data = {};
+            const items = _.map(this.state.data.move_lines, function (record) {
+                const item_data = {};
                 _.forEach(self.move_line_list_fields(true), function (field) {
                     item_data[field.path] = _.result(record, field.path);
                     if (field.renderer) {
                         item_data[field.path] = field.renderer(record, field);
                     }
                 });
-                item_data["_origin"] = record;
+                item_data._origin = record;
                 return item_data;
             });
             return items;
         },
         select_line_move_line_detail_options: function () {
-            let options = {
+            const options = {
                 key_title: "location_src.name",
                 group_color: this.utils.colors.color_for("screen_step_todo"),
                 card_klass: "loud-labels",
@@ -392,7 +392,7 @@ const ZonePicking = {
         },
         move_line_list_fields: function (table_mode = false) {
             const self = this;
-            let fields = [
+            const fields = [
                 {path: "product.display_name", label: table_mode ? "Product" : null},
                 {
                     path: "package_src.name",
@@ -407,7 +407,7 @@ const ZonePicking = {
                     path: "quantity",
                     label: "Qty",
                     render_component: "packaging-qty-picker-display",
-                    render_options: function(record) {
+                    render_options: function (record) {
                         return self.utils.wms.move_line_qty_picker_options(record);
                     },
                 },
@@ -415,7 +415,7 @@ const ZonePicking = {
                 {
                     path: "picking.scheduled_date",
                     label: "Date",
-                    renderer: function(rec, field) {
+                    renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
                 },
@@ -462,10 +462,9 @@ const ZonePicking = {
             );
         },
         picking_summary_records_grouped(move_lines) {
-            const self = this;
             return this.utils.wms.group_lines_by_location(move_lines, {
                 group_key: "location_dest",
-                // group_no_title: true,
+                // Group_no_title: true,
                 prepare_records: _.partialRight(
                     this.utils.wms.group_by_pack,
                     "package_dest"
@@ -578,7 +577,7 @@ const ZonePicking = {
                         this.scan_source(scanned.text);
                     },
                     on_select: (selected) => {
-                        let path = "package_src.name";
+                        const path = "package_src.name";
                         let barcode = _.result(selected, path);
                         while (!barcode) {
                             _.forEach(

@@ -345,7 +345,7 @@ const ClusterPicking = {
                         // FIXME: use state_load or traverse the state
                         // this.current_state_key = "unload_all";
                         // this.state.on_scan(scanned, confirmation);
-                        this.states["unload_all"].on_scan(scanned, confirmation);
+                        this.states.unload_all.on_scan(scanned, confirmation);
                     },
                 },
                 unload_single: {

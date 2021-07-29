@@ -56,7 +56,7 @@ const data_for_select_package = {
     },
 };
 
-let data_for_set_line_qty = _.cloneDeep(data_for_select_package);
+const data_for_set_line_qty = _.cloneDeep(data_for_select_package);
 
 const DEMO_CHECKOUT = {
     scan_document: {
@@ -104,17 +104,17 @@ const DEMO_CHECKOUT = {
         },
     },
     select_line: data_for_select_package,
-    set_line_qty: function(data) {
-        let res = data_for_set_line_qty;
-        let line = res.data.select_package.selected_move_lines.filter(function(x) {
+    set_line_qty: function (data) {
+        const res = data_for_set_line_qty;
+        const line = res.data.select_package.selected_move_lines.filter(function (x) {
             return x.id == data.move_line_id;
         })[0];
         line.qty_done = line.quantity;
         return res;
     },
-    reset_line_qty: function(data) {
-        let res = data_for_set_line_qty;
-        let line = res.data.select_package.selected_move_lines.filter(function(x) {
+    reset_line_qty: function (data) {
+        const res = data_for_set_line_qty;
+        const line = res.data.select_package.selected_move_lines.filter(function (x) {
             return x.id == data.move_line_id;
         })[0];
         line.qty_done = 0;
@@ -138,7 +138,7 @@ const DEMO_CHECKOUT = {
                     ],
                     _.random(8)
                 ),
-                // simulate unselecting 1 line
+                // Simulate unselecting 1 line
                 selected_move_lines: select_pack_picking.move_lines,
             },
         },
@@ -239,7 +239,7 @@ const DEMO_CHECKOUT = {
         data: {
             select_package: {
                 picking: select_pack_picking,
-                // simulate unselecting 1 line
+                // Simulate unselecting 1 line
                 selected_move_lines: select_pack_picking.move_lines,
             },
         },

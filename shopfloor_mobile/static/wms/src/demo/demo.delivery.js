@@ -6,7 +6,7 @@
 
 import {demotools} from "/shopfloor_mobile_base/static/wms/src/demo/demo.core.js";
 
-let pickings = [];
+const pickings = [];
 const count = 8;
 
 for (let i = 1; i < count + 1; i++) {
@@ -15,7 +15,7 @@ for (let i = 1; i < count + 1; i++) {
         {lines_count: demotools.getRandomInt(5), line_random_pack: true}
     );
     for (let i = 0; i < demotools.getRandomInt(move_lines.length); i++) {
-        // set some as done
+        // Set some as done
         move_lines[i].qty_done = move_lines[i].quantity;
     }
     pickings.push(
@@ -31,7 +31,7 @@ for (let i = 1; i < count + 1; i++) {
 
 const manual_selection_pickings = _.sampleSize(pickings, _.random(1, 8));
 
-let scan_deliver = {};
+const scan_deliver = {};
 
 manual_selection_pickings.forEach(function (p) {
     scan_deliver[p.name] = {
