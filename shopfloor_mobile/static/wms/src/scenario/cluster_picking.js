@@ -314,14 +314,6 @@ const ClusterPicking = {
                             })
                         );
                     },
-                    on_action_split: () => {
-                        this.wait_call(
-                            this.odoo.call("unload_split", {
-                                picking_batch_id: this.current_batch().id,
-                                barcode: scanned.text, // TODO: should get barcode -> which one? See py specs
-                            })
-                        );
-                    },
                 },
                 confirm_unload_all: {
                     display_info: {
