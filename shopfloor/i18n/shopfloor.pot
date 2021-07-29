@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 13.0\n"
+"Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -23,6 +23,12 @@ msgid ""
 "* if a location is scanned, a new delivery package is created;\n"
 "* if a package is scanned, the package is validated against the carrier\n"
 "* in both cases, if the picking has no carrier the operation fails.\",\n"
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/services/forms/form_mixin.py:0
+#, python-format
+msgid "%s updated."
 msgstr ""
 
 #. module: shopfloor
@@ -176,7 +182,18 @@ msgid "Delivery"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__display_name
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_inventory__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_location__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking_batch__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_quant__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -200,7 +217,18 @@ msgid "Goods packed into {0.name}"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__id
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_inventory__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_location__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking_batch__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_quant__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__id
 msgid "ID"
 msgstr ""
 
@@ -246,7 +274,18 @@ msgid "Inventory Locations"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu____last_update
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_inventory____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_location____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move_line____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_package_level____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking_batch____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_quant____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package____last_update
 msgid "Last Modified on"
 msgstr ""
 
@@ -884,11 +923,6 @@ msgid "Stock Package Level"
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__picking_id
-msgid "Stock Picking"
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_priority_postpone_mixin__shopfloor_postponed
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__shopfloor_postponed
 #: model:ir.model.fields,help:shopfloor.field_stock_package_level__shopfloor_postponed
@@ -1092,6 +1126,7 @@ msgstr ""
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_picking
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__picking_id
 msgid "Transfer"
 msgstr ""
 
