@@ -123,7 +123,7 @@ const LocationContentTransfer = {
          */
         wrapped_context: function () {
             const data = this.state.data;
-            let res = {
+            const res = {
                 has_records: true,
                 records: [].concat(data.move_lines || [], data.package_levels || []),
                 location_src: null,
@@ -146,7 +146,7 @@ const LocationContentTransfer = {
             res.location_dest = res.has_records ? res.records[0].location_dest : null;
             return res;
         },
-        move_line_detail_list_options: function(move_line) {
+        move_line_detail_list_options: function (move_line) {
             return this.utils.wms.move_line_product_detail_options(move_line, {
                 loud_labels: true,
                 fields_blacklist: ["product.qty_available"],
@@ -154,7 +154,7 @@ const LocationContentTransfer = {
             });
         },
         line_actions: function () {
-            let actions = [
+            const actions = [
                 {name: "Postpone line", event_name: "action_postpone"},
                 {name: "Declare stock out", event_name: "action_stock_out"},
             ];
@@ -191,7 +191,7 @@ const LocationContentTransfer = {
         },
         on_action_open_package: function () {
             const data = this.state.data;
-            let endpoint_data = {
+            const endpoint_data = {
                 location_id: data.package_level.location_src.id,
                 package_level_id: data.package_level.id,
             };
@@ -199,7 +199,6 @@ const LocationContentTransfer = {
         },
     },
     data: function () {
-        const self = this;
         return {
             usage: "location_content_transfer",
             initial_state_key: "scan_location",

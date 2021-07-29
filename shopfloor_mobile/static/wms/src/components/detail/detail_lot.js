@@ -24,14 +24,14 @@ Vue.component("detail-lot", {
                 {
                     path: "expire_date",
                     label: "Expiry date",
-                    renderer: function(rec, field) {
+                    renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
                 },
                 {
                     path: "removal_date",
                     label: "Removal date",
-                    renderer: function(rec, field) {
+                    renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
                 },
@@ -45,11 +45,7 @@ Vue.component("detail-lot", {
             ];
         },
         render_packaging(record, field) {
-            return [
-                record["name"],
-                "(" + record["code"] + ")",
-                "= " + record["qty"],
-            ].join(" ");
+            return [record.name, "(" + record.code + ")", "= " + record.qty].join(" ");
         },
         packaging_detail_fields() {
             return [{path: "name", renderer: this.render_packaging}];

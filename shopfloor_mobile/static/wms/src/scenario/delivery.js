@@ -90,7 +90,7 @@ const Delivery = {
                     this.utils.wms.group_by_pack,
                     "package_src"
                 ),
-                group_color_maker: function(lines) {
+                group_color_maker: function (lines) {
                     return self.utils.wms.move_lines_completeness(lines) == 100
                         ? "screen_step_done"
                         : "screen_step_todo";
