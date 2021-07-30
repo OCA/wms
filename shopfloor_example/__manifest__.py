@@ -5,7 +5,7 @@
 {
     "name": "Shopfloor example",
     "summary": "Show how to customize the Shopfloor app frontend.",
-    "version": "13.0.1.0.0",
+    "version": "13.0.1.0.1",
     "depends": ["shopfloor_base", "shopfloor_mobile_base"],
     "author": "Camptocamp, ACSONE, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
