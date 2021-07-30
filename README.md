@@ -116,7 +116,7 @@ addon | version | summary
 [shopfloor_base](shopfloor_base/) | 13.0.1.1.0 | Core module for creating mobile apps
 [shopfloor_batch_automatic_creation](shopfloor_batch_automatic_creation/) | 13.0.1.1.0 | Create batch transfers for Cluster Picking
 [shopfloor_checkout_sync](shopfloor_checkout_sync/) | 13.0.1.0.0 | Glue module
-[shopfloor_example](shopfloor_example/) | 13.0.1.0.0 | Show how to customize the Shopfloor app frontend.
+[shopfloor_example](shopfloor_example/) | 13.0.1.0.1 | Show how to customize the Shopfloor app frontend.
 [shopfloor_mobile](shopfloor_mobile/) | 13.0.2.4.1 | Mobile frontend for WMS Shopfloor app
 [shopfloor_mobile_base](shopfloor_mobile_base/) | 13.0.1.11.1 | Mobile frontend for WMS Shopfloor app
 [shopfloor_packing_info](shopfloor_packing_info/) | 13.0.1.0.0 | Allows to predefine packing information messages per partner.
