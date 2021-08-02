@@ -10,6 +10,7 @@ setuptools.setup(
     install_requires=[
         'odoo14-addon-shopfloor',
         'odoo14-addon-shopfloor_base',
+        'odoo14-addon-shopfloor_mobile',
         'odoo14-addon-shopfloor_mobile_base',
         'odoo14-addon-stock_picking_completion_info',
         'odoo14-addon-stock_picking_consolidation_priority',
