@@ -21,6 +21,7 @@ addon | version | summary
 --- | --- | ---
 [shopfloor](shopfloor/) | 14.0.1.0.0 | manage warehouse operations with barcode scanners
 [shopfloor_base](shopfloor_base/) | 14.0.1.0.1 | Core module for creating mobile apps
+[shopfloor_mobile](shopfloor_mobile/) | 14.0.1.0.0 | Mobile frontend for WMS Shopfloor app
 [shopfloor_mobile_base](shopfloor_mobile_base/) | 14.0.1.0.1 | Mobile frontend for WMS Shopfloor app
 [stock_picking_completion_info](stock_picking_completion_info/) | 14.0.1.0.0 | Display on current document completion information according to next operations
 [stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.0.1 | Raise priority of all transfers for a chain when started
@@ -36,7 +37,6 @@ addon | version | summary
 [sale_stock_available_to_promise_release](sale_stock_available_to_promise_release/) | 13.0.1.3.0 (unported) | Integration between Sales and Available to Promise Release
 [shopfloor_batch_automatic_creation](shopfloor_batch_automatic_creation/) | 13.0.1.0.0 (unported) | Create batch transfers for Cluster Picking
 [shopfloor_checkout_sync](shopfloor_checkout_sync/) | 13.0.1.0.0 (unported) | Glue module
-[shopfloor_mobile](shopfloor_mobile/) | 13.0.2.4.1 (unported) | Mobile frontend for WMS Shopfloor app
 [shopfloor_mobile_custom_example](shopfloor_mobile_custom_example/) | 13.0.1.0.0 (unported) | Show how to customize the Shopfloor app frontend.
 [stock_available_to_promise_release](stock_available_to_promise_release/) | 13.0.1.9.2 (unported) | Release Operations based on available to promise
 [stock_available_to_promise_release_dynamic_routing](stock_available_to_promise_release_dynamic_routing/) | 13.0.1.0.1 (unported) | Glue between moves release and dynamic routing
