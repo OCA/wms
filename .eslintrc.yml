@@ -44,7 +44,7 @@ rules:
   handle-callback-err: warn
   id-blacklist: warn
   id-match: warn
-  init-declarations: error
+  init-declarations: warn
   max-depth: warn
   max-nested-callbacks: warn
   max-statements-per-line: warn

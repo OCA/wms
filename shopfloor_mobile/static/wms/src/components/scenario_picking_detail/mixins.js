@@ -11,7 +11,7 @@ import {PickingDetailMixin} from "../detail/detail_picking.js";
 export var ListActionsConsumerMixin = {
     methods: {
         _get_list_item_actions(to_enable) {
-            let actions = [];
+            const actions = [];
             const avail_list_item_actions = this._get_available_list_item_actions();
             to_enable.forEach(function (action) {
                 if (
@@ -20,7 +20,7 @@ export var ListActionsConsumerMixin = {
                 ) {
                     actions.push(avail_list_item_actions[action]);
                 } else {
-                    // we might get an action description object straight
+                    // We might get an action description object straight
                     actions.push(action);
                 }
             });
@@ -44,7 +44,7 @@ export var ListActionsConsumerMixin = {
                 {},
                 _.result(this.$props, opt_key_path + ".list_item_options", {}),
                 {
-                    // more options here if needed
+                    // More options here if needed
                 }
             );
             return opts;

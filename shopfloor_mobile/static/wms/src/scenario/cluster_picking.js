@@ -314,14 +314,6 @@ const ClusterPicking = {
                             })
                         );
                     },
-                    on_action_split: () => {
-                        this.wait_call(
-                            this.odoo.call("unload_split", {
-                                picking_batch_id: this.current_batch().id,
-                                barcode: scanned.text, // TODO: should get barcode -> which one? See py specs
-                            })
-                        );
-                    },
                 },
                 confirm_unload_all: {
                     display_info: {
@@ -345,7 +337,7 @@ const ClusterPicking = {
                         // FIXME: use state_load or traverse the state
                         // this.current_state_key = "unload_all";
                         // this.state.on_scan(scanned, confirmation);
-                        this.states["unload_all"].on_scan(scanned, confirmation);
+                        this.states.unload_all.on_scan(scanned, confirmation);
                     },
                 },
                 unload_single: {

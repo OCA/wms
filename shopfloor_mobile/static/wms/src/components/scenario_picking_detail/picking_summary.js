@@ -72,7 +72,7 @@ Vue.component("picking-summary", {
                     },
                     get_record: function (rec, action) {
                         if (rec.records) {
-                            // lines grouped, get real line
+                            // Lines grouped, get real line
                             return rec.records[0];
                         }
                         return rec;

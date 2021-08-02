@@ -25,7 +25,7 @@ export var PackagingQtyPickerMixin = {
             // Check max qty reached
             const future_qty = this.value + data.pkg.qty * (new_qty - origvalue);
             if (new_qty && future_qty > this.original_value) {
-                // restore qty just in case we can get here
+                // Restore qty just in case we can get here
                 new_qty = origvalue;
                 this._handle_qty_error(event, input, new_qty);
             }
@@ -83,8 +83,8 @@ export var PackagingQtyPickerMixin = {
          */
         _product_qty_by_packaging: function (pkg_by_qty, qty) {
             const self = this;
-            let res = {};
-            // const min_unit = _.last(pkg_by_qty);
+            const res = {};
+            // Const min_unit = _.last(pkg_by_qty);
             pkg_by_qty.forEach(function (pkg) {
                 let qty_per_pkg = 0;
                 [qty_per_pkg, qty] = self._qty_by_pkg(pkg.qty, qty);
@@ -131,7 +131,7 @@ export var PackagingQtyPickerMixin = {
             );
             this.qty_by_pkg = this.product_qty_by_packaging();
             this.orig_qty_by_pkg = this.qty_by_pkg;
-            // hooking via `v-on:change` we don't get the full event but only the qty :/
+            // Hooking via `v-on:change` we don't get the full event but only the qty :/
             // And forget about using v-text-field because it loses the full event object
             $(".pkg-value", this.$el).change(this.on_change_pkg_qty);
             $(".pkg-value", this.$el).on("focus click", function () {
@@ -194,7 +194,7 @@ export var PackagingQtyPickerMixin = {
          */
         contained_packaging: function () {
             const self = this;
-            let res = {};
+            const res = {};
             const packaging = this.sorted_packaging;
             _.forEach(packaging, function (pkg, i) {
                 if (packaging[i + 1]) {
@@ -271,12 +271,12 @@ export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-displ
         this._init_readonly();
     },
     methods: {
-        display_pkg: function(pkg) {
+        display_pkg: function (pkg) {
             return this.opts.non_zero_only ? this.qty_by_pkg[pkg.id] || 0 > 0 : true;
         },
     },
     computed: {
-        visible_packaging: function() {
+        visible_packaging: function () {
             return _.filter(this.sorted_packaging, this.display_pkg);
         },
     },

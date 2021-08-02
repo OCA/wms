@@ -121,7 +121,7 @@ const DEMO_CASE_1 = {
         },
     },
     list_move_lines: function (data) {
-        let res = _.cloneDeep(list_move_lines);
+        const res = _.cloneDeep(list_move_lines);
         if (data.order == "location") {
             res.data.select_line.move_lines = _.orderBy(
                 res.data.select_line.move_lines,
@@ -205,18 +205,17 @@ const DEMO_CASE_1 = {
                     body: "Confirm you want to unload them all?",
                 },
             };
-        } else {
-            return {
-                next_state: "select_line",
-                message: {
-                    message_type: "success",
-                    body: "All lines moved",
-                },
-                data: {
-                    select_line: _.cloneDeep(list_move_lines.data.select_line),
-                },
-            };
         }
+        return {
+            next_state: "select_line",
+            message: {
+                message_type: "success",
+                body: "All lines moved",
+            },
+            data: {
+                select_line: _.cloneDeep(list_move_lines.data.select_line),
+            },
+        };
     },
     change_pack_lot: {
         next_state: "set_line_destination",
@@ -264,18 +263,17 @@ const DEMO_CASE_1 = {
                     body: "Confirm you want to unload them all?",
                 },
             };
-        } else {
-            return {
-                next_state: "select_line",
-                message: {
-                    message_type: "success",
-                    body: "All lines moved",
-                },
-                data: {
-                    select_line: _.cloneDeep(list_move_lines.data.select_line),
-                },
-            };
         }
+        return {
+            next_state: "select_line",
+            message: {
+                message_type: "success",
+                body: "All lines moved",
+            },
+            data: {
+                select_line: _.cloneDeep(list_move_lines.data.select_line),
+            },
+        };
     },
 };
 

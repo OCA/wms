@@ -121,7 +121,7 @@ const scan_destination_all_move_lines = demotools.makePickingLines(
     {lines_count: demotools.getRandomInt(5), line_random_pack: true}
 );
 for (let i = 0; i < scan_destination_all_move_lines.length; i++) {
-    // set same location (clone to avoid circular dep on storage)
+    // Set same location (clone to avoid circular dep on storage)
     scan_destination_all_move_lines[i].location_src = _.cloneDeep(same_location);
 }
 const RECOVER_MOVE_LINES_SAME_LOCATION_CASE = {
