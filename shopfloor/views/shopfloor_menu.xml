@@ -40,6 +40,16 @@
                   <field name="pick_pack_same_time_is_possible" invisible="1" />
                   <field name="pick_pack_same_time" />
               </group>
+              <group
+                    name="picking_for_reception"
+                    attrs="{'invisible': [('ask_for_picking_for_reception_is_possible', '=', False)]}"
+                >
+                  <field
+                        name="ask_for_picking_for_reception_is_possible"
+                        invisible="1"
+                    />
+                  <field name="ask_for_picking_for_reception" />
+              </group>
             </group>
         </field>
     </record>

@@ -18,9 +18,10 @@ const Reception = {
                 :fields="state.fields"
                 />
             <choosing-reception-picking
-                v-if="state_is('manual_selection')"
+                v-if="state_is('choose_picking')"
                 @select-picking="state.onSelectPicking"
-                :stateData="state"
+                :pickings="state.data.pickings"
+                :fields="state.fields"
                 />
             <choosing-purchase-order
                 v-if="state_is('choose_purchase_order')"
@@ -59,6 +60,12 @@ const Reception = {
         partnerId: function() {
             return this.state.data.id;
         },
+        purchaseOrderId: function() {
+            return this.state.data.purchase_order_id;
+        },
+        pickingId: function() {
+            return this.state.data.picking_id;
+        },
     },
     data: function() {
         return {
@@ -90,8 +97,8 @@ const Reception = {
                 choose_purchase_order: {
                     onSelectOrder: purchase_order_id => {
                         this.wait_call(
-                            this.odoo.call("list_move_lines", {
-                                partner_id: this.state.data.id,
+                            this.odoo.call("choose_purchase_order", {
+                                partner_id: this.partnerId,
                                 purchase_order_id,
                             })
                         );
@@ -109,6 +116,35 @@ const Reception = {
                         {
                             label: "Date planned",
                             path: "date_order",
+                            renderer: (rec, field) => {
+                                return this.utils.display.render_field_date(rec, field);
+                            },
+                        },
+                    ],
+                },
+                choose_picking: {
+                    onSelectPicking: picking_id => {
+                        this.wait_call(
+                            this.odoo.call("list_move_lines", {
+                                partner_id: this.partnerId,
+                                purchase_order_id: this.purchaseOrderId,
+                                picking_id,
+                            })
+                        );
+                    },
+                    fields: [
+                        {
+                            label: "Partner",
+                            path: "partner.name",
+                            loud: true,
+                        },
+                        {
+                            label: "Number of lines",
+                            path: "move_line_count",
+                        },
+                        {
+                            label: "Scheduled date",
+                            path: "scheduled_date",
                             renderer: (rec, field) => {
                                 return this.utils.display.render_field_date(rec, field);
                             },
@@ -159,6 +195,8 @@ const Reception = {
                         this.wait_call(
                             this.odoo.call("finish_receipt", {
                                 partner_id: this.partnerId,
+                                purchase_order_id: this.purchaseOrderId,
+                                picking_id: this.pickingId,
                                 move_lines_picked: this.state.data.move_lines_picked.map(
                                     line => line.id
                                 ),
@@ -176,6 +214,8 @@ const Reception = {
                                 this.wait_call(
                                     this.odoo.call("reset_product", {
                                         partner_id: this.partnerId,
+                                        purchase_order_id: this.purchaseOrderId,
+                                        picking_id: this.pickingId,
                                         barcode,
                                         move_lines_picking: move_lines_picking.map(
                                             line => line.id
@@ -190,6 +230,8 @@ const Reception = {
                                 this.wait_call(
                                     this.odoo.call("set_quantity", {
                                         partner_id: this.partnerId,
+                                        purchase_order_id: this.purchaseOrderId,
+                                        picking_id: this.pickingId,
                                         move_lines_picking: move_lines_picking.map(
                                             line => line.id
                                         ),
@@ -206,6 +248,8 @@ const Reception = {
                                 this.wait_call(
                                     this.odoo.call("scan_product", {
                                         partner_id: this.partnerId,
+                                        picking_id: this.pickingId,
+                                        purchase_order_id: this.purchaseOrderId,
                                         barcode,
                                     })
                                 );
@@ -213,6 +257,8 @@ const Reception = {
                                 this.wait_call(
                                     this.odoo.call("set_destination", {
                                         partner_id: this.partnerId,
+                                        purchase_order_id: this.purchaseOrderId,
+                                        picking_id: this.pickingId,
                                         barcode,
                                         move_lines_picking: move_lines_picking.map(
                                             line => line.id
@@ -225,6 +271,8 @@ const Reception = {
                             this.wait_call(
                                 this.odoo.call("scan_product", {
                                     partner_id: this.partnerId,
+                                    picking_id: this.pickingId,
+                                    purchase_order_id: this.purchaseOrderId,
                                     barcode,
                                 })
                             );
