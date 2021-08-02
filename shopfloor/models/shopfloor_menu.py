@@ -63,6 +63,17 @@ class ShopfloorMenu(models.Model):
         compute="_compute_pick_pack_same_time_is_possible"
     )
 
+    ask_for_picking_for_reception = fields.Boolean(
+        string="Ask user to choose a picking while receiving",
+        default=False,
+        help="If you tick this box, users will be asked to "
+        "select a picking while receiving goods.",
+    )
+
+    ask_for_picking_for_reception_is_possible = fields.Boolean(
+        compute="_compute_ask_for_picking_is_possible"
+    )
+
     @api.depends("scenario_id", "picking_type_ids")
     def _compute_move_create_is_possible(self):
         for menu in self:
@@ -111,6 +122,19 @@ class ShopfloorMenu(models.Model):
     @api.onchange("ignore_no_putaway_available_is_possible")
     def onchange_ignore_no_putaway_available_is_possible(self):
         self.ignore_no_putaway_available = self.ignore_no_putaway_available_is_possible
+
+    @api.depends("scenario_id")
+    def _compute_ask_for_picking_is_possible(self):
+        for menu in self:
+            menu.ask_for_picking_for_reception_is_possible = menu.scenario_id.has_option(
+                "ask_for_picking_for_reception"
+            )
+
+    @api.onchange("ask_for_picking_for_reception_is_possible")
+    def onchange_ask_for_picking_is_possible(self):
+        self.ask_for_picking_for_reception = (
+            self.ask_for_picking_for_reception_is_possible
+        )
 
     @api.constrains("scenario_id", "picking_type_ids", "ignore_no_putaway_available")
     def _check_ignore_no_putaway_available(self):

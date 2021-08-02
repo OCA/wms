@@ -158,6 +158,11 @@
                 type="module"
             />
             <script
+                id="script_scenario_reception_choosing_pickings"
+                t-attf-src="/shopfloor_mobile/static/wms/src/scenario/reception/choosing_picking.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
                 id="script_scenario_reception_choosing_contact"
                 t-attf-src="/shopfloor_mobile/static/wms/src/scenario/reception/choosing_reception_contact.js?v=#{mod_version}"
                 type="module"
