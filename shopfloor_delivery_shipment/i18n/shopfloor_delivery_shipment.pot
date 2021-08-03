@@ -1,0 +1,168 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_delivery_shipment
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: shopfloor_delivery_shipment
+#: model:ir.model.fields,field_description:shopfloor_delivery_shipment.field_shopfloor_menu__allow_shipment_advice_create
+msgid "Allow Shipment Advice Creation"
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Delivery method {} not permitted for this shipment advice."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: model:shopfloor.menu,name:shopfloor_delivery_shipment.shopfloor_menu_delivery_shipment
+msgid "Delivery with shipment"
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: model:shopfloor.scenario,name:shopfloor_delivery_shipment.scenario_delivery_shipment
+msgid "Delivery with shipment advice"
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Lot {} can not been loaded in the shipment {}."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Lot {} has not been planned in the shipment {}."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Lot {} is already loaded in the shipment {}."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: model:ir.model,name:shopfloor_delivery_shipment.model_shopfloor_menu
+msgid "Menu displayed in the scanner application"
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "No more content to load from delivery {}."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "No shipment advice in progress found for this loading dock."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid ""
+"No shipment advice in progress found for this loading dock. Scan again {} to"
+" create a new one."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Package {} can not been loaded in the shipment {}."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Package {} has not been planned in the shipment {}."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Package {} is already loaded in the shipment {}."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Planned content has been fully loaded."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Please first scan the operation."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Please scan lot(s) {} where this product is."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Please scan package(s) {} where this lot is."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Please scan package(s) {} where this product is."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Product {} can not been loaded in the shipment {}."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Product {} has not been planned in the shipment {}."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Product {} is already loaded in the shipment {}."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: model:ir.model.fields,field_description:shopfloor_delivery_shipment.field_shopfloor_menu__shipment_advice_create_is_possible
+msgid "Shipment Advice Create Is Possible"
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Shipment {} is validated."
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: model:ir.model.fields,help:shopfloor_delivery_shipment.field_shopfloor_menu__allow_shipment_advice_create
+msgid ""
+"Some scenario may create shipment advice(s) automatically when a product or "
+"package is scanned and no shipment advice already exists. "
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid "Transfer {} has not been planned in the shipment {}."
+msgstr ""
