@@ -393,7 +393,7 @@ class StockLocation(models.Model):
             ]
         )
         pertinent_loc_s_t_domain = (
-            compatible_locations._domain_location_storage_type_constraints(  # noqa
+            compatible_locations._domain_location_storage_type_constraints(
                 package_storage_type, quants, products
             )
         )
@@ -402,8 +402,10 @@ class StockLocation(models.Model):
 
         # now loop over the pertinent location storage types (there should be
         # few of them) and check for properties to find suitable locations
-        valid_locations = compatible_locations._allowed_locations_for_location_storage_types(  # noqa
-            pertinent_loc_storage_types, quants, products
+        valid_locations = (
+            compatible_locations._allowed_locations_for_location_storage_types(
+                pertinent_loc_storage_types, quants, products
+            )
         )
 
         # NOTE: self.ids is ordered as expected, so we want to filter the valid
