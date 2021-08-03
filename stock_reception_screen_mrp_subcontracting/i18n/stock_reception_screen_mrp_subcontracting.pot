@@ -24,6 +24,11 @@ msgid "Record Production"
 msgstr ""
 
 #. module: stock_reception_screen_mrp_subcontracting
+#: model:ir.model,name:stock_reception_screen_mrp_subcontracting.model_stock_move
+msgid "Stock Move"
+msgstr ""
+
+#. module: stock_reception_screen_mrp_subcontracting
 #: model:ir.model,name:stock_reception_screen_mrp_subcontracting.model_stock_reception_screen
 msgid "Stock Reception Screen"
 msgstr ""
