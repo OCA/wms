@@ -8,6 +8,7 @@ setuptools.setup(
     description="Meta package for oca-wms Odoo addons",
     version=version,
     install_requires=[
+        'odoo14-addon-delivery_carrier_warehouse',
         'odoo14-addon-shopfloor',
         'odoo14-addon-shopfloor_base',
         'odoo14-addon-shopfloor_mobile',
