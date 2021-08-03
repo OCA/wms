@@ -19,6 +19,7 @@ Available addons
 ----------------
 addon | version | summary
 --- | --- | ---
+[delivery_carrier_warehouse](delivery_carrier_warehouse/) | 14.0.1.2.0 | Get delivery method used in sales orders from warehouse
 [shopfloor](shopfloor/) | 14.0.1.0.0 | manage warehouse operations with barcode scanners
 [shopfloor_base](shopfloor_base/) | 14.0.1.0.1 | Core module for creating mobile apps
 [shopfloor_mobile](shopfloor_mobile/) | 14.0.1.0.0 | Mobile frontend for WMS Shopfloor app
@@ -33,7 +34,6 @@ Unported addons
 addon | version | summary
 --- | --- | ---
 [delivery_carrier_preference](delivery_carrier_preference/) | 13.0.1.5.0 (unported) | Advanced selection of preferred shipping methods
-[delivery_carrier_warehouse](delivery_carrier_warehouse/) | 13.0.1.2.0 (unported) | Get delivery method used in sales orders from warehouse
 [sale_stock_available_to_promise_release](sale_stock_available_to_promise_release/) | 13.0.1.3.0 (unported) | Integration between Sales and Available to Promise Release
 [shopfloor_batch_automatic_creation](shopfloor_batch_automatic_creation/) | 13.0.1.0.0 (unported) | Create batch transfers for Cluster Picking
 [shopfloor_checkout_sync](shopfloor_checkout_sync/) | 13.0.1.0.0 (unported) | Glue module
