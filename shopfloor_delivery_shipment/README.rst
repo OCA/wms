@@ -27,6 +27,11 @@ Shopfloor - Delivery with shipment advice
 
 Shopfloor scenario to manage the delivery process based on shipment advices.
 
+.. IMPORTANT::
+   This is an alpha version, the data model and design can change at any time without warning.
+   Only for development or testing purpose, do not use in production.
+   `More details on development status <https://odoo-community.org/page/development-status>`_
+
 **Table of contents**
 
 .. contents::
@@ -85,10 +90,13 @@ promote its widespread use.
 .. |maintainer-sebalix| image:: https://github.com/sebalix.png?size=40px
     :target: https://github.com/sebalix
     :alt: sebalix
+.. |maintainer-TDu| image:: https://github.com/TDu.png?size=40px
+    :target: https://github.com/TDu
+    :alt: TDu
 
-Current `maintainer <https://odoo-community.org/page/maintainer-role>`__:
+Current `maintainers <https://odoo-community.org/page/maintainer-role>`__:
 
-|maintainer-sebalix| 
+|maintainer-sebalix| |maintainer-TDu| 
 
 This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/13.0/shopfloor_delivery_shipment>`_ project on GitHub.
 
