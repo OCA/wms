@@ -69,7 +69,7 @@ class StockLocationStorageBuffer(models.Model):
         }
 
     def _help_message(self):
-        return self.env["ir.qweb"].render(
+        return self.env["ir.qweb"]._render(
             "stock_storage_type_buffer.storage_buffer_help_message",
             self._prepare_values_for_help_message(),
         )
