@@ -16,6 +16,7 @@ setuptools.setup(
         'odoo13-addon-shopfloor_base',
         'odoo13-addon-shopfloor_batch_automatic_creation',
         'odoo13-addon-shopfloor_checkout_sync',
+        'odoo13-addon-shopfloor_delivery_shipment',
         'odoo13-addon-shopfloor_example',
         'odoo13-addon-shopfloor_mobile',
         'odoo13-addon-shopfloor_mobile_base',
