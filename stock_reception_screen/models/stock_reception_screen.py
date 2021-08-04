@@ -395,9 +395,13 @@ class StockReceptionScreen(models.Model):
         self.current_move_line_package = barcode
 
     def on_barcode_scanned_select_packaging(self, barcode):
-        """Auto-complete the package data."""
+        """Auto-complete the package data.
+
+        The package data is filled automatically depending on
+        the barcode scanned for the package storage type.
+        """
         packaging = self.current_move_product_packaging_ids.filtered(
-            lambda o: o.barcode == barcode
+            lambda o: o.package_storage_type_id.barcode == barcode
         )[:1]
         self._autocomplete_package_data(packaging)
 
