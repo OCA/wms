@@ -393,6 +393,11 @@ msgid "Ordered Children Locations"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__out_move_line_ids
+msgid "Out Move Line"
+msgstr ""
+
+#. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant_package__pack_weight_in_kg
 msgid "Pack weight in kg"
 msgstr ""
@@ -678,4 +683,9 @@ msgstr ""
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__in_move_ids
 msgid "technical field: the pending incoming stock.moves in the location"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,help:stock_storage_type.field_stock_location__out_move_line_ids
+msgid "technical field: the pending outgoing stock.move.lines in the location"
 msgstr ""
