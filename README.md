@@ -26,7 +26,7 @@ addon | version | summary
 [shopfloor_mobile_base](shopfloor_mobile_base/) | 14.0.1.0.1 | Mobile frontend for WMS Shopfloor app
 [stock_picking_completion_info](stock_picking_completion_info/) | 14.0.1.0.0 | Display on current document completion information according to next operations
 [stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.0.1 | Raise priority of all transfers for a chain when started
-[stock_storage_type](stock_storage_type/) | 14.0.1.1.0 | Manage packages and locations storage types
+[stock_storage_type](stock_storage_type/) | 14.0.1.2.0 | Manage packages and locations storage types
 [stock_storage_type_buffer](stock_storage_type_buffer/) | 14.0.1.1.0 | Exclude storage locations from put-away if their buffer is full
 
 
