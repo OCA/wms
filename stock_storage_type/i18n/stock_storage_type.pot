@@ -658,7 +658,8 @@ msgstr ""
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__location_is_empty
 msgid ""
 "technical field: True if the location is empty and there is no pending "
-"incoming products in the location"
+"incoming products in the location.  Computed only if the location needs to "
+"check for emptiness (has an \"only empty\" location storage type)."
 msgstr ""
 
 #. module: stock_storage_type
