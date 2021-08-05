@@ -395,7 +395,9 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         # Set a quantity in cardbox bin 4 to trigger the priority on the
         # location that already contains the product
         self.env["stock.quant"]._update_available_quantity(
-            product, self.cardboxes_bin_3_location, 10.0,
+            product,
+            self.cardboxes_bin_3_location,
+            10.0,
         )
         location = StockLocation._get_pack_putaway_strategy(
             dest_location, quant, product
@@ -405,7 +407,9 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         # Set less quantity on bin 4. Since it's the location with less quantity
         # that should have priority
         self.env["stock.quant"]._update_available_quantity(
-            product, self.cardboxes_bin_4_location, 1.0,
+            product,
+            self.cardboxes_bin_4_location,
+            1.0,
         )
         location = StockLocation._get_pack_putaway_strategy(
             dest_location, quant, product

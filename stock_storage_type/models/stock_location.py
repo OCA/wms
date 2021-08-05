@@ -117,10 +117,17 @@ class StockLocation(models.Model):
         help="The max height supported among allowed location storage types.",
     )
     do_not_mix_products = fields.Boolean(
-        compute="_compute_do_not_mix_products", store=True,
+        compute="_compute_do_not_mix_products",
+        store=True,
     )
-    do_not_mix_lots = fields.Boolean(compute="_compute_do_not_mix_lots", store=True,)
-    only_empty = fields.Boolean(compute="_compute_only_empty", store=True,)
+    do_not_mix_lots = fields.Boolean(
+        compute="_compute_do_not_mix_lots",
+        store=True,
+    )
+    only_empty = fields.Boolean(
+        compute="_compute_only_empty",
+        store=True,
+    )
 
     @api.depends(
         "usage",
@@ -202,7 +209,10 @@ class StockLocation(models.Model):
         return self.only_empty
 
     @api.depends(
-        "quant_ids", "in_move_ids", "in_move_line_ids", "do_not_mix_products",
+        "quant_ids",
+        "in_move_ids",
+        "in_move_line_ids",
+        "do_not_mix_products",
     )
     def _compute_location_will_contain_product_ids(self):
         for rec in self:
@@ -219,7 +229,9 @@ class StockLocation(models.Model):
             rec.location_will_contain_product_ids = products
 
     @api.depends(
-        "quant_ids", "in_move_line_ids", "do_not_mix_lots",
+        "quant_ids",
+        "in_move_line_ids",
+        "do_not_mix_lots",
     )
     def _compute_location_will_contain_lot_ids(self):
         for rec in self:
