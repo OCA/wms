@@ -100,6 +100,11 @@ msgid "Inventory Locations"
 msgstr ""
 
 #. module: stock_storage_type_buffer
+#: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location__is_in_storage_buffer
+msgid "Is In Storage Buffer"
+msgstr ""
+
+#. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location____last_update
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location_storage_buffer____last_update
 msgid "Last Modified on"
@@ -128,6 +133,11 @@ msgstr ""
 #. module: stock_storage_type_buffer
 #: model_terms:ir.ui.view,arch_db:stock_storage_type_buffer.location_storage_buffer_form_view
 msgid "Locations"
+msgstr ""
+
+#. module: stock_storage_type_buffer
+#: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location__storage_buffer_ids
+msgid "Storage Buffer"
 msgstr ""
 
 #. module: stock_storage_type_buffer
