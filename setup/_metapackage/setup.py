@@ -12,6 +12,7 @@ setuptools.setup(
         'odoo13-addon-delivery_carrier_warehouse',
         'odoo13-addon-delivery_preference_glue_stock_picking_group',
         'odoo13-addon-sale_stock_available_to_promise_release',
+        'odoo13-addon-sale_stock_available_to_promise_release_cutoff',
         'odoo13-addon-shopfloor',
         'odoo13-addon-shopfloor_base',
         'odoo13-addon-shopfloor_batch_automatic_creation',
