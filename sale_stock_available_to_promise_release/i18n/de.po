@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-02 13:13+0000\n"
+"POT-Creation-Date: 2021-07-12 17:07+0000\n"
 "PO-Revision-Date: 2021-07-02 08:11+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,9 +17,14 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: sale_stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
+msgid "As of"
+msgstr "Ab"
+
+#. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__availability_status
 msgid "Availability Status"
-msgstr ""
+msgstr "Verfügbarkeitsstatus"
 
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
@@ -29,7 +34,7 @@ msgstr "Verfügbar"
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__available_qty
 msgid "Available Qty"
-msgstr ""
+msgstr "Verfügbare Menge"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_move__carrier_id
@@ -53,12 +58,12 @@ msgstr ""
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__expected_availability_date
 msgid "Expected Availability Date"
-msgstr ""
+msgstr "Voraussichtliches Verfügbarkeitsdatum"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__full
 msgid "Fully Available"
-msgstr ""
+msgstr "Voll Verfügbar"
 
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_search
@@ -79,15 +84,15 @@ msgstr ""
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
 msgid "No"
-msgstr ""
+msgstr "Nein"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__no
 msgid "Not available"
-msgstr ""
+msgstr "Nicht verfügbar"
 
 #. module: sale_stock_available_to_promise_release
-#: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__mto
+#: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__on_order
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
 msgid "On order"
 msgstr "Auf Auftrag"
@@ -95,7 +100,7 @@ msgstr "Auf Auftrag"
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__partial
 msgid "Partially Available"
-msgstr ""
+msgstr "Teilweise Verfügbar"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_procurement_group
@@ -110,7 +115,7 @@ msgstr "Produkt"
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__restock
 msgid "Restock ordered"
-msgstr ""
+msgstr "Nachschub bestellt"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_sale_order
@@ -145,4 +150,4 @@ msgstr ""
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
