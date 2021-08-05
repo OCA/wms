@@ -134,6 +134,9 @@ Vue.component("cancel-move-line-action", {
         the_package: function () {
             return _.result(this.record, this.$props.options.package_cancel_key);
         },
+        the_package: function() {
+            return _.result(this.record, this.$props.options.package_cancel_key);
+        },
         message: function () {
             const item = this.the_package
                 ? this.the_package.name
