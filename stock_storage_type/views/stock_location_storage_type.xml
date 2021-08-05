@@ -58,6 +58,7 @@
         <field name="model">stock.location.storage.type</field>
         <field name="arch" type="xml">
             <search>
+                <field name="name" />
                 <filter
                     string="Archived"
                     name="inactive"
