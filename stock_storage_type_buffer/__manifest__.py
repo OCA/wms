@@ -3,7 +3,7 @@
 {
     "name": "Stock Storage Type Buffers",
     "summary": "Exclude storage locations from put-away if their buffer is full",
-    "version": "14.0.1.1.0",
+    "version": "14.0.1.2.0",
     "development_status": "Alpha",
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",
