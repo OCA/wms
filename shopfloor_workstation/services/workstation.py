@@ -36,7 +36,8 @@ class ShopfloorWorkstation(Component):
                 "body": _("Workstation not found"),
             }
         return self._response(
-            message=message, data=self._convert_one_record(ws) if ws else {},
+            message=message,
+            data=self._convert_one_record(ws) if ws else {},
         )
 
     def _convert_one_record(self, record):
