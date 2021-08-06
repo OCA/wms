@@ -38,6 +38,12 @@ msgid ""
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__active
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__active
+msgid "Active"
+msgstr ""
+
+#. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_level__allowed_location_dest_domain
 msgid "Allowed Destinations Domain"
 msgstr ""
@@ -55,6 +61,14 @@ msgstr ""
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__package_storage_type_ids
 msgid "Allowed packages storage types"
+msgstr ""
+
+#. module: stock_storage_type
+#: model_terms:ir.ui.view,arch_db:stock_storage_type.location_storage_type_form_view
+#: model_terms:ir.ui.view,arch_db:stock_storage_type.package_storage_type_form_view
+#: model_terms:ir.ui.view,arch_db:stock_storage_type.stock_location_storage_type_search_view
+#: model_terms:ir.ui.view,arch_db:stock_storage_type.stock_package_storage_type_search_view
+msgid "Archived"
 msgstr ""
 
 #. module: stock_storage_type
