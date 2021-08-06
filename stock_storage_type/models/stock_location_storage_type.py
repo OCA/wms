@@ -120,6 +120,7 @@ class StockLocationStorageType(models.Model):
     )
 
     has_restrictions = fields.Boolean(compute="_compute_has_restrictions")
+    active = fields.Boolean(default=True)
 
     @api.constrains("only_empty", "do_not_mix_lots", "do_not_mix_products")
     def _check_empty_mix(self):
