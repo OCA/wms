@@ -112,11 +112,13 @@ msgid "Display Name"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__do_not_mix_lots
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__do_not_mix_lots
 msgid "Do Not Mix Lots"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__do_not_mix_products
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__do_not_mix_products
 msgid "Do Not Mix Products"
 msgstr ""
@@ -388,6 +390,7 @@ msgid "None"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__only_empty
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__only_empty
 msgid "Only Empty"
 msgstr ""
