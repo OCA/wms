@@ -128,6 +128,7 @@ addon | version | summary
 [shopfloor_mobile](shopfloor_mobile/) | 14.0.1.0.1 | Mobile frontend for WMS Shopfloor app
 [shopfloor_mobile_base](shopfloor_mobile_base/) | 14.0.1.0.1 | Mobile frontend for WMS Shopfloor app
 [shopfloor_workstation](shopfloor_workstation/) | 14.0.1.1.0 | Manage warehouse workstation with barcode scanners
+[stock_dynamic_routing](stock_dynamic_routing/) | 14.0.1.0.0 | Dynamic routing of stock moves
 [stock_picking_completion_info](stock_picking_completion_info/) | 14.0.1.0.0 | Display on current document completion information according to next operations
 [stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.0.1 | Raise priority of all transfers for a chain when started
 [stock_picking_type_shipping_policy_group_by](stock_picking_type_shipping_policy_group_by/) | 14.0.1.0.0 | Glue module for Picking Type Shipping Policy and Group Transfers by Partner and Carrier
@@ -146,7 +147,6 @@ addon | version | summary
 [shopfloor_mobile_custom_example](shopfloor_mobile_custom_example/) | 13.0.1.0.0 (unported) | Show how to customize the Shopfloor app frontend.
 [stock_available_to_promise_release](stock_available_to_promise_release/) | 13.0.1.9.2 (unported) | Release Operations based on available to promise
 [stock_available_to_promise_release_dynamic_routing](stock_available_to_promise_release_dynamic_routing/) | 13.0.1.0.1 (unported) | Glue between moves release and dynamic routing
-[stock_dynamic_routing](stock_dynamic_routing/) | 13.0.1.0.1 (unported) | Dynamic routing of stock moves
 [stock_move_source_relocate](stock_move_source_relocate/) | 13.0.1.0.0 (unported) | Change source location of unavailable moves
 [stock_move_source_relocate_dynamic_routing](stock_move_source_relocate_dynamic_routing/) | 13.0.1.0.0 (unported) | Glue module
 [stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 13.0.1.0.0 (unported) | Define different shipping policies according to picking type
