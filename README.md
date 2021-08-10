@@ -7,7 +7,110 @@
 
 # wms
 
-TODO: add repo description.
+The WMS repo hosts the major components of the WMS stack for Odoo. Note that some odule have been placed in stock-logistics-* repos as well depending on the context.
+
+## References
+
+ - The WMS presentation made during Odoo XP 2020 [here](https://docs.google.com/presentation/d/1mYOCAaaVWZtCUDbslwIZyOT9_hHezbWkJVXxu0k01fw/edit) or watch the video [here](https://www.youtube.com/watch?v=Jy4JHBlN7HY)
+ - The Barcode App presentation  made during the OCA days 2020 [here](https://docs.google.com/presentation/d/1nTX_fR9V73y1Qquotf3iiom5kvTNZLfj-3DfgirR29I/edit?pli=1#slide=id.p1)
+
+## Dynamic routing of operation
+
+**Main module: stock_dynamic_routing***
+
+Classify operation depending on where they are reserved, manage handover places, creates different goods flow by carriers. Route explains the steps you want to produce whereas the “picking routing operation” defines how operations are grouped according to their final source
+and destination location.
+
+## Advanced barcode scanner
+
+**Main modules: shopfloor***
+
+Decouple transnational Odoo documents and flows toward an efficient shop-floor process. Do not rely on finding the proper operation to process, but scan location and package to deduce what to do with it. Proceed with operation by machine type or zone rather than Odoo document. Get optimized path computed properly.
+
+Configure your barcode menu, chose which scanning process to apply to each operation, allow to process several operation type within a same barcode menu.
+
+Provide state of the art logistics features to handle zero checks, inventory errors and stock out, etc..
+
+## Put away based on storage type and constraints (height, weight,..)
+
+**Main module: stock_storage_type***
+
+Define storage type on location and attribute storage type on PACK. Storage type can also be define on product packaging to help filling up the info while receiving products.
+The idea is that anything getting in the warehouse is given a unique PACK ID with proper storage type and attributes (height, weight, etc..). Put away will then compute the proper location based on those information.
+
+## Virtual reservation and release of operations
+
+**Main module: stock_available_to_promise_release**
+
+Make the final stock reservation when needed, decoupled from the order confirmation while respecting the order of arrival through virtual reservation. Thus also help to create internal operations such as pick or ship when required only. 
+
+When operation release occurs, only create moves for the goods we have in stocks. This will avoid having backorder in internal warehouse operations (only the delivery order will have ones),
+
+## Reception screen
+
+**Main module: stock_reception_screen**
+
+Drive the reception steps in a step-by-step approach and label each logistic unit with a unique serial number (SSCC: Serial Shipping Container Code) as recommended by the GS1 standard.
+
+## Delivery carrier preferences
+
+**Main module: delivery_carrier***
+
+Dynamically (re) assign the best suited carrier to a shipment based on availability of the goods at release of operation time.
+
+# Related work hosted on other OCA repos
+
+Some works initiated by the WMS is hosted in other OCA repos.
+
+## Packaging management
+
+**Main module: product_packaging_type**
+
+To better manage the product packaging we need to have them properly defined for each product and classify them by type. Most common type are usually:
+ - Retail box
+ - Transport box
+ - Pallet
+
+It is a basic requirement for improved reservation rules, efficient barcode operation and usage of measurement machines such as Cubiscan for example.
+
+## Reservation rules by packaging and location
+
+**Main module: stock_reserve_rule**
+
+Provide configurable reservation rule by location and packaging type with sequence. Thus allows to drive reservation differently depending on the packaging type to retrieve. For example, pick first pallets from Location A and then boxes from location B. 
+
+It supports several removal strategies: default FIFO/FEFO prefer packaging or empty bin to favor emptying spaces over anything else.
+
+
+## Delivery windows, weekly delivery and cut-off time
+
+**Main module: sale_partner_delivery_window* **
+
+Define delivery windows for your customers where they can receive your goods. Setup weekly day of delivery if required. Handle cut-off time by customer depending on where they are.
+
+## Group and consolidate your shipment for several orders
+
+**Main module: stock_picking_group_by_partner_by_carrier***
+
+Group several orders into one consolidated shipment by carrier during packing operations.
+
+## Manage replenishment zone
+
+**Main module: ddmrp***
+
+Re-allocate your needs for stocks to drive your replenishment operations within your location (from a pallet storage to a shelving one for example). This allows you to re-allocate a missing stock quantity to a given location to wait for stock there while performing replenishment (technically, it allows to change the source of a stock move to make it hit a stock rule).
+
+## Interface with measurement machine
+
+**Main module: stock_cubiscan**
+
+Here with Cubiscan, but interface might serve as a base for other brand.
+
+## Interface with vertical automated storage
+
+**Main module: stock_vertical_lift***
+
+Provide the proper interface and link to connect vertical lift machines such as Kardex.
 
 <!-- /!\ do not modify below this line -->
 
