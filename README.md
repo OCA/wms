@@ -125,7 +125,7 @@ addon | version | summary
 [delivery_carrier_warehouse](delivery_carrier_warehouse/) | 14.0.1.2.0 | Get delivery method used in sales orders from warehouse
 [shopfloor](shopfloor/) | 14.0.1.0.0 | manage warehouse operations with barcode scanners
 [shopfloor_base](shopfloor_base/) | 14.0.1.0.1 | Core module for creating mobile apps
-[shopfloor_mobile](shopfloor_mobile/) | 14.0.1.0.0 | Mobile frontend for WMS Shopfloor app
+[shopfloor_mobile](shopfloor_mobile/) | 14.0.1.0.1 | Mobile frontend for WMS Shopfloor app
 [shopfloor_mobile_base](shopfloor_mobile_base/) | 14.0.1.0.1 | Mobile frontend for WMS Shopfloor app
 [stock_picking_completion_info](stock_picking_completion_info/) | 14.0.1.0.0 | Display on current document completion information according to next operations
 [stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.0.1 | Raise priority of all transfers for a chain when started
