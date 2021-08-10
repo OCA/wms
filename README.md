@@ -127,7 +127,7 @@ addon | version | summary
 [shopfloor_base](shopfloor_base/) | 14.0.1.0.1 | Core module for creating mobile apps
 [shopfloor_mobile](shopfloor_mobile/) | 14.0.1.0.1 | Mobile frontend for WMS Shopfloor app
 [shopfloor_mobile_base](shopfloor_mobile_base/) | 14.0.1.0.1 | Mobile frontend for WMS Shopfloor app
-[shopfloor_workstation](shopfloor_workstation/) | 14.0.1.0.0 | Manage warehouse workstation with barcode scanners
+[shopfloor_workstation](shopfloor_workstation/) | 14.0.1.1.0 | Manage warehouse workstation with barcode scanners
 [stock_picking_completion_info](stock_picking_completion_info/) | 14.0.1.0.0 | Display on current document completion information according to next operations
 [stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.0.1 | Raise priority of all transfers for a chain when started
 [stock_picking_type_shipping_policy_group_by](stock_picking_type_shipping_policy_group_by/) | 14.0.1.0.0 | Glue module for Picking Type Shipping Policy and Group Transfers by Partner and Carrier
