@@ -26,6 +26,7 @@ addon | version | summary
 [shopfloor_mobile_base](shopfloor_mobile_base/) | 14.0.1.0.1 | Mobile frontend for WMS Shopfloor app
 [stock_picking_completion_info](stock_picking_completion_info/) | 14.0.1.0.0 | Display on current document completion information according to next operations
 [stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.0.1 | Raise priority of all transfers for a chain when started
+[stock_picking_type_shipping_policy_group_by](stock_picking_type_shipping_policy_group_by/) | 14.0.1.0.0 | Glue module for Picking Type Shipping Policy and Group Transfers by Partner and Carrier
 [stock_storage_type](stock_storage_type/) | 14.0.1.7.0 | Manage packages and locations storage types
 [stock_storage_type_buffer](stock_storage_type_buffer/) | 14.0.1.2.0 | Exclude storage locations from put-away if their buffer is full
 
@@ -45,7 +46,6 @@ addon | version | summary
 [stock_move_source_relocate](stock_move_source_relocate/) | 13.0.1.0.0 (unported) | Change source location of unavailable moves
 [stock_move_source_relocate_dynamic_routing](stock_move_source_relocate_dynamic_routing/) | 13.0.1.0.0 (unported) | Glue module
 [stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 13.0.1.0.0 (unported) | Define different shipping policies according to picking type
-[stock_picking_type_shipping_policy_group_by](stock_picking_type_shipping_policy_group_by/) | 13.0.1.0.0 (unported) | Glue module for Picking Type Shipping Policy and Group Transfers by Partner and Carrier
 [stock_reception_screen](stock_reception_screen/) | 13.0.1.1.2 (unported) | Dedicated screen to receive/scan goods.
 [stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 13.0.1.1.0 (unported) | Advanced storage strategy ABC for WMS
 
