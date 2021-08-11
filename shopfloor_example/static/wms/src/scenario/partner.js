@@ -44,7 +44,7 @@ const Partner = {
         </Screen>
         `,
     methods: {
-        current_doc: function() {
+        current_doc: function () {
             const data = this.state_get_data("view_partner");
             if (_.isEmpty(data)) {
                 return null;
@@ -55,7 +55,7 @@ const Partner = {
             };
         },
     },
-    data: function() {
+    data: function () {
         return {
             usage: "partner_example",
             initial_state_key: "scan",
@@ -65,10 +65,10 @@ const Partner = {
                         title: "Scan a partner",
                         scan_placeholder: "Scan ref",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(this.odoo.get(["scan", scanned.text]));
                     },
-                    on_manual_selection: evt => {
+                    on_manual_selection: (evt) => {
                         this.wait_call(this.odoo.get("partner_list"));
                     },
                 },
@@ -76,10 +76,10 @@ const Partner = {
                     display_info: {
                         title: "Partner detail",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(this.odoo.get(["scan", scanned.text]));
                     },
-                    on_manual_selection: evt => {
+                    on_manual_selection: (evt) => {
                         this.wait_call(this.odoo.get("partner_list"));
                     },
                 },
@@ -90,7 +90,7 @@ const Partner = {
                     events: {
                         select: "on_select",
                     },
-                    on_select: selected => {
+                    on_select: (selected) => {
                         if (selected)
                             this.wait_call(this.odoo.get(["detail", selected.id]));
                     },

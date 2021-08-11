@@ -6,8 +6,7 @@ from odoo.addons.component.core import Component
 
 
 class ScanPartnerHandler(Component):
-    """Scan anything handler for res.partner.
-    """
+    """Scan anything handler for res.partner."""
 
     _name = "shopfloor.scan.partner.handler"
     _inherit = "shopfloor.scan.anything.handler"

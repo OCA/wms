@@ -17,7 +17,7 @@ Vue.component("detail-partner_example", {
                     path: "email",
                     label: "Email",
                     // Not really needed... just an example
-                    renderer: function(rec, field) {
+                    renderer: function (rec, field) {
                         return rec[field.path];
                     },
                 },

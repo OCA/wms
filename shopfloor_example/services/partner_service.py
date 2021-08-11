@@ -20,8 +20,7 @@ class PartnerExampleService(Component):
         auth="api_key",
     )
     def scan(self, identifier):
-        """Scan a partner ref and return its data.
-        """
+        """Scan a partner ref and return its data."""
         search = self._actions_for("search")
         record = search.partner_from_scan(identifier)
         return self._response_for_scan(record)
@@ -33,8 +32,7 @@ class PartnerExampleService(Component):
         auth="api_key",
     )
     def partner_list(self, **params):
-        """Return list of available partners.
-        """
+        """Return list of available partners."""
         domain = []
         if "name" in params:
             domain.append(("name", "like", params["name"]))
@@ -47,8 +45,7 @@ class PartnerExampleService(Component):
         auth="api_key",
     )
     def detail(self, partner_id):
-        """Retrieve full detail for partner ID.
-        """
+        """Retrieve full detail for partner ID."""
         record = self.env["res.partner"].browse(partner_id).exists()
         if not record:
             message = self.msg_store.generic_record_not_found()
