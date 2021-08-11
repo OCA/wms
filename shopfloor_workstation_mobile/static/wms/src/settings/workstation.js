@@ -9,7 +9,7 @@
 import {page_registry} from "/shopfloor_mobile_base/static/wms/src/services/page_registry.js";
 
 var Workstation = {
-    data: function() {
+    data: function () {
         return {
             usage: "workstation",
             workstation_scanned: false,
@@ -45,8 +45,8 @@ var Workstation = {
         this.odoo = this.$root.getOdoo(odoo_params);
     },
     methods: {
-        on_scan: function(scanned) {
-            this.odoo.call("setdefault", {barcode: scanned.text}).then(result => {
+        on_scan: function (scanned) {
+            this.odoo.call("setdefault", {barcode: scanned.text}).then((result) => {
                 this.workstation_scanned = true;
                 // TODO : See how well a 404 when the shopfloor_workstation
                 // module is not installed will be handeled.
@@ -78,7 +78,7 @@ page_registry.add(
     {
         tag: "settings",
         icon: "mdi-printer",
-        display_name: function(instance, rec) {
+        display_name: function (instance, rec) {
             const workstation_name = instance.$root.workstation
                 ? instance.$root.workstation.name
                 : "?";
