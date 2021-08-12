@@ -98,6 +98,10 @@ class StockMove(models.Model):
                 moves_todo.move_line_ids.package_level_id.write(
                     {"picking_id": new_picking.id}
                 )
+                # Ensure the states of the transfers are up-to-date, required since
+                # odoo/odoo/commit/591a726f4901b863f7a13581942e7e6b352c1728
+                picking._compute_state()
+                new_picking._compute_state()
                 # NOTE: at this stage all the operations should be assigned already
                 # hence the new picking must be assigned already.
                 # DO NOT CALL `new_picking.action_assign` or you'll wipe qty_done.
