@@ -7,13 +7,12 @@
 <odoo>
     <template
         id="shopfloor_app_assets"
-        inherit_id="shopfloor_mobile.shopfloor_app_assets"
+        inherit_id="shopfloor_mobile_base.shopfloor_app_assets"
     >
-        <script id="script_scenario_checkout" position="after">
-            <t t-set="mod_name" t-value="'shopfloor_mobile_custom_example'" />
-            <script
-                id="script_scenario_checkout"
-                t-attf-src="/#{mod_name}/static/wms/src/scenario/checkout.js?v=#{get_version(mod_name)}"
+        <script id="script_page_profile" position="after">
+          <script
+                id="script_page_workstation"
+                t-attf-src="/shopfloor_workstation_mobile/static/wms/src/settings/workstation.js?v=#{app_version}"
                 type="module"
             />
         </script>
