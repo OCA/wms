@@ -120,39 +120,39 @@ Provide the proper interface and link to connect vertical lift machines such as 
 
 Available addons
 ----------------
-addon | version | summary
---- | --- | ---
-[delivery_carrier_warehouse](delivery_carrier_warehouse/) | 14.0.1.2.0 | Get delivery method used in sales orders from warehouse
-[shopfloor](shopfloor/) | 14.0.1.0.0 | manage warehouse operations with barcode scanners
-[shopfloor_base](shopfloor_base/) | 14.0.1.0.1 | Core module for creating mobile apps
-[shopfloor_example](shopfloor_example/) | 14.0.1.0.0 | Show how to customize the Shopfloor app frontend.
-[shopfloor_mobile](shopfloor_mobile/) | 14.0.1.0.1 | Mobile frontend for WMS Shopfloor app
-[shopfloor_mobile_base](shopfloor_mobile_base/) | 14.0.1.0.1 | Mobile frontend for WMS Shopfloor app
-[shopfloor_workstation](shopfloor_workstation/) | 14.0.1.1.0 | Manage warehouse workstation with barcode scanners
-[shopfloor_workstation_mobile](shopfloor_workstation_mobile/) | 14.0.1.0.0 | Shopfloor mobile app integration for workstation
-[stock_dynamic_routing](stock_dynamic_routing/) | 14.0.1.0.0 | Dynamic routing of stock moves
-[stock_picking_completion_info](stock_picking_completion_info/) | 14.0.1.0.0 | Display on current document completion information according to next operations
-[stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.0.1 | Raise priority of all transfers for a chain when started
-[stock_picking_type_shipping_policy_group_by](stock_picking_type_shipping_policy_group_by/) | 14.0.1.0.0 | Glue module for Picking Type Shipping Policy and Group Transfers by Partner and Carrier
-[stock_storage_type](stock_storage_type/) | 14.0.1.7.0 | Manage packages and locations storage types
-[stock_storage_type_buffer](stock_storage_type_buffer/) | 14.0.1.2.0 | Exclude storage locations from put-away if their buffer is full
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[delivery_carrier_warehouse](delivery_carrier_warehouse/) | 14.0.1.2.0 |  | Get delivery method used in sales orders from warehouse
+[shopfloor](shopfloor/) | 14.0.1.0.0 | [![guewen](https://github.com/guewen.png?size=30px)](https://github.com/guewen) [![simahawk](https://github.com/simahawk.png?size=30px)](https://github.com/simahawk) [![sebalix](https://github.com/sebalix.png?size=30px)](https://github.com/sebalix) | manage warehouse operations with barcode scanners
+[shopfloor_base](shopfloor_base/) | 14.0.1.0.1 | [![guewen](https://github.com/guewen.png?size=30px)](https://github.com/guewen) [![simahawk](https://github.com/simahawk.png?size=30px)](https://github.com/simahawk) [![sebalix](https://github.com/sebalix.png?size=30px)](https://github.com/sebalix) | Core module for creating mobile apps
+[shopfloor_example](shopfloor_example/) | 14.0.1.0.0 |  | Show how to customize the Shopfloor app frontend.
+[shopfloor_mobile](shopfloor_mobile/) | 14.0.1.0.1 | [![simahawk](https://github.com/simahawk.png?size=30px)](https://github.com/simahawk) | Mobile frontend for WMS Shopfloor app
+[shopfloor_mobile_base](shopfloor_mobile_base/) | 14.0.1.0.1 | [![simahawk](https://github.com/simahawk.png?size=30px)](https://github.com/simahawk) | Mobile frontend for WMS Shopfloor app
+[shopfloor_workstation](shopfloor_workstation/) | 14.0.1.1.0 |  | Manage warehouse workstation with barcode scanners
+[shopfloor_workstation_mobile](shopfloor_workstation_mobile/) | 14.0.1.0.0 |  | Shopfloor mobile app integration for workstation
+[stock_dynamic_routing](stock_dynamic_routing/) | 14.0.1.0.0 |  | Dynamic routing of stock moves
+[stock_picking_completion_info](stock_picking_completion_info/) | 14.0.1.0.0 |  | Display on current document completion information according to next operations
+[stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.0.1 |  | Raise priority of all transfers for a chain when started
+[stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 14.0.1.0.0 |  | Define different shipping policies according to picking type
+[stock_picking_type_shipping_policy_group_by](stock_picking_type_shipping_policy_group_by/) | 14.0.1.0.0 |  | Glue module for Picking Type Shipping Policy and Group Transfers by Partner and Carrier
+[stock_storage_type](stock_storage_type/) | 14.0.1.7.0 |  | Manage packages and locations storage types
+[stock_storage_type_buffer](stock_storage_type_buffer/) | 14.0.1.2.0 |  | Exclude storage locations from put-away if their buffer is full
 
 
 Unported addons
 ---------------
-addon | version | summary
---- | --- | ---
-[delivery_carrier_preference](delivery_carrier_preference/) | 13.0.1.5.0 (unported) | Advanced selection of preferred shipping methods
-[sale_stock_available_to_promise_release](sale_stock_available_to_promise_release/) | 13.0.1.3.0 (unported) | Integration between Sales and Available to Promise Release
-[shopfloor_batch_automatic_creation](shopfloor_batch_automatic_creation/) | 13.0.1.0.0 (unported) | Create batch transfers for Cluster Picking
-[shopfloor_checkout_sync](shopfloor_checkout_sync/) | 13.0.1.0.0 (unported) | Glue module
-[stock_available_to_promise_release](stock_available_to_promise_release/) | 13.0.1.9.2 (unported) | Release Operations based on available to promise
-[stock_available_to_promise_release_dynamic_routing](stock_available_to_promise_release_dynamic_routing/) | 13.0.1.0.1 (unported) | Glue between moves release and dynamic routing
-[stock_move_source_relocate](stock_move_source_relocate/) | 13.0.1.0.0 (unported) | Change source location of unavailable moves
-[stock_move_source_relocate_dynamic_routing](stock_move_source_relocate_dynamic_routing/) | 13.0.1.0.0 (unported) | Glue module
-[stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 13.0.1.0.0 (unported) | Define different shipping policies according to picking type
-[stock_reception_screen](stock_reception_screen/) | 13.0.1.1.2 (unported) | Dedicated screen to receive/scan goods.
-[stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 13.0.1.1.0 (unported) | Advanced storage strategy ABC for WMS
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[delivery_carrier_preference](delivery_carrier_preference/) | 13.0.1.5.0 (unported) |  | Advanced selection of preferred shipping methods
+[sale_stock_available_to_promise_release](sale_stock_available_to_promise_release/) | 13.0.1.3.0 (unported) |  | Integration between Sales and Available to Promise Release
+[shopfloor_batch_automatic_creation](shopfloor_batch_automatic_creation/) | 13.0.1.0.0 (unported) | [![guewen](https://github.com/guewen.png?size=30px)](https://github.com/guewen) | Create batch transfers for Cluster Picking
+[shopfloor_checkout_sync](shopfloor_checkout_sync/) | 13.0.1.0.0 (unported) | [![guewen](https://github.com/guewen.png?size=30px)](https://github.com/guewen) | Glue module
+[stock_available_to_promise_release](stock_available_to_promise_release/) | 13.0.1.9.2 (unported) |  | Release Operations based on available to promise
+[stock_available_to_promise_release_dynamic_routing](stock_available_to_promise_release_dynamic_routing/) | 13.0.1.0.1 (unported) |  | Glue between moves release and dynamic routing
+[stock_move_source_relocate](stock_move_source_relocate/) | 13.0.1.0.0 (unported) |  | Change source location of unavailable moves
+[stock_move_source_relocate_dynamic_routing](stock_move_source_relocate_dynamic_routing/) | 13.0.1.0.0 (unported) |  | Glue module
+[stock_reception_screen](stock_reception_screen/) | 13.0.1.1.2 (unported) |  | Dedicated screen to receive/scan goods.
+[stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 13.0.1.1.0 (unported) |  | Advanced storage strategy ABC for WMS
 
 [//]: # (end addons)
 
