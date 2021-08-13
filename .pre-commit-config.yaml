@@ -9,7 +9,6 @@ exclude: |
   ^stock_available_to_promise_release_dynamic_routing/|
   ^stock_move_source_relocate/|
   ^stock_move_source_relocate_dynamic_routing/|
-  ^stock_picking_type_shipping_policy/|
   ^stock_reception_screen/|
   ^stock_storage_type_putaway_abc/|
   # END NOT INSTALLABLE ADDONS
