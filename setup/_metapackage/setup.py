@@ -19,6 +19,7 @@ setuptools.setup(
         'odoo14-addon-stock_dynamic_routing',
         'odoo14-addon-stock_picking_completion_info',
         'odoo14-addon-stock_picking_consolidation_priority',
+        'odoo14-addon-stock_picking_type_shipping_policy',
         'odoo14-addon-stock_picking_type_shipping_policy_group_by',
         'odoo14-addon-stock_storage_type',
         'odoo14-addon-stock_storage_type_buffer',
