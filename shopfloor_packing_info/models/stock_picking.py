@@ -7,7 +7,8 @@ class StockPicking(models.Model):
     _inherit = "stock.picking"
 
     shopfloor_packing_info_id = fields.Many2one(
-        string="Packing information", related="partner_id.shopfloor_packing_info_id",
+        string="Packing information",
+        related="partner_id.shopfloor_packing_info_id",
     )
     shopfloor_display_packing_info = fields.Boolean(
         related="picking_type_id.shopfloor_display_packing_info",
