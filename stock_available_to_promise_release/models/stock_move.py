@@ -392,18 +392,11 @@ class StockMove(models.Model):
         # `stock.move._search_picking_for_assignation`.
         if not self.picking_id.printed:
             self.picking_id.printed = True
-
+        new_move = self  # Work on the current move if split doesn't occur
         new_move_vals = self._split(remaining_qty)
-        # In case self.product_qty <= remaining_qty, we need to use self as
-        # new move so that new picking can be assigned. If new_move_vals is
-        # empty, create method returns empty record set so _assign_picking does
-        # not assign new picking.
         if new_move_vals:
             new_move = self.create(new_move_vals)
             new_move._action_confirm(merge=False)
-        else:
-            # Use self.copy() will fail the test
-            new_move = self
         # Picking assignment is needed here because `_split` copies the move
         # thus the `_should_be_assigned` condition is not satisfied
         # and the move is not assigned.
