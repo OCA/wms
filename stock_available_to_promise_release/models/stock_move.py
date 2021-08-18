@@ -114,7 +114,7 @@ class StockMove(models.Model):
         horizon_date = self._promise_reservation_horizon_date()
         if horizon_date:
             sql += (
-                " AND (m.need_release IS true AND m.date_expected <= %(horizon)s "
+                " AND (m.need_release IS true AND m.date_deadline <= %(horizon)s "
                 "      OR m.need_release IS false)"
             )
             params["horizon"] = horizon_date
@@ -392,9 +392,14 @@ class StockMove(models.Model):
         # `stock.move._search_picking_for_assignation`.
         if not self.picking_id.printed:
             self.picking_id.printed = True
-        new_move = self.browse(self._split(remaining_qty))
+        new_move = self  # Work on the current move if split doesn't occur
+        new_move_vals = self._split(remaining_qty)
+        if new_move_vals:
+            new_move = self.create(new_move_vals)
+            new_move._action_confirm(merge=False)
         # Picking assignment is needed here because `_split` copies the move
         # thus the `_should_be_assigned` condition is not satisfied
         # and the move is not assigned.
         new_move._assign_picking()
+
         return new_move.with_context(context)
