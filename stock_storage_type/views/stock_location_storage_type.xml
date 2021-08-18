@@ -16,6 +16,15 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button
+                            string="Locations"
+                            class="oe_stat_button"
+                            icon="fa-th-list"
+                            name="button_show_locations"
+                            type="object"
+                        />
+                    </div>
                     <field name="active" invisible="1" />
                     <widget
                         name="web_ribbon"
