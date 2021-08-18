@@ -13,6 +13,11 @@
                 />
                 <field name="location_id" />
                 <field name="location_putaway_strategy" />
+                <button
+                    string="Show locations"
+                    name="button_show_locations"
+                    type="object"
+                />
             </tree>
         </field>
     </record>
