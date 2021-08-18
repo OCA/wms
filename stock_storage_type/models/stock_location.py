@@ -384,6 +384,7 @@ class StockLocation(models.Model):
         if self.pack_putaway_strategy == "none":
             locations = self
         else:
+            products = products or self.env["product.product"]
             locations = self._get_sorted_leaf_locations(products)
         return locations
 
