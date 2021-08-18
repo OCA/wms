@@ -16,6 +16,7 @@ setuptools.setup(
         'odoo14-addon-shopfloor_mobile_base',
         'odoo14-addon-shopfloor_workstation',
         'odoo14-addon-shopfloor_workstation_mobile',
+        'odoo14-addon-stock_available_to_promise_release',
         'odoo14-addon-stock_dynamic_routing',
         'odoo14-addon-stock_picking_completion_info',
         'odoo14-addon-stock_picking_consolidation_priority',
