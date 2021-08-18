@@ -67,3 +67,15 @@ class StockStorageLocationSequence(models.Model):
                 % self.location_id.name
             )
         return msg
+
+    def button_show_locations(self):
+        action = self.env.ref("stock.action_location_form").read()[0]
+        action["domain"] = [
+            ("parent_path", "=ilike", "{}%".format(self.location_id.parent_path)),
+            (
+                "allowed_location_storage_type_ids",
+                "in",
+                self.package_storage_type_id.location_storage_type_ids.ids,
+            ),
+        ]
+        return action
