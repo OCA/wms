@@ -136,8 +136,8 @@ addon | version | maintainers | summary
 [stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.0.1 |  | Raise priority of all transfers for a chain when started
 [stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 14.0.1.0.0 |  | Define different shipping policies according to picking type
 [stock_picking_type_shipping_policy_group_by](stock_picking_type_shipping_policy_group_by/) | 14.0.1.0.0 |  | Glue module for Picking Type Shipping Policy and Group Transfers by Partner and Carrier
-[stock_storage_type](stock_storage_type/) | 14.0.1.7.0 |  | Manage packages and locations storage types
-[stock_storage_type_buffer](stock_storage_type_buffer/) | 14.0.1.2.0 |  | Exclude storage locations from put-away if their buffer is full
+[stock_storage_type](stock_storage_type/) | 14.0.1.8.0 |  | Manage packages and locations storage types
+[stock_storage_type_buffer](stock_storage_type_buffer/) | 14.0.1.3.0 |  | Exclude storage locations from put-away if their buffer is full
 
 
 Unported addons
