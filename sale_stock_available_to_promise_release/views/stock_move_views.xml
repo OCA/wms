@@ -83,7 +83,7 @@
             name="view_ids"
             eval="[(5, 0, 0),
                      (0, 0, {'view_mode': 'tree', 'view_id': ref('view_move_release_tree')}),
-                     (0, 0, {'view_mode': 'kanban', 'view_id': ref('stock.stock_move_view_kanban')}),
+                     (0, 0, {'view_mode': 'kanban', 'view_id': ref('stock.view_move_kandan')}),
                      (0, 0, {'view_mode': 'form', 'view_id': ref('view_move_release_form')}),
                      ]"
         />
