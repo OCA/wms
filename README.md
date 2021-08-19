@@ -152,7 +152,7 @@ addon | version | maintainers | summary
 [stock_move_source_relocate](stock_move_source_relocate/) | 13.0.1.0.0 (unported) |  | Change source location of unavailable moves
 [stock_move_source_relocate_dynamic_routing](stock_move_source_relocate_dynamic_routing/) | 13.0.1.0.0 (unported) |  | Glue module
 [stock_reception_screen](stock_reception_screen/) | 13.0.1.1.2 (unported) |  | Dedicated screen to receive/scan goods.
-[stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 13.0.1.1.0 (unported) |  | Advanced storage strategy ABC for WMS
+[stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 13.0.2.0.0 (unported) |  | Advanced storage strategy ABC for WMS
 
 [//]: # (end addons)
 
