@@ -16,6 +16,6 @@ class ProductProduct(models.Model):
                 ("picking_type_id.code", "=", "incoming"),
             ],
             limit=1,
-            order="date_expected asc",
+            order="date asc",
         )
-        return move_line and move_line.date_expected or False
+        return move_line and move_line.date or False

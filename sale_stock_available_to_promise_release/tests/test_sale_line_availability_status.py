@@ -16,6 +16,7 @@ class TestSaleLineAvailablilityStatus(SavepointCase):
     @classmethod
     def setUpClassProduct(cls):
         cls.mto_route = cls.env.ref("stock.route_warehouse0_mto")
+        cls.mto_route.active = True
         cls.uom_unit = cls.env.ref("uom.product_uom_unit")
         cls.product = cls.env["product.product"].create(
             {
