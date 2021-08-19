@@ -73,6 +73,11 @@ the "ordered children" strategy, children locations are sorted by first by max
 height which is a physical constraint to respect, then pack putaway sequence
 which allow to favor for example some level or corridor, and finally by name.
 
+.. IMPORTANT::
+   This is an alpha version, the data model and design can change at any time without warning.
+   Only for development or testing purpose, do not use in production.
+   `More details on development status <https://odoo-community.org/page/development-status>`_
+
 **Table of contents**
 
 .. contents::
