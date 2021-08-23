@@ -318,6 +318,11 @@ msgid ""
 msgstr ""
 
 #. module: stock_storage_type
+#: model_terms:ir.ui.view,arch_db:stock_storage_type.location_storage_type_form_view
+msgid "Locations"
+msgstr ""
+
+#. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_package_storage_type__location_storage_type_ids
 msgid "Locations storage types that can accept such a package storage type."
 msgstr ""
@@ -476,6 +481,11 @@ msgstr ""
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_storage_location_sequence
 msgid "Sequence of locations to put-away the package storage type"
+msgstr ""
+
+#. module: stock_storage_type
+#: model_terms:ir.ui.view,arch_db:stock_storage_type.package_storage_location_tree_view
+msgid "Show locations"
 msgstr ""
 
 #. module: stock_storage_type
