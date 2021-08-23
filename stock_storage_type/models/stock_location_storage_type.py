@@ -156,3 +156,8 @@ class StockLocationStorageType(models.Model):
                     ("location_will_contain_lot_ids", "=", False),
                 ]
         return location_domain
+
+    def button_show_locations(self):
+        action = self.env.ref("stock.action_location_form").read()[0]
+        action["domain"] = [("allowed_location_storage_type_ids", "in", self.ids)]
+        return action
