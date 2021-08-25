@@ -112,6 +112,11 @@ class StockLocation(models.Model):
     leaf_location_ids = fields.Many2many(
         "stock.location",
         compute="_compute_leaf_location_ids",
+        help="technical field: all the leaves locations",
+    )
+    leaf_child_location_ids = fields.Many2many(
+        "stock.location",
+        compute="_compute_leaf_location_ids",
         help="technical field: all the leaves sub-locations",
     )
     max_height = fields.Float(
@@ -176,20 +181,23 @@ class StockLocation(models.Model):
         help="The max height supported among allowed location storage types.",
     )
 
-    @api.depends("child_ids.leaf_location_ids")
+    @api.depends("child_ids.leaf_location_ids", "child_ids.active")
     def _compute_leaf_location_ids(self):
+        """Compute all children leaf locations. Current location is excluded (not a child)"""
         query = """
             SELECT parent.id, ARRAY_AGG(sub.id) AS leaves
             FROM stock_location parent
             INNER JOIN stock_location sub
             ON sub.parent_path LIKE parent.parent_path || '%%'
             AND sub.id != parent.id
+            AND sub.active
             LEFT JOIN stock_location subsub
             ON subsub.location_id = sub.id
+            AND subsub.active
             WHERE
             -- exclude any location which has children so we keep only leaves
             subsub.id IS NULL
-            AND parent.id = %s
+            AND parent.id in %s
             GROUP BY parent.id;
         """
         self.env.cr.execute(query, (tuple(self.ids),))
@@ -197,11 +205,12 @@ class StockLocation(models.Model):
         for loc in self:
             leave_ids = rows.get(loc.id)
             if not leave_ids:
-                # if we have no sub-location, we are a leaf
                 loc.leaf_location_ids = loc
+                loc.leaf_child_location_ids = False
                 continue
             leaves = self.search([("id", "in", leave_ids)])
             loc.leaf_location_ids = leaves
+            loc.leaf_child_location_ids = leaves
 
     def _should_compute_will_contain_product_ids(self):
         return self.do_not_mix_products
@@ -385,7 +394,7 @@ class StockLocation(models.Model):
             locations = self
         else:
             products = products or self.env["product.product"]
-            locations = self._get_sorted_leaf_locations(products)
+            locations = self._get_sorted_leaf_child_locations(products)
         return locations
 
     def _get_sorted_leaf_locations_orderby(self, products):
@@ -408,16 +417,16 @@ class StockLocation(models.Model):
             ]
         return ", ".join(orderby), []
 
-    def _get_sorted_leaf_locations(self, products):
+    def _get_sorted_leaf_child_locations(self, products):
         """Return sorted leaf sub-locations
 
         The locations are candidate locations that will be evaluated one per
         one in order to find the first available location. They must be leaf
         locations where we can actually put goods.
         """
-        if not self.leaf_location_ids:
-            return self.leaf_location_ids
-        query = self._where_calc([("id", "in", self.leaf_location_ids.ids)])
+        if not self.leaf_child_location_ids:
+            return self.leaf_child_location_ids
+        query = self._where_calc([("id", "in", self.leaf_child_location_ids.ids)])
         from_clause, where_clause, where_params = query.get_sql()
         orderby_clause, orderby_params = self._get_sorted_leaf_locations_orderby(
             products
