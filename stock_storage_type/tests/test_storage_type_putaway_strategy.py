@@ -59,6 +59,23 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             int_picking.move_line_ids.mapped("location_dest_id"),
             self.cardboxes_bin_1_location,
         )
+        # Archive all leaf locations. Ensure that the intermediate location is
+        # not returned as a valid leaf location and that the next location in
+        # the sequence (reserve) is selected
+        int_picking.do_unreserve()
+        cardboxes_stock = self.env.ref("stock_storage_type.stock_location_cardboxes")
+        cardboxes_stock.child_ids.write({"active": False})
+        int_picking.action_assign()
+        self.assertEqual(int_picking.location_dest_id, self.stock_location)
+        self.assertEqual(
+            int_picking.move_lines.mapped("location_dest_id"), self.stock_location
+        )
+        reserve_cardbox = self.env.ref(
+            "stock_storage_type.stock_location_cardboxes_reserve_bin_1"
+        )
+        self.assertEqual(
+            int_picking.move_line_ids.mapped("location_dest_id"), reserve_cardbox
+        )
 
     def test_storage_strategy_only_empty_ordered_locations_pallets(self):
         # Set pallets location type as only empty
