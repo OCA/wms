@@ -188,8 +188,7 @@ class StockLocation(models.Model):
         for loc in self:
             leave_ids = rows.get(loc.id)
             if not leave_ids:
-                # if we have no sub-location, we are a leaf
-                loc.leaf_location_ids = loc
+                loc.leaf_location_ids = False
                 continue
             leaves = self.search([("id", "in", leave_ids)])
             loc.leaf_location_ids = leaves
