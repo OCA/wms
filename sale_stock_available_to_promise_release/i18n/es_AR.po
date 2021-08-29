@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-07-12 17:07+0000\n"
-"PO-Revision-Date: 2021-02-07 02:44+0000\n"
+"PO-Revision-Date: 2021-08-29 22:52+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -20,22 +20,22 @@ msgstr ""
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
 msgid "As of"
-msgstr ""
+msgstr "A partir de"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__availability_status
 msgid "Availability Status"
-msgstr ""
+msgstr "Estado de Disponibilidad"
 
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
 msgid "Available"
-msgstr ""
+msgstr "Disponible"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__available_qty
 msgid "Available Qty"
-msgstr ""
+msgstr "Cantidad Disponible"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_move__carrier_id
@@ -59,12 +59,12 @@ msgstr "Método de Entrega"
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__expected_availability_date
 msgid "Expected Availability Date"
-msgstr ""
+msgstr "Fecha de Disponibilidad Esperada"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__full
 msgid "Fully Available"
-msgstr ""
+msgstr "Totalmente Disponible"
 
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_search
@@ -85,23 +85,23 @@ msgstr "Movimientos Necesitan Liberarse"
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__no
 msgid "Not available"
-msgstr ""
+msgstr "No Disponible"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__on_order
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
 msgid "On order"
-msgstr ""
+msgstr "En orden"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__partial
 msgid "Partially Available"
-msgstr ""
+msgstr "Parcialmente Disponible"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_procurement_group
@@ -111,12 +111,12 @@ msgstr "Grupo de Adquisiciones"
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_product_product
 msgid "Product"
-msgstr ""
+msgstr "Producto"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__restock
 msgid "Restock ordered"
-msgstr ""
+msgstr "Reabastecimiento ordenado"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_sale_order
@@ -151,4 +151,4 @@ msgstr "Altura"
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
 msgid "Yes"
-msgstr ""
+msgstr "Si"
