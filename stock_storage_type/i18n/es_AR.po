@@ -250,6 +250,11 @@ msgid "Last Updated on"
 msgstr "Última Actualización el"
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__leaf_child_location_ids
+msgid "Leaf Child Location"
+msgstr ""
+
+#. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__leaf_location_ids
 msgid "Leaf Location"
 msgstr "Ubicación Hoja"
@@ -683,6 +688,11 @@ msgstr ""
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__leaf_location_ids
+msgid "technical field: all the leaves locations"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,help:stock_storage_type.field_stock_location__leaf_child_location_ids
 msgid "technical field: all the leaves sub-locations"
 msgstr "campo técnico: todas las sub-ubicaciones hojas"
 
