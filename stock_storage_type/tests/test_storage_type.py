@@ -112,7 +112,11 @@ class TestStorageType(SavepointCase):
         self.assertEqual(self.stock_location.leaf_location_ids, all_stock_leaves)
 
     def test_location_leaf_locations_on_leaf(self):
-        self.assertEqual(self.cardboxes_bin_3.leaf_location_ids, self.cardboxes_bin_3)
+        self.cardboxes_bin_4.active = False
+        self.assertEqual(
+            self.cardboxes_stock.leaf_location_ids,
+            self.cardboxes_bin_1 | self.cardboxes_bin_2 | self.cardboxes_bin_3,
+        )
 
     def test_location_max_height(self):
         self.pallets_location_storage_type.max_height = 2
