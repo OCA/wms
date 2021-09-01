@@ -225,10 +225,21 @@ class DataAction(Component):
             "display_name",
             "default_code",
             "barcode",
+            (
+                "barcode_ids:barcodes",
+                lambda record, fname: self._product_barcode_list(record[fname]),
+            ),
             ("packaging_ids:packaging", self._product_packaging),
             ("uom_id:uom", self._simple_record_parser() + ["factor", "rounding"]),
             ("seller_ids:supplier_code", self._product_supplier_code),
         ]
+
+    def _product_barcode_list(self, rec):
+        return self._jsonify(
+            rec,
+            self._simple_record_parser(),
+            multi=True,
+        )
 
     def _product_packaging(self, rec, field):
         return self._jsonify(

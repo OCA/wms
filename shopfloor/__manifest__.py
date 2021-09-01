@@ -18,6 +18,7 @@
         "shopfloor_base",
         "stock",
         "stock_picking_batch",
+        "product_multi_barcode",
         "base_jsonify",
         "base_rest",
         "base_sparse_field",
