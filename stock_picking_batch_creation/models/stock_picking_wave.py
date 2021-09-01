@@ -1,0 +1,32 @@
+# -*- coding: utf-8 -*-
+# Copyright 2021 ACSONE SA/NV
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+from odoo import api, fields, models
+
+
+class StockPickingWave(models.Model):
+
+    _inherit = "stock.picking.wave"
+    picking_device_id = fields.Many2one("stock.device.type", string="Device")
+    move_ids = fields.One2many(
+        "stock.move", string="Stock moves", compute="_compute_move_ids"
+    )
+    pack_operation_ids = fields.One2many(
+        "stock.pack.operation",
+        string="Stock pack operations",
+        compute="_compute_move_ids",
+        readonly=True,
+        states={"draft": [("readonly", False)], "in_progress": [("readonly", False)]},
+    )
+
+    @api.depends(
+        "picking_ids",
+        "picking_ids.pack_operation_ids",
+        "picking_ids.move_lines",
+        "picking_ids.move_lines.state",
+    )
+    def _compute_move_ids(self):
+        for batch in self:
+            batch.move_ids = batch.picking_ids.mapped("move_lines")
+            batch.pack_operation_ids = batch.picking_ids.mapped("pack_operation_ids")
