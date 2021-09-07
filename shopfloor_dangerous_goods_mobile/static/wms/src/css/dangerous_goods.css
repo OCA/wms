@@ -1,16 +1,10 @@
-.record-name {
-    position: relative;
-}
-
 .detail-picking-select .has-lq-products .record-name::after {
     display: inline-block;
-    width: 20px;
-    height: 20px;
+    width: 0.9em;
+    height: 0.9em;
     background-image: url(limited_quantity_label.png);
     background-size: cover;
     background-position: center;
     content: " ";
-    position: absolute;
-    top: 1px;
-    right: -25px;
+    margin-left: 0.3em;
 }
