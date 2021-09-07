@@ -106,7 +106,7 @@ class TestSaleLineAvailablilityStatus(SavepointCase):
         self.assertEqual(self.line.available_qty, 50.0)
 
     @freeze_time("2021-07-01 12:00:00")
-    def test_availabile_restock(self):
+    def test_available_restock(self):
         replenishment_picking = self._create_replenishment_picking(self.product, 100)
         self.sale.action_confirm()
         self.assertEqual(self.line.availability_status, "restock")
