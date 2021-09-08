@@ -22,6 +22,8 @@ class PriorityPostponeMixin(models.AbstractModel):
 
     def _get_max_shopfloor_priority(self, records):
         self.ensure_one()
+        if not records:
+            return 0
         return max(rec.shopfloor_priority for rec in records)
 
     def shopfloor_postpone(self, *recordsets):
