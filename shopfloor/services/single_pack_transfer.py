@@ -77,7 +77,9 @@ class SinglePackTransfer(Component):
                 self.msg_store.package_not_found_for_barcode(barcode)
             )
 
-        if not self.is_src_location_valid(package.location_id):
+        if not package.location_id or not self.is_src_location_valid(
+            package.location_id
+        ):
             return self._response_for_start(
                 message=self.msg_store.package_not_allowed_in_src_location(
                     barcode, picking_types
