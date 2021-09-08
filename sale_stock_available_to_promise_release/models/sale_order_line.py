@@ -40,48 +40,55 @@ class SaleOrderLine(models.Model):
     )
     def _compute_availability_status(self):
         for record in self:
-            if record.display_type or not record.product_id:
-                record.availability_status = False
-                record.expected_availability_date = False
-                record.available_qty = False
-                continue
-            elif record.is_delivery:
-                record.availability_status = "full"
-                record.expected_availability_date = False
-                record.available_qty = record.product_uom_qty
-                continue
-            # Fallback values
-            availability_status = "no"
-            expected_availability_date = False
-            available_qty = sum(
-                record.mapped("move_ids.ordered_available_to_promise_uom_qty")
+            data = record._get_availability_data()
+            record.update(data)
+
+    def _get_availability_data(self):
+        data = dict.fromkeys(
+            ("availability_status", "expected_availability_date", "available_qty"),
+            False,
+        )
+        self.ensure_one()
+        if self.display_type or not self.product_id:
+            return data
+        elif self.is_delivery:
+            data["availability_status"] = "full"
+            data["available_qty"] = self.product_uom_qty
+            return data
+        # Fallback values
+        availability_status = "no"
+        expected_availability_date = False
+        available_qty = sum(
+            self.mapped("move_ids.ordered_available_to_promise_uom_qty")
+        )
+        # required values
+        product = self.product_id
+        rounding = product.uom_id.rounding
+        # on_order product
+        if self._on_order_route():
+            availability_status = "on_order"
+        # Fully available
+        elif (
+            product.type == "service"
+            or float_compare(
+                available_qty, self.product_uom_qty, precision_rounding=rounding
             )
-            # required values
-            product = record.product_id
-            rounding = product.uom_id.rounding
-            # on_order product
-            if record._on_order_route():
-                availability_status = "on_order"
-            # Fully available
-            elif (
-                product.type == "service"
-                or float_compare(
-                    available_qty, record.product_uom_qty, precision_rounding=rounding
-                )
-                >= 0
-            ):
-                availability_status = "full"
-                available_qty = record.product_uom_qty
-            # Partially available
-            elif float_compare(available_qty, 0, precision_rounding=rounding) == 1:
-                availability_status = "partial"
-            # No stock
-            elif float_is_zero(available_qty, precision_rounding=rounding):
-                product_replenishment_date = product._get_next_replenishment_date()
-                # Replenishment ordered
-                if product_replenishment_date:
-                    availability_status = "restock"
-                    expected_availability_date = product_replenishment_date
-            record.availability_status = availability_status
-            record.expected_availability_date = expected_availability_date
-            record.available_qty = available_qty
+            >= 0
+        ):
+            availability_status = "full"
+            available_qty = self.product_uom_qty
+        # Partially available
+        elif float_compare(available_qty, 0, precision_rounding=rounding) == 1:
+            availability_status = "partial"
+        # No stock
+        elif float_is_zero(available_qty, precision_rounding=rounding):
+            product_replenishment_date = product._get_next_replenishment_date()
+            # Replenishment ordered
+            if product_replenishment_date:
+                availability_status = "restock"
+                expected_availability_date = product_replenishment_date
+        return {
+            "availability_status": availability_status,
+            "expected_availability_date": expected_availability_date,
+            "available_qty": available_qty,
+        }
