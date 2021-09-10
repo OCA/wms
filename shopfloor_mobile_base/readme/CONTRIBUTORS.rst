@@ -4,6 +4,7 @@
 * Juan Miguel Sánchez Arce  <juan.sanchez@camptocamp.com>
 * Raphaël Reverdy <raphael.reverdy@akretion.com>
 * Sébastien Beau <sebastien.beau@akretion.com>
+* Jacques-Etienne Baudoux <je@bcim.be>
 
 Design
 ~~~~~~
