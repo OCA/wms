@@ -1,7 +1,6 @@
 exclude: |
   (?x)
   # NOT INSTALLABLE ADDONS
-  ^delivery_carrier_preference/|
   ^shopfloor_batch_automatic_creation/|
   ^shopfloor_checkout_sync/|
   ^stock_available_to_promise_release_dynamic_routing/|
