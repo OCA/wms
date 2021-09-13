@@ -4,7 +4,7 @@
 {
     "name": "Stock Release Channels",
     "summary": "Manage workload in WMS with release channels",
-    "version": "13.0.1.0.0",
+    "version": "14.0.1.0.0",
     "license": "AGPL-3",
     "author": "Camptocamp",
     "website": "https://www.camptocamp.com",
@@ -22,5 +22,5 @@
         "data/ir_cron_data.xml",
         "security/stock_release_channel.xml",
     ],
-    "installable": False,
+    "installable": True,
 }

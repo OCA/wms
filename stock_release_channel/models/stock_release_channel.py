@@ -6,7 +6,13 @@ import logging
 from pytz import timezone
 
 from odoo import _, api, exceptions, fields, models
-from odoo.tools.safe_eval import safe_eval, test_python_expr
+from odoo.tools.safe_eval import (
+    datetime as safe_datetime,
+    dateutil as safe_dateutil,
+    safe_eval,
+    test_python_expr,
+    time as safe_time,
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -180,7 +186,7 @@ class StockReleaseChannel(models.Model):
             ],
             "count_picking_priority": [
                 ("need_release", "=", False),
-                ("priority", ">", "1"),
+                ("priority", "=", "1"),
                 ("state", "in", ("assigned", "waiting", "confirmed")),
             ],
             "count_picking_done": [
@@ -391,14 +397,14 @@ class StockReleaseChannel(models.Model):
     def _eval_context(self, pickings):
         """Prepare the context used when for the python rule evaluation
 
-        :returns: dict -- evaluation context given to (safe_)safe_eval
+        :returns: dict -- evaluation context given to (safe_)eval
         """
         eval_context = {
             "uid": self.env.uid,
             "user": self.env.user,
-            "time": time,
-            "datetime": datetime,
-            "dateutil": dateutil,
+            "time": safe_time,
+            "datetime": safe_datetime,
+            "dateutil": safe_dateutil,
             "timezone": timezone,
             # orm
             "env": self.env,

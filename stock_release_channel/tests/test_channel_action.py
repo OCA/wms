@@ -109,8 +109,8 @@ class TestChannelAction(ChannelReleaseCase):
 
     def test_action_priority(self):
         self._release_all()
-        self.picking.priority = "3"
-        self.picking2.priority = "3"
+        self.picking.priority = "1"
+        self.picking2.priority = "1"
         self._assert_picking_action(
             self.channel.action_picking_priority(), self.picking + self.picking2
         )
