@@ -250,7 +250,7 @@ class Reception(Component):
         if self.work.menu.ask_for_picking_for_reception:
             return self.list_pickings(partner_id, purchase_order_id)
         else:
-            return self.list_move_lines(partner_id, purchase_order_id)
+            return self.list_move_lines(partner_id, purchase_order_id, None)
 
     @response_decorator
     def list_pickings(self, partner_id, purchase_order_id):
@@ -259,7 +259,7 @@ class Reception(Component):
         return self._response(next_state="choose_picking", data=pickings)
 
     @response_decorator
-    def list_move_lines(self, partner_id, purchase_order_id, picking_id):
+    def list_move_lines(self, partner_id, purchase_order_id, picking_id=None):
         """List stock.picking records available
 
         Returns a list of all the available records for the current picking
@@ -496,8 +496,14 @@ class ShopfloorReceptionValidator(Component):
                 "coerce": to_int,
                 "required": False,
                 "type": "integer",
+                "nullable": True,
             },
-            "picking_id": {"coerce": to_int, "required": False, "type": "integer"},
+            "picking_id": {
+                "coerce": to_int,
+                "required": False,
+                "nullable": True,
+                "type": "integer",
+            },
         }
 
     def scan_product(self):
@@ -506,9 +512,15 @@ class ShopfloorReceptionValidator(Component):
             "purchase_order_id": {
                 "coerce": to_int,
                 "required": False,
+                "nullable": True,
                 "type": "integer",
             },
-            "picking_id": {"coerce": to_int, "required": False, "type": "integer"},
+            "picking_id": {
+                "coerce": to_int,
+                "nullable": True,
+                "required": False,
+                "type": "integer",
+            },
             "barcode": {"required": True, "type": "string"},
         }
 
@@ -518,9 +530,15 @@ class ShopfloorReceptionValidator(Component):
             "purchase_order_id": {
                 "coerce": to_int,
                 "required": False,
+                "nullable": True,
                 "type": "integer",
             },
-            "picking_id": {"coerce": to_int, "required": False, "type": "integer"},
+            "picking_id": {
+                "coerce": to_int,
+                "required": False,
+                "nullable": True,
+                "type": "integer",
+            },
             "move_lines_picking": {
                 "required": True,
                 "type": "list",
@@ -535,9 +553,15 @@ class ShopfloorReceptionValidator(Component):
             "purchase_order_id": {
                 "coerce": to_int,
                 "required": False,
+                "nullable": True,
                 "type": "integer",
             },
-            "picking_id": {"coerce": to_int, "required": False, "type": "integer"},
+            "picking_id": {
+                "coerce": to_int,
+                "required": False,
+                "type": "integer",
+                "nullable": True,
+            },
             "barcode": {"required": True, "type": "string"},
             "move_lines_picking": {
                 "required": True,
@@ -555,7 +579,12 @@ class ShopfloorReceptionValidator(Component):
                 "required": False,
                 "type": "integer",
             },
-            "picking_id": {"coerce": to_int, "required": False, "type": "integer"},
+            "picking_id": {
+                "coerce": to_int,
+                "nullable": True,
+                "required": False,
+                "type": "integer",
+            },
             "move_lines_picked": {
                 "required": True,
                 "type": "list",
@@ -569,9 +598,15 @@ class ShopfloorReceptionValidator(Component):
             "purchase_order_id": {
                 "coerce": to_int,
                 "required": False,
+                "nullable": True,
                 "type": "integer",
             },
-            "picking_id": {"coerce": to_int, "required": False, "type": "integer"},
+            "picking_id": {
+                "coerce": to_int,
+                "nullable": True,
+                "required": False,
+                "type": "integer",
+            },
             "move_lines_picking": {
                 "required": True,
                 "type": "list",
