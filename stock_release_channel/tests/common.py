@@ -153,4 +153,4 @@ class ChannelReleaseCase(PromiseReleaseCommonCase):
     def _action_done_picking(self, picking):
         for line in picking.move_line_ids:
             line.qty_done = line.product_uom_qty
-        picking.action_done()
+        picking._action_done()

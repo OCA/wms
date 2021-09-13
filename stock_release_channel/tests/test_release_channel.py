@@ -10,7 +10,7 @@ from .common import ReleaseChannelCase
 class TestReleaseChannel(ReleaseChannelCase):
     def _test_assign_channels(self, expected):
         move = self._create_single_move(self.product1, 10)
-        move.picking_id.priority = "3"
+        move.picking_id.priority = "1"
         move2 = self._create_single_move(self.product2, 10)
         (move + move2).picking_id.assign_release_channel()
         self.assertEqual(move.picking_id.release_channel_id, expected)
@@ -20,7 +20,7 @@ class TestReleaseChannel(ReleaseChannelCase):
         channel = self._create_channel(
             name="Test Domain",
             sequence=1,
-            rule_domain=[("priority", "=", "3")],
+            rule_domain=[("priority", "=", "1")],
         )
         self._test_assign_channels(channel)
 
@@ -28,7 +28,7 @@ class TestReleaseChannel(ReleaseChannelCase):
         channel = self._create_channel(
             name="Test Code",
             sequence=1,
-            code="pickings = pickings.filtered(lambda p: p.priority == '3')",
+            code="pickings = pickings.filtered(lambda p: p.priority == '1')",
         )
         self._test_assign_channels(channel)
 
@@ -36,8 +36,8 @@ class TestReleaseChannel(ReleaseChannelCase):
         channel = self._create_channel(
             name="Test Code",
             sequence=1,
-            rule_domain=[("priority", "=", "3")],
-            code="pickings = pickings.filtered(lambda p: p.priority == '3')",
+            rule_domain=[("priority", "=", "1")],
+            code="pickings = pickings.filtered(lambda p: p.priority == '1')",
         )
         self._test_assign_channels(channel)
 
