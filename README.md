@@ -134,6 +134,7 @@ addon | version | maintainers | summary
 [shopfloor_workstation_mobile](shopfloor_workstation_mobile/) | 14.0.1.0.0 |  | Shopfloor mobile app integration for workstation
 [stock_available_to_promise_release](stock_available_to_promise_release/) | 14.0.1.0.0 |  | Release Operations based on available to promise
 [stock_dynamic_routing](stock_dynamic_routing/) | 14.0.1.0.0 |  | Dynamic routing of stock moves
+[stock_dynamic_routing_reserve_rule](stock_dynamic_routing_reserve_rule/) | 14.0.1.0.0 |  | Glue module between dynamic routing and reservation rules
 [stock_picking_completion_info](stock_picking_completion_info/) | 14.0.1.0.0 |  | Display on current document completion information according to next operations
 [stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.0.1 |  | Raise priority of all transfers for a chain when started
 [stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 14.0.1.0.0 |  | Define different shipping policies according to picking type
