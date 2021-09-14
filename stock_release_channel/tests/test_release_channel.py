@@ -18,7 +18,9 @@ class TestReleaseChannel(ReleaseChannelCase):
 
     def test_assign_channel_domain(self):
         channel = self._create_channel(
-            name="Test Domain", sequence=1, rule_domain=[("priority", "=", "3")],
+            name="Test Domain",
+            sequence=1,
+            rule_domain=[("priority", "=", "3")],
         )
         self._test_assign_channels(channel)
 
@@ -42,7 +44,9 @@ class TestReleaseChannel(ReleaseChannelCase):
     def test_invalid_code(self):
         with self.assertRaises(exceptions.ValidationError):
             self._create_channel(
-                name="Test Code", sequence=1, code="pickings = pickings.filtered(",
+                name="Test Code",
+                sequence=1,
+                code="pickings = pickings.filtered(",
             )
 
     def test_default_sequence(self):

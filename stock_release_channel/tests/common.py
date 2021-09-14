@@ -120,19 +120,25 @@ class ChannelReleaseCase(PromiseReleaseCommonCase):
         cls.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         cls.picking = cls._out_picking(
             cls._create_picking_chain(
-                cls.wh, [(cls.product1, 5), (cls.product2, 5)], move_type="direct",
+                cls.wh,
+                [(cls.product1, 5), (cls.product2, 5)],
+                move_type="direct",
             )
         )
         cls.picking.partner_id = cls.delivery_address_1
         cls.picking2 = cls._out_picking(
             cls._create_picking_chain(
-                cls.wh, [(cls.product1, 5), (cls.product2, 5)], move_type="direct",
+                cls.wh,
+                [(cls.product1, 5), (cls.product2, 5)],
+                move_type="direct",
             )
         )
         cls.picking2.partner_id = cls.delivery_address_2
         cls.picking3 = cls._out_picking(
             cls._create_picking_chain(
-                cls.wh, [(cls.product1, 5), (cls.product2, 5)], move_type="direct",
+                cls.wh,
+                [(cls.product1, 5), (cls.product2, 5)],
+                move_type="direct",
             )
         )
         cls.picking3.partner_id = cls.other_partner
