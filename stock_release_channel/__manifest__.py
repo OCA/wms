@@ -22,5 +22,5 @@
         "data/ir_cron_data.xml",
         "security/stock_release_channel.xml",
     ],
-    'installable': False,
+    "installable": False,
 }

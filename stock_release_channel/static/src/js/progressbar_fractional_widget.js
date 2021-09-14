@@ -1,6 +1,4 @@
-odoo.define("stock_release_channel.progressbar_fractional_widget", function(require) {
-    "use strict";
-
+odoo.define("stock_release_channel.progressbar_fractional_widget", function (require) {
     var utils = require("web.utils");
     var field_registry = require("web.field_registry");
     var FieldProgressBar = field_registry.get("progressbar");
@@ -15,7 +13,7 @@ odoo.define("stock_release_channel.progressbar_fractional_widget", function(requ
          * Extended so that we can choose when to show the values always
          * as a fractional part.
          */
-        init: function() {
+        init: function () {
             this._super.apply(this, arguments);
             this.show_fractional = this.nodeOptions.show_fractional || false;
         },
@@ -27,7 +25,7 @@ odoo.define("stock_release_channel.progressbar_fractional_widget", function(requ
          * not 100. Also: if denominator is zero, it's zero, and not 100 as
          * in the core.
          */
-        _render_value: function(v) {
+        _render_value: function (v) {
             var value = this.value;
             var max_value = this.max_value;
             if (!isNaN(v)) {
@@ -77,9 +75,7 @@ odoo.define("stock_release_channel.progressbar_fractional_widget", function(requ
                 this.$(".o_progressbar_value").val(
                     this.edit_max_value ? max_value : value
                 );
-                this.$(".o_progressbar_value")
-                    .focus()
-                    .select();
+                this.$(".o_progressbar_value").focus().select();
             }
         },
     });
