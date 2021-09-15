@@ -11,7 +11,9 @@ class StockLocation(models.Model):
 
     _inherit = "stock.location"
 
-    pack_putaway_strategy = fields.Selection(selection_add=[("abc", "Chaotic ABC")])
+    pack_putaway_strategy = fields.Selection(
+        selection_add=[("abc", "Chaotic ABC")], ondelete={"abc": "set default"}
+    )
     display_abc_storage = fields.Boolean(compute="_compute_display_abc_storage")
     abc_storage = fields.Selection(ABC_SELECTION, required=True, default="b")
 
