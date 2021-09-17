@@ -142,6 +142,7 @@ addon | version | maintainers | summary
 [stock_picking_type_shipping_policy_group_by](stock_picking_type_shipping_policy_group_by/) | 14.0.1.0.0 |  | Glue module for Picking Type Shipping Policy and Group Transfers by Partner and Carrier
 [stock_storage_type](stock_storage_type/) | 14.0.1.8.0 |  | Manage packages and locations storage types
 [stock_storage_type_buffer](stock_storage_type_buffer/) | 14.0.1.3.0 |  | Exclude storage locations from put-away if their buffer is full
+[stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 14.0.1.0.0 |  | Advanced storage strategy ABC for WMS
 
 
 Unported addons
@@ -154,7 +155,6 @@ addon | version | maintainers | summary
 [stock_move_source_relocate](stock_move_source_relocate/) | 13.0.1.0.0 (unported) |  | Change source location of unavailable moves
 [stock_move_source_relocate_dynamic_routing](stock_move_source_relocate_dynamic_routing/) | 13.0.1.0.0 (unported) |  | Glue module
 [stock_reception_screen](stock_reception_screen/) | 13.0.1.1.2 (unported) |  | Dedicated screen to receive/scan goods.
-[stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 13.0.2.0.0 (unported) |  | Advanced storage strategy ABC for WMS
 
 [//]: # (end addons)
 
