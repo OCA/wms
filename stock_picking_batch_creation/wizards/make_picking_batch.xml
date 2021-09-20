@@ -11,7 +11,11 @@
         <field name="arch" type="xml">
             <form string="Make Picking Batch">
                 <group>
+<<<<<<< HEAD
                     <label for="picking_type_ids" colspan="2" />
+=======
+                    <label for="picking_type_id" colspan="2" />
+>>>>>>> f212af90b52d3e16ab88e42afdbee195575df965
                     <div colspan="2">
                         <field name="picking_type_ids" widget="many2many_tags">
                         </field>
@@ -39,7 +43,11 @@
                 </group>
                 <footer>
                     <button
+<<<<<<< HEAD
             name="create_batch"
+=======
+            name="create_batch_wizard"
+>>>>>>> f212af90b52d3e16ab88e42afdbee195575df965
             string="Create batch picking"
             class="btn-primary"
             type="object"
