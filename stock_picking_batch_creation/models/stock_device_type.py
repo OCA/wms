@@ -27,15 +27,3 @@ class StockDeviceType(models.Model):
         inverse_name="stock_device_type_id",
         string="Informations about stock device type",
     )
-
-
-class StockDeviceTypeLine(models.Model):
-
-    _name = "stock.device.type.line"
-    _description = "Stock Device Type Line"
-
-    name = fields.Char()
-    stock_device_type_id = fields.Many2one(
-        "stock.device.type", string="Stock Device Type", required=True,
-    )
-    sequence = fields.Integer(string="Priority")

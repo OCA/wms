@@ -22,6 +22,7 @@
     ],
     "data": [
         "views/stock_device_type.xml",
+        "views/stock_device_type_line.xml",
         "views/stock_picking_wave.xml",
         "views/stock_picking.xml",
         "wizards/make_picking_batch.xml",
