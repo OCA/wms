@@ -220,6 +220,27 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             },
         )
 
+    def test_start_pack_empty(self):
+        """Test /start when the scanned pack is empty
+
+        The pre-conditions:
+
+        * Nothing
+
+        Expected result:
+
+        * Return a message
+        """
+        pack_empty = self.env["stock.quant.package"].create({})
+        pack_code = pack_empty.name
+        params = {"barcode": pack_code}
+        response = self.service.dispatch("start", params=params)
+        self.assert_response(
+            response,
+            next_state="start",
+            message=self.service.msg_store.package_has_no_product_to_take(pack_code),
+        )
+
     def test_start_pack_from_location(self):
         """Test /start, finding the pack from location's barcode
 

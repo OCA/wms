@@ -58,9 +58,9 @@ class SinglePackTransfer(Component):
             message=message,
         )
 
-    def start(self, barcode, confirmation=False):
+    def _scan_source(self, barcode, confirmation=False):
+        """Search a package"""
         search = self._actions_for("search")
-        picking_types = self.picking_types
         location = search.location_from_scan(barcode)
 
         package = self.env["stock.quant.package"]
@@ -69,31 +69,32 @@ class SinglePackTransfer(Component):
                 [("location_id", "=", location.id)]
             )
             if not package:
-                return self._response_for_start(
-                    message=self.msg_store.no_pack_in_location(location)
-                )
+                return (self.msg_store.no_pack_in_location(location), None)
             if len(package) > 1:
-                return self._response_for_start(
-                    message=self.msg_store.several_packs_in_location(location)
-                )
+                return (self.msg_store.several_packs_in_location(location), None)
 
         if not package:
             package = search.package_from_scan(barcode)
 
         if not package:
-            return self._response_for_start(
-                self.msg_store.package_not_found_for_barcode(barcode)
+            return (self.msg_store.package_not_found_for_barcode(barcode), None)
+        if not package.location_id:
+            return (self.msg_store.package_has_no_product_to_take(barcode), None)
+        if not self.is_src_location_valid(package.location_id):
+            return (
+                self.msg_store.package_not_allowed_in_src_location(
+                    barcode, self.picking_types
+                ),
+                None,
             )
 
-        if not package.location_id or not self.is_src_location_valid(
-            package.location_id
-        ):
-            return self._response_for_start(
-                message=self.msg_store.package_not_allowed_in_src_location(
-                    barcode, picking_types
-                )
-            )
+        return (None, package)
 
+    def start(self, barcode, confirmation=False):
+        picking_types = self.picking_types
+        message, package = self._scan_source(barcode, confirmation)
+        if message:
+            return self._response_for_start(message=message)
         package_level = self.env["stock.package_level"].search(
             [
                 ("package_id", "=", package.id),
