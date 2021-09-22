@@ -2,6 +2,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from odoo.addons.shopfloor.tests.common import CommonCase
+from odoo.addons.stock.models.stock_move import PROCUREMENT_PRIORITIES
+
+PRIORITY_NORMAL = PROCUREMENT_PRIORITIES[0][0]
+PRIORITY_URGENT = PROCUREMENT_PRIORITIES[1][0]
 
 
 class TestBatchCreate(CommonCase):
@@ -50,8 +54,8 @@ class TestBatchCreate(CommonCase):
         )
 
     def test_create_batch_priority(self):
-        self.picking2.priority = "3"
-        self.picking3.priority = "3"
+        self.picking2.priority = PRIORITY_URGENT
+        self.picking3.priority = PRIORITY_URGENT
         batch = self.auto_batch.create_batch(self.picking_type, max_pickings=3)
         # even if we don't reach the max picking, we should not mix the priorities
         # to make delivery of higher priorities faster
@@ -140,14 +144,16 @@ class TestBatchCreate(CommonCase):
         volume_2 = 0.25
         volume_4 = 0.6
         self.product_a.volume = 0.1
+        cm_uom = self.env.ref("uom.product_uom_cm")
         self.env["product.packaging"].sudo().create(
             {
                 "name": "pair",
                 "product_id": self.product_a.id,
                 "qty": 2,
-                "height": 1000,
-                "width": 1000,
-                "lngth": volume_2 * 1000,
+                "height": 100,
+                "width": 100,
+                "packaging_length": volume_2 * 100,
+                "length_uom_id": cm_uom.id,
             }
         )
         self.env["product.packaging"].sudo().create(
@@ -155,9 +161,10 @@ class TestBatchCreate(CommonCase):
                 "name": "double pairs",
                 "product_id": self.product_a.id,
                 "qty": 4,
-                "height": 1000,
-                "width": 1000,
-                "lngth": volume_4 * 1000,
+                "height": 100,
+                "width": 100,
+                "packaging_length": volume_4 * 100,
+                "length_uom_id": cm_uom.id,
             }
         )
         # fmt: off
@@ -178,7 +185,7 @@ class TestBatchCreate(CommonCase):
 
     def test_cluster_picking_select(self):
         self.menu.sudo().batch_create = True
-        self.menu.sudo().batch_create_max_pickings = 2
+        self.menu.sudo().batch_create_max_picking = 2
 
         response = self.service.dispatch("find_batch")
         batch = self.picking1.batch_id
@@ -217,9 +224,15 @@ class TestBatchCreate(CommonCase):
                 "is_company": False,
             }
         )
-        self.picking1.write({"priority": "2", "partner_id": partner1_contact.id})
-        self.picking2.write({"priority": "2", "partner_id": partner2_contact.id})
-        self.picking3.write({"priority": "3", "partner_id": partner2_contact.id})
+        self.picking1.write(
+            {"priority": PRIORITY_NORMAL, "partner_id": partner1_contact.id}
+        )
+        self.picking2.write(
+            {"priority": PRIORITY_NORMAL, "partner_id": partner2_contact.id}
+        )
+        self.picking3.write(
+            {"priority": PRIORITY_URGENT, "partner_id": partner2_contact.id}
+        )
         batch = self.auto_batch.create_batch(
             self.picking_type, group_by_commercial_partner=True
         )
