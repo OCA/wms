@@ -8,8 +8,11 @@ import struct
 from odoo import fields, tools
 
 from odoo.addons.component.core import Component
+from odoo.addons.stock.models.stock_move import PROCUREMENT_PRIORITIES
 
 _logger = logging.getLogger(__name__)
+# Inspired by https://github.com/OCA/wms/pull/119
+PRIORITY_NORMAL = PROCUREMENT_PRIORITIES[0][0]
 
 
 class PickingBatchAutoCreateAction(Component):
@@ -110,7 +113,7 @@ class PickingBatchAutoCreateAction(Component):
     def _sort(self, pickings):
         return pickings.sorted(
             lambda picking: (
-                -(int(picking.priority) if picking.priority else 1),
+                -(int(picking.priority) if picking.priority else PRIORITY_NORMAL),
                 picking.scheduled_date,
                 picking.id,
             )
@@ -127,7 +130,7 @@ class PickingBatchAutoCreateAction(Component):
 
     def _apply_limits(self, pickings, max_pickings, max_weight, max_volume):
         first_picking = fields.first(pickings)
-        current_priority = first_picking.priority or "1"
+        current_priority = first_picking.priority or PRIORITY_NORMAL
         # Always take the first picking even if it doesn't fullfill the
         # weight/volume criteria. This allows to always process at least
         # one picking which won't be processed otherwise
@@ -146,7 +149,7 @@ class PickingBatchAutoCreateAction(Component):
             if max_pickings and len(selected_pickings) == max_pickings:
                 # selected enough!
                 break
-            if (picking.priority or "1") != current_priority:
+            if (picking.priority or PRIORITY_NORMAL) != current_priority:
                 # as we sort by priority, exit as soon as the priority changes,
                 # we do not mix priorities to make delivery of high priority
                 # transfers faster
