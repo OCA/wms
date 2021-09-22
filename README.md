@@ -136,6 +136,7 @@ addon | version | maintainers | summary
 [stock_available_to_promise_release](stock_available_to_promise_release/) | 14.0.1.0.0 |  | Release Operations based on available to promise
 [stock_dynamic_routing](stock_dynamic_routing/) | 14.0.1.0.0 |  | Dynamic routing of stock moves
 [stock_dynamic_routing_reserve_rule](stock_dynamic_routing_reserve_rule/) | 14.0.1.0.0 |  | Glue module between dynamic routing and reservation rules
+[stock_move_source_relocate](stock_move_source_relocate/) | 14.0.1.0.0 |  | Change source location of unavailable moves
 [stock_picking_completion_info](stock_picking_completion_info/) | 14.0.1.0.0 |  | Display on current document completion information according to next operations
 [stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.0.1 |  | Raise priority of all transfers for a chain when started
 [stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 14.0.1.0.0 |  | Define different shipping policies according to picking type
@@ -152,7 +153,6 @@ addon | version | maintainers | summary
 [shopfloor_batch_automatic_creation](shopfloor_batch_automatic_creation/) | 13.0.1.0.0 (unported) | [![guewen](https://github.com/guewen.png?size=30px)](https://github.com/guewen) | Create batch transfers for Cluster Picking
 [shopfloor_checkout_sync](shopfloor_checkout_sync/) | 13.0.1.0.0 (unported) | [![guewen](https://github.com/guewen.png?size=30px)](https://github.com/guewen) | Glue module
 [stock_available_to_promise_release_dynamic_routing](stock_available_to_promise_release_dynamic_routing/) | 13.0.1.0.1 (unported) |  | Glue between moves release and dynamic routing
-[stock_move_source_relocate](stock_move_source_relocate/) | 13.0.1.0.0 (unported) |  | Change source location of unavailable moves
 [stock_move_source_relocate_dynamic_routing](stock_move_source_relocate_dynamic_routing/) | 13.0.1.0.0 (unported) |  | Glue module
 [stock_reception_screen](stock_reception_screen/) | 13.0.1.1.2 (unported) |  | Dedicated screen to receive/scan goods.
 
