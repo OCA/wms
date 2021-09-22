@@ -14,5 +14,5 @@
         "stock_checkout_sync",
     ],
     "auto_install": True,
-    "installable": False,
+    "installable": True,
 }
