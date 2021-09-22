@@ -38,7 +38,7 @@ class StockReceptionScreen(models.Model):
         "set_expiry_date": {
             "label": _("Set Expiry Date"),
             "next_steps": [{"next": "set_quantity"}],
-            "focus_field": "current_move_line_lot_life_date",
+            "focus_field": "current_move_line_lot_expiration_date",
         },
         "set_quantity": {
             "label": _("Set Quantity"),
@@ -141,14 +141,15 @@ class StockReceptionScreen(models.Model):
     current_move_product_outgoing_qty = fields.Float(
         related="current_move_id.product_id.outgoing_qty"
     )
-    current_move_product_last_lot_life_date = fields.Datetime(
-        compute="_compute_current_move_product_last_lot_life_date",
+    current_move_product_last_lot_expiration_date = fields.Datetime(
+        compute="_compute_current_move_product_last_lot_expiration_date",
         string="Most recent exp. date",
     )
     # current move line
     current_move_line_id = fields.Many2one(comodel_name="stock.move.line", copy=False)
     current_move_line_location_dest_stored_id = fields.Many2one(
-        comodel_name="stock.location", string="Destination",
+        comodel_name="stock.location",
+        string="Destination",
     )
     current_move_line_location_dest_id = fields.Many2one(
         related="current_move_line_id.location_dest_id",
@@ -156,10 +157,10 @@ class StockReceptionScreen(models.Model):
     current_move_line_lot_id = fields.Many2one(
         related="current_move_line_id.lot_id", string="Lot NumBer"
     )
-    current_move_line_lot_life_date = fields.Datetime(
+    current_move_line_lot_expiration_date = fields.Datetime(
         # NOTE: Not a related as we want to check the user input before storing
         # the date in the related lot
-        string="End of Life Date",
+        string="End of Expiration Date",
     )
     current_move_line_qty_done = fields.Float(
         related="current_move_line_id.qty_done", string="Quantity", readonly=False
@@ -186,7 +187,9 @@ class StockReceptionScreen(models.Model):
     package_storage_type_id = fields.Many2one(
         "stock.package.storage.type",
     )
-    package_storage_type_id = fields.Many2one("stock.package.storage.type",)
+    package_storage_type_id = fields.Many2one(
+        "stock.package.storage.type",
+    )
     allowed_location_dest_ids = fields.One2many(
         "stock.location",
         string="Allowed destination locations",
@@ -247,17 +250,17 @@ class StockReceptionScreen(models.Model):
                     "focus_field", ""
                 )
 
-    def _compute_current_move_product_last_lot_life_date(self):
+    def _compute_current_move_product_last_lot_expiration_date(self):
         for wiz in self:
             lot = self.env["stock.production.lot"].search(
                 [
                     ("product_id", "=", wiz.current_move_product_id.id),
-                    ("life_date", "!=", False),
+                    ("expiration_date", "!=", False),
                 ],
-                order="life_date DESC",
+                order="expiration_date DESC",
                 limit=1,
             )
-            wiz.current_move_product_last_lot_life_date = lot.life_date
+            wiz.current_move_product_last_lot_expiration_date = lot.expiration_date
 
     @api.depends("current_move_line_id.qty_done")
     def _compute_current_move_line_qty_status(self):
@@ -500,13 +503,18 @@ class StockReceptionScreen(models.Model):
 
     def _split_move(self, move, qty):
         # Hook intended to be overridden
-        return move._split(qty)
+        new_move_vals = move._split(qty)
+        if new_move_vals:
+            new_move = self.env["stock.move"].create(new_move_vals)
+            new_move._action_confirm()
+            return new_move
+        return move
 
     def _action_done_picking(self):
         """Called by '_validate_current_move' when processing the last move
         to perform the validation at the picking level.
         """
-        return self.picking_id.action_done()
+        return self.picking_id._action_done()
 
     def _action_done_move(self, move):
         """Called by '_validate_current_move' when processing a partial qty to
@@ -582,10 +590,10 @@ class StockReceptionScreen(models.Model):
         last_lot = self.current_move_id.last_move_line_lot_id
         if last_lot:
             self.current_move_line_id.lot_id = last_lot
-            self.current_move_line_lot_life_date = last_lot.life_date
+            self.current_move_line_lot_expiration_date = last_lot.expiration_date
         else:
-            # No lot to reuse, we reset the life date
-            self.current_move_line_lot_life_date = False
+            # No lot to reuse, we reset the expiration date
+            self.current_move_line_lot_expiration_date = False
 
     def process_select_move(self):
         self.next_step()
@@ -604,26 +612,28 @@ class StockReceptionScreen(models.Model):
         self.next_step()
 
     def process_set_expiry_date(self):
-        """Set the lot life date on a move line."""
-        if not self.current_move_line_lot_life_date:
+        """Set the lot expiration date on a move line."""
+        if not self.current_move_line_lot_expiration_date:
             self.warn_notification = _("You have to set an expiry date.")
             return
         if (
-            self.current_move_line_lot_id.life_date
-            and self.current_move_line_lot_life_date
-            < self.current_move_line_lot_id.life_date
+            self.current_move_line_lot_id.expiration_date
+            and self.current_move_line_lot_expiration_date
+            < self.current_move_line_lot_id.expiration_date
         ):
             lang = self.env["res.lang"]._lang_get(self.env.user.lang)
-            previous_life_date_str = self.current_move_line_lot_id.life_date.strftime(
-                lang.date_format
+            previous_expiration_date_str = (
+                self.current_move_line_lot_id.expiration_date.strftime(lang.date_format)
             )
             self.warn_notification = _(
                 "You cannot set a date prior to previous one ({})".format(
-                    previous_life_date_str
+                    previous_expiration_date_str
                 )
             )
             return
-        self.current_move_line_lot_id.life_date = self.current_move_line_lot_life_date
+        self.current_move_line_lot_id.expiration_date = (
+            self.current_move_line_lot_expiration_date
+        )
         self.next_step()
 
     def process_set_quantity(self):
@@ -731,7 +741,7 @@ class StockReceptionScreen(models.Model):
                 # NOTE: we are not checking the 'volume' field as it is rounded
                 # to 0 with small dimensions and produces false positive results
                 not (
-                    self.product_packaging_id.lngth
+                    self.product_packaging_id.packaging_length
                     and self.product_packaging_id.width
                     and self.product_packaging_id.height
                 )

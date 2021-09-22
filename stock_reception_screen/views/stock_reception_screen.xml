@@ -138,14 +138,14 @@
                                     />
                                 </div>
                                 <label
-                                    for="current_move_product_last_lot_life_date"
+                                    for="current_move_product_last_lot_expiration_date"
                                     attrs="{'invisible': [('current_move_has_tracking', '=', 'none')]}"
                                 />
                                 <div
                                     attrs="{'invisible': [('current_move_has_tracking', '=', 'none')]}"
                                 >
                                     <field
-                                        name="current_move_product_last_lot_life_date"
+                                        name="current_move_product_last_lot_expiration_date"
                                         class="mr8"
                                     />
                                 </div>
@@ -167,10 +167,10 @@
                                         readonly="1"
                                     />
                                 </div>
-                                <label for="current_move_line_lot_life_date" />
+                                <label for="current_move_line_lot_expiration_date" />
                                 <div>
                                     <field
-                                        name="current_move_line_lot_life_date"
+                                        name="current_move_line_lot_expiration_date"
                                         class="mr8"
                                         style="width: 15em;"
                                         widget="date"
@@ -391,7 +391,7 @@
                                             >
                                                 <field name="product_id" />
                                                 <field name="lot_id" />
-                                                <field name="lot_life_date" />
+                                                <field name="lot_expiration_date" />
                                                 <field name="result_package_id" />
                                                 <field name="qty_done" />
                                                 <field name="product_uom_id" />
@@ -417,7 +417,7 @@
                                                         name="lot_id"
                                                         options="{'no_open': True}"
                                                     />
-                                                    <field name="lot_life_date" />
+                                                    <field name="lot_expiration_date" />
                                                     <field
                                                         name="result_package_id"
                                                         options="{'no_open': True}"

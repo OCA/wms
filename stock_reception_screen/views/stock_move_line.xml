@@ -9,7 +9,7 @@
         <field name="arch" type="xml">
             <field name="lot_name" position="after">
                 <field
-                    name="lot_life_date"
+                    name="lot_expiration_date"
                     attrs="{'readonly': ['&amp;', ('package_level_id', '!=', False), ('parent.picking_type_entire_packs', '=', True)]}"
                     invisible="not context.get('show_lots_text')"
                     groups="stock.group_production_lot"

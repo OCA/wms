@@ -17,7 +17,7 @@ class TestReceptionScreen(Common):
         self.screen.on_barcode_scanned_set_lot_number("LOT-TEST-1")
         # Set the expiry date on the lot
         self.assertEqual(self.screen.current_step, "set_expiry_date")
-        self.screen.current_move_line_lot_life_date = fields.Datetime.today()
+        self.screen.current_move_line_lot_expiration_date = fields.Datetime.today()
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_quantity")
         # Receive 4/10 qties (corresponding to the product packaging qty)
@@ -55,7 +55,7 @@ class TestReceptionScreen(Common):
         self.assertEqual(self.screen.current_move_line_lot_id.name, "LOT-TEST-1")
         self.screen.on_barcode_scanned_set_lot_number("LOT-TEST-2")
         self.assertEqual(self.screen.current_step, "set_expiry_date")
-        self.screen.current_move_line_lot_life_date = fields.Datetime.today()
+        self.screen.current_move_line_lot_expiration_date = fields.Datetime.today()
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_quantity")
         self.screen.current_move_line_qty_done = 6
@@ -180,7 +180,7 @@ class TestReceptionScreen(Common):
         self.screen.on_barcode_scanned_set_lot_number("LOT-TEST-1")
         # Set the expiry date on the lot
         self.assertEqual(self.screen.current_step, "set_expiry_date")
-        self.screen.current_move_line_lot_life_date = fields.Datetime.today()
+        self.screen.current_move_line_lot_expiration_date = fields.Datetime.today()
         self.screen.button_save_step()
         self.assertEqual(self.screen.current_step, "set_quantity")
         # Receive 4/10 qties (corresponding to the product packaging qty)
@@ -250,7 +250,7 @@ class TestReceptionScreen(Common):
         # with the reception screen
         for move in self.picking.move_lines:
             move.quantity_done = move.product_uom_qty
-        self.picking.action_done()
+        self.picking._action_done()
         self.assertEqual(self.picking.state, "done")
         # Continue the work on the reception screen by receiving some qty:
         # an error should be raised
@@ -259,13 +259,12 @@ class TestReceptionScreen(Common):
             self.screen.button_save_step()
 
     def test_reception_screen_scan_storage_type(self):
-        """ Tests the scanning of a storage type.
-        """
+        """Tests the scanning of a storage type."""
         # Moves until the screen in which we select a packaging.
         move = fields.first(self.screen.picking_filtered_move_lines)
         move.action_select_product()
         self.screen.on_barcode_scanned_set_lot_number("LOT-TEST-1")
-        self.screen.current_move_line_lot_life_date = fields.Datetime.today()
+        self.screen.current_move_line_lot_expiration_date = fields.Datetime.today()
         self.screen.button_save_step()
         self.screen.current_move_line_qty_done = 1
         self.screen.button_save_step()

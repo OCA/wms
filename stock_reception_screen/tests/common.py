@@ -70,7 +70,7 @@ class Common(SavepointCase):
                 "package_storage_type_id": cls.storage_type_pallet.id,
                 "height": 200,
                 "width": 500,
-                "lngth": 500,
+                "packaging_length": 500,
                 "max_weight": 10,
             }
         )
