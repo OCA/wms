@@ -133,7 +133,7 @@ addon | version | maintainers | summary
 [shopfloor_packing_info](shopfloor_packing_info/) | 14.0.1.0.0 |  | Allows to predefine packing information messages per partner.
 [shopfloor_workstation](shopfloor_workstation/) | 14.0.1.1.0 |  | Manage warehouse workstation with barcode scanners
 [shopfloor_workstation_mobile](shopfloor_workstation_mobile/) | 14.0.1.0.0 |  | Shopfloor mobile app integration for workstation
-[stock_available_to_promise_release](stock_available_to_promise_release/) | 14.0.1.0.0 |  | Release Operations based on available to promise
+[stock_available_to_promise_release](stock_available_to_promise_release/) | 14.0.1.0.1 |  | Release Operations based on available to promise
 [stock_checkout_sync](stock_checkout_sync/) | 14.0.1.0.0 |  | Sync location for Checkout operations
 [stock_dynamic_routing](stock_dynamic_routing/) | 14.0.1.0.0 |  | Dynamic routing of stock moves
 [stock_dynamic_routing_reserve_rule](stock_dynamic_routing_reserve_rule/) | 14.0.1.0.0 |  | Glue module between dynamic routing and reservation rules
