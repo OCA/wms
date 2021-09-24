@@ -26,18 +26,12 @@ class ClusterPickingCommonFeatures(SavepointCase):
         cls.warehouse_1 = cls.env.ref("stock.warehouse0")
         picking_sequence = cls.warehouse_1.pick_type_id.sequence_id
 
-        cls.device1 = cls._create_device("device1", 10, 50, 100, 6)
-        cls.device_line1 = cls._create_device_line("device_line1", cls.device1, 50)
-        cls.device2 = cls._create_device("device2", 70, 190, 250, 10)
-        cls.device_line2 = cls._create_device_line("device_line2", cls.device2, 70)
-        cls.device3 = cls._create_device("device3", 30, 100, 150, 1)
-        cls.device_line3 = cls._create_device_line("device_line3", cls.device3, 100)
-        cls.device4 = cls._create_device("device4", 30, 100, 150, 3)
-        cls.device_line4 = cls._create_device_line("device_line4", cls.device4, 50)
-        cls.device5 = cls._create_device("device5", 10, 70, 100, 10)
-        cls.device_line5 = cls._create_device_line("device_line5", cls.device5, 70)
-        cls.device6 = cls._create_device("device6", 50, 200, 300, 15)
-        cls.device_line6 = cls._create_device_line("device_line6", cls.device6, 100)
+        cls.device1 = cls._create_device("device1", 10, 50, 100, 6, 50)
+        cls.device2 = cls._create_device("device2", 70, 190, 250, 10, 70)
+        cls.device3 = cls._create_device("device3", 30, 100, 150, 1, 100)
+        cls.device4 = cls._create_device("device4", 30, 100, 150, 3, 50)
+        cls.device5 = cls._create_device("device5", 10, 70, 100, 10, 70)
+        cls.device6 = cls._create_device("device6", 50, 200, 300, 15, 100)
 
         cls.picking_type_1 = cls.env["stock.picking.type"].create(
             {
@@ -109,7 +103,7 @@ class ClusterPickingCommonFeatures(SavepointCase):
         )
 
     @classmethod
-    def _create_device(cls, name, min_volume, max_volume, max_weight, nbr_bins):
+    def _create_device(cls, name, min_volume, max_volume, max_weight, nbr_bins, sequence):
         return cls.env["stock.device.type"].create(
             {
                 "name": name,
@@ -117,13 +111,8 @@ class ClusterPickingCommonFeatures(SavepointCase):
                 "max_volume": max_volume,
                 "max_weight": max_weight,
                 "nbr_bins": nbr_bins,
+                "sequence": sequence,
             }
-        )
-
-    @classmethod
-    def _create_device_line(cls, name, device, sequence):
-        return cls.env["stock.device.type.line"].create(
-            {"name": name, "stock_device_type_id": device.id, "sequence": sequence}
         )
 
     @classmethod

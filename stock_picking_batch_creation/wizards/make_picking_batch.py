@@ -20,11 +20,11 @@ class MakePickingBatch(models.TransientModel):
         string="Default operation types",
         help="Default list of eligible operation types when creating a batch transfer",
     )
-    stock_device_type_line_ids = fields.Many2many(
-        comodel_name="stock.device.type.line",
-        relation="make_picking_batch_device_type_line_rel",
+    stock_device_type_ids = fields.Many2many(
+        comodel_name="stock.device.type",
+        relation="make_picking_batch_device_type_rel",
         column1="batch_id",
-        column2="device_type_line_id",
+        column2="device_type_id",
         string="Default device types",
         help="Default list of eligible device types when creating a batch transfer",
     )
@@ -70,9 +70,9 @@ class MakePickingBatch(models.TransientModel):
 
     def _compute_device_to_use(self, first_picking_to_batch):
         recommended_device = None
-        available_devices = self.stock_device_type_line_ids.sorted(
+        available_devices = self.stock_device_type_ids.sorted(
             lambda d: d.sequence, reverse=True
-        ).mapped("stock_device_type_id")
+        )
         picking_volume = self._picking_volume(first_picking_to_batch)
         for device in available_devices:
             if self._volume_condition_for_device_choice(

@@ -22,10 +22,10 @@ class TestGetDeviceToUse(ClusterPickingCommonFeatures):
             {
                 "user_id": self.env.user.id,
                 "picking_type_ids": [(4, self.picking_type_1.id)],
-                "stock_device_type_line_ids": [
-                    (4, self.device_line1.id),
-                    (4, self.device_line2.id),
-                    (4, self.device_line3.id),
+                "stock_device_type_ids": [
+                    (4, self.device1.id),
+                    (4, self.device2.id),
+                    (4, self.device3.id),
                 ],
             }
         )
@@ -54,10 +54,10 @@ class TestGetDeviceToUse(ClusterPickingCommonFeatures):
             {
                 "user_id": self.env.user.id,
                 "picking_type_ids": [(4, self.picking_type_1.id)],
-                "stock_device_type_line_ids": [
-                    (4, self.device_line1.id),
-                    (4, self.device_line2.id),
-                    (4, self.device_line3.id),
+                "stock_device_type_ids": [
+                    (4, self.device1.id),
+                    (4, self.device2.id),
+                    (4, self.device3.id),
                 ],
             }
         )

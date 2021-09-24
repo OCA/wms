@@ -15,10 +15,10 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
             {
                 "user_id": cls.env.user.id,
                 "picking_type_ids": [(4, cls.picking_type_1.id)],
-                "stock_device_type_line_ids": [
-                    (4, cls.device_line1.id),
-                    (4, cls.device_line2.id),
-                    (4, cls.device_line3.id),
+                "stock_device_type_ids": [
+                    (4, cls.device1.id),
+                    (4, cls.device2.id),
+                    (4, cls.device3.id),
                 ],
             }
         )
