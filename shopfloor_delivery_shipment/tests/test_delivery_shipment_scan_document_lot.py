@@ -167,7 +167,8 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
             self.shipment,
             self.picking1,
             message=self.service.msg_store.lot_already_loaded_in_shipment(
-                scanned_lot, self.shipment,
+                scanned_lot,
+                self.shipment,
             ),
         )
         # Check lot status

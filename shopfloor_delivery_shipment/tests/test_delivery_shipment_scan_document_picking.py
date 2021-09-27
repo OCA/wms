@@ -12,7 +12,9 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
             params={"shipment_advice_id": self.shipment.id, "barcode": "UNKNOWN"},
         )
         self.assert_response_scan_document(
-            response, self.shipment, message=self.service.msg_store.barcode_not_found(),
+            response,
+            self.shipment,
+            message=self.service.msg_store.barcode_not_found(),
         )
 
     def test_scan_document_shipment_planned_picking_not_planned(self):
@@ -53,7 +55,9 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
             },
         )
         self.assert_response_scan_document(
-            response, self.shipment, self.picking1,
+            response,
+            self.shipment,
+            self.picking1,
         )
         # Check returned content
         location_src = self.picking_type.default_location_src_id.name
@@ -88,7 +92,9 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
             },
         )
         self.assert_response_scan_document(
-            response, self.shipment, self.picking1,
+            response,
+            self.shipment,
+            self.picking1,
         )
         # Check returned content
         location_src = self.picking_type.default_location_src_id.name
@@ -244,7 +250,9 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
             },
         )
         self.assert_response_scan_document(
-            response, self.shipment, self.picking1,
+            response,
+            self.shipment,
+            self.picking1,
         )
         # Check returned content
         location_src = self.picking_type.default_location_src_id.name

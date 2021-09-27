@@ -6,8 +6,8 @@ from .test_delivery_shipment_base import DeliveryShipmentCommonCase
 class DeliveryShipmentUnloadCase(DeliveryShipmentCommonCase):
     """Tests for the following endpoints:
 
-        - /unload_move_line
-        - /unload_package_level
+    - /unload_move_line
+    - /unload_package_level
     """
 
     def test_unload_move_line_wrong_id(self):
@@ -20,7 +20,8 @@ class DeliveryShipmentUnloadCase(DeliveryShipmentCommonCase):
             },
         )
         self.assert_response_scan_dock(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
 
     def test_unload_move_line_ok(self):
@@ -39,7 +40,9 @@ class DeliveryShipmentUnloadCase(DeliveryShipmentCommonCase):
             },
         )
         self.assert_response_scan_document(
-            response, self.shipment, move_line.picking_id,
+            response,
+            self.shipment,
+            move_line.picking_id,
         )
 
     def test_unload_package_level_wrong_id(self):
@@ -52,7 +55,8 @@ class DeliveryShipmentUnloadCase(DeliveryShipmentCommonCase):
             },
         )
         self.assert_response_scan_dock(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
 
     def test_unload_package_level_ok(self):
@@ -69,5 +73,7 @@ class DeliveryShipmentUnloadCase(DeliveryShipmentCommonCase):
             },
         )
         self.assert_response_scan_document(
-            response, self.shipment, package_level.picking_id,
+            response,
+            self.shipment,
+            package_level.picking_id,
         )

@@ -179,7 +179,8 @@ class DeliveryShipment(Component):
             # Load the package
             package_level._load_in_shipment(shipment_advice)
             return self._response_for_scan_document_or_loading_list(
-                shipment_advice, move_lines.picking_id,
+                shipment_advice,
+                move_lines.picking_id,
             )
         message = self.msg_store.unable_to_load_package_in_shipment(
             package, shipment_advice
@@ -229,7 +230,8 @@ class DeliveryShipment(Component):
             # Load the lot
             move_lines._load_in_shipment(shipment_advice)
             return self._response_for_scan_document_or_loading_list(
-                shipment_advice, move_lines.picking_id,
+                shipment_advice,
+                move_lines.picking_id,
             )
         message = self.msg_store.unable_to_load_lot_in_shipment(lot, shipment_advice)
         if shipment_advice.planned_move_ids:
@@ -245,7 +247,8 @@ class DeliveryShipment(Component):
         """
         if not picking:
             return self._response_for_scan_document(
-                shipment_advice, message=self.msg_store.scan_operation_first(),
+                shipment_advice,
+                message=self.msg_store.scan_operation_first(),
             )
         move_lines = self._find_move_lines_from_product(
             shipment_advice, product, picking
@@ -301,7 +304,8 @@ class DeliveryShipment(Component):
             # Load the lines
             move_lines._load_in_shipment(shipment_advice)
             return self._response_for_scan_document_or_loading_list(
-                shipment_advice, move_lines.picking_id,
+                shipment_advice,
+                move_lines.picking_id,
             )
         message = self.msg_store.unable_to_load_product_in_shipment(
             product, shipment_advice
@@ -546,10 +550,10 @@ class DeliveryShipment(Component):
     def _find_move_lines_to_process_from_picking(self, shipment_advice, picking):
         """Returns the moves to load or unload for the given shipment and delivery.
 
-            - if the shipment is planned, returns delivery content planned for
-              this shipment
-            - if the shipment is not planned, returns delivery content to
-              load/unload (not planned and not loaded in another shipment)
+        - if the shipment is planned, returns delivery content planned for
+          this shipment
+        - if the shipment is not planned, returns delivery content to
+          load/unload (not planned and not loaded in another shipment)
         """
         picking.ensure_one()
         # Shipment with planned content

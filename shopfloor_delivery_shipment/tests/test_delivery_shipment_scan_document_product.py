@@ -163,7 +163,8 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
             self.shipment,
             self.picking1,
             message=self.service.msg_store.product_already_loaded_in_shipment(
-                scanned_product, self.shipment,
+                scanned_product,
+                self.shipment,
             ),
         )
         # Check product line status
