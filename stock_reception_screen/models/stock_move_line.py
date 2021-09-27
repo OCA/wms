@@ -7,8 +7,8 @@ from odoo import fields, models
 class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
 
-    lot_life_date = fields.Datetime(
-        string="End of Life Date", related="lot_id.life_date"
+    lot_expiration_date = fields.Datetime(
+        string="End of Expiration Date", related="lot_id.expiration_date"
     )
 
     def action_select_move_line(self):
@@ -20,3 +20,8 @@ class StockMoveLine(models.Model):
         self.picking_id.reception_screen_id.next_step()
         # FIXME: don't know how to close the pop-up and refresh the screen
         return self.picking_id.action_reception_screen_open()
+
+    def action_reception_screen_open(self):
+        """Open reception screen from specific move line."""
+        self.picking_id.action_reception_screen_open()
+        return self.action_select_move_line()

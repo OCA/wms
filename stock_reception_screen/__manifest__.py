@@ -3,7 +3,7 @@
 {
     "name": "Stock - Reception screen",
     "summary": "Dedicated screen to receive/scan goods.",
-    "version": "13.0.1.1.2",
+    "version": "14.0.1.0.0",
     "category": "Stock",
     "license": "AGPL-3",
     "author": "Camptocamp, Odoo Community Association (OCA)",
@@ -18,8 +18,6 @@
         "stock_quant_package_dimension",
         # OCA/wms
         "stock_storage_type",
-        # OCA/web
-        "web_notify",
     ],
     "data": [
         "security/ir.model.access.csv",
@@ -29,6 +27,6 @@
         "views/stock_reception_screen.xml",
         "views/manual_barcode.xml",
     ],
-    "installable": False,
+    "installable": True,
     "development_status": "Alpha",
 }

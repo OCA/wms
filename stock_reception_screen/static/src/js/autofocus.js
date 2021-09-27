@@ -1,5 +1,4 @@
 odoo.define("stock_reception_screen.autofocus", function (require) {
-    "use strict";
     var FormRenderer = require("web.FormRenderer");
 
     // Implements the autofocus on each form render, the field that need
@@ -17,7 +16,7 @@ odoo.define("stock_reception_screen.autofocus", function (require) {
             var widgets = this.allFieldWidgets[this.state.id];
             var field2focus = this.state.fields.current_step_focus_field.value;
             var focusWidget = false;
-            for (var i = 0; i < (widgets ? widgets.length : 0); i++) {
+            for (let i = 0; i < (widgets ? widgets.length : 0); i++) {
                 if (widgets[i].name === "current_step_focus_field") {
                     field2focus = widgets[i].value;
                     break;
@@ -28,7 +27,7 @@ odoo.define("stock_reception_screen.autofocus", function (require) {
             }
             // Using this.state.fields["current_step_focus_field"].value
             // is empty, does not work ?
-            for (var i = 0; i < (widgets ? widgets.length : 0); i++) {
+            for (let i = 0; i < (widgets ? widgets.length : 0); i++) {
                 if (widgets[i].name === field2focus) {
                     focusWidget = widgets[i];
                     break;

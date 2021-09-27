@@ -1,7 +1,12 @@
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
-from odoo import _, api, exceptions, fields, models
+from odoo import _, api, exceptions, fields, models, tools
+
+
+def gt(value1, value2, digits):
+    """Return True if value1 is greater than value2"""
+    return tools.float_compare(value1, value2, precision_digits=digits) == 1
 
 
 class StockReceptionScreen(models.Model):
@@ -33,26 +38,31 @@ class StockReceptionScreen(models.Model):
         "set_expiry_date": {
             "label": _("Set Expiry Date"),
             "next_steps": [{"next": "set_quantity"}],
-            "focus_field": "current_move_line_lot_life_date",
+            "focus_field": "current_move_line_lot_expiration_date",
         },
         "set_quantity": {
             "label": _("Set Quantity"),
-            "next_steps": [{"next": "set_location"}],
-            "focus_field": "current_move_line_qty_done",
-        },
-        "set_location": {
-            "label": _("Set Destination"),
             "next_steps": [
                 {
-                    "before": "_before_set_location_to_select_packaging",
+                    "before": "_before_set_quantity_to_select_packaging",
                     "next": "select_packaging",
                 }
             ],
-            "focus_field": "current_move_line_location_dest_id",
+            "focus_field": "current_move_line_qty_done",
         },
         "select_packaging": {
             "label": _("Select Packaging"),
+            "next_steps": [
+                {
+                    "before": "_before_select_packaging_to_set_location",
+                    "next": "set_location",
+                }
+            ],
+        },
+        "set_location": {
+            "label": _("Set Destination"),
             "next_steps": [{"next": "set_package"}],
+            "focus_field": "current_move_line_location_dest_stored_id",
         },
         "set_package": {
             "label": _("Set Package"),
@@ -108,6 +118,7 @@ class StockReceptionScreen(models.Model):
     current_filter_product = fields.Char(string="Filter product", copy=False)
     # current move
     current_move_id = fields.Many2one(comodel_name="stock.move", copy=False)
+    current_move_has_tracking = fields.Selection(related="current_move_id.has_tracking")
     current_move_product_id = fields.Many2one(
         related="current_move_id.product_id", string="Move's product"
     )
@@ -124,21 +135,32 @@ class StockReceptionScreen(models.Model):
     current_move_product_vendor_code = fields.Char(
         related="current_move_id.vendor_code"
     )
+    current_move_product_qty_available = fields.Float(
+        related="current_move_id.product_id.qty_available"
+    )
+    current_move_product_outgoing_qty = fields.Float(
+        related="current_move_id.product_id.outgoing_qty"
+    )
+    current_move_product_last_lot_expiration_date = fields.Datetime(
+        compute="_compute_current_move_product_last_lot_expiration_date",
+        string="Most recent exp. date",
+    )
     # current move line
     current_move_line_id = fields.Many2one(comodel_name="stock.move.line", copy=False)
-    current_move_line_location_dest_id = fields.Many2one(
+    current_move_line_location_dest_stored_id = fields.Many2one(
         comodel_name="stock.location",
         string="Destination",
-        compute="_compute_current_move_line_location_dest_id",
-        inverse="_inverse_current_move_line_location_dest_id",
+    )
+    current_move_line_location_dest_id = fields.Many2one(
+        related="current_move_line_id.location_dest_id",
     )
     current_move_line_lot_id = fields.Many2one(
         related="current_move_line_id.lot_id", string="Lot NumBer"
     )
-    current_move_line_lot_life_date = fields.Datetime(
+    current_move_line_lot_expiration_date = fields.Datetime(
         # NOTE: Not a related as we want to check the user input before storing
         # the date in the related lot
-        string="End of Life Date",
+        string="End of Expiration Date",
     )
     current_move_line_qty_done = fields.Float(
         related="current_move_line_id.qty_done", string="Quantity", readonly=False
@@ -165,11 +187,37 @@ class StockReceptionScreen(models.Model):
     package_storage_type_id = fields.Many2one(
         "stock.package.storage.type",
     )
+    package_storage_type_id = fields.Many2one(
+        "stock.package.storage.type",
+    )
+    allowed_location_dest_ids = fields.One2many(
+        "stock.location",
+        string="Allowed destination locations",
+        help="Allowed destination locations based on the package storage type.",
+        compute="_compute_allowed_location_dest_ids",
+    )
     package_storage_type_height_required = fields.Boolean(
         related="package_storage_type_id.height_required"
     )
     package_height = fields.Integer()
     # == / Packaging fields ==
+
+    warn_notification = fields.Char(default=False)
+    warn_notification_html = fields.Html(compute="_compute_warn_notification")
+
+    @api.depends("warn_notification")
+    def _compute_warn_notification(self):
+        warn_massage_html = """
+        <div class="alert alert-warning" role="alert">
+            {}
+        </div>
+        """
+        if self.warn_notification:
+            self.warn_notification_html = warn_massage_html.format(
+                self.warn_notification
+            )
+        else:
+            self.warn_notification_html = False
 
     @api.depends("picking_id.move_lines", "current_filter_product")
     def _compute_picking_filtered_move_lines(self):
@@ -202,21 +250,17 @@ class StockReceptionScreen(models.Model):
                     "focus_field", ""
                 )
 
-    @api.depends("current_move_line_id.location_dest_id")
-    def _compute_current_move_line_location_dest_id(self):
+    def _compute_current_move_product_last_lot_expiration_date(self):
         for wiz in self:
-            move_line = wiz.current_move_line_id
-            wiz.current_move_line_location_dest_id = move_line.location_dest_id
-            location = move_line.location_dest_id._get_putaway_strategy(
-                move_line.product_id
+            lot = self.env["stock.production.lot"].search(
+                [
+                    ("product_id", "=", wiz.current_move_product_id.id),
+                    ("expiration_date", "!=", False),
+                ],
+                order="expiration_date DESC",
+                limit=1,
             )
-            if location:
-                wiz.current_move_line_location_dest_id = location
-
-    def _inverse_current_move_line_location_dest_id(self):
-        for wiz in self:
-            move_line = wiz.current_move_line_id
-            move_line.location_dest_id = wiz.current_move_line_location_dest_id
+            wiz.current_move_product_last_lot_expiration_date = lot.expiration_date
 
     @api.depends("current_move_line_id.qty_done")
     def _compute_current_move_line_qty_status(self):
@@ -248,6 +292,20 @@ class StockReceptionScreen(models.Model):
     def _inverse_current_move_line_package(self):
         for wiz in self:
             wiz.current_move_line_package_stored = wiz.current_move_line_package
+
+    @api.depends("package_storage_type_id.location_storage_type_ids")
+    def _compute_allowed_location_dest_ids(self):
+        for wiz in self:
+            domain = [("id", "child_of", wiz.picking_location_dest_id.id)]
+            if wiz.package_storage_type_id:
+                domain += [
+                    (
+                        "allowed_location_storage_type_ids",
+                        "in",
+                        wiz.package_storage_type_id.location_storage_type_ids.ids,
+                    )
+                ]
+            wiz.allowed_location_dest_ids = self.env["stock.location"].search(domain)
 
     @api.onchange("product_packaging_id")
     def onchange_product_packaging_id(self):
@@ -331,9 +389,7 @@ class StockReceptionScreen(models.Model):
         if not move:
             move = moves.filtered(lambda o: barcode in o.product_id.name)
         if not move:
-            self.env.user.notify_warning(
-                message="", title=_("Product '{}' not found.").format(barcode)
-            )
+            self.warn_notification = _("Product '{}' not found.").format(barcode)
             return
         # If there are several moves/products corresponding to the search
         # criteria we want to propose the user to choose the right one
@@ -366,9 +422,7 @@ class StockReceptionScreen(models.Model):
             ]
         )
         if lot:
-            self.env.user.notify_info(
-                message="", title=_("Reuse the existing lot {}.").format(barcode)
-            )
+            self.warn_notification = _("Reuse the existing lot {}.").format(barcode)
         else:
             lot_vals = {
                 "name": barcode,
@@ -447,17 +501,51 @@ class StockReceptionScreen(models.Model):
             # Go to the next step automatically if only one move has been found
             self.process_select_move()
 
-    def _validate_current_move(self):
-        """Split the current move with the move line qty done and
-        validate it.
-        It is performed right after the processing of the current move (so
-        before checking the next move to process).
+    def _split_move(self, move, qty):
+        # Hook intended to be overridden
+        new_move_vals = move._split(qty)
+        if new_move_vals:
+            new_move = self.env["stock.move"].create(new_move_vals)
+            new_move._action_confirm()
+            return new_move
+        return move
+
+    def _action_done_picking(self):
+        """Called by '_validate_current_move' when processing the last move
+        to perform the validation at the picking level.
         """
+        return self.picking_id._action_done()
+
+    def _action_done_move(self, move):
+        """Called by '_validate_current_move' when processing a partial qty to
+        perform the validation at the move level.
+        """
+        # We use the 'is_scrap' context key to avoid the generation of a
+        # backorder when validating the move (see _action_done() method in
+        # stock/models/stock_move.py).
+        return move.with_context(is_scrap=True)._action_done()
+
+    def _validate_current_move(self):
+        """Split the current move with the move line qty done and validate it."""
         if self.current_move_line_id and self.current_move_id:
-            # We use the 'is_scrap' context key to avoid the generation of a
-            # backorder when validating the move (see _action_done() method in
-            # stock/models/stock_move.py).
-            self.current_move_id.with_context(is_scrap=True)._action_done()
+            qty_done = self.current_move_line_id.qty_done
+            qty_remaining = self.current_move_id.product_uom_qty - qty_done
+            # We don't want to create a new move with a negative qty if we
+            # receive more than expected.
+            digits = self.env["decimal.precision"].precision_get(
+                "Product Unit of Measure"
+            )
+            if gt(qty_remaining, 0, digits=digits):
+                self._split_move(self.current_move_id, qty_remaining)
+            moves_todo = self.picking_id.move_lines.filtered(
+                lambda m: m.state not in ["done", "cancel"]
+            )
+            # On the last move of the picking set the picking to done
+            # Otherwise set the move to done
+            if moves_todo == self.current_move_id:
+                self._action_done_picking()
+            else:
+                self._action_done_move(self.current_move_id)
             # A new move is automatically created if we made a partial receipt
             # and we have to update it to the 'assigned' state to generate the
             # related 'stock.move.line' (required if we want to process it)
@@ -470,7 +558,6 @@ class StockReceptionScreen(models.Model):
         """Check if there is remaining moves to process for the
         selected product.
         """
-        # self._validate_current_move()
         if not self.current_filter_product:
             return False
         moves_to_process_ok = any(
@@ -503,10 +590,10 @@ class StockReceptionScreen(models.Model):
         last_lot = self.current_move_id.last_move_line_lot_id
         if last_lot:
             self.current_move_line_id.lot_id = last_lot
-            self.current_move_line_lot_life_date = last_lot.life_date
+            self.current_move_line_lot_expiration_date = last_lot.expiration_date
         else:
-            # No lot to reuse, we reset the life date
-            self.current_move_line_lot_life_date = False
+            # No lot to reuse, we reset the expiration date
+            self.current_move_line_lot_expiration_date = False
 
     def process_select_move(self):
         self.next_step()
@@ -518,62 +605,47 @@ class StockReceptionScreen(models.Model):
 
     def process_set_lot_number(self):
         if not self.current_move_line_id.lot_id:
-            self.env.user.notify_warning(
-                message="", title=_("You have to fill the lot number.")
-            )
+            self.warn_notification = _("You have to fill the lot number.")
             return
         # Saving the lot number for next operation
         self.current_move_id.last_move_line_lot_id = self.current_move_line_id.lot_id
         self.next_step()
 
     def process_set_expiry_date(self):
-        """Set the lot life date on a move line."""
-        if not self.current_move_line_lot_life_date:
-            self.env.user.notify_warning(
-                message="", title=_("You have to set an expiry date.")
-            )
+        """Set the lot expiration date on a move line."""
+        if not self.current_move_line_lot_expiration_date:
+            self.warn_notification = _("You have to set an expiry date.")
             return
         if (
-            self.current_move_line_lot_id.life_date
-            and self.current_move_line_lot_life_date
-            < self.current_move_line_lot_id.life_date
+            self.current_move_line_lot_id.expiration_date
+            and self.current_move_line_lot_expiration_date
+            < self.current_move_line_lot_id.expiration_date
         ):
             lang = self.env["res.lang"]._lang_get(self.env.user.lang)
-            previous_life_date_str = self.current_move_line_lot_id.life_date.strftime(
-                lang.date_format
+            previous_expiration_date_str = (
+                self.current_move_line_lot_id.expiration_date.strftime(lang.date_format)
             )
-            self.env.user.notify_warning(
-                message="",
-                title=_(
-                    "You cannot set a date prior to previous one ({})".format(
-                        previous_life_date_str
-                    )
-                ),
+            self.warn_notification = _(
+                "You cannot set a date prior to previous one ({})".format(
+                    previous_expiration_date_str
+                )
             )
             return
-        self.current_move_line_lot_id.life_date = self.current_move_line_lot_life_date
+        self.current_move_line_lot_id.expiration_date = (
+            self.current_move_line_lot_expiration_date
+        )
         self.next_step()
 
     def process_set_quantity(self):
         if not self.current_move_line_qty_done:
-            self.env.user.notify_warning(
-                message="", title=_("You have to set the received quantity.")
-            )
-            return
-        self.next_step()
-
-    def process_set_location(self):
-        if not self.current_move_line_location_dest_id:
-            self.env.user.notify_warning(
-                message="", title=_("You have to set the destination.")
-            )
+            self.warn_notification = _("You have to set the received quantity.")
             return
         self.next_step()
 
     def process_select_packaging(self):
         self.next_step()
 
-    def _before_set_location_to_select_packaging(self):
+    def _before_set_quantity_to_select_packaging(self):
         """Auto-complete the package data matching the qty (if there is one)."""
         qty_done = self.current_move_line_qty_done
         if qty_done:
@@ -589,6 +661,36 @@ class StockReceptionScreen(models.Model):
             self.next_step()
             return True
         return False
+
+    def _before_select_packaging_to_set_location(self):
+        """Set a default value for the destination."""
+        move_line = self.current_move_line_id
+        # Default location
+        self.current_move_line_location_dest_stored_id = move_line.location_dest_id
+        destination = move_line.location_dest_id._get_putaway_strategy(
+            move_line.product_id
+        )
+        if destination:
+            self.current_move_line_location_dest_stored_id = destination
+        # If there are some allowed destinations set the field empty,
+        # the user will choose the right one among them
+        if (
+            self.allowed_location_dest_ids
+            and self.allowed_location_dest_ids != destination
+        ):
+            self.current_move_line_location_dest_stored_id = False
+            return True
+        self.current_move_line_location_dest_stored_id = destination
+        return True
+
+    def process_set_location(self):
+        if not self.current_move_line_location_dest_stored_id:
+            self.warn_notification = _("You have to set the destination.")
+            return
+        self.current_move_line_id.location_dest_id = (
+            self.current_move_line_location_dest_stored_id
+        )
+        self.next_step()
 
     def _before_next_move_to_set_lot_number(self):
         """Receive next move for same product (with lot) directely."""
@@ -628,8 +730,9 @@ class StockReceptionScreen(models.Model):
         the step later).
         """
         if not self.package_storage_type_id:
-            msg = _("The storage type is mandatory before going further.")
-            self.env.user.notify_warning(message="", title=msg)
+            self.warn_notification = _(
+                "The storage type is mandatory before going further."
+            )
             return False
         if (
             self.product_packaging_id
@@ -638,15 +741,16 @@ class StockReceptionScreen(models.Model):
                 # NOTE: we are not checking the 'volume' field as it is rounded
                 # to 0 with small dimensions and produces false positive results
                 not (
-                    self.product_packaging_id.lngth
+                    self.product_packaging_id.packaging_length
                     and self.product_packaging_id.width
                     and self.product_packaging_id.height
                 )
                 or not self.product_packaging_id.max_weight
             )
         ):
-            msg = _("Product packaging info are missing. Please use the CUBISCAN.")
-            self.env.user.notify_warning(message="", title=msg)
+            self.warn_notification = _(
+                "Product packaging info are missing. Please use the CUBISCAN."
+            )
             return False
         return True
 
@@ -662,6 +766,8 @@ class StockReceptionScreen(models.Model):
         self.ensure_one()
         if not self.current_move_id and not self.current_move_line_id:
             return
+        # Reset warning
+        self.warn_notification = False
         method = "process_{}".format(self.current_step)
         getattr(self, method)()
         return True
@@ -679,15 +785,18 @@ class StockReceptionScreen(models.Model):
         if not self.current_move_id and not self.current_move_line_id:
             return
         assert self.current_step == "set_package", f"step = {self.current_step}"
+        # Reset warning
+        self.warn_notification = False
         # Copy relevant data for the next package
         qty_done = self.current_move_line_qty_done
-        location_dest = self.current_move_line_location_dest_id
+        location_dest = self.current_move_line_location_dest_stored_id
         product_packaging = self.product_packaging_id
         package_storage_type = self.package_storage_type_id
         package_height = self.package_height
         # Validate the current package
-        if not self.process_set_package():
+        if not self.process_set_package() or self.current_step == "done":
             # Package data may be missing the first time, aborting operation
+            # OR, button Next Package was pressed when we had nothing pending.
             return
         # Stop when the current product/lot has been fully processed
         if self.current_step in ("select_product", "select_move"):
@@ -701,9 +810,6 @@ class StockReceptionScreen(models.Model):
         assert self.current_step == "set_quantity", f"step = {self.current_step}"
         self.current_move_line_qty_done = qty_done
         self.process_set_quantity()
-        #   - set the destination
-        self.current_move_line_location_dest_id = location_dest
-        self.process_set_location()
         #   - set packaging data
         assert self.current_step == "select_packaging", f"step = {self.current_step}"
         self.product_packaging_id = product_packaging
@@ -711,6 +817,10 @@ class StockReceptionScreen(models.Model):
         if self.package_storage_type_height_required:
             self.package_height = package_height
         self.process_select_packaging()
+        #   - set the destination
+        assert self.current_step == "set_location", f"step = {self.current_step}"
+        self.current_move_line_location_dest_stored_id = location_dest
+        self.process_set_location()
         assert self.current_step == "set_package", f"step = {self.current_step}"
         return True
 
@@ -723,6 +833,8 @@ class StockReceptionScreen(models.Model):
         self.current_step = self._step_start
         self.current_filter_product = False
         self.current_move_id = self.current_move_line_id = False
+        # Empty destination
+        self.current_move_line_location_dest_stored_id = False
         # Empty package input data
         self.product_packaging_id = (
             self.package_storage_type_id
