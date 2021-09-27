@@ -105,9 +105,7 @@ class MakePickingBatch(models.TransientModel):
 
         selected_pickings, unselected_pickings = self._apply_limits(
             candidates_pickings_to_batch,
-            device.nbr_bins,
-            device.max_weight,
-            device.max_volume,
+            device
         )
         vals = self._create_batch_values(user, device, selected_pickings)
         batch = self.env["stock.picking.wave"].create(vals)
@@ -157,7 +155,7 @@ class MakePickingBatch(models.TransientModel):
             self.env["decimal.precision"].precision_get("Product Unit of Measure") * 2,
         )
 
-    def _apply_limits(self, pickings, nbr_bins, max_weight, max_volume, max_pickings=0):
+    def _apply_limits(self, pickings, device, max_pickings=0):
         """
         Once we have the candidates pickings for clustering, we need to decide when to stop
         the cluster (i.e.,  when to stop adding pickings in it)
@@ -173,13 +171,13 @@ class MakePickingBatch(models.TransientModel):
         first_picking = fields.first(pickings)
         # 1) Check the number of bins available to create the cluster
         selected_pickings = self._check_number_of_available_bins(
-            first_picking, nbr_bins
+            first_picking, device.nbr_bins
         )
         if selected_pickings:
             return selected_pickings, unselected_pickings
         # 2) Check weither the first picking is breaking one condition or not
         selected_pickings = self._check_first_picking(
-            first_picking, max_weight, max_volume
+            first_picking, device.max_weight, device.max_volume
         )
         if selected_pickings:
             return selected_pickings, unselected_pickings
@@ -189,8 +187,8 @@ class MakePickingBatch(models.TransientModel):
         total_weight = 0.0
         total_volume = 0.0
         total_nbr_picking_lines = 0.0
-        available_nbr_bins = nbr_bins
-        volume_per_bin = max_volume / nbr_bins
+        available_nbr_bins = device.nbr_bins
+        volume_per_bin = device.max_volume / device.nbr_bins
         precision_weight = self._precision_weight()
         precision_volume = self._precision_volume()
 
@@ -213,21 +211,27 @@ class MakePickingBatch(models.TransientModel):
         # - total weight is not outreached
         # - maximum number of preparation lines is not outreached
         # - numbers of bins available is greater than 0
+        # - The device for the current picking is supposed to be
+        # the same as the one for the first picking
         for picking in pickings[1:]:
             if max_pickings and len(selected_pickings) == max_pickings:
                 # selected enough!
                 break
+
+            # Check that the picking can go on the selected device
+            picking_device = self._compute_device_to_use(picking)
+            different_device_for_current_picking = device != picking_device
 
             weight = self._picking_weight(picking)
             volume = self._picking_volume(picking)
             nbr_picking_lines = self._picking_nbr_lines(picking)
             needed_bins = math.ceil(volume / volume_per_bin)
 
-            weight_limit_outreached = max_weight and gt(
-                total_weight + weight, max_weight, precision_weight
+            weight_limit_outreached = device.max_weight and gt(
+                total_weight + weight, device.max_weight, precision_weight
             )
-            volume_limit_outreached = max_volume and gt(
-                total_volume + volume, max_volume, precision_volume
+            volume_limit_outreached = device.max_volume and gt(
+                total_volume + volume, device.max_volume, precision_volume
             )
             nbr_lines_limit_outreached = (
                 self.maximum_number_of_preparation_lines
@@ -246,6 +250,7 @@ class MakePickingBatch(models.TransientModel):
                 or volume_limit_outreached
                 or nbr_lines_limit_outreached
                 or available_bins_outreached
+                or different_device_for_current_picking
             ):
                 # All conditions are OK : we keep the picking in the cluster
                 selected_pickings |= picking
