@@ -73,7 +73,8 @@ class DeliveryShipmentCommonCase(common.CommonCase):
     @classmethod
     def _plan_records_in_shipment(cls, shipment_advice, records):
         wiz_model = cls.env["wizard.plan.shipment"].with_context(
-            active_model=records._name, active_ids=records.ids,
+            active_model=records._name,
+            active_ids=records.ids,
         )
         wiz = wiz_model.create({"shipment_advice_id": shipment_advice.id})
         wiz.action_plan()
@@ -107,7 +108,10 @@ class DeliveryShipmentCommonCase(common.CommonCase):
                 shipment_advice, picking
             )
         self.assert_response(
-            response, next_state="scan_document", data=data, message=message,
+            response,
+            next_state="scan_document",
+            data=data,
+            message=message,
         )
 
     def assert_response_loading_list(self, response, shipment_advice, message=None):
@@ -117,7 +121,10 @@ class DeliveryShipmentCommonCase(common.CommonCase):
             "on_dock": self.service._data_for_on_dock(shipment_advice),
         }
         self.assert_response(
-            response, next_state="loading_list", data=data, message=message,
+            response,
+            next_state="loading_list",
+            data=data,
+            message=message,
         )
 
     def assert_response_validate(self, response, shipment_advice, message=None):
@@ -127,5 +134,8 @@ class DeliveryShipmentCommonCase(common.CommonCase):
             "on_dock": self.service._data_for_on_dock_summary(shipment_advice),
         }
         self.assert_response(
-            response, next_state="validate", data=data, message=message,
+            response,
+            next_state="validate",
+            data=data,
+            message=message,
         )

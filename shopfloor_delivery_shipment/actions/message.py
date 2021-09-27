@@ -27,7 +27,8 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Transfer {} has not been planned in the shipment {}.").format(
-                picking.name, shipment_advice.name,
+                picking.name,
+                shipment_advice.name,
             ),
         }
 
@@ -35,7 +36,8 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Package {} has not been planned in the shipment {}.").format(
-                package.name, shipment_advice.name,
+                package.name,
+                shipment_advice.name,
             ),
         }
 
@@ -43,7 +45,8 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Lot {} has not been planned in the shipment {}.").format(
-                lot.name, shipment_advice.name,
+                lot.name,
+                shipment_advice.name,
             ),
         }
 
@@ -51,7 +54,8 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Product {} has not been planned in the shipment {}.").format(
-                product.barcode, shipment_advice.name,
+                product.barcode,
+                shipment_advice.name,
             ),
         }
 
@@ -59,7 +63,8 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Package {} can not been loaded in the shipment {}.").format(
-                package.name, shipment_advice.name,
+                package.name,
+                shipment_advice.name,
             ),
         }
 
@@ -67,7 +72,8 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Lot {} can not been loaded in the shipment {}.").format(
-                lot.name, shipment_advice.name,
+                lot.name,
+                shipment_advice.name,
             ),
         }
 
@@ -75,7 +81,8 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Product {} can not been loaded in the shipment {}.").format(
-                product.barcode, shipment_advice.name,
+                product.barcode,
+                shipment_advice.name,
             ),
         }
 
@@ -83,7 +90,8 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("Package {} is already loaded in the shipment {}.").format(
-                package.name, shipment_advice.name,
+                package.name,
+                shipment_advice.name,
             ),
         }
 
@@ -91,7 +99,8 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("Lot {} is already loaded in the shipment {}.").format(
-                lot.name, shipment_advice.name,
+                lot.name,
+                shipment_advice.name,
             ),
         }
 
@@ -99,7 +108,8 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("Product {} is already loaded in the shipment {}.").format(
-                product.name, shipment_advice.name,
+                product.name,
+                shipment_advice.name,
             ),
         }
 

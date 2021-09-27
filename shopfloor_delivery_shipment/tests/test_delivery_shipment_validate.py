@@ -51,7 +51,8 @@ class DeliveryShipmentValidateCase(DeliveryShipmentCommonCase):
             params={"shipment_advice_id": self.shipment.id, "confirmation": True},
         )
         self.assert_response_scan_dock(
-            response, message=self.service.msg_store.shipment_validated(self.shipment),
+            response,
+            message=self.service.msg_store.shipment_validated(self.shipment),
         )
         # Check data
         self.assertEqual(self.picking1.state, self.picking2.state, "done")
@@ -91,7 +92,8 @@ class DeliveryShipmentValidateCase(DeliveryShipmentCommonCase):
             params={"shipment_advice_id": self.shipment.id, "confirmation": True},
         )
         self.assert_response_scan_dock(
-            response, message=self.service.msg_store.shipment_validated(self.shipment),
+            response,
+            message=self.service.msg_store.shipment_validated(self.shipment),
         )
         # Check data
         self.assertTrue(all([s == "done" for s in self.pickings.mapped("state")]))
@@ -136,7 +138,8 @@ class DeliveryShipmentValidateCase(DeliveryShipmentCommonCase):
             params={"shipment_advice_id": self.shipment.id, "confirmation": True},
         )
         self.assert_response_scan_dock(
-            response, message=self.service.msg_store.shipment_validated(self.shipment),
+            response,
+            message=self.service.msg_store.shipment_validated(self.shipment),
         )
         # Check data
         self.assertEqual(self.picking1.state, self.picking2.state, "done")

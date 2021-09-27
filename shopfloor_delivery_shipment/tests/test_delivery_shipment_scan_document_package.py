@@ -125,7 +125,8 @@ class DeliveryShipmentScanDocumentPackageCase(DeliveryShipmentCommonCase):
             self.shipment,
             self.picking1,
             message=self.service.msg_store.package_already_loaded_in_shipment(
-                scanned_package, self.shipment,
+                scanned_package,
+                self.shipment,
             ),
         )
         # Check package level status
