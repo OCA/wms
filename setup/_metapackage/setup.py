@@ -31,6 +31,7 @@ setuptools.setup(
         'odoo14-addon-stock_picking_consolidation_priority',
         'odoo14-addon-stock_picking_type_shipping_policy',
         'odoo14-addon-stock_picking_type_shipping_policy_group_by',
+        'odoo14-addon-stock_reception_screen',
         'odoo14-addon-stock_storage_type',
         'odoo14-addon-stock_storage_type_buffer',
         'odoo14-addon-stock_storage_type_putaway_abc',
