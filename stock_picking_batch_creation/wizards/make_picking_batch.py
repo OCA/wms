@@ -114,30 +114,37 @@ class MakePickingBatch(models.TransientModel):
             self._change_priority_on_unselected_pickings(unselected_pickings)
         return batch
 
-    def _check_number_of_available_bins(self, first_picking, nbr_bins):
+    def _check_number_of_available_bins(self, first_picking, device):
         # If only one bin available: only one picking
         picking = self.env["stock.picking"].browse()
-        if nbr_bins == 1:
+        if device.nbr_bins == 1:
             picking = first_picking
         return picking
 
-    def _check_first_picking(self, first_picking, max_weight, max_volume):
+    def _check_first_picking(self, first_picking, device):
         # If first picking is already breaking one rule : batch of one picking
         picking = self.env["stock.picking"].browse()
-        weight_first_picking = self._picking_weight(first_picking)
-        volume_first_picking = self._picking_volume(first_picking)
+        first_picking.total_weight = self._picking_weight(first_picking)
+        first_picking.total_volume = self._picking_volume(first_picking)
         nbr_lines_first_picking = self._picking_nbr_lines(first_picking)
-        is_overweighted = tools.float_compare(weight_first_picking, max_weight, 1) == 1
-        is_oversized = tools.float_compare(volume_first_picking, max_volume, 1) == 1
+        volume_per_bin = device.max_volume / device.nbr_bins
+        first_picking.nbr_bins = math.ceil(first_picking.total_volume / volume_per_bin)
+        is_overweighted = tools.float_compare(first_picking.total_weight, device.max_weight, 1) == 1
+        is_oversized = tools.float_compare(first_picking.total_volume, device.max_volume, 1) == 1
         is_big_order = (
             tools.float_compare(
                 nbr_lines_first_picking, self.maximum_number_of_preparation_lines, 1
             )
             == 1
         )
-        if is_overweighted or is_oversized or is_big_order:
-            picking = first_picking
-        return picking
+        is_device_full = first_picking.nbr_bins > device.nbr_bins
+        if is_overweighted or is_oversized or is_big_order or is_device_full:
+            params = (first_picking.total_weight, first_picking.total_volume, nbr_lines_first_picking, first_picking.nbr_bins)
+            msg = "The first picking does not match the device you wanted to use"
+            msg2 = "First picking needs: weight %s, volume %s, number of picking lines %s, number of bins %s" % params
+            raise UserError(_(msg+"\n"+ msg2))
+        
+        return first_picking, nbr_lines_first_picking, volume_per_bin
 
     def _assign_operator_on_selected_pickings(self, batch, user):
         batch.picking_ids.write({"user_id": user.id})
@@ -171,24 +178,19 @@ class MakePickingBatch(models.TransientModel):
         first_picking = fields.first(pickings)
         # 1) Check the number of bins available to create the cluster
         selected_pickings = self._check_number_of_available_bins(
-            first_picking, device.nbr_bins
+            first_picking, device
         )
         if selected_pickings:
             return selected_pickings, unselected_pickings
         # 2) Check weither the first picking is breaking one condition or not
-        selected_pickings = self._check_first_picking(
-            first_picking, device.max_weight, device.max_volume
+        first_picking, total_nbr_picking_lines, volume_per_bin = self._check_first_picking(
+            first_picking, device
         )
-        if selected_pickings:
-            return selected_pickings, unselected_pickings
 
         # 3) add pickings as long as conditions are respected
         # Initial conditions
         total_weight = 0.0
         total_volume = 0.0
-        total_nbr_picking_lines = 0.0
-        available_nbr_bins = device.nbr_bins
-        volume_per_bin = device.max_volume / device.nbr_bins
         precision_weight = self._precision_weight()
         precision_volume = self._precision_volume()
 
@@ -200,11 +202,7 @@ class MakePickingBatch(models.TransientModel):
         # weight/volume criteria. This allows to always process at least
         # one picking which won't be processed otherwise
         selected_pickings = first_picking
-        total_weight = self._picking_weight(first_picking)
-        total_volume = self._picking_volume(first_picking)
-        total_nbr_picking_lines = self._picking_nbr_lines(first_picking)
-        needed_bins = math.ceil(total_volume / volume_per_bin)
-        available_nbr_bins -= needed_bins
+        available_nbr_bins =  device.nbr_bins - first_picking.nbr_bins
 
         # Add pickings to the first one as long as
         # - total volume is not outreached
@@ -213,6 +211,8 @@ class MakePickingBatch(models.TransientModel):
         # - numbers of bins available is greater than 0
         # - The device for the current picking is supposed to be
         # the same as the one for the first picking
+        total_weight = first_picking.total_weight
+        total_volume = first_picking.total_volume
         for picking in pickings[1:]:
             if max_pickings and len(selected_pickings) == max_pickings:
                 # selected enough!
@@ -222,16 +222,16 @@ class MakePickingBatch(models.TransientModel):
             picking_device = self._compute_device_to_use(picking)
             different_device_for_current_picking = device != picking_device
 
-            weight = self._picking_weight(picking)
-            volume = self._picking_volume(picking)
+            picking.total_weight = self._picking_weight(picking)
+            picking.total_volume = self._picking_volume(picking)
             nbr_picking_lines = self._picking_nbr_lines(picking)
-            needed_bins = math.ceil(volume / volume_per_bin)
+            picking.nbr_bins = math.ceil(picking.total_volume / volume_per_bin)
 
             weight_limit_outreached = device.max_weight and gt(
-                total_weight + weight, device.max_weight, precision_weight
+                total_weight + picking.total_weight, device.max_weight, precision_weight
             )
             volume_limit_outreached = device.max_volume and gt(
-                total_volume + volume, device.max_volume, precision_volume
+                total_volume + picking.total_volume, device.max_volume, precision_volume
             )
             nbr_lines_limit_outreached = (
                 self.maximum_number_of_preparation_lines
@@ -241,9 +241,7 @@ class MakePickingBatch(models.TransientModel):
                     1,
                 )
             )
-            available_bins_outreached = available_nbr_bins and gt(
-                0, available_nbr_bins - needed_bins, 1
-            )
+            available_bins_outreached = available_nbr_bins - picking.nbr_bins < 0
 
             if not (
                 weight_limit_outreached
@@ -254,10 +252,10 @@ class MakePickingBatch(models.TransientModel):
             ):
                 # All conditions are OK : we keep the picking in the cluster
                 selected_pickings |= picking
-                total_weight += weight
-                total_volume += volume
+                total_weight += picking.total_weight
+                total_volume += picking.total_volume
                 total_nbr_picking_lines += nbr_picking_lines
-                available_nbr_bins -= needed_bins
+                available_nbr_bins -= picking.nbr_bins
             else:
                 # At least one condition KO : we discard the picking from the cluster
                 unselected_pickings |= picking
@@ -296,5 +294,8 @@ class MakePickingBatch(models.TransientModel):
             "picking_ids": [(6, 0, pickings.ids)],
             "user_id": user.id,
             "state": "draft",
+            "wave_weight":sum([picking.total_weight for picking in pickings]),
+            "wave_volume":sum([picking.total_volume for picking in pickings]),
+            "wave_nbr_bins":sum([picking.nbr_bins for picking in pickings]),
             "picking_device_id": device.id if device else None,
         }

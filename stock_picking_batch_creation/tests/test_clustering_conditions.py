@@ -28,7 +28,7 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         candidates_pickings = self.make_picking_batch._search_pickings()
         device = self.make_picking_batch._compute_device_to_use(candidates_pickings[0])
         selected_pickings = self.make_picking_batch._check_number_of_available_bins(
-            candidates_pickings[0], device.nbr_bins
+            candidates_pickings[0], device
         )
         self.assertTrue(selected_pickings)
         self.assertEqual(selected_pickings[0], candidates_pickings[0])
@@ -42,14 +42,12 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         candidates_pickings = self.make_picking_batch._search_pickings()
         device = self.make_picking_batch._compute_device_to_use(candidates_pickings[0])
         selected_pickings = self.make_picking_batch._check_number_of_available_bins(
-            candidates_pickings[0], device.nbr_bins
+            candidates_pickings[0], device
         )
         self.assertFalse(selected_pickings)
-        selected_pickings = self.make_picking_batch._check_first_picking(
-            candidates_pickings[0], device.max_weight, device.max_volume
-        )
-        self.assertTrue(selected_pickings)
-        self.assertEqual(selected_pickings[0], picks[0])
+
+        with self.assertRaises(UserError):
+            self.make_picking_batch._check_first_picking(candidates_pickings[0], device)
 
     def test_put_3_pickings_in_one_cluster(self):
         self.p1.write(
@@ -67,13 +65,12 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         candidates_pickings = self.make_picking_batch._search_pickings()
         device = self.make_picking_batch._compute_device_to_use(candidates_pickings[0])
         selected_pickings = self.make_picking_batch._check_number_of_available_bins(
-            candidates_pickings[0], device.nbr_bins
+            candidates_pickings[0], device
         )
         self.assertFalse(selected_pickings)
-        selected_pickings = self.make_picking_batch._check_first_picking(
-            candidates_pickings[0], device.max_weight, device.max_volume
+        self.make_picking_batch._check_first_picking(
+            candidates_pickings[0], device
         )
-        self.assertFalse(selected_pickings)
         (
             selected_pickings,
             unselected_pickings,

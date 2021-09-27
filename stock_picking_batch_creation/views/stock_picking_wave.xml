@@ -12,6 +12,9 @@
         <field name="arch" type="xml">
             <field name="user_id" position="after">
                 <field name="picking_device_id" />
+                <field name="wave_weight" />
+                <field name="wave_volume" />
+                <field name="wave_nbr_bins" />
             </field>
             <xpath
         expr="//field[@name='picking_ids']/tree/field[@name='state']"
@@ -19,6 +22,9 @@
       >
                 <field name="picking_device_id" />
                 <field name="user_id" />
+                <field name="total_weight" />
+                <field name="total_volume" />
+                <field name="nbr_bins" />
             </xpath>
 
             <sheet position="inside">
