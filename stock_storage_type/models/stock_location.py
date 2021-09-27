@@ -284,19 +284,31 @@ class StockLocation(models.Model):
     @api.depends(
         "location_storage_type_ids",
         "location_id",
-        "location_id.allowed_location_storage_type_ids",
+        "location_id.location_storage_type_ids",
     )
     def _compute_allowed_location_storage_type_ids(self):
-        for location in self:
+        # NOTE: this compute isn't recursive to avoid a RecursionError
+        # on huge recordsets.
+        # Process the root location first and finish with leaves
+        all_locations = self.search(
+            [("id", "parent_of", self.ids)], order="parent_path"
+        )
+        for location in all_locations:
+            location.allowed_location_storage_type_ids = False
             if location.location_storage_type_ids:
                 location.allowed_location_storage_type_ids = [
                     (6, 0, location.location_storage_type_ids.ids)
                 ]
             else:
                 parent = location.location_id
-                location.allowed_location_storage_type_ids = [
-                    (6, 0, parent.allowed_location_storage_type_ids.ids)
-                ]
+                if parent:
+                    # 'Allowed storage types' of the parent have been computed
+                    # during the previous iterations, avoiding the recursive call
+                    # to '_compute_allowed_location_storage_type_ids' (the value
+                    # is taken from the cache)
+                    location.allowed_location_storage_type_ids = (
+                        parent.allowed_location_storage_type_ids
+                    )
 
     @api.depends("allowed_location_storage_type_ids.max_height")
     def _compute_max_height(self):
