@@ -145,6 +145,7 @@ addon | version | maintainers | summary
 [stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.0.1 |  | Raise priority of all transfers for a chain when started
 [stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 14.0.1.0.0 |  | Define different shipping policies according to picking type
 [stock_picking_type_shipping_policy_group_by](stock_picking_type_shipping_policy_group_by/) | 14.0.1.0.0 |  | Glue module for Picking Type Shipping Policy and Group Transfers by Partner and Carrier
+[stock_reception_screen](stock_reception_screen/) | 14.0.1.0.0 |  | Dedicated screen to receive/scan goods.
 [stock_storage_type](stock_storage_type/) | 14.0.1.8.0 |  | Manage packages and locations storage types
 [stock_storage_type_buffer](stock_storage_type_buffer/) | 14.0.1.3.0 |  | Exclude storage locations from put-away if their buffer is full
 [stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 14.0.1.0.0 |  | Advanced storage strategy ABC for WMS
@@ -155,7 +156,6 @@ Unported addons
 addon | version | maintainers | summary
 --- | --- | --- | ---
 [shopfloor_batch_automatic_creation](shopfloor_batch_automatic_creation/) | 13.0.1.0.0 (unported) | [![guewen](https://github.com/guewen.png?size=30px)](https://github.com/guewen) | Create batch transfers for Cluster Picking
-[stock_reception_screen](stock_reception_screen/) | 13.0.1.1.2 (unported) |  | Dedicated screen to receive/scan goods.
 
 [//]: # (end addons)
 
