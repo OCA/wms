@@ -2,9 +2,13 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo.tests.common import Form
 
+from odoo.addons.stock.models.stock_move import PROCUREMENT_PRIORITIES
 from odoo.addons.stock_available_to_promise_release.tests.common import (
     PromiseReleaseCommonCase,
 )
+
+PRIORITY_NORMAL = PROCUREMENT_PRIORITIES[0][0]
+PRIORITY_URGENT = PROCUREMENT_PRIORITIES[1][0]
 
 
 class TestSaleDeliveryCarrierPreference(PromiseReleaseCommonCase):
@@ -48,7 +52,7 @@ class TestSaleDeliveryCarrierPreference(PromiseReleaseCommonCase):
                 "preference": "carrier",
                 "carrier_id": cls.super_fast_carrier.id,
                 "max_weight": 0.0,
-                "picking_domain": "[('priority', '=', '3')]",
+                "picking_domain": f"[('priority', '=', '{PRIORITY_URGENT}')]",
             }
         )
         cls.env["delivery.carrier.preference"].create(
@@ -141,7 +145,7 @@ class TestSaleDeliveryCarrierPreference(PromiseReleaseCommonCase):
     def test_delivery_add_preferred_carrier_picking_domain(self):
         """
         With a qty of 5 in the sale order and 5 available to promise,
-        estimated_shipping_weight is 50, and with a priority of 2, preferred
+        estimated_shipping_weight is 50, and with a priority of 0, preferred
         carrier must be free
         """
         order = self._create_sale_order()
@@ -151,7 +155,7 @@ class TestSaleDeliveryCarrierPreference(PromiseReleaseCommonCase):
         )
         order.action_confirm()
         delivery_pick = order.picking_ids
-        self.assertEqual(delivery_pick.priority, "1")
+        self.assertEqual(delivery_pick.priority, PRIORITY_NORMAL)
         self.assertAlmostEqual(delivery_pick.estimated_shipping_weight, 50.0)
         delivery_pick.add_preferred_carrier()
         self.assertEqual(delivery_pick.carrier_id, self.free_delivery_carrier)
