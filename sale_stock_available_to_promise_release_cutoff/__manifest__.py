@@ -4,13 +4,13 @@
 {
     "name": "Sale Stock Available to Promise Release Cutoff",
     "summary": "Cutoff management with respect to stock availability",
-    "version": "13.0.1.0.0",
+    "version": "14.0.1.0.0",
     "author": "Camptocamp,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "category": "Stock Management",
     "depends": [
         "sale_stock_available_to_promise_release",
-        "sale_cutoff_time_delivery",
+        "sale_delivery_date",
     ],
     "installable": True,
     "auto_install": True,
