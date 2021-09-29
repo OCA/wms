@@ -3,7 +3,7 @@
 {
     "name": "Stock reception screen qty by packaging",
     "summary": "Glue module for `stock_product_qty_by_packaging` and `stock_vertical_lift`.",
-    "version": "13.0.1.0.0",
+    "version": "14.0.1.0.0",
     "development_status": "Alpha",
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",
