@@ -39,14 +39,14 @@ class StockReceptionScreen(models.Model):
             )
 
     @api.depends(
-        "product_packaging_id.lngth",
+        "product_packaging_id.packaging_length",
         "product_packaging_id.width",
         "product_packaging_id.height",
     )
     def _compute_package_dimensions(self):
         for record in self:
             pack = record.product_packaging_id
-            dimension_values = [pack.lngth, pack.height, pack.width]
+            dimension_values = [pack.packaging_length, pack.height, pack.width]
             if all(dimension_values):
                 record.display_package_dimensions = " x ".join(
                     [f"{str(val)}mm" for val in dimension_values]
@@ -56,7 +56,7 @@ class StockReceptionScreen(models.Model):
 
     @api.depends(
         "product_packaging_id.max_weight",
-        "product_packaging_id.lngth",
+        "product_packaging_id.packaging_length",
         "product_packaging_id.width",
         "product_packaging_id.height",
     )
@@ -65,7 +65,7 @@ class StockReceptionScreen(models.Model):
             pack = record.product_packaging_id
             if pack:
                 record.package_has_missing_dimensions = not pack.type_is_pallet and (
-                    not (pack.lngth and pack.width and pack.height)
+                    not (pack.packaging_length and pack.width and pack.height)
                     or not pack.max_weight
                 )
             else:
