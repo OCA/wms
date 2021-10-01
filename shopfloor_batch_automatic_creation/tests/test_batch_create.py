@@ -178,7 +178,7 @@ class TestBatchCreate(CommonCase):
 
     def test_cluster_picking_select(self):
         self.menu.sudo().batch_create = True
-        self.menu.sudo().batch_create_max_pickings = 2
+        self.menu.sudo().batch_create_max_picking = 2
 
         response = self.service.dispatch("find_batch")
         batch = self.picking1.batch_id
