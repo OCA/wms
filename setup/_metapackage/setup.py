@@ -13,6 +13,7 @@ setuptools.setup(
         'odoo14-addon-sale_stock_available_to_promise_release',
         'odoo14-addon-shopfloor',
         'odoo14-addon-shopfloor_base',
+        'odoo14-addon-shopfloor_batch_automatic_creation',
         'odoo14-addon-shopfloor_checkout_sync',
         'odoo14-addon-shopfloor_example',
         'odoo14-addon-shopfloor_mobile',
