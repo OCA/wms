@@ -19,9 +19,10 @@ class StockPickingWave(models.Model):
         readonly=True,
         states={"draft": [("readonly", False)], "in_progress": [("readonly", False)]},
     )
-    wave_weight = fields.Float(help="Indicates total weight of transfers included.")
-    wave_volume = fields.Float(help="Indicates total volume of transfers included.")
-    wave_nbr_bins = fields.Float(help="Indicates the bins occupied by the pickings on the device.")
+    wave_weight = fields.Float(string= "Total weight", help="Indicates total weight of transfers included.")
+    wave_volume = fields.Float(string= "Total volume",help="Indicates total volume of transfers included.")
+    wave_nbr_bins = fields.Integer(string= "Number of compartments", help="Indicates the bins occupied by the pickings on the device.")
+    wave_nbr_lines = fields.Integer(string= "Number of picking lines", help="Indicates the picking lines ready for preparation.")
 
     @api.depends(
         "picking_ids",

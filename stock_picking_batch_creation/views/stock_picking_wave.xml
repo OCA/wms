@@ -15,6 +15,7 @@
                 <field name="wave_weight" />
                 <field name="wave_volume" />
                 <field name="wave_nbr_bins" />
+                <field name="wave_nbr_lines" />
             </field>
             <xpath
         expr="//field[@name='picking_ids']/tree/field[@name='state']"
@@ -22,9 +23,10 @@
       >
                 <field name="picking_device_id" />
                 <field name="user_id" />
-                <field name="total_weight" />
-                <field name="total_volume" />
-                <field name="nbr_bins" />
+                <field name="total_weight_batch_picking" />
+                <field name="total_volume_batch_picking" />
+                <field name="nbr_bins_batch_picking" />
+                <field name="nbr_picking_lines" />
             </xpath>
 
             <sheet position="inside">
