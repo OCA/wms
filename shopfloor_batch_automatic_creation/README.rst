@@ -33,6 +33,7 @@ batch is available, it automatically creates a new batch for the user.
 Some options can be configured on the Shopfloor menu:
 
 * Activate or not the batch creation
+* Group by commercial entity
 * Max number of transfer per batch
 * Max weight per batch
 * Max volume per batch
@@ -80,6 +81,12 @@ Contributors
 ~~~~~~~~~~~~
 
 * Guewen Baconnier <guewen.baconnier@camptocamp.com>
+* `Trobz <https://trobz.com>`_:
+
+Other credits
+~~~~~~~~~~~~~
+
+The migration of this module from 13.0 to 14.0 was financially supported by Camptocamp
 
 Maintainers
 ~~~~~~~~~~~
