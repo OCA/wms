@@ -1,0 +1,257 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* delivery_carrier_preference
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2021-04-13 11:46+0000\n"
+"Last-Translator: jabelchi <jabelchi@gmail.com>\n"
+"Language-Team: none\n"
+"Language: ca\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.3.2\n"
+
+#. module: delivery_carrier_preference
+#: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
+#, python-format
+msgid "%s (Max weight %s %s)"
+msgstr "%s (Pes màxim %s %s)"
+
+#. module: delivery_carrier_preference
+#: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
+#, python-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#. module: delivery_carrier_preference
+#: model_terms:ir.ui.view,arch_db:delivery_carrier_preference.view_picking_withcarrier_out_form
+msgid "Add preferred carrier"
+msgstr "Afegir transportista preferit"
+
+#. module: delivery_carrier_preference
+#: model_terms:ir.ui.view,arch_db:delivery_carrier_preference.view_picking_withcarrier_out_form
+msgid "Add preferred carrier according to estimated shipping weight"
+msgstr "Afegir transportista preferit d'acord al pes estimat de l'expedició"
+
+#. module: delivery_carrier_preference
+#: code:addons/delivery_carrier_preference/models/stock_picking.py:0
+#, python-format
+msgid "Cannot find preferred carrier"
+msgstr "No es pot trobar transportista preferit"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__carrier_id
+msgid "Carrier"
+msgstr "Transportitsta"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__company_id
+msgid "Company"
+msgstr "Companyia"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__create_uid
+msgid "Created by"
+msgstr "Creat per"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__create_date
+msgid "Created on"
+msgstr "Creat el"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields.selection,name:delivery_carrier_preference.selection__delivery_carrier_preference__preference__carrier
+msgid "Defined carrier"
+msgstr "Transportista definit"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__display_name
+msgid "Display Name"
+msgstr "Nom a mostrar"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,help:delivery_carrier_preference.field_delivery_carrier_preference__picking_domain
+msgid ""
+"Domain to restrict application of this preference for carrier selection on "
+"pickings"
+msgstr ""
+"Domini per a restringir l'aplicació d'aquesta preferència per selecció dels "
+"transportistes als pickings"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_move__estimated_shipping_weight
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_picking__estimated_shipping_weight
+msgid "Estimated shipping weight"
+msgstr "Pes estimat de l'expedició"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_location_route__force_recompute_preferred_carrier_on_release
+msgid "Force recomputation of preferred carrier."
+msgstr "Força recàlcul de transportista preferit."
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__id
+msgid "ID"
+msgstr "ID"
+
+#. module: delivery_carrier_preference
+#: model:ir.model,name:delivery_carrier_preference.model_stock_location_route
+msgid "Inventory Routes"
+msgstr "Rutes d'inventari"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference____last_update
+msgid "Last Modified on"
+msgstr "Darrera modificació el"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__write_uid
+msgid "Last Updated by"
+msgstr "Darrera actualització per"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__write_date
+msgid "Last Updated on"
+msgstr "Darrera actualització el"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,help:delivery_carrier_preference.field_delivery_carrier_preference__max_weight
+msgid "Leave empty for no limit"
+msgstr "Deixar buit per deixar sense límit"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,help:delivery_carrier_preference.field_stock_location_route__force_recompute_preferred_carrier_on_release
+msgid ""
+"Mark this box to trigger a recomputation of preferred carrier on the release"
+" of operations."
+msgstr ""
+"Marqueu aquesta casella per a llençar un recàlcul de transportista preferit "
+"a l'alliberar les operacions."
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__max_weight_uom_id
+msgid "Max Weight Uom"
+msgstr "UdM pes màxim"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__max_weight
+msgid "Max weight"
+msgstr "Pes màxim"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__max_weight_uom_name
+msgid "Max weight UOM"
+msgstr "UdM pes màxim"
+
+#. module: delivery_carrier_preference
+#: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
+#, python-format
+msgid "Max weight must have a positive or null value."
+msgstr "Pes màxim ha d'ésser positiu o nul."
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__name
+#: model_terms:ir.ui.view,arch_db:delivery_carrier_preference.delivery_carrier_preference_form_view
+msgid "Name"
+msgstr "Nom"
+
+#. module: delivery_carrier_preference
+#: code:addons/delivery_carrier_preference/models/stock_picking.py:0
+#, python-format
+msgid ""
+"No preferred carrier could be found automatically for this delivery order. "
+"Pleaseselect one manually."
+msgstr ""
+"No es pot trobar transportista preferit per aquesta ordre d'entrega. "
+"Seleccioneu-ne un manualment."
+
+#. module: delivery_carrier_preference
+#: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
+#, python-format
+msgid ""
+"Only one Preferred Shipping Method can be set with 'Partner carrier' "
+"preference."
+msgstr ""
+"Només es pot establir un mètode d'entrega amb les preferències de "
+"transportista."
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields.selection,name:delivery_carrier_preference.selection__delivery_carrier_preference__preference__partner
+msgid "Partner carrier"
+msgstr "Transportista"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_procurement_group__picking_ids
+msgid "Picking"
+msgstr "Picking"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__picking_domain
+msgid "Picking Domain"
+msgstr "Domini del picking"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__preference
+msgid "Preference"
+msgstr "Preferència"
+
+#. module: delivery_carrier_preference
+#: model:ir.actions.act_window,name:delivery_carrier_preference.action_delivery_carrier_preference_view
+#: model:ir.model,name:delivery_carrier_preference.model_delivery_carrier_preference
+#: model:ir.ui.menu,name:delivery_carrier_preference.menu_delivery_carrier_preference
+msgid "Preferred Shipping Methods"
+msgstr "Mètodes d'entrega preferits"
+
+#. module: delivery_carrier_preference
+#: code:addons/delivery_carrier_preference/models/delivery_carrier_preference.py:0
+#, python-format
+msgid ""
+"Preferred Shipping Methods with 'Carrier' preference must define a Delivery "
+"carrier."
+msgstr ""
+"Cal que els mètodes d'entrega amb preferències de transportista, defineixin "
+"un transportista d'entrega ."
+
+#. module: delivery_carrier_preference
+#: model:ir.model,name:delivery_carrier_preference.model_procurement_group
+msgid "Procurement Group"
+msgstr "Grup d'abastiment"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__sequence
+msgid "Sequence"
+msgstr "Seqüència"
+
+#. module: delivery_carrier_preference
+#: model:ir.model,name:delivery_carrier_preference.model_stock_move
+msgid "Stock Move"
+msgstr "Moviment d'estoc"
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,help:delivery_carrier_preference.field_stock_picking__estimated_shipping_weight
+msgid ""
+"This weight is calculated according to the move quantity available to "
+"promise and existing product packagings weight for each product on the "
+"moves."
+msgstr ""
+"Aquest pes es calcula d'acord amb la quantitat disponible del moviment i el "
+"pes dels paquets de producte existents per a cada producte en els moviments."
+
+#. module: delivery_carrier_preference
+#: model:ir.model.fields,help:delivery_carrier_preference.field_stock_move__estimated_shipping_weight
+msgid ""
+"Total weight available to promise calculated according to the quantity "
+"available to promise and weight defined on packagings for this product."
+msgstr ""
+"Pes total disponible calculat d'acord amb la quantitat disponible i el pes "
+"definit dels paquets d'aquest producte."
+
+#. module: delivery_carrier_preference
+#: model:ir.model,name:delivery_carrier_preference.model_stock_picking
+msgid "Transfer"
+msgstr "Transferència"
