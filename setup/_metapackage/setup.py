@@ -25,6 +25,7 @@ setuptools.setup(
         'odoo14-addon-stock_available_to_promise_release_dynamic_routing',
         'odoo14-addon-stock_checkout_sync',
         'odoo14-addon-stock_dynamic_routing',
+        'odoo14-addon-stock_dynamic_routing_checkout_sync',
         'odoo14-addon-stock_dynamic_routing_reserve_rule',
         'odoo14-addon-stock_move_source_relocate',
         'odoo14-addon-stock_move_source_relocate_dynamic_routing',
