@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 Camptocamp SA
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <record id="stock_reception_screen_view_form" model="ir.ui.view">
+        <field name="name">stock.reception.screen.form</field>
+        <field name="model">stock.reception.screen</field>
+        <field
+            name="inherit_id"
+            ref="stock_reception_screen.stock_reception_screen_view_form"
+        />
+        <field name="arch" type="xml">
+            <button name="button_next_pack" position="after">
+                <field name="package_has_missing_dimensions" invisible="1" />
+                <button
+                    name="measure_current_packaging"
+                    type="object"
+                    string="Measure Current Packaging"
+                    icon="fa-tachometer"
+                    class="btn btn-secondary"
+                    attrs="{'invisible': [('package_has_missing_dimensions', '=', False)]}"
+                />
+                <field name="scan_requested" invisible="1" />
+                <button
+                    name="cancel_measure_current_packaging"
+                    type="object"
+                    string="Cancel Measure"
+                    icon="fa-tachometer"
+                    class="btn btn-warning"
+                    attrs="{'invisible': [('scan_requested', '=', False)]}"
+                />
+                <button
+                    name="reload"
+                    type="object"
+                    string="Refresh"
+                    icon="fa-refresh"
+                    attrs="{'invisible': [('scan_requested', '=', False)]}"
+                />
+            </button>
+            <xpath
+                expr="//field[@name='current_move_line_package']/.."
+                position="after"
+            >
+                <label for="display_package_dimensions" />
+                <div>
+                    <field
+                        name="display_package_dimensions"
+                        class="mr8"
+                        style="width: 15em;"
+                        readonly="1"
+                    />
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,99 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_reception_screen_measuring_device
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_reception_screen_measuring_device
+#: model:ir.model.fields,help:stock_reception_screen_measuring_device.field_stock_reception_screen__scan_requested
+msgid "A scan from the measuring device was requested"
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: model_terms:ir.ui.view,arch_db:stock_reception_screen_measuring_device.stock_reception_screen_view_form
+msgid "Cancel Measure"
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_measuring_device__is_default
+msgid "Default"
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_stock_reception_screen__display_package_dimensions
+msgid "Dimensions (lxhxw)"
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: model:ir.model.fields,help:stock_reception_screen_measuring_device.field_stock_reception_screen__display_package_dimensions
+msgid "Dimensions of the package in mm (length x height x width)"
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: model:ir.model.fields,help:stock_reception_screen_measuring_device.field_stock_reception_screen__package_has_missing_dimensions
+msgid "Indicates if the package have any measurement missing."
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: model_terms:ir.ui.view,arch_db:stock_reception_screen_measuring_device.stock_reception_screen_view_form
+msgid "Measure Current Packaging"
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: code:addons/stock_reception_screen_measuring_device/models/stock_reception_screen.py:0
+#, python-format
+msgid "Measurement machine already in use."
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: model:ir.model,name:stock_reception_screen_measuring_device.model_measuring_device
+msgid "Measuring and Weighing Device"
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: code:addons/stock_reception_screen_measuring_device/models/stock_reception_screen.py:0
+#, python-format
+msgid "No default device set, please configure one."
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: code:addons/stock_reception_screen_measuring_device/models/measuring_device.py:0
+#, python-format
+msgid "Only one measuring device can be the default one."
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_stock_reception_screen__package_has_missing_dimensions
+msgid "Package Requires Measures?"
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: model_terms:ir.ui.view,arch_db:stock_reception_screen_measuring_device.stock_reception_screen_view_form
+msgid "Refresh"
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_stock_reception_screen__scan_requested
+msgid "Scan Requested"
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: model:ir.model,name:stock_reception_screen_measuring_device.model_stock_reception_screen
+msgid "Stock Reception Screen"
+msgstr ""
+
+#. module: stock_reception_screen_measuring_device
+#: model:ir.model.fields,help:stock_reception_screen_measuring_device.field_measuring_device__is_default
+msgid ""
+"The device set as the default one will be the one used in the reception "
+"screen."
+msgstr ""
