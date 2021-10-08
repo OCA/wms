@@ -10,6 +10,7 @@ setuptools.setup(
     install_requires=[
         'odoo14-addon-delivery_carrier_preference',
         'odoo14-addon-delivery_carrier_warehouse',
+        'odoo14-addon-delivery_preference_glue_stock_picking_group',
         'odoo14-addon-sale_stock_available_to_promise_release',
         'odoo14-addon-shopfloor',
         'odoo14-addon-shopfloor_base',
