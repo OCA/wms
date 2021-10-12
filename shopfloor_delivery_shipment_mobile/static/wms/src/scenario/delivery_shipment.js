@@ -129,17 +129,17 @@ const DeliveryShipment = {
         </Screen>
         `,
     methods: {
-        screen_title: function() {
+        screen_title: function () {
             if (_.isEmpty(this.state.data.shipment_advice)) {
                 return this.menu_item().name;
             }
             return this.state.data.shipment_advice.name;
         },
-        btn_back_label: function() {
+        btn_back_label: function () {
             return this.state.button_back_label || "Back";
         },
         // The current picking
-        picking: function(from_state = "") {
+        picking: function (from_state = "") {
             var data = {};
             if (from_state) {
                 data = this.state_get_data(from_state);
@@ -151,7 +151,7 @@ const DeliveryShipment = {
             }
             return data.picking;
         },
-        pickings: function() {
+        pickings: function () {
             if (this.filter_state === "dock" && !_.isEmpty(this.state.data.on_dock)) {
                 return this.state.data.on_dock;
             } else if (
@@ -162,23 +162,23 @@ const DeliveryShipment = {
             }
             return {};
         },
-        filter_pickings: function(pickings) {
+        filter_pickings: function (pickings) {
             let res = pickings;
             const nameFilter = this.state.data.filter_name;
             if (nameFilter) {
-                res = _.filter(pickings, pick => {
+                res = _.filter(pickings, (pick) => {
                     return pick.name.indexOf(nameFilter) >= 0;
                 });
             }
             return res;
         },
-        shipment: function() {
+        shipment: function () {
             if (_.isEmpty(this.state.data.shipment_advice)) {
                 return {};
             }
             return this.state.data.shipment_advice;
         },
-        picking_options: function(picking) {
+        picking_options: function (picking) {
             return {
                 main: true,
                 key_title: "name",
@@ -196,7 +196,7 @@ const DeliveryShipment = {
                 ],
             };
         },
-        pack_options: function(pack) {
+        pack_options: function (pack) {
             const action = pack.is_done
                 ? () => {
                       this.unload_pack(pack);
@@ -208,11 +208,11 @@ const DeliveryShipment = {
                 title_action_icon: "mdi-upload",
             };
         },
-        pack_color: function(pack) {
+        pack_color: function (pack) {
             const color = pack.is_done ? "screen_step_done" : "screen_step_todo";
             return this.utils.colors.color_for(color);
         },
-        line_options: function(line) {
+        line_options: function (line) {
             const action =
                 line.qty_done == line.quantity
                     ? () => {
@@ -230,14 +230,14 @@ const DeliveryShipment = {
                 ],
             };
         },
-        line_color: function(line) {
+        line_color: function (line) {
             const color =
                 line.qty_done >= line.quantity
                     ? "screen_step_done"
                     : "screen_step_todo";
             return this.utils.colors.color_for(color);
         },
-        unload_line: function(line) {
+        unload_line: function (line) {
             this.wait_call(
                 this.odoo.call("unload_move_line", {
                     shipment_advice_id: this.shipment().id,
@@ -245,7 +245,7 @@ const DeliveryShipment = {
                 })
             );
         },
-        unload_pack: function(pack) {
+        unload_pack: function (pack) {
             this.wait_call(
                 this.odoo.call("unload_package_level", {
                     shipment_advice_id: this.shipment().id,
@@ -253,7 +253,7 @@ const DeliveryShipment = {
                 })
             );
         },
-        operation_color: function(pick, shipment) {
+        operation_color: function (pick, shipment) {
             var color = "";
             if (pick.is_fully_loaded) {
                 color = "success";
@@ -268,13 +268,13 @@ const DeliveryShipment = {
             }
             return color;
         },
-        loaded_total: function(data, key) {
+        loaded_total: function (data, key) {
             // Return two value formatted has a fraction
             return (
                 data["loaded_" + key].toString() + "/" + data["total_" + key].toString()
             );
         },
-        is_fully_loaded: function(data) {
+        is_fully_loaded: function (data) {
             // Check if the summary from last screen is fully loaded
             // May need to know if planned or not
             if (data.total_packages_count != data.loaded_packages_count) {
@@ -284,7 +284,7 @@ const DeliveryShipment = {
             }
             return true;
         },
-        lading_summary_options: function(data) {
+        lading_summary_options: function (data) {
             return {
                 theme_dark: this.shipment_summary_color(data) === "error",
                 fields: [
@@ -325,7 +325,7 @@ const DeliveryShipment = {
                 ],
             };
         },
-        ondock_summary: function(data) {
+        ondock_summary: function (data) {
             return {
                 theme_dark: this.shipment_summary_color(data) === "error",
                 fields: [
@@ -347,7 +347,7 @@ const DeliveryShipment = {
                 ],
             };
         },
-        shipment_summary_color: function(data) {
+        shipment_summary_color: function (data) {
             const isLading = "loaded_weight" in data;
             var color = "";
             if (isLading) {
@@ -366,7 +366,7 @@ const DeliveryShipment = {
             return color;
         },
     },
-    data: function() {
+    data: function () {
         const self = this;
         return {
             usage: "delivery_shipment",
@@ -378,7 +378,7 @@ const DeliveryShipment = {
                         title: "Start by scanning a dock",
                         scan_placeholder: "Scan dock",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("scan_dock", {
                                 barcode: scanned.text,
@@ -399,7 +399,7 @@ const DeliveryShipment = {
                             }
                         },
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("scan_document", {
                                 barcode: scanned.text,
@@ -428,7 +428,7 @@ const DeliveryShipment = {
                         title: "Filter documents",
                         scan_placeholder: "Scan a document number",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.state_set_data({filter_name: scanned.text});
                     },
                     on_back: () => {
@@ -440,7 +440,7 @@ const DeliveryShipment = {
                             })
                         );
                     },
-                    on_back2picking: picking => {
+                    on_back2picking: (picking) => {
                         this.wait_call(
                             this.odoo.call("scan_document", {
                                 barcode: picking.name,
