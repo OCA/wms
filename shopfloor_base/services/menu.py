@@ -15,7 +15,7 @@ class ShopfloorMenu(Component):
     """
 
     _inherit = "base.shopfloor.service"
-    _name = "shopfloor.menu"
+    _name = "shopfloor.service.menu"
     _usage = "menu"
     _expose_model = "shopfloor.menu"
     _description = __doc__
@@ -73,7 +73,7 @@ class ShopfloorMenuValidator(Component):
     """Validators for the Menu endpoints"""
 
     _inherit = "base.shopfloor.validator"
-    _name = "shopfloor.menu.validator"
+    _name = "shopfloor.service.menu.validator"
     _usage = "menu.validator"
 
     def search(self):
@@ -86,7 +86,7 @@ class ShopfloorMenuValidatorResponse(Component):
     """Validators for the Menu endpoints responses"""
 
     _inherit = "base.shopfloor.validator.response"
-    _name = "shopfloor.menu.validator.response"
+    _name = "shopfloor.service.menu.validator.response"
     _usage = "menu.validator.response"
 
     def return_search(self):

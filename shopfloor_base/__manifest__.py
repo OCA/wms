@@ -19,6 +19,7 @@
         "data/module_category_data.xml",
         "security/groups.xml",
         "security/ir.model.access.csv",
+        "views/shopfloor_app.xml",
         "views/shopfloor_menu.xml",
         "views/shopfloor_scenario_views.xml",
         "views/shopfloor_profile_views.xml",

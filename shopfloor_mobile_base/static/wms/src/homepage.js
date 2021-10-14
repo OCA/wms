@@ -43,7 +43,7 @@ export var HomePage = Vue.component("home-page", {
 
             <v-footer absolute padless>
                 <v-col class="text-center font-weight-light" cols="12">
-                    <span class="version">{{ $t('screen.home.version') }}</span> <span class="version-number" v-text="$root.app_info.app_version" />
+                    <span class="version">{{ $t('screen.home.version') }}</span> <span class="version-number" v-text="$root.app_info.version" />
                 </v-col>
             </v-footer>
         </Screen>

@@ -5,11 +5,15 @@
 
 
 import json
+import logging
 import os
 
 from odoo import http
 from odoo.modules.module import load_information_from_description_file
 from odoo.tools.config import config as odoo_config
+
+_logger = logging.getLogger(__name__)
+
 
 APP_VERSIONS = {}
 
@@ -40,22 +44,33 @@ class ShopfloorMobileAppMixin(object):
     module_path = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
     main_template = "shopfloor_mobile_base.shopfloor_app_main"
 
-    def _load_app(self, demo=False, **kw):
+    def _load_app(self, shopfloor_app=None, demo=False, **kw):
         return http.request.render(
-            self.main_template, self._get_main_template_values(demo=demo, **kw)
+            self.main_template,
+            self._get_main_template_values(
+                shopfloor_app=shopfloor_app, demo=demo, **kw
+            ),
         )
 
-    def _get_main_template_values(self, demo=False, **kw):
-        base_url = "/shopfloor/"
-        auth_type = "api_key"
+    def _get_main_template_values(self, shopfloor_app=None, demo=False, **kw):
+        # TODO: move this to shopfloor_app model and wrap everything
+        # into `app_info` key. Then we simply dump to json here.
+        app_info = self._make_app_info(shopfloor_app=shopfloor_app, demo=demo)
+        return {
+            "app_info": app_info,
+            "get_version": self._get_version,
+        }
+
+    def _make_app_info(self, shopfloor_app=None, demo=False):
+        base_url = shopfloor_app.api_route + "/" if shopfloor_app else "/shopfloor/"
+        # TODO: get auth from app (requires rest routes pluggability)
+        auth_type = "user"
         return dict(
-            app_version=self._get_app_version(),
-            app_base_url=base_url,
+            base_url=base_url,
             auth_type=auth_type,
-            get_version=self._get_version,
-            running_env=self._get_running_env(),
             demo_mode=demo,
-            **kw
+            version=self._get_app_version(),
+            running_env=self._get_running_env(),
         )
 
     def _get_version(self, module_name, module_path=None):
@@ -78,22 +93,6 @@ class ShopfloorMobileAppMixin(object):
     def _get_running_env(self):
         return RUNNING_ENV
 
-    def _serve_assets(self, path_fragment="", **kw):
-        # TODO Should be authorized via api.key except for the login ?
-        if path_fragment.endswith((".map", "scriptElement")):
-            # `.map` -> .map maps called by debugger
-            # `scriptElement` -> file imported via JS but not loaded
-            return http.request.not_found()
-        if path_fragment.startswith("src/"):
-            # Serving an asset
-            payload = self._make_asset_path(path_fragment)
-            if os.path.exists(payload):
-                return http.send_file(payload)
-        return http.request.not_found()
-
-    def _make_asset_path(self, path_fragment):
-        return os.path.join(self.module_path, "static", "wms", path_fragment)
-
     def _make_icons(self, fname, rel, sizes, img_type, url_pattern=None):
         app_version = self._get_app_version()
         all_icons = []
@@ -114,7 +113,7 @@ class ShopfloorMobileAppMixin(object):
             )
         return all_icons
 
-    def _get_app_icons(self):
+    def _get_app_icons(self, shopfloor_app):
         all_icons = []
         # apple icons
         rel = "apple-touch-icon"
@@ -146,43 +145,48 @@ class ShopfloorMobileAppMixin(object):
         all_icons.extend(self._make_icons(fname, rel, sizes, img_type))
         return all_icons
 
-    def _get_manifest(self):
+    def _get_manifest(self, shopfloor_app):
         return {
-            "name": "Shopfloor WMS app",
-            "short_name": "Shopfloor",
-            "start_url": "/shopfloor_mobile/app/#",
+            "name": shopfloor_app.name,
+            "short_name": shopfloor_app.short_name,
+            "start_url": shopfloor_app.url + "#",
             "display": "fullscreen",
-            "icons": self._get_app_icons(),
+            "icons": self._get_app_icons(shopfloor_app),
         }
 
 
 class ShopfloorMobileAppController(http.Controller, ShopfloorMobileAppMixin):
     @http.route(
-        ["/shopfloor_mobile/app", "/shopfloor_mobile/app/<string:demo>"],
+        [
+            "/shopfloor/app/<tech_name(shopfloor.app):shopfloor_app>",
+            "/shopfloor/app/<tech_name(shopfloor.app):shopfloor_app>/<string:demo>",
+        ],
         auth="public",
     )
-    def load_app(self, demo=False, **kw):
-        return self._load_app(demo=True if demo else False, **kw)
+    def load_app(self, shopfloor_app, demo=False, **kw):
+        return self._load_app(shopfloor_app, demo=True if demo else False, **kw)
 
     @http.route(
-        ["/shopfloormobile/scanner"],
+        ["/shopfloor_mobile/app"],
         auth="public",
     )
     def load_app_backward(self, demo=False):
-        # Backward compat redirect (url changed from /scanner to /app)
-        return http.redirect_with_hash("/shopfloor_mobile/app", code=301)
+        # Backward compat redirect to the 1st matching app if any.
+        model = http.request.env["shopfloor.app"]
+        app = model.search([], limit=1)
+        if app:
+            return http.redirect_with_hash(app.url, code=301)
+        _logger.error("No matching app")
+        return http.request.not_found()
 
-    # TODO: do we really need this?
     @http.route(
-        ["/shopfloor_mobile/assets/<path:path_fragment>"],
+        [
+            "/shopfloor/app/<tech_name(shopfloor.app):shopfloor_app>/manifest.json",
+        ],
         auth="public",
     )
-    def load_assets(self, path_fragment="", **kw):
-        return self._serve_assets(path_fragment=path_fragment, **kw)
-
-    @http.route("/shopfloor_mobile/manifest.json", auth="public")
-    def manifest(self):
-        manifest = self._get_manifest()
+    def manifest(self, shopfloor_app):
+        manifest = self._get_manifest(shopfloor_app)
         headers = {}
         headers["Content-Type"] = "application/json"
         return http.request.make_response(json.dumps(manifest), headers=headers)
