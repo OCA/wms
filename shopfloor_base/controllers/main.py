@@ -6,6 +6,8 @@ from odoo.addons.base_rest.controllers import main
 
 
 class ShopfloorController(main.RestController):
-    _root_path = "/shopfloor/"
-    _collection_name = "shopfloor.service"
-    _default_auth = "api_key"
+    _root_path = "/shopfloor/<tech_name(shopfloor.app):collection>/"
+    # Useless when calling via real request
+    # as the collection will come from model converter
+    _collection_name = "shopfloor.app"
+    _default_auth = "user"

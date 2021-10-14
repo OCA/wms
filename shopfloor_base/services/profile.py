@@ -15,7 +15,7 @@ class ShopfloorProfile(Component):
     """
 
     _inherit = "base.shopfloor.service"
-    _name = "shopfloor.profile"
+    _name = "shopfloor.service.profile"
     _usage = "profile"
     _expose_model = "shopfloor.profile"
     _description = __doc__
@@ -52,7 +52,7 @@ class ShopfloorProfileValidator(Component):
     """Validators for the Profile endpoints"""
 
     _inherit = "base.shopfloor.validator"
-    _name = "shopfloor.profile.validator"
+    _name = "shopfloor.service.profile.validator"
     _usage = "profile.validator"
 
     def search(self):
@@ -65,7 +65,7 @@ class ShopfloorProfileValidatorResponse(Component):
     """Validators for the Profile endpoints responses"""
 
     _inherit = "base.shopfloor.validator.response"
-    _name = "shopfloor.profile.validator.response"
+    _name = "shopfloor.service.profile.validator.response"
     _usage = "profile.validator.response"
 
     def search(self):

@@ -57,7 +57,8 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
     @contextmanager
     def work_on_services(self, env=None, **params):
         params = params or {}
-        collection = _PseudoCollection("shopfloor.service", env or self.env)
+        # TODO: test specific shopfloor.app record
+        collection = _PseudoCollection("shopfloor.app", env or self.env)
         yield WorkContext(
             model_name="rest.service.registration",
             collection=collection,

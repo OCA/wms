@@ -19,7 +19,7 @@ class BaseShopfloorService(AbstractComponent):
 
     _inherit = "base.rest.service"
     _name = "base.shopfloor.service"
-    _collection = "shopfloor.service"
+    _collection = "shopfloor.app"
     _expose_model = None
 
     def dispatch(self, method_name, *args, params=None):

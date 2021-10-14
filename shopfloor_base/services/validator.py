@@ -51,7 +51,7 @@ class ShopfloorRestCerberusValidator(Component):
     _name = "shopfloor.rest.cerberus.validator"
     _inherit = "base.rest.cerberus.validator"
     _usage = "cerberus.validator"
-    _collection = "shopfloor.service"
+    _collection = "shopfloor.app"
     _is_rest_service_component = False
 
     def _get_validator_component(self, service, method_name, direction):
@@ -109,7 +109,7 @@ class BaseShopfloorValidator(AbstractComponent):
 
     _inherit = "base.rest.service"
     _name = "base.shopfloor.validator"
-    _collection = "shopfloor.service"
+    _collection = "shopfloor.app"
     _is_rest_service_component = False
 
 
@@ -155,7 +155,7 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
 
     _inherit = "base.rest.service"
     _name = "base.shopfloor.validator.response"
-    _collection = "shopfloor.service"
+    _collection = "shopfloor.app"
     _is_rest_service_component = False
 
     # Initial state of a workflow

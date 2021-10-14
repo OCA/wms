@@ -76,7 +76,7 @@ class ShopfloorScanAnythingHandler(AbstractComponent):
     _name = "shopfloor.scan.anything.handler"
     _usage = "scan_anything.handler"
     _description = __doc__
-    _collection = "shopfloor.service"
+    _collection = "shopfloor.app"
     _actions_collection_name = "shopfloor.action"
 
     @property
