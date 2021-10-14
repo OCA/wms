@@ -195,7 +195,9 @@ new Vue({
             const self = this;
             const odoo = self.getOdoo({
                 usage: "user",
-                profile_id: this.profile.id,
+                headers: {
+                    "SERVICE-CTX-PROFILE-ID": this.profile.id,
+                },
             });
             return odoo.call("menu").then(function (result) {
                 self.appmenu = result.data;

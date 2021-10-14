@@ -107,9 +107,15 @@ export var ScenarioBaseMixin = {
          * Retrieve Odoo connection params.
          */
         _get_odoo_params: function () {
+            // /!\ IMPORTANT /!\ Always use headers w/out underscores.
+            // https://www.nginx.com/resources/wiki/start/
+            // topics/tutorials/config_pitfalls/#missing-disappearing-http-headers
+            let headers = {
+                "SERVICE-CTX-MENU-ID": this.menu_item_id,
+                "SERVICE-CTX-PROFILE-ID": this.$root.profile.id,
+            };
             return {
-                process_menu_id: this.menu_item_id,
-                profile_id: this.$root.profile.id,
+                headers: headers,
                 usage: this.usage,
             };
         },
