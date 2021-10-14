@@ -8,12 +8,9 @@ import {demotools} from "../demo/demo.core.js";
 export class OdooMixin {
     constructor(params) {
         this.params = params;
-        this.apikey = params.apikey;
         this.base_url = params.base_url;
         this.usage = params.usage;
         this.headers = params.headers || {};
-        this.process_menu_id = this.params.process_menu_id;
-        this.profile_id = this.params.profile_id;
         this.debug = this.params.debug;
     }
     call(path, data, method = "POST", fullpath = false) {
@@ -84,14 +81,7 @@ export class OdooMixin {
         return this._error_info(response, json);
     }
     _get_headers(method) {
-        // /!\ IMPORTANT /!\ Always use headers w/out underscores.
-        // https://www.nginx.com/resources/wiki/start/
-        // topics/tutorials/config_pitfalls/#missing-disappearing-http-headers
-        const headers = {
-            "SERVICE-CTX-MENU-ID": this.process_menu_id,
-            "SERVICE-CTX-PROFILE-ID": this.profile_id,
-            "API-KEY": this.apikey,
-        };
+        let headers = {};
         if (method == "POST") {
             headers["Content-Type"] = "application/json";
         }
@@ -118,6 +108,10 @@ export class Odoo extends OdooMixin {}
  */
 // TODO: move this to its on file in demo folder
 export class OdooMocked extends OdooMixin {
+    constructor(params) {
+        super(params);
+        this.process_menu_id = this.params.headers["SERVICE-CTX-MENU-ID"];
+    }
     _set_demo_data() {
         this.demo_data = demotools.get_case(this.usage);
     }

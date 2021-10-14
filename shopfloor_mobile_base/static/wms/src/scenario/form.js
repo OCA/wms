@@ -37,7 +37,9 @@ const Form = {
         this.usage = this.$route.params.form_name;
         const odoo_params = {
             usage: this.usage,
-            profile_id: this.$root.profile.id,
+            headers: {
+                "SERVICE-CTX-PROFILE-ID": this.$root.profile.id,
+            },
         };
         this.odoo = this.$root.getOdoo(odoo_params);
         if (this.$route.params.record_id) {
