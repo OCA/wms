@@ -446,6 +446,15 @@ you must choose one before starting.</p>
 <div class="section" id="customization">
 <h1>Customization</h1>
 <p>Please refer to <cite>shopfloor_mobile_custom_example</cite>.</p>
+</div>
+<div class="section" id="working-environment">
+<h1>Working environment</h1>
+<p>You can control which running env is considerd by Odoo config or env vars.</p>
+<p>For Odoo config: <cite>running_env</cite> or <cite>shopfloor_running_env</cite>.</p>
+<p>For env var: <cite>RUNNING_ENV</cite> or <cite>SHOPFLOOR_RUNNING_ENV</cite>.</p>
+<p>Expected key <cite>RUNNING_ENV</cite> is compliant w/ <cite>server_environment</cite> naming but is not depending on it.</p>
+<p>Additionally, as specific key for Shopfloor is supported.</p>
+<p><strong>You don’t need `server_environment` module to use this feature.</strong></p>
 <div class="section" id="known-issues-roadmap">
 <h2>Known issues / Roadmap</h2>
 <ul>
