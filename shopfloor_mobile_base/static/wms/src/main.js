@@ -13,6 +13,7 @@ import {config_registry} from "./services/config_registry.js";
 import {process_registry} from "./services/process_registry.js";
 import {page_registry} from "./services/page_registry.js";
 import {color_registry} from "./services/color_registry.js";
+import {auth_handler_registry} from "./services/auth_handler_registry.js";
 import {Odoo, OdooMocked} from "./services/odoo.js";
 import VueSuperMethod from "./lib/vue-super-call.js";
 
@@ -147,6 +148,13 @@ new Vue({
             } else {
                 OdooClass = Odoo;
             }
+            const auth_type = this.app_info.auth_type;
+            const auth_handler = auth_handler_registry.get(auth_type);
+            if (_.isUndefined(auth_handler)) {
+                throw "Auth type '" + auth_type + " not supported";
+            }
+            params = _.merge({}, params, auth_handler.get_params(this));
+            // TODO: allow auth_handler to return OdooClass?
             return new OdooClass(params);
         },
         loadConfig: function (force) {
