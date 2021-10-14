@@ -6,10 +6,10 @@
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
+
 export var LoginPage = Vue.component("login-page", {
     data: function () {
         return {
-            apikey: "",
             error: "",
         };
     },
@@ -28,28 +28,9 @@ export var LoginPage = Vue.component("login-page", {
         },
     },
     methods: {
-        login: function (evt) {
-            evt.preventDefault();
-            // Call odoo application load => set the result in the local storage in json
-            this.error = "";
-            this.$root.apikey = this.apikey;
-            this.$root
-                ._loadConfig()
-                .catch((error) => {
-                    this._handle_invalid_key();
-                })
-                .then(() => {
-                    // TODO: shall we do this in $root._loadRoutes?
-                    if (this.$root.authenticated) {
-                        this.$router.push({name: "home"});
-                    } else {
-                        this._handle_invalid_key();
-                    }
-                });
-        },
-        _handle_invalid_key() {
-            this.error = this.$t("screen.login.error.api_key_invalid");
-            this.$root.apikey = "";
+        login_form_component_name() {
+            const name = "login-" + this.$root.app_info.auth_type;
+            return name;
         },
     },
     template: `
@@ -74,22 +55,9 @@ export var LoginPage = Vue.component("login-page", {
                 justify="center">
                 <v-col cols="12" sm="8" md="4">
                     <div class="login-wrapper">
-                        <v-form v-on:submit="login">
-                            <v-text-field
-                                name="apikey"
-                                v-model="apikey"
-                                :label="$t('screen.login.api_key_label')"
-                                :placeholder="$t('screen.login.api_key_placeholder')"
-                                autofocus
-                                autocomplete="off"></v-text-field>
-                            <div class="button-list button-vertical-list full">
-                                <v-row align="center">
-                                    <v-col class="text-center" cols="12">
-                                        <v-btn color="success" type="submit">{{ $t('screen.login.action.login') }}</v-btn>
-                                    </v-col>
-                                </v-row>
-                            </div>
-                        </v-form>
+                        <component
+                            :is="login_form_component_name()"
+                            />
                     </div>
                 </v-col>
             </v-row>

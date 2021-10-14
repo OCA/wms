@@ -46,7 +46,6 @@ const register_app_components = function (components) {
 register_app_components(process_registry.all());
 register_app_components(page_registry.all());
 
-config_registry.add("apikey", {default: "", reset_on_clear: true});
 config_registry.add("profile", {default: {}, reset_on_clear: true});
 config_registry.add("appmenu", {default: [], reset_on_clear: true});
 config_registry.add("authenticated", {default: false, reset_on_clear: true});
