@@ -29,6 +29,8 @@
             app_version: "<t t-esc="app_version" />",
             running_env: "<t t-esc="running_env" />",
             demo_mode: <t t-esc="'true' if demo_mode else 'false'" />,
+            auth_type: "<t t-esc="auth_type" />",
+            base_url: "<t t-esc="app_base_url" />",
           };
         </script>
                 <t t-call="shopfloor_mobile_base.shopfloor_app_assets" />
