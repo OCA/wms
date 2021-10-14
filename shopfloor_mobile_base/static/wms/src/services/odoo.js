@@ -9,6 +9,7 @@ export class OdooMixin {
     constructor(params) {
         this.params = params;
         this.apikey = params.apikey;
+        this.base_url = params.base_url;
         this.usage = params.usage;
         this.headers = params.headers || {};
         this.process_menu_id = this.params.process_menu_id;
@@ -100,7 +101,7 @@ export class OdooMixin {
         return headers;
     }
     _get_url(endpoint) {
-        return "/shopfloor/" + endpoint;
+        return this.base_url + endpoint;
     }
     _update_headers(headers) {
         _.merge(this.headers, headers);

@@ -24,8 +24,12 @@ class ShopfloorMobileAppMixin(object):
         )
 
     def _get_main_template_values(self, demo=False, **kw):
+        base_url = "/shopfloor/"
+        auth_type = "api_key"
         return dict(
             app_version=self._get_app_version(),
+            app_base_url=base_url,
+            auth_type=auth_type,
             get_version=self._get_version,
             demo_mode=demo,
             **kw
