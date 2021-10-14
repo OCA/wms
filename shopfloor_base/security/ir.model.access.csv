@@ -5,3 +5,5 @@
 "access_shopfloor_profile_manager","shopfloor profile manager","model_shopfloor_profile","shopfloor_base.group_shopfloor_manager",1,1,1,1
 "access_shopfloor_scenario_users","shopfloor scenario","model_shopfloor_scenario","shopfloor_base.group_shopfloor_user",1,0,0,0
 "access_shopfloor_scenario_manager","shopfloor scenario manager","model_shopfloor_scenario","shopfloor_base.group_shopfloor_manager",1,1,1,1
+"access_shopfloor_app_users","shopfloor app","model_shopfloor_app","",1,0,0,0
+"access_shopfloor_app_manager","shopfloor app manager","model_shopfloor_app","shopfloor_base.group_shopfloor_manager",1,1,1,1
