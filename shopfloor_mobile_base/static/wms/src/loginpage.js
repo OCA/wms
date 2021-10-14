@@ -55,6 +55,20 @@ export var LoginPage = Vue.component("login-page", {
     template: `
     <Screen :screen_info="screen_info" :show-menu="false">
         <v-container>
+            <v-row align="center" v-if="$root.app_info.running_env != 'prod'">
+                <v-col cols="12">
+                    <v-alert
+                        dense
+                        colored-border
+                        type="warning"
+                        border="left"
+                        elevation="2"
+                        :icon="false"
+                        >
+                        <user-session-detail :show_profile="false" :show_user="false" />
+                    </v-alert>
+                </v-col>
+            </v-row>
             <v-row
                 align="center"
                 justify="center">
