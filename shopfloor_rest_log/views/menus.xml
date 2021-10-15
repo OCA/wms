@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="action_shopfloor_log" model="ir.actions.act_window">
+        <field name="name">Logs</field>
+        <field name="res_model">rest.log</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('collection', '=', 'shopfloor.service')]</field>
+        <field name="search_view_id" ref="rest_log.rest_log_search_view" />
+    </record>
+
+    <menuitem
+        action="action_shopfloor_log"
+        id="menu_action_shopfloor_log"
+        parent="shopfloor_base.menu_shopfloor_root"
+        groups="base.group_no_one"
+        sequence="30"
+    />
+</odoo>
