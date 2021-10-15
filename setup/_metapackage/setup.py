@@ -21,6 +21,7 @@ setuptools.setup(
         'odoo14-addon-shopfloor_mobile',
         'odoo14-addon-shopfloor_mobile_base',
         'odoo14-addon-shopfloor_packing_info',
+        'odoo14-addon-shopfloor_rest_log',
         'odoo14-addon-shopfloor_workstation',
         'odoo14-addon-shopfloor_workstation_mobile',
         'odoo14-addon-stock_available_to_promise_release',
