@@ -212,9 +212,13 @@ new Vue({
             });
         },
         logout: function () {
+            // TODO: we should have events for login too
+            // and hook to them to call _loadConfig automatically
+            this.trigger("logout:before");
             this.authenticated = false;
             this._clearAppData();
             this.$router.push({name: "login"});
+            this.trigger("logout:after");
         },
         // Likely not needed anymore
         loadJS: function (url, script_id) {
