@@ -123,6 +123,11 @@ msgid "Bin %s doesn't exist"
 msgstr "Compartimento %s no existe"
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking__bulk_line_count
+msgid "Bulk Line Count"
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Canceled, you can scan a new pack."
@@ -560,6 +565,11 @@ msgid "Operation's already running. Would you like to take it over?"
 msgstr "La operación ya está en marcha. ¿Le gustaría hacerse cargo?"
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking__package_level_count
+msgid "Package Level Count"
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid "Package cancelled"
@@ -985,6 +995,17 @@ msgstr ""
 #: model:ir.model.fields,help:shopfloor.field_stock_picking_batch__move_line_count
 msgid "Technical field. Indicates number of move lines included."
 msgstr "Campo técnico. Indica el número de líneas de movimiento incluidas."
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_stock_picking__bulk_line_count
+msgid ""
+"Technical field. Indicates number of move lines without package included."
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_stock_picking__package_level_count
+msgid "Technical field. Indicates number of package_level included."
+msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking_batch__picking_count
