@@ -1,0 +1,14 @@
+<odoo noupdate="1">
+    <record id="shopfloor_menu_delivery_shipment" model="shopfloor.menu">
+        <field name="name">Delivery with shipment</field>
+        <field name="sequence">55</field>
+        <field
+            name="scenario_id"
+            ref="shopfloor_delivery_shipment.scenario_delivery_shipment"
+        />
+        <field
+            name="picking_type_ids"
+            eval="[(4, ref('shopfloor.picking_type_delivery_demo'))]"
+        />
+    </record>
+</odoo>

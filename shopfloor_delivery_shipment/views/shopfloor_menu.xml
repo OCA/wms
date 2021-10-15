@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+  <record id="shopfloor_menu_form_view" model="ir.ui.view">
+    <field name="model">shopfloor.menu</field>
+    <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_form_view" />
+    <field name="arch" type="xml">
+      <group name="options" position="inside">
+              <group
+                    name="shipment_advice_create"
+                    attrs="{'invisible': [('shipment_advice_create_is_possible', '=', False)]}"
+                >
+                  <field name="shipment_advice_create_is_possible" invisible="1" />
+                  <field name="allow_shipment_advice_create" />
+              </group>
+      </group>
+    </field>
+  </record>
+
+</odoo>
