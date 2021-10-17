@@ -1,4 +1,3 @@
-
 [MASTER]
 load-plugins=pylint_odoo
 score=n
