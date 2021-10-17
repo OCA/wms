@@ -1,15 +1,13 @@
-
-[![Runboat](https://img.shields.io/badge/runboat-Try%20me-875A7B.png)](https://runboat.odoo-community.org/builds?repo=OCA/wms&target_branch=16.0)
-[![Pre-commit Status](https://github.com/OCA/wms/actions/workflows/pre-commit.yml/badge.svg?branch=16.0)](https://github.com/OCA/wms/actions/workflows/pre-commit.yml?query=branch%3A16.0)
-[![Build Status](https://github.com/OCA/wms/actions/workflows/test.yml/badge.svg?branch=16.0)](https://github.com/OCA/wms/actions/workflows/test.yml?query=branch%3A16.0)
-[![codecov](https://codecov.io/gh/OCA/wms/branch/16.0/graph/badge.svg)](https://codecov.io/gh/OCA/wms)
-[![Translation Status](https://translation.odoo-community.org/widgets/wms-16-0/-/svg-badge.svg)](https://translation.odoo-community.org/engage/wms-16-0/?utm_source=widget)
+[![Runbot Status](https://runbot.odoo-community.org/runbot/badge/flat/285/15.0.svg)](https://runbot.odoo-community.org/runbot/repo/github-com-oca-wms-285)
+[![Build Status](https://travis-ci.com/OCA/wms.svg?branch=15.0)](https://travis-ci.com/OCA/wms)
+[![codecov](https://codecov.io/gh/OCA/wms/branch/15.0/graph/badge.svg)](https://codecov.io/gh/OCA/wms)
+[![Translation Status](https://translation.odoo-community.org/widgets/wms-15-0/-/svg-badge.svg)](https://translation.odoo-community.org/engage/wms-15-0/?utm_source=widget)
 
 <!-- /!\ do not modify above this line -->
 
 # wms
 
-WMS modules for Odoo
+TODO: add repo description.
 
 <!-- /!\ do not modify below this line -->
 
@@ -17,13 +15,7 @@ WMS modules for Odoo
 
 [//]: # (addons)
 
-Available addons
-----------------
-addon | version | maintainers | summary
---- | --- | --- | ---
-[stock_available_to_promise_release](stock_available_to_promise_release/) | 16.0.1.0.0 |  | Release Operations based on available to promise
-[stock_dynamic_routing](stock_dynamic_routing/) | 16.0.1.0.1 |  | Dynamic routing of stock moves
-[stock_picking_completion_info](stock_picking_completion_info/) | 16.0.1.0.1 |  | Display on current document completion information according to next operations
+This part will be replaced when running the oca-gen-addons-table script from OCA/maintainer-tools.
 
 [//]: # (end addons)
 
@@ -33,11 +25,12 @@ addon | version | maintainers | summary
 
 This repository is licensed under [AGPL-3.0](LICENSE).
 
-However, each module can have a totally different license, as long as they adhere to Odoo Community Association (OCA)
+However, each module can have a totally different license, as long as they adhere to OCA
 policy. Consult each module's `__manifest__.py` file, which contains a `license` key
 that explains its license.
 
 ----
+
 OCA, or the [Odoo Community Association](http://odoo-community.org/), is a nonprofit
 organization whose mission is to support the collaborative development of Odoo features
 and promote its widespread use.
