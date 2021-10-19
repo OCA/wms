@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-07-24 18:49+0000\n"
+"PO-Revision-Date: 2021-10-19 23:35+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -125,7 +125,7 @@ msgstr "Compartimento %s no existe"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__bulk_line_count
 msgid "Bulk Line Count"
-msgstr ""
+msgstr "Cuenta de Líneas de Bultos"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -567,7 +567,7 @@ msgstr "La operación ya está en marcha. ¿Le gustaría hacerse cargo?"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__package_level_count
 msgid "Package Level Count"
-msgstr ""
+msgstr "Cuental del Nivel de Paquete"
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
@@ -1001,11 +1001,12 @@ msgstr "Campo técnico. Indica el número de líneas de movimiento incluidas."
 msgid ""
 "Technical field. Indicates number of move lines without package included."
 msgstr ""
+"Campo técnico. Indica el número de lineas de movimiento sin paquete incluído."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking__package_level_count
 msgid "Technical field. Indicates number of package_level included."
-msgstr ""
+msgstr "Campo técnico. Indica el número del package_level incluído."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking_batch__picking_count
