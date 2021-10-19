@@ -88,7 +88,7 @@ class ShopfloorMobileAppMixin(object):
             return "dev"
 
     def _get_app_version(self):
-        return self._get_version("shopfloor_mobile_base", module_path=self.module_path)
+        return self._get_version("shopfloor_mobile_base")
 
     def _get_running_env(self):
         return RUNNING_ENV
