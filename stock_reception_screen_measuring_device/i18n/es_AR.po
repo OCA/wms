@@ -6,109 +6,111 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2021-10-20 04:35+0000\n"
+"Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.3.2\n"
 
 #. module: stock_reception_screen_measuring_device
 #: model:ir.model.fields,help:stock_reception_screen_measuring_device.field_stock_reception_screen__scan_requested
 msgid "A scan from the measuring device was requested"
-msgstr ""
+msgstr "Se solicitó un escaneo del dispositivo de medición"
 
 #. module: stock_reception_screen_measuring_device
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen_measuring_device.stock_reception_screen_view_form
 msgid "Cancel Measure"
-msgstr ""
+msgstr "Cancelar Medición"
 
 #. module: stock_reception_screen_measuring_device
 #: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_measuring_device__is_default
 msgid "Default"
-msgstr ""
+msgstr "Predeterminado"
 
 #. module: stock_reception_screen_measuring_device
 #: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_stock_reception_screen__display_package_dimensions
 msgid "Dimensions (lxhxw)"
-msgstr ""
+msgstr "Dimensiones (lxalxan)"
 
 #. module: stock_reception_screen_measuring_device
 #: model:ir.model.fields,help:stock_reception_screen_measuring_device.field_stock_reception_screen__display_package_dimensions
 msgid "Dimensions of the package in mm (length x height x width)"
-msgstr ""
+msgstr "Dimensiones del paquete en mm (largo x alto x ancho)"
 
 #. module: stock_reception_screen_measuring_device
 #: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_measuring_device__display_name
 #: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_stock_reception_screen__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Mostrar Nombre"
 
 #. module: stock_reception_screen_measuring_device
 #: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_measuring_device__id
 #: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_stock_reception_screen__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: stock_reception_screen_measuring_device
 #: model:ir.model.fields,help:stock_reception_screen_measuring_device.field_stock_reception_screen__package_has_missing_dimensions
 msgid "Indicates if the package have any measurement missing."
-msgstr ""
+msgstr "Indica si al paquete le falta alguna medida."
 
 #. module: stock_reception_screen_measuring_device
 #: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_measuring_device____last_update
 #: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_stock_reception_screen____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Última Modificación el"
 
 #. module: stock_reception_screen_measuring_device
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen_measuring_device.stock_reception_screen_view_form
 msgid "Measure Current Packaging"
-msgstr ""
+msgstr "Medida del Paquete Actual"
 
 #. module: stock_reception_screen_measuring_device
 #: code:addons/stock_reception_screen_measuring_device/models/stock_reception_screen.py:0
 #, python-format
 msgid "Measurement machine already in use."
-msgstr ""
+msgstr "La máquina de medición se encuentra en uso."
 
 #. module: stock_reception_screen_measuring_device
 #: model:ir.model,name:stock_reception_screen_measuring_device.model_measuring_device
 msgid "Measuring and Weighing Device"
-msgstr ""
+msgstr "Dispositivo de Medición y Pesaje"
 
 #. module: stock_reception_screen_measuring_device
 #: code:addons/stock_reception_screen_measuring_device/models/stock_reception_screen.py:0
 #, python-format
 msgid "No default device set, please configure one."
-msgstr ""
+msgstr "No hay ningún dispositivo predeterminado, configure uno."
 
 #. module: stock_reception_screen_measuring_device
 #: code:addons/stock_reception_screen_measuring_device/models/measuring_device.py:0
 #, python-format
 msgid "Only one measuring device can be the default one."
-msgstr ""
+msgstr "Solo un dispositivo de medición puede ser el predeterminado."
 
 #. module: stock_reception_screen_measuring_device
 #: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_stock_reception_screen__package_has_missing_dimensions
 msgid "Package Requires Measures?"
-msgstr ""
+msgstr "¿El Paquete Requiere Medidas?"
 
 #. module: stock_reception_screen_measuring_device
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen_measuring_device.stock_reception_screen_view_form
 msgid "Refresh"
-msgstr ""
+msgstr "Recargar"
 
 #. module: stock_reception_screen_measuring_device
 #: model:ir.model.fields,field_description:stock_reception_screen_measuring_device.field_stock_reception_screen__scan_requested
 msgid "Scan Requested"
-msgstr ""
+msgstr "Escaneo Solicitado"
 
 #. module: stock_reception_screen_measuring_device
 #: model:ir.model,name:stock_reception_screen_measuring_device.model_stock_reception_screen
 msgid "Stock Reception Screen"
-msgstr ""
+msgstr "Pantalla de Recepción de Inventario"
 
 #. module: stock_reception_screen_measuring_device
 #: model:ir.model.fields,help:stock_reception_screen_measuring_device.field_measuring_device__is_default
@@ -116,3 +118,5 @@ msgid ""
 "The device set as the default one will be the one used in the reception "
 "screen."
 msgstr ""
+"El dispositivo configurado como predeterminado será el que se utilice en la "
+"pantalla de recepción."
