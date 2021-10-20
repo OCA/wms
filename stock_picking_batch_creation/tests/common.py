@@ -103,7 +103,9 @@ class ClusterPickingCommonFeatures(SavepointCase):
         )
 
     @classmethod
-    def _create_device(cls, name, min_volume, max_volume, max_weight, nbr_bins, sequence):
+    def _create_device(
+        cls, name, min_volume, max_volume, max_weight, nbr_bins, sequence
+    ):
         return cls.env["stock.device.type"].create(
             {
                 "name": name,

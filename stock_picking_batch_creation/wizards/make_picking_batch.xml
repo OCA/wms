@@ -17,12 +17,12 @@
                     </div>
                     <label for="stock_device_type_ids" colspan="2" />
                     <div colspan="2">
-                    <field name="stock_device_type_ids">
-                        <tree>
-                        <field name="name" />
-                        <field name="sequence" />
-                        </tree>
-                    </field>
+                        <field name="stock_device_type_ids">
+                            <tree>
+                                <field name="name" />
+                                <field name="sequence" />
+                            </tree>
+                        </field>
                     </div>
                     <label for="user_id" colspan="2" />
                     <div colspan="2">
@@ -42,11 +42,11 @@
                 </group>
                 <footer>
                     <button
-            name="create_batch"
-            string="Create batch picking"
-            class="btn-primary"
-            type="object"
-          />
+                        name="create_batch"
+                        string="Create batch picking"
+                        class="btn-primary"
+                        type="object"
+                    />
                     <button string="Cancel" class="btn-default" special="cancel" />
                 </footer>
             </form>

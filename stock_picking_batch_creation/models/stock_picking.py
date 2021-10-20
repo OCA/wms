@@ -16,7 +16,17 @@ class StockPicking(models.Model):
     )
 
     user_id = fields.Many2one("res.users", string="Responsible", readonly=True)
-    total_weight_batch_picking = fields.Float(string= "Weight",help="Indicates total weight of transfers included.")
-    total_volume_batch_picking = fields.Float(string= "Volume",help="Indicates total volume of transfers included.")
-    nbr_bins_batch_picking = fields.Integer(string= "Number of compartments", help="Indicates the bins occupied by the picking on the device.")
-    nbr_picking_lines = fields.Integer(string= "Number of lines", help="Indicates the picking lines ready for preparation.")
+    total_weight_batch_picking = fields.Float(
+        string="Weight", help="Indicates total weight of transfers included."
+    )
+    total_volume_batch_picking = fields.Float(
+        string="Volume", help="Indicates total volume of transfers included."
+    )
+    nbr_bins_batch_picking = fields.Integer(
+        string="Number of compartments",
+        help="Indicates the bins occupied by the picking on the device.",
+    )
+    nbr_picking_lines = fields.Integer(
+        string="Number of lines",
+        help="Indicates the picking lines ready for preparation.",
+    )

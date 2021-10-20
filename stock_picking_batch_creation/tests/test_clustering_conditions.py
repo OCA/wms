@@ -68,15 +68,11 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
             candidates_pickings[0], device
         )
         self.assertFalse(selected_pickings)
-        self.make_picking_batch._check_first_picking(
-            candidates_pickings[0], device
-        )
+        self.make_picking_batch._check_first_picking(candidates_pickings[0], device)
         (
             selected_pickings,
             unselected_pickings,
-        ) = self.make_picking_batch._apply_limits(
-            candidates_pickings, device
-        )
+        ) = self.make_picking_batch._apply_limits(candidates_pickings, device)
         self.assertTrue(selected_pickings)
         self.assertEqual(len(selected_pickings), 3)
         self.assertTrue(unselected_pickings)
@@ -107,7 +103,6 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         with self.assertRaises(UserError):
             self.make_picking_batch._create_batch()
 
-
     def test_one_picking_on_another_device(self):
         self.p1.write(
             {"volume": 10.0, "length": 10, "height": 1, "width": 1, "weight": 1}
@@ -118,21 +113,19 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         self.p5.write(
             {"volume": 120.0, "length": 120, "height": 1, "width": 1, "weight": 1}
         )
-        self.device1.write(
-            {"nbr_bins": 8}
-        )
+        self.device1.write({"nbr_bins": 8})
         self._create_picking_pick_and_assign(
-            self.picking_type_1.id, products= self.p5, priority="0"
+            self.picking_type_1.id, products=self.p5, priority="0"
         )
-        pick_on_another_device = self.env["stock.picking"].search([("product_id", "=", self.p5.id)])
+        pick_on_another_device = self.env["stock.picking"].search(
+            [("product_id", "=", self.p5.id)]
+        )
         candidates_pickings = self.make_picking_batch._search_pickings()
         device = self.make_picking_batch._compute_device_to_use(candidates_pickings[0])
         (
             selected_pickings,
             unselected_pickings,
-        ) = self.make_picking_batch._apply_limits(
-            candidates_pickings, device
-        )
+        ) = self.make_picking_batch._apply_limits(candidates_pickings, device)
         self.assertTrue(selected_pickings)
         self.assertEqual(len(selected_pickings), 3)
         self.assertTrue(unselected_pickings)
