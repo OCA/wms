@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<odoo>
+  <record model="ir.ui.view" id="view_users_form">
+    <field name="name">res.users.form.shopfloor.workstation.delivery.printer</field>
+    <field name="model">res.users</field>
+    <field name="inherit_id" ref="base_report_to_printer.view_users_form" />
+    <field name="arch" type="xml">
+      <xpath expr="//group[@name='printing']" position="inside">
+        <field name="default_label_printer_id" options="{'no_create': True}" />
+      </xpath>
+    </field>
+  </record>
+
+  <record model="ir.ui.view" id="view_users_form_simple_modif">
+    <field
+            name="name"
+        >res.users.form.simple.shopfloor.workstation.delivery.printer</field>
+    <field name="model">res.users</field>
+    <field
+            name="inherit_id"
+            ref="base_report_to_printer.view_users_form_simple_modif"
+        />
+    <field name="arch" type="xml">
+      <xpath expr="//group[@name='printing']" position="inside">
+        <field
+                    name="default_label_printer_id"
+                    readonly="0"
+                    options="{'no_create': True}"
+                />
+      </xpath>
+    </field>
+  </record>
+</odoo>
