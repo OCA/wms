@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<odoo>
+  <record model="ir.ui.view" id="shopfloor_workstation_form_view">
+    <field name="name">shopfloor.workstation.form.workstation.label.printer</field>
+    <field name="model">shopfloor.workstation</field>
+    <field
+            name="inherit_id"
+            ref="shopfloor_workstation.shopfloor_workstation_form_view"
+        />
+    <field name="arch" type="xml">
+      <field name="printing_printer_id" position="after">
+        <field name="default_label_printer_id" options="{'no_create': True}" />
+      </field>
+    </field>
+  </record>
+
+</odoo>
