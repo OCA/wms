@@ -1,1 +1,4 @@
 freezegun
+odoo10-addon-product-packaging-dimension @ git+https://github.com/oca/product-attribute.git@refs/pull/695/head#subdirectory=setup/product_packaging_dimension
+odoo10-addon-product-total-weight-from-packaging @ git+https://github.com/oca/product-attribute.git@refs/pull/906/head#subdirectory=setup/product_total_weight_from_packaging
+odoo10-addon-stock-packaging-calculator @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/1236/head#subdirectory=setup/stock_packaging_calculator
