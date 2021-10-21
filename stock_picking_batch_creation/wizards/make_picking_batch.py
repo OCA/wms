@@ -7,6 +7,8 @@ import math
 from odoo import _, api, fields, models, tools
 from odoo.exceptions import UserError
 
+from ..exceptions import NoPickingCandidateError, NoSuitableDeviceError
+
 
 class MakePickingBatch(models.TransientModel):
 
@@ -38,7 +40,7 @@ class MakePickingBatch(models.TransientModel):
     @api.multi
     def create_batch(self):
         self.ensure_one()
-        batch = self._create_batch()
+        batch = self._create_batch(raise_if_not_possible=True)
         action = {
             "type": "ir.actions.act_window",
             "name": batch.name,
@@ -102,19 +104,23 @@ class MakePickingBatch(models.TransientModel):
         pickings = self.env["stock.picking"].browse(ids)
         return pickings
 
-    def _create_batch(self):
+    def _create_batch(self, raise_if_not_possible=False):
         user = self.user_id if self.user_id else self.env.user
         device = None
         candidates_pickings_to_batch = self._candidates_pickings_to_batch(user=user)
         if not candidates_pickings_to_batch:
-            raise UserError(_("no candidate pickings to batch"))
+            if raise_if_not_possible:
+                raise NoPickingCandidateError()
+            return self.env["stock.picking.wave"].browse()
 
         for picking in candidates_pickings_to_batch:
             device = self._compute_device_to_use(picking)
             if device:
                 break
         if not device:
-            raise UserError(_("no device found for batch picking"))
+            if raise_if_not_possible:
+                raise NoSuitableDeviceError()
+            return self.env["stock.picking.wave"].browse()
 
         candidates_pickings_to_batch = self._exclude_first_unfit_pickings_on_device(
             candidates_pickings_to_batch, picking

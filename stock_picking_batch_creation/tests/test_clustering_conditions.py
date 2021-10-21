@@ -4,6 +4,7 @@
 
 from odoo.exceptions import UserError
 
+from ..exceptions import NoSuitableDeviceError
 from .common import ClusterPickingCommonFeatures
 
 
@@ -100,8 +101,8 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
                 break
         self.assertFalse(device)
 
-        with self.assertRaises(UserError):
-            self.make_picking_batch._create_batch()
+        with self.assertRaises(NoSuitableDeviceError):
+            self.make_picking_batch._create_batch(raise_if_not_possible=True)
 
     def test_one_picking_on_another_device(self):
         self.p1.write(
