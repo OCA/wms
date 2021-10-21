@@ -8,7 +8,7 @@ from odoo.tests.common import Form
 from .common import CommonCase
 
 
-class TestShopfloorRecords(CommonCase):
+class TestShopfloorScenario(CommonCase):
     @classmethod
     def setUpClassUsers(cls):
         super().setUpClassUsers()
