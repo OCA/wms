@@ -26,7 +26,6 @@ export var HomePage = Vue.component("home-page", {
             location.reload();
         },
     },
-    props: ["routes"],
     template: `
         <Screen :screen_info="{title: $t('screen.home.main_title'), klass: 'home'}" :show-menu="false">
             <v-list v-if="$root.has_profile">
