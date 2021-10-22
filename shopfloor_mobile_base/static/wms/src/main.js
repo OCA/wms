@@ -273,8 +273,19 @@ new Vue({
                 document.getElementsByTagName("head")[0].appendChild(script);
             }
         },
-        getNav: function () {
-            return _.result(this, "appmenu.menus", []);
+        getNav: function (menu_type = "all") {
+            const app_nav = _.result(this, "appmenu.menus", []);
+            const extra_nav = process_registry
+                .for_menu(menu_type)
+                .concat(page_registry.for_menu(menu_type));
+            return {
+                app_nav: app_nav,
+                // These items have no ID or `scenario` key.
+                // NOTE: items coming from process registry
+                // might be duplicated of the ones in app_nav.
+                // Register them wisely.
+                extra_nav: extra_nav,
+            };
         },
         /*
         Trigger and event on the event hub.
