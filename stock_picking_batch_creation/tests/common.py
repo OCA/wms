@@ -26,12 +26,12 @@ class ClusterPickingCommonFeatures(SavepointCase):
         cls.warehouse_1 = cls.env.ref("stock.warehouse0")
         picking_sequence = cls.warehouse_1.pick_type_id.sequence_id
 
-        cls.device1 = cls._create_device("device1", 10, 50, 100, 6, 50)
+        cls.device1 = cls._create_device("device1", 2, 50, 100, 6, 100)
         cls.device2 = cls._create_device("device2", 70, 190, 250, 10, 70)
-        cls.device3 = cls._create_device("device3", 30, 100, 150, 1, 100)
-        cls.device4 = cls._create_device("device4", 30, 100, 150, 3, 50)
+        cls.device3 = cls._create_device("device3", 30, 100, 150, 1, 50)
+        cls.device4 = cls._create_device("device4", 30, 100, 150, 3, 100)
         cls.device5 = cls._create_device("device5", 10, 70, 100, 10, 70)
-        cls.device6 = cls._create_device("device6", 50, 200, 300, 15, 100)
+        cls.device6 = cls._create_device("device6", 50, 200, 300, 15, 50)
 
         cls.picking_type_1 = cls.env["stock.picking.type"].create(
             {

@@ -2,8 +2,6 @@
 # Copyright 2021 ACSONE SA/NV
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo.exceptions import UserError
-
 from ..exceptions import NoSuitableDeviceError
 from .common import ClusterPickingCommonFeatures
 
@@ -28,27 +26,11 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
     def test_device_with_one_bin(self):
         candidates_pickings = self.make_picking_batch._search_pickings()
         device = self.make_picking_batch._compute_device_to_use(candidates_pickings[0])
-        selected_pickings = self.make_picking_batch._check_number_of_available_bins(
-            candidates_pickings[0], device
+        selected_pickings, unselected_pickings = self.make_picking_batch._apply_limits(
+            candidates_pickings, device
         )
         self.assertTrue(selected_pickings)
         self.assertEqual(selected_pickings[0], candidates_pickings[0])
-
-    def test_first_pick_breaks_condition(self):
-        self.p1.write({"volume": 5.0, "length": 5, "height": 1, "width": 1})
-        self.p2.write({"volume": 3.0, "length": 3, "height": 1, "width": 1})
-        picks = self._get_picks_by_type(self.picking_type_1)
-        self._add_product_to_picking(picks[0], self.p5)
-        self.make_picking_batch.write({"maximum_number_of_preparation_lines": 2})
-        candidates_pickings = self.make_picking_batch._search_pickings()
-        device = self.make_picking_batch._compute_device_to_use(candidates_pickings[0])
-        selected_pickings = self.make_picking_batch._check_number_of_available_bins(
-            candidates_pickings[0], device
-        )
-        self.assertFalse(selected_pickings)
-
-        with self.assertRaises(UserError):
-            self.make_picking_batch._check_first_picking(candidates_pickings[0], device)
 
     def test_put_3_pickings_in_one_cluster(self):
         self.p1.write(
@@ -65,11 +47,6 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         )
         candidates_pickings = self.make_picking_batch._search_pickings()
         device = self.make_picking_batch._compute_device_to_use(candidates_pickings[0])
-        selected_pickings = self.make_picking_batch._check_number_of_available_bins(
-            candidates_pickings[0], device
-        )
-        self.assertFalse(selected_pickings)
-        self.make_picking_batch._check_first_picking(candidates_pickings[0], device)
         (
             selected_pickings,
             unselected_pickings,
