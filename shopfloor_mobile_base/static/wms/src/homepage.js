@@ -9,7 +9,7 @@ import {demotools} from "./demo/demo.core.js";
 export var HomePage = Vue.component("home-page", {
     computed: {
         navigation() {
-            return this.$root.appmenu.menus;
+            return this.$root.getNav();
         },
     },
     methods: {
