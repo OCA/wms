@@ -1,0 +1,17 @@
+{
+  "projectId": "shopfloor",
+  "baseUrl": "http://localhost:8069/shopfloor_mobile/app/#/",
+  "baseUrlDemo": "http://localhost:8069/shopfloor_mobile/app/demo/#/",
+  "viewportHeight": 700,
+  "viewportWidth": 360,
+  "env": {
+    "auth_type": "apikey"
+  },
+  "TEST_AUTH_DATA": {
+    "auth_user_credentials": {
+      "username": "admin",
+      "password": "admin"
+    },
+    "auth_api_key": "72B044F7AC780DAC"
+  }
+}
