@@ -18,7 +18,11 @@ const routes = [
         name: "home",
         meta: {requiresAuth: true, requiresProfile: true},
     },
-    {path: "/login", component: LoginPage, name: "login"},
+    {
+        path: "/login",
+        component: LoginPage,
+        name: "login",
+    },
     {
         path: "/settings",
         component: SettingsControlPanel,
