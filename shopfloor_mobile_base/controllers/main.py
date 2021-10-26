@@ -63,8 +63,8 @@ class ShopfloorMobileAppMixin(object):
 
     def _make_app_info(self, shopfloor_app=None, demo=False):
         base_url = shopfloor_app.api_route + "/" if shopfloor_app else "/shopfloor/"
-        # TODO: get auth from app (requires rest routes pluggability)
-        auth_type = "user"
+        # TODO: shopfloor_app should be mandatory at this stage.
+        auth_type = shopfloor_app.auth_type
         return dict(
             base_url=base_url,
             auth_type=auth_type,
@@ -173,6 +173,8 @@ class ShopfloorMobileAppController(http.Controller, ShopfloorMobileAppMixin):
     def load_app_backward(self, demo=False):
         # Backward compat redirect to the 1st matching app if any.
         model = http.request.env["shopfloor.app"]
+        # TODO: create a default app and redirect to it automatically.
+        # Then make `shopfloor_app` required at every step in `_load_app`.
         app = model.search([], limit=1)
         if app:
             return http.redirect_with_hash(app.url, code=301)
