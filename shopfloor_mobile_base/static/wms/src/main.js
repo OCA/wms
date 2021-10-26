@@ -219,6 +219,9 @@ new Vue({
             this.$router.push({name: "login"});
             this.trigger("logout:after");
         },
+        is_authenticated: function () {
+            return this.authenticated ? true : false;
+        },
         // Likely not needed anymore
         loadJS: function (url, script_id) {
             if (script_id && !document.getElementById(script_id)) {
