@@ -13,6 +13,7 @@ import {config_registry} from "./services/config_registry.js";
 import {process_registry} from "./services/process_registry.js";
 import {page_registry} from "./services/page_registry.js";
 import {color_registry} from "./services/color_registry.js";
+import {auth_handler_registry} from "./services/auth_handler_registry.js";
 import {Odoo, OdooMocked} from "./services/odoo.js";
 import VueSuperMethod from "./lib/vue-super-call.js";
 
@@ -132,9 +133,14 @@ new Vue({
     },
     methods: {
         getOdoo: function (odoo_params) {
-            const params = _.defaults({}, odoo_params, {
-                apikey: this.apikey,
+            let params = _.defaults({}, odoo_params, {
                 debug: this.demo_mode,
+                base_url: this.app_info.base_url,
+                // TODO: move out to its own handler
+                // when full aut decoupling happens
+                headers: {
+                    "API-KEY": this.apikey,
+                },
             });
             let OdooClass = null;
             if (this.demo_mode) {
@@ -142,6 +148,13 @@ new Vue({
             } else {
                 OdooClass = Odoo;
             }
+            const auth_type = this.app_info.auth_type;
+            const auth_handler = auth_handler_registry.get(auth_type);
+            if (_.isUndefined(auth_handler)) {
+                throw "Auth type '" + auth_type + " not supported";
+            }
+            params = _.merge({}, params, auth_handler.get_params(this));
+            // TODO: allow auth_handler to return OdooClass?
             return new OdooClass(params);
         },
         loadConfig: function (force) {
@@ -190,16 +203,22 @@ new Vue({
             const self = this;
             const odoo = self.getOdoo({
                 usage: "user",
-                profile_id: this.profile.id,
+                headers: {
+                    "SERVICE-CTX-PROFILE-ID": this.profile.id,
+                },
             });
             return odoo.call("menu").then(function (result) {
                 self.appmenu = result.data;
             });
         },
         logout: function () {
+            // TODO: we should have events for login too
+            // and hook to them to call _loadConfig automatically
+            this.trigger("logout:before");
             this.authenticated = false;
             this._clearAppData();
             this.$router.push({name: "login"});
+            this.trigger("logout:after");
         },
         // Likely not needed anymore
         loadJS: function (url, script_id) {

@@ -133,7 +133,7 @@ Vue.component("Screen", {
             </v-btn>
             <app-bar-actions v-if="$root.authenticated"/>
         </v-app-bar>
-        <v-content :class="screen_content_class">
+        <v-main :class="screen_content_class">
 
             <div class="notifications">
                 <slot name="notifications">
@@ -167,7 +167,7 @@ Vue.component("Screen", {
             <div class="footer" v-if="$slots.footer">
                 <slot name="footer">Optional footer - no content</slot>
             </div>
-        </v-content>
+        </v-main>
     </v-app>
     `,
 });
