@@ -11,6 +11,7 @@ export class AuthHandlerMixin {
     get_params() {
         return {};
     }
+    // TODO: document on_login and on_logout
 }
 
 /**

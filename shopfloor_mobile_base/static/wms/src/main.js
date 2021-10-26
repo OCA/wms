@@ -147,14 +147,18 @@ new Vue({
             } else {
                 OdooClass = Odoo;
             }
+            const auth_handler = this._get_auth_handler();
+            params = _.merge({}, params, auth_handler.get_params(this));
+            // TODO: allow auth_handler to return OdooClass?
+            return new OdooClass(params);
+        },
+        _get_auth_handler: function (force) {
             const auth_type = this.app_info.auth_type;
             const auth_handler = auth_handler_registry.get(auth_type);
             if (_.isUndefined(auth_handler)) {
                 throw "Auth type '" + auth_type + " not supported";
             }
-            params = _.merge({}, params, auth_handler.get_params(this));
-            // TODO: allow auth_handler to return OdooClass?
-            return new OdooClass(params);
+            return auth_handler;
         },
         loadConfig: function (force) {
             if (this.appconfig && !force) {
@@ -210,14 +214,44 @@ new Vue({
                 self.appmenu = result.data;
             });
         },
+        login: function (evt, data) {
+            const self = this;
+            this.trigger("login:before");
+            const auth_handler = this._get_auth_handler();
+            if (!_.isUndefined(auth_handler.on_login)) {
+                auth_handler
+                    .on_login(this, evt, data)
+                    .then(this._on_login)
+                    .catch((error) => {
+                        self.trigger("login:failure", error);
+                    });
+            }
+        },
+        _on_login: function () {
+            const self = this;
+            this._loadConfig().then(function () {
+                self.authenticated = true;
+                self.trigger("login:success");
+            });
+        },
         logout: function () {
-            // TODO: we should have events for login too
-            // and hook to them to call _loadConfig automatically
             this.trigger("logout:before");
+            const self = this;
+            const auth_handler = this._get_auth_handler();
+            if (!_.isUndefined(auth_handler.on_logout)) {
+                auth_handler
+                    .on_logout(this)
+                    .then(this._on_logout)
+                    .catch(function () {
+                        self.trigger("logout:failure");
+                    });
+            }
+        },
+        _on_logout: function () {
             this.authenticated = false;
             this._clearAppData();
             this.$router.push({name: "login"});
-            this.trigger("logout:after");
+            this.trigger("logout:success");
         },
         is_authenticated: function () {
             return this.authenticated ? true : false;

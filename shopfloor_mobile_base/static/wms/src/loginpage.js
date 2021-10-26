@@ -13,6 +13,24 @@ export var LoginPage = Vue.component("login-page", {
             error: "",
         };
     },
+    beforeCreate: function () {
+        const self = this;
+        if (this.$root.is_authenticated()) {
+            self.$router.push({name: "home"});
+        }
+    },
+    mounted: function () {
+        const self = this;
+        this.$root.event_hub.$once("login:before", function () {
+            self.error = "";
+        });
+        this.$root.event_hub.$once("login:success", function () {
+            self.$router.push({name: "home"});
+        });
+        this.$root.event_hub.$once("login:failure", function () {
+            self._handle_invalid_login();
+        });
+    },
     computed: {
         screen_info: function () {
             return {
@@ -31,6 +49,9 @@ export var LoginPage = Vue.component("login-page", {
         login_form_component_name() {
             const name = "login-" + this.$root.app_info.auth_type;
             return name;
+        },
+        _handle_invalid_login() {
+            this.error = this.$t("screen.login.error.login_invalid");
         },
     },
     template: `
