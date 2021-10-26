@@ -40,7 +40,7 @@ Vue.component("Screen", {
         },
         screen_app_class() {
             return [
-                this.$root.authenticated ? "authenticated" : "anonymous",
+                this.$root.is_authenticated() ? "authenticated" : "anonymous",
                 this.$root.loading ? "loading" : "",
                 this.$root.demo_mode ? "demo_mode" : "",
                 "env-" + this.$root.app_info.running_env,
@@ -57,7 +57,7 @@ Vue.component("Screen", {
         },
         show_profile_not_ready() {
             return (
-                this.$root.authenticated &&
+                this.$root.is_authenticated() &&
                 this.$route.meta.requiresProfile &&
                 !this.$root.has_profile
             );
@@ -131,7 +131,7 @@ Vue.component("Screen", {
             <v-btn icon v-if="info.current_doc_identifier" @click="$router.push({'name': 'scan_anything', params: {identifier: info.current_doc_identifier}, query: {displayOnly: 1}})">
                 <btn-info-icon color="'#fff'" />
             </v-btn>
-            <app-bar-actions v-if="$root.authenticated"/>
+            <app-bar-actions v-if="$root.is_authenticated()"/>
         </v-app-bar>
         <v-main :class="screen_content_class">
 
