@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="shopfloor_menu_tree_view" model="ir.ui.view">
+    <record id="shopfloor_app_tree_view" model="ir.ui.view">
         <field name="name">shopfloor app tree</field>
         <field name="model">shopfloor.app</field>
         <field name="arch" type="xml">
@@ -17,6 +17,13 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button
+                            type="object"
+                            name="action_open_app"
+                            string="Open app"
+                        />
+                    </div>
                     <field name="active" invisible="1" />
                     <widget
                         name="web_ribbon"
@@ -32,13 +39,13 @@
                         <page name="main" string="Main">
                             <group name="main">
                                 <field name="tech_name" />
+                                <field name="auth_type" />
                             </group>
                             <group name="metadata" string="Metadata">
                                 <field name="short_name" />
                             </group>
                         </page>
                     </notebook>
-                    <button type="object" name="action_open_app" string="Open app" />
                 </sheet>
             </form>
         </field>
