@@ -49,7 +49,7 @@ Vue.component("login-api_key", {
                 })
                 .then(() => {
                     // TODO: shall we do this in $root._loadRoutes?
-                    if (this.$root.authenticated) {
+                    if (this.$root.is_authenticated()) {
                         this.$router.push({name: "home"});
                     } else {
                         this._handle_invalid_key();
