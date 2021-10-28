@@ -4,6 +4,7 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
+import {translation_registry} from "/shopfloor_mobile_base/static/wms/src/services/translation_registry.js";
 import {
     AuthHandlerMixin,
     auth_handler_registry,
@@ -27,7 +28,6 @@ export class UserAuthHandler extends AuthHandlerMixin {
     }
 
     on_login($root, evt, data) {
-        const self = this;
         evt.preventDefault();
         // Call odoo application load => set the result in the local storage in json
         const odoo = $root.getOdoo({base_url: "/session/"});
@@ -36,9 +36,6 @@ export class UserAuthHandler extends AuthHandlerMixin {
             .post("auth/login", data, true)
             .then(function (response) {
                 if (response.error) {
-                    // If there is a need to handle different login error messages
-                    // depending on the response, pass the error as an argument
-                    // to def.reject
                     return def.reject();
                 }
                 return def.resolve();
@@ -108,3 +105,11 @@ Vue.component("login-user", {
     </v-form>
     `,
 });
+
+translation_registry.add("en-US.screen.login.username", "Username");
+translation_registry.add("fr-FR.screen.login.username", "Nom d'utilisateur");
+translation_registry.add("de-DE.screen.login.username", "Benutzername");
+
+translation_registry.add("en-US.screen.login.password", "Password");
+translation_registry.add("fr-FR.screen.login.password", "Mot de passe");
+translation_registry.add("de-DE.screen.login.password", "Passwort");
