@@ -51,7 +51,7 @@ export var LoginPage = Vue.component("login-page", {
             return name;
         },
         _handle_invalid_login() {
-            this.error = this.$t("screen.login.error.login_invalid");
+            this.error = this.$root.$t("screen.login.error.login_invalid");
         },
     },
     template: `

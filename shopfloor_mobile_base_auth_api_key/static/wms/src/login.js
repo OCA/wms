@@ -3,6 +3,7 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
+import {translation_registry} from "/shopfloor_mobile_base/static/wms/src/services/translation_registry.js";
 import {
     AuthHandlerMixin,
     auth_handler_registry,
@@ -21,7 +22,17 @@ export class ApiKeyAuthHandler extends AuthHandlerMixin {
             },
         };
     }
+
+    // on_login($root, evt, data) {
+    // No need for a handler as we set the api_key inside the login method
+    // }
+
+    // on_logout($root) {
+    // No need for a handler as the reset_on_clear flag in the config_registry
+    // is going to flush the api_key on appdata cleanup
+    // }
 }
+
 auth_handler_registry.add(new ApiKeyAuthHandler("api_key"));
 
 /**
@@ -32,33 +43,13 @@ auth_handler_registry.add(new ApiKeyAuthHandler("api_key"));
 Vue.component("login-api_key", {
     data: function () {
         return {
-            error: "",
             apikey: "",
         };
     },
     methods: {
         login: function (evt) {
-            evt.preventDefault();
-            // Call odoo application load => set the result in the local storage in json
-            this.$parent.error = "";
             this.$root.apikey = this.apikey;
-            this.$root
-                ._loadConfig()
-                .catch((error) => {
-                    this._handle_invalid_key();
-                })
-                .then(() => {
-                    // TODO: shall we do this in $root._loadRoutes?
-                    if (this.$root.is_authenticated()) {
-                        this.$router.push({name: "home"});
-                    } else {
-                        this._handle_invalid_key();
-                    }
-                });
-        },
-        _handle_invalid_key() {
-            this.error = this.$t("screen.login.error.api_key_invalid");
-            this.$root.apikey = "";
+            this.$root.login(evt);
         },
     },
     template: `
@@ -81,8 +72,13 @@ Vue.component("login-api_key", {
     `,
 });
 
-// TODO: Add translation
-// login: {
-//     api_key_placeholder: "YOUR_API_KEY_HERE",
-//     api_key_label: "API key",
-// },
+translation_registry.add("en-US.screen.login.api_key_label", "API key");
+translation_registry.add("fr-FR.screen.login.api_key_label", "Clé API");
+translation_registry.add("de-DE.screen.login.api_key_label", "API-Schlüssel");
+
+translation_registry.add("en-US.screen.login.api_key_placeholder", "YOUR_API_KEY_HERE");
+translation_registry.add("fr-FR.screen.login.api_key_placeholder", "VOTRE_CLE_API_ICI");
+translation_registry.add(
+    "de-DE.screen.login.api_key_placeholder",
+    "DEIN_API-SCHLÜSSEL_HIER"
+);

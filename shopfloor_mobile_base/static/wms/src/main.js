@@ -135,11 +135,6 @@ new Vue({
             let params = _.defaults({}, odoo_params, {
                 debug: this.demo_mode,
                 base_url: this.app_info.base_url,
-                // TODO: move out to its own handler
-                // when full aut decoupling happens
-                headers: {
-                    "API-KEY": this.apikey,
-                },
             });
             let OdooClass = null;
             if (this.demo_mode) {
@@ -181,9 +176,9 @@ new Vue({
                     self.appconfig = result.data;
                     self.authenticated = true;
                     self.$storage.set("appconfig", self.appconfig);
+                    return result;
                 } else {
-                    // TODO: any better thing to do here?
-                    console.log(result);
+                    return result;
                 }
             });
         },
@@ -215,6 +210,7 @@ new Vue({
             });
         },
         login: function (evt, data) {
+            evt.preventDefault();
             const self = this;
             this.trigger("login:before");
             const auth_handler = this._get_auth_handler();
@@ -225,13 +221,20 @@ new Vue({
                     .catch((error) => {
                         self.trigger("login:failure", error);
                     });
+            } else {
+                // TODO: we might want to enforce every authentication handler
+                // to provide the on_login handler to avoid such case
+                this._on_login();
             }
         },
         _on_login: function () {
             const self = this;
-            this._loadConfig().then(function () {
-                self.authenticated = true;
-                self.trigger("login:success");
+            this._loadConfig().then(function (result) {
+                if (!result.error) {
+                    self.trigger("login:success");
+                } else {
+                    self.trigger("login:failure");
+                }
             });
         },
         logout: function () {
@@ -245,6 +248,10 @@ new Vue({
                     .catch(function () {
                         self.trigger("logout:failure");
                     });
+            } else {
+                // TODO: we might want to enforce every authentication handler
+                // to provide the on_logout handler to avoid such case
+                this._on_logout();
             }
         },
         _on_logout: function () {
