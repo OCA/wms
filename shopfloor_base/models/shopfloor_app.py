@@ -23,9 +23,16 @@ class ShopfloorApp(models.Model):
     # Unique name
     tech_name = fields.Char(required=True, index=True)
     active = fields.Boolean(default=True)
+    api_route_public = fields.Char(
+        compute="_compute_api_route",
+        help="Base route for endpoints attached to this app, public version.",
+    )
     api_route = fields.Char(
         compute="_compute_api_route",
-        help="Base route for endpoints attached to this app.",
+        help="""
+        Base route for endpoints attached to this app,
+        internal controller-ready version.
+        """,
     )
     url = fields.Char(compute="_compute_url", help="Public URL to use the app.")
     auth_type = fields.Selection(
@@ -34,11 +41,14 @@ class ShopfloorApp(models.Model):
 
     _sql_constraints = [("tech_name", "unique(tech_name)", "tech_name must be unique")]
 
-    _api_route_path = "/shopfloor/"
+    _api_route_path = "/shopfloor/api/"
+    _api_route_path_dynamic_bit = "<tech_name(shopfloor.app):collection>/"
 
+    @api.depends("tech_name")
     def _compute_api_route(self):
         for rec in self:
-            rec.api_route = rec._api_route_path + rec.tech_name
+            rec.api_route_public = rec._api_route_path + rec.tech_name
+            rec.api_route = rec._api_route_path + rec._api_route_path_dynamic_bit
 
     _base_url_path = "/shopfloor/app/"
 
@@ -111,13 +121,15 @@ class ShopfloorApp(models.Model):
 
     def _generate_endpoints_values(self, service, api_route):
         values = []
-        root_path = self.api_route.rstrip("/") + "/" + service._usage
+        root_path = api_route.rstrip("/") + "/" + service._usage
         for name, method in _inspect_methods(service.__class__):
             if not hasattr(method, "routing"):
                 continue
             routing = method.routing
             for routes, http_method in routing["routes"]:
-                method_name = "{}_{}".format(http_method.lower(), name)
+                # TODO: why on base_rest we have this instead of pure method name?
+                # method_name = "{}_{}".format(http_method.lower(), name)
+                method_name = name
                 default_route = root_path + "/" + routes[0].lstrip("/")
                 route_params = dict(
                     route=["{}{}".format(root_path, r) for r in routes],
@@ -133,16 +145,17 @@ class ShopfloorApp(models.Model):
                         service, method_name, default_route, route_params
                     )
                 )
+        return values
 
+    def _generate_endpoints_routes(self, service, rest_endpoint_handler, vals):
         route_handler = self.env["endpoint.route.handler"]
-        for vals in values:
-            endpoint_handler = partial(
-                RestController()._process_method, service._usage, method_name
-            )
-            new_route = route_handler.new(vals)
-            new_route._register_controller(
-                endpoint_handler=endpoint_handler, key=vals["name"]
-            )
+        endpoint_handler = partial(
+            rest_endpoint_handler, service._usage, vals.pop("_method_name")
+        )
+        new_route = route_handler.new(vals)
+        new_route._register_controller(
+            endpoint_handler=endpoint_handler, key=vals["name"]
+        )
 
     def _prepare_endpoint_vals(self, service, method_name, route, routing_params):
         request_method = routing_params["methods"][0]
@@ -155,6 +168,7 @@ class ShopfloorApp(models.Model):
             route=route,
             route_group=self._route_group(),
             auth_type=self.auth_type,
+            _method_name=method_name,
         )
         return endpoint_vals
 
