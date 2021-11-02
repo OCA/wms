@@ -62,7 +62,9 @@ class ShopfloorMobileAppMixin(object):
         }
 
     def _make_app_info(self, shopfloor_app=None, demo=False):
-        base_url = shopfloor_app.api_route + "/" if shopfloor_app else "/shopfloor/"
+        base_url = (
+            shopfloor_app.api_route_public + "/" if shopfloor_app else "/shopfloor/"
+        )
         # TODO: shopfloor_app should be mandatory at this stage.
         auth_type = shopfloor_app.auth_type
         return dict(
