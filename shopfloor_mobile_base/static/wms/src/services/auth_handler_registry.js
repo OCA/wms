@@ -11,6 +11,9 @@ export class AuthHandlerMixin {
     get_params() {
         return {};
     }
+    get_login_component_name($root) {
+        return "login-" + this.$root.app_info.auth_type;
+    }
     // TODO: document on_login and on_logout
 }
 
