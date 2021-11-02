@@ -12,6 +12,9 @@
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "maintainer": ["simahawk"],
     "license": "AGPL-3",
-    "depends": ["shopfloor_mobile_base", "auth_api_key"],
-    "data": ["templates/assets.xml"],
+    "depends": [
+        "shopfloor_mobile_base",
+        "auth_api_key_group",
+    ],
+    "data": ["templates/assets.xml", "views/shopfloor_app.xml"],
 }
