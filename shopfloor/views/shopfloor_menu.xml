@@ -65,9 +65,4 @@
             </field>
         </field>
     </record>
-
-    <menuitem
-        id="shopfloor_base.menu_shopfloor_root"
-        web_icon="shopfloor_base,static/description/icon.png"
-    />
 </odoo>
