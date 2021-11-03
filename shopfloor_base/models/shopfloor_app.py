@@ -21,7 +21,7 @@ class ShopfloorApp(models.Model):
     name = fields.Char(required=True, translate=True)
     short_name = fields.Char(required=True, translate=True)
     # Unique name
-    tech_name = fields.Char(required=True)
+    tech_name = fields.Char(required=True, index=True)
     active = fields.Boolean(default=True)
     api_route = fields.Char(
         compute="_compute_api_route",
