@@ -32,18 +32,22 @@ export class DemoTools {
         this.packaging = [
             this.makePackaging({
                 name: "Little Box",
+                code: "LB",
                 qty: 50,
             }),
             this.makePackaging({
                 name: "Box",
+                code: "BX",
                 qty: 100,
             }),
             this.makePackaging({
                 name: "Big Box",
+                code: "BB",
                 qty: 500,
             }),
             this.makePackaging({
-                name: "Pallette",
+                name: "Pallet",
+                code: "PL",
                 qty: 5000,
             }),
         ];
@@ -176,8 +180,8 @@ export class DemoTools {
     makePackaging(defaults = {}, options = {}) {
         _.defaults(defaults, {
             name: "Packaging",
+            code: "PKG",
             qty: 1,
-            qty_unit: "Unit",
         });
         const rec = this.makeSimpleRecord(defaults, options);
         this.index_record("name", rec, "packaging");
@@ -372,14 +376,17 @@ export class DemoTools {
         _.defaults(options, {
             qty_done_random: true,
         });
-        const qty = this.getRandomInt(100);
+        const product = this.makeProduct();
+        // Always get a multiple of real packaging
+        const random_pkg = this.randomItemFromArray(product.packaging);
+        const qty = random_pkg.qty * this.getRandomInt(10);
         let qty_done = options.qty_done_full ? qty : defaults.qty_done;
         qty_done = options.qty_done_random ? this.getRandomInt(qty) : qty_done;
         return _.defaults({}, defaults, {
             id: this.getRandomInt(),
             quantity: qty,
             qty_done: qty_done,
-            product: this.makeProduct(),
+            product: product,
             lot: this.makeLot(),
             package_src: this.makePack({name_prefix: "PACK-SRC"}),
             package_dest: this.makePack({name_prefix: "PACK-DST"}),
