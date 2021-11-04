@@ -254,6 +254,11 @@ msgid "Last Updated on"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__leaf_child_location_ids
+msgid "Leaf Child Location"
+msgstr ""
+
+#. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__leaf_location_ids
 msgid "Leaf Location"
 msgstr ""
@@ -351,6 +356,11 @@ msgstr ""
 msgid ""
 "Location storage types defined here will be applied on all the children "
 "locations that do not define their own location storage types."
+msgstr ""
+
+#. module: stock_storage_type
+#: model_terms:ir.ui.view,arch_db:stock_storage_type.location_storage_type_form_view
+msgid "Locations"
 msgstr ""
 
 #. module: stock_storage_type
@@ -535,6 +545,11 @@ msgid "Sequence of locations to put-away the package storage type"
 msgstr ""
 
 #. module: stock_storage_type
+#: model_terms:ir.ui.view,arch_db:stock_storage_type.package_storage_location_tree_view
+msgid "Show locations"
+msgstr ""
+
+#. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.location_storage_type_form_view
 msgid "Size restrictions"
 msgstr ""
@@ -686,6 +701,11 @@ msgstr ""
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__leaf_location_ids
+msgid "technical field: all the leaves locations"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,help:stock_storage_type.field_stock_location__leaf_child_location_ids
 msgid "technical field: all the leaves sub-locations"
 msgstr ""
 
