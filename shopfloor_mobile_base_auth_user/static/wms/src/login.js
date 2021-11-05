@@ -27,35 +27,25 @@ export class UserAuthHandler extends AuthHandlerMixin {
         };
     }
 
-    on_login($root, evt, data) {
-        evt.preventDefault();
+    on_login($root, data) {
         // Call odoo application load => set the result in the local storage in json
         const odoo = $root.getOdoo({base_url: "/session/"});
-        const def = $.Deferred();
         return odoo
             .post("auth/login", data, true)
             .then(function (response) {
                 if (response.error) {
-                    return def.reject();
+                    return Promise.reject(response.error);
                 }
-                return def.resolve();
+                return response;
             })
             .catch(function (error) {
-                return def.reject();
+                return Promise.reject(error);
             });
     }
 
     on_logout($root) {
-        const def = $.Deferred();
         const odoo = $root.getOdoo({base_url: "/session/"});
-        return odoo
-            .post("auth/logout", null, true)
-            .then(function () {
-                return def.resolve();
-            })
-            .catch(function () {
-                return def.reject();
-            });
+        return odoo.post("auth/logout", null, true);
     }
 }
 auth_handler_registry.add(new UserAuthHandler("user"));
