@@ -7,7 +7,7 @@
         "Glue module between sale_stock_available_to_promise_release "
         "and stock_dropshipping"
     ),
-    "version": "13.0.1.0.0",
+    "version": "14.0.1.0.0",
     "author": "Camptocamp,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "category": "Stock Management",
