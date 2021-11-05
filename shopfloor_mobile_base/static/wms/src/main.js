@@ -176,10 +176,8 @@ new Vue({
                     self.appconfig = result.data;
                     self.authenticated = true;
                     self.$storage.set("appconfig", self.appconfig);
-                    return result;
-                } else {
-                    return result;
                 }
+                return result;
             });
         },
         _clearConfig: function (reload = true) {
