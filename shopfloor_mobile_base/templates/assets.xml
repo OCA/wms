@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+    @author Simone Orsi <simahawk@gmail.com>
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+-->
+<odoo>
+    <template id="shopfloor_app_assets" name="Shopfloor app assets">
+        <!-- Styles  -->
+        <link
+            id="link_css_gfonts_roboto"
+            t-attf-href="/shopfloor_mobile_base/static/wms/src/css/vendor/google-fonts-roboto.css?v=#{app_version}"
+            rel="stylesheet"
+        />
+        <link
+            id="link_css_materialdesignicons"
+            t-attf-href="/shopfloor_mobile_base/static/wms/src/lib/materialdesign-icons/css/materialdesignicons.min.css?v=#{app_version}"
+            rel="stylesheet"
+        />
+        <link
+            id="link_css_vuetify"
+            t-attf-href="/shopfloor_mobile_base/static/wms/src/lib/vuetify/vuetify.min.css?v=#{app_version}"
+            rel="stylesheet"
+        />
+        <link
+            id="link_css_main"
+            t-attf-href="/shopfloor_mobile_base/static/wms/src/css/main.css?v=#{app_version}"
+            rel="stylesheet"
+        />
+        <!-- External libs -->
+        <script
+            id="script_jquery"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/jquery-3.4.1.slim.min.js?v=#{app_version}"
+        />
+        <script
+            id="script_lodash"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/lodash.js?v=#{app_version}"
+        />
+        <script
+            t-if="not debug"
+            id="script_vue_min"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/vue.min.js?v=#{app_version}"
+        />
+        <script
+            t-if="debug"
+            id="script_vue"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/vue.js?v=#{app_version}"
+        />
+        <script
+            id="script_vue_router"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/vue-router.js?v=#{app_version}"
+        />
+        <!-- https://yarkovaleksei.github.io/vue2-storage/en -->
+        <script
+            id="script_vue_storage"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/vue2-storage.min.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_vue_super_call"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/vue-super-call.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_vue_vuetify"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/vuetify/vuetify.js?v=#{app_version}"
+        />
+        <script
+            id="script_vue_i18n"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/vue-i18n.min.js?v=#{app_version}"
+        />
+        <!-- Custom services, utils, generic scripts -->
+        <script
+            id="script_fetch"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/fetch.js?v=#{app_version}"
+        />
+        <script
+            id="script_service_odoo"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/services/odoo.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_registry_process"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/services/process_registry.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_registry_page"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/services/page_registry.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_registry_translation"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/services/translation_registry.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_i18n_translation_en"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/i18n/i18n.en.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_i18n_translation_fr"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/i18n/i18n.fr.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_i18n_translation_de"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/i18n/i18n.de.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_utils"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/utils.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_page_home"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/homepage.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_page_login"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/loginpage.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_page_language"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/settings/language.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_page_profile"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/settings/profile.js?v=#{app_version}"
+            type="module"
+        />
+        <!-- Global/generic components -->
+        <script
+            id="script_component_screen"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/components/screen.js?v=#{app_version}"
+        />
+        <script
+            id="script_component_misc"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/components/misc.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_component_list"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/components/list.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_component_manual_select"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/components/manual_select.js?v=#{app_version}"
+        />
+        <script
+            id="script_component_input_number_spinner"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/components/input-number-spinner.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_component_priority_widget"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/components/priority-widget.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_component_detail_mixin"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_component_detail_card"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/components/detail/detail_card.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_component_searchbar"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/components/searchbar/searchbar.js?v=#{app_version}"
+        />
+        <script
+            id="script_component_user_confirmation"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/components/userConfirmation/userConfirmation.js?v=#{app_version}"
+        />
+        <script
+            id="script_component_user_information"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/components/userInformation/userInformation.js?v=#{app_version}"
+        />
+        <script
+            id="script_scenario_scan_anything"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/scenario/scan_anything.js?v=#{app_version}"
+            type="module"
+        />
+        <script
+            id="script_scenario_form"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/scenario/form.js?v=#{app_version}"
+            type="module"
+        />
+
+        <t
+            id="new_scenario_hook"
+            t-if="0"
+        >Hook to this element to inject your own scenario</t>
+
+        <script id="script_devtools" t-if="debug or demo_mode">
+            Vue.config.devtools = true
+        </script>
+        <!-- Main app script -->
+        <script
+            id="script_app_main"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/main.js?v=#{app_version}"
+            type="module"
+        />
+    </template>
+    <template id="shopfloor_app_demo_assets" name="Shopfloor app demo assets">
+        <script
+            id="script_demo_core"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/demo/demo.core.js?v=#{app_version}"
+            type="module"
+        />
+        <!--
+        TODO add demo data for non wms stuff
+        <script
+            id="script_demo_scan_anything"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/demo/demo.scan_anything.js?v=#{app_version}"
+            type="module"
+        />
+        -->
+    </template>
+</odoo>

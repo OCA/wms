@@ -1,0 +1,54 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_mobile_base
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2021-04-14 20:46+0000\n"
+"Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
+"Language-Team: none\n"
+"Language: es_AR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.3.2\n"
+
+#. module: shopfloor_mobile_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base.shopfloor_app_main
+msgid ""
+"<strong>\n"
+"          We're sorry but wms doesn't work properly without JavaScript "
+"enabled.\n"
+"          Please enable it to continue.\n"
+"        </strong>"
+msgstr ""
+"<strong>\n"
+"          Lo sentimos, pero WMS no funciona correctamente sin JavaScript "
+"habilitado.\n"
+"           Por favor, activelo para continuar. \n"
+"        </strong>"
+
+#. module: shopfloor_mobile_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base.shopfloor_app_assets
+msgid "Hook to this element to inject your own scenario"
+msgstr "Engánchese a este elemento para inyectar su propio escenario"
+
+#. module: shopfloor_mobile_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base.shopfloor_app_main
+msgid "Shopfloor WMS app"
+msgstr "App WMS Taller"
+
+#. module: shopfloor_mobile_base
+#: model:ir.actions.act_url,name:shopfloor_mobile_base.action_shopfloor_app
+#: model:ir.ui.menu,name:shopfloor_mobile_base.menu_action_shopfloor_app
+msgid "Shopfloor mobile app"
+msgstr "App móvil del Taller"
+
+#. module: shopfloor_mobile_base
+#: model:ir.actions.act_url,name:shopfloor_mobile_base.action_shopfloor_app_demo
+#: model:ir.ui.menu,name:shopfloor_mobile_base.menu_action_shopfloor_app_demo
+msgid "Shopfloor mobile app DEMO"
+msgstr "App móvil del Taller DEMO"
