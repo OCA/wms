@@ -151,7 +151,7 @@ new Vue({
             const auth_type = this.app_info.auth_type;
             const auth_handler = auth_handler_registry.get(auth_type);
             if (_.isUndefined(auth_handler)) {
-                throw "Auth type '" + auth_type + " not supported";
+                throw new Error("Auth type '" + auth_type + "' not supported");
             }
             return auth_handler;
         },
