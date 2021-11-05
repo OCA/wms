@@ -178,6 +178,7 @@ Cypress.Commands.add("wait_for_profile_data", () => {
 
 Cypress.Commands.add("compare_sessionStorage_profiles", (data) => {
     cy.window().then((win) => {
+        cy.wait(300);
         const profile = JSON.parse(win.sessionStorage.getItem("shopfloor_profile"))
             .value;
         const appmenu = JSON.parse(win.sessionStorage.getItem("shopfloor_appmenu"))

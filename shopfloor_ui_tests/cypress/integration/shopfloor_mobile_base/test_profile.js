@@ -10,8 +10,14 @@ describe("Test to make sure that handling different profiles works as expected",
         });
     });
 
-    describe("Fake login", () => {
-        it("Logs in", () => {
+    describe("Selects a profile", () => {
+        // NOTE: This part of the test covers multiple different features
+        // as cypress erases the cookies between each test
+        // and the session_id cookie is required in many of them.
+        // Do not split it as it will break the test.
+
+        it("Navigates to the profile list and selects a profile", () => {
+            // Logs in
             const auth_type = Cypress.env("auth_type");
             cy.get_credentials("correct", auth_type).then((credentials) => {
                 credentials =
@@ -21,34 +27,31 @@ describe("Test to make sure that handling different profiles works as expected",
                               {name: "password", value: credentials.password},
                           ]
                         : [{name: "apikey", value: credentials.apikey}];
+                cy.intercept_user_config();
                 cy.login(credentials);
-            });
-        });
-        it("Goes to the profile page", () => {
-            cy.url().should("eq", Cypress.config("baseUrl"));
-            cy.get(".text-center").children("button").click();
-            cy.contains("Profile -", {matchCase: false}).click();
-            const expected_profiles = ["Demo Profile 1", "Demo Profile 2"];
-            cy.check_profile_list(expected_profiles);
-        });
-    });
-    describe("Test profiles", () => {
-        describe("Test profile 'Demo Profile 1'", () => {
-            it("Selects profile and makes sure the information in session storage corresponds with the information received from the request", () => {
-                cy.intercept_menu_request();
-                const profiles = JSON.parse(
-                    window.sessionStorage.getItem("shopfloor_appconfig")
-                ).value.profiles;
-                const profile = profiles.filter(
-                    (profile) => profile.name === "Demo Profile 1"
-                )[0];
-                cy.activate_profile(profile);
-                cy.wait_for_profile_data().then((res) => {
-                    cy.window()
-                        .its("sessionStorage")
-                        .invoke("getItem", "shopfloor_appmenu")
-                        .should("exist")
-                        .then(() => {
+
+                // Waits for user_config call
+                cy.wait_for({expect_success: true, request_name: "user_config"}).then(
+                    (res) => {
+                        // Goes to the profile page and checks the list of profiles
+                        cy.url().should("eq", Cypress.config("baseUrl"));
+                        cy.get(".text-center").children("button").click();
+                        cy.contains("Profile -", {matchCase: false}).click();
+                        const expected_profiles = ["Demo Profile 1", "Demo Profile 2"];
+                        cy.check_profile_list(expected_profiles);
+
+                        // Clicks on 'Demo Profile 1'
+                        cy.intercept_menu_request();
+
+                        const profiles = res.response.body.data.profiles;
+                        const profile = profiles.filter(
+                            (profile) => profile.name === "Demo Profile 1"
+                        )[0];
+
+                        cy.activate_profile(profile);
+
+                        // Waits for menu call and tests the outcome
+                        cy.wait_for_profile_data().then((res) => {
                             const menu_data = {
                                 profile: profile,
                                 menus: res.response.body.data.menus,
@@ -59,8 +62,13 @@ describe("Test to make sure that handling different profiles works as expected",
 
                             Cypress.env("test_menu_data", menu_data);
                         });
-                });
+                    }
+                );
             });
+        });
+    });
+    describe("Test profiles", () => {
+        describe("Test profile 'Demo Profile 1'", () => {
             it("Checks that the correct scenarios appear in the page", () => {
                 cy.check_profile_scenarios();
                 cy.check_sidebar_scenarios();
@@ -72,20 +80,3 @@ describe("Test to make sure that handling different profiles works as expected",
         });
     });
 });
-// Accept: */*
-// Accept-Encoding: gzip, deflate, br
-// Accept-Language: en-US,en;q=0.9
-// Content-Length: 2
-// Content-Type: application/json
-// Host: localhost:8069
-// Origin: http://localhost:8069
-// Proxy-Connection: keep-alive
-// Referer: http://localhost:8069/shopfloor_mobile/app/
-// sec-ch-ua: "Google Chrome";v="93", " Not;A Brand";v="99", "Chromium";v="93"
-// sec-ch-ua-mobile: ?0
-// sec-ch-ua-platform: "Linux"
-// Sec-Fetch-Dest: empty
-// Sec-Fetch-Mode: cors
-// Sec-Fetch-Site: same-origin
-// SERVICE-CTX-PROFILE-ID: 1
-// User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36

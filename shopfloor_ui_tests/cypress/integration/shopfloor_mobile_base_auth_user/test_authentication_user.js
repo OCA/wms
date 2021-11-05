@@ -64,7 +64,6 @@ describe("Test to make sure that the user can log in and log out", () => {
                 cy.wait_for({expect_success: true, request_name: "user_config"}).then(
                     (res) => {
                         const data = res.response.body.data;
-                        // TODO
                         Cypress.env("test_appconfig", {data});
                     }
                 );
@@ -74,6 +73,7 @@ describe("Test to make sure that the user can log in and log out", () => {
 
     describe("Tests for authenticated user", () => {
         it("Checks that the user has been redirected to the home page", () => {
+            debugger;
             cy.url().should("eq", Cypress.config("baseUrl"));
         });
 
