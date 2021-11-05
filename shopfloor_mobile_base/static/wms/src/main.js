@@ -147,7 +147,7 @@ new Vue({
             // TODO: allow auth_handler to return OdooClass?
             return new OdooClass(params);
         },
-        _get_auth_handler: function (force) {
+        _get_auth_handler: function () {
             const auth_type = this.app_info.auth_type;
             const auth_handler = auth_handler_registry.get(auth_type);
             if (_.isUndefined(auth_handler)) {
@@ -213,21 +213,21 @@ new Vue({
             this.trigger("login:before");
             const auth_handler = this._get_auth_handler();
             if (!_.isUndefined(auth_handler.on_login)) {
-                auth_handler
-                    .on_login(this, evt, data)
-                    .then(this._on_login)
+                return auth_handler
+                    .on_login(this, data)
+                    .then(this._on_login_default)
                     .catch((error) => {
                         self.trigger("login:failure", error);
                     });
             } else {
                 // TODO: we might want to enforce every authentication handler
                 // to provide the on_login handler to avoid such case
-                this._on_login();
+                return this._on_login_default();
             }
         },
-        _on_login: function () {
+        _on_login_default: function () {
             const self = this;
-            this._loadConfig().then(function (result) {
+            return this._loadConfig().then(function (result) {
                 if (!result.error) {
                     self.trigger("login:success");
                 } else {
@@ -240,23 +240,24 @@ new Vue({
             const self = this;
             const auth_handler = this._get_auth_handler();
             if (!_.isUndefined(auth_handler.on_logout)) {
-                auth_handler
+                return auth_handler
                     .on_logout(this)
-                    .then(this._on_logout)
+                    .then(this._on_logout_default)
                     .catch(function () {
                         self.trigger("logout:failure");
                     });
             } else {
                 // TODO: we might want to enforce every authentication handler
                 // to provide the on_logout handler to avoid such case
-                this._on_logout();
+                return this._on_logout_default();
             }
         },
-        _on_logout: function () {
+        _on_logout_default: function () {
             this.authenticated = false;
             this._clearAppData();
             this.$router.push({name: "login"});
             this.trigger("logout:success");
+            return Promise.resolve();
         },
         is_authenticated: function () {
             return this.authenticated ? true : false;
