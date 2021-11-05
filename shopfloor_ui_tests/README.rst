@@ -23,8 +23,10 @@ Pre-requisites
 ==============
 
 * Your Odoo instance must be running.
+* You should have npm and Cypress installed.
 * You should have the below modules installed:
 
+    - shopfloor_example
     - shopfloor_mobile
     - shopfloor_mobile_base
     - shopfloor_mobile_base_auth_user OR shopfloor_mobile_base_auth_api_key
@@ -56,7 +58,8 @@ Known issues / Roadmap
 ~~~~~~~~~~~~~~~~~~~~~~
 
 * At this stage, the features of the Shopfloor app that are covered by Cypress tests are:
-    - Authentication (both user and apikey).
+    - Authentication via username and password.
+    - Authentication via apikey.
     - Navigation throughout the main pages of the app.
     - Selection and representation of profiles.
 

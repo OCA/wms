@@ -5,13 +5,8 @@
   "viewportHeight": 700,
   "viewportWidth": 360,
   "env": {
-    "auth_type": "apikey"
-  },
-  "TEST_AUTH_DATA": {
-    "auth_user_credentials": {
-      "username": "admin",
-      "password": "admin"
-    },
-    "auth_api_key": "72B044F7AC780DAC"
+    "auth_type": "",
+    "test_appconfig": {},
+    "test_menu_data": {}
   }
 }

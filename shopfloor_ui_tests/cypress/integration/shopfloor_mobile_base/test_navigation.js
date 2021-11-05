@@ -4,9 +4,21 @@ describe("Test to make sure the navigation through the application works as expe
     // The functionality of these pages is not tested here,
     // only the navigation between them.
 
+    before(() => {
+        cy.visit(Cypress.config("baseUrl") + "login");
+        cy.get("form").then(($form) => {
+            if ($form.find("input[name='apikey']").length) {
+                Cypress.env("auth_type", "apikey");
+            } else {
+                Cypress.env("auth_type", "user");
+            }
+        });
+    });
+
     describe("Fake login", () => {
-        it("Recreates log in", () => {
-            cy.fake_login();
+        it("Logs in", () => {
+            const auth_type = Cypress.env("auth_type");
+            cy.fake_login(auth_type);
         });
         it("Goes to the home page", () => {
             cy.visit(Cypress.config("baseUrl"));
@@ -63,21 +75,6 @@ describe("Test to make sure the navigation through the application works as expe
             it("Goes back to settings", () => {
                 cy.contains("back", {matchCase: false}).click();
             });
-        });
-        describe("Profile", () => {
-            it("Goes to the profile page", () => {
-                cy.contains("Profile -", {matchCase: false}).click();
-                cy.url().should("eq", Cypress.config("baseUrl") + "profile");
-            });
-            it("Goes back to settings", () => {
-                cy.contains("back", {matchCase: false}).click();
-            });
-        });
-    });
-
-    describe("Clear session storage data", () => {
-        it("Removes the data", () => {
-            cy.reset_storage(["appconfig", "apikey", "authenticated"]);
         });
     });
 });

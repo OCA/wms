@@ -1,9 +1,12 @@
 describe("Test to make sure that the user can log in and log out", () => {
-    // This test works for both apikey and standard (username / password) authentication.
-    // The test detects the type of credentials expected in the login form
-    // and takes the appropriate credentials from the config file (cypress.json).
-    // This means that modules shopfloor_mobile_base_auth_user and
-    // shopfloor_mobile_base_auth_api_key can be tested with it.
+    // This test covers the standard (username / password) authentication
+    // from module shopfloor_mobile_base_auth_user.
+
+    before(() => {
+        // TODO: when we make auth type depend on the shopfloor app backend
+        // we won't need this anymore
+        Cypress.env("auth_type", "user");
+    });
 
     describe("Log in to the Shopfloor app", () => {
         describe("Preparation tests", () => {
@@ -14,7 +17,7 @@ describe("Test to make sure that the user can log in and log out", () => {
 
             it("Checks that the request to user_config fails (user is not authenticated)", () => {
                 cy.intercept_user_config();
-                cy.wait_for_user_config({reload: true});
+                cy.wait_for({reload: true, request_name: "user_config"});
             });
 
             it("Makes sure that the user_config or the authentication status are not in session storage", function () {
@@ -25,43 +28,46 @@ describe("Test to make sure that the user can log in and log out", () => {
         });
 
         describe("Log in", () => {
-            before(() => {
-                cy.get("form").then(($form) => {
-                    if ($form.find("input[name='apikey']").length) {
-                        Cypress.env("auth_type", "apikey");
-                    } else {
-                        Cypress.env("auth_type", "user");
-                    }
-                });
-            });
             beforeEach(() => {
-                const auth_type = Cypress.env("auth_type");
-                const field_names =
-                    auth_type === "user" ? ["username", "password"] : ["apikey"];
+                const field_names = ["username", "password"];
 
                 cy.clear_input_fields(field_names);
+
+                cy.intercept_login();
                 cy.intercept_user_config();
             });
 
             it("Attempts login with incorrect credentials", function () {
-                cy.attempt_login("incorrect");
-                cy.wait_for_user_config({});
+                cy.get_credentials("incorrect", "user").then((credentials) => {
+                    cy.login([
+                        {name: "username", value: credentials.username},
+                        {name: "password", value: credentials.password},
+                    ]);
+                });
+                cy.wait_for({request_name: "login"});
             });
 
             it("Attempts to log in with empty credentials", function () {
-                cy.attempt_login("empty");
-                cy.wait_for_user_config({});
+                cy.get('button[type="submit"]').click();
+                cy.wait_for({request_name: "login"});
             });
 
             it("Logs in with correct credentials and stores the response in app_config.json", function () {
-                cy.attempt_login("correct");
-                cy.wait_for_user_config({expect_success: true}).then((res) => {
-                    const data = res.response.body.data;
-                    cy.writeFile(
-                        "cypress/fixtures/app_config.json",
-                        JSON.stringify(data)
-                    );
+                cy.get_credentials("correct", "user").then((credentials) => {
+                    cy.login([
+                        {name: "username", value: credentials.username},
+                        {name: "password", value: credentials.password},
+                    ]);
                 });
+
+                cy.wait_for({expect_success: true, request_name: "login"});
+                cy.wait_for({expect_success: true, request_name: "user_config"}).then(
+                    (res) => {
+                        const data = res.response.body.data;
+                        // TODO
+                        Cypress.env("test_appconfig", {data});
+                    }
+                );
             });
         });
     });
@@ -71,17 +77,12 @@ describe("Test to make sure that the user can log in and log out", () => {
             cy.url().should("eq", Cypress.config("baseUrl"));
         });
 
-        // TODO: check if this test belongs here
-        it("Checks that a profile hasn't been selected yet", () => {
-            cy.get("[data-ref=profile-not-ready]").should("exist");
-        });
-
         it("Checks that the user's configuration and authentication status are both in the session storage", () => {
             cy.get_session_storage("shopfloor_appconfig").should("exist");
             cy.get_session_storage("shopfloor_authenticated").should("exist");
         });
 
-        it("Checks that a page reload doesn't redirect or erase the user's info", () => {
+        it("Checks that a page reload doesn't redirect or erase the session storage info", () => {
             cy.reload();
             cy.url().should("to.not.equal", Cypress.config("baseUrl") + "login");
 
@@ -111,11 +112,6 @@ describe("Test to make sure that the user can log in and log out", () => {
         it("Has erased the storage", () => {
             cy.get_session_storage("shopfloor_appconfig").should("not.exist");
             cy.get_session_storage("shopfloor_authenticated").should("not.exist");
-
-            cy.writeFile("cypress/fixtures/app_config.json", {
-                _comment:
-                    "Do not delete this file, it is used to handle data during the authentication tests",
-            });
         });
         it("Doesn't redirect to home after page reload", () => {
             cy.reload();
@@ -127,7 +123,7 @@ describe("Test to make sure that the user can log in and log out", () => {
         });
         it("Tests that the request to get the user's information fails as the user is not authenticated", () => {
             cy.intercept_user_config();
-            cy.wait_for_user_config({reload: true});
+            cy.wait_for({reload: true, request_name: "user_config"});
         });
     });
 });
