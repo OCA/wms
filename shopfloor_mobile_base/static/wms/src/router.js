@@ -18,7 +18,11 @@ const routes = [
         name: "home",
         meta: {requiresAuth: true, requiresProfile: true},
     },
-    {path: "/login", component: LoginPage, name: "login"},
+    {
+        path: "/login",
+        component: LoginPage,
+        name: "login",
+    },
     {
         path: "/settings",
         component: SettingsControlPanel,
@@ -57,7 +61,11 @@ const router = new VueRouter({
 });
 router.beforeEach(async (to, from, next) => {
     await Vue.nextTick();
-    if (!router.app.authenticated && to.meta.requiresAuth && !router.app.demo_mode) {
+    if (
+        !router.app.is_authenticated() &&
+        to.meta.requiresAuth &&
+        !router.app.demo_mode
+    ) {
         next("login");
     } else {
         if (router.app.global_state_key && to.name != from.name) {

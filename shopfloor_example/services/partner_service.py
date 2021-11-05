@@ -17,7 +17,6 @@ class PartnerExampleService(Component):
     @restapi.method(
         [(["/scan/<string:identifier>"], "GET")],
         output_param=restapi.CerberusValidator("scan"),
-        auth="api_key",
     )
     def scan(self, identifier):
         """Scan a partner ref and return its data."""
@@ -29,7 +28,6 @@ class PartnerExampleService(Component):
         [(["/partner_list"], "GET")],
         input_param=restapi.CerberusValidator("partner_list"),
         output_param=restapi.CerberusValidator("partner_list"),
-        auth="api_key",
     )
     def partner_list(self, **params):
         """Return list of available partners."""
@@ -42,7 +40,6 @@ class PartnerExampleService(Component):
     @restapi.method(
         [(["/detail/<int:partner_id>"], "GET")],
         output_param=restapi.CerberusValidator("detail"),
-        auth="api_key",
     )
     def detail(self, partner_id):
         """Retrieve full detail for partner ID."""
