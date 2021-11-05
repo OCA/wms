@@ -61,7 +61,6 @@ const router = new VueRouter({
 });
 router.beforeEach(async (to, from, next) => {
     await Vue.nextTick();
-    // debugger;
     if (
         !router.app.is_authenticated() &&
         to.meta.requiresAuth &&
