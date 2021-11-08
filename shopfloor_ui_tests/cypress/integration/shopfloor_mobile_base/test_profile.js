@@ -1,82 +1,71 @@
 describe("Test to make sure that handling different profiles works as expected", () => {
     before(() => {
-        cy.visit(Cypress.config("baseUrl") + "login");
-        cy.get("form").then(($form) => {
-            if ($form.find("input[name='apikey']").length) {
-                Cypress.env("auth_type", "apikey");
-            } else {
-                Cypress.env("auth_type", "user");
-            }
+        cy.prepare_test_authentication().then(() => {
+            const credentials = Cypress.env("credentials");
+
+            cy.intercept_user_config_request();
+            cy.login(credentials);
+        });
+        cy.wait_for({expect_success: true, request_name: "user_config"}).then((res) => {
+            cy.url().should("eq", Cypress.config("baseUrl"));
+            cy.get(".text-center").children("button").click();
+            cy.contains("Profile -", {matchCase: false}).click();
+            const expected_profiles = ["Demo Profile 1", "Demo Profile 2"];
+            cy.check_profile_list(expected_profiles);
+            Cypress.env("test_appconfig", res.response.body.data.profiles);
         });
     });
 
-    describe("Selects a profile", () => {
-        // NOTE: This part of the test covers multiple different features
-        // as cypress erases the cookies between each test
-        // and the session_id cookie is required in many of them.
-        // Do not split it as it will break the test.
+    beforeEach(() => {
+        Cypress.Cookies.preserveOnce("session_id");
+    });
 
-        it("Navigates to the profile list and selects a profile", () => {
-            // Logs in
-            const auth_type = Cypress.env("auth_type");
-            cy.get_credentials("correct", auth_type).then((credentials) => {
-                credentials =
-                    auth_type === "user"
-                        ? [
-                              {name: "username", value: credentials.username},
-                              {name: "password", value: credentials.password},
-                          ]
-                        : [{name: "apikey", value: credentials.apikey}];
-                cy.intercept_user_config();
-                cy.login(credentials);
+    // Runs the test twice (once per Demo Profile).
 
-                // Waits for user_config call
-                cy.wait_for({expect_success: true, request_name: "user_config"}).then(
-                    (res) => {
-                        // Goes to the profile page and checks the list of profiles
-                        cy.url().should("eq", Cypress.config("baseUrl"));
-                        cy.get(".text-center").children("button").click();
-                        cy.contains("Profile -", {matchCase: false}).click();
-                        const expected_profiles = ["Demo Profile 1", "Demo Profile 2"];
-                        cy.check_profile_list(expected_profiles);
+    for (let i = 1; i <= 2; i++) {
+        describe("Select profile", () => {
+            it(`Selects Demo Profile ${i}`, () => {
+                cy.intercept_menu_request();
 
-                        // Clicks on 'Demo Profile 1'
-                        cy.intercept_menu_request();
+                const profiles = Cypress.env("test_appconfig");
+                const profile = profiles.filter(
+                    (profile) => profile.name === `Demo Profile ${i}`
+                )[0];
 
-                        const profiles = res.response.body.data.profiles;
-                        const profile = profiles.filter(
-                            (profile) => profile.name === "Demo Profile 1"
-                        )[0];
+                cy.activate_profile(profile);
 
-                        cy.activate_profile(profile);
-
-                        // Waits for menu call and tests the outcome
-                        cy.wait_for_profile_data().then((res) => {
-                            const menu_data = {
-                                profile: profile,
-                                menus: res.response.body.data.menus,
-                            };
-                            cy.compare_sessionStorage_profiles(menu_data);
-
-                            cy.url().should("eq", Cypress.config("baseUrl"));
-
-                            Cypress.env("test_menu_data", menu_data);
-                        });
-                    }
-                );
+                cy.wait_for({
+                    expect_success: true,
+                    request_name: "profile_data",
+                }).then((res) => {
+                    const menu_data = {
+                        profile: profile,
+                        menus: res.response.body.data.menus,
+                    };
+                    Cypress.env("test_menu_data", menu_data);
+                });
             });
         });
-    });
-    describe("Test profiles", () => {
-        describe("Test profile 'Demo Profile 1'", () => {
-            it("Checks that the correct scenarios appear in the page", () => {
-                cy.check_profile_scenarios();
-                cy.check_sidebar_scenarios();
-            });
-            it("Goes back to the profile page", () => {
-                cy.sidebar_menu_to("settings");
-                cy.contains("Profile -", {matchCase: false}).click();
+        describe("Profile tests", () => {
+            describe(`Test profile 'Demo Profile ${i}'`, () => {
+                it("Checks the page is redirected and the local information was stored correctly", () => {
+                    const menu_data = Cypress.env("test_menu_data");
+
+                    cy.compare_sessionStorage_profiles(menu_data);
+
+                    cy.url().should("eq", Cypress.config("baseUrl"));
+
+                    Cypress.env("test_menu_data", menu_data);
+                });
+                it("Checks that the correct scenarios appear in the page", () => {
+                    cy.check_profile_scenarios();
+                    cy.check_sidebar_scenarios();
+                });
+                it("Goes back to the profile page", () => {
+                    cy.sidebar_menu_to("settings");
+                    cy.contains("Profile -", {matchCase: false}).click();
+                });
             });
         });
-    });
+    }
 });

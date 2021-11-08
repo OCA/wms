@@ -16,7 +16,7 @@ describe("Test to make sure that the user can log in and log out", () => {
             });
 
             it("Checks that the request to user_config fails (user is not authenticated)", () => {
-                cy.intercept_user_config();
+                cy.intercept_user_config_request();
                 cy.wait_for({reload: true, request_name: "user_config"});
             });
 
@@ -33,7 +33,7 @@ describe("Test to make sure that the user can log in and log out", () => {
 
                 cy.clear_input_fields(field_names);
 
-                cy.intercept_user_config();
+                cy.intercept_user_config_request();
             });
 
             it("Attempts login with incorrect apikey", function () {
@@ -116,7 +116,7 @@ describe("Test to make sure that the user can log in and log out", () => {
             cy.url().should("eq", Cypress.config("baseUrl") + "login");
         });
         it("Tests that the request to get the user's information fails as the user is not authenticated", () => {
-            cy.intercept_user_config();
+            cy.intercept_user_config_request();
             cy.wait_for({reload: true, request_name: "user_config"});
         });
     });

@@ -6,7 +6,10 @@
   "viewportWidth": 360,
   "env": {
     "auth_type": "",
+    "credentials": "",
     "test_appconfig": {},
-    "test_menu_data": {}
+    "test_menu_data": {},
+    "test_partners": {},
+    "test_current_partner": {}
   }
 }

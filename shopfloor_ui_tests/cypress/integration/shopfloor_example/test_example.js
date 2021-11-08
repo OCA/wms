@@ -1,45 +1,75 @@
 describe("Test to make sure that handling different profiles works as expected", () => {
     before(() => {
-        cy.visit(Cypress.config("baseUrl") + "login");
-        cy.get("form").then(($form) => {
-            if ($form.find("input[name='apikey']").length) {
-                Cypress.env("auth_type", "apikey");
-            } else {
-                Cypress.env("auth_type", "user");
-            }
-        });
+        cy.prepare_test_authentication();
     });
 
-    describe("Fake login", () => {
-        it("Logs in", () => {
-            const auth_type = Cypress.env("auth_type");
-            cy.fake_login(auth_type);
-        });
-        it("Goes to the profile page", () => {
-            cy.visit(Cypress.config("baseUrl") + "profile");
-            cy.url().should("eq", Cypress.config("baseUrl") + "profile");
-
-            const expected_profiles = ["Partner manager"];
-            cy.check_profile_list(expected_profiles);
-        });
+    beforeEach(() => {
+        Cypress.Cookies.preserveOnce("session_id");
     });
-    describe("Test profile 'Partner manager'", () => {
-        it("Selects profile and makes sure the information in session storage corresponds with the information received from the request", () => {
-            cy.activate_profile("Partner manager");
+
+    describe("Selects example profile 'Partner manager'", () => {
+        it("Navigates to the profile list and selects the profile", () => {
+            const credentials = Cypress.env("credentials");
+            // Logs in
+            cy.intercept_user_config_request();
+            cy.login(credentials);
+            cy.wait_for({expect_success: true, request_name: "user_config"}).then(
+                (res) => {
+                    // Goes to the profile page and checks the list of profiles
+                    cy.url().should("eq", Cypress.config("baseUrl"));
+                    cy.get(".text-center").children("button").click();
+                    cy.contains("Profile -", {matchCase: false}).click();
+
+                    // Clicks on 'Partner manager'
+                    const profiles = res.response.body.data.profiles;
+                    const profile = profiles.filter(
+                        (profile) => profile.name === "Partner manager"
+                    )[0];
+
+                    cy.activate_profile(profile);
+                }
+            );
         });
-        it("Checks that the correct scenarios appear in the page", () => {
-            cy.check_profile_scenarios();
-            cy.check_sidebar_scenarios();
-        });
-        it("Opens scenario", () => {
+        it("Opens the example scenario", () => {
             cy.open_scenario("partner_example");
+            cy.url().should("include", "partner_example");
         });
-        it("Closes scenario", () => {
-            cy.close_scenario();
+    });
+    describe("Tests manual selection", () => {
+        it("Selects a partner manually", () => {
+            cy.intercept_partner_list_request();
+            cy.contains("manual selection", {matchCase: false}).click();
+
+            cy.wait_for({expect_success: true, request_name: "partner_list"}).then(
+                (res) => {
+                    const partners = res.response.body.data.listing.records;
+                    Cypress.env("test_partners", partners);
+
+                    cy.check_page_contains_partners(partners);
+
+                    const first_partner_id = partners[0].id;
+                    cy.intercept_single_partner_detail_request();
+                    cy.get(`input[value=${first_partner_id}]`).click();
+                }
+            );
+            cy.wait_for({
+                expect_success: true,
+                request_name: "single_partner_detail",
+            }).then((res) => {
+                const record = res.response.body.data.detail.record;
+                Cypress.env("test_current_partner", record);
+            });
         });
-        it("Goes back to the page with the list of profiles", () => {
-            cy.sidebar_menu_to("settings");
-            cy.contains("Profile -", {matchCase: false}).click();
+        it("Checks that the partner was correctly selected", () => {
+            cy.test_partner_card();
+        });
+    });
+    describe("Tests scan selection", () => {
+        it("Selects a partner by scan ref", () => {
+            cy.scan_partner(26);
+        });
+        it("Checks that the partner was correctly selected", () => {
+            cy.test_partner_card();
         });
     });
 });
