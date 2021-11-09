@@ -5,6 +5,7 @@ Shopfloor ui tests
 Tests for Shopfloor app.
 
 These are end-to-end tests that cover the frontend of the application.
+Not testing the WMS part at this time.
 
 Tech details
 ~~~~~~~~~~~~
@@ -22,14 +23,17 @@ Usage
 Pre-requisites
 ==============
 
-* Your Odoo instance must be running.
 * You should have npm and Cypress installed.
 * You should have the below modules installed:
 
     - shopfloor_example
     - shopfloor_mobile
     - shopfloor_mobile_base
-    - shopfloor_mobile_base_auth_user OR shopfloor_mobile_base_auth_api_key
+    - shopfloor_mobile_base_auth_user OR shopfloor_mobile_base_auth_api_key*
+
+    ``*`` These two modules are mutually exclusive so make sure to only install the one needed by the app.
+
+* Your Odoo instance must be running.
 
 Open the Cypress interface
 ==========================
@@ -63,4 +67,5 @@ Known issues / Roadmap
     - Navigation throughout the main pages of the app.
     - Selection and representation of profiles.
 
+* Test the WMS features from `shopfloor_mobile`.
 * THE TESTS ARE NOT CURRENTLY PART OF THE CI/CD PIPELINE.

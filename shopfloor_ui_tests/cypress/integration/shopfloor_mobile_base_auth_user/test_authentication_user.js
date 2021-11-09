@@ -33,7 +33,7 @@ describe("Test to make sure that the user can log in and log out", () => {
 
                 cy.clear_input_fields(field_names);
 
-                cy.intercept_login_request();
+                intercept_login_request();
                 cy.intercept_user_config_request();
             });
 
@@ -126,3 +126,12 @@ describe("Test to make sure that the user can log in and log out", () => {
         });
     });
 });
+
+// Test-specific functions
+
+const intercept_login_request = () => {
+    cy.intercept({
+        method: "POST",
+        url: "*/auth/login",
+    }).as("login");
+};

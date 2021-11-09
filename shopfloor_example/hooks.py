@@ -12,6 +12,6 @@ def post_init_hook(cr, registry):
     _logger.info("Update ref field if empty to match id")
     env = api.Environment(cr, SUPERUSER_ID, {})
     # Update ref field
-    partners = env["res.partner"].search([])
+    partners = env["res.partner"].search([("ref", "=", False)])
     for partner in partners:
-        partner.ref = partner.id if not partner.ref else partner.ref
+        partner.ref = partner.id
