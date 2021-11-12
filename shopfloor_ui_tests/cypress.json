@@ -1,0 +1,15 @@
+{
+  "projectId": "shopfloor",
+  "baseUrl": "http://localhost:8069/shopfloor_mobile/app/#/",
+  "baseUrlDemo": "http://localhost:8069/shopfloor_mobile/app/demo/#/",
+  "viewportHeight": 700,
+  "viewportWidth": 360,
+  "env": {
+    "auth_type": "",
+    "credentials": "",
+    "test_appconfig": {},
+    "test_menu_data": {},
+    "test_partners": {},
+    "test_current_partner": {}
+  }
+}

@@ -20,4 +20,5 @@
     ],
     # fmt: on
     "data": ["templates/assets.xml"],
+    "post_init_hook": "post_init_hook",
 }

@@ -1,0 +1,20 @@
+{
+  "profiles": [
+    {
+      "id": 1,
+      "name": "Demo Profile 1"
+    },
+    {
+      "id": 2,
+      "name": "Demo Profile 2"
+    },
+    {
+      "id": 3,
+      "name": "Partner manager"
+    }
+  ],
+  "user_info": {
+    "id": 6,
+    "name": "Marc Demo"
+  }
+}
