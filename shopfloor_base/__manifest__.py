@@ -23,6 +23,7 @@
     ],
     "data": [
         "data/module_category_data.xml",
+        "data/shopfloor_app_data.xml",
         "security/groups.xml",
         "security/ir.model.access.csv",
         "views/shopfloor_app.xml",

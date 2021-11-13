@@ -1,0 +1,7 @@
+<odoo noupdate="1">
+  <record id="app_default" model="shopfloor.app">
+    <field name="name">Shopfloor</field>
+    <field name="short_name">default</field>
+    <field name="tech_name">default</field>
+  </record>
+</odoo>
