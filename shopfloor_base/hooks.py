@@ -7,6 +7,8 @@ from odoo import SUPERUSER_ID, api
 
 _logger = logging.getLogger(__name__)
 
+# TODO: get rid of this
+
 
 def post_init_hook(cr, registry):
     _logger.info("Linking existing menu items to their scenario")
