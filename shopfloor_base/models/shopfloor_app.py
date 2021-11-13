@@ -7,6 +7,7 @@ from odoo import api, fields, models
 
 from odoo.addons.base_rest.controllers.main import RestController
 from odoo.addons.base_rest.tools import _inspect_methods
+from odoo.addons.component.core import _component_databases
 
 
 class ShopfloorApp(models.Model):
@@ -176,4 +177,10 @@ class ShopfloorApp(models.Model):
         return f"{self._name}:{self.tech_name}"
 
     def _get_services(self):
+        comp_registry = _component_databases.get(self.env.cr.dbname)
+        if not comp_registry or comp_registry and not comp_registry.ready:
+            # No service is available before the registry has been loaded.
+            # This is a very special case, when the odoo registry is being
+            # built, it calls odoo.modules.loading.load_modules().
+            return []
         return self.env["rest.service.registration"]._get_services(self._name)
