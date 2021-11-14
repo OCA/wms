@@ -69,6 +69,15 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
             **params
         )
 
+    def get_service(self, usage, **kw):
+        with self.work_on_services(**kw) as work:
+            service = work.component(usage=usage)
+            # Thanks to shopfloor.app we don't need controllers
+            # but not having a controller means that non decorated methods
+            # stay undecorated as they are not fixed at startup by base_rest.
+            self.env["shopfloor.app"]._prepare_non_decorated_endpoints(service)
+            return service
+
     @contextmanager
     def work_on_actions(self, **params):
         params = params or {}

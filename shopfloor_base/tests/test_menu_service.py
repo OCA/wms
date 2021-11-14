@@ -13,7 +13,7 @@ class MenuCase(CommonCase, MenuTestMixin):
 
     def test_menu_search(self):
         """Request /menu/search"""
-        service = self._get_service()
+        service = self.get_service("menu", profile=self.profile)
         # Simulate the client searching menus
         response = service.dispatch("search")
         menus = self.env["shopfloor.menu"].search([])
@@ -28,7 +28,7 @@ class MenuCase(CommonCase, MenuTestMixin):
         other_profile = self.env.ref("shopfloor_base.profile_demo_1")
         menus_without_profile.profile_id = other_profile
 
-        service = self._get_service()
+        service = self.get_service("menu", profile=self.profile)
         response = service.dispatch("search")
 
         my_menus = menus - menus_without_profile

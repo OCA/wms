@@ -20,15 +20,11 @@ class UserCase(CommonCase, MenuTestMixin):
             [("id", "not in", cls.menu_items.ids)]
         ).sudo().write({"profile_id": profile1.id})
 
-    def setUp(self):
-        super().setUp()
-        with self.work_on_services(profile=self.profile) as work:
-            self.service = work.component(usage="user")
-
     def test_menu_no_profile(self):
         """Request /user/menu"""
+        service = self.get_service("user", profile=self.profile)
         # Simulate the client asking the menu
-        response = self.service.dispatch("menu")
+        response = service.dispatch("menu")
         menus = self.menu_items
         self.assert_response(
             response,
@@ -43,7 +39,8 @@ class UserCase(CommonCase, MenuTestMixin):
         menu.profile_id = self.profile
         (menus - menu).profile_id = self.profile2
 
-        response = self.service.dispatch("menu")
+        service = self.get_service("user", profile=self.profile)
+        response = service.dispatch("menu")
         self.assert_response(
             response,
             data={"menus": [self._data_for_menu_item(menu)]},
@@ -51,7 +48,8 @@ class UserCase(CommonCase, MenuTestMixin):
 
     def test_user_info(self):
         """Request /user/user_info"""
-        response = self.service.dispatch("user_info")
+        service = self.get_service("user", profile=self.profile)
+        response = service.dispatch("user_info")
         self.assert_response(
             response,
             data={"user_info": {"id": self.env.user.id, "name": self.env.user.name}},

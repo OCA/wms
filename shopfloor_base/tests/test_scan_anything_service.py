@@ -56,7 +56,7 @@ class ScanAnythingCase(CommonCase, ScanAnythingTestMixin):
         return (PartnerFinder, CurrencyFinder)
 
     def test_scan(self):
-        service = self._get_service()
+        service = self.get_service("scan_anything")
         test_handlers = self._get_test_handlers()
 
         for finder_class in test_handlers:
