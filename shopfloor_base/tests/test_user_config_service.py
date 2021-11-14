@@ -10,15 +10,11 @@ class AppCase(CommonCase):
         cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
         cls.profile2 = cls.env.ref("shopfloor_base.profile_demo_2")
 
-    def setUp(self):
-        super().setUp()
-        with self.work_on_services(profile=self.profile) as work:
-            self.service = work.component(usage="app")
-
     def test_user_config(self):
         """Request /app/user_config"""
         # Simulate the client asking the configuration
-        response = self.service.dispatch("user_config")
+        service = self.get_service("app", profile=self.profile)
+        response = service.dispatch("user_config")
         profiles = self.env["shopfloor.profile"].search([])
         self.assert_response(
             response,
