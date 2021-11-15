@@ -6,3 +6,4 @@ from . import test_user_service
 from . import test_user_config_service
 from . import test_openapi
 from . import test_shopfloor_scenario
+from . import test_shopfloor_app
