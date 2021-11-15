@@ -5,7 +5,7 @@ from odoo.addons.component.core import Component
 
 
 class ShopfloorMenu(Component):
-    _inherit = "shopfloor.menu"
+    _inherit = "shopfloor.service.menu"
 
     def _convert_one_record(self, record):
         values = super()._convert_one_record(record)
@@ -37,7 +37,7 @@ class ShopfloorMenu(Component):
 class ShopfloorMenuValidatorResponse(Component):
     """Validators for the Menu endpoints responses"""
 
-    _inherit = "shopfloor.menu.validator.response"
+    _inherit = "shopfloor.service.menu.validator.response"
 
     @property
     def _record_schema(self):
