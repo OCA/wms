@@ -44,28 +44,23 @@ class ShopfloorMobileAppMixin(object):
     module_path = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
     main_template = "shopfloor_mobile_base.shopfloor_app_main"
 
-    def _load_app(self, shopfloor_app=None, demo=False, **kw):
+    def _load_app(self, shopfloor_app, demo=False, **kw):
         return http.request.render(
             self.main_template,
-            self._get_main_template_values(
-                shopfloor_app=shopfloor_app, demo=demo, **kw
-            ),
+            self._get_main_template_values(shopfloor_app, demo=demo, **kw),
         )
 
-    def _get_main_template_values(self, shopfloor_app=None, demo=False, **kw):
+    def _get_main_template_values(self, shopfloor_app, demo=False, **kw):
         # TODO: move this to shopfloor_app model and wrap everything
         # into `app_info` key. Then we simply dump to json here.
-        app_info = self._make_app_info(shopfloor_app=shopfloor_app, demo=demo)
+        app_info = self._make_app_info(shopfloor_app, demo=demo)
         return {
             "app_info": app_info,
             "get_version": self._get_version,
         }
 
-    def _make_app_info(self, shopfloor_app=None, demo=False):
-        base_url = (
-            shopfloor_app.api_route_public + "/" if shopfloor_app else "/shopfloor/"
-        )
-        # TODO: shopfloor_app should be mandatory at this stage.
+    def _make_app_info(self, shopfloor_app, demo=False):
+        base_url = shopfloor_app.api_route_public.rstrip("/") + "/"
         auth_type = shopfloor_app.auth_type
         return dict(
             base_url=base_url,
