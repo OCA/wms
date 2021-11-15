@@ -45,6 +45,11 @@
                                 <field name="short_name" />
                             </group>
                         </page>
+                        <page name="dev" string="Developer" groups="base.group_no_one">
+                            <group name="dev_main">
+                                <field name="registered_routes" />
+                            </group>
+                        </page>
                     </notebook>
                 </sheet>
             </form>
