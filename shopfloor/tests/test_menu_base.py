@@ -35,25 +35,26 @@ class CommonMenuCase(CommonCase, MenuTestMixin):
 
     def _data_for_menu_item(self, menu, **kw):
         data = super()._data_for_menu_item(menu, **kw)
-        expected_counters = kw.get("expected_counters") or {}
-        data.update(
-            {
-                "picking_types": [
-                    {"id": picking_type.id, "name": picking_type.name}
-                    for picking_type in menu.picking_type_ids
-                ],
-            }
-        )
-        counters = expected_counters.get(
-            menu.id,
-            {
-                "lines_count": 0,
-                "picking_count": 0,
-                "priority_lines_count": 0,
-                "priority_picking_count": 0,
-            },
-        )
-        data.update(counters)
+        if menu.picking_type_ids:
+            data.update(
+                {
+                    "picking_types": [
+                        {"id": picking_type.id, "name": picking_type.name}
+                        for picking_type in menu.picking_type_ids
+                    ],
+                }
+            )
+            expected_counters = kw.get("expected_counters") or {}
+            counters = expected_counters.get(
+                menu.id,
+                {
+                    "lines_count": 0,
+                    "picking_count": 0,
+                    "priority_lines_count": 0,
+                    "priority_picking_count": 0,
+                },
+            )
+            data.update(counters)
         return data
 
 
