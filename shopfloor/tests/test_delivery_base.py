@@ -68,8 +68,9 @@ class DeliveryCommonCase(CommonCase):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(menu=self.menu, profile=self.profile) as work:
-            self.service = work.component(usage="delivery")
+        self.service = self.get_service(
+            "delivery", menu=self.menu, profile=self.profile
+        )
 
     def _stock_picking_data(self, picking):
         return self.service.data_detail.picking_detail(picking)
