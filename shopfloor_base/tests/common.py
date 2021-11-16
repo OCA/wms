@@ -69,8 +69,8 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
             **params
         )
 
-    def get_service(self, usage, **kw):
-        with self.work_on_services(**kw) as work:
+    def get_service(self, usage, env=None, **kw):
+        with self.work_on_services(env=env, **kw) as work:
             service = work.component(usage=usage)
             # Thanks to shopfloor.app we don't need controllers
             # but not having a controller means that non decorated methods
