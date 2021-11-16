@@ -25,5 +25,6 @@ class SinglePackTransferCommonBase(CommonCase):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(menu=self.menu, profile=self.profile) as work:
-            self.service = work.component(usage="single_pack_transfer")
+        self.service = self.get_service(
+            "single_pack_transfer", menu=self.menu, profile=self.profile
+        )

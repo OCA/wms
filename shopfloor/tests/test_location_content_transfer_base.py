@@ -30,8 +30,9 @@ class LocationContentTransferCommonCase(CommonCase):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(menu=self.menu, profile=self.profile) as work:
-            self.service = work.component(usage="location_content_transfer")
+        self.service = self.get_service(
+            "location_content_transfer", menu=self.menu, profile=self.profile
+        )
 
     @classmethod
     def _simulate_pickings_selected(cls, pickings):

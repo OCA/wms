@@ -19,8 +19,9 @@ class CheckoutCommonCase(CommonCase):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(menu=self.menu, profile=self.profile) as work:
-            self.service = work.component(usage="checkout")
+        self.service = self.get_service(
+            "checkout", menu=self.menu, profile=self.profile
+        )
 
     def _stock_picking_data(self, picking, **kw):
         return self.service._data_for_stock_picking(picking, **kw)
