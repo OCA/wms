@@ -50,8 +50,9 @@ class ClusterPickingBatchCase(CommonCase, PickingBatchMixin):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(menu=self.menu, profile=self.profile) as work:
-            self.service = work.component(usage="cluster_picking")
+        self.service = self.get_service(
+            "cluster_picking", menu=self.menu, profile=self.profile
+        )
 
     def test_search_empty(self):
         """No batch is available"""

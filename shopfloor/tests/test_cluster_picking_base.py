@@ -20,8 +20,9 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(menu=self.menu, profile=self.profile) as work:
-            self.service = work.component(usage="cluster_picking")
+        self.service = self.get_service(
+            "cluster_picking", menu=self.menu, profile=self.profile
+        )
 
     def _line_data(self, move_line, qty=None, package_dest=False):
         picking = move_line.picking_id

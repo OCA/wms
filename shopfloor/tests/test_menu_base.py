@@ -30,8 +30,7 @@ class CommonMenuCase(CommonCase, MenuTestMixin):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(profile=self.profile) as work:
-            self.service = work.component(usage="menu")
+        self.service = self.get_service("menu", profile=self.profile)
 
     def _data_for_menu_item(self, menu, **kw):
         data = super()._data_for_menu_item(menu, **kw)
