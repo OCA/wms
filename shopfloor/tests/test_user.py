@@ -49,8 +49,7 @@ class UserCase(CommonMenuCase):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(profile=self.profile) as work:
-            self.service = work.component(usage="user")
+        self.service = self.get_service("user", profile=self.profile)
 
     def test_menu_no_profile(self):
         """Request /user/menu"""

@@ -19,8 +19,7 @@ class PickingFormCase(CommonCase):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(profile=self.profile) as work:
-            self.service = work.component(usage="form_edit_stock_picking")
+        self.service = self.get_service("form_edit_stock_picking", profile=self.profile)
 
     def test_picking_form_get(self):
         available_carriers = self.service._get_available_carriers(self.picking)
