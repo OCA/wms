@@ -16,6 +16,7 @@ export class BaseRegistry {
     /**
      * Retrieve and existing process
      * @param {*} key
+     * @returns Object
      */
     get(key) {
         return this._data[key];
@@ -30,6 +31,7 @@ export class BaseRegistry {
      * @param {*} metadata : additional information for the process.
      * Eg: `path` is used to override automatic computation of the route path.
      * @param {*} override : bypass validation for existing process.
+     * @returns Object
      */
     add(key, component, route, metadata, override = false) {
         if (!_.isEmpty(this._data[key]) && !override) {
@@ -59,6 +61,7 @@ export class BaseRegistry {
      * This should be a bare JS object and not a Vue component
      * so that it gets registered locally in the app.
      * @param {*} metadata : additional information for the process.
+     * @returns Object
      */
     replace(key, component, metadata) {
         console.log("Replacing component", key);
@@ -75,6 +78,7 @@ export class BaseRegistry {
      * Keys can be Lodash-like paths to the destination keys to override.
      * Eg: {"methods.foo": function() { alert("foo")}}
      * will override the VueJS component method called "foo".
+     * @returns Object
      */
     extend(key, component_override) {
         const original = this.get(key);
@@ -99,6 +103,7 @@ export class BaseRegistry {
     }
     /**
      * Return all process.
+     * @returns Object
      */
     all() {
         return this._data;
@@ -107,8 +112,19 @@ export class BaseRegistry {
      * Generate a route path for given process key.
      *
      * @param {*} key : process's key.
+     * @returns String
      */
     make_route_path(key) {
         return _.template(this._make_route_path_pattern || "/${ key }")({key: key});
+    }
+    /**
+     * Retrieve all items that should appear on menu.
+     * @param {*} menu_type : string matching a menu type (sidebar, home, all)
+     * @returns Array
+     */
+    for_menu(menu_type = "all") {
+        return _.filter(this._data, function (x) {
+            return _.result(x, "metadata.menu._type", null) === menu_type;
+        }).map(_.property("metadata.menu"));
     }
 }

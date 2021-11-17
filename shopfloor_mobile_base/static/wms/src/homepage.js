@@ -9,7 +9,7 @@ import {demotools} from "./demo/demo.core.js";
 export var HomePage = Vue.component("home-page", {
     computed: {
         navigation() {
-            return this.$root.appmenu.menus;
+            return this.$root.getNav();
         },
     },
     methods: {
@@ -26,7 +26,6 @@ export var HomePage = Vue.component("home-page", {
             location.reload();
         },
     },
-    props: ["routes"],
     template: `
         <Screen :screen_info="{title: $t('screen.home.main_title'), klass: 'home'}" :show-menu="false">
             <v-list v-if="$root.has_profile">

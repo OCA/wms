@@ -20,11 +20,18 @@ class ShopfloorProfile(Component):
     _expose_model = "shopfloor.profile"
     _description = __doc__
 
+    @property
+    def _exposed_model(self):
+        # Use sudo because we don't care
+        # if the current user can see profiles or not.
+        # They should always be loaded by the app.
+        return super()._exposed_model.sudo()
+
     def _search(self, name_fragment=None):
         domain = self._get_base_search_domain()
         if name_fragment:
             domain.append(("name", "ilike", name_fragment))
-        records = self.env[self._expose_model].search(domain)
+        records = self._exposed_model.search(domain)
         return records
 
     def search(self, name_fragment=None):

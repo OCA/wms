@@ -174,7 +174,7 @@ Vue.component("Screen", {
 
 Vue.component("nav-items", {
     props: {
-        navigation: Array,
+        navigation: Object,
         show_full_info: {
             type: Boolean,
             default: true,
@@ -185,7 +185,7 @@ Vue.component("nav-items", {
     template: `
     <div :class="$options._componentTag">
         <v-list-item
-            v-for="item in navigation"
+            v-for="item in navigation.app_nav"
             :key="'nav-item-' + item.id"
             :to="{name: item.scenario, params: {menu_id: item.id, state: 'init'}}"
             link
@@ -198,6 +198,17 @@ Vue.component("nav-items", {
                 <nav-item-action :item="item" />
             </v-list-item-action>
         </v-list-item>
+        <v-list-item
+            v-for="item in navigation.extra_nav"
+            :key="'nav-item-' + item.id"
+            :to="{name: item.to.name, params: item.to.params}"
+            link
+            >
+            <v-list-item-content>
+                <nav-item-content :item="item" :show_full_info="false" />
+            </v-list-item-content>
+        </v-list-item>
+    </v-btn>
     </div>
     `,
 });
