@@ -40,7 +40,7 @@ class ShopfloorMenu(Component):
         domain = self._get_base_search_domain()
         if name_fragment:
             domain.append(("name", "ilike", name_fragment))
-        records = self.env[self._expose_model].search(domain)
+        records = self._exposed_model.search(domain)
         return records
 
     def search(self, name_fragment=None):

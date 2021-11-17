@@ -29,10 +29,16 @@ class BaseShopfloorService(AbstractComponent):
     def _actions_for(self, usage, **kw):
         return get_actions_for(self, usage, **kw)
 
+    @property
+    def _exposed_model(self):
+        # Use `.get` to avoid failure on `inspect.getmembers` call
+        # which load this on services w/out a model.
+        return self.env.get(self._expose_model)
+
     def _get(self, _id):
         domain = expression.normalize_domain(self._get_base_search_domain())
         domain = expression.AND([domain, [("id", "=", _id)]])
-        record = self.env[self._expose_model].search(domain)
+        record = self._exposed_model.search(domain)
         if not record:
             raise exceptions.MissingError(
                 _("The record %s %s does not exist") % (self._expose_model, _id)
