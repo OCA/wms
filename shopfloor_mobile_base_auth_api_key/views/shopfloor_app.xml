@@ -9,6 +9,14 @@
                 <field
                     name="auth_api_key_group_ids"
                     widget="many2many_tags"
+                    class="oe_inline"
+                    attrs="{'invisible': [('auth_type', '!=', 'api_key')]}"
+                />
+                <button
+                    type="object"
+                    name="action_manage_api_key_groups"
+                    string="Manage groups"
+                    class="btn btn-link"
                     attrs="{'invisible': [('auth_type', '!=', 'api_key')]}"
                 />
             </field>
