@@ -72,6 +72,9 @@ page_registry.add(
                 " - "
             );
         },
+        is_enabled: function (instance, rec) {
+            return instance.$root.app_info.profile_required;
+        },
     }
 );
 

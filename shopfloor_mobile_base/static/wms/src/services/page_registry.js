@@ -24,6 +24,9 @@ class PageRegistry extends BaseRegistry {
             display_name: function (instance, rec) {
                 return rec.key;
             },
+            is_enabled: function (instance, rec) {
+                return true;
+            },
         });
         return rec;
     }
