@@ -2,6 +2,7 @@
     <record id="shopfloor_menu_single_pallet_transfer" model="shopfloor.menu">
         <field name="name">Single Pallet Transfer</field>
         <field name="sequence">20</field>
+        <field name="profile_id" ref="shopfloor.profile_demo_1" />
         <field name="allow_move_create" eval="1" />
         <field name="scenario_id" ref="shopfloor.scenario_single_pack_transfer" />
         <field
@@ -12,6 +13,7 @@
     <record id="shopfloor_menu_zone_picking" model="shopfloor.menu">
         <field name="name">Zone Picking</field>
         <field name="sequence">35</field>
+        <field name="profile_id" ref="shopfloor.profile_demo_1" />
         <field name="scenario_id" ref="shopfloor.scenario_zone_picking" />
         <field
             name="picking_type_ids"
@@ -21,6 +23,7 @@
     <record id="shopfloor_menu_cluster_picking" model="shopfloor.menu">
         <field name="name">Cluster Picking</field>
         <field name="sequence">30</field>
+        <field name="profile_id" ref="shopfloor.profile_demo_1" />
         <field name="scenario_id" ref="shopfloor.scenario_cluster_picking" />
         <field
             name="picking_type_ids"
@@ -30,6 +33,7 @@
     <record id="shopfloor_menu_checkout" model="shopfloor.menu">
         <field name="name">Checkout</field>
         <field name="sequence">40</field>
+        <field name="profile_id" ref="shopfloor.profile_demo_1" />
         <field name="scenario_id" ref="shopfloor.scenario_checkout" />
         <field
             name="picking_type_ids"
@@ -39,6 +43,7 @@
     <record id="shopfloor_menu_delivery" model="shopfloor.menu">
         <field name="name">Delivery</field>
         <field name="sequence">50</field>
+        <field name="profile_id" ref="shopfloor.profile_demo_2" />
         <field name="scenario_id" ref="shopfloor.scenario_delivery" />
         <field
             name="picking_type_ids"
@@ -48,6 +53,7 @@
     <record id="shopfloor_menu_location_content_transfer" model="shopfloor.menu">
         <field name="name">Location Content Transfer</field>
         <field name="sequence">60</field>
+        <field name="profile_id" ref="shopfloor.profile_demo_1" />
         <field name="allow_move_create" eval="1" />
         <field name="scenario_id" ref="shopfloor.scenario_location_content_transfer" />
         <field
