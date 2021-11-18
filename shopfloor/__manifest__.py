@@ -54,6 +54,11 @@
         "views/stock_location.xml",
         "views/stock_move_line.xml",
     ],
-    "demo": ["demo/stock_picking_type_demo.xml", "demo/shopfloor_menu_demo.xml"],
+    "demo": [
+        "demo/stock_picking_type_demo.xml",
+        "demo/shopfloor_profile_demo.xml",
+        "demo/shopfloor_menu_demo.xml",
+        "demo/shopfloor_app_demo.xml",
+    ],
     "installable": True,
 }

@@ -1,0 +1,8 @@
+<odoo>
+    <record id="profile_demo_1" model="shopfloor.profile">
+        <field name="name">WH worker</field>
+    </record>
+    <record id="profile_demo_2" model="shopfloor.profile">
+        <field name="name">WH delivery</field>
+    </record>
+</odoo>
