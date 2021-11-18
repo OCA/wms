@@ -59,7 +59,8 @@ Vue.component("Screen", {
             return (
                 this.$root.is_authenticated() &&
                 this.$route.meta.requiresProfile &&
-                !this.$root.has_profile
+                !this.$root.has_profile &&
+                this.$root.app_info.profile_required
             );
         },
     },
@@ -180,7 +181,8 @@ Vue.component("nav-items", {
             default: true,
         },
     },
-    // NOTE: activation via router won't work because we can use the same route w/ several menu items.
+    // NOTE: activation via router won't work because
+    // we can use the same route w/ several menu items.
     // Hence we match via menu id.
     template: `
     <div :class="$options._componentTag">
