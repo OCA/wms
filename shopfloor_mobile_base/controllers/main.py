@@ -60,7 +60,7 @@ class ShopfloorMobileAppMixin(object):
         }
 
     def _make_app_info(self, shopfloor_app, demo=False):
-        base_url = shopfloor_app.api_route_public.rstrip("/") + "/"
+        base_url = shopfloor_app.api_route.rstrip("/") + "/"
         auth_type = shopfloor_app.auth_type
         return dict(
             base_url=base_url,
