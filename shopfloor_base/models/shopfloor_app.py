@@ -35,8 +35,6 @@ class ShopfloorApp(models.Model):
     _inherit = "collection.base"
     _description = "A Shopfloor application"
 
-    # TODO: attach and load menu items and other records
-    # from the specific shopfloor.app (aka current collection)
     name = fields.Char(required=True, translate=True)
     short_name = fields.Char(required=True, translate=True)
     # Unique name
@@ -65,6 +63,15 @@ class ShopfloorApp(models.Model):
         help="Technical field to allow developers to check registered routes on the form",
         groups="base.group_no_one",
     )
+    profile_ids = fields.Many2many(
+        comodel_name="shopfloor.profile",
+        string="Profiles",
+        help="Profiles used by this app. "
+        "This will determine menu items too."
+        "However this field is not required "
+        "in case you don't need profiles and menu items from the backend.",
+    )
+    profile_required = fields.Boolean(compute="_compute_profile_required", store=True)
 
     _sql_constraints = [("tech_name", "unique(tech_name)", "tech_name must be unique")]
 
@@ -91,6 +98,11 @@ class ShopfloorApp(models.Model):
                     f"{endpoint_rule.route} ({', '.join(endpoint_rule.routing['methods'])})"
                 )
             rec.registered_routes = "\n".join(vals)
+
+    @api.depends("profile_ids")
+    def _compute_profile_required(self):
+        for rec in self:
+            rec.profile_required = bool(rec.profile_ids)
 
     def _selection_auth_type(self):
         return self.env["endpoint.route.handler"]._selection_auth_type()

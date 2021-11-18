@@ -22,6 +22,12 @@ class BaseShopfloorService(AbstractComponent):
     _collection = "shopfloor.app"
     _expose_model = None
 
+    def __init__(self, work_context):
+        super().__init__(work_context)
+        # User private attributes to not mess up w/ public endpoints
+        self._profile = getattr(self.work, "profile", self.env["shopfloor.profile"])
+        self._menu = getattr(self.work, "menu", self.env["shopfloor.menu"])
+
     def dispatch(self, method_name, *args, params=None):
         self._validate_headers_update_work_context(request, method_name)
         return super().dispatch(method_name, *args, params=params)
@@ -250,7 +256,11 @@ class BaseShopfloorService(AbstractComponent):
         return "menu", self.env["shopfloor.menu"].browse(rec_id).exists()
 
     def _work_ctx_get_profile_id(self, rec_id):
-        return "profile", self.env["shopfloor.profile"].browse(rec_id).exists()
+        profile = self.env["shopfloor.profile"].browse(rec_id).exists()
+        limited_profiles = self.collection.profile_ids
+        if limited_profiles and profile not in limited_profiles:
+            raise BadRequest("Profile not allowed")
+        return "profile", profile
 
     _options = {}
 
@@ -264,8 +274,8 @@ class BaseShopfloorService(AbstractComponent):
             return self._options
 
         options = {}
-        if self._requires_header_menu and getattr(self.work, "menu", None):
-            options = self.work.menu.scenario_id.options or {}
+        if self._requires_header_menu and self._menu:
+            options = self._menu.scenario_id.options or {}
         options.update(getattr(self.work, "options", {}))
         self._options = DotDict(options)
         return self._options
