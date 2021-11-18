@@ -24,6 +24,7 @@
             <t t-set="html_data" t-value="{'app_version': app_version}" />
             <t t-set="title">Shopfloor WMS app</t>
             <t t-set="head">
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <script type="text/javascript">
           var shopfloor_app_info = {
             app_version: "<t t-esc="app_version" />",
