@@ -32,13 +32,11 @@ class TestShopfloorApp(CommonCase):
         # fmt: off
         expected = [
             {
-                "api_route": "/shopfloor/api/<tech_name(shopfloor.app):collection>/",
-                "api_route_public": "/shopfloor/api/test_app",
+                "api_route": "/shopfloor/api/test_app",
                 "url": "/shopfloor/app/test_app",
             },
             {
-                "api_route": "/shopfloor/api/<tech_name(shopfloor.app):collection>/",
-                "api_route_public": "/shopfloor/api/test_app_2",
+                "api_route": "/shopfloor/api/test_app_2",
                 "url": "/shopfloor/app/test_app_2",
             },
         ]
@@ -61,25 +59,16 @@ class TestShopfloorApp(CommonCase):
             _check[rule.route] = set(rule.routing["methods"])
         expected = {
             # TODO: review methods
-            "/shopfloor/api/<tech_name(shopfloor.app):collection>/app/user_config": {
-                "POST"
-            },
-            "/shopfloor/api/<tech_name(shopfloor.app):collection>/user/menu": {"POST"},
-            "/shopfloor/api/<tech_name(shopfloor.app):collection>/user/user_info": {
-                "POST"
-            },
-            #  From werkzeug.routing.Rule docs:
-            #  "If GET is present in the list of methods and HEAD is not,
-            #  HEAD is added automatically."
-            "/shopfloor/api/<tech_name(shopfloor.app):collection>/menu/search": {
+            f"/shopfloor/api/{rec.tech_name}/app/user_config": {"POST"},
+            f"/shopfloor/api/{rec.tech_name}/user/menu": {"POST"},
+            f"/shopfloor/api/{rec.tech_name}/user/user_info": {"POST"},
+            f"/shopfloor/api/{rec.tech_name}/menu/search": {
                 "GET",
             },
-            "/shopfloor/api/<tech_name(shopfloor.app):collection>/profile/search": {
+            f"/shopfloor/api/{rec.tech_name}/profile/search": {
                 "GET",
             },
-            "/shopfloor/api/<tech_name(shopfloor.app):collection>/scan_anything/scan": {
-                "POST"
-            },
+            f"/shopfloor/api/{rec.tech_name}/scan_anything/scan": {"POST"},
         }
         for route, method in expected.items():
             self.assertEqual(
