@@ -15,10 +15,10 @@ config_registry.add("apikey", {default: "", reset_on_clear: true});
 
 // Provide auth handle for Odoo calls
 export class ApiKeyAuthHandler extends AuthHandlerMixin {
-    get_params($root) {
+    get_params() {
         return {
             headers: {
-                "API-KEY": $root.apikey,
+                "API-KEY": this.$root.apikey,
             },
         };
     }
@@ -33,7 +33,7 @@ export class ApiKeyAuthHandler extends AuthHandlerMixin {
     // }
 }
 
-auth_handler_registry.add(new ApiKeyAuthHandler("api_key"));
+auth_handler_registry.add("api_key", ApiKeyAuthHandler);
 
 /**
  * Handle loging via API key.
