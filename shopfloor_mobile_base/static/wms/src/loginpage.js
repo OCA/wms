@@ -48,7 +48,7 @@ export var LoginPage = Vue.component("login-page", {
     methods: {
         login_form_component_name() {
             const auth_handler = this.$root._get_auth_handler();
-            return auth_handler.get_login_component_name(this.$root);
+            return auth_handler.get_login_component_name();
         },
         _handle_invalid_login() {
             this.error = this.$root.$t("screen.login.error.login_invalid");
