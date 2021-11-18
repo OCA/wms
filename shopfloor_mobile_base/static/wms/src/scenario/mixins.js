@@ -173,7 +173,7 @@ export var ScenarioBaseMixin = {
         menu_item: function () {
             const self = this;
             return _.head(
-                _.filter(this.$root.getNav(), function (m) {
+                _.filter(this.$root.getNav().app_nav, function (m) {
                     return m.id === self.menu_item_id;
                 })
             );

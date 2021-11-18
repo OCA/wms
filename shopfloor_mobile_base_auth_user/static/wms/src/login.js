@@ -13,7 +13,7 @@ import {
 // Provide auth handle for Odoo calls
 export class UserAuthHandler extends AuthHandlerMixin {
     // Not sure we need anything if we get a cookie in the same browser
-    get_params($root) {
+    get_params() {
         return {
             /**
              * NOTE: we don't have to provide any param because the auth
@@ -27,9 +27,13 @@ export class UserAuthHandler extends AuthHandlerMixin {
         };
     }
 
+    get_login_component_name() {
+        return "login-user";
+    }
+
     on_login($root, data) {
         // Call odoo application load => set the result in the local storage in json
-        const odoo = $root.getOdoo({base_url: "/session/"});
+        const odoo = this.$root.getOdoo({base_url: "/session/"});
         return odoo
             .post("auth/login", data, true)
             .then(function (response) {
@@ -43,12 +47,15 @@ export class UserAuthHandler extends AuthHandlerMixin {
             });
     }
 
-    on_logout($root) {
-        const odoo = $root.getOdoo({base_url: "/session/"});
+    on_logout() {
+        const odoo = this.$root.getOdoo({base_url: "/session/"});
         return odoo.post("auth/logout", null, true);
     }
 }
-auth_handler_registry.add(new UserAuthHandler("user"));
+// Std user auth
+auth_handler_registry.add("user", UserAuthHandler);
+// Endpoint user auth (from endpoint_route_handler)
+auth_handler_registry.add("user_endpoint", UserAuthHandler);
 
 /**
  * Handle loging via user.
