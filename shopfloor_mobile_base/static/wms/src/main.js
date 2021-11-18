@@ -143,17 +143,17 @@ new Vue({
                 OdooClass = Odoo;
             }
             const auth_handler = this._get_auth_handler();
-            params = _.merge({}, params, auth_handler.get_params(this));
+            params = _.merge({}, params, auth_handler.get_params());
             // TODO: allow auth_handler to return OdooClass?
             return new OdooClass(params);
         },
         _get_auth_handler: function () {
             const auth_type = this.app_info.auth_type;
-            const auth_handler = auth_handler_registry.get(auth_type);
-            if (_.isUndefined(auth_handler)) {
+            const auth_handler_class = auth_handler_registry.get(auth_type);
+            if (_.isUndefined(auth_handler_class)) {
                 throw new Error("Auth type '" + auth_type + "' not supported");
             }
-            return auth_handler;
+            return new auth_handler_class(this);
         },
         loadConfig: function (force) {
             if (this.appconfig && !force) {
@@ -214,7 +214,7 @@ new Vue({
             const auth_handler = this._get_auth_handler();
             if (!_.isUndefined(auth_handler.on_login)) {
                 return auth_handler
-                    .on_login(this, data)
+                    .on_login(data)
                     .then(this._on_login_default)
                     .catch((error) => {
                         self.trigger("login:failure", error);
@@ -241,7 +241,7 @@ new Vue({
             const auth_handler = this._get_auth_handler();
             if (!_.isUndefined(auth_handler.on_logout)) {
                 return auth_handler
-                    .on_logout(this)
+                    .on_logout()
                     .then(this._on_logout_default)
                     .catch(function () {
                         self.trigger("logout:failure");
