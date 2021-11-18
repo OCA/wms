@@ -5,7 +5,7 @@
 {
     "name": "Shopfloor Mobile Base auth via user auth",
     "summary": "Provides authentication via standard user login",
-    "version": "14.0.1.0.0",
+    "version": "14.0.1.0.1",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
