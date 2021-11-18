@@ -27,6 +27,12 @@ class ShopfloorProfile(Component):
         # They should always be loaded by the app.
         return super()._exposed_model.sudo()
 
+    def _get_base_search_domain(self):
+        res = super()._get_base_search_domain()
+        if self.collection.profile_ids:
+            return [("id", "in", self.collection.profile_ids.ids)]
+        return res
+
     def _search(self, name_fragment=None):
         domain = self._get_base_search_domain()
         if name_fragment:
