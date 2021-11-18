@@ -29,19 +29,18 @@ class ShopfloorMenu(Component):
 
     def _get_base_search_domain(self):
         base_domain = super()._get_base_search_domain()
-        return expression.AND(
-            [
-                base_domain,
-                [
-                    "|",
-                    ("profile_id", "=", False),
-                    ("profile_id", "=", self.work.profile.id),
-                ],
+        if self._profile:
+            profile_domain = [
+                "|",
+                ("profile_id", "=", False),
+                ("profile_id", "=", self._profile.id),
             ]
-        )
+        else:
+            profile_domain = [("profile_id", "=", False)]
+        return expression.AND([base_domain, profile_domain])
 
     def _search(self, name_fragment=None):
-        if not self.work.profile:
+        if not self._profile:
             # we need to know the profile to load menus
             return self.env["shopfloor.menu"].browse()
         domain = self._get_base_search_domain()
