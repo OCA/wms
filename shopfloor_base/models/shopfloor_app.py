@@ -54,6 +54,7 @@ class ShopfloorApp(models.Model):
         """,
     )
     url = fields.Char(compute="_compute_url", help="Public URL to use the app.")
+    api_docs_url = fields.Char(compute="_compute_url", help="Public URL for api docs.")
     auth_type = fields.Selection(
         selection="_selection_auth_type", default="user_endpoint"
     )
@@ -83,10 +84,13 @@ class ShopfloorApp(models.Model):
             rec.api_route = rec._api_route_path + rec.tech_name
 
     _base_url_path = "/shopfloor/app/"
+    _base_api_docs_url_path = "/shopfloor/api-docs/"
 
+    @api.depends("tech_name")
     def _compute_url(self):
         for rec in self:
             rec.url = rec._base_url_path + rec.tech_name
+            rec.api_docs_url = rec._base_api_docs_url_path + rec.tech_name
 
     @api.depends("tech_name")
     def _compute_registered_routes(self):
@@ -112,6 +116,14 @@ class ShopfloorApp(models.Model):
             "type": "ir.actions.act_url",
             "name": self.name,
             "url": self.url,
+            "target": "new",
+        }
+
+    def action_open_app_docs(self):
+        return {
+            "type": "ir.actions.act_url",
+            "name": self.name,
+            "url": self.api_docs_url,
             "target": "new",
         }
 

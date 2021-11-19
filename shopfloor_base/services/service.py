@@ -12,6 +12,7 @@ from odoo.tools import DotDict
 from odoo.addons.component.core import AbstractComponent
 
 from ..actions.base_action import get_actions_for
+from ..apispec.service_apispec import ShopfloorRestServiceAPISpec
 
 
 class BaseShopfloorService(AbstractComponent):
@@ -27,6 +28,9 @@ class BaseShopfloorService(AbstractComponent):
         # User private attributes to not mess up w/ public endpoints
         self._profile = getattr(self.work, "profile", self.env["shopfloor.profile"])
         self._menu = getattr(self.work, "menu", self.env["shopfloor.menu"])
+
+    def _get_api_spec(self, **params):
+        return ShopfloorRestServiceAPISpec(self, **params)
 
     def dispatch(self, method_name, *args, params=None):
         self._validate_headers_update_work_context(request, method_name)
@@ -137,15 +141,15 @@ class BaseShopfloorService(AbstractComponent):
                 "value": demo_api_key.key if demo_api_key else "",
             },
         ]
+        menu_model = self.env["shopfloor.menu"].sudo()
+        profile_model = self.env["shopfloor.profile"].sudo()
         if self._requires_header_menu:
             # Try to first the first menu that implements the current service.
             # Not all usages have a process, in that case, we'll set the first
             # menu found
-            menu = self.env["shopfloor.menu"].search(
-                [("scenario", "=", self._usage)], limit=1
-            )
+            menu = menu_model.search([("scenario", "=", self._usage)], limit=1)
             if not menu:
-                menu = self.env["shopfloor.menu"].search([], limit=1)
+                menu = menu_model.search([], limit=1)
             service_params.append(
                 {
                     "name": "SERVICE_CTX_MENU_ID",
@@ -158,7 +162,7 @@ class BaseShopfloorService(AbstractComponent):
                 }
             )
         if self._requires_header_profile:
-            profile = self.env["shopfloor.profile"].search([], limit=1)
+            profile = profile_model.search([], limit=1)
             service_params.append(
                 {
                     "name": "SERVICE_CTX_PROFILE_ID",
