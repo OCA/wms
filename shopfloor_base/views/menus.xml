@@ -11,25 +11,25 @@
         action="action_shopfloor_app"
         id="menu_action_shopfloor_app"
         parent="menu_shopfloor_root"
-        sequence="30"
+        sequence="10"
     />
     <menuitem
         action="action_shopfloor_menu"
         id="menu_action_shopfloor_menu"
         parent="menu_shopfloor_root"
-        sequence="10"
+        sequence="20"
     />
     <menuitem
         action="action_shopfloor_profile"
         id="menu_action_shopfloor_profile"
         parent="menu_shopfloor_root"
-        sequence="20"
+        sequence="30"
     />
     <menuitem
         action="action_shopfloor_scenario"
         id="menu_action_shopfloor_scenario"
         parent="menu_shopfloor_root"
-        sequence="30"
+        sequence="40"
     />
 
 </odoo>
