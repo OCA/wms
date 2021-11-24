@@ -114,7 +114,7 @@ Vue.component("Screen", {
             </template>
         </v-navigation-drawer>
         <v-app-bar
-                color="#491966"
+                color="primary"
                 dark
                 app
                 dense

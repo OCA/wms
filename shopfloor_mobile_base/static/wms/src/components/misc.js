@@ -141,7 +141,7 @@ Vue.component("btn-back", {
         },
     },
     template: `
-<btn-action v-bind="$attrs" action="back" v-on:click="on_back">
+<btn-action color="secondary" v-bind="$attrs" action="back" v-on:click="on_back">
   <v-icon>mdi-keyboard-backspace</v-icon><slot>{{ $t("btn.back.title") }}</slot>
 </btn-action>
 `,
@@ -284,7 +284,7 @@ Vue.component("btn-fullscreen", {
         },
     },
     template: `
-    <btn-action @click="fullscreen_on ? leave_fullscreen() : go_fullscreen()">
+    <btn-action color="primary" @click="fullscreen_on ? leave_fullscreen() : go_fullscreen()">
         <v-icon>{{ fullscreen_on ? 'mdi-fullscreen-exit' : 'mdi-fullscreen' }}</v-icon> {{ btn_label }}
     </btn-action>
     `,
