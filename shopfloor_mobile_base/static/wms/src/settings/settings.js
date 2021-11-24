@@ -31,7 +31,7 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
                 </v-row>
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-action @click="logout()">{{ $t('app.action.logout') }}</btn-action>
+                        <btn-action color="primary" @click="logout()">{{ $t('app.action.logout') }}</btn-action>
                     </v-col>
                 </v-row>
                 <v-row align="center">
