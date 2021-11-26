@@ -20,3 +20,17 @@ def migrate(cr, version):
         # but existing installations might depend on api key.
         _logger.info("Install shopfloor_mobile_base_auth_api_key")
         module.write({"state": "to install"})
+        # Add a default app to make `/shopfloor_mobile/app/#` work.
+        _create_default_app(env)
+
+
+def _create_default_app(env):
+    # Add default app
+    values = {
+        "name": "Shopfloor WMS",
+        "short_name": "WMS",
+        "tech_name": "wms",
+        "auth_type": "api_key",
+        "category": "wms",
+    }
+    env["shopfloor.app"].create(values)
