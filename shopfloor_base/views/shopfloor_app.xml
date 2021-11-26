@@ -48,13 +48,13 @@
                                 <group name="main">
                                     <field name="category" />
                                     <field name="tech_name" />
-                                    <field name="auth_type" />
-                                </group>
-                                <group name="metadata" string="Metadata">
                                     <field name="short_name" />
                                 </group>
+                                <group name="auth" string="Auth">
+                                    <field name="auth_type" />
+                                </group>
                             </group>
-                            <group name="two">
+                            <group name="profiles" string="Profiles and menu items">
                                 <field name="profile_ids" widget="many2many_tags" />
                                 <button
                                     type="object"
