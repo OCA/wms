@@ -1,0 +1,8 @@
+<odoo noupdate="1">
+  <record id="app_demo1" model="shopfloor.app">
+    <field name="name">Shopfloor Demo (user auth)</field>
+    <field name="short_name">demo user</field>
+    <field name="tech_name">demo_user</field>
+    <field name="auth_type">user_endpoint</field>
+  </record>
+</odoo>
