@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/JuMiSanAr/wms#readme",
   "devDependencies": {
-    "cypress": "^8.6.0"
+    "cypress": "^8.7.0"
   }
 }
