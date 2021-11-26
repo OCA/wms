@@ -56,6 +56,12 @@
                             </group>
                             <group name="two">
                                 <field name="profile_ids" widget="many2many_tags" />
+                                <button
+                                    type="object"
+                                    name="action_view_menu_items"
+                                    string="View menu items"
+                                    class="btn btn-link"
+                                />
                             </group>
                         </page>
                         <page name="dev" string="Developer" groups="base.group_no_one">
