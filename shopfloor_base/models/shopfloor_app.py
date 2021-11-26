@@ -130,6 +130,16 @@ class ShopfloorApp(models.Model):
             "target": "new",
         }
 
+    def action_view_menu_items(self):
+        xid = "shopfloor_base.action_shopfloor_menu"
+        action = self.env["ir.actions.act_window"]._for_xml_id(xid)
+        action["domain"] = [
+            "|",
+            ("id", "in", self.profile_ids.menu_ids.ids),
+            ("profile_id", "=", False),
+        ]
+        return action
+
     # TODO: move to shopfloor_app_base? or just `app_base`?
     @api.model_create_multi
     def create(self, vals_list):
