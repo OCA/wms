@@ -36,10 +36,13 @@ class ShopfloorApp(models.Model):
     _description = "A Shopfloor application"
 
     name = fields.Char(required=True, translate=True)
-    short_name = fields.Char(required=True, translate=True)
+    short_name = fields.Char(
+        required=True, translate=True, help="Needed for app manifest"
+    )
     # Unique name
     tech_name = fields.Char(required=True, index=True)
     active = fields.Boolean(default=True)
+    category = fields.Selection(selection=[("", "None")])
     api_route = fields.Char(
         compute="_compute_api_route",
         compute_sudo=True,

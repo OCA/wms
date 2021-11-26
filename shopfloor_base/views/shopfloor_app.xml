@@ -46,6 +46,7 @@
                         <page name="main" string="Main">
                             <group name="one">
                                 <group name="main">
+                                    <field name="category" />
                                     <field name="tech_name" />
                                     <field name="auth_type" />
                                 </group>
@@ -74,6 +75,16 @@
             <search>
                 <field name="name" />
                 <field name="tech_name" />
+                <field name="category" />
+                <separator />
+                <group string="Group By">
+                    <filter
+                        name="group_by_category"
+                        string="Category"
+                        domain="[]"
+                        context="{'group_by':'category'}"
+                    />
+                </group>
                 <separator />
                 <filter
                     string="Archived"
