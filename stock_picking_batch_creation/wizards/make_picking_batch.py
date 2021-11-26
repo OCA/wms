@@ -253,21 +253,24 @@ class MakePickingBatch(models.TransientModel):
 
     def _picking_volume(self, picking):
         volume = 0.0
-        for line in picking.move_lines:
-            product = line.product_id
-            packagings_with_volume = product.with_context(
-                _packaging_filter=lambda p: p.volume
-            ).product_qty_by_packaging(line.product_uom_qty)
-            for packaging_info in packagings_with_volume:
-                if packaging_info.get("is_unit"):
-                    pack_volume = product.volume
-                else:
-                    packaging = self.env["product.packaging"].browse(
-                        packaging_info["id"]
-                    )
-                    pack_volume = packaging.volume
+        with self.env["product.product"].product_qty_by_packaging_arg_ctx(
+            packaging_filter=lambda p: p.volume
+        ):
+            for line in picking.move_lines:
+                product = line.product_id
+                packagings_with_volume = product.product_qty_by_packaging(
+                    line.product_uom_qty
+                )
+                for packaging_info in packagings_with_volume:
+                    if packaging_info.get("is_unit"):
+                        pack_volume = product.volume
+                    else:
+                        packaging = self.env["product.packaging"].browse(
+                            packaging_info["id"]
+                        )
+                        pack_volume = packaging.volume
 
-                volume += pack_volume * packaging_info["qty"]
+                    volume += pack_volume * packaging_info["qty"]
         return volume
 
     def _create_batch_values(self, user, device, pickings):
