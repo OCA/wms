@@ -17,4 +17,9 @@
         "auth_api_key_group",
     ],
     "data": ["templates/assets.xml", "views/shopfloor_app.xml"],
+    "demo": [
+        "demo/auth_api_key_demo.xml",
+        "demo/auth_api_key_group_demo.xml",
+        "demo/shopfloor_app_demo.xml",
+    ],
 }
