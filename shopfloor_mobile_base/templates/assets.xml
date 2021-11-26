@@ -197,7 +197,7 @@
         />
         <script
             id="script_theme"
-            t-attf-src="/shopfloor_mobile_base/static/wms/src/theme.js?v=#{app_info['version']}"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/theme.js?v=#{app_version}"
             type="module"
         />
 
