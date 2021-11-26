@@ -12,7 +12,6 @@ import {
 
 // Provide auth handle for Odoo calls
 export class UserAuthHandler extends AuthHandlerMixin {
-    // Not sure we need anything if we get a cookie in the same browser
     get_params() {
         return {
             /**
@@ -31,7 +30,7 @@ export class UserAuthHandler extends AuthHandlerMixin {
         return "login-user";
     }
 
-    on_login($root, data) {
+    on_login(data) {
         // Call odoo application load => set the result in the local storage in json
         const odoo = this.$root.getOdoo({base_url: "/session/"});
         return odoo
