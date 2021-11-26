@@ -1,0 +1,14 @@
+<odoo noupdate="1">
+  <record id="app_demo1" model="shopfloor.app">
+    <field name="name">Shopfloor Demo (api key auth)</field>
+    <field name="short_name">demo api key</field>
+    <field name="tech_name">demo_api_key</field>
+    <field name="auth_type">api_key</field>
+    <field
+            name="auth_api_key_group_ids"
+            eval="[
+          (4, ref('auth_api_key_group')),
+        ]"
+        />
+  </record>
+</odoo>
