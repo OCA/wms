@@ -18,12 +18,10 @@
         "base_jsonify",
         "base_rest",
         "base_sparse_field",
-        "auth_api_key",  # FIXME: remove
         "endpoint_route_handler",
     ],
     "data": [
         "data/module_category_data.xml",
-        "data/shopfloor_app_data.xml",
         "security/groups.xml",
         "security/ir.model.access.csv",
         "views/shopfloor_app.xml",
@@ -34,7 +32,6 @@
     ],
     "demo": [
         "demo/res_users_demo.xml",
-        "demo/auth_api_key_demo.xml",
         "demo/shopfloor_scenario_demo.xml",
         "demo/shopfloor_menu_demo.xml",
         "demo/shopfloor_profile_demo.xml",
