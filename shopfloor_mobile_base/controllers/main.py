@@ -65,6 +65,7 @@ class ShopfloorMobileAppMixin(object):
         profile_required = shopfloor_app.profile_required
         return dict(
             base_url=base_url,
+            manifest_url=shopfloor_app.url + "/manifest.json",
             auth_type=auth_type,
             profile_required=profile_required,
             demo_mode=demo,
