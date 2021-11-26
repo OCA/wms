@@ -12,7 +12,7 @@
         name="Shopfloor app layout"
     >
         <link type="image/x-icon" position="after">
-            <link rel="manifest" href="/shopfloor_mobile/manifest.json" />
+            <link rel="manifest" t-att-href="app_info['manifest_url']" />
         </link>
     </template>
     <template id="shopfloor_app_main" name="Shopfloor app main">
