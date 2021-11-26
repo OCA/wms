@@ -6,7 +6,7 @@
 {
     "name": "Shopfloor Base",
     "summary": "Core module for creating mobile apps",
-    "version": "14.0.1.2.2",
+    "version": "14.0.2.0.0",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
@@ -36,5 +36,4 @@
         "demo/shopfloor_menu_demo.xml",
         "demo/shopfloor_profile_demo.xml",
     ],
-    "post_init_hook": "post_init_hook",
 }
