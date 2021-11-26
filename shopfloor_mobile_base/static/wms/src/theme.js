@@ -3,7 +3,7 @@
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
-import {color_registry} from "./services/color_registry";
+import {color_registry} from "./services/color_registry.js";
 
 const error_color = "#c22a4a";
 const success_color = "#8fbf44";
