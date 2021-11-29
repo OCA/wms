@@ -167,21 +167,6 @@ class ShopfloorMobileAppController(http.Controller, ShopfloorMobileAppMixin):
         return self._load_app(shopfloor_app, demo=True if demo else False, **kw)
 
     @http.route(
-        ["/shopfloor_mobile/app"],
-        auth="public",
-    )
-    def load_app_backward(self, demo=False):
-        # Backward compat redirect to the 1st matching app if any.
-        model = http.request.env["shopfloor.app"]
-        # TODO: create a default app and redirect to it automatically.
-        # Then make `shopfloor_app` required at every step in `_load_app`.
-        app = model.search([], limit=1)
-        if app:
-            return http.redirect_with_hash(app.url, code=301)
-        _logger.error("No matching app")
-        return http.request.not_found()
-
-    @http.route(
         [
             "/shopfloor/app/<tech_name(shopfloor.app):shopfloor_app>/manifest.json",
         ],
