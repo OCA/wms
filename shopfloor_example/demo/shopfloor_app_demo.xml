@@ -1,0 +1,30 @@
+<odoo>
+  <record id="app_demo_user" model="shopfloor.app">
+    <field name="name">Shopfloor Example - user auth</field>
+    <field name="short_name">Example - user auth</field>
+    <field name="tech_name">example_user</field>
+    <field name="category">example</field>
+    <field name="auth_type">user_endpoint</field>
+    <field
+            name="profile_ids"
+            eval="[(4, ref('shopfloor_profile_partner_manager_demo'))]"
+        />
+  </record>
+  <record id="app_demo_api_key" model="shopfloor.app">
+    <field name="name">Shopfloor Example - api key auth</field>
+    <field name="short_name">Example - api key auth</field>
+    <field name="tech_name">example_api_key</field>
+    <field name="category">example</field>
+    <field name="auth_type">api_key</field>
+    <field
+            name="auth_api_key_group_ids"
+            eval="[
+          (4, ref('shopfloor_mobile_base_auth_api_key.auth_api_key_group')),
+        ]"
+        />
+    <field
+            name="profile_ids"
+            eval="[(4, ref('shopfloor_profile_partner_manager_demo'))]"
+        />
+  </record>
+</odoo>

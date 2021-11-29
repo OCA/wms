@@ -6,17 +6,23 @@
     "name": "Shopfloor example",
     "summary": "Show how to customize the Shopfloor app frontend.",
     "version": "14.0.1.0.0",
-    "depends": ["shopfloor_base", "shopfloor_mobile_base"],
     "author": "Camptocamp, ACSONE, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "category": "Hidden",
     "license": "AGPL-3",
     "installable": True,
+    "depends": [
+        "shopfloor_base",
+        "shopfloor_mobile_base",
+        "shopfloor_mobile_base_auth_user",
+        "shopfloor_mobile_base_auth_api_key",
+    ],
     # fmt: off
     "demo": [
         "demo/shopfloor_scenario_demo.xml",
         "demo/shopfloor_profile_demo.xml",
         "demo/shopfloor_menu_demo.xml",
+        "demo/shopfloor_app_demo.xml",
     ],
     # fmt: on
     "data": ["templates/assets.xml"],
