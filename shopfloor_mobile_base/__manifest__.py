@@ -14,5 +14,5 @@
     "category": "Warehouse Management",
     "license": "AGPL-3",
     "installable": True,
-    "data": ["menus.xml", "templates/main.xml", "templates/assets.xml"],
+    "data": ["templates/main.xml", "templates/assets.xml"],
 }
