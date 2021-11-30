@@ -1,11 +1,13 @@
 {
   "projectId": "shopfloor",
-  "baseUrl": "http://localhost:8069/shopfloor_mobile/app/#/",
-  "baseUrlDemo": "http://localhost:8069/shopfloor_mobile/app/demo/#/",
+  "baseUrl": "http://localhost:8069/shopfloor/app/example_api_key/#/",
+  "baseUrlDemo": "http://localhost:8069/shopfloor/app/example_api_key/demo/#/",
+  "baseUrlUserAuth": "http://localhost:8069/shopfloor/app/example_user/#/",
+  "baseUrlDemoUserAuth": "http://localhost:8069/shopfloor/app/example_user/demo/#/",
   "viewportHeight": 700,
   "viewportWidth": 360,
   "env": {
-    "auth_type": "",
+    "auth_type": "api_key",
     "credentials": "",
     "test_appconfig": {},
     "test_menu_data": {},

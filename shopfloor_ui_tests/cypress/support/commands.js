@@ -65,13 +65,7 @@ Cypress.Commands.add("intercept_user_config_request", () => {
 Cypress.Commands.add("prepare_test_authentication", () => {
     cy.visit(Cypress.config("baseUrl") + "login");
     cy.get("form").then(($form) => {
-        if ($form.find("input[name='apikey']").length) {
-            Cypress.env("auth_type", "apikey");
-        } else {
-            Cypress.env("auth_type", "user");
-        }
         const auth_type = Cypress.env("auth_type");
-
         cy.get_credentials("correct", auth_type).then((credentials) => {
             credentials =
                 auth_type === "user"
