@@ -5,12 +5,12 @@
 
 Vue.component(
     "picking-select-package-content"
-).extendOptions.methods.get_wrapper_klass = function(record) {
+).extendOptions.methods.get_wrapper_klass = function (record) {
     return record.has_lq_products ? "has-lq-products" : "";
 };
 
 Vue.component(
     "picking-select-line-content"
-).extendOptions.methods.get_wrapper_klass = function(record) {
+).extendOptions.methods.get_wrapper_klass = function (record) {
     return record.has_lq_products ? "has-lq-products" : "";
 };
