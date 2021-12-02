@@ -4,7 +4,7 @@
 {
     "name": "Shopfloor Dangerous Goods",
     "summary": "Glue Module Between Shopfloor and Stock Dangerous Goods",
-    "version": "13.0.1.0.0",
+    "version": "14.0.1.0.0",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
