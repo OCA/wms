@@ -25,7 +25,7 @@ Sale Stock Available to Promise Release Cutoff
 
 |badge1| |badge2| |badge3| |badge4| |badge5| 
 
-Glue module between `sale_stock_available_to_promise_release` and `sale_cutoff_time_delivery`.
+Glue module between `sale_stock_available_to_promise_release` and `sale_delivery_date`.
 Cutoff management with respect to stock availability
 
 **Table of contents**
