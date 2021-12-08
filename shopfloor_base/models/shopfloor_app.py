@@ -255,9 +255,12 @@ class ShopfloorApp(models.Model):
     def _route_group(self):
         return f"{self._name}:{self.tech_name}"
 
-    def _get_services(self):
+    def _is_component_registry_ready(self):
         comp_registry = _component_databases.get(self.env.cr.dbname)
-        if not comp_registry or comp_registry and not comp_registry.ready:
+        return comp_registry and comp_registry.ready
+
+    def _get_services(self):
+        if not self._is_component_registry_ready():
             # No service is available before the registry has been loaded.
             # This is a very special case, when the odoo registry is being
             # built, it calls odoo.modules.loading.load_modules().
