@@ -14,26 +14,34 @@ export class OdooMixin {
         this.debug = this.params.debug;
     }
     call(path, data, method = "POST", fullpath = false) {
-        const endpoint = fullpath ? path : this.usage + "/" + path;
-        return this._call(endpoint, method, data);
+        const endpoint_info = this._make_endpoint_info(path, fullpath);
+        return this._call(endpoint_info, method, data);
     }
     post(path, data, fullpath = false) {
         if (_.isArray(path)) {
             path = path.join("/");
         }
-        const endpoint = fullpath ? path : this.usage + "/" + path;
-        return this._call(endpoint, "POST", data);
+        const endpoint_info = this._make_endpoint_info(path, fullpath);
+        return this._call(endpoint_info, "POST", data);
     }
     get(path, data, fullpath = false) {
         if (_.isArray(path)) {
             path = path.join("/");
         }
-        const endpoint = fullpath ? path : this.usage + "/" + path;
-        return this._call(endpoint, "GET", data);
+        const endpoint_info = this._make_endpoint_info(path, fullpath);
+        return this._call(endpoint_info, "GET", data);
     }
-    _call(endpoint, method, data) {
+    _make_endpoint_info(path, fullpath) {
+        return {
+            endpoint: fullpath ? path : this.usage + "/" + path,
+            path: path,
+            fullpath: fullpath,
+        };
+    }
+    _call(endpoint_info, method, data) {
+        let endpoint = endpoint_info.endpoint;
         if (this.debug) {
-            console.log("CALL", endpoint);
+            console.log("DEBUG CALL", endpoint);
         }
         const self = this;
         const params = {
@@ -115,7 +123,8 @@ export class OdooMocked extends OdooMixin {
     _set_demo_data() {
         this.demo_data = demotools.get_case(this.usage);
     }
-    call(path, data, method = "POST", fullpath = false) {
+    _call(endpoint_info, method, data) {
+        let path = endpoint_info.path;
         this._set_demo_data();
         console.log("CALL:", path, this.usage);
         console.dir("CALL data:", data);
