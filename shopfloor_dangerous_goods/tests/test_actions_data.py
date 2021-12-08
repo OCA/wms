@@ -7,7 +7,9 @@ from odoo.addons.shopfloor.tests.test_actions_data_base import ActionsDataCaseBa
 class ActionsDataBase(ActionsDataCaseBase):
     @classmethod
     def _set_product_lq(cls):
-        limited_amount_lq = cls.env.ref("l10n_eu_product_adr.limited_amount_1")
+        limited_amount_lq = cls.env.ref(
+            "l10n_eu_product_adr_dangerous_goods.limited_amount_1"
+        )
         cls.product_a.is_dangerous = True
         cls.product_a.limited_amount_id = limited_amount_lq
 
