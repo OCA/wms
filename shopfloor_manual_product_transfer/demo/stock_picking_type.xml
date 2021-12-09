@@ -1,0 +1,17 @@
+<odoo noupdate="1">
+    <record id="picking_type_manual_product_transfer_demo" model="stock.picking.type">
+        <field name="name">Manual Product Transfer</field>
+        <field name="sequence_code">MPT</field>
+        <field name="sequence" eval="10" />
+        <field name="warehouse_id" ref="stock.warehouse0" />
+        <field name="default_location_src_id" ref="stock.stock_location_stock" />
+        <field name="default_location_dest_id" ref="stock.stock_location_stock" />
+        <field name="show_entire_packs" eval="1" />
+        <field name="use_create_lots" eval="0" />
+        <field name="use_existing_lots" eval="1" />
+        <field name="color" eval="5" />
+        <field name="code">internal</field>
+        <field name="show_operations" eval="1" />
+        <field name="display_completion_info" eval="1" />
+    </record>
+</odoo>

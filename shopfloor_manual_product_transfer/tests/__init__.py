@@ -1,0 +1,6 @@
+from . import test_manual_product_transfer_base
+from . import test_manual_product_transfer_start
+from . import test_manual_product_transfer_scan_product
+from . import test_manual_product_transfer_confirm_quantity
+from . import test_manual_product_transfer_scan_destination_location
+from . import test_manual_product_transfer_misc
