@@ -44,14 +44,4 @@
 }
         </field>
     </record>
-    <record id="scenario_manual_product_transfer" model="shopfloor.scenario">
-        <field name="name">Manual product transfer</field>
-        <field name="key">manual_product_transfer</field>
-        <field name="options_edit">
-{
-    "allow_unreserve_other_moves": true,
-    "allow_ignore_no_putaway_available": true
-}
-        </field>
-    </record>
 </odoo>
