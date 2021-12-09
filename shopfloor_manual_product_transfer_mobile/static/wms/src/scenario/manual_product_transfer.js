@@ -93,18 +93,18 @@ const ManualProductTransfer = {
         </Screen>
         `,
     methods: {
-        quantity_btn_label: function() {
+        quantity_btn_label: function () {
             const n = 200;
             return "Quantity " + this.quantity().toString();
         },
-        screen_title: function() {
+        screen_title: function () {
             if (_.isEmpty(this.state.data.picking)) {
                 return this.menu_item().name;
             }
             return this.state.data.picking.name;
         },
-        state_data_check: function(data) {},
-        location_src: function() {
+        state_data_check: function (data) {},
+        location_src: function () {
             const data = this.state.data;
             if (_.isEmpty(data)) {
                 return {};
@@ -117,7 +117,7 @@ const ManualProductTransfer = {
             }
             return {};
         },
-        product: function() {
+        product: function () {
             const data = this.state.data;
             if (_.isEmpty(data)) {
                 return {};
@@ -130,7 +130,7 @@ const ManualProductTransfer = {
             }
             return {};
         },
-        quantity: function() {
+        quantity: function () {
             const data = this.state.data;
             if (_.isEmpty(data)) {
                 return 0;
@@ -141,7 +141,7 @@ const ManualProductTransfer = {
             }
             return 0;
         },
-        lot: function() {
+        lot: function () {
             const data = this.state.data;
             if (_.isEmpty(data)) {
                 return {};
@@ -157,21 +157,21 @@ const ManualProductTransfer = {
             }
             return {};
         },
-        lot_name: function() {
+        lot_name: function () {
             const lot = this.lot();
             if ("name" in lot) {
                 return lot.name;
             }
             return "";
         },
-        fake_line: function() {
+        fake_line: function () {
             const product = this.product();
             return {
                 quantity: this.quantity(),
                 product: this.product(),
             };
         },
-        move_line_ids: function() {
+        move_line_ids: function () {
             const data = this.state.data;
             if (_.isEmpty(data)) {
                 return {};
@@ -179,9 +179,9 @@ const ManualProductTransfer = {
             if (_.isEmpty(data.move_lines)) {
                 return {};
             }
-            return data.move_lines.map(line => line.id);
+            return data.move_lines.map((line) => line.id);
         },
-        location_dest: function() {
+        location_dest: function () {
             const data = this.state.data;
             if (_.isEmpty(data)) {
                 return {};
@@ -192,7 +192,7 @@ const ManualProductTransfer = {
             return {};
         },
     },
-    data: function() {
+    data: function () {
         const self = this;
         return {
             usage: "manual_product_transfer",
@@ -203,7 +203,7 @@ const ManualProductTransfer = {
                         title: "Start by scanning a location",
                         scan_placeholder: "Scan location",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("scan_source_location", {
                                 barcode: scanned.text,
@@ -216,7 +216,7 @@ const ManualProductTransfer = {
                         title: "Scan a product or a lot",
                         scan_placeholder: "Scan product or lot",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("scan_product", {
                                 barcode: scanned.text,
@@ -233,7 +233,7 @@ const ManualProductTransfer = {
                         title: "Confirm quantity",
                         scan_placeholder: "Scan again product or a lot to confirm",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("confirm_quantity", {
                                 location_id: this.location_src().id,
@@ -262,7 +262,7 @@ const ManualProductTransfer = {
                     events: {
                         qty_edit: "on_qty_update",
                     },
-                    on_qty_update: qty => {
+                    on_qty_update: (qty) => {
                         this.state.data.quantity = qty;
                     },
                 },
@@ -278,7 +278,7 @@ const ManualProductTransfer = {
                     events: {
                         qty_edit: "on_qty_update",
                     },
-                    on_qty_update: qty => {
+                    on_qty_update: (qty) => {
                         this.state.data.quantity = qty;
                     },
                     display_info: {
@@ -305,7 +305,7 @@ const ManualProductTransfer = {
                         title: "Scann a destination location",
                         scan_placeholder: "Scan location",
                     },
-                    on_scan: scanned => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("scan_destination_location", {
                                 barcode: scanned.text,
