@@ -18,7 +18,8 @@ class ManualProductTransferScanDestinationLocation(ManualProductTransferCommonCa
             params={"move_line_ids": [-1], "barcode": self.shelf1.barcode},
         )
         self.assert_response_start(
-            response, message=self.service.msg_store.record_not_found(),
+            response,
+            message=self.service.msg_store.record_not_found(),
         )
 
     def _confirm_quantity(self):

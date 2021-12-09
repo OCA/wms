@@ -6,8 +6,7 @@ from odoo.tools import float_compare, float_is_zero
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
-
-from ..utils import to_float
+from odoo.addons.shopfloor.utils import to_float
 
 
 class ManualProductTransfer(Component):
@@ -63,7 +62,9 @@ class ManualProductTransfer(Component):
         if lot:
             data["lot"] = self.data.lot(lot)
         return self._response(
-            next_state="confirm_quantity", data=data, message=message,
+            next_state="confirm_quantity",
+            data=data,
+            message=message,
         )
 
     def _response_for_set_quantity(self, move_lines, quantity, message=None):
@@ -192,7 +193,9 @@ class ManualProductTransfer(Component):
         return sum(
             [
                 line.product_id.uom_id._compute_quantity(
-                    line.qty_done, line.product_uom_id, rounding_method="HALF-UP",
+                    line.qty_done,
+                    line.product_uom_id,
+                    rounding_method="HALF-UP",
                 )
                 for line in move_lines
             ]
@@ -352,8 +355,10 @@ class ManualProductTransfer(Component):
         barcode=None,
         confirm=False,
     ):
-        """Confirm the quantity to move by scanning the product/lot a second
-        time (`barcode`) or by clicking the button (`confirm`).
+        """Confirm the quantity to move.
+
+        Done by scanning the product/lot a second time (`barcode`)
+        or by clicking the button (`confirm`).
 
         Transitions:
         * scan_destination_location: quantity is confirmed for the current product/lot
@@ -379,7 +384,10 @@ class ManualProductTransfer(Component):
         # means no barcode is scanned or no confirm button is clicked)
         if not confirm:
             return self._response_for_confirm_quantity(
-                location, product, quantity, lot,
+                location,
+                product,
+                quantity,
+                lot,
             )
         # Check the input quantity
         initial_qty = self._get_initial_qty(location, product, lot)

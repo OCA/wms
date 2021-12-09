@@ -249,7 +249,10 @@ class ManualProductTransferConfirmQuantity(ManualProductTransferCommonCase):
             },
         )
         self.assert_response_confirm_quantity(
-            response, self.src_location, self.product_a, 9,
+            response,
+            self.src_location,
+            self.product_a,
+            9,
         )
 
     def test_set_quantity_exceeds_initial_qty(self):

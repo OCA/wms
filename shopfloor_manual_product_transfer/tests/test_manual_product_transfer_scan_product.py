@@ -46,7 +46,10 @@ class ManualProductTransferScanProduct(ManualProductTransferCommonCase):
             },
         )
         self.assert_response_confirm_quantity(
-            response, self.src_location, self.product_a, 10,
+            response,
+            self.src_location,
+            self.product_a,
+            10,
         )
 
     def test_scan_product_lot_ok(self):
@@ -58,7 +61,11 @@ class ManualProductTransferScanProduct(ManualProductTransferCommonCase):
             },
         )
         self.assert_response_confirm_quantity(
-            response, self.src_location, self.product_b, 10, self.product_b_lot,
+            response,
+            self.src_location,
+            self.product_b,
+            10,
+            self.product_b_lot,
         )
 
     def test_scan_product_recover_session(self):

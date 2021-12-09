@@ -1,14 +1,16 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from .common import CommonCase
+from odoo.addons.shopfloor.tests.common import CommonCase
 
 
 class ManualProductTransferCommonCase(CommonCase):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
-        cls.menu = cls.env.ref("shopfloor.shopfloor_menu_manual_product_transfer")
+        cls.menu = cls.env.ref(
+            "shopfloor_manual_product_transfer.shopfloor_menu_manual_product_transfer"
+        )
         cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
         cls.picking_type = cls.menu.picking_type_ids
         cls.wh = cls.picking_type.warehouse_id
@@ -57,7 +59,9 @@ class ManualProductTransferCommonCase(CommonCase):
             }
         )
         cls._update_qty_in_location(
-            cls.src_location, cls.product_a, 10,
+            cls.src_location,
+            cls.product_a,
+            10,
         )
         cls._update_qty_in_location(
             cls.src_location, cls.product_b, 10, lot=cls.product_b_lot
@@ -90,7 +94,10 @@ class ManualProductTransferCommonCase(CommonCase):
         if lot:
             data.update(lot=self.data.lot(lot))
         self.assert_response(
-            response, "confirm_quantity", data=data, message=message,
+            response,
+            "confirm_quantity",
+            data=data,
+            message=message,
         )
 
     def assert_response_set_quantity(self, response, move_line, message=None):

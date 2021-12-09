@@ -575,9 +575,3 @@ class MessageAction(Component):
                 "The system couldn't pack goods automatically."
             ).format(picking),
         }
-
-    def qty_exceeds_initial_qty(self):
-        return {
-            "message_type": "error",
-            "body": _("This quantity exceeds the initial one."),
-        }
