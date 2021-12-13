@@ -40,6 +40,13 @@
                   <field name="pick_pack_same_time_is_possible" invisible="1" />
                   <field name="pick_pack_same_time" />
               </group>
+              <group
+                    name="force_reservation"
+                    attrs="{'invisible': [('allow_force_reservation_is_possible', '=', False)]}"
+                >
+                  <field name="allow_force_reservation_is_possible" invisible="1" />
+                  <field name="allow_force_reservation" />
+              </group>
             </group>
         </field>
     </record>
