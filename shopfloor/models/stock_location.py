@@ -72,7 +72,6 @@ class StockLocation(models.Model):
 
     def should_bypass_reservation(self):
         self.ensure_one()
-        # TODO: This could be set as an option on shopfloor.menu
         if self.env.context.get("force_reservation"):
             return False
         return super().should_bypass_reservation()

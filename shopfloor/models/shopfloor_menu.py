@@ -63,6 +63,14 @@ class ShopfloorMenu(models.Model):
         compute="_compute_pick_pack_same_time_is_possible"
     )
 
+    allow_force_reservation = fields.Boolean(
+        string="Force stock reservation",
+        default=False,
+    )
+    allow_force_reservation_is_possible = fields.Boolean(
+        compute="_compute_allow_force_reservation_is_possible"
+    )
+
     @api.depends("scenario_id", "picking_type_ids")
     def _compute_move_create_is_possible(self):
         for menu in self:
@@ -158,3 +166,10 @@ class ShopfloorMenu(models.Model):
                         "Please, adjust your configuration."
                     ).format(scenario_name, "\n- ".join(bad_picking_types))
                 )
+
+    @api.depends("scenario_id")
+    def _compute_allow_force_reservation_is_possible(self):
+        for menu in self:
+            menu.allow_force_reservation_is_possible = menu.scenario_id.has_option(
+                "allow_force_reservation"
+            )
