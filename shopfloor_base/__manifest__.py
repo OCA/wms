@@ -13,7 +13,7 @@
     "author": "Camptocamp, BCIM, Akretion, Odoo Community Association (OCA)",
     "maintainers": ["guewen", "simahawk", "sebalix"],
     "license": "LGPL-3",
-    "application": True,
+    "application": False,
     "depends": ["base_jsonify", "base_rest", "base_sparse_field", "auth_api_key"],
     "data": [
         "data/module_category_data.xml",
