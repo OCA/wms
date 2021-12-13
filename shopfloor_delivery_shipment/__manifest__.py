@@ -10,7 +10,7 @@
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "maintainers": ["sebalix", "TDu"],
     "license": "AGPL-3",
-    "application": True,
+    "application": False,
     "depends": [
         # OCA/wms
         "shopfloor",
