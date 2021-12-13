@@ -9,7 +9,7 @@
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "license": "AGPL-3",
-    "application": True,
+    "application": False,
     "depends": ["shopfloor", "sales_team"],
     "data": [
         "security/ir.model.access.csv",
