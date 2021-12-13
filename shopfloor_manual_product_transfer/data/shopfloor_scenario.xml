@@ -5,7 +5,8 @@
         <field name="options_edit">
 {
     "allow_unreserve_other_moves": true,
-    "allow_ignore_no_putaway_available": true
+    "allow_ignore_no_putaway_available": true,
+    "allow_force_reservation": true
 }
         </field>
     </record>

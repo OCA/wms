@@ -339,7 +339,9 @@ class ManualProductTransfer(Component):
             move_vals["restrict_lot_id"] = lot.id
         move = self.env["stock.move"].create(move_vals)
         move._action_confirm(merge=False)
-        move.with_context({"force_reservation": True})._action_assign()
+        move.with_context(
+            {"force_reservation": self.work.menu.allow_force_reservation}
+        )._action_assign()
         assert move.state == "assigned", "The reservation of quantities has failed"
         move.move_line_ids.shopfloor_user_id = self.env.user
         for line in move.move_line_ids:
@@ -433,7 +435,9 @@ class ManualProductTransfer(Component):
                 message=self.msg_store.no_putaway_destination_available(),
             )
         # 4. If moves were unreserved -> Reserve them back again
-        unreserved_moves.with_context({"force_reservation": True})._action_assign()
+        unreserved_moves.with_context(
+            {"force_reservation": self.work.menu.allow_force_reservation}
+        )._action_assign()
         savepoint.release()
         return self._response_for_scan_destination_location(
             move.picking_id, move.move_line_ids
@@ -549,7 +553,9 @@ class ManualProductTransfer(Component):
         # Validate the move and get back to the start
         stock = self._actions_for("stock")
         stock.validate_moves(
-            move_lines.move_id.with_context({"force_reservation": True})
+            move_lines.move_id.with_context(
+                {"force_reservation": self.work.menu.allow_force_reservation}
+            )
         )
         return self._response_for_start(
             message=self.msg_store.transfer_done_success(move_lines.picking_id)
