@@ -1,0 +1,31 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_manual_product_transfer
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: shopfloor_manual_product_transfer
+#: model:shopfloor.menu,name:shopfloor_manual_product_transfer.shopfloor_menu_manual_product_transfer
+#: model:stock.picking.type,name:shopfloor_manual_product_transfer.picking_type_manual_product_transfer_demo
+msgid "Manual Product Transfer"
+msgstr ""
+
+#. module: shopfloor_manual_product_transfer
+#: model:shopfloor.scenario,name:shopfloor_manual_product_transfer.scenario_manual_product_transfer
+msgid "Manual product transfer"
+msgstr ""
+
+#. module: shopfloor_manual_product_transfer
+#: code:addons/shopfloor_manual_product_transfer/actions/message.py:0
+#, python-format
+msgid "This quantity exceeds the initial one."
+msgstr ""
