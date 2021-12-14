@@ -60,3 +60,12 @@ class StockAction(Component):
             # the lines related to the package itself. In such case we have to
             # split the move to process only the lines related to the package.
             package_move.split_other_move_lines(package_move_lines)
+
+    def no_putaway_available(self, picking_types, move_lines):
+        """Returns `True` if no putaway destination has been computed for one
+        of the given move lines.
+        """
+        base_locations = picking_types.default_location_dest_id
+        # when no putaway is found, the move line destination stays the
+        # default's of the picking type
+        return any(line.location_dest_id in base_locations for line in move_lines)

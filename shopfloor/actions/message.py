@@ -193,6 +193,18 @@ class MessageAction(Component):
             "body": _("No package or lot found for barcode {}.").format(barcode),
         }
 
+    def no_product_for_barcode(self, barcode):
+        return {
+            "message_type": "error",
+            "body": _("No product found for {}").format(barcode),
+        }
+
+    def wrong_product(self):
+        return {
+            "message_type": "error",
+            "body": _("Wrong product."),
+        }
+
     def no_lot_for_barcode(self, barcode):
         return {
             "message_type": "error",
@@ -203,6 +215,12 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Lot {} is for another product.").format(barcode),
+        }
+
+    def wrong_lot(self):
+        return {
+            "message_type": "error",
+            "body": _("Wrong lot."),
         }
 
     def several_lots_in_location(self, location):
@@ -217,6 +235,12 @@ class MessageAction(Component):
             "body": _(
                 "Several products found in %s, please scan a product." % location.name
             ),
+        }
+
+    def no_product_in_location(self, location):
+        return {
+            "message_type": "error",
+            "body": _("No product found in {}").format(location.name),
         }
 
     def no_pending_operation_for_pack(self, pack):
