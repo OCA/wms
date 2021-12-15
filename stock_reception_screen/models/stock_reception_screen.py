@@ -506,7 +506,7 @@ class StockReceptionScreen(models.Model):
         new_move_vals = move._split(qty)
         if new_move_vals:
             new_move = self.env["stock.move"].create(new_move_vals)
-            new_move._action_confirm()
+            new_move = new_move._action_confirm(merge=False)
             return new_move
         return move
 
