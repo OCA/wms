@@ -13,8 +13,8 @@ class StockMove(models.Model):
     @api.model
     def create(self, vals):
         res = super(StockMove, self).create(vals)
-        res.location_dest_id._tigger_cache_recompute_if_required()
         res.location_dest_id.invalidate_cache(["in_move_ids"], res.location_dest_id.ids)
+        res.location_dest_id._tigger_cache_recompute_if_required()
         return res
 
     def write(self, vals):
@@ -32,5 +32,6 @@ class StockMove(models.Model):
     def unlink(self):
         locations = self.mapped("location_dest_id")
         res = super(StockMove, self).unlink()
+        locations.invalidate_cache(["in_move_ids"], locations.ids)
         locations._tigger_cache_recompute_if_required()
         return res

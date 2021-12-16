@@ -75,7 +75,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             "stock_storage_type.stock_location_cardboxes_reserve_bin_1"
         )
         self.assertEqual(
-            int_picking.move_line_ids.mapped("location_dest_id"), reserve_cardbox
+            int_picking.pack_operation_ids.mapped("location_dest_id"), reserve_cardbox
         )
 
     def test_storage_strategy_only_empty_ordered_locations_pallets(self):

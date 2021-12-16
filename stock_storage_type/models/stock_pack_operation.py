@@ -206,5 +206,8 @@ class StockPackOperation(models.Model):
     def unlink(self):
         locations = self.mapped("location_id") | self.mapped("location_dest_id")
         res = super(StockPackOperation, self).unlink()
+        locations.invalidate_cache(
+            ["in_move_line_ids", "out_move_line_ids"], locations.ids
+        )
         locations._tigger_cache_recompute_if_required()
         return res

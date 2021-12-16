@@ -455,7 +455,7 @@ class StockLocation(models.Model):
 
         pertinent_loc_storagetype_domain = [
             ("id", "in", compatible_location_storage_types.ids),
-            ("package_storage_type_ids", "=", package_storage_type.id),
+            ("package_storage_type_ids", "in", package_storage_type.id),
         ]
         height = quants and max(quants.mapped("package_id.height") or [False])
         if height:
