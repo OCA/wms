@@ -10,4 +10,23 @@
             </group>
         </field>
     </record>
+
+    <record id="view_move_tree" model="ir.ui.view">
+        <field name="model">stock.move</field>
+        <field
+            name="inherit_id"
+            ref="stock_available_to_promise_release.view_move_release_tree"
+        />
+        <field name="arch" type="xml">
+            <field name="ordered_available_to_promise_uom_qty" position="after">
+                <field
+                    name="estimated_shipping_weight"
+                    sum="Total Estimated Shipping Weight"
+                />
+            </field>
+            <field name="weight" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+        </field>
+    </record>
 </odoo>
