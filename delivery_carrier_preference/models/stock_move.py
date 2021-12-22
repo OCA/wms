@@ -98,3 +98,34 @@ class StockMove(models.Model):
             need_release_pickings.carrier_id = original_group.carrier_id
 
         return res
+
+    @api.model
+    def read_group(
+        self,
+        domain,
+        fields,
+        groupby,
+        offset=0,
+        limit=None,
+        orderby=False,
+        lazy=True,
+    ):
+        # Override read_group to calculate the sum of the non-stored fields
+        # that depend on the user context
+        res = super().read_group(
+            domain,
+            fields,
+            groupby,
+            offset=offset,
+            limit=limit,
+            orderby=orderby,
+            lazy=lazy,
+        )
+        moves = self.env["stock.move"]
+        for line in res:
+            if "__domain" in line and "estimated_shipping_weight" in fields:
+                moves = self.search(line["__domain"])
+                line["estimated_shipping_weight"] = sum(
+                    moves.mapped("estimated_shipping_weight")
+                )
+        return res
