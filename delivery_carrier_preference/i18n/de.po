@@ -69,6 +69,10 @@ msgstr ""
 
 #. module: delivery_carrier_preference
 #: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__display_name
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_procurement_group__display_name
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_location_route__display_name
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_move__display_name
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_picking__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -92,6 +96,10 @@ msgstr ""
 
 #. module: delivery_carrier_preference
 #: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__id
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_procurement_group__id
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_location_route__id
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_move__id
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_picking__id
 msgid "ID"
 msgstr ""
 
@@ -102,6 +110,10 @@ msgstr ""
 
 #. module: delivery_carrier_preference
 #: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference____last_update
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_procurement_group____last_update
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_location_route____last_update
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_move____last_update
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_picking____last_update
 msgid "Last Modified on"
 msgstr ""
 
@@ -123,8 +135,8 @@ msgstr ""
 #. module: delivery_carrier_preference
 #: model:ir.model.fields,help:delivery_carrier_preference.field_stock_location_route__force_recompute_preferred_carrier_on_release
 msgid ""
-"Mark this box to trigger a recomputation of preferred carrier on the release"
-" of operations."
+"Mark this box to trigger a recomputation of preferred carrier on the release "
+"of operations."
 msgstr ""
 
 #. module: delivery_carrier_preference
@@ -224,8 +236,12 @@ msgstr ""
 #: model:ir.model.fields,help:delivery_carrier_preference.field_stock_picking__estimated_shipping_weight
 msgid ""
 "This weight is calculated according to the move quantity available to "
-"promise and existing product packagings weight for each product on the "
-"moves."
+"promise and existing product packagings weight for each product on the moves."
+msgstr ""
+
+#. module: delivery_carrier_preference
+#: model_terms:ir.ui.view,arch_db:delivery_carrier_preference.view_move_tree
+msgid "Total Estimated Shipping Weight"
 msgstr ""
 
 #. module: delivery_carrier_preference
