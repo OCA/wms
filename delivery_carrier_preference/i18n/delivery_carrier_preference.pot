@@ -240,6 +240,11 @@ msgid ""
 msgstr ""
 
 #. module: delivery_carrier_preference
+#: model_terms:ir.ui.view,arch_db:delivery_carrier_preference.view_move_tree
+msgid "Total Estimated Shipping Weight"
+msgstr ""
+
+#. module: delivery_carrier_preference
 #: model:ir.model.fields,help:delivery_carrier_preference.field_stock_move__estimated_shipping_weight
 msgid ""
 "Total weight available to promise calculated according to the quantity "
