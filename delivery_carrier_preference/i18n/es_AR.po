@@ -71,6 +71,10 @@ msgstr "Transportista definido"
 
 #. module: delivery_carrier_preference
 #: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__display_name
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_procurement_group__display_name
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_location_route__display_name
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_move__display_name
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_picking__display_name
 msgid "Display Name"
 msgstr "Mostrar Nombre"
 
@@ -96,6 +100,10 @@ msgstr "Forzar computación del transportista preferido."
 
 #. module: delivery_carrier_preference
 #: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference__id
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_procurement_group__id
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_location_route__id
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_move__id
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_picking__id
 msgid "ID"
 msgstr "ID"
 
@@ -106,6 +114,10 @@ msgstr "Rutas de Inventario"
 
 #. module: delivery_carrier_preference
 #: model:ir.model.fields,field_description:delivery_carrier_preference.field_delivery_carrier_preference____last_update
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_procurement_group____last_update
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_location_route____last_update
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_move____last_update
+#: model:ir.model.fields,field_description:delivery_carrier_preference.field_stock_picking____last_update
 msgid "Last Modified on"
 msgstr "Última Modificación el"
 
@@ -127,8 +139,8 @@ msgstr "Dejar vacío para no tener límite"
 #. module: delivery_carrier_preference
 #: model:ir.model.fields,help:delivery_carrier_preference.field_stock_location_route__force_recompute_preferred_carrier_on_release
 msgid ""
-"Mark this box to trigger a recomputation of preferred carrier on the release"
-" of operations."
+"Mark this box to trigger a recomputation of preferred carrier on the release "
+"of operations."
 msgstr ""
 "Marque esta casilla para activar una computación del transportista preferido "
 "en la liberación de operaciones."
@@ -236,12 +248,16 @@ msgstr "Movimiento de Inventario"
 #: model:ir.model.fields,help:delivery_carrier_preference.field_stock_picking__estimated_shipping_weight
 msgid ""
 "This weight is calculated according to the move quantity available to "
-"promise and existing product packagings weight for each product on the "
-"moves."
+"promise and existing product packagings weight for each product on the moves."
 msgstr ""
 "Este peso se calcula de acuerdo con la cantidad de movimientos disponibles y "
 "el peso de los empaques de productos existentes para cada producto en "
 "movimiento."
+
+#. module: delivery_carrier_preference
+#: model_terms:ir.ui.view,arch_db:delivery_carrier_preference.view_move_tree
+msgid "Total Estimated Shipping Weight"
+msgstr ""
 
 #. module: delivery_carrier_preference
 #: model:ir.model.fields,help:delivery_carrier_preference.field_stock_move__estimated_shipping_weight
