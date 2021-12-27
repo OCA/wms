@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-02-07 02:44+0000\n"
+"PO-Revision-Date: 2021-12-27 05:39+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -257,7 +257,7 @@ msgstr ""
 #. module: delivery_carrier_preference
 #: model_terms:ir.ui.view,arch_db:delivery_carrier_preference.view_move_tree
 msgid "Total Estimated Shipping Weight"
-msgstr ""
+msgstr "Peso Total Estimado para el Envío"
 
 #. module: delivery_carrier_preference
 #: model:ir.model.fields,help:delivery_carrier_preference.field_stock_move__estimated_shipping_weight
