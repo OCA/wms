@@ -469,3 +469,36 @@ main.v-content > .v-content__wrap > .header .container {
     */
     position: absolute;
 }
+
+/* searchbar */
+.v-text-field input.searchbar {
+    margin-bottom: 8px;
+    padding: 5px;
+    line-height: 1.5;
+}
+@keyframes scanning {
+    0%,
+    40%,
+    100% {
+        background-color: #ffe0e0;
+    }
+    20% {
+        background-color: #fa9696;
+    }
+}
+.v-text-field input.searchbar-keyboard {
+    caret-color: auto !important;
+}
+.v-text-field input.searchbar-keyboard:focus::placeholder {
+    color: transparent;
+}
+.v-text-field input.searchbar-scan {
+    caret-color: transparent;
+    /*border-radius: 10%;*/
+    animation-name: scanning;
+    animation-duration: 3s;
+    animation-timing-function: ease-out;
+    animation-delay: 0;
+    animation-direction: normal;
+    animation-iteration-count: infinite;
+}
