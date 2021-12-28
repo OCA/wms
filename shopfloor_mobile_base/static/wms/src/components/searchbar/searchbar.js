@@ -36,6 +36,7 @@ Vue.component("searchbar", {
             type: String,
             default: "text",
         },
+        input_label: String,
         input_placeholder: String,
         input_data_type: String,
         reset_on_submit: {
@@ -89,10 +90,10 @@ Vue.component("searchbar", {
   <v-form
       v-on:submit="search"
       :data-type="input_data_type"
-      ref="form"
       class="searchform"
       >
-    <div class="v-input v-text-field">
+    <div class="searchbar v-input v-text-field">
+      <label class="v-label" v-if="input_label">{{ input_label }}</label>
       <input
         ref="searchbar"
         required v-model="entered"
@@ -104,7 +105,6 @@ Vue.component("searchbar", {
         @focus="onfocus"
         @blur="onblur"
         @click="onclick"
-        class="searchbar"
         />
       </div>
   </v-form>

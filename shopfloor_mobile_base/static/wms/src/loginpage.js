@@ -28,11 +28,10 @@ export var LoginPage = Vue.component("login-page", {
         },
     },
     methods: {
-        login: function(evt) {
-            evt.preventDefault();
+        login: function(apikey) {
             // Call odoo application load => set the result in the local storage in json
             this.error = "";
-            this.$root.apikey = this.apikey;
+            this.$root.apikey = apikey.text;
             this.$root
                 ._loadConfig()
                 .catch(error => {
@@ -69,28 +68,14 @@ export var LoginPage = Vue.component("login-page", {
                     </v-alert>
                 </v-col>
             </v-row>
-            <v-row
-                align="center"
-                justify="center">
-                <v-col cols="12" sm="8" md="4">
-                    <div class="login-wrapper">
-                        <v-form v-on:submit="login">
-                            <v-text-field
-                                name="apikey"
-                                v-model="apikey"
-                                :label="$t('screen.login.api_key_label')"
-                                :placeholder="$t('screen.login.api_key_placeholder')"
-                                autofocus
-                                autocomplete="off"></v-text-field>
-                            <div class="button-list button-vertical-list full">
-                                <v-row align="center">
-                                    <v-col class="text-center" cols="12">
-                                        <v-btn color="success" type="submit">{{ $t('screen.login.action.login') }}</v-btn>
-                                    </v-col>
-                                </v-row>
-                            </div>
-                        </v-form>
-                    </div>
+            <v-row class="login-wrapper">
+                <v-col class="text-center" cols="12">
+                <searchbar
+                    v-on:found="login"
+                    :input_label="$t('screen.login.api_key_label')"
+                    :input_placeholder="$t('screen.login.api_key_placeholder')"
+                    forcefocus
+                    input_type="password"/>
                 </v-col>
             </v-row>
             <div class="button-list button-vertical-list full">

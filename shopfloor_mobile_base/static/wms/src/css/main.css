@@ -470,8 +470,24 @@ main.v-content > .v-content__wrap > .header .container {
     position: absolute;
 }
 
+/* login */
+.login-wrapper .searchbar input {
+    padding: 50px 10px;
+    text-align: center;
+    font-size: 2rem !important;
+}
+
 /* searchbar */
-.v-text-field input.searchbar {
+.searchbar {
+    position: relative;
+}
+.searchbar label.v-label {
+    top: -20px;
+    left: 0px;
+    right: auto;
+    position: absolute;
+}
+.searchbar input {
     margin-bottom: 8px;
     padding: 5px;
     line-height: 1.5;
@@ -486,13 +502,13 @@ main.v-content > .v-content__wrap > .header .container {
         background-color: #fa9696;
     }
 }
-.v-text-field input.searchbar-keyboard {
+.searchbar input.searchbar-keyboard {
     caret-color: auto !important;
 }
-.v-text-field input.searchbar-keyboard:focus::placeholder {
+.searchbar input.searchbar-keyboard:focus::placeholder {
     color: transparent;
 }
-.v-text-field input.searchbar-scan {
+.searchbar input.searchbar-scan {
     caret-color: transparent;
     /*border-radius: 10%;*/
     animation-name: scanning;
