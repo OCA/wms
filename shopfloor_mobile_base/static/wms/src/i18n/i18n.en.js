@@ -10,13 +10,13 @@ const messages_en = {
     screen: {
         login: {
             title: "Login",
-            api_key_placeholder: "YOUR_API_KEY_HERE",
+            api_key_placeholder: "Scan your badge",
             api_key_label: "API key",
             action: {
                 login: "Login",
             },
             error: {
-                api_key_invalid: "Invalid API KEY",
+                api_key_invalid: "Login failed. Invalid API key",
             },
         },
         home: {
