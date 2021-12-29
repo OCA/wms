@@ -1,6 +1,8 @@
 /**
  * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
  * @author Simone Orsi <simahawk@gmail.com>
+ * Copyright 2021 Jacques-Etienne Baudoux (BCIM)
+ * @author Jacques-Etienne Baudoux <je@bcim.be>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
@@ -10,30 +12,20 @@ export var PackagingQtyPickerMixin = {
     },
     data: function () {
         return {
-            value: 0,
-            original_value: 0,
-            orig_qty_by_pkg: {},
+            qty_done: 0,
+            qty_todo: 0,
             qty_by_pkg: {},
+            qty_by_pkg_manual: false,
         };
     },
-    methods: {
-        on_change_pkg_qty: function (event) {
-            const input = event.target;
-            let new_qty = parseInt(input.value || 0, 10);
-            const data = $(input).data();
-            const origvalue = parseInt(data.origvalue || 0, 10);
-            // Check max qty reached
-            const future_qty = this.value + data.pkg.qty * (new_qty - origvalue);
-            if (new_qty && future_qty > this.original_value) {
-                // Restore qty just in case we can get here
-                new_qty = origvalue;
-                this._handle_qty_error(event, input, new_qty);
-            }
-            // Trigger update
-            this.$set(this.qty_by_pkg, data.pkg.id, new_qty);
-            // Set new orig value
-            $(input).data("origvalue", new_qty);
+    watch: {
+        qty_done: function () {
+            if (!this.qty_by_pkg_manual)
+                this.qty_by_pkg = this.product_qty_by_packaging();
+            this.qty_by_pkg_manual = false;
         },
+    },
+    methods: {
         _handle_qty_error(event, input, new_qty) {
             event.preventDefault();
             // Make it red and shake it
@@ -72,7 +64,7 @@ export var PackagingQtyPickerMixin = {
                    Default: to UoM unit.
         */
         product_qty_by_packaging: function () {
-            return this._product_qty_by_packaging(this.sorted_packaging, this.value);
+            return this._product_qty_by_packaging(this.sorted_packaging, this.qty_done);
         },
         /**
          * Produce a list of tuple of packaging qty and packaging name.
@@ -88,7 +80,7 @@ export var PackagingQtyPickerMixin = {
             pkg_by_qty.forEach(function (pkg) {
                 let qty_per_pkg = 0;
                 [qty_per_pkg, qty] = self._qty_by_pkg(pkg.qty, qty);
-                if (qty_per_pkg) res[pkg.id] = qty_per_pkg;
+                res[pkg.id] = qty_per_pkg;
                 if (!qty) return;
             });
             return res;
@@ -117,35 +109,13 @@ export var PackagingQtyPickerMixin = {
             });
             return value;
         },
-        compute_qty: function (newVal, oldVal) {
-            this.value = this._compute_qty();
-        },
-        _init_editable() {
-            const self = this;
-            this.$watch(
-                "qty_by_pkg",
-                function () {
-                    self.compute_qty();
-                },
-                {deep: true}
-            );
-            this.qty_by_pkg = this.product_qty_by_packaging();
-            this.orig_qty_by_pkg = this.qty_by_pkg;
-            // Hooking via `v-on:change` we don't get the full event but only the qty :/
-            // And forget about using v-text-field because it loses the full event object
-            $(".pkg-value", this.$el).change(this.on_change_pkg_qty);
-            $(".pkg-value", this.$el).on("focus click", function () {
-                $(this).select();
-            });
-        },
-        _init_readonly() {
-            this.qty_by_pkg = this.product_qty_by_packaging();
-            this.compute_qty();
+        compute_qty: function () {
+            this.qty_done = this._compute_qty();
         },
     },
     created: function () {
-        this.original_value = parseInt(this.opts.init_value, 10);
-        this.value = parseInt(this.opts.init_value, 10);
+        this.qty_todo = parseInt(this.opts.init_value, 10);
+        this.qty_done = parseInt(this.opts.init_value, 10);
     },
     computed: {
         opts() {
@@ -212,67 +182,98 @@ export var PackagingQtyPickerMixin = {
 
 export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
     mixins: [PackagingQtyPickerMixin],
-    /** TODO: the trigger has been moved to `updated` because
-     * when if you refresh the same state/page the qty change is not triggered
-     * and the qty stored in the scenario data variable is lost.
-     * (eg: zone_picking/set_line_destination:on_qty_update).
-     * BUT this is still weird because there shouldn't be any need
-     * to retrigger the event if `scan_destination_qty` would not lose its value
-     * when the page is updated.
-     * It seems weird to have to not use `watch` here.
-     * Hence, if we have the time, this is something good to check.
-     */
-    // watch: {
-    //     value: {
-    //         handler: function(newVal, oldVal) {
-    //             this.$root.trigger("qty_edit", this.value);
-    //             console.log("picker trigger");
-    //         },
-    //     },
-    // },
-    mounted: function () {
-        this._init_editable();
+    props: {
+        readonly: Boolean,
+    },
+    data: function () {
+        return {
+            qty_todo: 0,
+            panel: 0, // expand panel by default
+        };
+    },
+    watch: {
+        qty_by_pkg: {
+            deep: true,
+            handler: function () {
+                // prevent watched qty_done to update again qty_by_pkg
+                this.qty_by_pkg_manual = true;
+                this.compute_qty();
+                this.qty_by_pkg_manual = false;
+            },
+        },
+    },
+    created: function () {
+        // Propagate the newly initialized quantity to the parent component
+        this.$root.trigger("qty_edit", this.qty_done);
     },
     updated: function () {
-        this.$root.trigger("qty_edit", this.value);
+        this.$root.trigger("qty_edit", this.qty_done);
+    },
+    computed: {
+        qty_color: function () {
+            if (this.qty_done == this.qty_todo) {
+                if (this.readonly) return "";
+                return "background-color: rgb(143, 191, 68)";
+            }
+            if (this.qty_done > this.qty_todo) {
+                return "background-color: orangered";
+            }
+            return "background-color: pink";
+        },
     },
     template: `
-<div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode: '']">
-    <v-row class="unit-value">
-        <v-col class="current-value">
-            <v-text-field :type="opts.input_type" v-model="value" readonly="readonly" />
-        </v-col>
-        <v-col class="init-value">
-            <v-text-field :type="opts.input_type" v-model="original_value" readonly="readonly" disabled="disabled" />
-        </v-col>
-    </v-row>
-    <v-row class="packaging-value">
-        <v-col class="packaging" v-for="pkg in sorted_packaging" :key="make_component_key([pkg.id])">
-            <div class="inner-wrapper">
-                <div class="input-wrapper">
-                    <input type="text" class="pkg-value"
-                        :value="qty_by_pkg[pkg.id] || 0"
-                        :data-origvalue="orig_qty_by_pkg[pkg.id] || 0"
-                        :data-pkg="JSON.stringify(pkg)"
+<div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode : '']">
+    <v-expansion-panels flat v-model="panel">
+        <v-expansion-panel>
+            <v-expansion-panel-header expand-icon="mdi-menu-down">
+                <v-row dense align="center">
+                    <v-col cols="5" md="3">
+                        <input type="number" v-model="qty_done" class="qty-done" :style="qty_color"
+                            v-on:click.stop
+                            :readonly="readonly"
                         />
-                </div>
-                <div class="pkg-name"> {{ pkg.name }}</div>
-                <div v-if="contained_packaging[pkg.id]" class="pkg-qty">({{ contained_packaging[pkg.id].qty }} {{ contained_packaging[pkg.id].pkg.name }})</div>
-            </div>
-        </v-col>
-    </v-row>
+                    </v-col>
+                    <v-col cols="3" md="2" :class="readonly ? 'd-none' : ''">
+                        <span class="qty-todo">/ {{ qty_todo }}</span>
+                    </v-col>
+                    <v-col>
+                        {{ unit_uom.name }}
+                    </v-col>
+                </v-row>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content v-if="sorted_packaging.length > 1">
+                <v-row dense
+                    v-for="(pkg, index) in sorted_packaging"
+                    :key="make_component_key([pkg.id])"
+                    :class="(readonly && !qty_by_pkg[pkg.id]) ? 'd-none' : ''"
+                >
+                    <v-col cols="4" md="2">
+                        <input type="text" inputmode="decimal" class="qty-done"
+                            v-model.lazy="qty_by_pkg[pkg.id]"
+                            :data-origvalue="qty_by_pkg[pkg.id]"
+                            :data-pkg="JSON.stringify(pkg)"
+                            :readonly="readonly"
+                            @focus="!readonly && ($event.target.value='')"
+                            @blur="$event.target.value=qty_by_pkg[pkg.id]"
+                            />
+                    </v-col>
+                    <v-col>
+                        <div class="pkg-name"> {{ pkg.name }}</div>
+                        <div v-if="contained_packaging[pkg.id]" class="pkg-qty">(x{{ contained_packaging[pkg.id].qty }} {{ contained_packaging[pkg.id].pkg.name }})</div>
+                    </v-col>
+                </v-row>
+            </v-expansion-panel-content>
+        </v-expansion-panel>
+    </v-expansion-panels>
 </div>
 `,
 });
 
 export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-display", {
     mixins: [PackagingQtyPickerMixin],
-    mounted: function () {
-        this._init_readonly();
-    },
     methods: {
         display_pkg: function (pkg) {
-            return this.opts.non_zero_only ? this.qty_by_pkg[pkg.id] || 0 > 0 : true;
+            return this.opts.non_zero_only ? this.qty_by_pkg[pkg.id] > 0 : true;
         },
     },
     computed: {
@@ -283,10 +284,10 @@ export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-displ
     template: `
 <div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode: '', 'd-inline']">
     <span class="packaging" v-for="(pkg, index) in visible_packaging" :key="make_component_key([pkg.id])">
-        <span class="pkg-qty" v-text="qty_by_pkg[pkg.id] || 0" />
+        <span class="pkg-qty" v-text="qty_by_pkg[pkg.id]" />
         <span class="pkg-name" v-text="pkg[opts.pkg_name_key]" /><span class="sep" v-if="index != Object.keys(visible_packaging).length - 1">, </span>
     </span>
-    <span class="min-unit">({{ opts.init_value }} {{ unit_uom.name }})</span>
+    <span class="min-unit">({{ qty_todo }} {{ unit_uom.name }})</span>
 </div>
 `,
 });

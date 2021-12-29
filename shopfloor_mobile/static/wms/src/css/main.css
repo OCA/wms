@@ -27,36 +27,35 @@ ul.packaging span:first-child {
     border-bottom: 1px dotted #ccc;
 }
 
-.packaging-qty-picker * {
+/* packaging-qty-picker */
+.packaging-qty-picker .v-expansion-panel-header {
+    padding: 0;
+    min-height: 0;
+}
+.packaging-qty-picker .v-expansion-panel-content {
+    border-left: 2px dashed;
+    padding-left: 7px;
+}
+.packaging-qty-picker .v-expansion-panel-content > div {
+    padding: 0;
+}
+.packaging-qty-picker input {
+    line-height: 35px;
+}
+.packaging-qty-picker .qty-done {
+    text-align: center;
+    width: 100%;
+    outline: -webkit-focus-ring-color auto 1px;
+}
+.packaging-qty-picker .qty-todo {
     text-align: center;
 }
-.packaging-qty-picker .unit-value input {
-    font-size: 130%;
-}
-.packaging-qty-picker .unit-value .col {
-    padding-bottom: 0;
-}
-.packaging-qty-picker .packaging-value .col {
-    padding-top: 0;
-    padding-bottom: 5px;
-}
-.packaging-qty-picker .packaging-value .col:not(:last-child) {
-    padding-right: 0;
+.packaging-qty-picker .pkg-name {
+    line-height: 1;
+    padding-top: 2px;
 }
 .packaging-qty-picker .pkg-qty {
-    font-size: 80%;
-}
-.packaging-qty-picker input.pkg-value {
-    max-width: 90px;
-    padding: 0.5rem 0.5rem 0;
-    font-size: 130%;
-    border-bottom: 1px solid;
-}
-.packaging-qty-picker .inner-wrapper {
-    padding-bottom: 8px;
-}
-.packaging-qty-picker .input-wrapper {
-    margin-bottom: 8px;
+    font-size: 75%;
 }
 
 /*
