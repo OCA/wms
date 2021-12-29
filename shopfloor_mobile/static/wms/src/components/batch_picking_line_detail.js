@@ -43,7 +43,7 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
   <item-detail-card
     :key="'batch-picking-line-detail-2'"
     :record="line"
-    :options="utils.wms.move_line_product_detail_options()"
+    :options="utils.wms.move_line_product_detail_options(line, {fields_blacklist: ['quantity']})"
     :card_color="utils.colors.color_for(articleScanned ? 'screen_step_done': 'screen_step_todo')"
     />
 
@@ -55,10 +55,11 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     :card_color="utils.colors.color_for(destination ? 'screen_step_done': 'screen_step_todo')"
     />
 
-  <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')" v-if="showQtyPicker">
+  <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
     <packaging-qty-picker
       :key="make_component_key(['packaging-qty-picker', line.id])"
       :options="utils.wms.move_line_qty_picker_options(line)"
+      :readonly="!showQtyPicker"
       />
   </v-card>
 
