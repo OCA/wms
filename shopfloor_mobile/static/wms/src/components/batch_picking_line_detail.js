@@ -38,7 +38,7 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     :key="'batch-picking-line-detail-1'"
     :record="line"
     :options="{main: true, key_title: 'location_src.name', title_action_field: {action_val_path: 'location_src.barcode'}}"
-    :card_color="utils.colors.color_for('screen_step_done')"
+    :card_color="utils.colors.color_for(articleScanned ? 'screen_step_done': 'screen_step_todo')"
     />
   <item-detail-card
     :key="'batch-picking-line-detail-2'"
