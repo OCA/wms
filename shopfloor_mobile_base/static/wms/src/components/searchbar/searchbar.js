@@ -54,10 +54,10 @@ Vue.component("searchbar", {
             type: Number,
             default: 50,
         },
-        // on manually typed input, the search will run after 1.5s to provide time for typing
+        // on manually typed input, the search will run after time. Set to 1500 (ms) as time for typing. By default, disabled, enter must be pressed
         autosearch_typing: {
             type: Number,
-            default: 1500,
+            default: 0,
         },
     },
     mounted: function() {
@@ -74,8 +74,10 @@ Vue.component("searchbar", {
                     this.debounceWait != this.autosearch_typing
                 ) {
                     this.debounceWait = this.autosearch_typing;
+                    if (!this.debounceWait) return;
                     return this.debouncedSearch();
                 }
+                if (!this.debounceWait) return;
                 return this.search(e);
             }, this.debounceWait);
         },
@@ -121,6 +123,7 @@ Vue.component("searchbar", {
             e.preventDefault();
             this.debouncedSearch.cancel();
             this.search(e);
+            if (this.reset_on_submit) this.reset();
         },
         reset: function() {
             this.entered = "";
