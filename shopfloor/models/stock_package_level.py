@@ -1,11 +1,16 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import models
+from odoo import fields, models
 
 
 class StockPackageLevel(models.Model):
     _name = "stock.package_level"
     _inherit = ["stock.package_level", "shopfloor.priority.postpone.mixin"]
+
+    # we search package levels based on their package in some workflows
+    package_id = fields.Many2one(index=True)
+    # allow domain on picking_id.xxx without too much perf penalty
+    picking_id = fields.Many2one(auto_join=True)
 
     def explode_package(self):
         """Unlink but keep the moves.
