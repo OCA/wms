@@ -495,3 +495,76 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             package_level.location_dest_id,
             self.cardboxes_bin_4_location,
         )
+
+    def test_storage_strategy_sequence_condition(self):
+        """If a condition is not met on storage location sequence, it's ignored"""
+        move = self._create_single_move(self.product)
+        move._assign_picking()
+        original_location_dest = move.location_dest_id
+        package = self.env["stock.quant.package"].create(
+            {"product_packaging_id": self.product_lot_cardbox_product_packaging.id}
+        )
+        self._update_qty_in_location(
+            move.location_id, move.product_id, move.product_qty, package=package
+        )
+
+        # configure a new sequence with none in the parent location
+        self.cardboxes_package_storage_type.storage_location_sequence_ids.unlink()
+        self.warehouse.lot_stock_id.pack_putaway_strategy = "none"
+        self.warehouse.lot_stock_id.location_storage_type_ids = (
+            self.cardboxes_location_storage_type
+        )
+        condition = self.env["stock.storage.location.sequence.cond"].create(
+            {"name": "Always False", "code_snippet": "result = False"}
+        )
+        self.none_sequence = self.env["stock.storage.location.sequence"].create(
+            {
+                "package_storage_type_id": self.cardboxes_package_storage_type.id,
+                "location_id": self.warehouse.lot_stock_id.id,
+                "sequence": 1,
+                "location_sequence_cond_ids": [(6, 0, condition.ids)],
+            }
+        )
+        self.env["stock.storage.location.sequence"].create(
+            {
+                "package_storage_type_id": self.cardboxes_package_storage_type.id,
+                "location_id": self.cardboxes_location.id,
+                "sequence": 2,
+            }
+        )
+
+        move._action_assign()
+        move_line = move.move_line_ids
+        package_level = move_line.package_level_id
+
+        self.assertIn(
+            package_level.location_dest_id,
+            self.cardboxes_location.child_ids,
+            "the move line's destination must go into the cardbox location"
+            " since the the first sequence is ignored due to the False"
+            " condition on it",
+        )
+
+        # if we update the condition to always be True, reset the
+        # location_dest on the package_level and reapply the put away strategy
+        # the move line's destination must be in Stock as we have a 'none'
+        # strategy the first putaway sequence
+        condition.code_snippet = "result = True"
+        package_level.location_dest_id = original_location_dest.id
+        package_level.recompute_pack_putaway()
+
+        self.assertEqual(
+            package_level.location_dest_id,
+            self.warehouse.lot_stock_id,
+            "the move line's destination must stay in Stock as we have"
+            " a 'none' strategy on it and it is in the sequence",
+        )
+
+        package_level.location_dest_id = self.cardboxes_location
+        # if we reapply the strategy, it should now apply the ordered
+        # location of the cardbox location
+        package_level.recompute_pack_putaway()
+
+        self.assertTrue(
+            package_level.location_dest_id in self.cardboxes_location.child_ids
+        )

@@ -13,6 +13,7 @@
                 />
                 <field name="location_id" />
                 <field name="location_putaway_strategy" />
+                <field name="location_sequence_cond_ids" widget="many2many_tags" />
                 <button
                     string="Show locations"
                     name="button_show_locations"
