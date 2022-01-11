@@ -29,6 +29,7 @@
         "views/stock_package_storage_type.xml",
         "views/stock_quant_package.xml",
         "views/stock_storage_location_sequence.xml",
+        "views/stock_storage_location_sequence_cond.xml",
         "views/storage_type_menus.xml",
     ],
     "demo": [
