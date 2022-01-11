@@ -356,6 +356,8 @@ class StockLocation(models.Model):
             return dest_location
 
         for package_sequence in package_locations:
+            if not package_sequence.can_be_applied(putaway_location, quant, product):
+                continue
             pref_loc = package_sequence.location_id
             storage_locations = pref_loc.get_storage_locations(products=product)
             _logger.debug("Storage locations selected: %s" % storage_locations)
