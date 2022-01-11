@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 ACSONE SA/NV
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="stock_storage_location_sequence_cond_form_view">
+        <field
+            name="name"
+        >stock.storage.location.sequence.cond.form (in stock_storage_type)</field>
+        <field name="model">stock.storage.location.sequence.cond</field>
+        <field name="arch" type="xml">
+            <form>
+                <header />
+                <field name="active" invisible="1" />
+                <widget
+                    name="web_ribbon"
+                    title="Archived"
+                    bg_color="bg-danger"
+                    attrs="{'invisible': [('active', '=', True)]}"
+                />
+                <sheet>
+                    <div name="title" class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group name="main">
+                        <field name="condition_type" />
+                    </group>
+                    <field
+                        name="code_snippet_docs"
+                        attrs="{'invisible': [('condition_type', '!=', 'code')]}"
+                    />
+                    <field
+                        name="code_snippet"
+                        widget="ace"
+                        attrs="{'invisible': [('condition_type', '!=', 'code')]}"
+                    />
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="stock_storage_location_sequence_cond_tree_view">
+        <field
+            name="name"
+        >stock.storage.location.sequence.cond.tree (in stock_storage_type)</field>
+        <field name="model">stock.storage.location.sequence.cond</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <record
+        model="ir.actions.act_window"
+        id="stock_storage_location_sequence_cond_act_window"
+    >
+        <field name="name">Stock Storage Location Sequence Conditions</field>
+        <field name="res_model">stock.storage.location.sequence.cond</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+
+
+</odoo>
