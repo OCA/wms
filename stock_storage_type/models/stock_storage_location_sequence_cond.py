@@ -1,7 +1,11 @@
 # Copyright 2022 ACSONE SA/NV
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+import datetime
 import logging
 import textwrap
+import time
+
+import dateutil
 
 from odoo import _, api, exceptions, fields, models
 from odoo.tools import safe_eval
@@ -62,7 +66,7 @@ class StockStorageLocationSequenceCond(models.Model):
         * dateutil
         * time
         * user
-        * exceptions
+        * Warning: Warning Exception to use with raise
 
         Must initialize a boolean 'result' variable set to True when condition is met
 
@@ -82,13 +86,11 @@ class StockStorageLocationSequenceCond(models.Model):
             "putaway_location": putaway_location,
             "quant": quant,
             "product": product,
-            "datetime": safe_eval.datetime,
-            "dateutil": safe_eval.dateutil,
-            "time": safe_eval.time,
+            "datetime": datetime,
+            "dateutil": dateutil,
+            "time": time,
             "storage_location_sequence": storage_location_sequence,
-            "exceptions": safe_eval.wrap_module(
-                exceptions, ["UserError", "ValidationError"]
-            ),
+            "Warning": exceptions.Warning,
         }
 
     def _exec_code(self, storage_location_sequence, putaway_location, quant, product):
@@ -99,7 +101,7 @@ class StockStorageLocationSequenceCond(models.Model):
             storage_location_sequence, putaway_location, quant, product
         )
         snippet = self.code_snippet
-        safe_eval.safe_eval(snippet, eval_ctx, mode="exec", nocopy=True)
+        safe_eval(snippet, eval_ctx, mode="exec", nocopy=True)
         result = eval_ctx.get("result")
         if not isinstance(result, bool):
             raise exceptions.UserError(
@@ -141,5 +143,5 @@ class StockStorageLocationSequenceCond(models.Model):
             )
         condition_type = self.condition_type
         raise exceptions.UserError(
-            _(f"Not able to evaluate condtion of type {condition_type}")
+            _("Not able to evaluate condition of type %s") % condition_type
         )
