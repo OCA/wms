@@ -28,4 +28,11 @@
         parent="storage_type_menu"
         sequence="12"
     />
+    <menuitem
+        id="stock_storage_location_sequence_cond_menu"
+        action="stock_storage_location_sequence_cond_act_window"
+        name="Storage Location Sequence Conditions"
+        parent="storage_type_menu"
+        sequence="13"
+    />
 </odoo>
