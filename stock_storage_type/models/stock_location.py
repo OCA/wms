@@ -357,18 +357,6 @@ class StockLocation(models.Model):
 
         for package_sequence in package_locations:
             pref_loc = package_sequence.location_id
-            if (
-                pref_loc.pack_putaway_strategy == "none"
-                and pref_loc.select_allowed_locations(
-                    package_storage_type, quant, product
-                )
-            ):
-                _logger.debug(
-                    "No putaway strategy defined on location %s and package "
-                    "storage type %s allowed."
-                    % (pref_loc.complete_name, package_storage_type.name)
-                )
-                return pref_loc
             storage_locations = pref_loc.get_storage_locations(products=product)
             _logger.debug("Storage locations selected: %s" % storage_locations)
             allowed_location = storage_locations.select_first_allowed_location(
