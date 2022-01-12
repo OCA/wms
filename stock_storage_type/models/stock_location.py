@@ -380,10 +380,36 @@ class StockLocation(models.Model):
         locations = self.browse()
         if self.pack_putaway_strategy == "none":
             locations = self
+            if products and len(products) == 1:
+                locations = self._get_product_putaway(products) or self
         else:
             products = products or self.env["product.product"]
             locations = self._get_sorted_leaf_child_locations(products)
         return locations
+
+    def _get_product_putaway(self, product):
+        """Returns the direct location where the product has to be put if
+        found Otherwise returns an empty recordset.."""
+        self.ensure_one()
+        putaway_location = self.env["stock.location"]
+        # Looking for a putaway about the product.
+        putaway_rules = self.putaway_rule_ids.filtered(
+            lambda x: x.product_id == product
+        )
+        if putaway_rules:
+            putaway_location = putaway_rules[0].location_out_id
+        # If not product putaway found, we're looking with category so.
+        else:
+            categ = product.categ_id
+            while categ:
+                putaway_rules = self.putaway_rule_ids.filtered(
+                    lambda x: x.category_id == categ
+                )
+                if putaway_rules:
+                    putaway_location = putaway_rules[0].location_out_id
+                    break
+                categ = categ.parent_id
+        return putaway_location
 
     def _get_sorted_leaf_locations_orderby(self, products):
         """Return SQL orderby clause and params for sorting locations
