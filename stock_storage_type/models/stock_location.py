@@ -375,10 +375,17 @@ class StockLocation(models.Model):
         locations = self.browse()
         if self.pack_putaway_strategy == "none":
             locations = self
+            if products and len(products) == 1:
+                locations = self._get_product_putaway(products) or self
         else:
             products = products or self.env["product.product"]
             locations = self._get_sorted_leaf_child_locations(products)
         return locations
+
+    def _get_product_putaway(self, product):
+        """Method hook to return a specific location in cas of strategy None"""
+        self.ensure_one()
+        return self.env["stock.location"]
 
     def _get_sorted_leaf_locations_orderby(self, products):
         """Return SQL orderby clause and params for sorting locations
