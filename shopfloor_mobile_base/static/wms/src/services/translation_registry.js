@@ -3,6 +3,17 @@
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
+export function loadTranslation(callback, url) {
+    let xobj = new XMLHttpRequest();
+    xobj.overrideMimeType("application/json");
+    xobj.open("GET", url, false); // false -> synchronous call to be sure to  have the result before the registery is used by others JS
+    xobj.onreadystatechange = function () {
+        if (xobj.readyState == 4 && xobj.status == "200") {
+            callback(xobj.responseText);
+        }
+    };
+    xobj.send(null);
+}
 
 export class TranslationRegistry {
     constructor() {
@@ -35,6 +46,15 @@ export class TranslationRegistry {
 
     get_default_lang() {
         return this._default_lang;
+    }
+
+    load(lang, path) {
+        loadTranslation((json) => {
+            const messages = JSON.parse(json);
+            const original_messages = this.get(lang);
+            const merged_messages = {...messages, ...original_messages};
+            this.add(lang, merged_messages);
+        }, path);
     }
 }
 

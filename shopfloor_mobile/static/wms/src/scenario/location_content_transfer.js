@@ -212,8 +212,8 @@ const LocationContentTransfer = {
                 },
                 scan_location: {
                     display_info: {
-                        title: "Start by scanning a location",
-                        scan_placeholder: "Scan location",
+                        title: this.$t("location_content_transfer.scan_location.title"),
+                        scan_placeholder: this.$t("scan_placeholder_translation"),
                     },
                     on_scan: scanned => {
                         this.wait_call(
@@ -223,8 +223,10 @@ const LocationContentTransfer = {
                 },
                 scan_destination_all: {
                     display_info: {
-                        title: "Scan destination location for all items",
-                        scan_placeholder: "Scan location",
+                        title: this.$t(
+                            "location_content_transfer.scan_destination_all.title"
+                        ),
+                        scan_placeholder: this.$t("scan_placeholder_translation"),
                     },
                     on_scan: scanned => {
                         const data = this.state.data;
@@ -245,7 +247,9 @@ const LocationContentTransfer = {
                 },
                 start_single: {
                     display_info: {
-                        scan_placeholder: "Scan pack / product / lot",
+                        scan_placeholder: this.$t(
+                            "location_content_transfer.start_single.scan_placeholder"
+                        ),
                     },
                     on_scan: scanned => {
                         let endpoint, endpoint_data;
@@ -273,8 +277,10 @@ const LocationContentTransfer = {
                         this.reset_notification();
                     },
                     display_info: {
-                        title: "Set a qty and scan destination location",
-                        scan_placeholder: "Scan location",
+                        title: this.$t(
+                            "location_content_transfer.scan_destination.title"
+                        ),
+                        scan_placeholder: this.$t("scan_placeholder_translation"),
                     },
                     events: {
                         qty_edit: "on_qty_update",
