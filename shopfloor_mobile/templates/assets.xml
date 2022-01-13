@@ -32,6 +32,11 @@
                 type="module"
             />
             <script
+                id="script_add_translations_registry"
+                t-attf-src="/shopfloor_mobile/static/wms/src/i18n/add_translations_to_registry.js?v=#{app_version}"
+                type="module"
+            />
+            <script
                 id="script_component_packaging_qty_picker"
                 t-attf-src="/shopfloor_mobile/static/wms/src/components/packaging-qty-picker.js?v=#{mod_version}"
                 type="module"
