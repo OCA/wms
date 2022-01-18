@@ -1,5 +1,5 @@
 # Copyright 2020 Camptocamp SA
-# License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl)
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/lgpl)
 {
     "name": "Stock reception screen qty by packaging",
     "summary": "Glue module for `stock_product_qty_by_packaging` and `stock_vertical_lift`.",
@@ -8,7 +8,7 @@
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "application": False,
     "installable": True,
     "auto_install": True,
