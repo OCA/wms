@@ -1,5 +1,5 @@
 # Copyright 2021 Camptocamp (https://www.camptocamp.com)
-# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 {
     "name": "Sale Stock Available to Promise Release Cutoff",
@@ -14,6 +14,6 @@
     ],
     "installable": True,
     "auto_install": True,
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "application": False,
 }
