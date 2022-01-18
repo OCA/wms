@@ -3,6 +3,7 @@
 * Guewen Baconnier <guewen.baconnier@camptocamp.com>
 * Raphaël Reverdy <raphael.reverdy@akretion.com>
 * Sébastien Beau <sebastien.beau@akretion.com>
+* Jacques-Etienne Baudoux <je@bcim.be>
 
 Design
 ~~~~~~
