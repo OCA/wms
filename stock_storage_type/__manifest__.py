@@ -5,7 +5,7 @@
     "name": "Stock Storage Type",
     "summary": "Manage packages and locations storage types",
     "version": "14.0.1.9.0",
-    "development_status": "Alpha",
+    "development_status": "Beta",
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
