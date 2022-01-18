@@ -3,7 +3,7 @@
 
 {
     "name": "Stock Available to Promise Release - Sale Integration",
-    "version": "14.0.1.0.0",
+    "version": "14.0.1.1.0",
     "summary": "Integration between Sales and Available to Promise Release",
     "author": "Camptocamp,Odoo Community Association (OCA)",
     "category": "Stock Management",
@@ -19,5 +19,5 @@
     "installable": True,
     "license": "LGPL-3",
     "application": False,
-    "development_status": "Alpha",
+    "development_status": "Beta",
 }
