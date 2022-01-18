@@ -1,6 +1,7 @@
 /**
  * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
  * @author Simone Orsi <simahawk@gmail.com>
+ * Copyright 2021 Jacques-Etienne Baudoux (BCIM)
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
@@ -194,14 +195,23 @@ export var PackagingQtyPickerMixin = {
          */
         contained_packaging: function() {
             const self = this;
-            let res = {};
+            let res = {},
+                qty_per_pkg,
+                remaining,
+                elected_next_pkg;
             const packaging = this.sorted_packaging;
             _.forEach(packaging, function(pkg, i) {
-                if (packaging[i + 1]) {
-                    const next_pkg = packaging[i + 1];
+                const next_pkgs = packaging.slice(i + 1);
+                remaining = undefined;
+                _.every(next_pkgs, function(next_pkg) {
+                    [qty_per_pkg, remaining] = self._qty_by_pkg(next_pkg.qty, pkg.qty);
+                    elected_next_pkg = next_pkg;
+                    return remaining;
+                });
+                if (remaining === 0) {
                     res[pkg.id] = {
-                        pkg: next_pkg,
-                        qty: self._qty_by_pkg(next_pkg.qty, pkg.qty)[0],
+                        pkg: elected_next_pkg,
+                        qty: qty_per_pkg,
                     };
                 }
             });
