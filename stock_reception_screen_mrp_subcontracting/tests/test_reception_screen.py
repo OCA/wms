@@ -3,38 +3,14 @@
 
 from odoo import fields
 
-from odoo.addons.stock_reception_screen.tests.common import Common
+from .common import MrpSubcontractingCommon
 
 
-class TestReceptionScreenMrpSubcontracting(Common):
+class TestReceptionScreenMrpSubcontracting(MrpSubcontractingCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls._prepare_reception_screen()
-
-    @classmethod
-    def _prepare_reception_screen(cls):
-        # product.product_delivery_02 has a subcontracted BoM defined with
-        # 'mrp_subcontracting' installed
-        cls.picking = cls._create_picking_in(partner=cls.env.ref("base.res_partner_12"))
-        cls._create_picking_line(cls.picking, cls.product_2, 4)
-        cls.picking.action_confirm()
-        cls.picking.action_reception_screen_open()
-        cls.screen = cls.picking.reception_screen_id
-
-    def _record_components_for_picking(self, picking):
-        for move in picking.move_lines:
-            if not move.is_subcontract:
-                continue
-            context = dict(
-                default_production_id=move.move_orig_ids.production_id.id,
-                default_subcontract_move_id=move.id,
-            )
-            wiz_model = self.env["mrp.product.produce"].with_context(context)
-            wiz = wiz_model.create({})
-            for line in wiz.move_raw_ids.move_line_ids:
-                line.qty_done = line.product_uom_qty
-            wiz.do_produce()
 
     def test_reception_screen_with_subcontracted_products(self):
         """Receive subcontracted goods."""
@@ -101,8 +77,6 @@ class TestReceptionScreenMrpSubcontracting(Common):
         self.assertEqual(production.move_finished_ids.product_uom_qty, 4)
         self.assertEqual(production.move_finished_ids.quantity_done, 4)
         self.assertEqual(production.move_finished_ids.state, "done")
-        for ml in production.finished_move_line_ids:
-            self.assertEqual(ml.qty_done, 2)
 
     def test_reception_screen_with_subcontracted_products_with_tracked_components(self):
         """Receive subcontracted goods having components tracked by lots."""
@@ -182,8 +156,6 @@ class TestReceptionScreenMrpSubcontracting(Common):
         # Check that the manufacturing order is now done
         production = self.picking.move_lines.move_orig_ids.production_id
         self.assertEqual(production.state, "done")
-        self.assertEqual(production.move_finished_ids.product_uom_qty, 4)
-        self.assertEqual(production.move_finished_ids.quantity_done, 4)
+        self.assertEqual(sum(production.move_finished_ids.mapped("product_uom_qty")), 4)
+        self.assertEqual(sum(production.move_finished_ids.mapped("quantity_done")), 4)
         self.assertEqual(production.move_finished_ids.state, "done")
-        for ml in production.finished_move_line_ids:
-            self.assertEqual(ml.qty_done, 2)
