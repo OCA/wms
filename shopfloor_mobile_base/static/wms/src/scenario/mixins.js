@@ -35,6 +35,11 @@ export var ScenarioBaseMixin = {
         this.menu_item_id = this._get_menu_item_id();
     },
     beforeRouteUpdate(to, from, next) {
+        // force the menu id to the one from the menu since at this stage
+        // the new route is not yet applied but a call to odoo could
+        // be done when entering into the init state and this call must be
+        // done with the right menu_item_id
+        this.menu_item_id = to.params.menu_id;
         // Load initial state
         this._state_load(to.params.state);
         next();
