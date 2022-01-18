@@ -22,5 +22,5 @@
     "installable": True,
     "license": "LGPL-3",
     "application": False,
-    "development_status": "Alpha",
+    "development_status": "Beta",
 }
