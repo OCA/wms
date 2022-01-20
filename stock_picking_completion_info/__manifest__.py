@@ -4,7 +4,7 @@
     "name": "Stock Picking Completion Info",
     "summary": "Display on current document completion information according "
     "to next operations",
-    "version": "14.0.1.0.0",
+    "version": "14.0.1.1.0",
     "development_status": "Beta",
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",
