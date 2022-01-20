@@ -529,19 +529,30 @@ class DeliveryShipment(Component):
             "total_bulk_lines_count": sum(pickings.mapped("total_move_lines_count")),
         }
 
+    def _find_shipment_advice_from_dock_domain(self, dock):
+        return [
+            ("dock_id", "=", dock.id),
+            ("state", "in", ["in_progress"]),
+            ("warehouse_id", "in", self.picking_types.warehouse_id.ids),
+        ]
+
     def _find_shipment_advice_from_dock(self, dock):
         return self.env["shipment.advice"].search(
-            [("dock_id", "=", dock.id), ("state", "in", ["in_progress"])],
+            self._find_shipment_advice_from_dock_domain(dock),
             limit=1,
             order="arrival_date",
         )
 
+    def _prepare_shipment_advice_from_dock_values(self, dock):
+        return {
+            "dock_id": dock.id,
+            "arrival_date": fields.Datetime.to_string(fields.Datetime.now()),
+            "warehouse_id": dock.warehouse_id.id,
+        }
+
     def _create_shipment_advice_from_dock(self, dock):
         shipment_advice = self.env["shipment.advice"].create(
-            {
-                "dock_id": dock.id,
-                "arrival_date": fields.Datetime.to_string(fields.Datetime.now()),
-            }
+            self._prepare_shipment_advice_from_dock_values(dock)
         )
         shipment_advice.action_confirm()
         shipment_advice.action_in_progress()
