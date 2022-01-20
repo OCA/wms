@@ -67,10 +67,16 @@ class ManualProductTransferCommonCase(CommonCase):
             cls.src_location, cls.product_b, 10, lot=cls.product_b_lot
         )
 
+    @classmethod
+    def setUpShopfloorApp(cls):
+        super().setUpShopfloorApp()
+        cls.shopfloor_app.sudo().profile_ids += cls.profile
+
     def setUp(self):
         super().setUp()
-        with self.work_on_services(menu=self.menu, profile=self.profile) as work:
-            self.service = work.component(usage="manual_product_transfer")
+        self.service = self.get_service(
+            "manual_product_transfer", profile=self.profile, menu=self.menu
+        )
 
     def assert_response_start(self, response, message=None):
         self.assert_response(response, next_state="start", message=message)
