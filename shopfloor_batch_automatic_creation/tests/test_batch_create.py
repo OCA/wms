@@ -38,8 +38,9 @@ class TestBatchCreate(CommonCase):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(menu=self.menu, profile=self.profile) as work:
-            self.service = work.component(usage="cluster_picking")
+        self.service = self.get_service(
+            "cluster_picking", profile=self.profile, menu=self.menu
+        )
         with self.work_on_actions() as work:
             self.auto_batch = work.component(usage="picking.batch.auto.create")
 
