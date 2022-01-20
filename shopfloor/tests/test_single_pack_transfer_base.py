@@ -8,7 +8,7 @@ class SinglePackTransferCommonBase(CommonCase):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
-        cls.menu = cls.env.ref("shopfloor.shopfloor_menu_single_pallet_transfer")
+        cls.menu = cls.env.ref("shopfloor.shopfloor_menu_demo_single_pallet_transfer")
         cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
         cls.picking_type = cls.menu.picking_type_ids
         cls.wh = cls.picking_type.warehouse_id
