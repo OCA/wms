@@ -26,7 +26,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
                 }
             )
         )
-        cls.shelf1_2 = cls.shelf1.sudo().copy()
+        cls.shelf1_2 = cls.shelf1.sudo().copy({"name": "Shelf 1_2"})
         cls.pack_b = cls.env["stock.quant.package"].create(
             {"location_id": cls.stock_location.id}
         )
