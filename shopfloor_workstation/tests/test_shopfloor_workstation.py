@@ -30,8 +30,7 @@ class ShopfloorWorkstationCase(CommonCase):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services() as work:
-            self.service = work.component(usage="workstation")
+        self.service = self.get_service("workstation")
 
     def test_workstation_set_default_not_found(self):
         res = self.service.dispatch("setdefault", params={"barcode": "bc-???"})
