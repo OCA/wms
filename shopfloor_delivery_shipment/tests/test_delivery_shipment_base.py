@@ -12,7 +12,7 @@ class DeliveryShipmentCommonCase(common.CommonCase):
         cls.menu = cls.env.ref(
             "shopfloor_delivery_shipment.shopfloor_menu_delivery_shipment"
         )
-        cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
+        cls.profile = cls.env.ref("shopfloor_delivery_shipment.profile_demo_1")
         # Change menu picking type to ease test (avoid to configure pick+pack+ship)
         cls.wh = cls.menu.picking_type_ids.warehouse_id
         cls.picking_type = cls.menu.sudo().picking_type_ids = cls.wh.out_type_id
@@ -55,10 +55,16 @@ class DeliveryShipmentCommonCase(common.CommonCase):
         # Create a shipment advice
         cls.shipment = cls._create_shipment()
 
+    @classmethod
+    def setUpShopfloorApp(cls):
+        super().setUpShopfloorApp()
+        cls.shopfloor_app.sudo().profile_ids += cls.profile
+
     def setUp(self):
         super().setUp()
-        with self.work_on_services(menu=self.menu, profile=self.profile) as work:
-            self.service = work.component(usage="delivery_shipment")
+        self.service = self.get_service(
+            "delivery_shipment", profile=self.profile, menu=self.menu
+        )
 
     @classmethod
     def _create_shipment(cls):
