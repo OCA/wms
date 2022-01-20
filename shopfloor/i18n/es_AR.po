@@ -145,14 +145,14 @@ msgid "Cannot change to lot {} which is entirely picked."
 msgstr "No se puede cambiar al lote {} ya que está completamente recogido."
 
 #. module: shopfloor
-#: model:shopfloor.menu,name:shopfloor.shopfloor_menu_checkout
+#: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_checkout
 #: model:shopfloor.scenario,name:shopfloor.scenario_checkout
 #: model:stock.picking.type,name:shopfloor.picking_type_checkout_demo
 msgid "Checkout"
 msgstr "Checkout"
 
 #. module: shopfloor
-#: model:shopfloor.menu,name:shopfloor.shopfloor_menu_cluster_picking
+#: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_cluster_picking
 #: model:shopfloor.scenario,name:shopfloor.scenario_cluster_picking
 #: model:stock.picking.type,name:shopfloor.picking_type_cluster_picking_demo
 msgid "Cluster Picking"
@@ -199,7 +199,7 @@ msgid "Creation of moves is not allowed for menu {}."
 msgstr "La creación de movimientos no está permitida para el menú {}."
 
 #. module: shopfloor
-#: model:shopfloor.menu,name:shopfloor.shopfloor_menu_delivery
+#: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_delivery
 #: model:shopfloor.scenario,name:shopfloor.scenario_delivery
 #: model:stock.picking.type,name:shopfloor.picking_type_delivery_demo
 msgid "Delivery"
@@ -353,7 +353,7 @@ msgid "Location %s doesn't contain any package."
 msgstr "La Ubicación %s no contiene ningún paquete."
 
 #. module: shopfloor
-#: model:shopfloor.menu,name:shopfloor.shopfloor_menu_location_content_transfer
+#: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_location_content_transfer
 #: model:stock.picking.type,name:shopfloor.picking_type_location_content_transfer_demo
 msgid "Location Content Transfer"
 msgstr "Transferencia de Contenido de Ubicación"
@@ -974,7 +974,7 @@ msgid "Single Pack Transfer"
 msgstr "Transferencia de Paquete Individual"
 
 #. module: shopfloor
-#: model:shopfloor.menu,name:shopfloor.shopfloor_menu_single_pallet_transfer
+#: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_single_pallet_transfer
 #: model:stock.picking.type,name:shopfloor.picking_type_single_pallet_transfer_demo
 msgid "Single Pallet Transfer"
 msgstr "Transferencia de un solo Palet"
@@ -1343,7 +1343,7 @@ msgid "Zero check issue on location {} ({})"
 msgstr "Error de verificación cero en la ubicación {} ({})"
 
 #. module: shopfloor
-#: model:shopfloor.menu,name:shopfloor.shopfloor_menu_zone_picking
+#: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_zone_picking
 #: model:shopfloor.scenario,name:shopfloor.scenario_zone_picking
 #: model:stock.picking.type,name:shopfloor.picking_type_zone_picking_demo
 msgid "Zone Picking"

@@ -28,7 +28,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
-        cls.zp_menu = cls.env.ref("shopfloor.shopfloor_menu_zone_picking")
+        cls.zp_menu = cls.env.ref("shopfloor.shopfloor_menu_demo_zone_picking")
         cls.wh.sudo().delivery_steps = "pick_pack_ship"
         cls.pack_location = cls.wh.wh_pack_stock_loc_id
         cls.ship_location = cls.wh.wh_output_stock_loc_id
