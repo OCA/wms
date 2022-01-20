@@ -5,7 +5,7 @@
     "summary": "Display on current document completion information according "
     "to next operations",
     "version": "14.0.1.0.0",
-    "development_status": "Alpha",
+    "development_status": "Beta",
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",
