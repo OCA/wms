@@ -1,10 +1,10 @@
 # Copyright 2021 Camptocamp (https://www.camptocamp.com)
-# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 {
     "name": "Sale Stock Available to Promise Release Cutoff",
     "summary": "Cutoff management with respect to stock availability",
-    "version": "14.0.1.0.0",
+    "version": "14.0.1.1.0",
     "author": "Camptocamp,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "category": "Stock Management",
@@ -14,6 +14,6 @@
     ],
     "installable": True,
     "auto_install": True,
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "application": False,
 }

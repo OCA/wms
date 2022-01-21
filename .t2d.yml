@@ -12,8 +12,8 @@ addons:
   apt:
     packages:
       - expect-dev # provides unbuffer utility
-      - cups
-      - libcups2-dev
+      - "cups"
+      - "libcups2-dev"
 
 stages:
   - test
