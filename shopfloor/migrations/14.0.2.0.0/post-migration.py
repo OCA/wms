@@ -30,7 +30,11 @@ def _create_default_app(env):
         "name": "Shopfloor WMS",
         "short_name": "WMS",
         "tech_name": "wms",
-        "auth_type": "api_key",
         "category": "wms",
     }
-    env["shopfloor.app"].create(values)
+    app = env["shopfloor.app"].create(values)
+    # Bypass ORM validation on `auth_type`
+    # as `shopfloor_mobile_base_auth_api_key` is not installed yet
+    env.cr.execute(
+        "UPDATE shopfloor_app SET auth_type='api_key' WHERE id=%s", (app.id,)
+    )
