@@ -163,7 +163,7 @@ const Checkout = {
                 <item-detail-card :card_color="utils.colors.color_for('screen_step_done')"
                     :key="make_state_component_key(['product'])"
                     :record="state.data.line"
-                    :options="utils.wms.move_line_product_detail_options(state.data.line)"
+                    :options="utils.wms.move_line_product_detail_options(state.data.line, {fields_blacklist: ['quantity']})"
                     />
                 <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
                     <packaging-qty-picker

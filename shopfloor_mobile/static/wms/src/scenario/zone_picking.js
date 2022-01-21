@@ -118,7 +118,7 @@ const template_mobile = `
             v-if="state_in(['set_line_destination', 'stock_issue', 'change_pack_lot'])"
             :key="make_state_component_key(['detail-move-line-product', state.data.move_line.id])"
             :record="state.data.move_line"
-            :options="utils.wms.move_line_product_detail_options(state.data.move_line, {fields: [{path: 'picking.name', label: 'Picking'}]})"
+            :options="utils.wms.move_line_product_detail_options(state.data.move_line, {fields: [{path: 'picking.name', label: 'Picking'}], fields_blacklist: ['quantity']})"
             :card_color="utils.colors.color_for(state_in(['set_line_destination']) ? 'screen_step_done': 'screen_step_todo')"
             />
         <item-detail-card
