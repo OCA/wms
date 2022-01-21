@@ -121,7 +121,7 @@ addon | version | maintainers | summary
 [shopfloor_delivery_shipment](shopfloor_delivery_shipment/) | 13.0.1.1.0 | [![sebalix](https://github.com/sebalix.png?size=30px)](https://github.com/sebalix) [![TDu](https://github.com/TDu.png?size=30px)](https://github.com/TDu) | Manage delivery process with shipment advices
 [shopfloor_delivery_shipment_mobile](shopfloor_delivery_shipment_mobile/) | 13.0.1.0.0 |  | Frontend for delivery shipment scenario for shopfloor
 [shopfloor_example](shopfloor_example/) | 13.0.1.0.1 |  | Show how to customize the Shopfloor app frontend.
-[shopfloor_mobile](shopfloor_mobile/) | 13.0.2.5.0 | [![simahawk](https://github.com/simahawk.png?size=30px)](https://github.com/simahawk) | Mobile frontend for WMS Shopfloor app
+[shopfloor_mobile](shopfloor_mobile/) | 13.0.2.5.1 | [![simahawk](https://github.com/simahawk.png?size=30px)](https://github.com/simahawk) | Mobile frontend for WMS Shopfloor app
 [shopfloor_mobile_base](shopfloor_mobile_base/) | 13.0.1.12.0 | [![simahawk](https://github.com/simahawk.png?size=30px)](https://github.com/simahawk) | Mobile frontend for WMS Shopfloor app
 [shopfloor_packing_info](shopfloor_packing_info/) | 13.0.1.0.0 |  | Allows to predefine packing information messages per partner.
 [shopfloor_rest_log](shopfloor_rest_log/) | 13.0.1.2.0 | [![simahawk](https://github.com/simahawk.png?size=30px)](https://github.com/simahawk) | Integrate rest_log into Shopfloor app
