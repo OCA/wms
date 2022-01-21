@@ -137,7 +137,7 @@ addon | version | maintainers | summary
 [shopfloor_example](shopfloor_example/) | 14.0.1.0.0 |  | Show how to customize the Shopfloor app frontend.
 [shopfloor_manual_product_transfer](shopfloor_manual_product_transfer/) | 14.0.1.1.0 | [![sebalix](https://github.com/sebalix.png?size=30px)](https://github.com/sebalix) | Manage manual product transfers
 [shopfloor_manual_product_transfer_mobile](shopfloor_manual_product_transfer_mobile/) | 14.0.1.1.0 |  | Frontend for manual product transfer scenario for Shopfloor
-[shopfloor_mobile](shopfloor_mobile/) | 14.0.1.3.0 | [![simahawk](https://github.com/simahawk.png?size=30px)](https://github.com/simahawk) | Mobile frontend for WMS Shopfloor app
+[shopfloor_mobile](shopfloor_mobile/) | 14.0.1.3.1 | [![simahawk](https://github.com/simahawk.png?size=30px)](https://github.com/simahawk) | Mobile frontend for WMS Shopfloor app
 [shopfloor_mobile_base](shopfloor_mobile_base/) | 14.0.1.6.0 | [![simahawk](https://github.com/simahawk.png?size=30px)](https://github.com/simahawk) | Mobile frontend for WMS Shopfloor app
 [shopfloor_mobile_base_auth_api_key](shopfloor_mobile_base_auth_api_key/) | 14.0.1.0.1 |  | Provides authentication via API key to Shopfloor base mobile app
 [shopfloor_mobile_base_auth_user](shopfloor_mobile_base_auth_user/) | 14.0.1.0.2 |  | Provides authentication via standard user login
