@@ -498,7 +498,7 @@ class StockReleaseChannel(models.Model):
         pickings = self.env["stock.picking"].search(domain)
         field_descr = self._fields[field_domain]._description_string(self.env)
         xmlid = "stock_available_to_promise_release.stock_move_release_action"
-        action = self.env.ref(xmlid).read()[0]
+        action = self.env["ir.actions.act_window"]._for_xml_id(xmlid)
         action["display_name"] = "{} ({})".format(
             ", ".join(self.mapped("display_name")), field_descr
         )
@@ -507,7 +507,7 @@ class StockReleaseChannel(models.Model):
         return action
 
     def _build_action(self, xmlid, records, description, context=None):
-        action = self.env.ref(xmlid).read()[0]
+        action = self.env["ir.actions.act_window"]._for_xml_id(xmlid)
         action["display_name"] = "{} ({})".format(
             ", ".join(self.mapped("display_name")), description
         )
@@ -531,7 +531,9 @@ class StockReleaseChannel(models.Model):
 
     def get_action_picking_form(self):
         self.ensure_one()
-        action = self.env.ref("stock.action_picking_form").read()[0]
+        action = self.env["ir.actions.act_window"]._for_xml_id(
+            "stock.action_picking_form"
+        )
         action["context"] = {}
         if not self.last_done_picking_id:
             raise exceptions.UserError(
