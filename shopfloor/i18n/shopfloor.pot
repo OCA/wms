@@ -557,6 +557,11 @@ msgid "Operation's already running. Would you like to take it over?"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__package_id
+msgid "Package"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__package_level_count
 msgid "Package Level Count"
 msgstr ""
@@ -691,6 +696,11 @@ msgstr ""
 #: code:addons/shopfloor/actions/change_package_lot.py:0
 #, python-format
 msgid "Pick: stock issue on lot: {} found in {}"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__picking_id
+msgid "Picking"
 msgstr ""
 
 #. module: shopfloor
