@@ -73,7 +73,8 @@ class StockStorageLocationSequence(models.Model):
         return msg
 
     def button_show_locations(self):
-        action = self.env.ref("stock.action_location_form").read()[0]
+        xmlid = "stock.action_location_form"
+        action = self.env["ir.actions.act_window"]._for_xml_id(xmlid)
         action["domain"] = [
             ("parent_path", "=ilike", "{}%".format(self.location_id.parent_path)),
             (
