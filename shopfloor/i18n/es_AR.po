@@ -587,6 +587,11 @@ msgid "Operation's already running. Would you like to take it over?"
 msgstr "La operación ya está en marcha. ¿Le gustaría hacerse cargo?"
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__package_id
+msgid "Package"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__package_level_count
 msgid "Package Level Count"
 msgstr "Cuental del Nivel de Paquete"
@@ -728,6 +733,11 @@ msgstr "Pick y pack al mismo tiempo"
 #, python-format
 msgid "Pick: stock issue on lot: {} found in {}"
 msgstr "Entrega: error de inventario en el lote: {} encontrado en {}"
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__picking_id
+msgid "Picking"
+msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_batch__picking_count
