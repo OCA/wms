@@ -160,7 +160,7 @@ addon | version | maintainers | summary
 [stock_reception_screen](stock_reception_screen/) | 14.0.1.0.1 |  | Dedicated screen to receive/scan goods.
 [stock_reception_screen_measuring_device](stock_reception_screen_measuring_device/) | 14.0.1.0.0 | [![gurneyalex](https://github.com/gurneyalex.png?size=30px)](https://github.com/gurneyalex) | Allow to use a measuring device from a reception screen.for packaging measurement
 [stock_reception_screen_qty_by_packaging](stock_reception_screen_qty_by_packaging/) | 14.0.1.1.0 |  | Glue module for `stock_product_qty_by_packaging` and `stock_vertical_lift`.
-[stock_storage_type](stock_storage_type/) | 14.0.1.10.0 |  | Manage packages and locations storage types
+[stock_storage_type](stock_storage_type/) | 14.0.1.11.0 |  | Manage packages and locations storage types
 [stock_storage_type_buffer](stock_storage_type_buffer/) | 14.0.1.3.0 |  | Exclude storage locations from put-away if their buffer is full
 [stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 14.0.1.0.0 |  | Advanced storage strategy ABC for WMS
 
