@@ -23,7 +23,7 @@ class ProductProduct(models.Model):
         if not self.move_need_release_count:
             return
         xmlid = "stock_available_to_promise_release.stock_move_release_action"
-        action = self.env.ref(xmlid).read()[0]
+        action = self.env["ir.actions.act_window"]._for_xml_id(xmlid)
         action["domain"] = [
             ("product_id", "in", self.ids),
             ("need_release", "=", True),

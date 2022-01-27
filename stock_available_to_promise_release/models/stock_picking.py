@@ -166,7 +166,7 @@ class StockPicking(models.Model):
         if not self.need_release:
             return
         xmlid = "stock_available_to_promise_release.stock_move_release_action"
-        action = self.env.ref(xmlid).read()[0]
+        action = self.env["ir.actions.act_window"]._for_xml_id(xmlid)
         action["domain"] = [("picking_id", "=", self.id), ("need_release", "=", True)]
         action["context"] = {}
         return action
