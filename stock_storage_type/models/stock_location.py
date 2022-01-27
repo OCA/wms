@@ -357,18 +357,6 @@ class StockLocation(models.Model):
 
         for package_sequence in package_locations:
             pref_loc = package_sequence.location_id
-            if (
-                pref_loc.pack_putaway_strategy == "none"
-                and pref_loc.select_allowed_locations(
-                    package_storage_type, quant, product
-                )
-            ):
-                _logger.debug(
-                    "No putaway strategy defined on location %s and package "
-                    "storage type %s allowed."
-                    % (pref_loc.complete_name, package_storage_type.name)
-                )
-                return pref_loc
             storage_locations = pref_loc.get_storage_locations(products=product)
             _logger.debug("Storage locations selected: %s" % storage_locations)
             allowed_location = storage_locations.select_first_allowed_location(
@@ -392,10 +380,36 @@ class StockLocation(models.Model):
         locations = self.browse()
         if self.pack_putaway_strategy == "none":
             locations = self
+            if products and len(products) == 1:
+                locations = self._get_product_putaway(products) or self
         else:
             products = products or self.env["product.product"]
             locations = self._get_sorted_leaf_child_locations(products)
         return locations
+
+    def _get_product_putaway(self, product):
+        """Returns the direct location where the product has to be put if
+        found Otherwise returns an empty recordset.."""
+        self.ensure_one()
+        putaway_location = self.env["stock.location"]
+        # Looking for a putaway about the product.
+        putaway_rules = self.putaway_rule_ids.filtered(
+            lambda x: x.product_id == product
+        )
+        if putaway_rules:
+            putaway_location = putaway_rules[0].location_out_id
+        # If not product putaway found, we're looking with category so.
+        else:
+            categ = product.categ_id
+            while categ:
+                putaway_rules = self.putaway_rule_ids.filtered(
+                    lambda x: x.category_id == categ
+                )
+                if putaway_rules:
+                    putaway_location = putaway_rules[0].location_out_id
+                    break
+                categ = categ.parent_id
+        return putaway_location
 
     def _get_sorted_leaf_locations_orderby(self, products):
         """Return SQL orderby clause and params for sorting locations
