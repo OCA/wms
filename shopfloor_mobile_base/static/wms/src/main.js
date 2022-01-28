@@ -15,7 +15,7 @@ import {page_registry} from "./services/page_registry.js";
 import {color_registry} from "./services/color_registry.js";
 import {auth_handler_registry} from "./services/auth_handler_registry.js";
 import {Odoo, OdooMocked} from "./services/odoo.js";
-import VueSuperMethod from "./lib/vue-super-call.js";
+import VueSuperMethod from "./lib/vue-super-call.min.js";
 
 Vue.prototype.$super = VueSuperMethod;
 

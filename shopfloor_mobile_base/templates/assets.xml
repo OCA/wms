@@ -34,7 +34,7 @@
         />
         <script
             id="script_lodash"
-            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/lodash.js?v=#{app_version}"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/lodash.min.js?v=#{app_version}"
         />
         <script
             t-if="not debug"
@@ -48,7 +48,7 @@
         />
         <script
             id="script_vue_router"
-            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/vue-router.js?v=#{app_version}"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/vue-router.min.js?v=#{app_version}"
         />
         <!-- https://yarkovaleksei.github.io/vue2-storage/en -->
         <script
@@ -58,12 +58,12 @@
         />
         <script
             id="script_vue_super_call"
-            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/vue-super-call.js?v=#{app_version}"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/vue-super-call.min.js?v=#{app_version}"
             type="module"
         />
         <script
             id="script_vue_vuetify"
-            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/vuetify/vuetify.js?v=#{app_version}"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/lib/vuetify/vuetify.min.js?v=#{app_version}"
         />
         <script
             id="script_vue_i18n"
