@@ -4,6 +4,8 @@
 from contextlib import contextmanager
 from pprint import pformat
 
+import mock
+
 from odoo.tests.common import SavepointCase
 
 from odoo.addons.base_rest.controllers.main import _PseudoCollection
@@ -59,7 +61,13 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
         params = params or {}
         collection = _PseudoCollection("shopfloor.service", env or cls.env)
         yield WorkContext(
-            model_name="rest.service.registration", collection=collection, **params
+            model_name="rest.service.registration",
+            collection=collection,
+            # No need for a real request mock
+            # as we don't deal w/ real request for testing
+            # but base_rest context provider needs it.
+            request=mock.Mock(),
+            **params
         )
 
     @classmethod
