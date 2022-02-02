@@ -72,7 +72,7 @@ const Form = {
                 });
         },
         _getFormData: function (record_id) {
-            this.odoo.call(record_id, {}, "GET").then(this._load_form_data);
+            this.odoo.get(record_id + "/get").then(this._load_form_data);
         },
         _load_form_data: function (result) {
             this.odoo_data = result.data || {};
