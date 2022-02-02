@@ -46,7 +46,10 @@ class ShopfloorPickingFormValidator(Component):
     _usage = "form_edit_stock_picking.validator"
 
     def get(self):
-        return {}
+        return {
+            "id": {"type": "integer", "rename": "_id"},
+            "_id": {"type": "integer"},
+        }
 
     def update(self):
         return {
