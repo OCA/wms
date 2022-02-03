@@ -206,7 +206,7 @@
             t-if="0"
         >Hook to this element to inject your own scenario</t>
 
-        <script id="script_devtools" t-if="debug or demo_mode">
+        <script id="script_devtools" t-if="debug or app_info['demo_mode']">
             Vue.config.devtools = true
         </script>
         <!-- Main app script -->
