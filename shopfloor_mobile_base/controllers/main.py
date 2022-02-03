@@ -10,6 +10,7 @@ import os
 
 from odoo import http
 from odoo.modules.module import load_information_from_description_file
+from odoo.tools import DotDict
 from odoo.tools.config import config as odoo_config
 
 _logger = logging.getLogger(__name__)
@@ -63,7 +64,7 @@ class ShopfloorMobileAppMixin(object):
         base_url = shopfloor_app.api_route.rstrip("/") + "/"
         auth_type = shopfloor_app.auth_type
         profile_required = shopfloor_app.profile_required
-        return dict(
+        return DotDict(
             name=shopfloor_app.name,
             short_name=shopfloor_app.short_name,
             base_url=base_url,
