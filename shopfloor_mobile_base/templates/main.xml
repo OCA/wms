@@ -14,7 +14,11 @@
         <link type="image/x-icon" position="after">
             <link rel="manifest" t-att-href="app_info.manifest_url" />
         </link>
+        <title position="attributes">
+            <attribute name="t-esc">app_info.name</attribute>
+        </title>
     </template>
+
     <template id="shopfloor_app_main" name="Shopfloor app main">
         <t t-call="shopfloor_mobile_base.shopfloor_app_layout">
             <t
@@ -25,7 +29,6 @@
                 t-set="html_data"
                 t-value="{'shopfloor_app_version': app_info.version}"
             />
-            <t t-set="title" t-esc="app_info.name" />
             <t t-set="head">
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <script type="text/javascript">
