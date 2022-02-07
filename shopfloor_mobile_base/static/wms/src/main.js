@@ -63,6 +63,7 @@ new Vue({
             demo_mode: false,
             global_state_key: "",
             loading: false,
+            loading_msg_custom: "",
             appconfig: null,
         };
         _.merge(data, config_registry.generare_data_keys());
@@ -99,6 +100,14 @@ new Vue({
         ...config_registry.generate_computed_properties(),
         app_info: function () {
             return shopfloor_app_info;
+        },
+        loading_msg: {
+            get() {
+                return this.loading_msg_custom || this.$t("app.loading");
+            },
+            set(newValue) {
+                this.loading_msg_custom = newValue;
+            },
         },
         available_languages: function () {
             // FIXME: this should come from odoo and from app config

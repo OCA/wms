@@ -234,7 +234,7 @@ Vue.component("screen-loading", {
           justify="center">
           <v-col cols="12" class="text-center">
               <v-progress-circular indeterminate :color="utils.colors.color_for('spinner')" />
-              <p class="mt-4">Waiting...</p>
+              <p class="mt-4">{{ $root.loading_msg }}</p>
           </v-col>
       </v-row>
     </v-overlay>
