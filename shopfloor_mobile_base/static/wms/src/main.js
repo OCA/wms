@@ -93,6 +93,7 @@ new Vue({
             self.profile = profile;
             self.loadMenu(true);
         });
+        event_hub.$emit("app:mounted", self, false);
     },
     computed: {
         ...config_registry.generate_computed_properties(),
