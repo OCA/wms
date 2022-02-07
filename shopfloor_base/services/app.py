@@ -11,14 +11,16 @@ class ShopfloorApp(Component):
     _usage = "app"
     _description = __doc__
 
-    # TODO: maybe rename to `config` or `app_config`
-    # as this is not related to current user conf
+    # TODO: RENAME TO `sync`
     def user_config(self):
+        return self._response(data=self._sync_data())
+
+    def _sync_data(self):
         profiles_comp = self.component("profile")
         profiles = profiles_comp._to_json(profiles_comp._search())
         user_comp = self.component("user")
         user_info = user_comp._user_info()
-        return self._response(data={"profiles": profiles, "user_info": user_info})
+        return {"profiles": profiles, "user_info": user_info}
 
 
 class ShopfloorAppValidator(Component):
