@@ -6,6 +6,7 @@
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
+import event_hub from "../../services/event_hub.js";
 
 Vue.component("searchbar", {
     data: function () {
@@ -35,7 +36,7 @@ Vue.component("searchbar", {
         },
     },
     mounted: function () {
-        this.$root.event_hub.$on("screen:reload", this.on_screen_reload);
+        event_hub.$on("screen:reload", this.on_screen_reload);
     },
     methods: {
         search: function (e) {

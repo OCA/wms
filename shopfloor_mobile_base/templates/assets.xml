@@ -176,6 +176,7 @@
         <script
             id="script_component_searchbar"
             t-attf-src="/shopfloor_mobile_base/static/wms/src/components/searchbar/searchbar.js?v=#{app_info.version}"
+            type="module"
         />
         <script
             id="script_component_user_confirmation"

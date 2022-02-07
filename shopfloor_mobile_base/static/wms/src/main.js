@@ -15,6 +15,7 @@ import {page_registry} from "./services/page_registry.js";
 import {color_registry} from "./services/color_registry.js";
 import {auth_handler_registry} from "./services/auth_handler_registry.js";
 import {Odoo, OdooMocked} from "./services/odoo.js";
+import event_hub from "./services/event_hub.js";
 import VueSuperMethod from "./lib/vue-super-call.min.js";
 
 Vue.prototype.$super = VueSuperMethod;
@@ -28,8 +29,6 @@ Vue.use(Vue2Storage, {
 });
 
 Vue.use(Vuetify);
-
-var EventHub = new Vue();
 
 Vue.mixin(GlobalMixin);
 
@@ -63,8 +62,6 @@ new Vue({
         const data = {
             demo_mode: false,
             global_state_key: "",
-            // Collect global events
-            event_hub: EventHub,
             loading: false,
             appconfig: null,
         };
@@ -92,7 +89,7 @@ new Vue({
         this.$root.$on("state:change", function (key) {
             self.global_state_key = key;
         });
-        this.$root.event_hub.$on("profile:selected", function (profile) {
+        event_hub.$on("profile:selected", function (profile) {
             self.profile = profile;
             self.loadMenu(true);
         });
@@ -298,7 +295,7 @@ new Vue({
             if (this.global_state_key && !no_state) {
                 event_name = this.global_state_key + ":" + event_name;
             }
-            this.event_hub.$emit(event_name, data);
+            event_hub.$emit(event_name, data);
         },
     },
 }).$mount("#app");

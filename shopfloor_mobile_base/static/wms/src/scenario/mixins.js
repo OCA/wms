@@ -4,6 +4,8 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
+import event_hub from "../services/event_hub.js";
+
 export var ScenarioBaseMixin = {
     data: function () {
         return {
@@ -433,12 +435,12 @@ export var ScenarioBaseMixin = {
                     if (typeof handler === "string") handler = state[handler];
                     const event_name =
                         self._global_state_key(self.state.key) + ":" + name;
-                    const existing = self.$root.event_hub._events[event_name];
+                    const existing = event_hub._events[event_name];
                     if (!_.isEmpty(existing)) {
-                        self.$root.event_hub.$off(event_name);
+                        event_hub.$off(event_name);
                     }
                     if (handler) {
-                        self.$root.event_hub.$on(event_name, handler);
+                        event_hub.$on(event_name, handler);
                     }
                 });
             }
