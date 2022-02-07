@@ -9,35 +9,11 @@ import logging
 import os
 
 from odoo import http
-from odoo.modules.module import load_information_from_description_file
 from odoo.tools import DotDict
-from odoo.tools.config import config as odoo_config
+
+from ..utils import RUNNING_ENV, get_version
 
 _logger = logging.getLogger(__name__)
-
-
-APP_VERSIONS = {}
-
-
-def _get_running_env():
-    """Retrieve current system environment.
-
-    Expected key `RUNNING_ENV` is compliant w/ `server_environment` naming
-    but is not depending on it.
-
-    Additionally, as specific key for Shopfloor is supported.
-
-    You don't need `server_environment` module to have this feature.
-    """
-    for key in ("SHOPFLOOR_RUNNING_ENV", "RUNNING_ENV"):
-        if os.getenv(key):
-            return os.getenv(key)
-        if odoo_config.options.get(key.lower()):
-            return odoo_config.get(key.lower())
-    return "prod"
-
-
-RUNNING_ENV = _get_running_env()
 
 
 class ShopfloorMobileAppMixin(object):
@@ -57,7 +33,7 @@ class ShopfloorMobileAppMixin(object):
         app_info = self._make_app_info(shopfloor_app, demo=demo)
         return {
             "app_info": app_info,
-            "get_version": self._get_version,
+            "get_version": get_version,
         }
 
     def _make_app_info(self, shopfloor_app, demo=False):
@@ -72,32 +48,15 @@ class ShopfloorMobileAppMixin(object):
             auth_type=auth_type,
             profile_required=profile_required,
             demo_mode=demo,
-            version=self._get_app_version(),
+            version=shopfloor_app.app_version,
             running_env=self._get_running_env(),
         )
-
-    def _get_version(self, module_name, module_path=None):
-        """Return module version straight from manifest."""
-        global APP_VERSIONS
-        if APP_VERSIONS.get(module_name):
-            return APP_VERSIONS[module_name]
-        try:
-            info = load_information_from_description_file(
-                module_name, mod_path=module_path
-            )
-            APP_VERSIONS[module_name] = info["version"]
-            return APP_VERSIONS[module_name]
-        except Exception:
-            return "dev"
-
-    def _get_app_version(self):
-        return self._get_version("shopfloor_mobile_base")
 
     def _get_running_env(self):
         return RUNNING_ENV
 
-    def _make_icons(self, fname, rel, sizes, img_type, url_pattern=None):
-        app_version = self._get_app_version()
+    def _make_icons(self, shopfloor_app, fname, rel, sizes, img_type, url_pattern=None):
+        app_version = shopfloor_app.app_version
         all_icons = []
         url_pattern = url_pattern or (
             "/shopfloor_mobile_base/static/wms/src/assets/icons/"
@@ -133,19 +92,19 @@ class ShopfloorMobileAppMixin(object):
         )
         fname = "apple-icon"
         img_type = "image/png"
-        all_icons.extend(self._make_icons(fname, rel, sizes, img_type))
+        all_icons.extend(self._make_icons(shopfloor_app, fname, rel, sizes, img_type))
         # android icons
         rel = "icon"
         sizes = ("48x48", "72x72", "96x96", "144x144", "192x192")
         fname = "android-icon"
         img_type = "image/png"
-        all_icons.extend(self._make_icons(fname, rel, sizes, img_type))
+        all_icons.extend(self._make_icons(shopfloor_app, fname, rel, sizes, img_type))
         # favicons
         rel = "icon"
         sizes = ("16x16", "32x32", "96x96")
         fname = "favicon"
         img_type = "image/png"
-        all_icons.extend(self._make_icons(fname, rel, sizes, img_type))
+        all_icons.extend(self._make_icons(shopfloor_app, fname, rel, sizes, img_type))
         return all_icons
 
     def _get_manifest(self, shopfloor_app):

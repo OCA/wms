@@ -14,5 +14,5 @@
     "category": "Warehouse Management",
     "license": "AGPL-3",
     "installable": True,
-    "data": ["templates/main.xml", "templates/assets.xml"],
+    "data": ["templates/main.xml", "templates/assets.xml", "views/shopfloor_app.xml"],
 }
