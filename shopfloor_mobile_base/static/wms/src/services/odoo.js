@@ -12,6 +12,8 @@ export class OdooMixin {
         this.usage = params.usage;
         this.headers = params.headers || {};
         this.debug = this.params.debug;
+        // Bypass "loading" state when calling Odoo
+        this.in_background = this.params.in_background;
     }
     call(path, data, method = "POST", fullpath = false) {
         const endpoint_info = this._make_endpoint_info(path, fullpath);
@@ -54,7 +56,8 @@ export class OdooMixin {
         } else if (method == "POST") {
             params.body = JSON.stringify(data);
         }
-        return fetch(this._get_url(endpoint), params).then((response) => {
+        const fn = this.in_background ? window.standardFetch : window.fetch;
+        return fn(this._get_url(endpoint), params).then((response) => {
             if (!response.ok) {
                 let handler = self["_handle_" + response.status.toString()];
                 if (_.isUndefined(handler)) {

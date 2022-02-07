@@ -10,7 +10,7 @@
 
 // Credit https://stackoverflow.com/questions/43792026
 
-var _oldFetch = fetch;
+window.standardFetch = fetch;
 
 /**
  * Patch `fetch` to trigger events on start and end request.
@@ -29,7 +29,7 @@ window.fetch = function () {
     });
 
     // Pass the supplied arguments to the real fetch function
-    var fetchCall = _oldFetch.apply(this, arguments);
+    var fetchCall = window.standardFetch.apply(this, arguments);
 
     // Trigger the fetchStart event
     document.dispatchEvent(fetchStart);
