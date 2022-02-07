@@ -178,12 +178,14 @@ new Vue({
         _loadConfig: function () {
             const self = this;
             const odoo = self.getOdoo({usage: "app"});
+            // TODO: rename this endpoint to `sync`
             return odoo.call("user_config").then(function (result) {
                 if (!_.isUndefined(result.data)) {
                     self.appconfig = result.data;
                     self.authenticated = true;
                     self.$storage.set("appconfig", self.appconfig);
                 }
+                event_hub.$emit("app.sync:update", {root: self, sync_data: result});
                 return result;
             });
         },
