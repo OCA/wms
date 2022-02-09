@@ -131,13 +131,16 @@ export class OdooMocked extends OdooMixin {
         this._set_demo_data();
         console.log("CALL:", path, this.usage);
         console.dir("CALL data:", data);
-        if (!_.isUndefined(this[path])) {
-            // Provide your own mock by enpoint
-            return this[path].call(this, data);
+        // Provide your own mock by enpoint
+        let mocked_handler = "mocked_" + path;
+        if (!_.isUndefined(this[mocked_handler])) {
+            return this[mocked_handler].call(this, data);
         }
-        if (!_.isUndefined(this[this.usage + "_" + path])) {
+        // Provide your own mock by service and endpoint
+        mocked_handler = "mocked_" + this.usage + "_" + path;
+        if (!_.isUndefined(this[mocked_handler])) {
             // Provide your own mock by enpoint and specific process
-            return this[this.usage + "_" + path].call(this, data);
+            return this[mocked_handler].call(this, data);
         }
         let result = null;
         const barcode = data
@@ -177,13 +180,13 @@ export class OdooMocked extends OdooMixin {
         console.dir("CALL RETURN data:", result);
         return Promise.resolve(result);
     }
-    user_config(params) {
+    mocked_user_config(params) {
         return Promise.resolve({data: demotools.makeAppConfig()});
     }
-    menu(params) {
+    mocked_menu(params) {
         return Promise.resolve({data: {menus: demotools.getAppMenus()}});
     }
-    scan(params) {
+    mocked_scan(params) {
         const result = {};
         const data = demotools.get_indexed(params.identifier);
         if (data) {
