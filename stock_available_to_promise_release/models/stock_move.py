@@ -371,6 +371,10 @@ class StockMove(models.Model):
             moves = moves.mapped("move_orig_ids")
         pickings = self.env["stock.picking"].browse(picking_ids)
         pickings._after_release_update_chain()
+        # Set the highest priority on all pickings in the chain
+        priorities = pickings.mapped("priority")
+        if priorities:
+            pickings.write({"priority": max(priorities)})
 
     def _after_release_assign_moves(self):
         moves = self
@@ -403,3 +407,9 @@ class StockMove(models.Model):
         new_move._assign_picking()
 
         return new_move.with_context(context)
+
+    def _assign_picking_post_process(self, new=False):
+        super()._assign_picking_post_process(new)
+        priorities = self.mapped("move_dest_ids.picking_id.priority")
+        if priorities:
+            self.picking_id.write({"priority": max(priorities)})
