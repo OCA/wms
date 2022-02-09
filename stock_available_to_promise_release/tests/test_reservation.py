@@ -936,3 +936,52 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         # TODO a MTO picking should work normally
 
     # TODO: test w/ multiple orders by priority
+
+    def test_picking_priority(self):
+        self.pick_type = self.env.ref("stock.picking_type_out")
+        self.loc_output = self.env.ref("stock.stock_location_output")
+        self.route = self.env["stock.location.route"].create(
+            {
+                "name": "test route",
+                "company_id": self.env.company.id,
+                "sequence": 10,
+            }
+        )
+        self.product1.route_ids = [(6, 0, [self.route.id])]
+        self.rule = self.env["stock.rule"].create(
+            {
+                "name": "pull rule test",
+                "action": "pull",
+                "location_src_id": self.loc_customer.id,
+                "location_id": self.loc_output.id,
+                "route_id": self.route.id,
+                "picking_type_id": self.pick_type.id,
+                "procure_method": "make_to_order",
+            }
+        )
+        self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
+        self._update_qty_in_location(self.loc_stock, self.product1, 20.0)
+        pick = self.env["stock.picking"].create(
+            {
+                "picking_type_id": self.pick_type.id,
+                "location_id": self.loc_output.id,
+                "location_dest_id": self.loc_customer.id,
+                "move_lines": [
+                    (
+                        0,
+                        0,
+                        {
+                            "name": self.product1.name,
+                            "product_id": self.product1.id,
+                            "product_uom_qty": 5.0,
+                            "product_uom": self.product1.uom_id.id,
+                            "need_release": True,
+                        },
+                    )
+                ],
+            }
+        )
+        pick.priority = "1"
+        pick.action_confirm()
+        pick.release_available_to_promise()
+        self.assertEqual(pick.move_lines.move_orig_ids.picking_id.priority, "1")
