@@ -137,10 +137,10 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
         )
 
     def test_scan_document_lot_already_loaded(self):
-        """Scan a package already loaded in the current shipment.
+        """Scan a lot already loaded in the current shipment.
 
-        The second time a package is scanned an warning is returned saying that
-        the package has already been loaded.
+        The second time a lot is scanned an warning is returned saying that
+        the lot has already been loaded.
         """
         move_line = self.picking1.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product_c
@@ -217,3 +217,41 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
                 scanned_lot, self.shipment
             ),
         )
+
+    def test_scan_document_lot_number_shared_with_multiple_products(self):
+        """Scan a lot whose the number is shared with different products.
+
+        One is a relevant product (ready to be loaded in the shipment) and
+        another one is a completely unrelated product for the current
+        shipment/operations to process.
+
+        The scan should then load the relevant lot.
+        """
+        # Prepare data
+        product_unrelated = self.product_c.create(
+            {"name": "UNRELATED PRODUCT", "default_code": "UNRELATED"}
+        )
+        move_line = self.picking1.move_line_ids.filtered(
+            lambda ml: ml.product_id == self.product_c
+        )
+        lot = move_line.lot_id
+        lot_unrelated = lot.copy({"product_id": product_unrelated.id})
+        self.assertEqual(lot.name, lot_unrelated.name)
+        self.assertNotEqual(lot.product_id, lot_unrelated.product_id)
+        # Check that lot number is shared as expected
+        available_lots = self.service._actions_for("search").lot_from_scan(
+            lot.name, limit=None
+        )
+        self.assertEqual(available_lots.product_id, self.product_c | product_unrelated)
+        # Scan the lot number
+        response = self.service.dispatch(
+            "scan_document",
+            params={
+                "shipment_advice_id": self.shipment.id,
+                "barcode": lot.name,
+            },
+        )
+        self.assert_response_scan_document(response, self.shipment, self.picking1)
+        # Check lot status
+        self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        self.assertEqual(move_line.lot_id, lot)

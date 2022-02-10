@@ -113,13 +113,20 @@ class DeliveryShipment(Component):
                     shipment_advice, message=message
                 )
         search = self._actions_for("search")
+        # Look for an operation
         scanned_picking = search.picking_from_scan(barcode)
         if scanned_picking:
             return self._scan_picking(shipment_advice, scanned_picking)
+        # Look for a package
         scanned_package = search.package_from_scan(barcode)
         if scanned_package:
             return self._scan_package(shipment_advice, scanned_package)
-        scanned_lot = search.lot_from_scan(barcode)
+        # Look for a lot (restricted to the relevant products as a lot number
+        # can be shared by different products)
+        move_lines = self.env["stock.move.line"].search(
+            self._find_move_lines_domain(shipment_advice)
+        )
+        scanned_lot = search.lot_from_scan(barcode, products=move_lines.product_id)
         if scanned_lot:
             return self._scan_lot(shipment_advice, scanned_lot)
         scanned_product = search.product_from_scan(barcode)

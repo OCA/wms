@@ -248,8 +248,9 @@ class ManualProductTransfer(Component):
                     message=self.msg_store.recovered_previous_session(),
                 )
         # Search by lot
-        lot = search.lot_from_scan(barcode)
-        if lot:
+        lots = search.lot_from_scan(barcode, limit=None)
+        lot = None
+        for lot in lots:
             product = lot.product_id
             existing_move_lines = self._find_user_move_lines(
                 location, lot.product_id, lot=lot
@@ -449,7 +450,7 @@ class ManualProductTransfer(Component):
         search = self._actions_for("search")
         # Check if the lot matches if any
         if lot:
-            scanned_lot = search.lot_from_scan(barcode)
+            scanned_lot = search.lot_from_scan(barcode, products=product)
             # Barcode is not a lot
             if not scanned_lot:
                 return self._response_for_confirm_quantity(

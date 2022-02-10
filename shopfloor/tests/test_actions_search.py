@@ -46,7 +46,7 @@ class TestSearchCase(TestSearchBaseCase):
         packaging = self.product_a_packaging
         self.assertEqual(handler(packaging.barcode), rec)
 
-    def test_search_lot(self):
+    def test_search_lot_number_unique(self):
         rec = (
             self.env["stock.production.lot"]
             .sudo()
@@ -55,9 +55,33 @@ class TestSearchCase(TestSearchBaseCase):
             )
         )
         handler = self.search.lot_from_scan
-        self.assertEqual(handler(rec.name), rec)
+        self.assertEqual(handler(rec.name, products=self.product_a), rec)
         self.assertEqual(handler(False), rec.browse())
         self.assertEqual(handler("NONE"), rec.browse())
+
+    def test_search_lot_number_shared_with_multiple_products(self):
+        lot_model = self.env["stock.production.lot"].sudo()
+        lots = (
+            lot_model.create(
+                {
+                    "name": "TEST",
+                    "product_id": self.product_a.id,
+                    "company_id": self.env.company.id,
+                }
+            ),
+            lot_model.create(
+                {
+                    "name": "TEST",
+                    "product_id": self.product_b.id,
+                    "company_id": self.env.company.id,
+                }
+            ),
+        )
+        handler = self.search.lot_from_scan
+        self.assertEqual(handler(lots[0].name, products=self.product_a), lots[0])
+        self.assertEqual(handler(lots[1].name, products=self.product_a), lots[0])
+        self.assertEqual(handler(lots[0].name, products=self.product_b), lots[1])
+        self.assertEqual(handler(lots[1].name, products=self.product_b), lots[1])
 
     def test_search_generic_packaging(self):
         rec = (
