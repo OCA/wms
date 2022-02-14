@@ -142,6 +142,18 @@ class TestStorageType(SavepointCase):
         self.cardboxes_location_storage_type.max_height = 1
         self.assertEqual(test_location.max_height, 3)
 
+    def test_storage_type_max_height_in_meters(self):
+        # Set the 'max_height' as meters and check that 'max_height_in_m' is equal
+        uom_meter = self.env.ref("uom.product_uom_meter")
+        self.pallets_location_storage_type.length_uom_id = uom_meter
+        self.pallets_location_storage_type.max_height = 100
+        self.assertEqual(self.pallets_location_storage_type.max_height_in_m, 100)
+        # Then set the UoM to centimeters and check that max_height_in_m is
+        # reduced by a factor 100
+        uom_cm = self.env.ref("uom.product_uom_cm")
+        self.pallets_location_storage_type.length_uom_id = uom_cm
+        self.assertEqual(self.pallets_location_storage_type.max_height_in_m, 1)
+
     def test_archive_package_storage_type(self):
         target = self.env.ref("stock_storage_type.package_storage_type_pallets")
         all_package_storage_types = self.env["stock.package.storage.type"].search([])

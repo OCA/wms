@@ -174,7 +174,7 @@ class StockLocationStorageType(models.Model):
                 ]
             )
 
-    @api.depends("max_height")
+    @api.depends("max_height", "length_uom_id")
     def _compute_max_height_in_m(self):
         uom_m = self.env.ref("uom.product_uom_meter")
         for slst in self:
