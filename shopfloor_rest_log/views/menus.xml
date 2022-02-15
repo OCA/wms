@@ -6,7 +6,7 @@
         <field name="res_model">rest.log</field>
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('collection', '=', 'shopfloor.service')]</field>
+        <field name="domain">[('collection', '=', 'shopfloor.app')]</field>
         <field name="search_view_id" ref="rest_log.rest_log_search_view" />
     </record>
 
