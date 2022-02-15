@@ -11,7 +11,7 @@
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "maintainers": ["guewen"],
     "license": "AGPL-3",
-    "application": True,
+    "application": False,
     "depends": [
         "shopfloor",
         "stock_packaging_calculator",  # OCA/stock-logistics-warehouse
