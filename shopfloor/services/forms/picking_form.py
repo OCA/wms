@@ -45,16 +45,14 @@ class ShopfloorPickingFormValidator(Component):
     _name = "shopfloor.form.stock.picking.validator"
     _usage = "form_edit_stock_picking.validator"
 
-    def get(self):
-        return {
-            "id": {"type": "integer", "rename": "_id"},
-            "_id": {"type": "integer"},
-        }
-
     def update(self):
-        return {
-            "carrier_id": {"type": "integer", "required": True},
-        }
+        schema = super().update()
+        schema.update(
+            {
+                "carrier_id": {"type": "integer", "required": True},
+            }
+        )
+        return schema
 
 
 class ShopfloorPickingFormValidatorResponse(Component):
