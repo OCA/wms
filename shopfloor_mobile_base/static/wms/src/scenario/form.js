@@ -43,7 +43,7 @@ const Form = {
         };
         this.odoo = this.$root.getOdoo(odoo_params);
         if (this.$route.params.record_id) {
-            this._getFormData(this.$route.params.record_id);
+            this._get_form_data(this.$route.params.record_id);
         }
     },
     methods: {
@@ -71,7 +71,7 @@ const Form = {
                     }, 1500);
                 });
         },
-        _getFormData: function (record_id) {
+        _get_form_data: function (record_id) {
             this.odoo.get(record_id + "/get").then(this._load_form_data);
         },
         _load_form_data: function (result) {
