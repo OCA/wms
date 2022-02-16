@@ -54,10 +54,23 @@ class ShopfloorFormMixinValidator(AbstractComponent):
     _usage = "form_mixin.validator"
 
     def get(self):
-        raise NotImplementedError()
+        return {
+            # TODO @simahawk: remove the need for this
+            # The black magic in base_rest
+            # is going to register the endpoint as `/int:id/get` (or `/update`)
+            # hence what is coming after as param is going to value `id`
+            # and `_id` as we expect in the method (to avoid using a built-in name).
+            # In theory we can replace this validator w/ proper restapi decorator.
+            "id": {"type": "integer", "rename": "_id"},
+            "_id": {"type": "integer"},
+        }
 
     def update(self):
-        raise NotImplementedError()
+        return {
+            # TODO @simahawk: remove the need for this
+            "id": {"type": "integer", "rename": "_id"},
+            "_id": {"type": "integer"},
+        }
 
 
 class ShopfloorFormMixinValidatorResponse(AbstractComponent):
