@@ -13,6 +13,6 @@
     "maintainers": ["simahawk"],
     "license": "LGPL-3",
     "depends": ["rest_log", "shopfloor_base"],
-    "data": ["security/groups.xml", "views/menus.xml"],
+    "data": ["security/groups.xml", "views/menus.xml", "views/shopfloor_app.xml"],
     "post_init_hook": "post_init_hook",
 }
