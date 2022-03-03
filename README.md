@@ -122,7 +122,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
-[delivery_carrier_preference](delivery_carrier_preference/) | 14.0.1.1.0 |  | Advanced selection of preferred shipping methods
+[delivery_carrier_preference](delivery_carrier_preference/) | 14.0.1.1.1 |  | Advanced selection of preferred shipping methods
 [delivery_carrier_warehouse](delivery_carrier_warehouse/) | 14.0.1.2.0 |  | Get delivery method used in sales orders from warehouse
 [delivery_preference_glue_stock_picking_group](delivery_preference_glue_stock_picking_group/) | 14.0.1.0.0 |  | Fix Delivery preferences module on grouping picking
 [sale_stock_available_to_promise_release](sale_stock_available_to_promise_release/) | 14.0.1.1.1 |  | Integration between Sales and Available to Promise Release
