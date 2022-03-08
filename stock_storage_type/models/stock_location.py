@@ -279,9 +279,15 @@ class StockLocation(models.Model):
             # to enforce concurrent transaction safety: 2 moves taking
             # quantities in a location have to be executed sequentially
             # or the location could remain "not empty"
+            out_pack_op = rec.out_move_line_ids.filtered(
+                lambda p: p.state in ("partially_available", "assigned")
+            )
             if (
-                sum(rec.quant_ids.mapped("qty"))
-                - sum(rec.out_move_line_ids.mapped("qty_done"))
+                float_compare(
+                    sum(rec.quant_ids.mapped("qty")),
+                    sum(out_pack_op.mapped("qty_done")),
+                    precision_digits=2,
+                )
                 > 0
                 or rec.in_move_ids
                 or rec.in_move_line_ids
