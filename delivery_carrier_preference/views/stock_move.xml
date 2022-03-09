@@ -15,7 +15,7 @@
         <field name="model">stock.move</field>
         <field
             name="inherit_id"
-            ref="stock_available_to_promise_release.view_move_release_tree"
+            ref="sale_stock_available_to_promise_release.view_move_release_tree"
         />
         <field name="arch" type="xml">
             <field name="ordered_available_to_promise_uom_qty" position="after">
