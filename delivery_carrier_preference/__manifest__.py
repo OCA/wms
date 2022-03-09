@@ -13,7 +13,7 @@
     "depends": [
         "delivery",
         "product_total_weight_from_packaging",
-        "stock_available_to_promise_release",
+        "sale_stock_available_to_promise_release",
         "stock_picking_group_by_partner_by_carrier",
     ],
     "data": [
