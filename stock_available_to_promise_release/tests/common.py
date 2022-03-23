@@ -95,10 +95,7 @@ class PromiseReleaseCommonCase(common.SavepointCase):
             )
         pickings = cls._pickings_in_group(group)
         pickings.mapped("move_lines").write(
-            {
-                "date_priority": date or fields.Datetime.now(),
-                "date_deadline": date or fields.Datetime.now(),
-            }
+            {"date_priority": date or fields.Datetime.now()}
         )
         return pickings
 

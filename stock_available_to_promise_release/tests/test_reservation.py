@@ -255,7 +255,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.env.company.stock_reservation_horizon = 1
         with freeze_time("2019-09-03"):
             # set expected date for picking moves far in the future
-            picking.move_lines.write({"date_deadline": "2019-09-10"})
+            picking.move_lines.write({"date": "2019-09-10"})
             # its quantity won't be counted in previously reserved
             # and we get 3 more on the next one
             # promised qty is 0 because the picking is excluded by its date
@@ -267,8 +267,8 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             )
 
             # do the same for picking 2
-            picking2_orig_date_expected = picking2.move_lines.date_deadline
-            picking2.move_lines.write({"date_deadline": "2019-09-10"})
+            picking2_orig_date_expected = picking2.move_lines.date
+            picking2.move_lines.write({"date": "2019-09-10"})
             # since we modified date_expected, force recomputation of the field
             self.env["stock.move"].invalidate_cache(
                 fnames=["previous_promised_qty", "ordered_available_to_promise_uom_qty"]
@@ -284,8 +284,8 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 picking4.move_lines.ordered_available_to_promise_uom_qty, 0
             )
 
-            picking3_orig_date_expected = picking3.move_lines.date_deadline
-            picking3.move_lines.write({"date_deadline": "2019-09-10"})
+            picking3_orig_date_expected = picking3.move_lines.date
+            picking3.move_lines.write({"date": "2019-09-10"})
             # since we modified date_expected, force recomputation of the field
             self.env["stock.move"].invalidate_cache(
                 fnames=["previous_promised_qty", "ordered_available_to_promise_uom_qty"]
@@ -306,10 +306,10 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
 
             # set a higher priority for picking 5
             # (restoring previous date_expected values for other pickings before)
-            picking2.move_lines.date_deadline = picking2_orig_date_expected
-            picking3.move_lines.date_deadline = picking3_orig_date_expected
+            picking2.move_lines.date = picking2_orig_date_expected
+            picking3.move_lines.date = picking3_orig_date_expected
             picking5.move_lines.write(
-                {"date_deadline": "2019-09-01", "date_priority": "2019-09-01"}
+                {"date": "2019-09-01", "date_priority": "2019-09-01"}
             )
             # Put 23 in stock. Available:
             #  5 for the released move.

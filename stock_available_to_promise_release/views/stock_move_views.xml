@@ -44,7 +44,7 @@
         <field name="inherit_id" ref="stock.view_move_form" />
         <field eval="900" name="priority" />
         <field name="arch" type="xml">
-            <field name="date_deadline" position="attributes">
+            <field name="date" position="attributes">
                 <attribute name="string">Shipment date</attribute>
             </field>
             <group name="main_grp_col2" position="inside">
