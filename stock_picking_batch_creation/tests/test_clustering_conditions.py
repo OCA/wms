@@ -109,3 +109,44 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         self.assertTrue(unselected_pickings)
         self.assertEqual(len(unselected_pickings), 1)
         self.assertEqual(unselected_pickings, pick_on_another_device)
+
+    def test_put_2_pickings_with_volume_zero_in_one_cluster(self):
+        "2 products don't have a volume : they should still occupy at least one bin each"
+        device = self.env["stock.device.type"].create(
+            {
+                "name": "test volume null devices",
+                "min_volume": 0,
+                "max_volume": 200,
+                "max_weight": 200,
+                "nbr_bins": 6,
+                "sequence": 50,
+            }
+        )
+        make_picking_batch_volume_zero = self.makePickingBatch.create(
+            {
+                "user_id": self.env.user.id,
+                "picking_type_ids": [(4, self.picking_type_1.id)],
+                "stock_device_type_ids": [(4, device.id)],
+            }
+        )
+        self.p1.write(
+            {"volume": 0.0, "length": 0, "height": 0, "width": 0, "weight": 1}
+        )
+        self.p2.write(
+            {"volume": 0.0, "length": 0, "height": 0, "width": 0, "weight": 1}
+        )
+        self._create_picking_pick_and_assign(
+            self.picking_type_1.id, products=self.p1 | self.p2
+        )
+        make_picking_batch_volume_zero.write({"maximum_number_of_preparation_lines": 6})
+        candidates_pickings = make_picking_batch_volume_zero._search_pickings()
+        device = make_picking_batch_volume_zero._compute_device_to_use(
+            candidates_pickings[0]
+        )
+        batch = make_picking_batch_volume_zero._create_batch()
+        selected_pickings = batch.picking_ids
+        self.assertTrue(selected_pickings)
+        self.assertEqual(len(selected_pickings), 4)
+
+        # All picks have a volume of 0 : they should each occupy one bin
+        self.assertEqual(batch.wave_nbr_bins, len(selected_pickings))

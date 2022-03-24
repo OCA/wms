@@ -195,8 +195,10 @@ class MakePickingBatch(models.TransientModel):
             picking.total_weight_batch_picking = self._picking_weight(picking)
             picking.total_volume_batch_picking = self._picking_volume(picking)
             picking.nbr_picking_lines = self._picking_nbr_lines(picking)
-            picking.nbr_bins_batch_picking = math.ceil(
-                picking.total_volume_batch_picking / volume_per_bin
+            picking.nbr_bins_batch_picking = (
+                math.ceil(picking.total_volume_batch_picking / volume_per_bin)
+                if picking.total_volume_batch_picking > 0
+                else 1
             )
 
             available_bins_outreached = (
