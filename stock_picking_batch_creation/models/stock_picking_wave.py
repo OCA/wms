@@ -20,10 +20,10 @@ class StockPickingWave(models.Model):
         states={"draft": [("readonly", False)], "in_progress": [("readonly", False)]},
     )
     wave_weight = fields.Float(
-        string="Total weight", help="Indicates total weight of transfers included."
+        string="Total weight", help="Indicates total weight of transfers included.",
     )
     wave_volume = fields.Float(
-        string="Total volume", help="Indicates total volume of transfers included."
+        string="Total volume", help="Indicates total volume of transfers included.",
     )
     wave_nbr_bins = fields.Integer(
         string="Number of compartments",
@@ -44,3 +44,21 @@ class StockPickingWave(models.Model):
         for batch in self:
             batch.move_ids = batch.picking_ids.mapped("move_lines")
             batch.pack_operation_ids = batch.picking_ids.mapped("pack_operation_ids")
+
+    def _init_wave_info(self):
+        """Store initial result of the wave computation"""
+        self.ensure_one()
+        pickings = self.picking_ids.with_prefetch()
+        info = {
+            "wave_weight": sum(
+                [picking.total_weight_batch_picking for picking in pickings]
+            ),
+            "wave_volume": sum(
+                [picking.total_volume_batch_picking for picking in pickings]
+            ),
+            "wave_nbr_bins": sum(
+                [picking.nbr_bins_batch_picking for picking in pickings]
+            ),
+            "wave_nbr_lines": sum([picking.nbr_picking_lines for picking in pickings]),
+        }
+        self.write(info)
