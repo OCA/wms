@@ -1,0 +1,6 @@
+diff a/.eslintrc.yml b/.eslintrc.yml	(rejected hunks)
+@@ -6,3 +6,4 @@ env:
+ parserOptions:
+-  ecmaVersion: 2017
++  ecmaVersion: 2018
++  sourceType: "module"
