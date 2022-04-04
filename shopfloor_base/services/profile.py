@@ -53,6 +53,16 @@ class ShopfloorProfile(Component):
             "name": record.name,
         }
 
+    def set_default_profile(self, profile_id):
+        if (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("shopfloor.default.profile")
+            and self.env.user.shopfloor_default_profile_id.id != profile_id
+        ):
+            self.env.user.shopfloor_default_profile_id = profile_id
+        return self._response(data={"result": True})
+
 
 class ShopfloorProfileValidator(Component):
     """Validators for the Profile endpoints"""
@@ -65,6 +75,9 @@ class ShopfloorProfileValidator(Component):
         return {
             "name_fragment": {"type": "string", "nullable": True, "required": False}
         }
+
+    def set_default_profile(self):
+        return {"profile_id": {"type": "integer", "coerce": to_int, "required": True}}
 
 
 class ShopfloorProfileValidatorResponse(Component):
@@ -82,6 +95,13 @@ class ShopfloorProfileValidatorResponse(Component):
                     "type": "list",
                     "schema": {"type": "dict", "schema": self._record_schema},
                 },
+            }
+        )
+
+    def set_default_profile(self):
+        return self._response_schema(
+            {
+                "result": {"required": True, "type": "boolean"},
             }
         )
 

@@ -118,6 +118,8 @@ new Vue({
         });
         event_hub.$on("profile:selected", function (profile) {
             self.profile = profile;
+            const odoo = self.getOdoo({usage: "profile"});
+            odoo.call("set_default_profile", {profile_id: profile.id});
             self.loadMenu(true);
         });
         event_hub.$emit("app:mounted", self, false);
@@ -136,6 +138,14 @@ new Vue({
             },
         },
         has_profile: function () {
+            if (_.isEmpty(this.profile) && this.authenticated) {
+                this.profile = this.appconfig
+                    ? this.appconfig.user_info
+                        ? this.appconfig.user_info.default_profile || {}
+                        : {}
+                    : {};
+            }
+            console.log(this.profile);
             return !_.isEmpty(this.profile);
         },
         profiles: function () {

@@ -27,7 +27,12 @@ class ShopfloorUser(Component):
 
     @property
     def _user_info_parser(self):
-        return ["id", "name", ("lang", self._user_lang_parser)]
+        return [
+            "id",
+            "name",
+            ("lang", self._user_lang_parser),
+            ("shopfloor_default_profile_id:default_profile", ["id", "name"]),
+        ]
 
     def _user_lang_parser(self, rec, fname):
         if not rec[fname]:
@@ -83,8 +88,15 @@ class ShopfloorUserValidatorResponse(Component):
         )
 
     def _user_info_schema(self):
+        profile_return_validator = self.component("profile.validator.response")
         return {
             "id": {"coerce": to_int, "required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
             "lang": {"type": "string", "nullable": False, "required": False},
+            "default_profile": {
+                "type": "dict",
+                "nullable": True,
+                "required": False,
+                "schema": profile_return_validator._record_schema,
+            },
         }

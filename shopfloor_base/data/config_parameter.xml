@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record
+            id="shopfloor_user_default_profile"
+            model="ir.config_parameter"
+            forcecreate="True"
+        >
+            <field name="key">shopfloor.default.profile</field>
+            <field name="value">False</field>
+        </record>
+    </data>
+</odoo>
