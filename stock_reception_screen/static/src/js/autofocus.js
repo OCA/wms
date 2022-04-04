@@ -1,4 +1,5 @@
 odoo.define("stock_reception_screen.autofocus", function (require) {
+    "use strict";
     var FormRenderer = require("web.FormRenderer");
 
     // Implements the autofocus on each form render, the field that need
