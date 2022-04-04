@@ -9,7 +9,7 @@ class StockPicking(models.Model):
     _inherit = "stock.picking"
 
     reception_screen_id = fields.Many2one(
-        comodel_name="stock.reception.screen", string=u"Reception Screen", copy=False
+        comodel_name="stock.reception.screen", string="Reception Screen", copy=False
     )
 
     def action_reception_screen_open(self):
