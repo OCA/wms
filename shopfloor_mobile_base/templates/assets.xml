@@ -138,6 +138,7 @@
         <script
             id="script_component_screen"
             t-attf-src="/shopfloor_mobile_base/static/wms/src/components/screen.js?v=#{app_info.version}"
+            type="module"
         />
         <script
             id="script_component_misc"
