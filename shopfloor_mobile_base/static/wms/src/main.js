@@ -238,9 +238,9 @@ new Vue({
             const self = this;
             return this._loadConfig().then(function (result) {
                 if (!result.error) {
-                    self.trigger("login:success");
+                    self.trigger("login:success", self);
                 } else {
-                    self.trigger("login:failure");
+                    self.trigger("login:failure", self);
                 }
             });
         },
