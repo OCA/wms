@@ -60,7 +60,7 @@ class ClusterPickingBatchCase(CommonCase, PickingBatchMixin):
         self.assertFalse(self.service._batch_picking_search())
 
     def test_search(self):
-        """Return only draft batches with assigned pickings """
+        """Return only draft batches with assigned pickings"""
         pickings = self.all_batches.mapped("picking_ids")
         self._fill_stock_for_moves(pickings.mapped("move_lines"))
         pickings.action_assign()
