@@ -4,8 +4,7 @@ env:
 
 # See https://github.com/OCA/odoo-community.org/issues/37#issuecomment-470686449
 parserOptions:
-  ecmaVersion: 2018
-  sourceType: "module"
+  ecmaVersion: 2019
 
 overrides:
   - files:
@@ -52,7 +51,7 @@ rules:
   handle-callback-err: warn
   id-blacklist: warn
   id-match: warn
-  init-declarations: warn
+  init-declarations: error
   max-depth: warn
   max-nested-callbacks: warn
   max-statements-per-line: warn
@@ -147,7 +146,7 @@ rules:
   no-unsafe-finally: error
   no-unused-expressions: error
   no-unused-labels: error
-  no-unused-vars: [error, {"args": "none"}]
+  no-unused-vars: error
   no-use-before-define: error
   no-useless-call: warn
   no-useless-computed-key: warn
