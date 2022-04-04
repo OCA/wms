@@ -6,7 +6,7 @@
     "name": "Shopfloor Mobile Base auth via user auth",
     "summary": "Provides authentication via standard user login",
     "version": "14.0.1.0.2",
-    "development_status": "Alpha",
+    "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",
