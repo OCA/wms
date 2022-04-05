@@ -23,23 +23,31 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor_mobile_base
+#: model:ir.model,name:shopfloor_mobile_base.model_shopfloor_app
+msgid "A Shopfloor application"
+msgstr ""
+
+#. module: shopfloor_mobile_base
+#: model:ir.model.fields,field_description:shopfloor_mobile_base.field_shopfloor_app__app_version
+msgid "App Version"
+msgstr ""
+
+#. module: shopfloor_mobile_base
+#: model:ir.model.fields,field_description:shopfloor_mobile_base.field_shopfloor_app__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: shopfloor_mobile_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base.shopfloor_app_assets
 msgid "Hook to this element to inject your own scenario"
 msgstr ""
 
 #. module: shopfloor_mobile_base
-#: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base.shopfloor_app_main
-msgid "Shopfloor WMS app"
+#: model:ir.model.fields,field_description:shopfloor_mobile_base.field_shopfloor_app__id
+msgid "ID"
 msgstr ""
 
 #. module: shopfloor_mobile_base
-#: model:ir.actions.act_url,name:shopfloor_mobile_base.action_shopfloor_app
-#: model:ir.ui.menu,name:shopfloor_mobile_base.menu_action_shopfloor_app
-msgid "Shopfloor mobile app"
-msgstr ""
-
-#. module: shopfloor_mobile_base
-#: model:ir.actions.act_url,name:shopfloor_mobile_base.action_shopfloor_app_demo
-#: model:ir.ui.menu,name:shopfloor_mobile_base.menu_action_shopfloor_app_demo
-msgid "Shopfloor mobile app DEMO"
+#: model:ir.model.fields,field_description:shopfloor_mobile_base.field_shopfloor_app____last_update
+msgid "Last Modified on"
 msgstr ""
