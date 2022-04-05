@@ -14,18 +14,45 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: shopfloor_base
+#: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__api_route
+msgid ""
+"\n"
+"        Base route for endpoints attached to this app,\n"
+"        internal controller-ready version.\n"
+"        "
+msgstr ""
+
+#. module: shopfloor_base
 #: code:addons/shopfloor_base/services/forms/form_mixin.py:0
 #, python-format
 msgid "%s updated."
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.model,name:shopfloor_base.model_shopfloor_app
+msgid "A Shopfloor application"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__active
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__active
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__active
 msgid "Active"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__api_docs_url
+msgid "Api Docs Url"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__api_route
+msgid "Api Route"
+msgstr ""
+
+#. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_menu_form_view
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_menu_search_view
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_profile_form_view
@@ -34,11 +61,28 @@ msgid "Archived"
 msgstr ""
 
 #. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
+msgid "Auth"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__auth_type
+msgid "Auth Type"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__category
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
+msgid "Category"
+msgstr ""
+
+#. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_scenario__options_edit
 msgid "Configure options via JSON"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__create_uid
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__create_uid
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__create_uid
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__create_uid
@@ -46,6 +90,7 @@ msgid "Created by"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__create_date
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__create_date
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__create_date
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__create_date
@@ -58,6 +103,13 @@ msgid "Demo scenario 1"
 msgstr ""
 
 #. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
+msgid "Developer"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_ir_http__display_name
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__display_name
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__display_name
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__display_name
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__display_name
@@ -65,11 +117,19 @@ msgid "Display Name"
 msgstr ""
 
 #. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_menu_search_view
 msgid "Group By"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.model,name:shopfloor_base.model_ir_http
+msgid "HTTP Routing"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_ir_http__id
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__id
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__id
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__id
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__id
@@ -89,6 +149,8 @@ msgid "Key"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_ir_http____last_update
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app____last_update
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu____last_update
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile____last_update
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario____last_update
@@ -96,6 +158,7 @@ msgid "Last Modified on"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__write_uid
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__write_uid
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__write_uid
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__write_uid
@@ -103,6 +166,7 @@ msgid "Last Updated by"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__write_date
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__write_date
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__write_date
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__write_date
@@ -112,6 +176,11 @@ msgstr ""
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__scenario
 msgid "Legacy scenario field"
+msgstr ""
+
+#. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
+msgid "Main"
 msgstr ""
 
 #. module: shopfloor_base
@@ -137,10 +206,26 @@ msgid "Menus visible for this profile"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__name
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__name
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__name
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__name
 msgid "Name"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__short_name
+msgid "Needed for app manifest"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields.selection,name:shopfloor_base.selection__shopfloor_app__category__
+msgid "None"
+msgstr ""
+
+#. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
+msgid "Open app"
 msgstr ""
 
 #. module: shopfloor_base
@@ -160,9 +245,38 @@ msgid "Profile"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__profile_required
+msgid "Profile Required"
+msgstr ""
+
+#. module: shopfloor_base
 #: model:ir.actions.act_window,name:shopfloor_base.action_shopfloor_profile
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__profile_ids
 #: model:ir.ui.menu,name:shopfloor_base.menu_action_shopfloor_profile
 msgid "Profiles"
+msgstr ""
+
+#. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
+msgid "Profiles and menu items"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__profile_ids
+msgid ""
+"Profiles used by this app. This will determine menu items too.However this "
+"field is not required in case you don't need profiles and menu items from "
+"the backend."
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__api_docs_url
+msgid "Public URL for api docs."
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__url
+msgid "Public URL to use the app."
 msgstr ""
 
 #. module: shopfloor_base
@@ -177,6 +291,11 @@ msgstr ""
 msgid ""
 "Record not found.\n"
 "We've tried with the following types: {}"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__registered_routes
+msgid "Registered Routes"
 msgstr ""
 
 #. module: shopfloor_base
@@ -219,13 +338,35 @@ msgid "Shopfloor User"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.actions.act_window,name:shopfloor_base.action_shopfloor_app
+#: model:ir.ui.menu,name:shopfloor_base.menu_action_shopfloor_app
+msgid "Shopfloor apps"
+msgstr ""
+
+#. module: shopfloor_base
 #: model:ir.model,name:shopfloor_base.model_shopfloor_profile
 msgid "Shopfloor profile settings"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__short_name
+msgid "Short Name"
+msgstr ""
+
+#. module: shopfloor_base
 #: model:shopfloor.menu,name:shopfloor_base.shopfloor_menu_demo_1
 msgid "Simple Thing To Do"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__tech_name
+msgid "Tech Name"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__registered_routes
+msgid ""
+"Technical field to allow developers to check registered routes on the form"
 msgstr ""
 
 #. module: shopfloor_base
@@ -235,6 +376,26 @@ msgid "The record %s %s does not exist"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__url
+msgid "Url"
+msgstr ""
+
+#. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
+msgid "View api docs"
+msgstr ""
+
+#. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
+msgid "View menu items"
+msgstr ""
+
+#. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_menu__profile_id
 msgid "Visible on this profile only"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:ir.model.constraint,message:shopfloor_base.constraint_shopfloor_app_tech_name
+msgid "tech_name must be unique"
 msgstr ""
