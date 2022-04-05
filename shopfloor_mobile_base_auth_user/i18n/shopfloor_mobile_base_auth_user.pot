@@ -1,5 +1,6 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
+# 	* shopfloor_mobile_base_auth_user
 #
 msgid ""
 msgstr ""
@@ -11,3 +12,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: shopfloor_mobile_base_auth_user
+#: model:shopfloor.app,name:shopfloor_mobile_base_auth_user.app_demo1
+msgid "Shopfloor Demo (user auth)"
+msgstr ""
+
+#. module: shopfloor_mobile_base_auth_user
+#: model:shopfloor.app,short_name:shopfloor_mobile_base_auth_user.app_demo1
+msgid "demo user"
+msgstr ""
