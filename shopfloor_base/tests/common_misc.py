@@ -18,10 +18,6 @@ class ActionsDataTestMixin(object):
 
 
 class MenuTestMixin(object):
-    def _get_service(self, profile=None):
-        with self.work_on_services(profile=profile or self.profile) as work:
-            return work.component(usage="menu")
-
     def _assert_menu_response(self, response, menus, **kw):
         self.assert_response(
             response,
@@ -51,12 +47,8 @@ class OpenAPITestMixin(object):
 
 
 class ScanAnythingTestMixin(object):
-    def _get_service(self):
-        with self.work_on_services() as work:
-            return work.component(usage="scan_anything")
-
     def _test_response_ok(self, rec_type, data, identifier, record_types=None):
-        service = self._get_service()
+        service = self.get_service("scan_anything")
         params = {"identifier": identifier, "record_types": record_types}
         response = service.dispatch("scan", params=params)
         self.assert_response(
@@ -65,7 +57,7 @@ class ScanAnythingTestMixin(object):
         )
 
     def _test_response_ko(self, identifier, record_types=None):
-        service = self._get_service()
+        service = self.get_service("scan_anything")
         tried = record_types or [x.record_type for x in service._scan_handlers()]
         params = {"identifier": identifier, "record_types": record_types}
         response = service.dispatch("scan", params=params)

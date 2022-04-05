@@ -12,6 +12,7 @@ from odoo.tools import DotDict
 from odoo.addons.component.core import AbstractComponent
 
 from ..actions.base_action import get_actions_for
+from ..apispec.service_apispec import ShopfloorRestServiceAPISpec
 
 
 class BaseShopfloorService(AbstractComponent):
@@ -19,8 +20,17 @@ class BaseShopfloorService(AbstractComponent):
 
     _inherit = "base.rest.service"
     _name = "base.shopfloor.service"
-    _collection = "shopfloor.service"
+    _collection = "shopfloor.app"
     _expose_model = None
+
+    def __init__(self, work_context):
+        super().__init__(work_context)
+        # User private attributes to not mess up w/ public endpoints
+        self._profile = getattr(self.work, "profile", self.env["shopfloor.profile"])
+        self._menu = getattr(self.work, "menu", self.env["shopfloor.menu"])
+
+    def _get_api_spec(self, **params):
+        return ShopfloorRestServiceAPISpec(self, **params)
 
     def dispatch(self, method_name, *args, params=None):
         self._validate_headers_update_work_context(request, method_name)
@@ -131,15 +141,15 @@ class BaseShopfloorService(AbstractComponent):
                 "value": demo_api_key.key if demo_api_key else "",
             },
         ]
+        menu_model = self.env["shopfloor.menu"].sudo()
+        profile_model = self.env["shopfloor.profile"].sudo()
         if self._requires_header_menu:
             # Try to first the first menu that implements the current service.
             # Not all usages have a process, in that case, we'll set the first
             # menu found
-            menu = self.env["shopfloor.menu"].search(
-                [("scenario", "=", self._usage)], limit=1
-            )
+            menu = menu_model.search([("scenario", "=", self._usage)], limit=1)
             if not menu:
-                menu = self.env["shopfloor.menu"].search([], limit=1)
+                menu = menu_model.search([], limit=1)
             service_params.append(
                 {
                     "name": "SERVICE_CTX_MENU_ID",
@@ -152,7 +162,7 @@ class BaseShopfloorService(AbstractComponent):
                 }
             )
         if self._requires_header_profile:
-            profile = self.env["shopfloor.profile"].search([], limit=1)
+            profile = profile_model.search([], limit=1)
             service_params.append(
                 {
                     "name": "SERVICE_CTX_PROFILE_ID",
@@ -250,7 +260,11 @@ class BaseShopfloorService(AbstractComponent):
         return "menu", self.env["shopfloor.menu"].browse(rec_id).exists()
 
     def _work_ctx_get_profile_id(self, rec_id):
-        return "profile", self.env["shopfloor.profile"].browse(rec_id).exists()
+        profile = self.env["shopfloor.profile"].browse(rec_id).exists()
+        limited_profiles = self.collection.profile_ids
+        if limited_profiles and profile not in limited_profiles:
+            raise BadRequest("Profile not allowed")
+        return "profile", profile
 
     _options = {}
 
@@ -264,8 +278,8 @@ class BaseShopfloorService(AbstractComponent):
             return self._options
 
         options = {}
-        if self._requires_header_menu and getattr(self.work, "menu", None):
-            options = self.work.menu.scenario_id.options or {}
+        if self._requires_header_menu and self._menu:
+            options = self._menu.scenario_id.options or {}
         options.update(getattr(self.work, "options", {}))
         self._options = DotDict(options)
         return self._options

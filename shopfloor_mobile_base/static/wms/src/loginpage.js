@@ -6,6 +6,7 @@
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
+import event_hub from "./services/event_hub.js";
 
 export var LoginPage = Vue.component("login-page", {
     data: function () {
@@ -21,13 +22,13 @@ export var LoginPage = Vue.component("login-page", {
     },
     mounted: function () {
         const self = this;
-        this.$root.event_hub.$once("login:before", function () {
+        event_hub.$once("login:before", function () {
             self.error = "";
         });
-        this.$root.event_hub.$once("login:success", function () {
+        event_hub.$once("login:success", function () {
             self.$router.push({name: "home"});
         });
-        this.$root.event_hub.$once("login:failure", function () {
+        event_hub.$once("login:failure", function () {
             self._handle_invalid_login();
         });
     },

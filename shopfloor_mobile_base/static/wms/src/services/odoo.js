@@ -12,28 +12,38 @@ export class OdooMixin {
         this.usage = params.usage;
         this.headers = params.headers || {};
         this.debug = this.params.debug;
+        // Bypass "loading" state when calling Odoo
+        this.in_background = this.params.in_background;
     }
     call(path, data, method = "POST", fullpath = false) {
-        const endpoint = fullpath ? path : this.usage + "/" + path;
-        return this._call(endpoint, method, data);
+        const endpoint_info = this._make_endpoint_info(path, fullpath);
+        return this._call(endpoint_info, method, data);
     }
     post(path, data, fullpath = false) {
         if (_.isArray(path)) {
             path = path.join("/");
         }
-        const endpoint = fullpath ? path : this.usage + "/" + path;
-        return this._call(endpoint, "POST", data);
+        const endpoint_info = this._make_endpoint_info(path, fullpath);
+        return this._call(endpoint_info, "POST", data);
     }
     get(path, data, fullpath = false) {
         if (_.isArray(path)) {
             path = path.join("/");
         }
-        const endpoint = fullpath ? path : this.usage + "/" + path;
-        return this._call(endpoint, "GET", data);
+        const endpoint_info = this._make_endpoint_info(path, fullpath);
+        return this._call(endpoint_info, "GET", data);
     }
-    _call(endpoint, method, data) {
+    _make_endpoint_info(path, fullpath) {
+        return {
+            endpoint: fullpath ? path : this.usage + "/" + path,
+            path: path,
+            fullpath: fullpath,
+        };
+    }
+    _call(endpoint_info, method, data) {
+        let endpoint = endpoint_info.endpoint;
         if (this.debug) {
-            console.log("CALL", endpoint);
+            console.log("DEBUG CALL", endpoint);
         }
         const self = this;
         const params = {
@@ -46,7 +56,8 @@ export class OdooMixin {
         } else if (method == "POST") {
             params.body = JSON.stringify(data);
         }
-        return fetch(this._get_url(endpoint), params).then((response) => {
+        const fn = this.in_background ? window.standardFetch : window.fetch;
+        return fn(this._get_url(endpoint), params).then((response) => {
             if (!response.ok) {
                 let handler = self["_handle_" + response.status.toString()];
                 if (_.isUndefined(handler)) {
@@ -115,17 +126,21 @@ export class OdooMocked extends OdooMixin {
     _set_demo_data() {
         this.demo_data = demotools.get_case(this.usage);
     }
-    call(path, data, method = "POST", fullpath = false) {
+    _call(endpoint_info, method, data) {
+        let path = endpoint_info.path;
         this._set_demo_data();
         console.log("CALL:", path, this.usage);
         console.dir("CALL data:", data);
-        if (!_.isUndefined(this[path])) {
-            // Provide your own mock by enpoint
-            return this[path].call(this, data);
+        // Provide your own mock by enpoint
+        let mocked_handler = "mocked_" + path;
+        if (!_.isUndefined(this[mocked_handler])) {
+            return this[mocked_handler].call(this, data);
         }
-        if (!_.isUndefined(this[this.usage + "_" + path])) {
+        // Provide your own mock by service and endpoint
+        mocked_handler = "mocked_" + this.usage + "_" + path;
+        if (!_.isUndefined(this[mocked_handler])) {
             // Provide your own mock by enpoint and specific process
-            return this[this.usage + "_" + path].call(this, data);
+            return this[mocked_handler].call(this, data);
         }
         let result = null;
         const barcode = data
@@ -165,13 +180,13 @@ export class OdooMocked extends OdooMixin {
         console.dir("CALL RETURN data:", result);
         return Promise.resolve(result);
     }
-    user_config(params) {
+    mocked_user_config(params) {
         return Promise.resolve({data: demotools.makeAppConfig()});
     }
-    menu(params) {
+    mocked_menu(params) {
         return Promise.resolve({data: {menus: demotools.getAppMenus()}});
     }
-    scan(params) {
+    mocked_scan(params) {
         const result = {};
         const data = demotools.get_indexed(params.identifier);
         if (data) {

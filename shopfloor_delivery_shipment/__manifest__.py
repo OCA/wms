@@ -18,5 +18,5 @@
         "shipment_advice",
     ],
     "data": ["data/shopfloor_scenario_data.xml", "views/shopfloor_menu.xml"],
-    "demo": ["demo/shopfloor_menu_demo.xml"],
+    "demo": ["demo/shopfloor_profile_demo.xml", "demo/shopfloor_menu_demo.xml"],
 }

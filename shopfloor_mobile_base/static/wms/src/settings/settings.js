@@ -12,7 +12,10 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
             this.$root.logout();
         },
         get_pages: function () {
-            return page_registry.by_tag("settings");
+            const self = this;
+            return page_registry.by_tag("settings").filter(function (page) {
+                return page.metadata.is_enabled(self, page);
+            });
         },
     },
     template: `

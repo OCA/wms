@@ -12,7 +12,7 @@ class TestBatchCreate(CommonCase):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
-        cls.menu = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
+        cls.menu = cls.env.ref("shopfloor.shopfloor_menu_demo_cluster_picking")
         cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
         cls.picking_type = cls.menu.picking_type_ids
         cls.wh = cls.picking_type.warehouse_id
@@ -38,8 +38,9 @@ class TestBatchCreate(CommonCase):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(menu=self.menu, profile=self.profile) as work:
-            self.service = work.component(usage="cluster_picking")
+        self.service = self.get_service(
+            "cluster_picking", profile=self.profile, menu=self.menu
+        )
         with self.work_on_actions() as work:
             self.auto_batch = work.component(usage="picking.batch.auto.create")
 

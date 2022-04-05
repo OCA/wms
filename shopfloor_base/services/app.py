@@ -7,25 +7,27 @@ class ShopfloorApp(Component):
     """Generic endpoints for the Application."""
 
     _inherit = "base.shopfloor.service"
-    _name = "shopfloor.app"
+    _name = "shopfloor.service.app"
     _usage = "app"
     _description = __doc__
 
-    # TODO: maybe rename to `config` or `app_config`
-    # as this is not related to current user conf
+    # TODO: RENAME TO `sync`
     def user_config(self):
+        return self._response(data=self._sync_data())
+
+    def _sync_data(self):
         profiles_comp = self.component("profile")
         profiles = profiles_comp._to_json(profiles_comp._search())
         user_comp = self.component("user")
         user_info = user_comp._user_info()
-        return self._response(data={"profiles": profiles, "user_info": user_info})
+        return {"profiles": profiles, "user_info": user_info}
 
 
 class ShopfloorAppValidator(Component):
     """Validators for the Application endpoints"""
 
     _inherit = "base.shopfloor.validator"
-    _name = "shopfloor.app.validator"
+    _name = "shopfloor.service.app.validator"
     _usage = "app.validator"
 
     def user_config(self):
@@ -36,7 +38,7 @@ class ShopfloorAppValidatorResponse(Component):
     """Validators for the Application endpoints responses"""
 
     _inherit = "base.shopfloor.validator.response"
-    _name = "shopfloor.app.validator.response"
+    _name = "shopfloor.service.app.validator.response"
     _usage = "app.validator.response"
 
     def user_config(self):

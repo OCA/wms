@@ -28,7 +28,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
-        cls.zp_menu = cls.env.ref("shopfloor.shopfloor_menu_zone_picking")
+        cls.zp_menu = cls.env.ref("shopfloor.shopfloor_menu_demo_zone_picking")
         cls.wh.sudo().delivery_steps = "pick_pack_ship"
         cls.pack_location = cls.wh.wh_pack_stock_loc_id
         cls.ship_location = cls.wh.wh_output_stock_loc_id
@@ -135,10 +135,13 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         service = self.service
         if user:
             env = self.env(user=user)
-            with self.work_on_services(
-                env=env, menu=self.menu, profile=self.profile
-            ) as work:
-                service = work.component(usage="location_content_transfer")
+            service = self.get_service(
+                "location_content_transfer",
+                env=env,
+                menu=self.menu,
+                profile=self.profile,
+            )
+
         pack_location = move_line.location_id
         out_location = move_line.location_dest_id
         # Scan the location

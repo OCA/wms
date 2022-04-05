@@ -5,13 +5,21 @@
 {
     "name": "Shopfloor Mobile Base auth via API key",
     "summary": "Provides authentication via API key to Shopfloor base mobile app",
-    "version": "14.0.1.0.1",
-    "development_status": "Alpha",
+    "version": "14.0.1.1.0",
+    "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "maintainer": ["simahawk"],
     "license": "AGPL-3",
-    "depends": ["shopfloor_mobile_base", "auth_api_key"],
-    "data": ["templates/assets.xml"],
+    "depends": [
+        "shopfloor_mobile_base",
+        "auth_api_key_group",
+    ],
+    "data": ["templates/assets.xml", "views/shopfloor_app.xml"],
+    "demo": [
+        "demo/auth_api_key_demo.xml",
+        "demo/auth_api_key_group_demo.xml",
+        "demo/shopfloor_app_demo.xml",
+    ],
 }

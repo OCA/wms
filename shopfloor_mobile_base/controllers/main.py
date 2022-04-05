@@ -5,34 +5,15 @@
 
 
 import json
+import logging
 import os
 
 from odoo import http
-from odoo.modules.module import load_information_from_description_file
-from odoo.tools.config import config as odoo_config
+from odoo.tools import DotDict
 
-APP_VERSIONS = {}
+from ..utils import RUNNING_ENV, get_version
 
-
-def _get_running_env():
-    """Retrieve current system environment.
-
-    Expected key `RUNNING_ENV` is compliant w/ `server_environment` naming
-    but is not depending on it.
-
-    Additionally, as specific key for Shopfloor is supported.
-
-    You don't need `server_environment` module to have this feature.
-    """
-    for key in ("SHOPFLOOR_RUNNING_ENV", "RUNNING_ENV"):
-        if os.getenv(key):
-            return os.getenv(key)
-        if odoo_config.options.get(key.lower()):
-            return odoo_config.get(key.lower())
-    return "prod"
-
-
-RUNNING_ENV = _get_running_env()
+_logger = logging.getLogger(__name__)
 
 
 class ShopfloorMobileAppMixin(object):
@@ -40,62 +21,42 @@ class ShopfloorMobileAppMixin(object):
     module_path = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
     main_template = "shopfloor_mobile_base.shopfloor_app_main"
 
-    def _load_app(self, demo=False, **kw):
+    def _load_app(self, shopfloor_app, demo=False, **kw):
         return http.request.render(
-            self.main_template, self._get_main_template_values(demo=demo, **kw)
+            self.main_template,
+            self._get_main_template_values(shopfloor_app, demo=demo, **kw),
         )
 
-    def _get_main_template_values(self, demo=False, **kw):
-        base_url = "/shopfloor/"
-        auth_type = "api_key"
-        return dict(
-            app_version=self._get_app_version(),
-            app_base_url=base_url,
+    def _get_main_template_values(self, shopfloor_app, demo=False, **kw):
+        # TODO: move this to shopfloor_app model and wrap everything
+        # into `app_info` key. Then we simply dump to json here.
+        app_info = self._make_app_info(shopfloor_app, demo=demo)
+        return {
+            "app_info": app_info,
+            "get_version": get_version,
+        }
+
+    def _make_app_info(self, shopfloor_app, demo=False):
+        base_url = shopfloor_app.api_route.rstrip("/") + "/"
+        auth_type = shopfloor_app.auth_type
+        profile_required = shopfloor_app.profile_required
+        return DotDict(
+            name=shopfloor_app.name,
+            short_name=shopfloor_app.short_name,
+            base_url=base_url,
+            manifest_url=shopfloor_app.url + "/manifest.json",
             auth_type=auth_type,
-            get_version=self._get_version,
-            running_env=self._get_running_env(),
+            profile_required=profile_required,
             demo_mode=demo,
-            **kw
+            version=shopfloor_app.app_version,
+            running_env=self._get_running_env(),
         )
-
-    def _get_version(self, module_name, module_path=None):
-        """Return module version straight from manifest."""
-        global APP_VERSIONS
-        if APP_VERSIONS.get(module_name):
-            return APP_VERSIONS[module_name]
-        try:
-            info = load_information_from_description_file(
-                module_name, mod_path=module_path
-            )
-            APP_VERSIONS[module_name] = info["version"]
-            return APP_VERSIONS[module_name]
-        except Exception:
-            return "dev"
-
-    def _get_app_version(self):
-        return self._get_version("shopfloor_mobile_base", module_path=self.module_path)
 
     def _get_running_env(self):
         return RUNNING_ENV
 
-    def _serve_assets(self, path_fragment="", **kw):
-        # TODO Should be authorized via api.key except for the login ?
-        if path_fragment.endswith((".map", "scriptElement")):
-            # `.map` -> .map maps called by debugger
-            # `scriptElement` -> file imported via JS but not loaded
-            return http.request.not_found()
-        if path_fragment.startswith("src/"):
-            # Serving an asset
-            payload = self._make_asset_path(path_fragment)
-            if os.path.exists(payload):
-                return http.send_file(payload)
-        return http.request.not_found()
-
-    def _make_asset_path(self, path_fragment):
-        return os.path.join(self.module_path, "static", "wms", path_fragment)
-
-    def _make_icons(self, fname, rel, sizes, img_type, url_pattern=None):
-        app_version = self._get_app_version()
+    def _make_icons(self, shopfloor_app, fname, rel, sizes, img_type, url_pattern=None):
+        app_version = shopfloor_app.app_version
         all_icons = []
         url_pattern = url_pattern or (
             "/shopfloor_mobile_base/static/wms/src/assets/icons/"
@@ -114,7 +75,7 @@ class ShopfloorMobileAppMixin(object):
             )
         return all_icons
 
-    def _get_app_icons(self):
+    def _get_app_icons(self, shopfloor_app):
         all_icons = []
         # apple icons
         rel = "apple-touch-icon"
@@ -131,58 +92,50 @@ class ShopfloorMobileAppMixin(object):
         )
         fname = "apple-icon"
         img_type = "image/png"
-        all_icons.extend(self._make_icons(fname, rel, sizes, img_type))
+        all_icons.extend(self._make_icons(shopfloor_app, fname, rel, sizes, img_type))
         # android icons
         rel = "icon"
         sizes = ("48x48", "72x72", "96x96", "144x144", "192x192")
         fname = "android-icon"
         img_type = "image/png"
-        all_icons.extend(self._make_icons(fname, rel, sizes, img_type))
+        all_icons.extend(self._make_icons(shopfloor_app, fname, rel, sizes, img_type))
         # favicons
         rel = "icon"
         sizes = ("16x16", "32x32", "96x96")
         fname = "favicon"
         img_type = "image/png"
-        all_icons.extend(self._make_icons(fname, rel, sizes, img_type))
+        all_icons.extend(self._make_icons(shopfloor_app, fname, rel, sizes, img_type))
         return all_icons
 
-    def _get_manifest(self):
+    def _get_manifest(self, shopfloor_app):
         return {
-            "name": "Shopfloor WMS app",
-            "short_name": "Shopfloor",
-            "start_url": "/shopfloor_mobile/app/#",
+            "name": shopfloor_app.name,
+            "short_name": shopfloor_app.short_name,
+            "start_url": shopfloor_app.url + "#",
             "display": "fullscreen",
-            "icons": self._get_app_icons(),
+            "icons": self._get_app_icons(shopfloor_app),
         }
 
 
 class ShopfloorMobileAppController(http.Controller, ShopfloorMobileAppMixin):
     @http.route(
-        ["/shopfloor_mobile/app", "/shopfloor_mobile/app/<string:demo>"],
+        [
+            "/shopfloor/app/<tech_name(shopfloor.app):shopfloor_app>",
+            "/shopfloor/app/<tech_name(shopfloor.app):shopfloor_app>/<string:demo>",
+        ],
         auth="public",
     )
-    def load_app(self, demo=False, **kw):
-        return self._load_app(demo=True if demo else False, **kw)
+    def load_app(self, shopfloor_app, demo=False, **kw):
+        return self._load_app(shopfloor_app, demo=True if demo else False, **kw)
 
     @http.route(
-        ["/shopfloormobile/scanner"],
+        [
+            "/shopfloor/app/<tech_name(shopfloor.app):shopfloor_app>/manifest.json",
+        ],
         auth="public",
     )
-    def load_app_backward(self, demo=False):
-        # Backward compat redirect (url changed from /scanner to /app)
-        return http.redirect_with_hash("/shopfloor_mobile/app", code=301)
-
-    # TODO: do we really need this?
-    @http.route(
-        ["/shopfloor_mobile/assets/<path:path_fragment>"],
-        auth="public",
-    )
-    def load_assets(self, path_fragment="", **kw):
-        return self._serve_assets(path_fragment=path_fragment, **kw)
-
-    @http.route("/shopfloor_mobile/manifest.json", auth="public")
-    def manifest(self):
-        manifest = self._get_manifest()
+    def manifest(self, shopfloor_app):
+        manifest = self._get_manifest(shopfloor_app)
         headers = {}
         headers["Content-Type"] = "application/json"
         return http.request.make_response(json.dumps(manifest), headers=headers)

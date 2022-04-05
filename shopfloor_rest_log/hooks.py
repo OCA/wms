@@ -14,7 +14,7 @@ def post_init_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})
     params = env["ir.config_parameter"].sudo()
     key = "rest.log.active"
-    shopfloor_value = "shopfloor.service"
+    shopfloor_value = "shopfloor.app"
     param = params.search([("key", "=", key)], limit=1)
     if param:
         value = (param.value if param.value else "").split(",")

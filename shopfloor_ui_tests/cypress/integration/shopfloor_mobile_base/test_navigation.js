@@ -6,13 +6,6 @@ describe("Test to make sure the navigation through the application works as expe
 
     before(() => {
         cy.visit(Cypress.config("baseUrl") + "login");
-        cy.get("form").then(($form) => {
-            if ($form.find("input[name='apikey']").length) {
-                Cypress.env("auth_type", "apikey");
-            } else {
-                Cypress.env("auth_type", "user");
-            }
-        });
     });
 
     describe("Fake login", () => {

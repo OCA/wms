@@ -7,7 +7,7 @@ class ZonePickingCommonCase(CommonCase):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
-        cls.menu = cls.env.ref("shopfloor.shopfloor_menu_zone_picking")
+        cls.menu = cls.env.ref("shopfloor.shopfloor_menu_demo_zone_picking")
         cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
         cls.picking_type = cls.menu.picking_type_ids
         cls.wh = cls.picking_type.warehouse_id
@@ -252,13 +252,13 @@ class ZonePickingCommonCase(CommonCase):
 
     def setUp(self):
         super().setUp()
-        with self.work_on_services(
+        self.service = self.get_service(
+            "zone_picking",
             menu=self.menu,
             profile=self.profile,
             current_zone_location=self.zone_location,
             current_picking_type=self.picking_type,
-        ) as work:
-            self.service = work.component(usage="zone_picking")
+        )
 
     def _assert_response_select_zone(self, response, zone_locations, message=None):
         data = {"zones": self.service._data_for_select_zone(zone_locations)}

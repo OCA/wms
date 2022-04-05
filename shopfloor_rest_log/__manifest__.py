@@ -5,7 +5,7 @@
 {
     "name": "Shopfloor REST log",
     "summary": "Integrate rest_log into Shopfloor app",
-    "version": "14.0.1.0.0",
+    "version": "14.0.1.1.0",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
@@ -13,6 +13,6 @@
     "maintainers": ["simahawk"],
     "license": "LGPL-3",
     "depends": ["rest_log", "shopfloor_base"],
-    "data": ["security/groups.xml", "views/menus.xml"],
+    "data": ["security/groups.xml", "views/menus.xml", "views/shopfloor_app.xml"],
     "post_init_hook": "post_init_hook",
 }

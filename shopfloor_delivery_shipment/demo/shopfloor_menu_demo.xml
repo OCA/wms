@@ -6,6 +6,7 @@
             name="scenario_id"
             ref="shopfloor_delivery_shipment.scenario_delivery_shipment"
         />
+        <field name="profile_id" ref="shopfloor_delivery_shipment.profile_demo_1" />
         <field
             name="picking_type_ids"
             eval="[(4, ref('shopfloor.picking_type_delivery_demo'))]"

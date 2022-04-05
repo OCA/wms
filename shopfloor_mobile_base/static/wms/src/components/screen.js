@@ -52,14 +52,14 @@ Vue.component("Screen", {
                 "screen-" + this.info.klass,
                 this.$slots.header ? "with-header" : "",
                 this.$slots.footer ? "with-footer" : "",
-                this.utils.colors.color_for("content_bg"),
             ].join(" ");
         },
         show_profile_not_ready() {
             return (
                 this.$root.is_authenticated() &&
                 this.$route.meta.requiresProfile &&
-                !this.$root.has_profile
+                !this.$root.has_profile &&
+                this.$root.app_info.profile_required
             );
         },
     },
@@ -159,7 +159,7 @@ Vue.component("Screen", {
                 <screen-loading :loading="$root.loading" />
                 <div class="main-content">
                     <slot>
-                        <span v-if="this.$root.has_profile">{{ $t('app.loading') }}</span>
+                        <span v-if="this.$root.has_profile">{{ $root.loading_msg }}</span>
                     </slot>
                 </div>
             </v-container>
@@ -180,7 +180,8 @@ Vue.component("nav-items", {
             default: true,
         },
     },
-    // NOTE: activation via router won't work because we can use the same route w/ several menu items.
+    // NOTE: activation via router won't work because
+    // we can use the same route w/ several menu items.
     // Hence we match via menu id.
     template: `
     <div :class="$options._componentTag">

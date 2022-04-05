@@ -15,7 +15,7 @@ class ShopfloorMenu(Component):
     """
 
     _inherit = "base.shopfloor.service"
-    _name = "shopfloor.menu"
+    _name = "shopfloor.service.menu"
     _usage = "menu"
     _expose_model = "shopfloor.menu"
     _description = __doc__
@@ -29,19 +29,18 @@ class ShopfloorMenu(Component):
 
     def _get_base_search_domain(self):
         base_domain = super()._get_base_search_domain()
-        return expression.AND(
-            [
-                base_domain,
-                [
-                    "|",
-                    ("profile_id", "=", False),
-                    ("profile_id", "=", self.work.profile.id),
-                ],
+        if self._profile:
+            profile_domain = [
+                "|",
+                ("profile_id", "=", False),
+                ("profile_id", "=", self._profile.id),
             ]
-        )
+        else:
+            profile_domain = [("profile_id", "=", False)]
+        return expression.AND([base_domain, profile_domain])
 
     def _search(self, name_fragment=None):
-        if not self.work.profile:
+        if not self._profile:
             # we need to know the profile to load menus
             return self.env["shopfloor.menu"].browse()
         domain = self._get_base_search_domain()
@@ -73,7 +72,7 @@ class ShopfloorMenuValidator(Component):
     """Validators for the Menu endpoints"""
 
     _inherit = "base.shopfloor.validator"
-    _name = "shopfloor.menu.validator"
+    _name = "shopfloor.service.menu.validator"
     _usage = "menu.validator"
 
     def search(self):
@@ -86,7 +85,7 @@ class ShopfloorMenuValidatorResponse(Component):
     """Validators for the Menu endpoints responses"""
 
     _inherit = "base.shopfloor.validator.response"
-    _name = "shopfloor.menu.validator.response"
+    _name = "shopfloor.service.menu.validator.response"
     _usage = "menu.validator.response"
 
     def return_search(self):

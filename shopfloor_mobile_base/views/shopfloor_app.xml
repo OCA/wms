@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shopfloor_app_form_view" model="ir.ui.view">
+        <field name="name">shopfloor app form</field>
+        <field name="model">shopfloor.app</field>
+        <field name="inherit_id" ref="shopfloor_base.shopfloor_app_form_view" />
+        <field name="arch" type="xml">
+            <field name="short_name" position="after">
+                <field name="app_version" />
+            </field>
+        </field>
+    </record>
+</odoo>

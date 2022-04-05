@@ -15,6 +15,7 @@ import {page_registry} from "./services/page_registry.js";
 import {color_registry} from "./services/color_registry.js";
 import {auth_handler_registry} from "./services/auth_handler_registry.js";
 import {Odoo, OdooMocked} from "./services/odoo.js";
+import event_hub from "./services/event_hub.js";
 import VueSuperMethod from "./lib/vue-super-call.min.js";
 
 Vue.prototype.$super = VueSuperMethod;
@@ -28,8 +29,6 @@ Vue.use(Vue2Storage, {
 });
 
 Vue.use(Vuetify);
-
-var EventHub = new Vue();
 
 Vue.mixin(GlobalMixin);
 
@@ -63,9 +62,8 @@ new Vue({
         const data = {
             demo_mode: false,
             global_state_key: "",
-            // Collect global events
-            event_hub: EventHub,
             loading: false,
+            loading_msg_custom: "",
             appconfig: null,
         };
         _.merge(data, config_registry.generare_data_keys());
@@ -92,15 +90,24 @@ new Vue({
         this.$root.$on("state:change", function (key) {
             self.global_state_key = key;
         });
-        this.$root.event_hub.$on("profile:selected", function (profile) {
+        event_hub.$on("profile:selected", function (profile) {
             self.profile = profile;
             self.loadMenu(true);
         });
+        event_hub.$emit("app:mounted", self, false);
     },
     computed: {
         ...config_registry.generate_computed_properties(),
         app_info: function () {
             return shopfloor_app_info;
+        },
+        loading_msg: {
+            get() {
+                return this.loading_msg_custom || this.$t("app.loading");
+            },
+            set(newValue) {
+                this.loading_msg_custom = newValue;
+            },
         },
         available_languages: function () {
             // FIXME: this should come from odoo and from app config
@@ -171,12 +178,14 @@ new Vue({
         _loadConfig: function () {
             const self = this;
             const odoo = self.getOdoo({usage: "app"});
+            // TODO: rename this endpoint to `sync`
             return odoo.call("user_config").then(function (result) {
                 if (!_.isUndefined(result.data)) {
                     self.appconfig = result.data;
                     self.authenticated = true;
                     self.$storage.set("appconfig", self.appconfig);
                 }
+                event_hub.$emit("app.sync:update", {root: self, sync_data: result});
                 return result;
             });
         },
@@ -229,9 +238,9 @@ new Vue({
             const self = this;
             return this._loadConfig().then(function (result) {
                 if (!result.error) {
-                    self.trigger("login:success");
+                    self.trigger("login:success", self);
                 } else {
-                    self.trigger("login:failure");
+                    self.trigger("login:failure", self);
                 }
             });
         },
@@ -298,7 +307,7 @@ new Vue({
             if (this.global_state_key && !no_state) {
                 event_name = this.global_state_key + ":" + event_name;
             }
-            this.event_hub.$emit(event_name, data);
+            event_hub.$emit(event_name, data);
         },
     },
 }).$mount("#app");

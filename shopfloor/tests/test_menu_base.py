@@ -12,8 +12,9 @@ class CommonMenuCase(CommonCase, MenuTestMixin):
         super().setUpClassVars(*args, **kwargs)
         ref = cls.env.ref
         profile1 = ref("shopfloor_base.profile_demo_1")
-        cls.profile = profile1.sudo().copy()
-        menu_xid_pref = "shopfloor.shopfloor_menu_"
+        cls.wms_profile = ref("shopfloor.profile_demo_1")
+        cls.wms_profile2 = ref("shopfloor.profile_demo_2")
+        menu_xid_pref = "shopfloor.shopfloor_menu_demo_"
         cls.menu_items = (
             ref(menu_xid_pref + "single_pallet_transfer")
             | ref(menu_xid_pref + "zone_picking")
@@ -23,15 +24,9 @@ class CommonMenuCase(CommonCase, MenuTestMixin):
             | ref(menu_xid_pref + "location_content_transfer")
         )
         # Isolate menu items
-        cls.menu_items.sudo().write({"profile_id": cls.profile.id})
         cls.env["shopfloor.menu"].search(
             [("id", "not in", cls.menu_items.ids)]
         ).sudo().write({"profile_id": profile1.id})
-
-    def setUp(self):
-        super().setUp()
-        with self.work_on_services(profile=self.profile) as work:
-            self.service = work.component(usage="menu")
 
     def _data_for_menu_item(self, menu, **kw):
         data = super()._data_for_menu_item(menu, **kw)
@@ -62,14 +57,18 @@ class MenuCountersCommonCase(CommonMenuCase):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
-        cls.menu1 = cls.env.ref("shopfloor.shopfloor_menu_zone_picking")
-        cls.menu2 = cls.env.ref("shopfloor.shopfloor_menu_cluster_picking")
+        cls.menu1 = cls.env.ref("shopfloor.shopfloor_menu_demo_zone_picking")
+        cls.menu2 = cls.env.ref("shopfloor.shopfloor_menu_demo_cluster_picking")
         cls.menu1_picking_type = cls.menu1.picking_type_ids[0]
         cls.menu2_picking_type = cls.menu2.picking_type_ids[0]
+        cls.wms_profile = cls.env.ref("shopfloor.profile_demo_1")
+        cls.wms_profile2 = cls.env.ref("shopfloor.profile_demo_2")
 
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
+        # Setup some data to simulate good amount of operations
+        # to be worked on w/ the app which will be reflected in the menu counters.
         cls.packing_location.sudo().active = True
         # We want to limit the tests to a dedicated location in Stock/ to not
         # be bothered with pickings brought by demo data

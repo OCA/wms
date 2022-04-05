@@ -55,9 +55,11 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
     maxDiff = None
 
     @contextmanager
-    def work_on_services(self, env=None, **params):
+    def work_on_services(self, collection=None, env=None, **params):
+        collection = collection or self.shopfloor_app
+        if env:
+            collection = collection.with_env(env)
         params = params or {}
-        collection = _PseudoCollection("shopfloor.service", env or self.env)
         yield WorkContext(
             model_name="rest.service.registration",
             collection=collection,
@@ -67,6 +69,15 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
             request=mock.Mock(),
             **params
         )
+
+    def get_service(self, usage, collection=None, env=None, **kw):
+        with self.work_on_services(collection=collection, env=env, **kw) as work:
+            service = work.component(usage=usage)
+            # Thanks to shopfloor.app we don't need controllers
+            # but not having a controller means that non decorated methods
+            # stay undecorated as they are not fixed at startup by base_rest.
+            self.env["shopfloor.app"]._prepare_non_decorated_endpoints(service)
+            return service
 
     @contextmanager
     def work_on_actions(self, **params):
@@ -95,12 +106,14 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
                 _service_skip_request_validation=True,
             )
         )
-
         cls.setUpComponent()
         cls.setUpRegistry()
         cls.setUpClassUsers()
         cls.setUpClassVars()
         cls.setUpClassBaseData()
+
+        # Keep this here to have the whole env set up already
+        cls.setUpShopfloorApp()
 
         with cls.work_on_actions(cls) as work:
             cls.data = work.component(usage="data")
@@ -127,6 +140,7 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
             "groups_id": [
                 (6, 0, [cls.env.ref("shopfloor_base.group_shopfloor_user").id])
             ],
+            "tz": cls.env.user.tz,
         }
 
     @classmethod
@@ -138,6 +152,7 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
             "groups_id": [
                 (6, 0, [cls.env.ref("shopfloor_base.group_shopfloor_manager").id])
             ],
+            "tz": cls.env.user.tz,
         }
 
     @classmethod
@@ -147,6 +162,21 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
     @classmethod
     def setUpClassBaseData(cls):
         pass
+
+    @classmethod
+    def setUpShopfloorApp(cls):
+        cls.shopfloor_app = (
+            cls.env["shopfloor.app"]
+            .with_user(cls.shopfloor_manager)
+            .create(
+                {
+                    "tech_name": "test",
+                    "name": "Test",
+                    "short_name": "test",
+                }
+            )
+            .with_user(cls.shopfloor_user)
+        )
 
     def assert_response(
         self, response, next_state=None, message=None, data=None, popup=None

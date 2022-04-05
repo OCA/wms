@@ -10,6 +10,12 @@ from odoo.addons.shopfloor_base.tests.common import CommonCase as BaseCommonCase
 
 class CommonCase(BaseCommonCase):
     @classmethod
+    def setUpShopfloorApp(cls):
+        cls.shopfloor_app = cls.env.ref("shopfloor.app_demo").with_user(
+            cls.shopfloor_user
+        )
+
+    @classmethod
     def setUpClassVars(cls):
         super().setUpClassVars()
         stock_location = cls.env.ref("stock.stock_location_stock")

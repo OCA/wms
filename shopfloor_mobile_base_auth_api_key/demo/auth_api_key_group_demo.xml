@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo noupdate="1">
+
+  <record id="auth_api_key_group" model="auth.api.key.group">
+    <field name="name">Shopfloor Demo</field>
+    <field name="code">shopfloor_demo</field>
+    <field
+            name="auth_api_key_ids"
+            eval="[
+          (4, ref('api_key_demo')),
+        ]"
+        />
+  </record>
+
+</odoo>

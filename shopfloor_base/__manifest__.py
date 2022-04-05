@@ -6,7 +6,7 @@
 {
     "name": "Shopfloor Base",
     "summary": "Core module for creating mobile apps",
-    "version": "14.0.1.2.2",
+    "version": "14.0.2.0.0",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
@@ -14,11 +14,17 @@
     "maintainers": ["guewen", "simahawk", "sebalix"],
     "license": "LGPL-3",
     "application": True,
-    "depends": ["base_jsonify", "base_rest", "base_sparse_field", "auth_api_key"],
+    "depends": [
+        "base_jsonify",
+        "base_rest",
+        "base_sparse_field",
+        "endpoint_route_handler",
+    ],
     "data": [
         "data/module_category_data.xml",
         "security/groups.xml",
         "security/ir.model.access.csv",
+        "views/shopfloor_app.xml",
         "views/shopfloor_menu.xml",
         "views/shopfloor_scenario_views.xml",
         "views/shopfloor_profile_views.xml",
@@ -26,10 +32,8 @@
     ],
     "demo": [
         "demo/res_users_demo.xml",
-        "demo/auth_api_key_demo.xml",
         "demo/shopfloor_scenario_demo.xml",
         "demo/shopfloor_menu_demo.xml",
         "demo/shopfloor_profile_demo.xml",
     ],
-    "post_init_hook": "post_init_hook",
 }
