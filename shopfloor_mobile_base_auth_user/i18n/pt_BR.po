@@ -12,3 +12,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
+
+#. module: shopfloor_mobile_base_auth_user
+#: model:shopfloor.app,name:shopfloor_mobile_base_auth_user.app_demo1
+msgid "Shopfloor Demo (user auth)"
+msgstr ""
+
+#. module: shopfloor_mobile_base_auth_user
+#: model:shopfloor.app,short_name:shopfloor_mobile_base_auth_user.app_demo1
+msgid "demo user"
+msgstr ""
