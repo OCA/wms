@@ -29,9 +29,8 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
-#: code:addons/shopfloor/services/forms/form_mixin.py:0
-#, python-format
-msgid "%s updated."
+#: model:ir.model,name:shopfloor.model_shopfloor_app
+msgid "A Shopfloor application"
 msgstr ""
 
 #. module: shopfloor
@@ -136,6 +135,11 @@ msgid "Cannot change to lot {} which is entirely picked."
 msgstr "No es pot canviar al lot {} que ya està recollit per complet."
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app__category
+msgid "Category"
+msgstr ""
+
+#. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_checkout
 #: model:shopfloor.scenario,name:shopfloor.scenario_checkout
 #: model:stock.picking.type,name:shopfloor.picking_type_checkout_demo
@@ -197,6 +201,7 @@ msgid "Delivery"
 msgstr "Lliurament"
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app__display_name
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__display_name
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__display_name
 #: model:ir.model.fields,field_description:shopfloor.field_stock_inventory__display_name
@@ -237,6 +242,7 @@ msgid "Goods packed into {0.name}"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app__id
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__id
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__id
 #: model:ir.model.fields,field_description:shopfloor.field_stock_inventory__id
@@ -296,6 +302,7 @@ msgid "Inventory Locations"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app____last_update
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu____last_update
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin____last_update
 #: model:ir.model.fields,field_description:shopfloor.field_stock_inventory____last_update
@@ -925,6 +932,11 @@ msgid "Shopfloor User"
 msgstr ""
 
 #. module: shopfloor
+#: model:shopfloor.app,name:shopfloor.app_demo
+msgid "Shopfloor WMS (demo)"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__shopfloor_weight
 msgid "Shopfloor weight (kg)"
 msgstr ""
@@ -1219,6 +1231,16 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__unreserve_other_moves_is_possible
 msgid "Unreserve Other Moves Is Possible"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_app__category__wms
+msgid "WMS"
+msgstr ""
+
+#. module: shopfloor
+#: model:shopfloor.app,short_name:shopfloor.app_demo
+msgid "WMS (demo)"
 msgstr ""
 
 #. module: shopfloor

@@ -38,10 +38,9 @@ msgstr ""
 "\",\n"
 
 #. module: shopfloor
-#: code:addons/shopfloor/services/forms/form_mixin.py:0
-#, python-format
-msgid "%s updated."
-msgstr "%s actualizado."
+#: model:ir.model,name:shopfloor.model_shopfloor_app
+msgid "A Shopfloor application"
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -145,6 +144,11 @@ msgid "Cannot change to lot {} which is entirely picked."
 msgstr "No se puede cambiar al lote {} ya que está completamente recogido."
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app__category
+msgid "Category"
+msgstr ""
+
+#. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_checkout
 #: model:shopfloor.scenario,name:shopfloor.scenario_checkout
 #: model:stock.picking.type,name:shopfloor.picking_type_checkout_demo
@@ -206,6 +210,7 @@ msgid "Delivery"
 msgstr "Entrega"
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app__display_name
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__display_name
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__display_name
 #: model:ir.model.fields,field_description:shopfloor.field_stock_inventory__display_name
@@ -249,6 +254,7 @@ msgid "Goods packed into {0.name}"
 msgstr "Mercadería empaquetada en {0.name}"
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app__id
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__id
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__id
 #: model:ir.model.fields,field_description:shopfloor.field_stock_inventory__id
@@ -311,6 +317,7 @@ msgid "Inventory Locations"
 msgstr "Ubicaciones de Inventario"
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app____last_update
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu____last_update
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin____last_update
 #: model:ir.model.fields,field_description:shopfloor.field_stock_inventory____last_update
@@ -964,6 +971,11 @@ msgid "Shopfloor User"
 msgstr "Usuario del Taller"
 
 #. module: shopfloor
+#: model:shopfloor.app,name:shopfloor.app_demo
+msgid "Shopfloor WMS (demo)"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__shopfloor_weight
 msgid "Shopfloor weight (kg)"
 msgstr "Peso del taller (kg)"
@@ -1279,6 +1291,16 @@ msgid "Unreserve Other Moves Is Possible"
 msgstr "Es posible Anular la Reserva de Otros Movimientos"
 
 #. module: shopfloor
+#: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_app__category__wms
+msgid "WMS"
+msgstr ""
+
+#. module: shopfloor
+#: model:shopfloor.app,short_name:shopfloor.app_demo
+msgid "WMS (demo)"
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/services/cluster_picking.py:0
 #, python-format
 msgid "Wrong bin"
@@ -1370,6 +1392,9 @@ msgstr "{} no es un paquete de destino válido."
 #, python-format
 msgid "{} {} put in {}"
 msgstr "{} {} poner en {}"
+
+#~ msgid "%s updated."
+#~ msgstr "%s actualizado."
 
 #~ msgid "Stock Picking"
 #~ msgstr "Inventario de la Entrega"
