@@ -30,6 +30,7 @@ setuptools.setup(
         'odoo14-addon-shopfloor_packing_info',
         'odoo14-addon-shopfloor_rest_log',
         'odoo14-addon-shopfloor_workstation',
+        'odoo14-addon-shopfloor_workstation_label_printer',
         'odoo14-addon-shopfloor_workstation_mobile',
         'odoo14-addon-stock_available_to_promise_release',
         'odoo14-addon-stock_available_to_promise_release_dynamic_routing',
