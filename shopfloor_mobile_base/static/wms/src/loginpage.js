@@ -26,7 +26,14 @@ export var LoginPage = Vue.component("login-page", {
             self.error = "";
         });
         event_hub.$once("login:success", function () {
-            self.$router.push({name: "home"});
+            const home_route = self.$router.options.routes.find((route) => {
+                // isHomeRoute can be set on route registration to use
+                // any custom route as home;
+                // if no route is explicitly set as home
+                // the router will use a default.
+                return route.meta ? route.meta.isHomeRoute : false;
+            });
+            self.$router.push({name: home_route.name});
         });
         event_hub.$once("login:failure", function () {
             self._handle_invalid_login();
