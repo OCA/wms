@@ -13,12 +13,6 @@ import {page_registry} from "./services/page_registry.js";
 
 const routes = [
     {
-        path: "/",
-        component: HomePage,
-        name: "home",
-        meta: {requiresAuth: true, requiresProfile: true},
-    },
-    {
         path: "/login",
         component: LoginPage,
         name: "login",
@@ -32,9 +26,16 @@ const routes = [
     // TODO Fix this it needs to be the last route, but I think it is not anymore with the dynamic one added.
     // { path: '*', component: NotFound },
 ];
+const default_home_route = {
+    path: "/",
+    component: HomePage,
+    name: "home",
+    meta: {requiresAuth: true, requiresProfile: true, isHomeRoute: true},
+};
 
 const register_routes = function (route_records) {
     const registered = [];
+    let custom_home = false;
     _.forEach(route_records, function (process, key) {
         const route = {
             name: process.key,
@@ -46,9 +47,21 @@ const register_routes = function (route_records) {
             // By default, unless explicitly specified, require auth
             route.meta.requiresAuth = true;
         }
+        if (route.meta.isHomeRoute) {
+            if (custom_home) {
+                console.warn(
+                    "Another home route was already registered. Skipping: ",
+                    route
+                );
+            } else {
+                custom_home = true;
+            }
+        }
         routes.push(route);
         registered.push(key);
     });
+    // TODO: the HomePage component should be loaded only if needed here
+    if (!custom_home) routes.push(default_home_route);
     if (registered.length)
         console.log("Registered component routes:", registered.join(", "));
 };
