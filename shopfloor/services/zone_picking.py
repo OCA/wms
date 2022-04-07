@@ -556,15 +556,17 @@ class ZonePicking(Component):
         message = None
         response = None
         search = self._actions_for("search")
-        lot = search.lot_from_scan(barcode)
-        if not lot:
+        # Could get several lots from different products, check each of them
+        lots = search.lot_from_scan(barcode, limit=None)
+        if not lots:
             return response, message
-        move_lines = self._find_location_move_lines(lot=lot)
-        if move_lines:
-            response = self._response_for_set_line_destination(first(move_lines))
-        else:
-            response = self._list_move_lines(self.zone_location)
-            message = self.msg_store.lot_not_found()
+        for lot in lots:
+            move_lines = self._find_location_move_lines(lot=lot)
+            if move_lines:
+                response = self._response_for_set_line_destination(first(move_lines))
+                return response, message
+        response = self._list_move_lines(self.zone_location)
+        message = self.msg_store.lot_not_found()
         return response, message
 
     def scan_source(self, barcode, confirmation=False):
@@ -1052,7 +1054,7 @@ class ZonePicking(Component):
         response = None
         change_package_lot = self._actions_for("change.package.lot")
         # handle lot
-        lot = search.lot_from_scan(barcode)
+        lot = search.lot_from_scan(barcode, products=move_line.product_id)
         if lot:
             response = change_package_lot.change_lot(
                 move_line, lot, response_ok_func, response_error_func

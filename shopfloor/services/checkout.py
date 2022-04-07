@@ -367,7 +367,7 @@ class Checkout(Component):
         if product:
             return self._select_lines_from_product(picking, selection_lines, product)
 
-        lot = search.lot_from_scan(barcode)
+        lot = search.lot_from_scan(barcode, products=picking.move_lines.product_id)
         if lot:
             return self._select_lines_from_lot(picking, selection_lines, lot)
 
@@ -731,7 +731,7 @@ class Checkout(Component):
             product_lines = selected_lines.filtered(lambda l: l.product_id == product)
             return self._switch_line_qty_done(picking, selected_lines, product_lines)
 
-        lot = search.lot_from_scan(barcode)
+        lot = search.lot_from_scan(barcode, products=selected_lines.product_id)
         if lot:
             lot_lines = selected_lines.filtered(lambda l: l.lot_id == lot)
             return self._switch_line_qty_done(picking, selected_lines, lot_lines)
