@@ -49,10 +49,32 @@ export class TranslationRegistry {
         return this._default_lang;
     }
 
-    load(lang, path) {
+    /**
+     * The load method adds collections of translations to the registry.
+     * It expects the corresponding language as well as the path to
+     * the file with the translations.
+     * It adds them on top of the existing ones.
+     *
+     * If the translations are in dotted_path format ("any.translation.key": "translation"),
+     * each entry needs to be added to original_messages individually
+     * in order to avoid unwanted overrides to the original translations.
+     *
+     * @param {string} lang
+     * @param {string} path
+     * @param {bool} dotted_path
+     */
+    load(lang, path, dotted_path = false) {
         loadJSON((messages) => {
             const original_messages = this.get(lang);
-            const merged_messages = {...messages, ...original_messages};
+            let merged_messages;
+            if (dotted_path) {
+                Object.entries(messages).forEach((entry) => {
+                    _.set(original_messages, entry[0], entry[1]);
+                });
+                merged_messages = original_messages;
+            } else {
+                merged_messages = {...original_messages, ...messages};
+            }
             this.add(lang, merged_messages);
         }, path);
     }
