@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-04-14 20:46+0000\n"
+"PO-Revision-Date: 2022-04-10 18:05+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -34,17 +34,17 @@ msgstr ""
 #. module: shopfloor_mobile_base
 #: model:ir.model,name:shopfloor_mobile_base.model_shopfloor_app
 msgid "A Shopfloor application"
-msgstr ""
+msgstr "Una Aplicación de Taller"
 
 #. module: shopfloor_mobile_base
 #: model:ir.model.fields,field_description:shopfloor_mobile_base.field_shopfloor_app__app_version
 msgid "App Version"
-msgstr ""
+msgstr "Versión de la App"
 
 #. module: shopfloor_mobile_base
 #: model:ir.model.fields,field_description:shopfloor_mobile_base.field_shopfloor_app__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Mostrar Nombre"
 
 #. module: shopfloor_mobile_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base.shopfloor_app_assets
@@ -54,12 +54,12 @@ msgstr "Engánchese a este elemento para inyectar su propio escenario"
 #. module: shopfloor_mobile_base
 #: model:ir.model.fields,field_description:shopfloor_mobile_base.field_shopfloor_app__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: shopfloor_mobile_base
 #: model:ir.model.fields,field_description:shopfloor_mobile_base.field_shopfloor_app____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Última Modificación el"
 
 #~ msgid "Shopfloor WMS app"
 #~ msgstr "App WMS Taller"
