@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-06-05 04:48+0000\n"
+"PO-Revision-Date: 2022-04-10 18:05+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -24,6 +24,10 @@ msgid ""
 "        internal controller-ready version.\n"
 "        "
 msgstr ""
+"\n"
+"        Ruta base para endpoints adjuntos a esta aplicación,\n"
+"        versión para controlador interno lista.\n"
+"        "
 
 #. module: shopfloor_base
 #: code:addons/shopfloor_base/services/forms/form_mixin.py:0
@@ -34,7 +38,7 @@ msgstr "%s actualizado."
 #. module: shopfloor_base
 #: model:ir.model,name:shopfloor_base.model_shopfloor_app
 msgid "A Shopfloor application"
-msgstr ""
+msgstr "Una Aplicación de Taller"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__active
@@ -46,12 +50,12 @@ msgstr "Activo"
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__api_docs_url
 msgid "Api Docs Url"
-msgstr ""
+msgstr "Api Docs Url"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__api_route
 msgid "Api Route"
-msgstr ""
+msgstr "Ruta de Api"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
@@ -66,18 +70,18 @@ msgstr "Archivado"
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "Auth"
-msgstr ""
+msgstr "Auth"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__auth_type
 msgid "Auth Type"
-msgstr ""
+msgstr "Tipo de Auth"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__category
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
 msgid "Category"
-msgstr ""
+msgstr "Categoría"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_scenario__options_edit
@@ -108,7 +112,7 @@ msgstr "Escenario de demostración 1"
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "Developer"
-msgstr ""
+msgstr "Desarrollador"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_ir_http__display_name
@@ -128,7 +132,7 @@ msgstr "Agrupar por"
 #. module: shopfloor_base
 #: model:ir.model,name:shopfloor_base.model_ir_http
 msgid "HTTP Routing"
-msgstr ""
+msgstr "Ruta HTTP"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_ir_http__id
@@ -186,7 +190,7 @@ msgstr "Campo de escenario heredado"
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "Main"
-msgstr ""
+msgstr "Principal"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_menu_form_view
@@ -221,17 +225,17 @@ msgstr "Nombre"
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__short_name
 msgid "Needed for app manifest"
-msgstr ""
+msgstr "Requerido para el manifiesto de la app"
 
 #. module: shopfloor_base
 #: model:ir.model.fields.selection,name:shopfloor_base.selection__shopfloor_app__category__
 msgid "None"
-msgstr ""
+msgstr "Ninguno"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "Open app"
-msgstr ""
+msgstr "Abrir app"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__options
@@ -252,7 +256,7 @@ msgstr "Perfil"
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__profile_required
 msgid "Profile Required"
-msgstr ""
+msgstr "Perfil Requerido"
 
 #. module: shopfloor_base
 #: model:ir.actions.act_window,name:shopfloor_base.action_shopfloor_profile
@@ -264,7 +268,7 @@ msgstr "Perfiles"
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "Profiles and menu items"
-msgstr ""
+msgstr "Perfiles y elementos del menú"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__profile_ids
@@ -273,16 +277,19 @@ msgid ""
 "field is not required in case you don't need profiles and menu items from "
 "the backend."
 msgstr ""
+"Perfiles utilizados por esta aplicación. Esto también determinará los "
+"elementos del menú. Sin embargo, este campo no es obligatorio en caso de que "
+"no necesite perfiles ni elementos del menú del backend."
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__api_docs_url
 msgid "Public URL for api docs."
-msgstr ""
+msgstr "URL pública para los api docs."
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__url
 msgid "Public URL to use the app."
-msgstr ""
+msgstr "URL pública para usar la app."
 
 #. module: shopfloor_base
 #: code:addons/shopfloor_base/actions/message.py:0
@@ -303,7 +310,7 @@ msgstr ""
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__registered_routes
 msgid "Registered Routes"
-msgstr ""
+msgstr "Rutas Registradas"
 
 #. module: shopfloor_base
 #: model:ir.actions.act_window,name:shopfloor_base.action_shopfloor_scenario
@@ -348,7 +355,7 @@ msgstr "Usuario del Taller"
 #: model:ir.actions.act_window,name:shopfloor_base.action_shopfloor_app
 #: model:ir.ui.menu,name:shopfloor_base.menu_action_shopfloor_app
 msgid "Shopfloor apps"
-msgstr ""
+msgstr "Apps del taller"
 
 #. module: shopfloor_base
 #: model:ir.model,name:shopfloor_base.model_shopfloor_profile
@@ -358,7 +365,7 @@ msgstr "Ajustes del perfil de taller"
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__short_name
 msgid "Short Name"
-msgstr ""
+msgstr "Nombre Corto"
 
 #. module: shopfloor_base
 #: model:shopfloor.menu,name:shopfloor_base.shopfloor_menu_demo_1
@@ -368,13 +375,15 @@ msgstr "Cosas Simples Para Hacer"
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__tech_name
 msgid "Tech Name"
-msgstr ""
+msgstr "Nombre Técnico"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__registered_routes
 msgid ""
 "Technical field to allow developers to check registered routes on the form"
 msgstr ""
+"Campo técnico para permitir a los desarrolladores verificar las rutas "
+"registradas en el formulario"
 
 #. module: shopfloor_base
 #: code:addons/shopfloor_base/services/service.py:0
@@ -385,17 +394,17 @@ msgstr "El registro %s %s no existe"
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__url
 msgid "Url"
-msgstr ""
+msgstr "Url"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "View api docs"
-msgstr ""
+msgstr "Ver api docs"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "View menu items"
-msgstr ""
+msgstr "Ver elementos del menú"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_menu__profile_id
@@ -405,4 +414,4 @@ msgstr "Visible solo en este perfil"
 #. module: shopfloor_base
 #: model:ir.model.constraint,message:shopfloor_base.constraint_shopfloor_app_tech_name
 msgid "tech_name must be unique"
-msgstr ""
+msgstr "tech_name debe ser único"
