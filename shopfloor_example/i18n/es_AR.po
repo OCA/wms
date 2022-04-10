@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-10-19 23:35+0000\n"
+"PO-Revision-Date: 2022-04-10 18:05+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -19,42 +19,42 @@ msgstr ""
 #. module: shopfloor_example
 #: model:ir.model,name:shopfloor_example.model_shopfloor_app
 msgid "A Shopfloor application"
-msgstr ""
+msgstr "Una Aplicación de Taller"
 
 #. module: shopfloor_example
 #: model:ir.model.fields,field_description:shopfloor_example.field_shopfloor_app__category
 msgid "Category"
-msgstr ""
+msgstr "Categoría"
 
 #. module: shopfloor_example
 #: model:ir.model.fields,field_description:shopfloor_example.field_shopfloor_app__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Mostrar Nombre"
 
 #. module: shopfloor_example
 #: model:ir.model.fields.selection,name:shopfloor_example.selection__shopfloor_app__category__example
 msgid "Example"
-msgstr ""
+msgstr "Ejemplo"
 
 #. module: shopfloor_example
 #: model:shopfloor.app,short_name:shopfloor_example.app_demo_api_key
 msgid "Example - api key auth"
-msgstr ""
+msgstr "Ejemplo - api key auth"
 
 #. module: shopfloor_example
 #: model:shopfloor.app,short_name:shopfloor_example.app_demo_user
 msgid "Example - user auth"
-msgstr ""
+msgstr "Ejemplo - user auth"
 
 #. module: shopfloor_example
 #: model:ir.model.fields,field_description:shopfloor_example.field_shopfloor_app__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: shopfloor_example
 #: model:ir.model.fields,field_description:shopfloor_example.field_shopfloor_app____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Última Modificación el"
 
 #. module: shopfloor_example
 #: model:shopfloor.menu,name:shopfloor_example.shopfloor_menu_partners_demo
@@ -65,9 +65,9 @@ msgstr "Gestionar contactos"
 #. module: shopfloor_example
 #: model:shopfloor.app,name:shopfloor_example.app_demo_api_key
 msgid "Shopfloor Example - api key auth"
-msgstr ""
+msgstr "Ejemplo de Taller - api key auth"
 
 #. module: shopfloor_example
 #: model:shopfloor.app,name:shopfloor_example.app_demo_user
 msgid "Shopfloor Example - user auth"
-msgstr ""
+msgstr "Ejemplo de Taller - user auth"
