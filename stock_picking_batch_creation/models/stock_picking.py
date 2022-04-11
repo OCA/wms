@@ -91,10 +91,13 @@ class StockPicking(models.Model):
         for rec in self:
             nbr_bins = False
             device = self.env.context.get("picking_device", rec.picking_device_id)
-            if device and rec.total_volume_batch_picking:
-                nbr_bins = math.ceil(
-                    rec.total_volume_batch_picking / device.volume_per_bin
-                )
+            if device:
+                if rec.total_volume_batch_picking:
+                    nbr_bins = math.ceil(
+                        rec.total_volume_batch_picking / device.volume_per_bin
+                    )
+                else:
+                    nbr_bins = 1
             rec.nbr_bins_batch_picking = nbr_bins
 
     @api.depends("pack_operation_ids")
