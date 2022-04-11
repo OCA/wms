@@ -51,7 +51,7 @@ export var Profile = {
         on_select: function (selected) {
             if (!_.isEmpty(selected)) {
                 this.$root.trigger("profile:selected", selected, true);
-                this.$root.$router.push({name: "home"});
+                this.$root.$router.push("/");
             }
         },
     },

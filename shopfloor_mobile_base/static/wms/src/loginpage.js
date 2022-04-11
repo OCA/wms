@@ -17,7 +17,7 @@ export var LoginPage = Vue.component("login-page", {
     beforeCreate: function () {
         const self = this;
         if (this.$root.is_authenticated()) {
-            self.$router.push({name: "home"});
+            self.$router.push("/");
         }
     },
     mounted: function () {
