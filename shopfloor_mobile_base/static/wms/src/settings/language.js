@@ -29,7 +29,7 @@ export var Language = {
             const self = this;
             this.$i18n.locale = selected.id;
             // This.$root.trigger("language:selected", selected, true);
-            self.$root.$router.push({name: "home"});
+            self.$root.$router.push("/");
         },
     },
 };
