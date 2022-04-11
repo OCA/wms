@@ -276,7 +276,7 @@ Vue.component("nav-items-extra", {
                     id: "home",
                     name: this.$t("screen.home.title"),
                     icon: "mdi-home",
-                    route: {name: "home"},
+                    route: "/",
                 },
                 {
                     id: "scan-anything",
