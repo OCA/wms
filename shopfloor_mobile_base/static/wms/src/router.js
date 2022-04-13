@@ -11,6 +11,10 @@ import {process_registry} from "./services/process_registry.js";
 import {page_registry} from "./services/page_registry.js";
 // Const NotFound = { template: '<div>Lost in the scanner app.</div>' }
 
+// Used to redirect to the chosen custom home path
+// when landing in the "/" route.
+let _CUSTOM_HOME_PATH = "";
+
 const routes = [
     {
         path: "/login",
@@ -35,7 +39,6 @@ const default_home_route = {
 
 const register_routes = function (route_records) {
     const registered = [];
-    let custom_home = false;
     _.forEach(route_records, function (process, key) {
         const route = {
             name: process.key,
@@ -48,20 +51,27 @@ const register_routes = function (route_records) {
             route.meta.requiresAuth = true;
         }
         if (route.meta.isHomeRoute) {
-            if (custom_home) {
+            if (_CUSTOM_HOME_PATH) {
                 console.warn(
                     "Another home route was already registered. Skipping: ",
                     route
                 );
             } else {
-                custom_home = true;
+                _CUSTOM_HOME_PATH = route.path;
+                const home_route_redirect = {
+                    path: "/",
+                    redirect: (to) => {
+                        return _CUSTOM_HOME_PATH;
+                    },
+                };
+                routes.push(home_route_redirect);
             }
         }
         routes.push(route);
         registered.push(key);
     });
     // TODO: the HomePage component should be loaded only if needed here
-    if (!custom_home) routes.push(default_home_route);
+    if (!_CUSTOM_HOME_PATH) routes.push(default_home_route);
     if (registered.length)
         console.log("Registered component routes:", registered.join(", "));
 };
