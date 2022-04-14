@@ -27,7 +27,6 @@ class StockPicking(models.Model):
     nbr_bins_batch_picking = fields.Integer(
         string="Number of compartments",
         help="Indicates the bins occupied by the picking on the device.",
-        compute="_compute_nbr_bins_batch_picking",
     )
     nbr_picking_lines = fields.Integer(
         string="Number of lines",
@@ -37,6 +36,20 @@ class StockPicking(models.Model):
 
     def _refresh_dimension_fields(self):
         self._init_dimension_fields(force=True)
+
+    def _refresh_nbr_bins_on_device_field(self, device):
+        self._init_nbr_bins_on_device_field(device, force=True)
+
+    def _init_nbr_bins_on_device_field(self, device, force=False):
+        """Initialize nbr_bin batch picking on demand"""
+        for record in self:
+            to_write = {}
+            if not record.nbr_bins_batch_picking or force:
+                nbr_bins = self._get_nbr_bin_batch_for_device(device)
+                if nbr_bins != record.nbr_bins_batch_picking:
+                    to_write["nbr_bins_batch_picking"] = nbr_bins
+            if to_write:
+                record.write(to_write)
 
     def _init_dimension_fields(self, force=False):
         """Initialize dimension fields on demand since the computation of these
@@ -86,19 +99,16 @@ class StockPicking(models.Model):
                     volume += pack_volume * packaging_info["qty"]
         return volume
 
-    @api.depends("total_volume_batch_picking", "wave_id.picking_device_id")
-    def _compute_nbr_bins_batch_picking(self):
-        for rec in self:
-            nbr_bins = False
-            device = self.env.context.get("picking_device", rec.picking_device_id)
-            if device:
-                if rec.total_volume_batch_picking:
-                    nbr_bins = math.ceil(
-                        rec.total_volume_batch_picking / device.volume_per_bin
-                    )
-                else:
-                    nbr_bins = 1
-            rec.nbr_bins_batch_picking = nbr_bins
+    def _get_nbr_bin_batch_for_device(self, device):
+        self.ensure_one()
+        nbr_bins = 0
+        if self.total_volume_batch_picking:
+            nbr_bins = math.ceil(
+                self.total_volume_batch_picking / device.volume_per_bin
+            )
+        else:
+            nbr_bins = 1
+        return nbr_bins
 
     @api.depends("pack_operation_ids")
     def _compute_nbr_picking_lines(self):
