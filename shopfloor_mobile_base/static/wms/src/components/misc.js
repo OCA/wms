@@ -152,7 +152,7 @@ Vue.component("btn-reset-config", {
         redirect: {
             type: Object,
             default: function () {
-                return "/";
+                return {path: "/"};
             },
         },
     },
