@@ -70,14 +70,13 @@ const register_routes = function (route_records) {
         routes.push(route);
         registered.push(key);
     });
-    // TODO: the HomePage component should be loaded only if needed here
-    if (!_CUSTOM_HOME_PATH) routes.push(default_home_route);
     if (registered.length)
         console.log("Registered component routes:", registered.join(", "));
 };
 
 register_routes(process_registry.all());
 register_routes(page_registry.all());
+if (!_CUSTOM_HOME_PATH) routes.push(default_home_route);
 
 const router = new VueRouter({
     routes: routes,
