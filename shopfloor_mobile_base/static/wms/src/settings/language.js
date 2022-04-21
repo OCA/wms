@@ -4,6 +4,7 @@
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
+import event_hub from "../services/event_hub.js";
 import {page_registry} from "../services/page_registry.js";
 
 export var Language = {
@@ -27,8 +28,7 @@ export var Language = {
     methods: {
         on_select: function (selected) {
             const self = this;
-            this.$i18n.locale = selected.id;
-            // This.$root.trigger("language:selected", selected, true);
+            event_hub.$emit("language:selected", selected.id);
             self.$root.$router.push("/");
         },
     },
