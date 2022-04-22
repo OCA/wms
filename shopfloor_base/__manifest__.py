@@ -15,7 +15,7 @@
     "license": "LGPL-3",
     "application": True,
     "depends": [
-        "base_jsonify",
+        "jsonifier",
         "base_rest",
         "base_sparse_field",
         "endpoint_route_handler",
