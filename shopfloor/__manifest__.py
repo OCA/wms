@@ -18,7 +18,7 @@
         "shopfloor_base",
         "stock",
         "stock_picking_batch",
-        "base_jsonify",
+        "jsonifier",
         "base_rest",
         "base_sparse_field",
         #  OCA / stock-logistics-warehouse

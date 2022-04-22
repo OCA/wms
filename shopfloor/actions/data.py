@@ -206,7 +206,7 @@ class DataAction(Component):
                 "package_id:product",
                 lambda rec, fname: self.product(rec.package_id.single_product_id),
             ),
-            # TODO: allow to pass mapped path to base_jsonify
+            # TODO: allow to pass mapped path to jsonifier
             (
                 "package_id:quantity",
                 lambda rec, fname: rec.package_id.single_product_qty,
