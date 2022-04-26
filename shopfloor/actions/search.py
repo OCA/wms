@@ -34,15 +34,13 @@ class SearchAction(Component):
             return model.browse()
         return model.search([("name", "=", barcode)], limit=1)
 
-    def product_from_scan(self, barcode):
+    def product_from_scan(self, barcode, use_packaging=True):
         model = self.env["product.product"]
         if not barcode:
             return model.browse()
         product = model.search([("barcode", "=", barcode)], limit=1)
-        if not product:
-            packaging = self.env["product.packaging"].search(
-                [("product_id", "!=", False), ("barcode", "=", barcode)], limit=1
-            )
+        if not product and use_packaging:
+            packaging = self.packaging_from_scan(barcode)
             product = packaging.product_id
         return product
 
@@ -57,6 +55,14 @@ class SearchAction(Component):
         if products:
             domain.append(("product_id", "in", products.ids))
         return model.search(domain, limit=limit)
+
+    def packaging_from_scan(self, barcode):
+        model = self.env["product.packaging"]
+        if not barcode:
+            return model.browse()
+        return model.search(
+            [("barcode", "=", barcode), ("product_id", "!=", False)], limit=1
+        )
 
     def generic_packaging_from_scan(self, barcode):
         model = self.env["product.packaging"]

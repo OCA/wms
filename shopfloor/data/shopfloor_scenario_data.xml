@@ -31,7 +31,12 @@
     <record id="scenario_delivery" model="shopfloor.scenario">
         <field name="name">Delivery</field>
         <field name="key">delivery</field>
-        <field name="options_edit">{"must_move_entire_pack": true}</field>
+        <field name="options_edit">
+{
+    "must_move_entire_pack": true,
+    "allow_prepackaged_product": true
+}
+        </field>
     </record>
     <record id="scenario_location_content_transfer" model="shopfloor.scenario">
         <field name="name">Location content transfer</field>
