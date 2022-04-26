@@ -53,6 +53,20 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
                 package=product_f_pkg,
             )
         picking.action_assign()
+        # Add a packaging on the raw product
+        cls.packaging = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "TEST PACKAGING",
+                    "product_id": cls.raw_move.product_id.id,
+                    "qty": 10,
+                    "product_uom_id": cls.raw_move.product_id.uom_id.id,
+                    "barcode": "TEST_PACKAGING",
+                }
+            )
+        )
         # Some records not related at all to the processed picking
         cls.free_package = cls.env["stock.quant.package"].create(
             {"name": "FREE_PACKAGE"}
@@ -194,6 +208,17 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             picking=self.picking,
             message=self.service.msg_store.lot_mixed_package_scan_package(),
         )
+
+    def test_scan_deliver_scan_product_packaging_ok(self):
+        self.menu.sudo().allow_prepackaged_product = True
+        line = self.raw_move.mapped("move_line_ids")
+        response = self.service.dispatch(
+            "scan_deliver", params={"barcode": self.packaging.barcode}
+        )
+        self.assert_response_deliver(
+            response, message=self.service.msg_store.transfer_complete(self.picking)
+        )
+        self.assertEqual(line.qty_done, self.packaging.qty)
 
     def test_scan_deliver_picking_done(self):
         # Set qty done for all lines (packages/raw product/lot...), picking is

@@ -47,6 +47,13 @@
                   <field name="allow_force_reservation_is_possible" invisible="1" />
                   <field name="allow_force_reservation" />
               </group>
+              <group
+                    name="prepackaged_product"
+                    attrs="{'invisible': [('prepackaged_product_is_possible', '=', False)]}"
+                >
+                  <field name="prepackaged_product_is_possible" invisible="1" />
+                  <field name="allow_prepackaged_product" />
+              </group>
             </group>
         </field>
     </record>

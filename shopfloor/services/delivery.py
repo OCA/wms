@@ -94,6 +94,11 @@ class Delivery(Component):
         than one package, a package barcode is requested, and if the product is
         tracked by lot/serial, a lot is asked.
 
+        If the option 'Process as pre-packaged' is enabled on the menu, then
+        when a product's packaging is scanned, the first move line without
+        a source package (bulk line) corresponding to the quantity of the
+        packaging will be set to done.
+
         If the barcode is a lot, the lines for this lot are set to
         done. However, if the lot is in more than one package, a package
         barcode is requested.
@@ -112,6 +117,7 @@ class Delivery(Component):
         * deliver: always return here with the data for the last touched
         picking or no picking if the picking has been set to done
         """
+        allow_prepackaged_product = self.work.menu.allow_prepackaged_product
         search = self._actions_for("search")
         picking = search.picking_from_scan(barcode)
         barcode_valid = bool(picking)
@@ -130,7 +136,9 @@ class Delivery(Component):
                 return self._deliver_package(picking, package)
 
         if not barcode_valid:
-            product = search.product_from_scan(barcode)
+            product = search.product_from_scan(
+                barcode, use_packaging=(not allow_prepackaged_product)
+            )
             if product:
                 return self._deliver_product(picking, product)
 
@@ -139,16 +147,36 @@ class Delivery(Component):
             if lot:
                 return self._deliver_lot(picking, lot)
 
+        if not barcode_valid and allow_prepackaged_product:
+            packaging = search.packaging_from_scan(barcode)
+            if packaging:
+                # By scanning a packaging, we want to process
+                # the full quantity of the packaging
+                packaging_qty = packaging.product_uom_id._compute_quantity(
+                    packaging.qty, packaging.product_id.uom_id
+                )
+                return self._deliver_product(
+                    picking, packaging.product_id, product_qty=packaging_qty
+                )
+
         message = self.msg_store.barcode_not_found() if not barcode_valid else None
         return self._response_for_deliver(picking=picking, message=message)
 
-    def _set_lines_done(self, lines):
+    def _set_lines_done(self, lines, product_qty=None):
         """Set done quantities on `lines`.
 
         Once all lines of a picking have been processed, the picking will be
         validated automatically.
         Return `True` if the related picking has been validated.
         """
+        if product_qty:
+            # When we scan a packaging we process only one move line,
+            # so one move to deal with regarding the qty
+            qty_done = lines.move_id.product_id.uom_id._compute_quantity(
+                product_qty, lines.move_id.product_uom
+            )
+            lines.qty_done = qty_done
+            return self._action_picking_done(lines.picking_id, force=True)
         for line in lines:
             # note: the package level is automatically set to "is_done" when
             # the qty_done is full
@@ -206,24 +234,39 @@ class Delivery(Component):
             [self._lines_base_domain(no_qty_done), [("lot_id", "=", lot.id)]]
         )
 
-    def _lines_from_product_domain(self, product, no_qty_done=True):
-        return expression.AND(
+    def _lines_from_product_domain(self, product, no_qty_done=True, product_qty=None):
+        # TODO: searching lines is common to other scenario, to refactor
+        domain = expression.AND(
             [self._lines_base_domain(no_qty_done), [("product_id", "=", product.id)]]
         )
+        if product_qty:
+            # Match lines corresponding to the product packaging qty
+            # (in stock UoM) and exclude lines having a source package (those
+            # must be processed by scanning the package)
+            domain.extend(
+                [
+                    ("product_qty", ">=", product_qty),
+                    ("package_id", "=", False),
+                ]
+            )
+        return domain
 
     def _lines_from_package_domain(self, package, no_qty_done=True):
         return expression.AND(
             [self._lines_base_domain(no_qty_done), [("package_id", "=", package.id)]]
         )
 
-    def _deliver_product(self, picking, product):
+    def _deliver_product(self, picking, product, product_qty=None):
         if product.tracking in ("lot", "serial"):
             return self._response_for_deliver(
                 picking, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
             )
 
+        limit = 1 if product_qty else None
         lines = self.env["stock.move.line"].search(
-            self._lines_from_product_domain(product)
+            self._lines_from_product_domain(product, product_qty=product_qty),
+            limit=limit,
+            order="date_planned",
         )
         if not lines:
             return self._response_for_deliver(
@@ -266,7 +309,7 @@ class Delivery(Component):
                     new_picking,
                     message=self.msg_store.product_mixed_package_scan_package(),
                 )
-        if self._set_lines_done(lines):
+        if self._set_lines_done(lines, product_qty):
             return self._response_for_deliver(
                 message=self.msg_store.transfer_complete(new_picking)
             )
