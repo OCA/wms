@@ -19,6 +19,8 @@ class StockMoveLine(models.Model):
     shopfloor_checkout_done = fields.Boolean(default=False)
     shopfloor_user_id = fields.Many2one(comodel_name="res.users", index=True)
 
+    date_planned = fields.Datetime(related="move_id.date", store=True, index=True)
+
     # we search lines based on their location in some workflows
     location_id = fields.Many2one(index=True)
     package_id = fields.Many2one(index=True)
