@@ -8,15 +8,30 @@ import {translation_registry} from "../services/translation_registry.js";
 
 const messages_fr = {
     screen: {
+        login: {
+            title: "Se connecter",
+            action: {
+                login: "Se connecter",
+            },
+            error: {
+                login_invalid: "Iformations d'identification invalides",
+            },
+        },
         home: {
             title: "Accueil",
             main_title: "Accueil",
+            version: "Version:",
+            action: {
+                nuke_data_and_reload: "Forcer rechargement des données et actualiser",
+            },
         },
         scan_anything: {
             name: "Scanner",
             title: "Scannez {what}",
+            scan_placeholder: "Scannez quelque chose",
         },
         settings: {
+            title: "Paramètres",
             home: {
                 name: "Réglages",
                 title: "Réglages",
@@ -28,11 +43,33 @@ const messages_fr = {
             profile: {
                 name: "Profil",
                 title: "Choisissez un profil",
+                profile_updated: "Profil mis à jour",
             },
             fullscreen: {
-                enter: "Go fullscreen",
-                exit: "Exit fullscreen",
+                enter: "Plein écran",
+                exit: "Quitter plein écran",
             },
+        },
+    },
+    app: {
+        profile_not_configured:
+            "Profil pas encore configuré. S'il vous plait sélectionner en un.",
+        profile_configure: "Configurer le profil",
+        loading: "Chargement en cours...",
+        action: {
+            logout: "Se déconnecter",
+        },
+        nav: {
+            scenario: "Scénario:",
+            op_types: "Op types:",
+        },
+        log_entry_link: "Afficher / partager l'entrée du journal",
+        running_env: {
+            prod: "Production",
+            integration: "Intégration",
+            staging: "Staging",
+            test: "Test",
+            dev: "Développement",
         },
     },
     language: {
@@ -51,6 +88,15 @@ const messages_fr = {
         },
         ok: {
             title: "Ok",
+        },
+        reset: {
+            title: "Réinitialiser",
+        },
+        cancel: {
+            title: "Annuler",
+        },
+        reload_config: {
+            title: "Recharger la configuration et le menu",
         },
     },
 };
