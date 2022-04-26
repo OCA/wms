@@ -24,7 +24,8 @@
     "@vue/cli-plugin-unit-jest": "~4.4.0",
     "@vue/cli-service": "~4.4.0",
     "@vue/test-utils": "^1.0.3",
-    "cypress": "^8.7.0"
+    "cypress": "^8.7.0",
+    "cypress-localstorage-commands": "^1.7.0"
   },
   "dependencies": {
     "node": "^16.13.2",

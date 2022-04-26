@@ -1,6 +1,10 @@
-describe("Test to make sure that the user can log in and log out", () => {
+describe("Test to make sure that the user can log in and log out using credentials", () => {
     // This test covers the standard (username / password) authentication
     // from module shopfloor_mobile_base_auth_user.
+
+    before(() => {
+        sessionStorage.clear();
+    });
 
     describe("Log in to the Shopfloor app", () => {
         describe("Preparation tests", () => {
@@ -11,7 +15,11 @@ describe("Test to make sure that the user can log in and log out", () => {
 
             it("Checks that the request to user_config fails (user is not authenticated)", () => {
                 cy.intercept_user_config_request();
-                cy.wait_for({reload: true, request_name: "user_config"});
+                cy.wait_for({
+                    expect_success: false,
+                    reload: true,
+                    request_name: "user_config",
+                });
             });
 
             it("Makes sure that the user_config or the authentication status are not in session storage", function () {
@@ -38,12 +46,12 @@ describe("Test to make sure that the user can log in and log out", () => {
                         {name: "password", value: credentials.password},
                     ]);
                 });
-                cy.wait_for({request_name: "login"});
+                cy.wait_for({expect_success: false, request_name: "login"});
             });
 
             it("Attempts to log in with empty credentials", function () {
                 cy.get('button[type="submit"]').click();
-                cy.wait_for({request_name: "login"});
+                cy.wait_for({expect_success: false, request_name: "login"});
             });
 
             it("Logs in with correct credentials and stores the response in app_config.json", function () {
@@ -119,7 +127,11 @@ describe("Test to make sure that the user can log in and log out", () => {
         });
         it("Tests that the request to get the user's information fails as the user is not authenticated", () => {
             cy.intercept_user_config_request();
-            cy.wait_for({reload: true, request_name: "user_config"});
+            cy.wait_for({
+                expect_success: false,
+                reload: true,
+                request_name: "user_config",
+            });
         });
     });
 });
