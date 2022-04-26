@@ -150,3 +150,15 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
 
         # All picks have a volume of 0 : they should each occupy one bin
         self.assertEqual(batch.wave_nbr_bins, len(selected_pickings))
+
+    def test_user_propagates_on_pickings(self):
+        batch = self.make_picking_batch._create_batch()
+        self.assertTrue(batch.picking_ids)
+        self.assertEqual(batch.user_id.id, self.env.user.id)
+        for pick in batch.picking_ids:
+            self.assertEqual(pick.user_id.id, self.env.user.id)
+
+        # remove user_id from batch
+        batch.user_id = False
+        for pick in batch.picking_ids:
+            self.assertFalse(pick.user_id)

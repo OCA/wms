@@ -17,7 +17,14 @@ class StockPicking(models.Model):
         readonly=True,
     )
 
-    user_id = fields.Many2one("res.users", string="Responsible", readonly=True)
+    user_id = fields.Many2one(
+        "res.users",
+        string="Responsible",
+        readonly=True,
+        related="wave_id.user_id",
+        store=True,
+        copy=False,
+    )
     total_weight_batch_picking = fields.Float(
         string="Weight", help="Indicates total weight of transfers included.",
     )
