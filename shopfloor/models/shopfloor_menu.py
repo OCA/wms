@@ -47,6 +47,18 @@ class ShopfloorMenu(models.Model):
         "if the put-away can find a sublocation (when putaway destination "
         "is different from the operation type's destination).",
     )
+    prepackaged_product_is_possible = fields.Boolean(
+        compute="_compute_prepackaged_product_is_possible"
+    )
+    allow_prepackaged_product = fields.Boolean(
+        string="Process as pre-packaged",
+        default=False,
+        help=(
+            "When active, what you scan (typically a product packaging EAN) "
+            "will be ship 'as-is' and the operation will be validated "
+            "triggering a backorder creation with the remaining lines."
+        ),
+    )
     # TODO: refactor handling of these options.
     # Possible solution:
     # * field should stay on the scenario and get stored in options
@@ -119,6 +131,13 @@ class ShopfloorMenu(models.Model):
     @api.onchange("ignore_no_putaway_available_is_possible")
     def onchange_ignore_no_putaway_available_is_possible(self):
         self.ignore_no_putaway_available = self.ignore_no_putaway_available_is_possible
+
+    @api.depends("scenario_id")
+    def _compute_prepackaged_product_is_possible(self):
+        for menu in self:
+            menu.prepackaged_product_is_possible = menu.scenario_id.has_option(
+                "allow_prepackaged_product"
+            )
 
     @api.constrains("scenario_id", "picking_type_ids", "ignore_no_putaway_available")
     def _check_ignore_no_putaway_available(self):
