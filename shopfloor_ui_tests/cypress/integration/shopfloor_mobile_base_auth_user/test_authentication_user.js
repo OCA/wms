@@ -129,6 +129,6 @@ describe("Test to make sure that the user can log in and log out", () => {
 const intercept_login_request = () => {
     cy.intercept({
         method: "POST",
-        url: "*/auth/login",
+        url: "**/auth/login",
     }).as("login");
 };

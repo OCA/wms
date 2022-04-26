@@ -58,7 +58,7 @@ Cypress.Commands.add(
 Cypress.Commands.add("intercept_user_config_request", () => {
     cy.intercept({
         method: "POST",
-        url: "*/app/user_config",
+        url: "**/app/user_config",
     }).as("user_config");
 });
 
