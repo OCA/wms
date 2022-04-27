@@ -5,7 +5,7 @@
 {
     "name": "Shopfloor Mobile Base auth via user auth",
     "summary": "Provides authentication via standard user login",
-    "version": "14.0.1.1.0",
+    "version": "14.0.1.1.1",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
@@ -13,8 +13,10 @@
     "maintainer": ["simahawk"],
     "license": "AGPL-3",
     "depends": ["shopfloor_mobile_base", "base_rest_auth_user_service"],
-    "data": [
+    "demo": [
         "demo/shopfloor_app_demo.xml",
+    ],
+    "data": [
         "templates/assets.xml",
     ],
 }
