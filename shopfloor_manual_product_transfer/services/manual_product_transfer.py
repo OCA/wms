@@ -463,7 +463,11 @@ class ManualProductTransfer(Component):
             # Barcode is a lot but doesn't match the processed one
             if lot != scanned_lot:
                 return self._response_for_confirm_quantity(
-                    location, product, quantity, lot, message=self.msg_store.wrong_lot()
+                    location,
+                    product,
+                    quantity,
+                    lot,
+                    message=self.msg_store.wrong_record(scanned_lot),
                 )
             return
         # Search by product
@@ -480,7 +484,11 @@ class ManualProductTransfer(Component):
         # Barcode is a product but doesn't match the processed one
         if product != scanned_product:
             return self._response_for_confirm_quantity(
-                location, product, quantity, lot, message=self.msg_store.wrong_product()
+                location,
+                product,
+                quantity,
+                lot,
+                message=self.msg_store.wrong_record(scanned_product),
             )
 
     # FIXME copy pasted from location content transfer, put it elsewhere?
