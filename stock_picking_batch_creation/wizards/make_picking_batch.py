@@ -300,3 +300,4 @@ class MakePickingBatch(models.TransientModel):
             "state": "draft",
             "picking_device_id": device.id if device else None,
         }
+        
