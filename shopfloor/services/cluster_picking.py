@@ -464,6 +464,12 @@ class ClusterPicking(Component):
         if location and move_line.location_id == location:
             return self._scan_line_by_location(picking, move_line, location)
 
+        # Nothing matches what is expected from the move line.
+        for rec in (package, product, lot, location):
+            if rec:
+                return self._response_for_start_line(
+                    move_line, message=self.msg_store.wrong_record(rec)
+                )
         return self._response_for_start_line(
             move_line, message=self.msg_store.barcode_not_found()
         )
