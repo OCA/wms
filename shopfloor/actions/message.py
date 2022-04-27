@@ -1,8 +1,12 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+import logging
+
 from odoo import _
 
 from odoo.addons.component.core import Component
+
+_logger = logging.getLogger(__name__)
 
 
 class MessageAction(Component):
@@ -200,10 +204,23 @@ class MessageAction(Component):
         }
 
     def wrong_product(self):
+        # Method to drop in v15
+        _logger.warning("`wrong_product` is deprecated, use `wrong_record` instead")
         return {
             "message_type": "error",
-            "body": _("Wrong product."),
+            "body": self._wrong_record_msg("product.product"),
         }
+
+    def _wrong_record_msg(self, model_name):
+        return {
+            "product.product": _("Wrong product."),
+            "stock.production.lot": _("Wrong lot."),
+            "stock.location": _("Wrong location."),
+            "stock.quant.package": _("Wrong pack."),
+        }.get(model_name, _("Wrong."))
+
+    def wrong_record(self, record):
+        return {"message_type": "error", "body": self._wrong_record_msg(record._name)}
 
     def no_lot_for_barcode(self, barcode):
         return {
@@ -218,9 +235,11 @@ class MessageAction(Component):
         }
 
     def wrong_lot(self):
+        # Method to drop in v15
+        _logger.warning("`wrong_product` is deprecated, use `wrong_record` instead")
         return {
             "message_type": "error",
-            "body": _("Wrong lot."),
+            "body": self._wrong_record_msg("stock.production.lot"),
         }
 
     def several_lots_in_location(self, location):
