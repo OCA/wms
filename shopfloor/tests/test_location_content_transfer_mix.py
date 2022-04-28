@@ -236,12 +236,12 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         """Test the following scenario:
 
         1) Operator-1 processes the first pallet with the "zone picking" scenario
-           to move the goods to PACK-1:
+           to move the goods to PACK-1 and unload in destination location1:
 
             move1 PICK -> PACK-1 'done'
 
         2) Operator-1 processes the second pallet with the "zone picking" scenario
-           to move the goods to PACK-2:
+           to move the goods to PACK-2 and unload in destination location2:
 
             move1 PICK -> PACK-2 'done'
 
