@@ -51,6 +51,11 @@ msgid "Api Route"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__app_version
+msgid "App Version"
+msgstr ""
+
+#. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_menu_form_view
