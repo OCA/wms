@@ -1,5 +1,5 @@
 # Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
-# Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+# Copyright 2020-2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _
 
@@ -258,7 +258,7 @@ class LocationContentTransfer(Component):
         unreserved_moves._do_unreserve()
         return (move_lines - lines_other_picking_types, unreserved_moves, None)
 
-    def scan_location(self, barcode):
+    def scan_location(self, barcode):  # noqa: C901
         """Scan start location
 
         Called at the beginning at the workflow to select the location from which
@@ -288,6 +288,12 @@ class LocationContentTransfer(Component):
         location = self._actions_for("search").location_from_scan(barcode)
         if not location:
             return self._response_for_start(message=self.msg_store.barcode_not_found())
+
+        if not self.is_src_location_valid(location):
+            return self._response_for_start(
+                message=self.msg_store.cannot_move_something_in_picking_type()
+            )
+
         move_lines = self._find_location_move_lines(location)
         pickings = move_lines.picking_id
         picking_types = pickings.mapped("picking_type_id")
@@ -311,12 +317,7 @@ class LocationContentTransfer(Component):
                 )
             if picking_types - self.picking_types:
                 return self._response_for_start(
-                    message={
-                        "message_type": "error",
-                        "body": _(
-                            "This location content can't be moved using this menu."
-                        ),
-                    }
+                    message=self.msg_store.cannot_move_something_in_picking_type()
                 )
         # If there are different source locations, we put the move lines we are
         # interested in in a separate picking.
@@ -350,8 +351,9 @@ class LocationContentTransfer(Component):
         ):
             new_moves = self._create_moves_from_location(location)
             if not new_moves:
+                savepoint.rollback()
                 return self._response_for_start(
-                    message=self.msg_store.no_pack_in_location(location)
+                    message=self.msg_store.location_empty(location)
                 )
             new_moves._action_confirm(merge=False)
             new_moves._action_assign()
@@ -367,7 +369,6 @@ class LocationContentTransfer(Component):
                     move_line.move_id, move_line.location_dest_id
                 ):
                     savepoint.rollback()
-
                     return self._response_for_start(
                         message=self.msg_store.location_content_unable_to_transfer(
                             location
@@ -386,6 +387,7 @@ class LocationContentTransfer(Component):
             )
 
         if not pickings:
+            savepoint.rollback()
             return self._response_for_start(
                 message=self.msg_store.location_empty(location)
             )
@@ -559,6 +561,13 @@ class LocationContentTransfer(Component):
             else:
                 return self._response_for_scan_destination(location, package_level)
 
+        # Nothing matches what is expected from the move line.
+        for rec in (package, product, lot):
+            if rec:
+                return self._response_for_start_single(
+                    move_lines.mapped("picking_id"),
+                    message=self.msg_store.wrong_record(rec),
+                )
         return self._response_for_start_single(
             move_lines.mapped("picking_id"), message=self.msg_store.barcode_not_found()
         )
@@ -607,7 +616,14 @@ class LocationContentTransfer(Component):
         if lot and lot == move_line.lot_id:
             return self._response_for_scan_destination(location, move_line)
 
+        # Nothing matches what is expected from the move line.
         move_lines = self._find_transfer_move_lines(location)
+        for rec in (package, product, lot):
+            if rec:
+                return self._response_for_start_single(
+                    move_lines.mapped("picking_id"),
+                    message=self.msg_store.wrong_record(rec),
+                )
         return self._response_for_start_single(
             move_lines.mapped("picking_id"), message=self.msg_store.barcode_not_found()
         )
