@@ -78,18 +78,69 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         package_level = self.picking1.move_line_ids.package_level_id
         self._test_scan_package_ok(package_level.package_id.name)
 
-    def test_scan_package_barcode_not_found(self):
-        package_level = self.picking1.move_line_ids.package_level_id
+    def _scan_package_error(self, package_level, scanned, message):
         response = self.service.dispatch(
             "scan_package",
             params={
                 "location_id": self.content_loc.id,
                 "package_level_id": package_level.id,
-                "barcode": "NOT_FOUND",
+                "barcode": scanned,
             },
         )
-        self.assert_response_start_single(
-            response, self.pickings, message=self.service.msg_store.barcode_not_found()
+        self.assert_response_start_single(response, self.pickings, message=message)
+
+    def test_scan_package_error_wrong_package(self):
+        """Wrong package scanned"""
+        pack = self.env["stock.quant.package"].sudo().create({})
+        self._scan_package_error(
+            self.picking1.move_line_ids.package_level_id,
+            pack.name,
+            {"message_type": "error", "body": "Wrong pack."},
+        )
+
+    def test_scan_package_error_wrong_product(self):
+        """Wrong product scanned"""
+        product = (
+            self.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Wrong",
+                    "barcode": "WRONGPRODUCT",
+                }
+            )
+        )
+        self._scan_package_error(
+            self.picking1.move_line_ids.package_level_id,
+            product.barcode,
+            {"message_type": "error", "body": "Wrong product."},
+        )
+
+    def test_scan_package_error_wrong_lot(self):
+        """Wrong product scanned"""
+        lot = (
+            self.env["stock.production.lot"]
+            .sudo()
+            .create(
+                {
+                    "name": "WRONGLOT",
+                    "product_id": self.picking1.move_line_ids[0].product_id.id,
+                    "company_id": self.env.company.id,
+                }
+            )
+        )
+        self._scan_package_error(
+            self.picking1.move_line_ids.package_level_id,
+            lot.name,
+            {"message_type": "error", "body": "Wrong lot."},
+        )
+
+    def test_scan_package_barcode_not_found(self):
+        """Nothing found for the barcode"""
+        self._scan_package_error(
+            self.picking1.move_line_ids.package_level_id,
+            "NO_EXISTING_BARCODE",
+            {"message_type": "error", "body": "Barcode not found"},
         )
 
     def test_scan_package_product_ok(self):
@@ -275,6 +326,58 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
             move_line.id,
             self.product_d.barcode,
             self.service.msg_store.scan_lot_on_product_tracked_by_lot(),
+        )
+
+    def test_scan_line_error_wrong_package(self):
+        """Wrong package scanned"""
+        move_line = self.picking2.move_line_ids[0]
+        pack = self.env["stock.quant.package"].sudo().create({})
+        self._test_scan_line_nok(
+            self.pickings,
+            move_line.id,
+            pack.name,
+            {"message_type": "error", "body": "Wrong pack."},
+        )
+
+    def test_scan_line_error_wrong_product(self):
+        """Wrong product scanned"""
+        move_line = self.picking2.move_line_ids[0]
+        product = (
+            self.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Wrong",
+                    "barcode": "WRONGPRODUCT",
+                }
+            )
+        )
+        self._test_scan_line_nok(
+            self.pickings,
+            move_line.id,
+            product.barcode,
+            {"message_type": "error", "body": "Wrong product."},
+        )
+
+    def test_scan_line_error_wrong_lot(self):
+        """Wrong product scanned"""
+        move_line = self.picking2.move_line_ids[0]
+        lot = (
+            self.env["stock.production.lot"]
+            .sudo()
+            .create(
+                {
+                    "name": "WRONGLOT",
+                    "product_id": move_line.product_id.id,
+                    "company_id": self.env.company.id,
+                }
+            )
+        )
+        self._test_scan_line_nok(
+            self.pickings,
+            move_line.id,
+            lot.name,
+            {"message_type": "error", "body": "Wrong lot."},
         )
 
     def test_scan_line_barcode_not_found(self):

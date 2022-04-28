@@ -236,7 +236,7 @@ class MessageAction(Component):
 
     def wrong_lot(self):
         # Method to drop in v15
-        _logger.warning("`wrong_product` is deprecated, use `wrong_record` instead")
+        _logger.warning("`wrong_log` is deprecated, use `wrong_record` instead")
         return {
             "message_type": "error",
             "body": self._wrong_record_msg("stock.production.lot"),
@@ -466,7 +466,7 @@ class MessageAction(Component):
 
     def location_empty(self, location):
         return {
-            "message_type": "info",
+            "message_type": "error",
             "body": _("Location {} empty").format(location.name),
         }
 
