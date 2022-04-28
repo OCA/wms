@@ -55,7 +55,10 @@ Object.entries(demotools.indexed).forEach(([key, value]) => {
 });
 
 function _create_partner_detail_endpoint(partner) {
-    const email = demotools.makePartnerEmail(partner);
+    let email;
+    if (partner.id % 2) {
+        email = demotools.makePartnerEmail(partner);
+    }
     return {
         next_state: "detail",
         data: {
