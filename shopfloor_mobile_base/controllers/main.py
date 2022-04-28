@@ -9,9 +9,8 @@ import logging
 import os
 
 from odoo import http
-from odoo.tools import DotDict
 
-from ..utils import RUNNING_ENV, get_version
+from odoo.addons.shopfloor_base.utils import get_version
 
 _logger = logging.getLogger(__name__)
 
@@ -37,23 +36,7 @@ class ShopfloorMobileAppMixin(object):
         }
 
     def _make_app_info(self, shopfloor_app, demo=False):
-        base_url = shopfloor_app.api_route.rstrip("/") + "/"
-        auth_type = shopfloor_app.auth_type
-        profile_required = shopfloor_app.profile_required
-        return DotDict(
-            name=shopfloor_app.name,
-            short_name=shopfloor_app.short_name,
-            base_url=base_url,
-            manifest_url=shopfloor_app.url + "/manifest.json",
-            auth_type=auth_type,
-            profile_required=profile_required,
-            demo_mode=demo,
-            version=shopfloor_app.app_version,
-            running_env=self._get_running_env(),
-        )
-
-    def _get_running_env(self):
-        return RUNNING_ENV
+        return shopfloor_app._make_app_info(demo=demo)
 
     def _make_icons(self, shopfloor_app, fname, rel, sizes, img_type, url_pattern=None):
         app_version = shopfloor_app.app_version
