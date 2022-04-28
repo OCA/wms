@@ -41,7 +41,7 @@ class TestCustomServiceCase(CommonCase):
     def test_scan(self):
         service = self._get_service()
         identifier = self.record.ref
-        res = service.dispatch("scan", identifier)
+        res = service.dispatch("scan", params={"identifier": identifier})
         self.assertEqual(
             res,
             {

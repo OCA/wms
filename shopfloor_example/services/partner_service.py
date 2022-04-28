@@ -16,6 +16,7 @@ class PartnerExampleService(Component):
 
     @restapi.method(
         [(["/scan/<string:identifier>"], "GET")],
+        input_param=restapi.CerberusValidator("scan"),
         output_param=restapi.CerberusValidator("scan"),
     )
     def scan(self, identifier):
@@ -39,6 +40,7 @@ class PartnerExampleService(Component):
 
     @restapi.method(
         [(["/detail/<int:partner_id>"], "GET")],
+        input_param=restapi.CerberusValidator("detail"),
         output_param=restapi.CerberusValidator("detail"),
     )
     def detail(self, partner_id):
@@ -68,6 +70,16 @@ class ShopfloorCheckoutValidator(Component):
     _inherit = "base.shopfloor.validator"
     _name = "shopfloor.partner_example.validator"
     _usage = "partner_example.validator"
+
+    def scan(self):
+        return {
+            "identifier": {"required": True, "type": "string"},
+        }
+
+    def detail(self):
+        return {
+            "partner_id": {"required": True, "type": "integer"},
+        }
 
     def partner_list(self):
         return {
