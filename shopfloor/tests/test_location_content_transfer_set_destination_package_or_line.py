@@ -843,11 +843,12 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         self.assertEqual(move_line.product_uom_qty, 0)
         self.assertEqual(move_line.qty_done, 6)
         self.assertEqual(move_line.state, "done")
+        # the move has been split
+        self.assertNotEqual(move_line.move_id, move)
 
         # Check the move handling the remaining qty
-        remaining_move = picking_b.move_lines - move
-        self.assertEqual(remaining_move.state, "assigned")
-        remaining_move_line = remaining_move.move_line_ids
-        self.assertEqual(remaining_move_line.move_id.product_uom_qty, 4)
-        self.assertEqual(remaining_move_line.product_uom_qty, 4)
-        self.assertEqual(remaining_move_line.qty_done, 4)
+        self.assertEqual(move.state, "assigned")
+        move_line = move.move_line_ids
+        self.assertEqual(move_line.move_id.product_uom_qty, 4)
+        self.assertEqual(move_line.product_uom_qty, 4)
+        self.assertEqual(move_line.qty_done, 4)
