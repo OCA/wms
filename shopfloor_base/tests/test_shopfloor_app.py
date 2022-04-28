@@ -88,3 +88,18 @@ class TestShopfloorApp(CommonCase):
         self._test_registered_routes(rec1)
         self._test_registered_routes(rec2)
         # TODO: test after routing_map cleaned
+
+    def test_api_url_for_service(self):
+        app = self.shopfloor_app
+        self.assertEqual(
+            app.api_url_for_service("profile"),
+            f"/shopfloor/api/{app.tech_name}/profile",
+        )
+        self.assertEqual(
+            app.api_url_for_service("profile", "search"),
+            f"/shopfloor/api/{app.tech_name}/profile/search",
+        )
+        self.assertEqual(
+            app.api_url_for_service("app", "user_config"),
+            f"/shopfloor/api/{app.tech_name}/app/user_config",
+        )

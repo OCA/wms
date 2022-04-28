@@ -114,6 +114,10 @@ class ShopfloorApp(models.Model):
     def _selection_auth_type(self):
         return self.env["endpoint.route.handler"]._selection_auth_type()
 
+    def api_url_for_service(self, service_name, endpoint=None):
+        """Handy method to generate services' API URLs for current app."""
+        return f"{self.api_route}/{service_name}/{endpoint or ''}".rstrip("/")
+
     def action_open_app(self):
         return {
             "type": "ir.actions.act_url",
