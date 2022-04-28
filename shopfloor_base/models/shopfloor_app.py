@@ -5,10 +5,13 @@ from functools import partial
 
 from odoo import api, fields, models
 from odoo.http import request
+from odoo.tools import DotDict
 
 from odoo.addons.base_rest.controllers.main import RestController
 from odoo.addons.base_rest.tools import _inspect_methods
 from odoo.addons.component.core import _component_databases
+
+from ..utils import APP_VERSION, RUNNING_ENV
 
 
 def _process_endpoint(
@@ -76,6 +79,7 @@ class ShopfloorApp(models.Model):
         "in case you don't need profiles and menu items from the backend.",
     )
     profile_required = fields.Boolean(compute="_compute_profile_required", store=True)
+    app_version = fields.Char(compute="_compute_app_version")
 
     _sql_constraints = [("tech_name", "unique(tech_name)", "tech_name must be unique")]
 
@@ -110,6 +114,11 @@ class ShopfloorApp(models.Model):
     def _compute_profile_required(self):
         for rec in self:
             rec.profile_required = bool(rec.profile_ids)
+
+    def _compute_app_version(self):
+        # Override this to choose your own versioning policy
+        for rec in self:
+            rec.app_version = APP_VERSION
 
     def _selection_auth_type(self):
         return self.env["endpoint.route.handler"]._selection_auth_type()
@@ -270,3 +279,17 @@ class ShopfloorApp(models.Model):
             # built, it calls odoo.modules.loading.load_modules().
             return []
         return self.env["rest.service.registration"]._get_services(self._name)
+
+    def _make_app_info(self, demo=False):
+        base_url = self.api_route.rstrip("/") + "/"
+        return DotDict(
+            name=self.name,
+            short_name=self.short_name,
+            base_url=base_url,
+            manifest_url=self.url + "/manifest.json",
+            auth_type=self.auth_type,
+            profile_required=self.profile_required,
+            demo_mode=demo,
+            version=self.app_version,
+            running_env=RUNNING_ENV,
+        )

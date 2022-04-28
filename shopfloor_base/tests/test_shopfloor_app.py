@@ -1,6 +1,8 @@
 # Copyright 2021 Camptocamp SA (http://www.camptocamp.com)
 # @author Simone Orsi <simahawk@gmail.com>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
+from odoo.addons.shopfloor_base.utils import APP_VERSION
+
 from .common import CommonCase
 
 
@@ -103,3 +105,20 @@ class TestShopfloorApp(CommonCase):
             app.api_url_for_service("app", "user_config"),
             f"/shopfloor/api/{app.tech_name}/app/user_config",
         )
+
+    def test_make_app_info(self):
+        info = self.shopfloor_app._make_app_info()
+        expected = {
+            "auth_type": "user_endpoint",
+            "base_url": "/shopfloor/api/test/",
+            "demo_mode": False,
+            "manifest_url": "/shopfloor/app/test/manifest.json",
+            "name": "Test",
+            "profile_required": False,
+            "running_env": "prod",
+            "short_name": "test",
+            "version": APP_VERSION,
+        }
+        self.assertEqual(info, expected)
+        info = self.shopfloor_app._make_app_info(demo=True)
+        self.assertEqual(info["demo_mode"], True)
