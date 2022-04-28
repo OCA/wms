@@ -1,8 +1,13 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+import logging
+
 from odoo import _, exceptions, fields, models
 from odoo.exceptions import UserError
 from odoo.tools.float_utils import float_compare
+
+_logger = logging.getLogger(__name__)
 
 
 class StockMoveLine(models.Model):
@@ -20,6 +25,28 @@ class StockMoveLine(models.Model):
 
     # allow domain on picking_id.xxx without too much perf penalty
     picking_id = fields.Many2one(auto_join=True)
+
+    def _extract_in_split_order(self):
+        """Have pickings fully reserved with only those move lines.
+
+        If the condition is not met, extract the move lines in a new picking.
+        """
+        for picking in self.picking_id:
+            moves_to_extract = new_move = picking.move_lines.browse()
+            need_split = False
+            for move in picking.move_lines:
+                move_lines = move.move_line_ids & self
+                if not move_lines:
+                    # The picking contains moves not related to given move lines
+                    need_split = True
+                    continue
+                new_move = move.split_other_move_lines(move_lines, intersection=True)
+                if new_move:
+                    # The move contains other move lines or is partially available
+                    need_split = True
+                moves_to_extract += new_move or move
+            if need_split:
+                moves_to_extract._extract_in_split_order()
 
     def _split_pickings_from_source_location(self):
         """Ensure that the related pickings will have the same source location.
@@ -49,9 +76,12 @@ class StockMoveLine(models.Model):
                     - move line with source location LOC2
                     - move line with source location LOC2
 
-        Return the new picking (in case a split has been made), or the current
-        related pickings.
+        Return the pickings containing the given move lines.
         """
+        _logger.warning(
+            "`_split_pickings_from_source_location` is deprecated "
+            "and replaced by `_extract_in_split_order`"
+        )
         location_src_to_process = self.location_id
         if location_src_to_process and len(location_src_to_process) != 1:
             raise UserError(
@@ -60,51 +90,15 @@ class StockMoveLine(models.Model):
         pickings = self.picking_id
         move_lines_to_process_ids = []
         for picking in pickings:
-            location_src = picking.mapped("move_line_ids.location_id")
+            location_src = picking.move_line_ids.location_id
             if len(location_src) == 1:
                 continue
+            (picking.move_line_ids & self)._extract_in_split_order()
             # Get the related move lines among the picking and split them
             move_lines_to_process_ids.extend(
                 set(picking.move_line_ids.ids) & set(self.ids)
             )
-        # Put all move lines related to the source location in a separate picking
-        move_lines_to_process = self.browse(move_lines_to_process_ids)
-        new_move_ids = []
-        for move_line in move_lines_to_process:
-            new_move = move_line.move_id.split_other_move_lines(
-                move_line, intersection=True
-            )
-            if new_move:
-                new_move._recompute_state()
-                new_move_ids.append(new_move.id)
-        # If we have new moves, create the backorder picking
-        # NOTE: code copy/pasted & adapted from OCA module 'stock_split_picking'
-        new_moves = self.env["stock.move"].browse(new_move_ids)
-        if new_moves:
-            picking = pickings[0]
-            new_picking = picking.copy(
-                {
-                    "name": "/",
-                    "move_lines": [],
-                    "move_line_ids": [],
-                    "backorder_id": picking.id,
-                }
-            )
-            message = _(
-                'The backorder <a href="#" '
-                'data-oe-model="stock.picking" '
-                'data-oe-id="%d">%s</a> has been created.'
-            ) % (new_picking.id, new_picking.name)
-            for pick in pickings:
-                pick.message_post(body=message)
-            new_moves.write({"picking_id": new_picking.id})
-            new_moves.mapped("move_line_ids").write({"picking_id": new_picking.id})
-            new_moves.move_line_ids.package_level_id.write(
-                {"picking_id": new_picking.id}
-            )
-            new_moves._action_assign()
-            pickings = new_picking
-        return pickings
+        return self.picking_id
 
     def _split_qty_to_be_done(self, qty_done, split_partial=True, **split_default_vals):
         """Check qty to be done for current move line. Split it if needed.
