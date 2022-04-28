@@ -91,3 +91,11 @@ class BaseShopfloorProcess(AbstractComponent):
         The location is valid but not the expected one: ask for confirmation
         """
         return not location.is_sublocation_of(location_dest_id)
+
+    def is_allow_move_create(self):
+        """Check a new operation can be created
+
+        The menu is configured to allow the creation of moves
+        The menu is bind to one picking type
+        """
+        return self.work.menu.allow_move_create and len(self.picking_types) == 1

@@ -33,11 +33,25 @@ class TestLocationContentTransferStart(LocationContentTransferCommonCase):
             lines=[(cls.product_c, 10), (cls.product_d, 10)]
         )
         cls.pickings = picking1 | picking2
+
+        cls.content_loc2 = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Content Location 2",
+                    "barcode": "Content2",
+                    "location_id": cls.picking_type.default_location_src_id.id,
+                }
+            )
+        )
         cls._fill_stock_for_moves(
             picking1.move_lines, in_package=True, location=cls.content_loc
         )
-        cls._fill_stock_for_moves(picking2.move_lines, location=cls.content_loc)
+        cls._fill_stock_for_moves(picking2.move_lines[0], location=cls.content_loc)
+        cls._fill_stock_for_moves(picking2.move_lines[1], location=cls.content_loc2)
         cls.pickings.action_assign()
+        cls.move_lines = cls.pickings.move_line_ids
 
     def test_start_fresh(self):
         """Start a fresh session when there is no transfer to recover"""
@@ -46,14 +60,14 @@ class TestLocationContentTransferStart(LocationContentTransferCommonCase):
 
     def test_start_recover_destination_all(self):
         """Recover transfers, all move lines have the same destination"""
-        self._simulate_pickings_selected(self.pickings)
+        self._simulate_pickings_selected(self.picking1)
         # all lines go to the same destination (shelf1)
-        self.assertEqual(len(self.pickings.mapped("move_line_ids.location_dest_id")), 1)
+        self.assertEqual(len(self.picking1.mapped("move_line_ids.location_dest_id")), 1)
 
         response = self.service.dispatch("start_or_recover", params={})
         self.assert_response_scan_destination_all(
             response,
-            self.pickings,
+            self.picking1,
             message=self.service.msg_store.recovered_previous_session(),
         )
 
@@ -82,24 +96,30 @@ class TestLocationContentTransferStart(LocationContentTransferCommonCase):
     def test_scan_location_find_content_destination_all(self):
         """Scan a location with content to transfer, all dest. identical"""
         # all lines go to the same destination (shelf1)
-        self.assertEqual(len(self.pickings.mapped("move_line_ids.location_dest_id")), 1)
+        self.assertEqual(len(self.move_lines.location_dest_id), 1)
         response = self.service.dispatch(
             "scan_location", params={"barcode": self.content_loc.barcode}
         )
-        self.assert_response_scan_destination_all(response, self.pickings)
+        processed_move_lines = self.move_lines.filtered(
+            lambda line: line.location_id == self.content_loc
+        )
+        processed_pickings = processed_move_lines.picking_id
+        self.assertTrue(processed_pickings != self.pickings)
+        self.assert_response_scan_destination_all(response, processed_pickings)
         self.assertRecordValues(
-            self.pickings, [{"user_id": self.env.uid}, {"user_id": self.env.uid}]
+            processed_pickings, [{"user_id": self.env.uid}, {"user_id": self.env.uid}]
         )
         self.assertRecordValues(
-            self.pickings.move_line_ids,
+            processed_move_lines,
             [
-                {"qty_done": 10.0},
                 {"qty_done": 10.0},
                 {"qty_done": 10.0},
                 {"qty_done": 10.0},
             ],
         )
-        self.assertRecordValues(self.picking1.package_level_ids, [{"is_done": True}])
+        self.assertRecordValues(
+            processed_pickings.package_level_ids, [{"is_done": True}]
+        )
 
     def test_scan_location_find_content_destination_single(self):
         """Scan a location with content to transfer, different destinations"""
@@ -109,20 +129,25 @@ class TestLocationContentTransferStart(LocationContentTransferCommonCase):
         response = self.service.dispatch(
             "scan_location", params={"barcode": self.content_loc.barcode}
         )
-        self.assert_response_start_single(response, self.pickings)
+        processed_move_lines = self.move_lines.filtered(
+            lambda line: line.location_id == self.content_loc
+        )
+        processed_pickings = processed_move_lines.picking_id
+        self.assert_response_start_single(response, processed_pickings)
         self.assertRecordValues(
-            self.pickings, [{"user_id": self.env.uid}, {"user_id": self.env.uid}]
+            processed_pickings, [{"user_id": self.env.uid}, {"user_id": self.env.uid}]
         )
         self.assertRecordValues(
-            self.pickings.move_line_ids,
+            processed_move_lines,
             [
-                {"qty_done": 10.0},
                 {"qty_done": 10.0},
                 {"qty_done": 10.0},
                 {"qty_done": 10.0},
             ],
         )
-        self.assertRecordValues(self.picking1.package_level_ids, [{"is_done": True}])
+        self.assertRecordValues(
+            processed_pickings.package_level_ids, [{"is_done": True}]
+        )
 
     def test_scan_location_different_picking_type(self):
         """Content has different picking types, can't move"""

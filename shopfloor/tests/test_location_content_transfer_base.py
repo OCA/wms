@@ -61,9 +61,10 @@ class LocationContentTransferCommonCase(CommonCase):
         # this code is repeated from the implementation, not great, but we
         # mostly want to ensure the selection of pickings is right, and the
         # data methods have their own tests
-        lines = pickings.move_line_ids.filtered(lambda line: not line.package_level_id)
+        move_lines = pickings.move_line_ids
+        lines = move_lines.filtered(lambda line: not line.package_level_id)
         package_levels = pickings.package_level_ids
-        location = pickings.mapped("move_line_ids.location_id")
+        location = move_lines.location_id
         self.assert_response(
             response,
             next_state=state,
