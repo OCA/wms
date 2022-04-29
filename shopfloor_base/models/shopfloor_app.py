@@ -80,6 +80,12 @@ class ShopfloorApp(models.Model):
     )
     profile_required = fields.Boolean(compute="_compute_profile_required", store=True)
     app_version = fields.Char(compute="_compute_app_version")
+    lang_id = fields.Many2one(
+        "res.lang",
+        string="Default language",
+        help="If set, the app will be first loaded with this lang.",
+    )
+    lang_ids = fields.Many2many("res.lang", string="Available languages")
 
     _sql_constraints = [("tech_name", "unique(tech_name)", "tech_name must be unique")]
 
@@ -292,4 +298,29 @@ class ShopfloorApp(models.Model):
             demo_mode=demo,
             version=self.app_version,
             running_env=RUNNING_ENV,
+            lang=self._app_info_lang(),
         )
+
+    def _app_info_lang(self):
+        enabled = []
+        if self.lang_ids:
+            # TODO: we should probably let the front decide the format
+            enabled = [x.code.replace("_", "-") for x in self.lang_ids]
+        return dict(
+            default=self.lang_id.code.replace("_", "-") if self.lang_id else False,
+            enabled=enabled,
+        )
+
+    @api.onchange("lang_id")
+    def _onchange_lang_id(self):
+        if self.env.context.get("from_onchange__lang_ids"):
+            return
+        if self.lang_id and self.lang_id not in self.lang_ids:
+            self.with_context(from_onchange__lang_id=1).lang_ids += self.lang_id
+
+    @api.onchange("lang_ids")
+    def _onchange_lang_ids(self):
+        if self.env.context.get("from_onchange__lang_id"):
+            return
+        if self.lang_ids and self.lang_id and self.lang_id not in self.lang_ids:
+            self.with_context(from_onchange__lang_ids=1).lang_id = False
