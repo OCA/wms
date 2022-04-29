@@ -27,7 +27,12 @@ class ShopfloorUser(Component):
 
     @property
     def _user_info_parser(self):
-        return ["id", "name"]
+        return ["id", "name", ("lang", self._user_lang_parser)]
+
+    def _user_lang_parser(self, rec, fname):
+        if not rec[fname]:
+            return False
+        return self.collection._app_convert_lang_code(rec[fname])
 
 
 class ShopfloorUserValidator(Component):
@@ -81,4 +86,5 @@ class ShopfloorUserValidatorResponse(Component):
         return {
             "id": {"coerce": to_int, "required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
+            "lang": {"type": "string", "nullable": False, "required": False},
         }
