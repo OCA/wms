@@ -188,6 +188,9 @@ new Vue({
                     self.$storage.set("appconfig", self.appconfig);
                 }
                 event_hub.$emit("app.sync:update", {root: self, sync_data: result});
+                if (self.user.lang) {
+                    self.switch_language(self.user.lang);
+                }
                 return result;
             });
         },
