@@ -1162,6 +1162,8 @@ class ZonePicking(Component):
         self._lock_lines(lines)
         lines.location_dest_id = location
         lines.package_level_id.location_dest_id = location
+        if self.work.menu.unload_package_at_destination:
+            lines.result_package_id = False
 
     def unload_split(self):
         """Indicates that now the buffer must be treated line per line
