@@ -54,6 +54,12 @@
                                     <field name="auth_type" />
                                 </group>
                             </group>
+                            <group name="two">
+                                <group name="lang" string="Language">
+                                    <field name="lang_id" options="{'no_create': 1}" />
+                                    <field name="lang_ids" widget="many2many_tags" />
+                                </group>
+                            </group>
                             <group name="profiles" string="Profiles and menu items">
                                 <field name="profile_ids" widget="many2many_tags" />
                                 <button
