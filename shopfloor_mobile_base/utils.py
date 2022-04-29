@@ -3,10 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 
-import os
-
 from odoo.modules.module import load_information_from_description_file
-from odoo.tools.config import config as odoo_config
 
 APP_VERSIONS = {}
 
@@ -25,24 +22,3 @@ def get_version(module_name, module_path=None):
 
 
 APP_VERSION = get_version("shopfloor_mobile_base")
-
-
-def _get_running_env():
-    """Retrieve current system environment.
-
-    Expected key `RUNNING_ENV` is compliant w/ `server_environment` naming
-    but is not depending on it.
-
-    Additionally, as specific key for Shopfloor is supported.
-
-    You don't need `server_environment` module to have this feature.
-    """
-    for key in ("SHOPFLOOR_RUNNING_ENV", "RUNNING_ENV"):
-        if os.getenv(key):
-            return os.getenv(key)
-        if odoo_config.options.get(key.lower()):
-            return odoo_config.get(key.lower())
-    return "prod"
-
-
-RUNNING_ENV = _get_running_env()
