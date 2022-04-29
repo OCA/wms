@@ -498,3 +498,77 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             picking_type,
             move_line,
         )
+
+    def test_set_same_destination_package_multiple_moves(self):
+        """Scanned barcode is the destination package."""
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        # picking_type.sudo().shopfloor_zero_check = True
+        self.assertEqual(len(self.picking1.move_line_ids), 1)
+        move_line = self.picking1.move_line_ids
+        location_is_empty = move_line.location_id.planned_qty_in_location_is_empty
+        self.assertFalse(location_is_empty())
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "move_line_id": move_line.id,
+                "barcode": self.free_package.name,
+                "quantity": move_line.product_uom_qty,
+                "confirmation": False,
+            },
+        )
+        self.assertTrue(location_is_empty())
+        # Check response
+        move_lines = self.service._find_location_move_lines()
+        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        self.assert_response_select_line(
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.service.msg_store.confirm_pack_moved(),
+        )
+        # Now, try to add more goods in the same package
+        move_line = self.picking3.move_line_ids
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "move_line_id": move_line.id,
+                "barcode": self.free_package.name,
+                "quantity": move_line.product_uom_qty,
+                "confirmation": False,
+            },
+        )
+        self.assertEqual(
+            response["message"],
+            {
+                "body": "Package FREE_PACKAGE is already used.",
+                "message_type": "warning",
+            },
+        )
+        # Now enable `multiple_move_single_pack` and try again
+        self.menu.sudo().write(
+            {
+                "multiple_move_single_pack": True,
+                "unload_package_at_destination": True,
+            }
+        )
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "move_line_id": move_line.id,
+                "barcode": self.free_package.name,
+                "quantity": move_line.product_uom_qty,
+                "confirmation": False,
+            },
+        )
+        # We now have no error in the response
+        move_lines = self.service._find_location_move_lines()
+        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        self.assert_response_select_line(
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+            message=self.service.msg_store.confirm_pack_moved(),
+        )

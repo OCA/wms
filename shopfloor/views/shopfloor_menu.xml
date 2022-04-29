@@ -54,6 +54,16 @@
                   <field name="prepackaged_product_is_possible" invisible="1" />
                   <field name="allow_prepackaged_product" />
               </group>
+              <group
+                    name="multiple_move_single_pack"
+                    attrs="{'invisible': [('multiple_move_single_pack_is_possible', '=', False)]}"
+                >
+                  <field name="multiple_move_single_pack_is_possible" invisible="1" />
+                  <field
+                        name="multiple_move_single_pack"
+                        attrs="{'readonly': [('pick_pack_same_time', '=', True)]}"
+                    />
+              </group>
             </group>
         </field>
     </record>
