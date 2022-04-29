@@ -597,6 +597,52 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             data=data,
         )
 
+    def test_scan_destination_unload_package_enabled(self):
+        """Endpoint /unload_scan_destination is called, unload_package_at_destination
+        is enabled, lines.result_package_id should be False"""
+        dest_location = self.bin1_lines[0].location_dest_id
+        # Default behavior, result_package_id is kept when package in unloaded
+        self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": dest_location.barcode,
+                "confirmation": True,
+            },
+        )
+        self.assertRecordValues(
+            self.bin1_lines,
+            [
+                {
+                    "result_package_id": self.bin1.id,
+                }
+            ],
+        )
+        # Now, if `unload_package_at_destination` is enabled, result_package_id
+        # should be set to False
+        self.menu.sudo().write({"unload_package_at_destination": True})
+        self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin2.id,
+                "barcode": dest_location.barcode,
+                "confirmation": True,
+            },
+        )
+        self.assertRecordValues(
+            self.bin2_lines,
+            [
+                {
+                    "result_package_id": False,
+                },
+                {
+                    "result_package_id": False,
+                },
+            ],
+        )
+
     def test_unload_scan_destination_one_line_of_picking_only(self):
         """Endpoint /unload_scan_destination is called, only one line of picking"""
         # For this test, we assume the move in bin1 is already done.

@@ -11,6 +11,16 @@ If you tick this box, while picking goods from a location
 * in both cases, if the picking has no carrier the operation fails.",
 """
 
+UNLOAD_PACK_AT_DEST_HELP = """
+With this option, the lines you process by putting on a package during the
+picking process will be put as bulk products at the final destination location.
+
+This is useful if your picking device is emptied at the destination location or
+if you want to provide bulk products to the next operation.
+
+Incompatible with: "Pick and pack at the same time"
+"""
+
 MULTIPLE_MOVE_SINGLE_PACK_HELP = """
 When picking a move,
 allow to set a destination package that was already used for the other lines.
@@ -87,6 +97,14 @@ class ShopfloorMenu(models.Model):
         default=False,
         help=MULTIPLE_MOVE_SINGLE_PACK_HELP,
     )
+    unload_package_at_destination_is_possible = fields.Boolean(
+        compute="_compute_unload_package_at_dest_is_possible"
+    )
+    unload_package_at_destination = fields.Boolean(
+        string="Unload package at destination",
+        default=False,
+        help=UNLOAD_PACK_AT_DEST_HELP,
+    )
 
     allow_force_reservation = fields.Boolean(
         string="Force stock reservation",
@@ -95,6 +113,63 @@ class ShopfloorMenu(models.Model):
     allow_force_reservation_is_possible = fields.Boolean(
         compute="_compute_allow_force_reservation_is_possible"
     )
+
+    @api.onchange("unload_package_at_destination")
+    def _onchange_unload_package_at_destination(self):
+        # Uncheck pick_pack_same_time when unload_package_at_destination is set to True
+        # Ensure that multiple_move_single_pack is False when
+        # unload_package_at_destination is checked out
+        for record in self:
+            if record.unload_package_at_destination:
+                record.pick_pack_same_time = False
+            else:
+                record.multiple_move_single_pack = False
+
+    @api.onchange("pick_pack_same_time")
+    def _onchange_pick_pack_same_time(self):
+        # pick_pack_same_time is incompatible with multiple_move_single_pack and
+        # multiple_move_single_pack
+        for record in self:
+            if record.pick_pack_same_time:
+                record.unload_package_at_destination = False
+                record.multiple_move_single_pack = False
+
+    @api.onchange("multiple_move_single_pack")
+    def _onchange_multiple_move_single_pack(self):
+        # multiple_move_single_pack is incompatible with pick_pack_same_time,
+        # and requires unload_package_at_destination to be set
+        for record in self:
+            if record.multiple_move_single_pack:
+                record.unload_package_at_destination = True
+                record.pick_pack_same_time = False
+
+    @api.constrains(
+        "unload_package_at_destination",
+        "pick_pack_same_time",
+        "multiple_move_single_pack",
+    )
+    def _check_options(self):
+        if self.pick_pack_same_time and self.unload_package_at_destination:
+            raise exceptions.UserError(
+                _(
+                    "'Pick and pack at the same time' is incompatible with "
+                    "'Unload package at destination'."
+                )
+            )
+        elif self.pick_pack_same_time and self.multiple_move_single_pack:
+            raise exceptions.UserError(
+                _(
+                    "'Pick and pack at the same time' is incompatible with "
+                    "'Multiple moves same destination package'."
+                )
+            )
+        elif self.multiple_move_single_pack and not self.unload_package_at_destination:
+            raise exceptions.UserError(
+                _(
+                    "'Multiple moves same destination package' is mandatory when "
+                    "'Pick and pack at the same time' is set."
+                )
+            )
 
     @api.depends("scenario_id", "picking_type_ids")
     def _compute_move_create_is_possible(self):
@@ -128,6 +203,13 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.pick_pack_same_time_is_possible = menu.scenario_id.has_option(
                 "pick_pack_same_time"
+            )
+
+    @api.depends("scenario_id")
+    def _compute_unload_package_at_dest_is_possible(self):
+        for menu in self:
+            menu.unload_package_at_destination_is_possible = (
+                menu.scenario_id.has_option("unload_package_at_destination")
             )
 
     @api.depends("scenario_id")
