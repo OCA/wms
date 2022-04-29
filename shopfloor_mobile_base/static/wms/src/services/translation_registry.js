@@ -20,18 +20,40 @@ export class TranslationRegistry {
     constructor() {
         this._data = {};
         this._default_lang = "en-US";
-    }
-
-    get(path) {
-        return _.result(this._data, path);
+        this._enabled = [];
     }
 
     add(path, value) {
         _.set(this._data, path, value);
     }
 
-    all() {
+    get(path) {
+        return _.result(this._data, path);
+    }
+
+    messages() {
         return this._data;
+    }
+
+    ensure_lang(lang, log_missing = false) {
+        if (!_.isEmpty(this._data[lang])) {
+            return lang;
+        }
+        // find most suitable lang (eg: fr-FR for fr-CH)
+        const fallback_lang = this.available_langs().find((x) => {
+            return x.startsWith(lang.slice(0, 2));
+        });
+        if (log_missing) {
+            if (fallback_lang) {
+                console.log("Lang fallback", {lang, fallback_lang});
+            } else {
+                console.log("Lang fallback on default", {
+                    lang,
+                    default: this._default_lang,
+                });
+            }
+        }
+        return fallback_lang || this._default_lang;
     }
 
     available_langs() {
@@ -39,14 +61,42 @@ export class TranslationRegistry {
     }
 
     set_default_lang(lang) {
-        if (_.isEmpty(this._data[lang])) {
-            throw "Language not available: " + lang;
-        }
-        this._default_lang = lang;
+        this._default_lang = this.ensure_lang(lang, true);
     }
 
-    get_default_lang() {
+    default_lang() {
         return this._default_lang;
+    }
+
+    set_enabled_langs(langs) {
+        let enabled = [];
+        langs.forEach((lang) => {
+            enabled.push(this.ensure_lang(lang, true));
+        });
+        this._enabled = enabled;
+    }
+
+    enabled_langs() {
+        return this._enabled || this.available_langs();
+    }
+
+    available_langs_display($root) {
+        return [
+            {
+                id: "en-US",
+                name: $root.$t("language.name.English"),
+            },
+            {
+                id: "fr-FR",
+                name: $root.$t("language.name.French"),
+            },
+            {
+                id: "de-DE",
+                name: $root.$t("language.name.German"),
+            },
+        ].filter((x) => {
+            return this.enabled_langs().includes(x.id);
+        });
     }
 
     /**
@@ -77,6 +127,17 @@ export class TranslationRegistry {
             }
             this.add(lang, merged_messages);
         }, path);
+    }
+    /**
+     * Initilize VueI18n configuration
+     * @returns {VueI18n} Object
+     */
+    init_i18n() {
+        return new VueI18n({
+            locale: this.default_lang(), // Set locale
+            availableLocales: this.available_langs(),
+            messages: this.messages(),
+        });
     }
 }
 
