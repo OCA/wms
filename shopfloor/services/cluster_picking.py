@@ -975,6 +975,8 @@ class ClusterPicking(Component):
             picking_lines = picking.mapped("move_line_ids")
             if all(line.shopfloor_unloaded for line in picking_lines):
                 picking._action_done()
+        if self.work.menu.unload_package_at_destination:
+            lines.result_package_id = False
 
     def _unload_end(self, batch, completion_info_popup=None):
         """Try to close the batch if all transfers are done.
