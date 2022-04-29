@@ -9,7 +9,8 @@ import {translation_registry} from "../services/translation_registry.js";
 const messages_de = {
     screen: {
         home: {
-            title: "Barcode scanner",
+            title: "Home",
+            main_title: "Home",
         },
         scan_anything: {
             name: "Gescannt",
