@@ -303,13 +303,17 @@ class ShopfloorApp(models.Model):
 
     def _app_info_lang(self):
         enabled = []
+        conv = self._app_convert_lang_code
         if self.lang_ids:
-            # TODO: we should probably let the front decide the format
-            enabled = [x.code.replace("_", "-") for x in self.lang_ids]
+            enabled = [conv(x.code) for x in self.lang_ids]
         return dict(
-            default=self.lang_id.code.replace("_", "-") if self.lang_id else False,
+            default=conv(self.lang_id.code) if self.lang_id else False,
             enabled=enabled,
         )
+
+    def _app_convert_lang_code(self, code):
+        # TODO: we should probably let the front decide the format
+        return code.replace("_", "-")
 
     @api.onchange("lang_id")
     def _onchange_lang_id(self):

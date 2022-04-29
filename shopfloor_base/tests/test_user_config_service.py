@@ -22,6 +22,10 @@ class AppCase(CommonCase):
                 "profiles": [
                     {"id": profile.id, "name": profile.name} for profile in profiles
                 ],
-                "user_info": {"id": self.env.user.id, "name": self.env.user.name},
+                "user_info": {
+                    "id": self.env.user.id,
+                    "name": self.env.user.name,
+                    "lang": self.env.user.lang.replace("_", "-"),
+                },
             },
         )
