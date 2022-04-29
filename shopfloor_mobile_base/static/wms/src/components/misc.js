@@ -241,6 +241,8 @@ Vue.component("screen-loading", {
   `,
 });
 
+// TODO: decide if is useful to keep this or not.
+// We migtht move non core components to a side module.
 Vue.component("btn-fullscreen", {
     data: function () {
         return {
