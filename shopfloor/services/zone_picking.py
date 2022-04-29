@@ -661,14 +661,8 @@ class ZonePicking(Component):
         return not bool(package.quant_ids)
 
     def _is_package_already_used(self, package):
-        return bool(
-            self.env["stock.move.line"].search_count(
-                [
-                    ("state", "not in", ("done", "cancel")),
-                    ("result_package_id", "=", package.id),
-                ]
-            )
-        )
+        # Deprecated, use planned_move_line_ids instead
+        return bool(package.planned_move_line_ids)
 
     def _move_line_compare_qty(self, move_line, qty):
         rounding = move_line.product_uom_id.rounding
@@ -694,7 +688,8 @@ class ZonePicking(Component):
                 message=self.msg_store.package_not_empty(package),
             )
             return (package_changed, response)
-        if self._is_package_already_used(package):
+        multiple_move_allowed = self.work.menu.multiple_move_single_pack
+        if package.planned_move_line_ids and not multiple_move_allowed:
             response = self._response_for_set_line_destination(
                 move_line,
                 message=self.msg_store.package_already_used(package),

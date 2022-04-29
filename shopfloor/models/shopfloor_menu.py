@@ -11,6 +11,11 @@ If you tick this box, while picking goods from a location
 * in both cases, if the picking has no carrier the operation fails.",
 """
 
+MULTIPLE_MOVE_SINGLE_PACK_HELP = """
+When picking a move,
+allow to set a destination package that was already used for the other lines.
+"""
+
 
 class ShopfloorMenu(models.Model):
     _inherit = "shopfloor.menu"
@@ -74,6 +79,14 @@ class ShopfloorMenu(models.Model):
     pick_pack_same_time_is_possible = fields.Boolean(
         compute="_compute_pick_pack_same_time_is_possible"
     )
+    multiple_move_single_pack_is_possible = fields.Boolean(
+        compute="_compute_multiple_move_single_pack_is_possible"
+    )
+    multiple_move_single_pack = fields.Boolean(
+        string="Collect multiple moves on a same destination package",
+        default=False,
+        help=MULTIPLE_MOVE_SINGLE_PACK_HELP,
+    )
 
     allow_force_reservation = fields.Boolean(
         string="Force stock reservation",
@@ -115,6 +128,13 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.pick_pack_same_time_is_possible = menu.scenario_id.has_option(
                 "pick_pack_same_time"
+            )
+
+    @api.depends("scenario_id")
+    def _compute_multiple_move_single_pack_is_possible(self):
+        for menu in self:
+            menu.multiple_move_single_pack_is_possible = menu.scenario_id.has_option(
+                "multiple_move_single_pack"
             )
 
     @api.onchange("unreserve_other_moves_is_possible")
