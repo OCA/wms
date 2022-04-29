@@ -32,34 +32,24 @@ msgstr ""
 "        </strong>"
 
 #. module: shopfloor_mobile_base
-#: model:ir.model,name:shopfloor_mobile_base.model_shopfloor_app
-msgid "A Shopfloor application"
-msgstr "Una Aplicación de Taller"
-
-#. module: shopfloor_mobile_base
-#: model:ir.model.fields,field_description:shopfloor_mobile_base.field_shopfloor_app__app_version
-msgid "App Version"
-msgstr "Versión de la App"
-
-#. module: shopfloor_mobile_base
-#: model:ir.model.fields,field_description:shopfloor_mobile_base.field_shopfloor_app__display_name
-msgid "Display Name"
-msgstr "Mostrar Nombre"
-
-#. module: shopfloor_mobile_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base.shopfloor_app_assets
 msgid "Hook to this element to inject your own scenario"
 msgstr "Engánchese a este elemento para inyectar su propio escenario"
 
-#. module: shopfloor_mobile_base
-#: model:ir.model.fields,field_description:shopfloor_mobile_base.field_shopfloor_app__id
-msgid "ID"
-msgstr "ID"
+#~ msgid "A Shopfloor application"
+#~ msgstr "Una Aplicación de Taller"
 
-#. module: shopfloor_mobile_base
-#: model:ir.model.fields,field_description:shopfloor_mobile_base.field_shopfloor_app____last_update
-msgid "Last Modified on"
-msgstr "Última Modificación el"
+#~ msgid "App Version"
+#~ msgstr "Versión de la App"
+
+#~ msgid "Display Name"
+#~ msgstr "Mostrar Nombre"
+
+#~ msgid "ID"
+#~ msgstr "ID"
+
+#~ msgid "Last Modified on"
+#~ msgstr "Última Modificación el"
 
 #~ msgid "Shopfloor WMS app"
 #~ msgstr "App WMS Taller"
