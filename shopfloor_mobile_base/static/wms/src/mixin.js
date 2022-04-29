@@ -39,5 +39,10 @@ export var GlobalMixin = {
             );
             return language ? language.name : "?";
         },
+        app_options() {
+            return {
+                show_fullscreen_btn: this.$root.app_info.show_fullscreen_btn || false,
+            };
+        },
     },
 };
