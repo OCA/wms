@@ -152,6 +152,42 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             },
         )
 
+    def test_scan_destination_pack_not_empty_multi_pick_allowed(self):
+        """Scan a destination package with move lines of other picking"""
+        # do as if the user already picked the first good (for another picking)
+        # and put it in bin1
+        self.menu.sudo().write(
+            {"unload_package_at_destination": True, "multiple_move_single_pack": True}
+        )
+        self._set_dest_package_and_done(self.one_line_picking.move_line_ids, self.bin1)
+        line = self.two_lines_picking.move_line_ids[0]
+        self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "move_line_id": line.id,
+                # this bin is used for the other picking
+                "barcode": self.bin1.name,
+                "quantity": line.product_uom_qty,
+            },
+        )
+        # Since `multiple_move_single_pack` is enabled, assigning `bin` should be ok
+        new_line = self.two_lines_picking.move_line_ids - line
+        self.assertRecordValues(
+            line,
+            [
+                {
+                    "qty_done": 10,
+                    "result_package_id": self.bin1.id,
+                    "product_uom_qty": 10,
+                }
+            ],
+        )
+        self.assertRecordValues(
+            new_line,
+            [{"qty_done": 0, "result_package_id": False, "product_uom_qty": 10}],
+        )
+
     def test_scan_destination_pack_bin_not_found(self):
         """Scan a destination package that do not exist"""
         line = self.one_line_picking.move_line_ids

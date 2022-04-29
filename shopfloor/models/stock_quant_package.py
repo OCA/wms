@@ -15,6 +15,7 @@ class StockQuantPackage(models.Model):
     planned_move_line_ids = fields.One2many(
         comodel_name="stock.move.line",
         inverse_name="result_package_id",
+        domain=[("state", "not in", ("done", "cancel"))],
         readonly=True,
         help="Technical field. Move lines for which destination is this package.",
     )
