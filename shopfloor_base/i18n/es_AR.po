@@ -83,6 +83,11 @@ msgid "Auth Type"
 msgstr "Tipo de Auth"
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__lang_ids
+msgid "Available languages"
+msgstr ""
+
+#. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__category
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
 msgid "Category"
@@ -108,6 +113,11 @@ msgstr "Creado por"
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__create_date
 msgid "Created on"
 msgstr "Creado el"
+
+#. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__lang_id
+msgid "Default language"
+msgstr ""
 
 #. module: shopfloor_base
 #: model:shopfloor.scenario,name:shopfloor_base.shopfloor_scenario_demo_1
@@ -158,9 +168,19 @@ msgstr ""
 "\"uso\" de un componente de servicio."
 
 #. module: shopfloor_base
+#: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__lang_id
+msgid "If set, the app will be first loaded with this lang."
+msgstr ""
+
+#. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__key
 msgid "Key"
 msgstr "Clave"
+
+#. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
+msgid "Language"
+msgstr ""
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_ir_http____last_update
