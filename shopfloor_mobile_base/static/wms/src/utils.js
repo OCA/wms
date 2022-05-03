@@ -7,7 +7,19 @@
 import {utils_registry} from "./services/utils_registry.js";
 
 export class DisplayUtils {
-    format_date_display(date_string, options = {}) {
+    _ensure_UTC_datetime(date_string) {
+        if (!date_string.endsWith("Z")) {
+            const _value = date_string.replace(" ", "T") + "Z";
+            if (!_.isNaN(Date.parse(_value))) {
+                return _value;
+            }
+        }
+        return date_string;
+    }
+    format_date_display(date_string, options = {}, utc = true) {
+        if (utc) {
+            date_string = this._ensure_UTC_datetime(date_string);
+        }
         _.defaults(options, {
             locale: navigator ? navigator.language : "en-US",
             format: {
