@@ -19,7 +19,7 @@ const messages_en = {
         },
         home: {
             title: "Home",
-            main_title: "Barcode scanner",
+            main_title: "Home",
             version: "Version:",
             action: {
                 nuke_data_and_reload: "Force reload data and refresh",

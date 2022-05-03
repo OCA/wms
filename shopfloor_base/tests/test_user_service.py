@@ -52,5 +52,11 @@ class UserCase(CommonCase, MenuTestMixin):
         response = service.dispatch("user_info")
         self.assert_response(
             response,
-            data={"user_info": {"id": self.env.user.id, "name": self.env.user.name}},
+            data={
+                "user_info": {
+                    "id": self.env.user.id,
+                    "name": self.env.user.name,
+                    "lang": self.env.user.lang.replace("_", "-"),
+                }
+            },
         )

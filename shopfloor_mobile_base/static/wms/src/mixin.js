@@ -28,7 +28,7 @@ export var GlobalMixin = {
             return utils_registry.all();
         },
         available_languages() {
-            return this.$root.available_languages;
+            return this.$root.available_languages();
         },
         active_language_code() {
             return this.$i18n.locale || "en-US";
@@ -38,6 +38,11 @@ export var GlobalMixin = {
                 ({id}) => id === this.active_language_code
             );
             return language ? language.name : "?";
+        },
+        app_options() {
+            return {
+                show_fullscreen_btn: this.$root.app_info.show_fullscreen_btn || false,
+            };
         },
     },
 };

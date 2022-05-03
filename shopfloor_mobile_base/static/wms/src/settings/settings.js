@@ -37,7 +37,7 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
                         <btn-action color="primary" @click="logout()">{{ $t('app.action.logout') }}</btn-action>
                     </v-col>
                 </v-row>
-                <v-row align="center">
+                <v-row align="center" v-if="app_options.show_fullscreen_btn">
                     <v-col class="text-center" cols="12">
                         <btn-fullscreen />
                     </v-col>
