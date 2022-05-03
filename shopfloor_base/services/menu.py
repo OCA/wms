@@ -57,7 +57,10 @@ class ShopfloorMenu(Component):
         )
 
     def _convert_one_record(self, record):
-        values = record.jsonify(self._one_record_parser(record), one=True)
+        # TODO: drop this ctx flag for v15 as `jsonifier` makes it default
+        values = record.with_context(jsonifier__date_user_tz=False).jsonify(
+            self._one_record_parser(record), one=True
+        )
         return values
 
     def _one_record_parser(self, record):
