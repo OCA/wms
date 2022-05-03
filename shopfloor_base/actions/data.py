@@ -17,7 +17,8 @@ class DataAction(Component):
     _usage = "data"
 
     def _jsonify(self, recordset, parser, multi=False, **kw):
-        res = recordset.jsonify(parser)
+        # TODO: drop this ctx flag for v15 as `jsonifier` makes it default
+        res = recordset.with_context(jsonifier__date_user_tz=False).jsonify(parser)
         if not multi:
             return res[0] if res else None
         return res
