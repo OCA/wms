@@ -20,6 +20,7 @@ class StoredConfig {
         this.key = key;
         this.default = meta.default;
         this.reset_on_clear = meta.reset_on_clear;
+        this.storage_driver = meta.storage_driver;
     }
     _safe_value(v) {
         return v === null ? this.default : v;
@@ -90,17 +91,33 @@ export class ConfigRegistry {
             self.reset(key);
         });
     }
-    _get_root_val(k) {
-        return this.root[this._current_value_prefix + k];
+    _get_root_val(config) {
+        return this.root[this._current_value_prefix + config.key];
     }
-    _set_root_val(k, v) {
-        this.root[this._current_value_prefix + k] = v;
+    _set_root_val(config, v) {
+        this.root[this._current_value_prefix + config.key] = v;
     }
-    _get_storage_val(k) {
-        return this.root.$storage.get(k);
+    _get_storage_val(config) {
+        let orig_driver;
+        if (config.storage_driver) {
+            orig_driver = this.root.$storage.options.driver;
+            this._switch_storage_driver(config.storage_driver);
+        }
+        const value = this.root.$storage.get(config.key);
+        if (config.storage_driver) {
+            this._switch_storage_driver(orig_driver);
+        }
+        return value;
     }
-    _set_storage_val(k, v) {
-        this.root.$storage.set(k, v);
+    _set_storage_val(config, v) {
+        const orig_driver = this.root.$storage.options.driver;
+        if (config.storage_driver) {
+            this._switch_storage_driver(config.storage_driver);
+        }
+        this.root.$storage.set(config.key, v);
+        if (config.storage_driver) {
+            this._switch_storage_driver(orig_driver);
+        }
     }
     /**
      * Retrieve the value of given config key.
@@ -114,9 +131,9 @@ export class ConfigRegistry {
      */
     get_value(k) {
         const config = this.get(k);
-        let val = this._get_root_val(config.key);
+        let val = this._get_root_val(config);
         if (_.isEmpty(val)) {
-            val = this._get_storage_val(config.key);
+            val = this._get_storage_val(config);
         }
         if (_.isEmpty(val)) {
             val = config._safe_value(val);
@@ -131,12 +148,29 @@ export class ConfigRegistry {
      * @param {*} v
      */
     set_value(k, v) {
-        // TODO: merge values for objects
-        // const config = this.get(k);
-        // let val = config._safe_value(v);
-        // const new_data = _.merge({}, this.root[this.data_key], {[this.key]: v});
-        this._set_root_val(k, v);
-        this._set_storage_val(k, v);
+        const config = this.get(k);
+        this._set_root_val(config, v);
+        this._set_storage_val(config, v);
+    }
+
+    _switch_storage_driver(driver) {
+        // The app uses sessionStorage by default (currently set on app creation).
+        // If any piece of data needs to be handled by localStorage,
+        // we switch the vue2storage driver option to "local", we store / retrieve the value,
+        // and then we revert to "session" for further use.
+        // See example in documentation: https://github.com/yarkovaleksei/vue2-storage/blob/master/docs/en/started.md
+
+        // TODO: these permitted types are hardcoded, matching the driver types of Vue2Storage.
+        // If possible, we should be able to get them from the library class instead.
+        const permitted_types = ["local", "session", "memory"];
+        if (!permitted_types.includes(driver)) {
+            return;
+        }
+        this.root.$storage.setOptions({
+            prefix: this.root.$storage.options.prefix,
+            driver: driver,
+            ttl: this.root.$storage.options.ttl,
+        });
     }
     /**
      * Reset given config key to default value.
@@ -145,8 +179,8 @@ export class ConfigRegistry {
      */
     reset(k) {
         const config = this.get(k);
-        this._set_root_val(k, config.default);
-        this.root.$storage.remove(k);
+        this._set_root_val(config, config.default);
+        this.root.$storage.remove(config.key);
     }
     /**
      * Generate mapping suitable for components' computed properties.
