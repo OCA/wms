@@ -99,7 +99,9 @@ class DataDetailAction(Component):
         suppliers = self.env["product.supplierinfo"].search(
             [("product_id", "=", record.id)]
         )
-        data["suppliers"] = suppliers.jsonify(self._product_supplierinfo_parser)
+        data["suppliers"] = self._jsonify(
+            suppliers, self._product_supplierinfo_parser, multi=True
+        )
         return data
 
     def products_detail(self, record, **kw):
