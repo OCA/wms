@@ -466,11 +466,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         self.another_package = self.env["stock.quant.package"].create(
             {"name": "ANOTHER_PACKAGE"}
         )
-        self.assertEqual(
-            self.picking5.move_line_ids.location_dest_id, self.packing_location
-        )
+        move_lines = self.picking5.move_line_ids
+        self.assertEqual(move_lines.location_dest_id, self.packing_location)
         for move_line, package_dest in zip(
-            self.picking5.move_line_ids, self.free_package | self.another_package
+            move_lines, self.free_package | self.another_package
         ):
             self.service.dispatch(
                 "set_destination",
@@ -490,7 +489,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             response,
             self.zone_location,
             self.picking_type,
-            self.picking5.move_line_ids,
+            move_lines,
         )
 
     def test_list_move_lines_empty_location(self):

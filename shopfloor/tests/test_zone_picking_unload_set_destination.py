@@ -302,11 +302,12 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         )
         # check data
         # move line has been moved to a new picking
-        # move line has been validated in the current picking
-        self.assertEqual(move_line.move_id.picking_id, self.picking_z)
-        # the new picking (backorder) contains a new line w/ the rest of the qty
+        # move line has been validated in the new picking
+        self.assertNotEqual(move_line.move_id.picking_id, self.picking_z)
+        backorder = move_line.move_id.picking_id.backorder_id
+        self.assertEqual(backorder, self.picking_z)
+        # the backorder contains a new line w/ the rest of the qty
         # that couldn't be processed
-        backorder = self.picking_z.backorder_ids[0]
         self.assertEqual(backorder.move_lines[0].product_uom_qty, 8)
         self.assertEqual(backorder.state, "confirmed")
         # the line has been processed
