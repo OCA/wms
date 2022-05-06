@@ -56,23 +56,31 @@ class StockMove(models.Model):
             partial_move.split_other_move_lines(partial_move.move_line_ids)
         return partial_moves
 
-    def _extract_in_split_order(self):
-        """Extract moves in a new picking"""
+    def _extract_in_split_order(self, default=None, backorder=False):
+        """Extract moves in a new picking
+
+        :param default: dictionary of field values to override in the original
+            values of the copied record
+        :param backorder: indicate if the original picking can be seen as a
+            backorder after the split. You could apply a specific backorder
+            strategy (e.g. cancel it).
+        :return: the new order
+        """
         picking = self.picking_id
         picking.ensure_one()
-        new_picking = picking.copy(
-            {
-                "name": "/",
-                "move_lines": [],
-                "move_line_ids": [],
-                "backorder_id": picking.id,
-            }
+        data = {
+            "name": "/",
+            "move_lines": [],
+            "move_line_ids": [],
+            "backorder_id": picking.id,
+        }
+        data.update(dict(default or []))
+        new_picking = picking.copy(data)
+        link = '<a href="#" data-oe-model="stock.picking" data-oe-id="%d">%s</a>' % (
+            new_picking.id,
+            new_picking.name,
         )
-        message = _(
-            'The split order <a href="#" '
-            'data-oe-model="stock.picking" '
-            'data-oe-id="%d">%s</a> has been created.'
-        ) % (new_picking.id, new_picking.name)
+        message = (_("The split order {} has been created.")).format(link)
         picking.message_post(body=message)
         self.picking_id = new_picking.id
         self.package_level_id.picking_id = new_picking.id
