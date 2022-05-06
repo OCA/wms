@@ -5,7 +5,7 @@ import logging
 
 from odoo import _, exceptions, fields, models
 from odoo.exceptions import UserError
-from odoo.tools.float_utils import float_compare
+from odoo.tools.float_utils import float_compare, float_is_zero
 
 _logger = logging.getLogger(__name__)
 
@@ -26,15 +26,50 @@ class StockMoveLine(models.Model):
     # allow domain on picking_id.xxx without too much perf penalty
     picking_id = fields.Many2one(auto_join=True)
 
-    def _extract_in_split_order(self):
+    def _split_partial_quantity(self):
+        """Create new move line for the quantity remaining to do
+
+        :return: the new move line if created else empty recordset
+        """
+        self.ensure_one()
+        rounding = self.product_uom_id.rounding
+        if float_is_zero(self.qty_done, precision_rounding=rounding):
+            return self.browse()
+        compare = float_compare(
+            self.qty_done, self.product_uom_qty, precision_rounding=rounding
+        )
+        qty_lesser = compare == -1
+        qty_greater = compare == 1
+        assert not qty_greater, "Quantity done cannot exceed quantity to do"
+        if qty_lesser:
+            remaining = self.product_uom_qty - self.qty_done
+            new_line = self.copy({"product_uom_qty": remaining, "qty_done": 0})
+            # if we didn't bypass reservation update, the quant reservation
+            # would be reduced as much as the deduced quantity, which is wrong
+            # as we only moved the quantity to a new move line
+            self.with_context(
+                bypass_reservation_update=True
+            ).product_uom_qty = self.qty_done
+            return new_line
+        return self.browse()
+
+    def _extract_in_split_order(self, default=None):
         """Have pickings fully reserved with only those move lines.
 
         If the condition is not met, extract the move lines in a new picking.
+        :param default: dictionary of field values to override in the original
+            values of the copied record
         """
         for picking in self.picking_id:
             moves_to_extract = new_move = picking.move_lines.browse()
-            need_split = False
+            need_backorder = need_split = False
             for move in picking.move_lines:
+                if move.state in ("cancel", "done"):
+                    continue
+                if move.state == "confirmed":
+                    # The move has no ancestor and is not available
+                    need_backorder = True
+                    continue
                 move_lines = move.move_line_ids & self
                 if not move_lines:
                     # The picking contains moves not related to given move lines
@@ -42,11 +77,20 @@ class StockMoveLine(models.Model):
                     continue
                 new_move = move.split_other_move_lines(move_lines, intersection=True)
                 if new_move:
-                    # The move contains other move lines or is partially available
-                    need_split = True
+                    if move.state == "confirmed":
+                        # The move has no ancestor and is not available
+                        need_backorder = True
+                    else:
+                        # The move contains other move lines
+                        need_split = True
                 moves_to_extract += new_move or move
             if need_split:
-                moves_to_extract._extract_in_split_order()
+                moves_to_extract._extract_in_split_order(default=default)
+            elif need_backorder:
+                # All the lines are processed but some moves are partially available
+                moves_to_extract._extract_in_split_order(
+                    default=default, backorder=True
+                )
 
     def _split_pickings_from_source_location(self):
         """Ensure that the related pickings will have the same source location.
