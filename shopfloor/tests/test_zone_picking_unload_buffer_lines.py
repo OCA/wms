@@ -96,7 +96,7 @@ class ZonePickingUnloadBufferLinesCase(ZonePickingCommonCase):
             dest_package = self.env["stock.quant.package"].create(
                 {"name": f"TEST PKG 1 {i}"}
             )
-            self.service._set_move_line_as_done(
+            self.service._actions_for("stock").mark_move_line_as_picked(
                 line,
                 line.product_uom_qty,
                 dest_package,

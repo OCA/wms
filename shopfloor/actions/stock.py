@@ -10,6 +10,31 @@ class StockAction(Component):
     _inherit = "shopfloor.process.action"
     _usage = "stock"
 
+    def mark_move_line_as_picked(
+        self, move_lines, quantity=None, package=None, user=None
+    ):
+        """Set the qty_done and extract lines in new order"""
+        user = user or self.env.user
+        for line in move_lines:
+            qty_done = quantity if quantity is not None else line.product_uom_qty
+            line.qty_done = qty_done
+            line._split_partial_quantity()
+            data = {
+                "shopfloor_user_id": user.id,
+            }
+            if package:
+                # destination package is set to the scanned one
+                data["result_package_id"] = package.id
+            line.write(data)
+        # Extract the picked quantity in a split order and set current user
+        move_lines._extract_in_split_order(
+            {
+                "user_id": user.id,
+                "printed": True,
+            }
+        )
+        move_lines.picking_id.filtered(lambda p: p.user_id != user.id).user_id = user.id
+
     def validate_moves(self, moves):
         """Validate moves in different ways depending on several criterias:
 

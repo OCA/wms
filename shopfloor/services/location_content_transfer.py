@@ -295,8 +295,6 @@ class LocationContentTransfer(Component):
             )
 
         move_lines = self._find_location_move_lines(location)
-        pickings = move_lines.picking_id
-        picking_types = pickings.mapped("picking_type_id")
 
         savepoint = self._actions_for("savepoint").new()
 
@@ -308,6 +306,7 @@ class LocationContentTransfer(Component):
             if response:
                 return response
         else:
+            picking_types = move_lines.picking_id.picking_type_id
             if len(picking_types) > 1:
                 return self._response_for_start(
                     message={
@@ -320,20 +319,12 @@ class LocationContentTransfer(Component):
                     message=self.msg_store.cannot_move_something_in_picking_type()
                 )
 
-        if move_lines:
-            # If there are different source locations, we put the move lines we are
-            # interested in in a separate picking.
-            # This is required as we can only deal within this scenario with pickings
-            # that share the same source location.
-            # We also need to put the unreserved qty into separate moves as a new move
-            # line could be created in the middle of the process.
-            move_lines._extract_in_split_order()
-        elif not self.is_allow_move_create():
-            savepoint.rollback()
-            return self._response_for_start(
-                message=self.msg_store.location_empty(location)
-            )
-        else:
+        if not move_lines:
+            if not self.is_allow_move_create():
+                savepoint.rollback()
+                return self._response_for_start(
+                    message=self.msg_store.location_empty(location)
+                )
             new_moves = self._create_moves_from_location(location)
             if not new_moves:
                 savepoint.rollback()
@@ -348,10 +339,15 @@ class LocationContentTransfer(Component):
                     message=self.msg_store.new_move_lines_not_assigned()
                 )
             move_lines = new_moves.move_line_ids
-            for move_line in move_lines:
-                if not self.is_dest_location_valid(
-                    move_line.move_id, move_line.location_dest_id
-                ):
+            for line in move_lines:
+                for line in move_lines:
+                    line.write(
+                        {
+                            "qty_done": line.product_uom_qty,
+                            "shopfloor_user_id": self.env.uid,
+                        }
+                    )
+                if not self.is_dest_location_valid(line.move_id, line.location_dest_id):
                     savepoint.rollback()
                     return self._response_for_start(
                         message=self.msg_store.location_content_unable_to_transfer(
@@ -370,10 +366,7 @@ class LocationContentTransfer(Component):
                 message=self.msg_store.no_putaway_destination_available()
             )
 
-        for line in move_lines:
-            line.qty_done = line.product_uom_qty
-            line.shopfloor_user_id = self.env.uid
-        move_lines.picking_id.user_id = self.env.uid
+        stock.mark_move_line_as_picked(move_lines)
 
         unreserved_moves._action_assign()
 
