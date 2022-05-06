@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2022-04-10 18:05+0000\n"
+"PO-Revision-Date: 2022-05-06 04:05+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -60,7 +60,7 @@ msgstr "Ruta de Api"
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__app_version
 msgid "App Version"
-msgstr ""
+msgstr "Versión de la App"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
@@ -85,7 +85,7 @@ msgstr "Tipo de Auth"
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__lang_ids
 msgid "Available languages"
-msgstr ""
+msgstr "Idiomas disponibles"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__category
@@ -117,7 +117,7 @@ msgstr "Creado el"
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__lang_id
 msgid "Default language"
-msgstr ""
+msgstr "Idioma predeterminado"
 
 #. module: shopfloor_base
 #: model:shopfloor.scenario,name:shopfloor_base.shopfloor_scenario_demo_1
@@ -170,7 +170,7 @@ msgstr ""
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__lang_id
 msgid "If set, the app will be first loaded with this lang."
-msgstr ""
+msgstr "Si está configurado, la app se cargará inicialmente con este idioma."
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__key
@@ -180,7 +180,7 @@ msgstr "Clave"
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "Language"
-msgstr ""
+msgstr "Idioma"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_ir_http____last_update
