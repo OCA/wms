@@ -1,6 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # @author Simone Orsi <simone.orsi@camptocamp.com>
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 
 from odoo.modules.module import load_information_from_description_file
