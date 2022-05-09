@@ -57,7 +57,9 @@ config_registry.add("authenticated", {default: false, reset_on_clear: true});
 config_registry.add("current_language", {
     default: "",
     reset_on_clear: false,
-    storage_driver: "local",
+    storage: {
+        driver: "local",
+    },
 });
 
 new Vue({
@@ -81,7 +83,7 @@ new Vue({
         return data;
     },
     beforeCreate: function () {
-        config_registry._set_root(this);
+        config_registry.setup(this);
     },
     created: function () {
         const self = this;
@@ -192,8 +194,7 @@ new Vue({
                     self.$storage.set("appconfig", self.appconfig);
                 }
                 event_hub.$emit("app.sync:update", {root: self, sync_data: result});
-                const stored_lang = config_registry.get_value("current_language");
-                if (self.user.lang && !stored_lang) {
+                if (self.user.lang && !self.current_language) {
                     // Use user default language if a language hasn't been
                     // manually selected in the app.
                     self.switch_language(self.user.lang);
