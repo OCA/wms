@@ -102,7 +102,8 @@ class ShopfloorApp(models.Model):
     @api.depends("tech_name")
     def _compute_url(self):
         for rec in self:
-            rec.url = rec._base_url_path + rec.tech_name
+            full_url = rec._base_url_path + rec.tech_name
+            rec.url = full_url.rstrip("/") + "/"
             rec.api_docs_url = rec._base_api_docs_url_path + rec.tech_name
 
     @api.depends("tech_name")
@@ -292,7 +293,8 @@ class ShopfloorApp(models.Model):
             name=self.name,
             short_name=self.short_name,
             base_url=base_url,
-            manifest_url=self.url + "/manifest.json",
+            url=self.url,
+            manifest_url=self.url + "manifest.json",
             auth_type=self.auth_type,
             profile_required=self.profile_required,
             demo_mode=demo,
