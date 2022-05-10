@@ -4,9 +4,9 @@ from .test_checkout_base import CheckoutCommonCase
 
 
 class CheckoutScanCase(CheckoutCommonCase):
-    def _test_scan_ok(self, barcode_func):
+    def _test_scan_ok(self, barcode_func, in_package=True):
         picking = self._create_picking()
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_lines, in_package=in_package)
         picking.action_assign()
         barcode = barcode_func(picking)
         response = self.service.dispatch("scan_document", params={"barcode": barcode})
@@ -24,6 +24,18 @@ class CheckoutScanCase(CheckoutCommonCase):
 
     def test_scan_document_package_ok(self):
         self._test_scan_ok(lambda picking: picking.move_line_ids.package_id.name)
+
+    def test_scan_document_product_ok(self):
+        self._test_scan_ok(
+            lambda picking: picking.move_line_ids.product_id[0].barcode,
+            in_package=False,
+        )
+
+    def test_scan_document_packaging_ok(self):
+        self._test_scan_ok(
+            lambda picking: picking.move_line_ids.product_id[0].packaging_ids.barcode,
+            in_package=False,
+        )
 
     def test_scan_document_error_not_found(self):
         response = self.service.dispatch("scan_document", params={"barcode": "NOPE"})
