@@ -5,7 +5,7 @@
 {
     "name": "Shopfloor Mobile Base auth via API key",
     "summary": "Provides authentication via API key to Shopfloor base mobile app",
-    "version": "14.0.1.1.0",
+    "version": "14.0.2.0.0",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
