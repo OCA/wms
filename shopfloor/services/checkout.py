@@ -154,7 +154,7 @@ class Checkout(Component):
         )
 
     def scan_document(self, barcode):
-        """Scan a package, a stock.picking or a location
+        """Scan a package, a product, a transfer or a location
 
         When a location is scanned, if all the move lines from this destination
         are for the same stock.picking, the stock.picking is used for the
@@ -163,6 +163,10 @@ class Checkout(Component):
         When a package is scanned, if the package has a move line to move it
         from a location/sublocation of the current stock.picking.type, the
         stock.picking for the package is used for the next steps.
+
+        When a product is scanned, use the first picking (ordered by priority desc,
+        scheduled_date asc, id desc) which has an ongoing move line with no source
+        package for the given product.
 
         When a stock.picking is scanned, it is used for the next steps.
 
@@ -216,6 +220,41 @@ class Checkout(Component):
                     )
                 if len(pickings) == 1:
                     picking = pickings
+        if not picking:
+            # Try to find the product first
+            product = search.product_from_scan(barcode, use_packaging=False)
+            # TODO Filter lines on picking_type before
+            # line_domain = [
+            #     ("move_id.picking_id.picking_type_id", "in", self.picking_types.ids)
+            # ]
+            line_domain = []
+            if not product:
+                # Then, try to find a packaging matching the barcode
+                packaging = search.packaging_from_scan(barcode)
+                if packaging:
+                    # And retrieve its product
+                    product = packaging.product_id
+                    # The picking should have a move line for the product
+                    # where qty >= packaging.qty, since it doesn't makes sense
+                    # to select a move line which have less qty than the packaging
+                    line_domain.append(("product_uom_qty", ">=", packaging.qty))
+            if product:
+                line_domain.extend(
+                    [
+                        ("product_id", "=", product.id),
+                        ("state", "not in", ("cancel", "done")),
+                        ("package_id", "=", False),
+                    ]
+                )
+                lines = self.env["stock.move.line"].search(line_domain)
+                picking = self.env["stock.picking"].search(
+                    [
+                        ("id", "in", lines.move_id.picking_id.ids),
+                        ("picking_type_id", "in", self.picking_types.ids),
+                    ],
+                    order="priority desc, scheduled_date asc, id desc",
+                    limit=1,
+                )
         return self._select_picking(picking, "select_document")
 
     def _select_picking(self, picking, state_for_error):
