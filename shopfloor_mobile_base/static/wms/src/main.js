@@ -29,9 +29,9 @@ Vue.prototype.$super = VueSuperMethod;
 // TODO: we need a local storage handler too, to store device/profile specific data
 // Maybe replace w/ https://github.com/ankurk91/vue-web-storage
 Vue.use(window.Vue2StoragePlugin, {
-    prefix: "shopfloor_",
-    driver: "session", // Local|session|memory
-    ttl: 60 * 60 * 24 * 1000, // 24 hours
+    prefix: _.result(shopfloor_app_info, "storage.prefix", "shopfloor_"),
+    driver: _.result(shopfloor_app_info, "storage.driver", "session"), // Local|session|memory
+    ttl: _.result(shopfloor_app_info, "storage.ttl", 60 * 60 * 24 * 1000), // 24 hours
 });
 
 Vue.use(Vuetify);
