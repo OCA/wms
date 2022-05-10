@@ -91,10 +91,18 @@ class ShopfloorMobileAppMixin(object):
         return all_icons
 
     def _get_manifest(self, shopfloor_app):
+        param = (
+            http.request.env["ir.config_parameter"]
+            .sudo()
+            .get_param("web.base.url", "")
+            .rstrip("/")
+        )
         return {
             "name": shopfloor_app.name,
             "short_name": shopfloor_app.short_name,
-            "start_url": shopfloor_app.url + "#",
+            "start_url": param + shopfloor_app.url,
+            "scope": param + shopfloor_app.url,
+            "id": shopfloor_app.url,
             "display": "fullscreen",
             "icons": self._get_app_icons(shopfloor_app),
         }
