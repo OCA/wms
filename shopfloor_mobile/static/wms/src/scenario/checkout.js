@@ -331,7 +331,7 @@ const Checkout = {
                 select_document: {
                     display_info: {
                         title: "Choose an order to pack",
-                        scan_placeholder: "Scan pack / picking / location",
+                        scan_placeholder: "Scan pack / product / picking / location",
                     },
                     on_scan: (scanned) => {
                         this.wait_call(
