@@ -37,11 +37,11 @@ class TestShopfloorApp(CommonCase):
         expected = [
             {
                 "api_route": "/shopfloor/api/test_app",
-                "url": "/shopfloor/app/test_app",
+                "url": "/shopfloor/app/test_app/",
             },
             {
                 "api_route": "/shopfloor/api/test_app_2",
-                "url": "/shopfloor/app/test_app_2",
+                "url": "/shopfloor/app/test_app_2/",
             },
         ]
         # fmt: on
@@ -113,6 +113,7 @@ class TestShopfloorApp(CommonCase):
         expected = {
             "auth_type": "user_endpoint",
             "base_url": "/shopfloor/api/test/",
+            "url": "/shopfloor/app/test/",
             "demo_mode": False,
             "manifest_url": "/shopfloor/app/test/manifest.json",
             "name": "Test",
