@@ -14,7 +14,7 @@ const messages_en = {
                 login: "Login",
             },
             error: {
-                login_invalid: "Invalid credentials",
+                login_invalid: "Login failed. Invalid credentials",
             },
         },
         home: {
