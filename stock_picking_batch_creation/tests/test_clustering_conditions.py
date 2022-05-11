@@ -33,6 +33,7 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         self.assertEqual(selected_pickings[0], candidates_pickings[0])
 
     def test_put_3_pickings_in_one_cluster(self):
+        self._set_quantity_in_stock(self.stock_location, self.p5)
         self.p1.write(
             {"volume": 5.0, "length": 5, "height": 1, "width": 1, "weight": 1}
         )
@@ -66,6 +67,8 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         self.p5.write(
             {"volume": 200.0, "length": 200, "height": 1, "width": 1, "weight": 1}
         )
+
+        self._set_quantity_in_stock(self.stock_location, self.p5)
         picks = self._get_picks_by_type(self.picking_type_1)
         self._add_product_to_picking(picks[0], self.p5)
         self._create_picking_pick_and_assign(
@@ -91,6 +94,7 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         self.p5.write(
             {"volume": 120.0, "length": 120, "height": 1, "width": 1, "weight": 1}
         )
+        self._set_quantity_in_stock(self.stock_location, self.p5)
         self.device1.write({"nbr_bins": 8})
         self._create_picking_pick_and_assign(
             self.picking_type_1.id, products=self.p5, priority="0"
@@ -162,3 +166,43 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         batch.user_id = False
         for pick in batch.picking_ids:
             self.assertFalse(pick.user_id)
+
+    def test_only_available_moves_for_weight_and_volume(self):
+        total_weight_pickings = 0
+        total_volume_pickings = 0
+        self.p3.write(
+            {"volume": 10.0, "length": 10, "height": 1, "width": 1, "weight": 1}
+        )
+        self.p4.write(
+            {"volume": 10.0, "length": 10, "height": 1, "width": 1, "weight": 1}
+        )
+        self.p5.write(
+            {"volume": 10.0, "length": 10, "height": 1, "width": 1, "weight": 1}
+        )
+        self._create_picking_pick_and_assign(
+            self.picking_type_2.id, products=self.p3 | self.p4 | self.p5
+        )
+        picks = self._get_picks_by_type(self.picking_type_2)
+        pick = picks.filtered(lambda p: len(p.move_lines) == 3)
+        move_line = pick.move_lines[0]
+        make_picking_batch = self.makePickingBatch.create(
+            {
+                "user_id": self.env.user.id,
+                "picking_type_ids": [(4, self.picking_type_2.id)],
+                "stock_device_type_ids": [
+                    (4, self.device4.id),
+                    (4, self.device5.id),
+                    (4, self.device6.id),
+                ],
+            }
+        )
+        batch = make_picking_batch._create_batch()
+        self.assertTrue(batch.picking_ids)
+        for pick in batch.picking_ids:
+            for move_line in pick.move_lines:
+                total_weight_pickings += move_line.product_id.weight
+                total_volume_pickings += move_line.product_id.volume
+        move_line_volume = move_line.product_id.volume
+        move_line_weight = move_line.product_id.weight
+        self.assertEqual(batch.wave_volume, total_volume_pickings - move_line_volume)
+        self.assertEqual(batch.wave_weight, total_weight_pickings - move_line_weight)

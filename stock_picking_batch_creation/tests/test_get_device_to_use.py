@@ -47,6 +47,7 @@ class TestGetDeviceToUse(ClusterPickingCommonFeatures):
         max volume is 190m3
         """
         product_big_1 = self._create_product("Unittest P1 voluminous", 10, 100, 1, 1)
+        self._set_quantity_in_stock(self.stock_location, product_big_1)
         picks = self._get_picks_by_type(self.picking_type_1)
         self._add_product_to_picking(picks[0], product_big_1)
 
@@ -78,6 +79,7 @@ class TestGetDeviceToUse(ClusterPickingCommonFeatures):
         L-> last pick must be excluded from the candidate
         """
         product_big_1 = self._create_product("Unittest P1 voluminous", 10, 10000, 1, 1)
+        self._set_quantity_in_stock(self.stock_location, product_big_1)
         picks = self._get_picks_by_type(self.picking_type_1)
         self._add_product_to_picking(picks[-1], product_big_1)
 

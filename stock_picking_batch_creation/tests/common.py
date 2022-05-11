@@ -11,17 +11,21 @@ class ClusterPickingCommonFeatures(SavepointCase):
         super(ClusterPickingCommonFeatures, cls).setUpClass()
         cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
         cls.partner1 = cls._create_partner("Unittest partner", "12344566777878")
-
+        cls.stock_location = cls.env.ref("stock.stock_location_stock")
+        cls.location_out = cls.env.ref("stock.stock_location_output")
         cls.uom_id = cls.env.ref("product.product_uom_unit").id
-
         cls.uom_m = cls.env["product.uom"].search([("name", "=", "m")])
+
         cls.p1 = cls._create_product("Unittest P1", 10.0, 10.0, 1, 1)
         cls.p2 = cls._create_product("Unittest P2", 20.0, 20.0, 1, 1)
         cls.p3 = cls._create_product("Unittest P3", 30.0, 30.0, 1, 1)
         cls.p4 = cls._create_product("Unittest P4", 40.0, 40.0, 1, 1)
 
-        cls.stock_location = cls.env.ref("stock.stock_location_stock")
-        cls.location_out = cls.env.ref("stock.stock_location_output")
+        cls._set_quantity_in_stock(cls.stock_location, cls.p1)
+        cls._set_quantity_in_stock(cls.stock_location, cls.p2)
+        cls._set_quantity_in_stock(cls.stock_location, cls.p3)
+        cls._set_quantity_in_stock(cls.stock_location, cls.p4)
+
         cls.makePickingBatch = cls.env["make.picking.batch"]
         cls.warehouse_1 = cls.env.ref("stock.warehouse0")
         picking_sequence = cls.warehouse_1.pick_type_id.sequence_id
@@ -74,6 +78,29 @@ class ClusterPickingCommonFeatures(SavepointCase):
         cls.pick6 = cls._create_picking_pick_and_assign(
             cls.picking_type_2.id, priority="0", products=cls.p3 | cls.p4
         )
+
+    @classmethod
+    def _set_quantity_in_stock(cls, location, product, qty=10):
+
+        inventory = cls.env["stock.inventory"].create(
+            {
+                "name": "Test",
+                "filter": "product",
+                "location_id": location.id,
+                "product_id": product.id,
+            }
+        )
+        inventory.prepare_inventory()
+        inventory.line_ids.unlink()
+        inventory.line_ids.create(
+            {
+                "product_id": product.id,
+                "product_qty": qty,
+                "inventory_id": inventory.id,
+                "location_id": location.id,
+            }
+        )
+        inventory.action_done()
 
     @classmethod
     def _create_partner(cls, name, ref):

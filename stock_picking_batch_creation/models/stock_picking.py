@@ -77,9 +77,9 @@ class StockPicking(models.Model):
     def _get_total_weight_batch_picking(self):
         self.ensure_one()
         weight = 0.0
-        for line in self.move_lines:
+        for line in self.move_lines.filtered(lambda m: m.reserved_quant_ids):
             weight += line.product_id.get_total_weight_from_packaging(
-                line.product_uom_qty
+                sum(line.mapped("reserved_quant_ids.qty"))
             )
         return weight
 
@@ -89,10 +89,10 @@ class StockPicking(models.Model):
         with self.env["product.product"].product_qty_by_packaging_arg_ctx(
             packaging_filter=lambda p: p.volume
         ):
-            for line in self.move_lines:
+            for line in self.move_lines.filtered(lambda m: m.reserved_quant_ids):
                 product = line.product_id
                 packagings_with_volume = product.product_qty_by_packaging(
-                    line.product_uom_qty
+                    sum(line.mapped("reserved_quant_ids.qty"))
                 )
                 for packaging_info in packagings_with_volume:
                     if packaging_info.get("is_unit"):
