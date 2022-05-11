@@ -235,8 +235,7 @@ new Vue({
                 self.appmenu = result.data;
             });
         },
-        login: function (evt, data) {
-            evt.preventDefault();
+        login: function (data) {
             const self = this;
             this.trigger("login:before", {root: self});
             const auth_handler = this._get_auth_handler();

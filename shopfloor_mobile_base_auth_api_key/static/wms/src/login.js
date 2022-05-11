@@ -47,29 +47,20 @@ Vue.component("login-api_key", {
         };
     },
     methods: {
-        login: function (evt) {
-            this.$root.apikey = this.apikey;
-            this.$root.login(evt);
+        login: function (apikey) {
+            this.$root.apikey = apikey.text;
+            this.$root.login();
         },
     },
     template: `
-    <v-form v-on:submit="login">
-        <v-text-field
-            name="apikey"
-            v-model="apikey"
-            :label="$t('screen.login.api_key_label')"
-            :placeholder="$t('screen.login.api_key_placeholder')"
-            type="password"
-            autofocus
-            autocomplete="off"></v-text-field>
-        <div class="button-list button-vertical-list full">
-            <v-row align="center">
-                <v-col class="text-center" cols="12">
-                    <v-btn color="success" type="submit">{{ $t('screen.login.action.login') }}</v-btn>
-                </v-col>
-            </v-row>
-        </div>
-    </v-form>
+    <div class="text-center"">
+        <searchbar
+            v-on:found="login"
+            :input_label="$t('screen.login.api_key_label')"
+            :input_placeholder="$t('screen.login.api_key_placeholder')"
+            forcefocus
+            input_type="password"/>
+    </div>
     `,
 });
 
@@ -77,9 +68,12 @@ translation_registry.add("en-US.screen.login.api_key_label", "API key");
 translation_registry.add("fr-FR.screen.login.api_key_label", "Clé API");
 translation_registry.add("de-DE.screen.login.api_key_label", "API-Schlüssel");
 
-translation_registry.add("en-US.screen.login.api_key_placeholder", "YOUR_API_KEY_HERE");
-translation_registry.add("fr-FR.screen.login.api_key_placeholder", "VOTRE_CLE_API_ICI");
+translation_registry.add("en-US.screen.login.api_key_placeholder", "Scan your badge");
+translation_registry.add(
+    "fr-FR.screen.login.api_key_placeholder",
+    "Scannez votre badge"
+);
 translation_registry.add(
     "de-DE.screen.login.api_key_placeholder",
-    "DEIN_API-SCHLÜSSEL_HIER"
+    "Scannen Sie Ihr Abzeichen"
 );
