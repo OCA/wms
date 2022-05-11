@@ -59,6 +59,7 @@ Vue.component("login-api_key", {
             v-model="apikey"
             :label="$t('screen.login.api_key_label')"
             :placeholder="$t('screen.login.api_key_placeholder')"
+            type="password"
             autofocus
             autocomplete="off"></v-text-field>
         <div class="button-list button-vertical-list full">
