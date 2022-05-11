@@ -470,6 +470,13 @@ main.v-content > .v-content__wrap > .header .container {
     position: absolute;
 }
 
+/* login */
+.login-wrapper .searchbar input {
+    padding: 50px 10px;
+    text-align: center;
+    font-size: 2rem !important;
+}
+
 /* searchbar */
 .searchbar {
     position: relative;

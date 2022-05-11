@@ -70,8 +70,9 @@ Vue.component("login-user", {
     },
     methods: {
         login: function (evt) {
+            evt.preventDefault();
             const data = {login: this.username, password: this.password};
-            this.$root.login(evt, data);
+            this.$root.login(data);
         },
     },
     template: `
