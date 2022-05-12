@@ -20,9 +20,25 @@ class StoredConfig {
         this.key = key;
         this.default = meta.default;
         this.reset_on_clear = meta.reset_on_clear;
+        if (!_.isEmpty(meta.storage)) {
+            const is_driver_allowed = this._is_storage_driver_allowed(
+                meta.storage.driver
+            );
+            if (!is_driver_allowed) {
+                throw new Error(
+                    "Storage driver not allowed. Allowed types: 'local', 'session', 'memory'"
+                );
+            }
+        }
+        this.storage = meta.storage || {};
     }
     _safe_value(v) {
         return v === null ? this.default : v;
+    }
+    _is_storage_driver_allowed(driver) {
+        // TODO: these permitted types are hardcoded, matching the driver types of Vue2Storage.
+        // If possible, we should be able to get them from the library class instead.
+        return ["local", "session", "memory"].includes(driver);
     }
 }
 
@@ -45,14 +61,16 @@ export class ConfigRegistry {
         this.root = null;
         this.to_reset_on_clear = [];
         this._current_value_prefix = "current_";
+        this.storage_defaults = {};
     }
     /**
      * Set Vue root object.
      *
      * @param {*} root: reference to the current Vue app root.
      */
-    _set_root(root) {
+    setup(root) {
         this.root = root;
+        this._set_storage_defaults();
     }
     /**
      * Add a new configuration key.
@@ -90,17 +108,33 @@ export class ConfigRegistry {
             self.reset(key);
         });
     }
-    _get_root_val(k) {
-        return this.root[this._current_value_prefix + k];
+    _set_storage_defaults() {
+        this.storage_defaults = this.root.$storage.options;
     }
-    _set_root_val(k, v) {
-        this.root[this._current_value_prefix + k] = v;
+    _get_root_val(config) {
+        return this.root[this._current_value_prefix + config.key];
     }
-    _get_storage_val(k) {
-        return this.root.$storage.get(k);
+    _set_root_val(config, v) {
+        this.root[this._current_value_prefix + config.key] = v;
     }
-    _set_storage_val(k, v) {
-        this.root.$storage.set(k, v);
+    _get_storage_val(config) {
+        if (config.storage.driver) {
+            this._switch_storage_driver(config.storage);
+        }
+        const value = this.root.$storage.get(config.key);
+        if (config.storage.driver) {
+            this._reset_storage_driver();
+        }
+        return value;
+    }
+    _set_storage_val(config, v) {
+        if (config.storage.driver) {
+            this._switch_storage_driver(config.storage);
+        }
+        this.root.$storage.set(config.key, v);
+        if (config.storage.driver) {
+            this._reset_storage_driver();
+        }
     }
     /**
      * Retrieve the value of given config key.
@@ -114,9 +148,9 @@ export class ConfigRegistry {
      */
     get_value(k) {
         const config = this.get(k);
-        let val = this._get_root_val(config.key);
+        let val = this._get_root_val(config);
         if (_.isEmpty(val)) {
-            val = this._get_storage_val(config.key);
+            val = this._get_storage_val(config);
         }
         if (_.isEmpty(val)) {
             val = config._safe_value(val);
@@ -131,12 +165,30 @@ export class ConfigRegistry {
      * @param {*} v
      */
     set_value(k, v) {
-        // TODO: merge values for objects
-        // const config = this.get(k);
-        // let val = config._safe_value(v);
-        // const new_data = _.merge({}, this.root[this.data_key], {[this.key]: v});
-        this._set_root_val(k, v);
-        this._set_storage_val(k, v);
+        const config = this.get(k);
+        this._set_root_val(config, v);
+        this._set_storage_val(config, v);
+    }
+
+    _switch_storage_driver(storage) {
+        // The app uses sessionStorage by default (currently set on app creation).
+        // If any piece of data needs to be handled by localStorage,
+        // we switch the vue2storage driver option to "local", we store / retrieve the value,
+        // and then we revert to "session" for further use.
+        // See example in documentation: https://github.com/yarkovaleksei/vue2-storage/blob/master/docs/en/started.md
+        this.root.$storage.setOptions({
+            prefix: storage.prefix || this.storage_defaults.prefix,
+            driver: storage.driver || this.storage_defaults.driver,
+            ttl: storage.ttl || this.storage_defaults.ttl,
+        });
+    }
+
+    _reset_storage_driver() {
+        this.root.$storage.setOptions({
+            prefix: this.storage_defaults.prefix,
+            driver: this.storage_defaults.driver,
+            ttl: this.storage_defaults.ttl,
+        });
     }
     /**
      * Reset given config key to default value.
@@ -145,8 +197,8 @@ export class ConfigRegistry {
      */
     reset(k) {
         const config = this.get(k);
-        this._set_root_val(k, config.default);
-        this.root.$storage.remove(k);
+        this._set_root_val(config, config.default);
+        this.root.$storage.remove(config.key);
     }
     /**
      * Generate mapping suitable for components' computed properties.

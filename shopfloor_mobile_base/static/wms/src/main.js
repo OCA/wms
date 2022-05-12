@@ -28,10 +28,10 @@ Vue.prototype.$super = VueSuperMethod;
 
 // TODO: we need a local storage handler too, to store device/profile specific data
 // Maybe replace w/ https://github.com/ankurk91/vue-web-storage
-Vue.use(Vue2Storage, {
-    prefix: "shopfloor_",
-    driver: "session", // Local|session|memory
-    ttl: 60 * 60 * 24 * 1000, // 24 hours
+Vue.use(window.Vue2StoragePlugin, {
+    prefix: _.result(shopfloor_app_info, "storage.prefix", "shopfloor_"),
+    driver: _.result(shopfloor_app_info, "storage.driver", "session"), // Local|session|memory
+    ttl: _.result(shopfloor_app_info, "storage.ttl", 60 * 60 * 24 * 1000), // 24 hours
 });
 
 Vue.use(Vuetify);
@@ -54,7 +54,13 @@ register_app_components(page_registry.all());
 config_registry.add("profile", {default: {}, reset_on_clear: true});
 config_registry.add("appmenu", {default: [], reset_on_clear: true});
 config_registry.add("authenticated", {default: false, reset_on_clear: true});
-config_registry.add("current_language", {default: "", reset_on_clear: false});
+config_registry.add("current_language", {
+    default: "",
+    reset_on_clear: false,
+    storage: {
+        driver: "local",
+    },
+});
 
 new Vue({
     i18n: translation_registry.init_i18n(),
@@ -77,7 +83,7 @@ new Vue({
         return data;
     },
     beforeCreate: function () {
-        config_registry._set_root(this);
+        config_registry.setup(this);
     },
     created: function () {
         const self = this;
@@ -188,7 +194,9 @@ new Vue({
                     self.$storage.set("appconfig", self.appconfig);
                 }
                 event_hub.$emit("app.sync:update", {root: self, sync_data: result});
-                if (self.user.lang) {
+                if (self.user.lang && !self.current_language) {
+                    // Use user default language if a language hasn't been
+                    // manually selected in the app.
                     self.switch_language(self.user.lang);
                 }
                 return result;
