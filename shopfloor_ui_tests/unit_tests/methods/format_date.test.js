@@ -1,7 +1,4 @@
-/**
- * @jest-environment jsdom
- */
-import {DisplayUtils} from "../../shopfloor_mobile_base/static/wms/src/utils.js";
+import {DisplayUtils} from "shopfloor_mobile_base/static/wms/src/utils.js";
 
 const display_utils = new DisplayUtils();
 

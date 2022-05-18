@@ -50,7 +50,7 @@ If you want to run the test in a specific browser, visit `Cypress browsers <http
 Test output
 ===========
 
-* If any of the steps fail, the Test Stateus Menu will highlight it in red and give you relevant information about the issue.
+* If any of the steps fail, the Test Status Menu will highlight it in red and give you relevant information about the issue.
 * If all steps of your test are green, you're good to go!
 
 Unit tests with jest
@@ -68,20 +68,58 @@ Run your tests
     * ``npm install``
 * To run all tests:
     * ``npm run unit-tests``
+* To run tests in a specific file:
+    * ``npm run unit-tests file_name``
+    * Note: file_name corresponds to the file name without .test.js (e.g. for searchbar.test.js, the command would be ``npm run unit-tests searchbar``).
 
 Add new tests
 =============
 
 To add a new test, simply create a new `**.test.js` file inside the `unit_tests` folder.
 
-The default environment for these tests uses node.js.
-Since we're building a web app, we need to add the "jsdom" environment by pasting the below on top of your test file:
+A few considerations for component tests:
+
+* If the component uses a library (e.g. Vuetify), it needs to be included in the second parameter of the shallowMount method:
+    - Install the library using npm, if it hasn't been installed yet.
+    
+    - In jest.config.js:
+
+    .. code-block:: javascript
+
+        const Vuetify = require("Vuetify");
+        Vue.use(Vuetify);
+
+    - In your test:
+
+    .. code-block:: javascript
+
+        shallowMount(Component, {
+            Vuetify,
+        });
+
+* If the component accesses $ attributes from Vue, you can mock them:
 
 .. code-block:: javascript
 
-    /**
-    * @jest-environment jsdom
-    */
+    shallowMount(Component, {
+        mocks: {
+            $t: () => {},
+        },
+    });
+
+* If the component accesses $root, a special mock is needed. For that, a $root mock object has been created in /unit_tests/mocks/root.js. To use it, add it to parentComponent in shallowMount:
+
+.. code-block:: javascript
+
+    const root_config = {config_key: custom_test_config_value};
+
+        shallowMount(Component, {
+            parentComponent: {
+                data() {
+                    return MockRoot(root_config);
+                },
+            },
+        });
 
 Known issues / Roadmap
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -97,9 +135,10 @@ Cypress:
 
 * Test the WMS features from `shopfloor_mobile`.
 
+* NOTE: THE CYPRESS TESTS ARE NOT CURRENTLY PART OF THE CI/CD PIPELINE.
+
 jest:
 
-* Look into the option of running only a single test, or a series of specific tests.
+* Increase coverage.
 
 
-NOTE: THE TESTS ARE NOT CURRENTLY PART OF THE CI/CD PIPELINE.
