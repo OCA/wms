@@ -10,7 +10,7 @@
  */
 import event_hub from "../../services/event_hub.js";
 
-Vue.component("searchbar", {
+export var Searchbar = Vue.component("searchbar", {
     data: function () {
         return {
             entered: "",
