@@ -12,8 +12,8 @@ describe("Test to make sure that the user can log in and log out using an api ke
         describe("Preparation tests", () => {
             it("Checks that unauthenticated users are redirected to the Login page", () => {
                 cy.intercept_user_config_request();
-                cy.visit(Cypress.config("baseUrl"));
-                cy.url().should("eq", Cypress.config("baseUrl") + "login");
+                cy.visit(Cypress.config("baseUrlExample"));
+                cy.url().should("eq", Cypress.config("baseUrlExample") + "login");
                 cy.wait("@user_config").its("response.statusCode").should("eq", 403);
             });
 
@@ -62,7 +62,7 @@ describe("Test to make sure that the user can log in and log out using an api ke
 
     describe("Tests for authenticated user", () => {
         it("Checks that the user has been redirected to the home page", () => {
-            cy.url().should("eq", Cypress.config("baseUrl"));
+            cy.url().should("eq", Cypress.config("baseUrlExample"));
         });
 
         it("Checks that the user's configuration, authentication status and apikey are all in the session storage", () => {
@@ -73,7 +73,7 @@ describe("Test to make sure that the user can log in and log out using an api ke
 
         it("Checks that a page reload doesn't redirect or erase the session storage info", () => {
             cy.reload();
-            cy.url().should("to.not.equal", Cypress.config("baseUrl") + "login");
+            cy.url().should("to.not.equal", Cypress.config("baseUrlExample") + "login");
 
             cy.get_session_storage("shopfloor_apikey").should("exist");
             cy.get_session_storage("shopfloor_appconfig").should("exist");
@@ -81,8 +81,8 @@ describe("Test to make sure that the user can log in and log out using an api ke
         });
 
         it("Checks that authenticated users are redirected to the home page when trying to reach the Login page", () => {
-            cy.visit(Cypress.config("baseUrl") + "login");
-            cy.url().should("eq", Cypress.config("baseUrl"));
+            cy.visit(Cypress.config("baseUrlExample") + "login");
+            cy.url().should("eq", Cypress.config("baseUrlExample"));
         });
 
         it("Checks that the information stored in the browser is identical to the information received from the server at login", () => {
@@ -93,11 +93,11 @@ describe("Test to make sure that the user can log in and log out using an api ke
     describe("Log out", () => {
         it("Goes to the settings page", () => {
             cy.contains("configure profile", {matchCase: false}).click();
-            cy.url().should("eq", Cypress.config("baseUrl") + "settings");
+            cy.url().should("eq", Cypress.config("baseUrlExample") + "settings");
         });
         it("Logs out", () => {
             cy.contains("logout", {matchCase: false}).click();
-            cy.url().should("eq", Cypress.config("baseUrl") + "login");
+            cy.url().should("eq", Cypress.config("baseUrlExample") + "login");
         });
         it("Has erased the storage", () => {
             cy.get_session_storage("shopfloor_apikey").should("not.exist");
@@ -106,11 +106,11 @@ describe("Test to make sure that the user can log in and log out using an api ke
         });
         it("Doesn't redirect to home after page reload", () => {
             cy.reload();
-            cy.url().should("eq", Cypress.config("baseUrl") + "login");
+            cy.url().should("eq", Cypress.config("baseUrlExample") + "login");
         });
         it("Redirects to login if trying to acces home page", () => {
-            cy.visit(Cypress.config("baseUrl"));
-            cy.url().should("eq", Cypress.config("baseUrl") + "login");
+            cy.visit(Cypress.config("baseUrlExample"));
+            cy.url().should("eq", Cypress.config("baseUrlExample") + "login");
         });
         it("Tests that the request to get the user's information fails as the user is not authenticated", () => {
             cy.intercept_user_config_request();

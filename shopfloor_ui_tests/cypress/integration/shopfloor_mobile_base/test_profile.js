@@ -11,7 +11,7 @@ describe("Test to make sure that handling different profiles works as expected",
     });
 
     it("Goes to the list of profiles", () => {
-        cy.visit(Cypress.config("baseUrlDemo") + "profile");
+        cy.visit(Cypress.config("baseUrlExampleDemo") + "profile");
     });
     it("Checks the demo profiles are displayed", () => {
         const profiles = Cypress.env("test_profiles");
@@ -30,7 +30,7 @@ describe("Test to make sure that handling different profiles works as expected",
         describe("Profile tests", () => {
             describe("Test profile", () => {
                 it("Checks the page is redirected and the local information was stored correctly", () => {
-                    cy.url().should("eq", Cypress.config("baseUrlDemo"));
+                    cy.url().should("eq", Cypress.config("baseUrlExampleDemo"));
                     const profiles = Cypress.env("test_profiles");
                     compare_sessionStorage_profile(profiles[i - 1]);
                 });

@@ -14,7 +14,7 @@ describe("Test to make sure the user can select different languages in the app",
     before(() => {
         sessionStorage.clear();
         cy.clearLocalStorageSnapshot();
-        cy.visit(Cypress.config("baseUrlDemo"));
+        cy.visit(Cypress.config("baseUrlExampleDemo"));
         cy.fixture("translations").then((translations) => {
             translations.forEach((language) => {
                 Cypress.env(`test_${language.id}_translations`, language);
@@ -54,12 +54,12 @@ describe("Test to make sure the user can select different languages in the app",
                 cy.reload();
             });
             it("Checks translations in settings", () => {
-                cy.visit(Cypress.config("baseUrlDemo") + "settings");
+                cy.visit(Cypress.config("baseUrlExampleDemo") + "settings");
                 const keys = ["language", "profile", "logout", "back"];
                 check_translations(keys, language_id);
             });
             it("Checks translations in home", () => {
-                cy.visit(Cypress.config("baseUrlDemo"));
+                cy.visit(Cypress.config("baseUrlExampleDemo"));
                 const keys = ["profile_configure"];
                 check_translations(keys, language_id);
             });
@@ -67,7 +67,7 @@ describe("Test to make sure the user can select different languages in the app",
     });
     describe("Check that the selected language persists on logout", () => {
         it("Logs out", () => {
-            cy.visit(Cypress.config("baseUrlDemo") + "settings");
+            cy.visit(Cypress.config("baseUrlExampleDemo") + "settings");
             cy.get("button").contains("logout", {matchCase: false}).click();
         });
         it("Checks that the language is still stored", () => {
@@ -104,7 +104,7 @@ const check_translations = (keys, language_id) => {
 };
 
 const change_language = (index) => {
-    cy.visit(Cypress.config("baseUrlDemo") + "settings");
+    cy.visit(Cypress.config("baseUrlExampleDemo") + "settings");
     cy.get("button[data-action='setting-language']").click();
     if (index < _LANGUAGE_IDS.length - 1) {
         // Click on the next language
