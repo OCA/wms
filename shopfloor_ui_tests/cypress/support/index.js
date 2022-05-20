@@ -21,5 +21,5 @@ import "./commands";
 
 //// CUSTOM ////
 
-// Clears the session storage at before running the test suite
+// Clears the session storage before running the test suite
 sessionStorage.clear();

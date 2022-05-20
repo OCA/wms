@@ -7,6 +7,11 @@ Tests for the Shopfloor app.
 These are end-to-end & unit tests that cover the frontend of the application.
 Not testing the WMS part at this time.
 
+Note that the tests use demo data for two reasons:
+
+- We don't rely on Odoo to be running.
+- We test the demo mode to make sure it's always consistent with the befaviour of the application.
+
 Tech details
 ~~~~~~~~~~~~
 
@@ -20,28 +25,23 @@ Pre-requisites
 ==============
 
 * You should have npm and Cypress installed.
-* You should have the below modules installed:
-
-    - shopfloor_example
-    - shopfloor_mobile
-    - shopfloor_mobile_base
-    - shopfloor_mobile_base_auth_user OR shopfloor_mobile_base_auth_api_key*
-
-    ``*`` These two modules are mutually exclusive so make sure to only install the one needed by the app.
-
+* You should have module `shopfloor_example` installed.
 * Your Odoo instance must be running.
 
 Open the Cypress interface
 ==========================
 
 * In a terminal, go to path/to/shopfloor_ui_tests.
+* >> ``npm install``
 * >> ``npx cypress open``
 
 Select a test
 =============
 
 With the Cypress interface open, select your test.
-A new browser window will be open and will run the test. 
+A new browser window will be open and will run the test.
+
+To run the full test suit, click the `Run n Integration specs` button.
 
 For more information regarding the Cypress interface, visit `Cypress features <https://www.cypress.io/features/>`_.
 If you want to run the test in a specific browser, visit `Cypress browsers <https://docs.cypress.io/guides/guides/launching-browsers#Browsers/>`_.
@@ -131,7 +131,8 @@ Cypress:
     - Authentication via apikey.
     - Navigation throughout the main pages of the app.
     - Selection and representation of profiles.
-    - Module shopfloor_example.
+    - Translations.
+    - Shopfloor example.
 
 * Test the WMS features from `shopfloor_mobile`.
 

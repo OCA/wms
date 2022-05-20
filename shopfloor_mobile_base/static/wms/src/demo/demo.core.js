@@ -482,6 +482,11 @@ export class DemoTools {
         ];
     }
 
+    makePartnerEmail(partner) {
+        const split_name = partner.name.toLowerCase().split(" ");
+        return `${split_name[0]}.${split_name[1]}@example.com`;
+    }
+
     makeAppConfig() {
         return {
             profiles: this.makeProfiles(),
@@ -489,8 +494,8 @@ export class DemoTools {
     }
     makeProfiles() {
         const profiles = [
-            {id: 1, name: "SCH Transport"},
-            {id: 2, name: "SCH Pick"},
+            {id: 1, name: "Transport"},
+            {id: 2, name: "Pick"},
         ];
         return profiles;
     }

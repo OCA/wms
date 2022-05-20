@@ -26,6 +26,7 @@ const messages_en = {
             },
         },
         scan_anything: {
+            name: "Scan",
             title: "Scan {what}",
             scan_placeholder: "Scan anything",
         },

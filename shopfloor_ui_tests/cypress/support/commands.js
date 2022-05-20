@@ -1,3 +1,5 @@
+import "cypress-localstorage-commands";
+
 Cypress.Commands.add("fake_login", (auth_type, login_data) => {
     cy.fixture("app_config.json").then((data) => {
         data.user_info = login_data || data.user_info;
@@ -34,7 +36,7 @@ Cypress.Commands.add("clear_input_fields", (field_names) => {
 
 Cypress.Commands.add(
     "wait_for",
-    ({expect_success = false, reload = false, request_name = ""}) => {
+    ({expect_success = true, reload = false, request_name = ""}) => {
         if (reload) {
             cy.reload();
         }
@@ -58,7 +60,7 @@ Cypress.Commands.add(
 Cypress.Commands.add("intercept_user_config_request", () => {
     cy.intercept({
         method: "POST",
-        url: "*/app/user_config",
+        url: "**/app/user_config",
     }).as("user_config");
 });
 
