@@ -1,4 +1,5 @@
-# Copyright 2019 Camptocamp (https://www.camptocamp.com)
+# Copyright 2019-2021 Camptocamp (https://www.camptocamp.com)
+# Copyright 2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 
 from odoo.tests import common
 
@@ -986,10 +987,7 @@ class TestRoutingPull(TestRoutingPullCommon):
 
         customer_moves = customer_picking.move_lines
         pick_picking = customer_moves.move_orig_ids.picking_id
-        pick_moves = pick_picking.move_lines
-
-        shelf_move = pick_moves.filtered(lambda m: m.product_uom_qty == 18)
-        handover_move = pick_moves.filtered(lambda m: m.product_uom_qty == 12)
+        pick_move = pick_picking.move_lines
 
         # At this point, we should have 3 stock.picking:
         #
@@ -1003,42 +1001,28 @@ class TestRoutingPull(TestRoutingPullCommon):
         # +-------------------------------------------------------------------+
         # | PRI/xxxx Waiting                                                  |
         # | Stock → Output                                                    |
-        # | 12x Product Stock → Output (waiting on the Handover moves)        |
-        # | 18x Product Stock → Output (available)                            |
-        # |   lines: 10 from Stock/Shelf1, 8 from Stock/Shelf2                |
+        # | 30x Product Stock → Output (waiting on the Handover move)         |
         # +-------------------------------------------------------------------+
         #
         # +-------------------------------------------------+
         # | OUT/xxxx Waiting                                |
         # | Output → Customer                               |
-        # | 18x Product Output → Customer (waiting)         |
-        # | 12x Product Output → Customer (waiting)         |
+        # | 30x Product Output → Customer (waiting)         |
         # +-------------------------------------------------+
 
-        highbay_move = handover_move.move_orig_ids
+        highbay_move = pick_move.move_orig_ids
 
         self.assertRecordValues(
-            shelf_move + handover_move,
+            pick_move,
             [
-                {
-                    "state": "assigned",
-                    "product_uom_qty": 18,
-                    "picking_type_id": priority_pick_type.id,
-                },
                 {
                     "state": "waiting",
-                    "product_uom_qty": 12,
+                    "product_uom_qty": 30,
                     "picking_type_id": priority_pick_type.id,
                 },
             ],
         )
-        self.assertRecordValues(
-            shelf_move.move_line_ids,
-            [
-                {"location_id": self.location_shelf_1.id, "product_uom_qty": 10},
-                {"location_id": self.location_shelf_2.id, "product_uom_qty": 8},
-            ],
-        )
+        self.assertFalse(pick_move.move_line_ids)
 
         self.assertRecordValues(
             highbay_move,

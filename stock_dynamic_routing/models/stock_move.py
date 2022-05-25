@@ -1,5 +1,5 @@
 # Copyright 2019-2020 Camptocamp (https://www.camptocamp.com)
-# Copyright 2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+# Copyright 2021-2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
@@ -92,7 +92,7 @@ class StockMove(models.Model):
         moves = self.browse(move.id for move in moves_with_routing_details)
         moves._apply_routing_rule_pull(moves_with_routing_details)
         moves._apply_routing_rule_push(moves_with_routing_details)
-        return moves
+        return moves.exists()
 
     def _prepare_routing_pull(self):
         """Prepare pull routing rules for moves
@@ -238,7 +238,7 @@ class StockMove(models.Model):
         the routing ones and creates a new chained move after it.
         """
         pickings_to_check_for_emptiness = self.env["stock.picking"]
-        move_ids_to_assign_per_location = defaultdict(list)
+        move_ids_to_assign_per_location = defaultdict(set)
         move_ids_to_assign_nonrelocated = []
         next_moves_to_update = self.browse()
         routing_to_apply = [
@@ -309,7 +309,8 @@ class StockMove(models.Model):
 
             pickings_to_check_for_emptiness |= move.picking_id
             move._assign_picking()
-            move_ids_to_assign_per_location[move.location_id].append(move.id)
+            move = move._merge_moves()
+            move_ids_to_assign_per_location[move.location_id].add(move.id)
 
         # We have two kind of "routed" moves:
         #
@@ -360,7 +361,7 @@ class StockMove(models.Model):
         )
         to_assign_ids = []
         for location in sorted_locations:
-            to_assign_ids += move_ids_to_assign_per_location[location]
+            to_assign_ids += list(move_ids_to_assign_per_location[location])
         to_assign_ids += move_ids_to_assign_nonrelocated
 
         self.browse(to_assign_ids).with_context(

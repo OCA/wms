@@ -1,4 +1,5 @@
 # Copyright 2020 Camptocamp SA
+# Copyright 2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 
 from odoo.addons.stock_checkout_sync.tests.common import CheckoutSyncCommonCase
@@ -139,11 +140,11 @@ class TestRoutingPullWithSync(CheckoutSyncCommonCase):
         self.assert_src_pack_post_bay1(self.pack_move1.move_line_ids)
         # no move lines on these waiting moves:
         self.assert_src_pack_post(self.pack_move2)
-        self.assert_src_pack_post(self.pack_move3)
-
         self.assert_picking_type_pack_post(self.pack_move1.picking_id)
         self.assert_picking_type_pack_post(self.pack_move2.picking_id)
-        self.assert_picking_type_pack_post(self.pack_move3.picking_id)
+        # pack_move3 has been merged into pack_move2
+        self.assertFalse(self.pack_move3.exists())
+        self.assertEqual(self.pack_move2.product_uom_qty, 4)
 
     def test_pack_sync_split(self):
         self.pack_type.checkout_sync = True
@@ -193,7 +194,7 @@ class TestRoutingPullWithSync(CheckoutSyncCommonCase):
         self.assert_dest_pack_post_bay1(self.pick_move1)
         self.assert_dest_pack_post_bay1(self.pick_move1.move_line_ids)
         self.assert_dest_pack_post_bay1(pick_move_split)
-        self.assert_dest_pack_post_bay1(self.pick_move1)
+        self.assert_dest_pack_post_bay1(self.pick_move2)
         self.assert_dest_pack_post_bay1(self.pick_move2.move_line_ids)
         self.assert_dest_pack_post_bay1(self.pick_move3)
         self.assert_dest_pack_post_bay1(self.pick_move3.move_line_ids)
@@ -204,8 +205,8 @@ class TestRoutingPullWithSync(CheckoutSyncCommonCase):
         # no move lines on these waiting moves:
         self.assert_src_pack_post(waiting_pack)
         self.assert_src_pack_post(self.pack_move2)
-        self.assert_src_pack_post(self.pack_move3)
-
         self.assert_picking_type_pack_post(self.pack_move1.picking_id)
         self.assert_picking_type_pack_post(self.pack_move2.picking_id)
-        self.assert_picking_type_pack_post(self.pack_move3.picking_id)
+        # pack_move3 has been merged into pack_move2
+        self.assertFalse(self.pack_move3.exists())
+        self.assertEqual(self.pack_move2.product_uom_qty, 4)

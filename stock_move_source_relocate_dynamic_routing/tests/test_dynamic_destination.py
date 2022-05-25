@@ -1,3 +1,5 @@
+# Copyright 2021-2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+
 from odoo.addons.stock_dynamic_routing.tests.test_routing_pull import (
     TestRoutingPullCommon,
 )
@@ -12,9 +14,11 @@ class TestRoutingAndSourceRelocate(TestRoutingPullCommon):
         destination location and one not assigned relocated and then re-routed
         to that same destination location. As both pick moves are going to the
         same destination location, ensure the ship move is not split.
+        As the pick moves share the same characteristics, they are merged back
+        together.
 
         This test is similar to test_change_dest_move_source_split in
-        stock_dynamic_routing/tests/test_routing_pull except that no move_d is created"""
+        stock_dynamic_routing/tests/test_routing_pull except that no move_prepick is created"""
 
         self.env["stock.source.relocate"].create(
             {
@@ -62,50 +66,42 @@ class TestRoutingAndSourceRelocate(TestRoutingPullCommon):
         pick_picking, customer_picking = self._create_pick_ship(
             self.wh, [(self.product1, 10)]
         )
-        move_a = pick_picking.move_lines
-        move_b = customer_picking.move_lines
+        move_ship = customer_picking.move_lines
 
-        self._update_product_qty_in_location(self.location_hb_1_2, move_a.product_id, 6)
+        self._update_product_qty_in_location(
+            self.location_hb_1_2, move_ship.product_id, 6
+        )
         pick_picking.action_assign()
 
-        move_c = (
-            self.env["stock.picking"]
-            .search([("picking_type_id", "=", self.pick_type_routing_op.id)])
-            .move_lines
-        )[0]
+        move_pick = move_ship.move_orig_ids
         self.assertRecordValues(
-            move_a | move_b | move_c,
+            move_pick | move_ship,
             [
                 {
-                    "product_qty": 4,
+                    "product_qty": 10,
                     "move_orig_ids": [],
-                    "move_dest_ids": move_b.ids,
-                    "state": "confirmed",
+                    "move_dest_ids": move_ship.ids,
+                    "state": "partially_available",
                     "location_id": self.location_hb.id,
                     "location_dest_id": area1.id,
                 },
                 {
                     "product_qty": 10,
-                    "move_orig_ids": (move_c | move_a).ids,
+                    "move_orig_ids": move_pick.ids,
                     "move_dest_ids": [],
                     "state": "waiting",
                     "location_id": area1.id,
                     "location_dest_id": self.customer_loc.id,
                 },
-                {
-                    "product_qty": 6,
-                    "move_orig_ids": [],
-                    "move_dest_ids": move_b.ids,
-                    "state": "assigned",
-                    "location_id": self.location_hb.id,
-                    "location_dest_id": area1.id,
-                },
             ],
         )
 
-        self.assertEqual(move_a.picking_id.picking_type_id, self.pick_type_routing_op)
-        self.assertEqual(move_b.picking_id.picking_type_id, pick_type_routing_delivery)
-        self.assertEqual(move_c.picking_id.picking_type_id, self.pick_type_routing_op)
+        self.assertEqual(
+            move_pick.picking_id.picking_type_id, self.pick_type_routing_op
+        )
+        self.assertEqual(
+            move_ship.picking_id.picking_type_id, pick_type_routing_delivery
+        )
 
     def test_prepickship_with_routing_and_relocate(self):
         """Check that if a pick move is waiting another move, the ship move is not split
@@ -116,10 +112,12 @@ class TestRoutingAndSourceRelocate(TestRoutingPullCommon):
         assigned relocated and then re-routed to that same destination
         location. As both pick moves are going to the same destination
         location, ensure the ship move is not split.
+        As the pick moves share the same characteristics, they are merged back
+        together.
 
         This test is similar to test_change_dest_move_source_split and
         test_change_dest_move_source_chain in
-        stock_dynamic_routing/tests/test_routing_pull except that no move_d is
+        stock_dynamic_routing/tests/test_routing_pull except that no move_prepick is
         created"""
 
         self.env["stock.source.relocate"].create(
@@ -195,36 +193,31 @@ class TestRoutingAndSourceRelocate(TestRoutingPullCommon):
         pick_picking, customer_picking = self._create_pick_ship(
             self.wh, [(self.product1, 10)]
         )
-        move_a = pick_picking.move_lines
-        move_b = customer_picking.move_lines
+        move_ship = customer_picking.move_lines
 
-        self._update_product_qty_in_location(location_shu, move_a.product_id, 6)
+        self._update_product_qty_in_location(location_shu, move_ship.product_id, 6)
         pick_picking.action_assign()
 
-        move_d = (
+        move_pick = move_ship.move_orig_ids
+        move_prepick = (
             self.env["stock.picking"]
             .search([("picking_type_id", "=", prepick_pick_type.id)])
             .move_lines
         )
-        move_c = (
-            self.env["stock.picking"]
-            .search([("picking_type_id", "=", self.pick_type_routing_op.id)])
-            .move_lines
-        )[0]
         self.assertRecordValues(
-            move_a | move_b | move_c | move_d,
+            move_pick | move_ship | move_prepick,
             [
                 {
-                    "product_qty": 4,
-                    "move_orig_ids": [],
-                    "move_dest_ids": move_b.ids,
-                    "state": "confirmed",
+                    "product_qty": 10,
+                    "move_orig_ids": move_prepick.ids,
+                    "move_dest_ids": move_ship.ids,
+                    "state": "waiting",
                     "location_id": self.location_hb.id,
                     "location_dest_id": area1.id,
                 },
                 {
                     "product_qty": 10,
-                    "move_orig_ids": (move_c | move_a).ids,
+                    "move_orig_ids": move_pick.ids,
                     "move_dest_ids": [],
                     "state": "waiting",
                     "location_id": area1.id,
@@ -232,16 +225,8 @@ class TestRoutingAndSourceRelocate(TestRoutingPullCommon):
                 },
                 {
                     "product_qty": 6,
-                    "move_orig_ids": move_d.ids,
-                    "move_dest_ids": move_b.ids,
-                    "state": "waiting",
-                    "location_id": self.location_hb.id,
-                    "location_dest_id": area1.id,
-                },
-                {
-                    "product_qty": 6,
                     "move_orig_ids": [],
-                    "move_dest_ids": move_c.ids,
+                    "move_dest_ids": move_pick.ids,
                     "state": "assigned",
                     "location_id": location_shu.id,
                     "location_dest_id": self.location_hb.id,
@@ -249,6 +234,9 @@ class TestRoutingAndSourceRelocate(TestRoutingPullCommon):
             ],
         )
 
-        self.assertEqual(move_a.picking_id.picking_type_id, self.pick_type_routing_op)
-        self.assertEqual(move_b.picking_id.picking_type_id, pick_type_routing_delivery)
-        self.assertEqual(move_c.picking_id.picking_type_id, self.pick_type_routing_op)
+        self.assertEqual(
+            move_pick.picking_id.picking_type_id, self.pick_type_routing_op
+        )
+        self.assertEqual(
+            move_ship.picking_id.picking_type_id, pick_type_routing_delivery
+        )

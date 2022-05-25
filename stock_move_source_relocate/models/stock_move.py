@@ -14,7 +14,7 @@ class StockMove(models.Model):
         )
         super()._action_assign()
         # could not be (entirely) reserved
-        unconfirmed_moves = unconfirmed_moves.filtered(
+        unconfirmed_moves = unconfirmed_moves.exists().filtered(
             lambda m: m.state in ["confirmed", "partially_available"]
         )
         unconfirmed_moves._apply_source_relocate()

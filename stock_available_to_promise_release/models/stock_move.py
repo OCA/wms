@@ -1,4 +1,5 @@
-# Copyright 2019-2020 Camptocamp (https://www.camptocamp.com)
+# Copyright 2019-2022 Camptocamp (https://www.camptocamp.com)
+# Copyright 2020-2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 import logging
@@ -377,10 +378,10 @@ class StockMove(models.Model):
             pickings.write({"priority": max(priorities)})
 
     def _after_release_assign_moves(self):
-        moves = self
+        moves = self.exists()
         while moves:
             moves._action_assign()
-            moves = moves.mapped("move_orig_ids")
+            moves = moves.exists().mapped("move_orig_ids")
 
     def _release_split(self, remaining_qty):
         """Split move and create a new picking for it.
