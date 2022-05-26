@@ -1125,12 +1125,6 @@ msgid "This location content can't be moved at once."
 msgstr ""
 
 #. module: shopfloor
-#: code:addons/shopfloor/services/location_content_transfer.py:0
-#, python-format
-msgid "This location content can't be moved using this menu."
-msgstr ""
-
-#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This lot does not exist anymore."
@@ -1252,13 +1246,31 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "Wrong location."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "Wrong lot."
 msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "Wrong pack."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "Wrong product."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Wrong."
 msgstr ""
 
 #. module: shopfloor
