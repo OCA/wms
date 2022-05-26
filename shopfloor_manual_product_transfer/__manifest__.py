@@ -6,7 +6,7 @@
 {
     "name": "Shopfloor - Manual Product Transfer",
     "summary": "Manage manual product transfers",
-    "version": "14.0.1.2.1",
+    "version": "14.0.1.2.2",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
