@@ -1,4 +1,5 @@
 # Copyright 2019-2020 Camptocamp (https://www.camptocamp.com)
+# Copyright 2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 
 from odoo import _, api, exceptions, fields, models
@@ -38,12 +39,21 @@ class StockRoutingRule(models.Model):
         required=True,
         help="Operation type that will be applied on the move.",
     )
+    group_id = fields.Many2one(
+        comodel_name="procurement.group",
+        string="Fixed Procurement Group",
+        help="Procurement group that will be applied on the move. This allows "
+        "you to merge moves initialy coming from different procurement group. "
+        "For instance, have 1 pick for multiple customer shippings.",
+    )
     location_src_id = fields.Many2one(
         comodel_name="stock.location",
+        string="Source Location",
         compute="_compute_location_src_id",
     )
     location_dest_id = fields.Many2one(
         comodel_name="stock.location",
+        string="Destination Location",
         compute="_compute_location_dest_id",
     )
     rule_domain = fields.Char(

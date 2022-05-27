@@ -259,6 +259,10 @@ class StockMove(models.Model):
 
             if move.picking_id.picking_type_id == routing_rule.picking_type_id:
                 # already correct
+                if routing_rule.group_id and move.group_id != routing_rule.group_id:
+                    move.group_id = routing_rule.group_id
+                    move._assign_picking()
+                    move = move._merge_moves()
                 move_ids_to_assign_nonrelocated.append(move.id)
                 continue
 
@@ -270,6 +274,8 @@ class StockMove(models.Model):
                 __applying_routing_rule=True
             ).location_id = routing_rule.location_src_id
             move.picking_type_id = routing_rule.picking_type_id
+            if routing_rule.group_id and move.group_id != routing_rule.group_id:
+                move.group_id = routing_rule.group_id
             dest_location = move.location_dest_id
             rule_location = routing_rule.location_dest_id
             if rule_location.is_sublocation_of(dest_location):

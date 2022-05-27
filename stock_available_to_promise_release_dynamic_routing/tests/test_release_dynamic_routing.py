@@ -1,4 +1,5 @@
 # Copyright 2020 Camptocamp (https://www.camptocamp.com)
+# Copyright 2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 """
 When we "release" moves, we set the "printed" flag on the transfers,
@@ -228,3 +229,91 @@ class TestAvailableToPromiseReleaseDynamicRouting(PromiseReleaseCommonCase):
                 }
             ],
         )
+
+    def test_dynamic_routing_procurement_group_merge_picks(self):
+        """Test pick moves merging
+
+        Set a fixed procurement group on the pick routing and check pick
+        moves from several orders are merged into a single pick move
+        """
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+
+        area1 = self.env["stock.location"].create(
+            {"location_id": self.wh.wh_output_stock_loc_id.id, "name": "Area1"}
+        )
+        pick_loc = self.wh.pick_type_id.default_location_src_id
+        pick_type_routing_op = self.env["stock.picking.type"].create(
+            {
+                "name": "Dynamic Routing",
+                "code": "internal",
+                "sequence_code": "WH/PICK2",
+                "warehouse_id": self.wh.id,
+                "use_create_lots": False,
+                "use_existing_lots": True,
+                "default_location_src_id": pick_loc.id,
+                "default_location_dest_id": area1.id,
+            }
+        )
+        pick_type_group = self.env["procurement.group"].create(
+            {
+                "name": "Merge Pick Moves",
+            }
+        )
+        self.env["stock.routing"].create(
+            {
+                "location_id": pick_loc.id,
+                "picking_type_id": self.wh.pick_type_id.id,
+                "rule_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "method": "pull",
+                            "group_id": pick_type_group.id,
+                            "picking_type_id": pick_type_routing_op.id,
+                        },
+                    )
+                ],
+            }
+        )
+
+        self._update_qty_in_location(self.loc_bin1, self.product1, 50.0)
+        self._update_qty_in_location(self.loc_bin1, self.product2, 50.0)
+
+        ship1 = self._create_picking_chain(
+            self.wh,
+            [(self.product1, 20), (self.product2, 10)],
+        )
+        ship2 = self._create_picking_chain(
+            self.wh,
+            [(self.product1, 2), (self.product2, 8)],
+        )
+        self.assertNotEqual(ship1, ship2)
+        shippings = ship1 | ship2
+        shippings.release_available_to_promise()
+
+        pick1_moves = ship1.move_lines.move_orig_ids
+        self.assertEqual(len(pick1_moves), 2)
+        pick2_moves = ship2.move_lines.move_orig_ids
+        self.assertEqual(len(pick2_moves), 2)
+        # check there is a single pick move for both shippings
+        self.assertEqual(pick1_moves, pick2_moves)
+        pick_move_product1 = pick1_moves.filtered(
+            lambda m: m.product_id == self.product1
+        )
+        self.assertEqual(len(pick_move_product1), 1)
+        self.assertEqual(pick_move_product1.product_uom_qty, 22)
+        pick_move_line_product1 = pick_move_product1.move_line_ids
+        self.assertEqual(len(pick_move_line_product1), 1)
+        self.assertEqual(pick_move_line_product1.product_uom_qty, 22)
+        pick_move_product2 = pick1_moves.filtered(
+            lambda m: m.product_id == self.product2
+        )
+        self.assertEqual(len(pick_move_product2), 1)
+        self.assertEqual(pick_move_product2.product_uom_qty, 18)
+        pick_move_line_product2 = pick_move_product2.move_line_ids
+        self.assertEqual(len(pick_move_line_product2), 1)
+        self.assertEqual(pick_move_line_product2.product_uom_qty, 18)
+        # this picking has been created to change the picking type
+        pick_picking = pick1_moves.picking_id
+        self.assertEqual(pick_picking.picking_type_id, pick_type_routing_op)

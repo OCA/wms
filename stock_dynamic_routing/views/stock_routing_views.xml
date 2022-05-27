@@ -33,7 +33,7 @@
                                 <field name="sequence" widget="handle" />
                                 <field name="method" />
                                 <field name="picking_type_id" />
-                                <field name="location_src_id" />
+                                <field name="group_id" />
                                 <field name="location_dest_id" />
                                 <field name="rule_domain" />
                             </tree>
@@ -47,6 +47,7 @@
                                     />
                                     <field name="location_src_id" />
                                     <field name="location_dest_id" />
+                                    <field name="group_id" />
                                     <field
                                         name="rule_domain"
                                         widget="domain"
