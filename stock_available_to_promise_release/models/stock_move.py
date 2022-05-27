@@ -1,5 +1,5 @@
 # Copyright 2019-2022 Camptocamp (https://www.camptocamp.com)
-# Copyright 2020-2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+# Copyright 2021-2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 import logging
@@ -304,6 +304,8 @@ class StockMove(models.Model):
         procurement_requests = []
         pulled_moves = self.env["stock.move"]
         backorder_links = {}
+
+        new_date = fields.Datetime.now()
         for move in self:
             if not move.need_release:
                 continue
@@ -322,9 +324,11 @@ class StockMove(models.Model):
                     # once
                     continue
                 new_move = move._release_split(remaining)
+                new_move._release_split_set_date(new_date)
                 backorder_links[new_move.picking_id] = move.picking_id
 
             values = move._prepare_procurement_values()
+            move._release_set_procurement_date(values, new_date)
             procurement_requests.append(
                 self.env["procurement.group"].Procurement(
                     move.product_id,
@@ -349,6 +353,7 @@ class StockMove(models.Model):
             # will be assigned to a new stock.picking
             original_picking = unreleased_move.picking_id
             unreleased_move._release_split(unreleased_move.product_qty)
+            unreleased_move._release_split_set_date(new_date)
             backorder_links[unreleased_move.picking_id] = original_picking
 
         for backorder, origin in backorder_links.items():
@@ -363,6 +368,23 @@ class StockMove(models.Model):
         pulled_moves._after_release_update_chain()
 
         return True
+
+    def _release_get_deadline(self, date_planned):
+        prep_time = self.env.company.stock_release_max_prep_time
+        date_deadline = fields.Datetime.add(date_planned, minutes=prep_time)
+        return date_deadline
+
+    def _release_split_set_date(self, date_planned):
+        """Set released move planned date to pulled moves planned date"""
+        self.date = self._release_get_deadline(date_planned)
+
+    def _release_set_procurement_date(self, values, date_planned):
+        # We must set the deadline on the move before pulling to allow pulled
+        # moves to be merged
+        values["date_deadline"] = self._release_get_deadline(date_planned)
+        # It cannot be scheduled for now otherwise it will immediately appear
+        # in the late picking count. So it is also set to the deadline.
+        values["date_planned"] = self._release_get_deadline(date_planned)
 
     def _after_release_update_chain(self):
         picking_ids = set()

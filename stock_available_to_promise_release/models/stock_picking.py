@@ -1,8 +1,12 @@
 # Copyright 2020 Camptocamp (https://www.camptocamp.com)
+# Copyright 2020-2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
+import logging
 
 from odoo import _, api, exceptions, fields, models
 from odoo.tools.float_utils import float_compare
+
+_logger = logging.getLogger(__name__)
 
 
 class StockPicking(models.Model):
@@ -149,17 +153,16 @@ class StockPicking(models.Model):
         to the released one.
         """
         self._after_release_set_printed()
-        self._after_release_set_expected_date()
 
     def _after_release_set_printed(self):
         self.filtered(lambda p: not p.printed).printed = True
 
     def _after_release_set_expected_date(self):
-        prep_time = self.env.company.stock_release_max_prep_time
-        new_expected_date = fields.Datetime.add(
-            fields.Datetime.now(), minutes=prep_time
+        # TODO: Method to drop in v15
+        _logger.warning("`_after_release_set_expected_date` is deprecated")
+        self.scheduled_date = self.move_lines._release_get_deadline(
+            fields.Datetime.now()
         )
-        self.scheduled_date = new_expected_date
 
     def action_open_move_need_release(self):
         self.ensure_one()
