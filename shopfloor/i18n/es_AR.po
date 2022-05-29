@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2022-04-10 18:05+0000\n"
+"PO-Revision-Date: 2022-05-29 23:05+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -1304,7 +1304,7 @@ msgstr "Compartimento incorrecto"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Wrong location."
-msgstr ""
+msgstr "Ubicación equivocada."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1316,7 +1316,7 @@ msgstr "Lote equivocado."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Wrong pack."
-msgstr ""
+msgstr "Paquete equivocado."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1328,7 +1328,7 @@ msgstr "Producto equivocado."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Wrong."
-msgstr ""
+msgstr "Incorrecto."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
