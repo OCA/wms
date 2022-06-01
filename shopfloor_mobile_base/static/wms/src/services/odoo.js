@@ -131,17 +131,6 @@ export class OdooMocked extends OdooMixin {
         this._set_demo_data();
         console.log("CALL:", path, this.usage);
         console.dir("CALL data:", data);
-        // Provide your own mock by enpoint
-        let mocked_handler = "mocked_" + path;
-        if (!_.isUndefined(this[mocked_handler])) {
-            return this[mocked_handler].call(this, data);
-        }
-        // Provide your own mock by service and endpoint
-        mocked_handler = "mocked_" + this.usage + "_" + path;
-        if (!_.isUndefined(this[mocked_handler])) {
-            // Provide your own mock by enpoint and specific process
-            return this[mocked_handler].call(this, data);
-        }
         let result = null;
         const barcode = data
             ? data.barcode || data.identifier || data.location_barcode
@@ -173,6 +162,19 @@ export class OdooMocked extends OdooMixin {
         if (_.has(result, "ok")) {
             // Pick the case were you have good or bad result
             result = result.ok;
+        }
+        if (!result) {
+            // Provide your own mock by enpoint
+            let mocked_handler = "mocked_" + path;
+            if (!_.isUndefined(this[mocked_handler])) {
+                result = this[mocked_handler].call(this, data);
+            }
+            // Provide your own mock by service and endpoint
+            mocked_handler = "mocked_" + this.usage + "_" + path;
+            if (!_.isUndefined(this[mocked_handler])) {
+                // Provide your own mock by enpoint and specific process
+                result = this[mocked_handler].call(this, data);
+            }
         }
         if (!result) {
             throw "NOT IMPLEMENTED: " + path;
