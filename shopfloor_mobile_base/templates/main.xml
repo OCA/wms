@@ -34,11 +34,12 @@
                 <script type="text/javascript">
           var shopfloor_app_info = <t t-raw="json.dumps(app_info)" />;
         </script>
-                <t t-call="shopfloor_mobile_base.shopfloor_app_assets" />
+                <!-- TODO: it would be nice to load this resources dinamically (see Roadmap) -->
                 <t
                     t-call="shopfloor_mobile_base.shopfloor_app_demo_assets"
                     t-if="app_info.demo_mode"
                 />
+                <t t-call="shopfloor_mobile_base.shopfloor_app_assets" />
             </t>
             <noscript>
                 <strong>

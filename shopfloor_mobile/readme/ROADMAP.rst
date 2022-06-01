@@ -27,3 +27,11 @@
   This part is also related to "Refactor states definition".
 
 * Go through `_.forEach` and similar calls to replace them w/ vanilla JS (eg: `.map()`)
+* Demo data management
+
+  In order to make sure that demo data is loaded before the application is loaded,
+  we should make demo data a dependency for the whole application.
+  To achieve this, we could support a new metadata key in process_registry which accepts the path to the demo data file.
+  Before the app is initialized, we can check if demo mode is enabled & we have demo data to load,
+  in which case we import those modules.
+  Once this is implemented, we can remove the demo data assets.
