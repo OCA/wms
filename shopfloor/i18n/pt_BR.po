@@ -176,14 +176,6 @@ msgid "Control stock issue in location {} for {}"
 msgstr ""
 
 #. module: shopfloor
-#: code:addons/shopfloor/models/stock_move.py:0
-#, python-format
-msgid ""
-"Created from backorder <a href=# data-oe-model=stock.picking data-oe-id=%d>"
-"%s</a>."
-msgstr ""
-
-#. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid "Creation of moves is not allowed for menu {}."
@@ -1029,7 +1021,6 @@ msgid "Technical field. Overrides operation priority in barcode scenario."
 msgstr ""
 
 #. module: shopfloor
-#: code:addons/shopfloor/models/stock_move_line.py:0
 #: code:addons/shopfloor/models/stock_picking.py:0
 #, python-format
 msgid ""
@@ -1087,6 +1078,12 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The record you were working on does not exist anymore."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/models/stock_move.py:0
+#, python-format
+msgid "The split order {} has been created."
 msgstr ""
 
 #. module: shopfloor
