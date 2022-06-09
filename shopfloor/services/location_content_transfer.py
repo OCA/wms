@@ -295,8 +295,6 @@ class LocationContentTransfer(Component):
             )
 
         move_lines = self._find_location_move_lines(location)
-        pickings = move_lines.picking_id
-        picking_types = pickings.mapped("picking_type_id")
 
         savepoint = self._actions_for("savepoint").new()
 
@@ -308,6 +306,7 @@ class LocationContentTransfer(Component):
             if response:
                 return response
         else:
+            picking_types = move_lines.picking_id.picking_type_id
             if len(picking_types) > 1:
                 return self._response_for_start(
                     message={
@@ -319,36 +318,13 @@ class LocationContentTransfer(Component):
                 return self._response_for_start(
                     message=self.msg_store.cannot_move_something_in_picking_type()
                 )
-        # If there are different source locations, we put the move lines we are
-        # interested in in a separate picking.
-        # This is required as we can only deal within this scenario with pickings
-        # that share the same source location.
-        pickings = move_lines._split_pickings_from_source_location()
-        # Ensure we process move lines related to transfers having only one source
-        # location among all their move lines.
-        # We need to put the unreserved qty into separate moves as a new move
-        # line could be created in the middle of the process.
-        new_picking_ids = []
-        for picking in pickings:
-            #   -> put move lines to process in their own move/transfer
-            new_picking_id = picking.split_assigned_move_lines(move_lines)
-            new_picking_ids.append(new_picking_id)
-        if new_picking_ids != pickings.ids:
-            pickings = pickings.browse(new_picking_ids)
 
-        # If the following criteria are met:
-        #   - no move lines have been found
-        #   - the menu is configured to allow the creation of moves
-        #   - the menu is bind to one picking type
-        #   - scanned location is a valid source for one the menu's picking types
-        # then prepare new stock moves to move goods from the scanned location.
-        menu = self.work.menu
-        if (
-            not move_lines
-            and menu.allow_move_create
-            and len(self.picking_types) == 1
-            and self.is_src_location_valid(location)
-        ):
+        if not move_lines:
+            if not self.is_allow_move_create():
+                savepoint.rollback()
+                return self._response_for_start(
+                    message=self.msg_store.location_empty(location)
+                )
             new_moves = self._create_moves_from_location(location)
             if not new_moves:
                 savepoint.rollback()
@@ -362,12 +338,16 @@ class LocationContentTransfer(Component):
                 return self._response_for_start(
                     message=self.msg_store.new_move_lines_not_assigned()
                 )
-            pickings = new_moves.mapped("picking_id")
             move_lines = new_moves.move_line_ids
-            for move_line in move_lines:
-                if not self.is_dest_location_valid(
-                    move_line.move_id, move_line.location_dest_id
-                ):
+            for line in move_lines:
+                for line in move_lines:
+                    line.write(
+                        {
+                            "qty_done": line.product_uom_qty,
+                            "shopfloor_user_id": self.env.uid,
+                        }
+                    )
+                if not self.is_dest_location_valid(line.move_id, line.location_dest_id):
                     savepoint.rollback()
                     return self._response_for_start(
                         message=self.msg_store.location_content_unable_to_transfer(
@@ -386,23 +366,13 @@ class LocationContentTransfer(Component):
                 message=self.msg_store.no_putaway_destination_available()
             )
 
-        if not pickings:
-            savepoint.rollback()
-            return self._response_for_start(
-                message=self.msg_store.location_empty(location)
-            )
-
-        for line in move_lines:
-            line.qty_done = line.product_uom_qty
-            line.shopfloor_user_id = self.env.uid
-
-        pickings.user_id = self.env.uid
+        stock.mark_move_line_as_picked(move_lines)
 
         unreserved_moves._action_assign()
 
         savepoint.release()
 
-        return self._router_single_or_all_destination(pickings)
+        return self._router_single_or_all_destination(move_lines.picking_id)
 
     def _find_transfer_move_lines_domain(self, location):
         return [
@@ -729,22 +699,11 @@ class LocationContentTransfer(Component):
 
         self._lock_lines(move_line)
 
-        if quantity < move_line.product_uom_qty:
-            # Update the current move line quantity and
-            # put the scanned qty (the move line) in its own move
-            # (by splitting the current one)
-            move_line.product_uom_qty = move_line.qty_done = quantity
-            current_move = move_line.move_id
-            new_move_vals = current_move._split(quantity)
-            new_move = self.env["stock.move"].create(new_move_vals)
-            new_move._action_confirm(merge=False)
-            new_move.move_line_ids = move_line
-            # Ensure that the remaining qty to process is reserved as before
-            (new_move | current_move)._recompute_state()
-            (new_move | current_move)._action_assign()
-            for remaining_move_line in current_move.move_line_ids:
-                remaining_move_line.qty_done = remaining_move_line.product_uom_qty
-        move_line.move_id.split_other_move_lines(move_line)
+        move_line.qty_done = quantity
+        remaining_move_line = move_line._split_partial_quantity()
+        move_line._extract_in_split_order({"user_id": self.env.uid})
+        remaining_move_line.qty_done = remaining_move_line.product_uom_qty
+
         self._write_destination_on_lines(move_line, scanned_location)
         stock = self._actions_for("stock")
         stock.validate_moves(move_line.move_id)

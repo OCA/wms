@@ -1,4 +1,5 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, models
 from odoo.tools.float_utils import float_compare
@@ -24,29 +25,27 @@ class StockMove(models.Model):
         `move_lines` and `move.move_line_ids` which will be put in a new move.
         """
         self.ensure_one()
+        other_move_lines = self.move_line_ids - move_lines
         if intersection:
-            other_move_lines = self.move_line_ids & move_lines
+            to_move = self.move_line_ids & move_lines
         else:
-            other_move_lines = self.move_line_ids - move_lines
+            to_move = other_move_lines
         if other_move_lines or self.state == "partially_available":
             if intersection:
-                # TODO @sebalix: please check if we can abandon the flag.
-                # Thi behavior can be achieved by passing all move lines
-                # as done at zone_picking.py:1293
-                qty_to_split = sum(other_move_lines.mapped("product_uom_qty"))
+                qty_to_split = sum(to_move.mapped("product_uom_qty"))
             else:
                 qty_to_split = self.product_uom_qty - sum(
                     move_lines.mapped("product_uom_qty")
                 )
-            backorder_move_vals = self._split(qty_to_split)
-            backorder_move = self.create(backorder_move_vals)
-            backorder_move._action_confirm(merge=False)
-            backorder_move.move_line_ids = other_move_lines
-            backorder_move._recompute_state()
-            backorder_move._action_assign()
+            split_move_vals = self._split(qty_to_split)
+            split_move = self.create(split_move_vals)
+            split_move._action_confirm(merge=False)
+            split_move.move_line_ids = to_move
+            split_move._recompute_state()
+            split_move._action_assign()
             self._recompute_state()
-            return backorder_move
-        return False
+            return split_move
+        return self.browse()
 
     def split_unavailable_qty(self):
         """Put unavailable qty of a partially available move in their own
@@ -56,6 +55,39 @@ class StockMove(models.Model):
         for partial_move in partial_moves:
             partial_move.split_other_move_lines(partial_move.move_line_ids)
         return partial_moves
+
+    def _extract_in_split_order(self, default=None, backorder=False):
+        """Extract moves in a new picking
+
+        :param default: dictionary of field values to override in the original
+            values of the copied record
+        :param backorder: indicate if the original picking can be seen as a
+            backorder after the split. You could apply a specific backorder
+            strategy (e.g. cancel it).
+        :return: the new order
+        """
+        picking = self.picking_id
+        picking.ensure_one()
+        data = {
+            "name": "/",
+            "move_lines": [],
+            "move_line_ids": [],
+            "backorder_id": picking.id,
+        }
+        data.update(dict(default or []))
+        new_picking = picking.copy(data)
+        link = '<a href="#" data-oe-model="stock.picking" data-oe-id="%d">%s</a>' % (
+            new_picking.id,
+            new_picking.name,
+        )
+        message = (_("The split order {} has been created.")).format(link)
+        picking.message_post(body=message)
+        self.picking_id = new_picking.id
+        self.package_level_id.picking_id = new_picking.id
+        self.move_line_ids.picking_id = new_picking.id
+        self.move_line_ids.package_level_id.picking_id = new_picking.id
+        self._action_assign()
+        return new_picking
 
     def extract_and_action_done(self):
         """Extract the moves in a separate transfer and validate them.
@@ -78,30 +110,7 @@ class StockMove(models.Model):
             # a new transfer to validate. All remaining moves stay in the
             # current transfer.
             else:
-                new_picking = picking.copy(
-                    {
-                        "name": "/",
-                        "move_lines": [],
-                        "move_line_ids": [],
-                        "backorder_id": picking.id,
-                    }
-                )
-                new_picking.message_post(
-                    body=_(
-                        "Created from backorder "
-                        "<a href=# data-oe-model=stock.picking data-oe-id=%d>%s</a>."
-                    )
-                    % (picking.id, picking.name)
-                )
-                moves_todo.write({"picking_id": new_picking.id})
-                moves_todo.package_level_id.write({"picking_id": new_picking.id})
-                moves_todo.move_line_ids.write({"picking_id": new_picking.id})
-                moves_todo.move_line_ids.package_level_id.write(
-                    {"picking_id": new_picking.id}
-                )
-                # NOTE: at this stage all the operations should be assigned already
-                # hence the new picking must be assigned already.
-                # DO NOT CALL `new_picking.action_assign` or you'll wipe qty_done.
+                new_picking = moves_todo._extract_in_split_order()
                 assert new_picking.state == "assigned"
             new_picking._action_done()
         return True

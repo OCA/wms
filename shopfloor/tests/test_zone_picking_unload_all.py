@@ -205,15 +205,15 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         )
         # check data
         #   picking validated
-        picking_validated = self.picking6
-        self.assertEqual(picking_validated.state, "done")
-        self.assertEqual(picking_validated.move_line_ids, move_line_g | move_line_h)
         self.assertEqual(move_line_g.state, "done")
+        self.assertEqual(move_line_g.picking_id.state, "done")
         self.assertEqual(move_line_g.qty_done, 6)
         self.assertEqual(move_line_h.state, "done")
+        self.assertEqual(move_line_h.picking_id.state, "done")
         self.assertEqual(move_line_h.qty_done, 3)
         #   current picking (backorder)
-        backorder = self.picking6.backorder_ids
+        backorder = (move_line_g | move_line_h).picking_id.backorder_id
+        self.assertEqual(backorder, self.picking6)
         self.assertEqual(backorder.state, "confirmed")
         self.assertEqual(backorder.move_lines.product_id, self.product_h)
         self.assertEqual(backorder.move_lines.product_uom_qty, 3)
