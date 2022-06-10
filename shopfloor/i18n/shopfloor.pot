@@ -26,6 +26,51 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__multiple_move_single_pack
+msgid ""
+"\n"
+"When picking a move,\n"
+"allow to set a destination package that was already used for the other lines.\n"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__unload_package_at_destination
+msgid ""
+"\n"
+"With this option, the lines you process by putting on a package during the\n"
+"picking process will be put as bulk products at the final destination location.\n"
+"\n"
+"This is useful if your picking device is emptied at the destination location or\n"
+"if you want to provide bulk products to the next operation.\n"
+"\n"
+"Incompatible with: \"Pick and pack at the same time\"\n"
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/models/shopfloor_menu.py:0
+#, python-format
+msgid ""
+"'Multiple moves same destination package' is mandatory when 'Pick and pack "
+"at the same time' is set."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/models/shopfloor_menu.py:0
+#, python-format
+msgid ""
+"'Pick and pack at the same time' is incompatible with 'Multiple moves same "
+"destination package'."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/models/shopfloor_menu.py:0
+#, python-format
+msgid ""
+"'Pick and pack at the same time' is incompatible with 'Unload package at "
+"destination'."
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_app
 msgid "A Shopfloor application"
 msgstr ""
@@ -148,6 +193,11 @@ msgstr ""
 #: model:shopfloor.scenario,name:shopfloor.scenario_cluster_picking
 #: model:stock.picking.type,name:shopfloor.picking_type_cluster_picking_demo
 msgid "Cluster Picking"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__multiple_move_single_pack
+msgid "Collect multiple moves on a same destination package"
 msgstr ""
 
 #. module: shopfloor
@@ -411,6 +461,11 @@ msgstr ""
 #: code:addons/shopfloor/models/stock_move_line.py:0
 #, python-format
 msgid "Move lines processed have to share the same source location."
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__multiple_move_single_pack_is_possible
+msgid "Multiple Move Single Pack Is Possible"
 msgstr ""
 
 #. module: shopfloor
@@ -1228,6 +1283,16 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Units replaced by package {}."
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__unload_package_at_destination_is_possible
+msgid "Unload Package At Destination Is Possible"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__unload_package_at_destination
+msgid "Unload package at destination"
 msgstr ""
 
 #. module: shopfloor
