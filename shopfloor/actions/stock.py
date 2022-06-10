@@ -33,7 +33,7 @@ class StockAction(Component):
                 "printed": True,
             }
         )
-        move_lines.picking_id.filtered(lambda p: p.user_id != user.id).user_id = user.id
+        move_lines.picking_id.filtered(lambda p: p.user_id != user).user_id = user.id
 
     def validate_moves(self, moves):
         """Validate moves in different ways depending on several criterias:
