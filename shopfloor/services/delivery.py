@@ -155,7 +155,7 @@ class Delivery(Component):
                 barcode, use_packaging=(not allow_prepackaged_product)
             )
             if product:
-                return self._deliver_product(picking, product, location=location)
+                return self._deliver_product(picking, product, product_qty=1, location=location)
 
         if not barcode_valid:
             lot = search.lot_from_scan(barcode)
