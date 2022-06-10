@@ -117,10 +117,16 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             message=self.service.msg_store.barcode_not_found(),
         )
 
-    def _test_scan_set_done_ok(self, move_lines, barcode):
+    def _test_scan_set_done_ok(self, move_lines, barcode, qties=None):
         response = self.service.dispatch("scan_deliver", params={"barcode": barcode})
-        self.assert_qty_done(move_lines)
-        self.assert_response_deliver(response, picking=self.picking)
+        self.assert_qty_done(move_lines, qties)
+        picking = move_lines.move_id.picking_id
+        if picking.state == "done":
+            self.assert_response_deliver(
+                response, message=self.msg_store.transfer_complete(picking)
+            )
+        else:
+            self.assert_response_deliver(response, picking=picking)
 
     def test_scan_deliver_scan_package_ok(self):
         move_lines = self.pack1_moves.mapped("move_line_ids")
@@ -180,7 +186,9 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
 
     def test_scan_deliver_scan_raw_product_ok(self):
         self._test_scan_set_done_ok(
-            self.raw_move.mapped("move_line_ids"), self.product_d.barcode
+            self.raw_move.mapped("move_line_ids"),
+            self.product_d.barcode,
+            [1],  # When scanning a product we want to process only 1 qty
         )
 
     def test_scan_deliver_scan_raw_product_in_multiple_pickings(self):
