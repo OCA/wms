@@ -193,6 +193,11 @@ msgid "Creation of moves is not allowed for menu {}."
 msgstr "La creación de movimientos no está permitida para el menú {}."
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__date_planned
+msgid "Date Scheduled"
+msgstr ""
+
+#. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_delivery
 #: model:shopfloor.scenario,name:shopfloor.scenario_delivery
 #: model:stock.picking.type,name:shopfloor.picking_type_delivery_demo
@@ -766,6 +771,16 @@ msgid "Planned Move Line"
 msgstr "Línea de Movimiento Planificada"
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__prepackaged_product_is_possible
+msgid "Prepackaged Product Is Possible"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_prepackaged_product
+msgid "Process as pre-packaged"
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid "Processing reserved quantities is not allowed for menu {}."
@@ -881,6 +896,11 @@ msgstr ""
 "Estos tipos no satisfacen esta restricción:\n"
 "{}.\n"
 "Por favor, ajuste su configuración."
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_stock_move_line__date_planned
+msgid "Scheduled date until move is done, then date of actual move processing"
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1288,6 +1308,14 @@ msgstr "WMS"
 #: model:shopfloor.app,short_name:shopfloor.app_demo
 msgid "WMS (demo)"
 msgstr "WMS (demo)"
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_prepackaged_product
+msgid ""
+"When active, what you scan (typically a product packaging EAN) will be ship "
+"'as-is' and the operation will be validated triggering a backorder creation "
+"with the remaining lines."
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/cluster_picking.py:0
