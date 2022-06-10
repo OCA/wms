@@ -38,13 +38,7 @@ class BaseShopfloorService(AbstractComponent):
         try:
             return super().dispatch(method_name, *args, params=params)
         except ShopfloorError as e:
-            res = self._reponse(
-                base_response=e.base_response,
-                data=e.data,
-                next_state=e.next_state,
-                message=e.message_data,
-                popup=e.popup,
-            )
+            res = self._reponse(e.args)
             return self._prepare_response(method_name, res)
 
     def _actions_for(self, usage, **kw):
