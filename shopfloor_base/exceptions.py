@@ -9,12 +9,6 @@ class ShopfloorError(Exception):
     def __init__(
         self, base_response=None, data=None, next_state=None, message=None, popup=None
     ):
-
-        self.base_response = base_response
-        self.data = data
-        self.next_state = next_state
-        self.message_data = message
-        self.popup = popup
         super().__init__(
             base_response=base_response,
             data=data,
