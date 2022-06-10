@@ -607,12 +607,14 @@ class ClusterPicking(Component):
             )
 
         # the scanned package can contain only move lines of the same picking
-        if bin_package.quant_ids or any(
+        different_picking = any(
             ml.picking_id != move_line.picking_id
             for ml in bin_package.planned_move_line_ids.filtered(
                 lambda x: x.state not in ("done", "cancel")
             )
-        ):
+        )
+        multi_pick_allowed = self.work.menu.multiple_move_single_pack
+        if not multi_pick_allowed and (bin_package.quant_ids or different_picking):
             return self._response_for_scan_destination(
                 move_line,
                 message={
@@ -973,6 +975,8 @@ class ClusterPicking(Component):
             picking_lines = picking.mapped("move_line_ids")
             if all(line.shopfloor_unloaded for line in picking_lines):
                 picking._action_done()
+        if self.work.menu.unload_package_at_destination:
+            lines.result_package_id = False
 
     def _unload_end(self, batch, completion_info_popup=None):
         """Try to close the batch if all transfers are done.
