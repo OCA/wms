@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2022-05-29 23:05+0000\n"
+"PO-Revision-Date: 2022-06-11 23:05+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -45,6 +45,10 @@ msgid ""
 "allow to set a destination package that was already used for the other "
 "lines.\n"
 msgstr ""
+"\n"
+"Al elegir un movimiento,\n"
+"permite establecer un paquete de destino que ya se utilizó para las otras "
+"líneas.\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__unload_package_at_destination
@@ -60,6 +64,16 @@ msgid ""
 "\n"
 "Incompatible with: \"Pick and pack at the same time\"\n"
 msgstr ""
+"\n"
+"Con esta opción, las líneas que procese poniendo un paquete durante el\n"
+"proceso de selección se pondrán como productos a granel en el lugar de "
+"destino final.\n"
+"\n"
+"Esto es útil si su dispositivo de recolección se vacía en la ubicación de "
+"destino o\n"
+"si desea proporcionar productos a granel a la siguiente operación.\n"
+"\n"
+"Incompatible con: \"Recoger y empaquetar al mismo tiempo\"\n"
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
@@ -68,6 +82,8 @@ msgid ""
 "'Multiple moves same destination package' is mandatory when 'Pick and pack "
 "at the same time' is set."
 msgstr ""
+"'Múltiples movimientos en el mismo paquete de destino' es obligatorio cuando "
+"'Recoger y empaquetar al mismo tiempo' está configurado."
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
@@ -76,6 +92,8 @@ msgid ""
 "'Pick and pack at the same time' is incompatible with 'Multiple moves same "
 "destination package'."
 msgstr ""
+"'Recoger y empaquetar al mismo tiempo' es incompatible con 'Múltiples "
+"movimientos en el mismo paquete de destino'."
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
@@ -84,6 +102,8 @@ msgid ""
 "'Pick and pack at the same time' is incompatible with 'Unload package at "
 "destination'."
 msgstr ""
+"'Recoger y empaquetar al mismo tiempo' es incompatible con 'Descargar "
+"paquete en destino'."
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_app
@@ -213,7 +233,7 @@ msgstr "Grupo de Picking"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__multiple_move_single_pack
 msgid "Collect multiple moves on a same destination package"
-msgstr ""
+msgstr "Recolecta múltiples movimientos en un mismo paquete de destino"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -248,7 +268,7 @@ msgstr "La creación de movimientos no está permitida para el menú {}."
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__date_planned
 msgid "Date Scheduled"
-msgstr ""
+msgstr "Fecha Planificada"
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_delivery
@@ -491,7 +511,7 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__multiple_move_single_pack_is_possible
 msgid "Multiple Move Single Pack Is Possible"
-msgstr ""
+msgstr "Paquete Individual de Movimiento Múltiple Es Posible"
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
@@ -831,12 +851,12 @@ msgstr "Línea de Movimiento Planificada"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__prepackaged_product_is_possible
 msgid "Prepackaged Product Is Possible"
-msgstr ""
+msgstr "Producto PreEmpaquetado Es Posible"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_prepackaged_product
 msgid "Process as pre-packaged"
-msgstr ""
+msgstr "Procesar como pre-empaquetado"
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
@@ -959,6 +979,8 @@ msgstr ""
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__date_planned
 msgid "Scheduled date until move is done, then date of actual move processing"
 msgstr ""
+"Fecha planificada hasta que se realiza el movimiento, luego fecha de "
+"procesamiento del movimiento actual"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1221,7 +1243,7 @@ msgstr "El registro en el que estaba trabajando ya no existe."
 #: code:addons/shopfloor/models/stock_move.py:0
 #, python-format
 msgid "The split order {} has been created."
-msgstr ""
+msgstr "Se ha creado el pedido dividido {}."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__picking_id
@@ -1349,12 +1371,12 @@ msgstr "Unidades reemplazadas por paquete {}."
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__unload_package_at_destination_is_possible
 msgid "Unload Package At Destination Is Possible"
-msgstr ""
+msgstr "Descargar Paquete En El Destino Es Posible"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__unload_package_at_destination
 msgid "Unload package at destination"
-msgstr ""
+msgstr "Descargar paquete en destino"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1384,6 +1406,9 @@ msgid ""
 "'as-is' and the operation will be validated triggering a backorder creation "
 "with the remaining lines."
 msgstr ""
+"Cuando está activo, lo que escanea (generalmente un EAN de empaque de "
+"producto) se enviará 'tal cual' y la operación se validará activando la "
+"creación de un pedido pendiente con las líneas restantes."
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/cluster_picking.py:0
