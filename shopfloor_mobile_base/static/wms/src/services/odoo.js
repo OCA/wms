@@ -64,7 +64,11 @@ export class OdooMixin {
                     handler = this._handle_error;
                 }
                 return response.json().then((json) => {
-                    return {error: handler.call(this, response, json)};
+                    if (json.no_wrap) {
+                        return json;
+                    } else {
+                        return {error: handler.call(this, response, json)};
+                    }
                 });
             }
             return response.json();

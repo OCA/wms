@@ -6,6 +6,22 @@ from odoo import fields
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
+from odoo.addons.shopfloor_base.exceptions import (
+    AlreadyDone,
+    DestLocationNotAllowed,
+    NoLocationFound,
+    NoPackInLocation,
+    NoPendingOperationForPack,
+    NoPutawayDestinationAvailable,
+    OperationHasBeenCanceledElsewhere,
+    OperationNotFound,
+    PackageAlreadyPickedBy,
+    PackageHasNoProductToTake,
+    PackageNotAllowedInSrcLocation,
+    PackageNotFoundForBarcode,
+    PackageUnableToTransfer,
+    SeveralPacksInLocation,
+)
 
 
 class SinglePackTransfer(Component):
@@ -69,32 +85,26 @@ class SinglePackTransfer(Component):
                 [("location_id", "=", location.id)]
             )
             if not package:
-                return (self.msg_store.no_pack_in_location(location), None)
+                raise NoPackInLocation(location, next_state="start")
             if len(package) > 1:
-                return (self.msg_store.several_packs_in_location(location), None)
+                raise SeveralPacksInLocation(location, next_state="start")
 
         if not package:
             package = search.package_from_scan(barcode)
 
         if not package:
-            return (self.msg_store.package_not_found_for_barcode(barcode), None)
+            raise PackageNotFoundForBarcode(barcode, next_state="start")
         if not package.location_id:
-            return (self.msg_store.package_has_no_product_to_take(barcode), None)
+            raise PackageHasNoProductToTake(barcode, next_state="start")
         if not self.is_src_location_valid(package.location_id):
-            return (
-                self.msg_store.package_not_allowed_in_src_location(
-                    barcode, self.picking_types
-                ),
-                None,
+            raise PackageNotAllowedInSrcLocation(
+                barcode, self.picking_types, next_state="start"
             )
-
-        return (None, package)
+        return package
 
     def start(self, barcode, confirmation=False):
         picking_types = self.picking_types
-        message, package = self._scan_source(barcode, confirmation)
-        if message:
-            return self._response_for_start(message=message)
+        package = self._scan_source(barcode, confirmation)
         package_level = self.env["stock.package_level"].search(
             [
                 ("package_id", "=", package.id),
@@ -102,10 +112,6 @@ class SinglePackTransfer(Component):
             ]
         )
 
-        # Start a savepoint because we are may unreserve moves of other
-        # picking types. If we do and we can't create a package level after,
-        # we rollback to the initial state
-        savepoint = self._actions_for("savepoint").new()
         unreserved_moves = self.env["stock.move"].browse()
         if not package_level:
             other_move_lines = self.env["stock.move.line"].search(
@@ -119,9 +125,7 @@ class SinglePackTransfer(Component):
                 other_move_lines and not self.work.menu.allow_unreserve_other_moves
             ):
                 picking = fields.first(other_move_lines).picking_id
-                return self._response_for_start(
-                    message=self.msg_store.package_already_picked_by(package, picking)
-                )
+                raise PackageAlreadyPickedBy(package, picking, next_state="start")
             elif other_move_lines and self.work.menu.allow_unreserve_other_moves:
 
                 unreserved_moves = other_move_lines.move_id
@@ -136,30 +140,22 @@ class SinglePackTransfer(Component):
         package_level = package_level.filtered(
             lambda pl: pl.state not in ("cancel", "done", "draft")
         )
-        message = self.msg_store.no_pending_operation_for_pack(package)
+        self.msg_store.no_pending_operation_for_pack(package)
         if not package_level and self.is_allow_move_create():
             package_level = self._create_package_level(package)
             if not self.is_dest_location_valid(
                 package_level.move_line_ids.move_id, package_level.location_dest_id
             ):
                 package_level = None
-                savepoint.rollback()
-                message = self.msg_store.package_unable_to_transfer(package)
+                raise PackageUnableToTransfer(package, next_state="start")
 
         if not package_level:
-            # restore any unreserved move/package level
-            savepoint.rollback()
-            return self._response_for_start(message=message)
+            raise NoPendingOperationForPack(package, next_state="start")
         stock = self._actions_for("stock")
         if self.work.menu.ignore_no_putaway_available and stock.no_putaway_available(
             self.picking_types, package_level.move_line_ids
         ):
-            # the putaway created a move line but no putaway was possible, so revert
-            # to the initial state
-            savepoint.rollback()
-            return self._response_for_start(
-                message=self.msg_store.no_putaway_destination_available()
-            )
+            raise NoPutawayDestinationAvailable(next_state="start")
 
         if package_level.is_done and not confirmation:
             return self._response_for_confirm_start(
@@ -169,8 +165,6 @@ class SinglePackTransfer(Component):
             package_level.is_done = True
 
         unreserved_moves._action_assign()
-
-        savepoint.release()
 
         return self._response_for_scan_location(package_level)
 
@@ -201,31 +195,28 @@ class SinglePackTransfer(Component):
     def validate(self, package_level_id, location_barcode, confirmation=False):
         """Validate the transfer"""
         search = self._actions_for("search")
-
         package_level = self.env["stock.package_level"].browse(package_level_id)
         if not package_level.exists():
-            return self._response_for_start(
-                message=self.msg_store.operation_not_found()
-            )
+            raise OperationNotFound(next_state="start")
 
         # Do not use package_level.move_ids, this is only filled in when the
         # moves have been created from a manually encoded package level, not
         # when a package has been reserved for existing moves
         moves = package_level.move_line_ids.move_id
         if not self._is_move_state_valid(moves):
-            return self._response_for_start(
-                message=self.msg_store.operation_has_been_canceled_elsewhere()
-            )
+            raise OperationHasBeenCanceledElsewhere(next_state="start")
 
         scanned_location = search.location_from_scan(location_barcode)
         if not scanned_location:
-            return self._response_for_scan_location(
-                package_level, message=self.msg_store.no_location_found()
+            raise NoLocationFound(
+                data=self._data_after_package_scanned(package_level),
+                next_state="scan_location",
             )
 
         if not self.is_dest_location_valid(moves, scanned_location):
-            return self._response_for_scan_location(
-                package_level, message=self.msg_store.dest_location_not_allowed()
+            raise DestLocationNotAllowed(
+                data=self._data_after_package_scanned(package_level),
+                next_state="scan_location",
             )
 
         if not confirmation and self.is_dest_location_to_confirm(
@@ -267,13 +258,11 @@ class SinglePackTransfer(Component):
     def cancel(self, package_level_id):
         package_level = self.env["stock.package_level"].browse(package_level_id)
         if not package_level.exists():
-            return self._response_for_start(
-                message=self.msg_store.operation_not_found()
-            )
+            raise OperationNotFound(next_state="start")
         # package.move_ids may be empty, it seems
         move = package_level.move_line_ids.move_id
         if move.state == "done":
-            return self._response_for_start(message=self.msg_store.already_done())
+            raise AlreadyDone(next_state="start")
 
         package_level.is_done = False
         return self._response_for_start(

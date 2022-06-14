@@ -13,7 +13,7 @@ from odoo.addons.component.core import AbstractComponent
 
 from ..actions.base_action import get_actions_for
 from ..apispec.service_apispec import ShopfloorRestServiceAPISpec
-from ..exceptions import ShopfloorError
+from ..exceptions import ShopfloorDispatchError, ShopfloorError
 
 
 class BaseShopfloorService(AbstractComponent):
@@ -38,8 +38,16 @@ class BaseShopfloorService(AbstractComponent):
         try:
             return super().dispatch(method_name, *args, params=params)
         except ShopfloorError as e:
-            res = self._reponse(e.args)
-            return self._prepare_response(method_name, res)
+            res = self._response(
+                message={"message_type": "error", "body": str(e)},
+                base_response=e.base_response,
+                data=e.data,
+                next_state=e.next_state,
+                popup=e.popup,
+            )
+            method = getattr(self, method_name, object())
+            payload = self._prepare_response(method, res)
+            raise ShopfloorDispatchError(payload)
 
     def _actions_for(self, usage, **kw):
         return get_actions_for(self, usage, **kw)

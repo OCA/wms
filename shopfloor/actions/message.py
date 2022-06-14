@@ -177,12 +177,6 @@ class MessageAction(Component):
             "body": _("Canceled, you can scan a new pack."),
         }
 
-    def no_pack_in_location(self, location):
-        return {
-            "message_type": "error",
-            "body": _("Location %s doesn't contain any package.") % location.name,
-        }
-
     def several_packs_in_location(self, location):
         return {
             "message_type": "warning",
