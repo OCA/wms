@@ -4,6 +4,8 @@
 
 from odoo.tests.common import Form
 
+from odoo.addons.shopfloor_base.exceptions import ShopfloorDispatchError
+
 from .test_single_pack_transfer_base import SinglePackTransferCommonBase
 
 
@@ -142,15 +144,11 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
 
         # Simulate the client scanning a package's barcode, which
         # in turns should start the operation in odoo
-        response = self.service.dispatch("start", params=params)
-
-        self.assert_response(
-            response,
-            next_state="start",
-            message={
-                "message_type": "error",
-                "body": "No pending operation for package {}.".format(self.pack_a.name),
-            },
+        with self.assertRaises(ShopfloorDispatchError) as error:
+            self.service.dispatch("start", params=params)
+        self.assertIn(
+            "No pending operation for package",
+            error.exception,
         )
 
     def test_start_no_operation_create(self):
@@ -210,14 +208,11 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         * Return a message
         """
         params = {"barcode": "THIS_BARCODE_DOES_NOT_EXIST"}
-        response = self.service.dispatch("start", params=params)
-        self.assert_response(
-            response,
-            next_state="start",
-            message={
-                "message_type": "error",
-                "body": "The package THIS_BARCODE_DOES_NOT_EXIST" " doesn't exist",
-            },
+        with self.assertRaises(ShopfloorDispatchError) as error:
+            self.service.dispatch("start", params=params)
+        self.assertIn(
+            "The package THIS_BARCODE_DOES_NOT_EXIST",
+            error.exception,
         )
 
     def test_start_pack_empty(self):
@@ -288,15 +283,11 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         """
         barcode = self.shelf2.barcode
         params = {"barcode": barcode}
-        response = self.service.dispatch("start", params=params)
-        self.assert_response(
-            response,
-            next_state="start",
-            message={
-                "message_type": "error",
-                "body": "Location %s doesn't contain any package."
-                % (self.shelf2.name,),
-            },
+        with self.assertRaises(ShopfloorDispatchError) as error:
+            self.service.dispatch("start", params=params)
+        self.assertIn(
+            "doesn't contain any package",
+            error.exception,
         )
 
     def test_start_pack_from_location_several_packs(self):
@@ -326,15 +317,12 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         )
         barcode = self.shelf1.barcode
         params = {"barcode": barcode}
-        response = self.service.dispatch("start", params=params)
-        self.assert_response(
-            response,
-            next_state="start",
-            message={
-                "message_type": "warning",
-                "body": "Several packages found in %s, please scan a package."
-                % (self.shelf1.name,),
-            },
+
+        with self.assertRaises(ShopfloorDispatchError) as error:
+            self.service.dispatch("start", params=params)
+        self.assertIn(
+            "Several packages found",
+            error.exception,
         )
 
     def test_start_pack_outside_of_location(self):
@@ -352,15 +340,11 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.pack_a.location_id = self.dispatch_location
         barcode = self.pack_a.name
         params = {"barcode": barcode}
-        response = self.service.dispatch("start", params=params)
-        self.assert_response(
-            response,
-            next_state="start",
-            message={
-                "message_type": "error",
-                "body": "You cannot work on a package (%s) outside of locations: %s"
-                % (self.pack_a.name, self.picking_type.default_location_src_id.name),
-            },
+        with self.assertRaises(ShopfloorDispatchError) as error:
+            self.service.dispatch("start", params=params)
+        self.assertIn(
+            "You cannot work on a package",
+            error.exception,
         )
 
     def test_start_already_started(self):
@@ -541,18 +525,17 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
 
         * No change in odoo, Transition with a message
         """
-        response = self.service.dispatch(
-            "validate",
-            params={"package_level_id": -1, "location_barcode": self.shelf1.barcode},
-        )
-
-        self.assert_response(
-            response,
-            next_state="start",
-            message={
-                "message_type": "error",
-                "body": "This operation does not exist anymore.",
-            },
+        with self.assertRaises(ShopfloorDispatchError) as error:
+            self.service.dispatch(
+                "validate",
+                params={
+                    "package_level_id": -1,
+                    "location_barcode": self.shelf1.barcode,
+                },
+            )
+        self.assertIn(
+            "This operation does not exist anymore",
+            error.exception,
         )
 
     def test_validate_location_not_found(self):
@@ -570,22 +553,17 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         # was already started by the first step (start operation)
         package_level = self._simulate_started(self.pack_a)
 
-        response = self.service.dispatch(
-            "validate",
-            params={
-                "package_level_id": package_level.id,
-                "location_barcode": "THIS_BARCODE_DOES_NOT_EXISTS",
-            },
-        )
-
-        self.assert_response(
-            response,
-            next_state="scan_location",
-            data=self.ANY,
-            message={
-                "message_type": "error",
-                "body": "No location found for this barcode.",
-            },
+        with self.assertRaises(ShopfloorDispatchError) as error:
+            self.service.dispatch(
+                "validate",
+                params={
+                    "package_level_id": package_level.id,
+                    "location_barcode": "THIS_BARCODE_DOES_NOT_EXISTS",
+                },
+            )
+        self.assertIn(
+            "No location found for this barcode",
+            error.exception,
         )
 
     def test_validate_location_forbidden(self):
@@ -607,20 +585,18 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         # was already started by the first step (start operation)
         package_level = self._simulate_started(self.pack_a)
 
-        response = self.service.dispatch(
-            "validate",
-            params={
-                "package_level_id": package_level.id,
-                # this location is outside of the expected destination
-                "location_barcode": self.dispatch_location.barcode,
-            },
-        )
-
-        self.assert_response(
-            response,
-            next_state="scan_location",
-            data=self.ANY,
-            message={"message_type": "error", "body": "You cannot place it here"},
+        with self.assertRaises(ShopfloorDispatchError) as error:
+            self.service.dispatch(
+                "validate",
+                params={
+                    "package_level_id": package_level.id,
+                    # this location is outside of the expected destination
+                    "location_barcode": self.dispatch_location.barcode,
+                },
+            )
+        self.assertIn(
+            "You cannot place it here",
+            error.exception,
         )
 
     def test_validate_location_move_not_child_of_picking_allowed(self):
@@ -921,14 +897,11 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
 
         * No change in odoo, Transition with a message
         """
-        response = self.service.dispatch("cancel", params={"package_level_id": -1})
-        self.assert_response(
-            response,
-            next_state="start",
-            message={
-                "message_type": "error",
-                "body": "This operation does not exist anymore.",
-            },
+        with self.assertRaises(ShopfloorDispatchError) as error:
+            self.service.dispatch("cancel", params={"package_level_id": -1})
+        self.assertIn(
+            "This operation does not exist anymore",
+            error.exception,
         )
 
 
