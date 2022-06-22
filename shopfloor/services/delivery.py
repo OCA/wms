@@ -150,7 +150,7 @@ class Delivery(Component):
                 return self._deliver_package(picking, package, location)
 
         if not barcode_valid:
-            product = search.product_from_scan(barcode, use_packaging=False)
+            product = search.product_from_scan(barcode)
             if product:
                 return self._deliver_product(
                     picking, product, product_qty=1, location=location

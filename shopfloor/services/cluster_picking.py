@@ -453,6 +453,9 @@ class ClusterPicking(Component):
 
         # use the common search method so we search by packaging too
         product = search.product_from_scan(barcode)
+        if not product:
+            packaging = search.packaging_from_scan(barcode)
+            product = packaging.product_id
         if product and move_line.product_id == product:
             return self._scan_line_by_product(picking, move_line, product)
 
