@@ -602,6 +602,9 @@ class ZonePicking(Component):
         search = self._actions_for("search")
         product = search.product_from_scan(barcode)
         if not product:
+            packaging = search.packaging_from_scan(barcode)
+            product = packaging.product_id
+        if not product:
             return response, message
         move_lines = self._find_location_move_lines(
             locations=sublocation, product=product
