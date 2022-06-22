@@ -361,14 +361,18 @@ class ZonePickingCommonCase(CommonCase):
         move_line,
         message=None,
         confirmation_required=False,
+        qty_done=None,
     ):
+        expected_move_line = self.data.move_line(move_line, with_picking=True)
+        if qty_done is not None:
+            expected_move_line["qty_done"] = qty_done
         self.assert_response(
             response,
             next_state=state,
             data={
                 "zone_location": self.data.location(zone_location),
                 "picking_type": self.data.picking_type(picking_type),
-                "move_line": self.data.move_line(move_line, with_picking=True),
+                "move_line": expected_move_line,
                 "confirmation_required": confirmation_required,
             },
             message=message,
@@ -382,6 +386,7 @@ class ZonePickingCommonCase(CommonCase):
         move_line,
         message=None,
         confirmation_required=False,
+        qty_done=None,
     ):
         self._assert_response_set_line_destination(
             "set_line_destination",
@@ -391,6 +396,7 @@ class ZonePickingCommonCase(CommonCase):
             move_line,
             message=message,
             confirmation_required=confirmation_required,
+            qty_done=qty_done,
         )
 
     def _assert_response_zero_check(

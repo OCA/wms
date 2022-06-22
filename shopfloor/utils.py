@@ -5,6 +5,6 @@
 def to_float(val):
     if isinstance(val, float):
         return val
-    if val:
+    if isinstance(val, int):
         return float(val)
     return None

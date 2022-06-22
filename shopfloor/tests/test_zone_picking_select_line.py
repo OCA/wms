@@ -126,6 +126,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_line=move_line,
+            qty_done=10.0,
         )
 
     def test_scan_source_barcode_location_two_move_lines_same_product(self):
@@ -151,6 +152,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_line=move_line,
+            qty_done=10.0,
         )
         # first line done
         move_line.qty_done = move_line.product_uom_qty
@@ -165,6 +167,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_line=move_line,
+            qty_done=10.0,
         )
 
     def test_scan_source_barcode_location_several_move_lines(self):
@@ -206,6 +209,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_line=move_line,
+            qty_done=10.0,
         )
 
     def test_scan_source_barcode_package_not_found(self):
@@ -332,6 +336,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_line=move_line,
+            qty_done=10.0,
         )
 
     def test_scan_source_barcode_product_not_found(self):
@@ -424,6 +429,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_line=move_line,
+            qty_done=10.0,
         )
 
     def test_scan_source_barcode_lot_in_multiple_location(self):

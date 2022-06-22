@@ -352,11 +352,16 @@ class Checkout(Component):
             return self._response_for_manual_selection(message=message)
         return self._select_picking(picking, "manual_selection")
 
-    def _select_lines(self, lines):
+    def _select_lines(self, lines, prefill_qty=0):
         for line in lines:
             if line.shopfloor_checkout_done:
                 continue
-            line.qty_done = line.product_uom_qty
+            if self.work.menu.no_prefill_qty:
+                line.qty_done += prefill_qty
+                # For prefill quantity we only want to increment one line
+                prefill_qty = 0
+            else:
+                line.qty_done = line.product_uom_qty
             line.shopfloor_user_id = self.env.user
 
         picking = lines.mapped("picking_id")
@@ -403,12 +408,15 @@ class Checkout(Component):
             return self._select_lines_from_package(picking, selection_lines, package)
 
         product = search.product_from_scan(barcode)
+        if product:
+            return self._select_lines_from_product(picking, selection_lines, product)
+
         if not product:
             packaging = search.packaging_from_scan(barcode)
             if packaging:
-                product = packaging.product_id
-        if product:
-            return self._select_lines_from_product(picking, selection_lines, product)
+                return self._select_lines_from_packaging(
+                    picking, selection_lines, packaging
+                )
 
         lot = search.lot_from_scan(barcode, products=picking.move_lines.product_id)
         if lot:
@@ -431,6 +439,8 @@ class Checkout(Component):
                 },
             )
         self._select_lines(lines)
+        if self.work.menu.no_prefill_qty:
+            lines = picking.move_line_ids
         return self._response_for_select_package(picking, lines)
 
     def _select_lines_from_product(self, picking, selection_lines, product):
@@ -442,11 +452,7 @@ class Checkout(Component):
         lines = selection_lines.filtered(lambda l: l.product_id == product)
         if not lines:
             return self._response_for_select_line(
-                picking,
-                message={
-                    "message_type": "error",
-                    "body": _("Product is not in the current transfer."),
-                },
+                picking, message=self.msg_store.product_not_found_in_current_picking()
             )
 
         # When products are as units outside of packages, we can select them for
@@ -467,7 +473,41 @@ class Checkout(Component):
             # package and we have only one.
             return self._select_lines_from_package(picking, selection_lines, packages)
 
-        self._select_lines(lines)
+        self._select_lines(lines, prefill_qty=1)
+        return self._response_for_select_package(picking, lines)
+
+    def _select_lines_from_packaging(self, picking, selection_lines, packaging):
+        product = packaging.product_id
+        if product.tracking in ("lot", "serial"):
+            return self._response_for_select_line(
+                picking, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
+            )
+
+        lines = selection_lines.filtered(lambda l: l.product_id == product)
+        if not lines:
+            return self._response_for_select_line(
+                picking, message=self.msg_store.product_not_found_in_current_picking()
+            )
+
+        # When products are as units outside of packages, we can select them for
+        # packing, but if they are in a package, we want the user to scan the packages.
+        # If the product is only in one package though, scanning the product selects
+        # the package.
+        packages = lines.mapped("package_id")
+        # Do not use mapped here: we want to see if we have more than one package,
+        # but also if we have one product as a package and the same product as
+        # a unit in another line. In both cases, we want the user to scan the
+        # package.
+        if packages and len({line.package_id for line in lines}) > 1:
+            return self._response_for_select_line(
+                picking, message=self.msg_store.product_multiple_packages_scan_package()
+            )
+        elif packages:
+            # Select all the lines of the package when we scan a product in a
+            # package and we have only one.
+            return self._select_lines_from_package(picking, selection_lines, packages)
+
+        self._select_lines(lines, prefill_qty=packaging.qty)
         return self._response_for_select_package(picking, lines)
 
     def _select_lines_from_lot(self, picking, selection_lines, lot):
@@ -499,7 +539,7 @@ class Checkout(Component):
             # package and we have only one.
             return self._select_lines_from_package(picking, selection_lines, packages)
 
-        self._select_lines(lines)
+        self._select_lines(lines, prefill_qty=1)
         return self._response_for_select_package(picking, lines)
 
     def _select_line_package(self, picking, selection_lines, package):
@@ -666,6 +706,25 @@ class Checkout(Component):
                 lambda l: l.product_uom_qty,
             )
 
+    def _increment_custom_qty(
+        self, picking, selected_line, increment_lines, qty_increment
+    ):
+        """Increment the  qty_done of a move line with a custom value
+
+        The selected_line_ids parameter is used to keep the selection of lines
+        stateless.
+
+        Transitions:
+        * select_package: goes back to this screen showing all the lines after
+          we changed the qty
+        """
+        return self._change_line_qty(
+            picking.id,
+            selected_line.ids,
+            increment_lines.ids,
+            lambda line: line.qty_done + qty_increment,
+        )
+
     @staticmethod
     def _filter_lines_unpacked(move_line):
         return (
@@ -763,6 +822,7 @@ class Checkout(Component):
 
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
 
+        packaging = None
         product = search.product_from_scan(barcode)
         if not product:
             packaging = search.packaging_from_scan(barcode)
@@ -775,12 +835,23 @@ class Checkout(Component):
                     message=self.msg_store.scan_lot_on_product_tracked_by_lot(),
                 )
             product_lines = selected_lines.filtered(lambda l: l.product_id == product)
-            return self._switch_line_qty_done(picking, selected_lines, product_lines)
+            if self.work.menu.no_prefill_qty:
+                quantity_increment = packaging.qty if packaging else 1
+                return self._increment_custom_qty(
+                    picking, selected_lines, product_lines, quantity_increment
+                )
+            else:
+                return self._switch_line_qty_done(
+                    picking, selected_lines, product_lines
+                )
 
         lot = search.lot_from_scan(barcode, products=selected_lines.product_id)
         if lot:
             lot_lines = selected_lines.filtered(lambda l: l.lot_id == lot)
-            return self._switch_line_qty_done(picking, selected_lines, lot_lines)
+            if self.work.menu.no_prefill_qty:
+                return self._increment_custom_qty(picking, selected_lines, lot_lines, 1)
+            else:
+                return self._switch_line_qty_done(picking, selected_lines, lot_lines)
 
         package = search.package_from_scan(barcode)
         if package:

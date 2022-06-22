@@ -26,6 +26,13 @@ When picking a move,
 allow to set a destination package that was already used for the other lines.
 """
 
+NO_PREFILL_QTY_HELP = """
+We assume the picker will take the suggested quantities.
+With this option, the operator will have to enter the quantity manually or
+by scanning a product or product packaging EAN to increase the quantity
+(i.e. +1 Unit or +1 Box)
+"""
+
 
 class ShopfloorMenu(models.Model):
     _inherit = "shopfloor.menu"
@@ -112,6 +119,15 @@ class ShopfloorMenu(models.Model):
     )
     allow_force_reservation_is_possible = fields.Boolean(
         compute="_compute_allow_force_reservation_is_possible"
+    )
+
+    no_prefill_qty = fields.Boolean(
+        string="Do not pre-fill quantity to pick",
+        help=NO_PREFILL_QTY_HELP,
+        default=False,
+    )
+    no_prefill_qty_is_possible = fields.Boolean(
+        compute="_compute_no_prefill_qty_is_possible"
     )
 
     @api.onchange("unload_package_at_destination")
@@ -293,4 +309,11 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.allow_force_reservation_is_possible = menu.scenario_id.has_option(
                 "allow_force_reservation"
+            )
+
+    @api.depends("scenario_id")
+    def _compute_no_prefill_qty_is_possible(self):
+        for menu in self:
+            menu.no_prefill_qty_is_possible = menu.scenario_id.has_option(
+                "no_prefill_qty"
             )

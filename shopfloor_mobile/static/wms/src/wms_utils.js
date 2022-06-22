@@ -216,8 +216,10 @@ export class WMSUtils {
                 path: "quantity",
                 label: "Qty",
                 render_component: "packaging-qty-picker-display",
-                render_options: function (record) {
-                    return self.move_line_qty_picker_options(record);
+                render_props: function (record) {
+                    return self.move_line_qty_picker_props(record, {
+                        qtyInit: record.quantity,
+                    });
                 },
             },
             {path: "product.qty_available", label: "Qty on hand"},
@@ -237,14 +239,15 @@ export class WMSUtils {
         });
         return options;
     }
-    move_line_qty_picker_options(line, override = {}) {
-        const opts = {
-            init_value: line.quantity,
-            available_packaging: line.product.packaging,
+    move_line_qty_picker_props(line, override = {}) {
+        const props = {
+            qtyTodo: parseInt(line.quantity, 10),
+            qtyInit: line.qty_done,
+            availablePackaging: line.product.packaging,
             uom: line.product.uom,
-            non_zero_only: true,
+            nonZeroOnly: true,
         };
-        return _.extend(opts, override || {});
+        return _.extend(props, override || {});
     }
 }
 

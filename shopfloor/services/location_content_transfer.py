@@ -577,7 +577,9 @@ class LocationContentTransfer(Component):
         product = search.product_from_scan(barcode)
         if not product:
             packaging = search.packaging_from_scan(barcode)
-            product = packaging.product_id
+            if packaging:
+                product = packaging.product_id
+
         if product and product == move_line.product_id:
             if product.tracking in ("lot", "serial"):
                 move_lines = self._find_transfer_move_lines(location)

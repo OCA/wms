@@ -77,6 +77,13 @@
                         attrs="{'readonly': [('pick_pack_same_time', '=', True)]}"
                     />
               </group>
+              <group
+                    name="no_prefill_qty"
+                    attrs="{'invisible': [('no_prefill_qty_is_possible', '=', False)]}"
+                >
+                  <field name="no_prefill_qty_is_possible" invisible="1" />
+                  <field name="no_prefill_qty" />
+              </group>
             </group>
         </field>
     </record>
