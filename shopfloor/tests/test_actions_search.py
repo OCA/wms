@@ -50,8 +50,9 @@ class TestSearchCase(TestSearchBaseCase):
         self.assertEqual(handler(rec.barcode), rec)
         self.assertEqual(handler(False), rec.browse())
         self.assertEqual(handler("NONE"), rec.browse())
+        # It is not possible to search a product by packaging
         packaging = self.product_a_packaging
-        self.assertEqual(handler(packaging.barcode), rec)
+        self.assertFalse(handler(packaging.barcode))
 
     def test_search_lot_number_unique(self):
         rec = (
