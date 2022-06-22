@@ -130,6 +130,9 @@ class DeliveryShipment(Component):
         if scanned_lot:
             return self._scan_lot(shipment_advice, scanned_lot)
         scanned_product = search.product_from_scan(barcode)
+        if not scanned_product:
+            packaging = search.packaging_from_scan(barcode)
+            scanned_product = packaging.product_id
         if scanned_product:
             return self._scan_product(shipment_advice, scanned_product, picking)
         return self._response_for_scan_document(
