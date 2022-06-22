@@ -222,7 +222,7 @@ class Checkout(Component):
                     picking = pickings
         if not picking:
             # Try to find the product first
-            product = search.product_from_scan(barcode, use_packaging=False)
+            product = search.product_from_scan(barcode)
             # TODO Filter lines on picking_type before
             # line_domain = [
             #     ("move_id.picking_id.picking_type_id", "in", self.picking_types.ids)
@@ -403,6 +403,10 @@ class Checkout(Component):
             return self._select_lines_from_package(picking, selection_lines, package)
 
         product = search.product_from_scan(barcode)
+        if not product:
+            packaging = search.packaging_from_scan(barcode)
+            if packaging:
+                product = packaging.product_id
         if product:
             return self._select_lines_from_product(picking, selection_lines, product)
 
@@ -760,6 +764,9 @@ class Checkout(Component):
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
 
         product = search.product_from_scan(barcode)
+        if not product:
+            packaging = search.packaging_from_scan(barcode)
+            product = packaging.product_id
         if product:
             if product.tracking in ("lot", "serial"):
                 return self._response_for_select_package(

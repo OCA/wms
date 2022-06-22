@@ -136,9 +136,11 @@ class Delivery(Component):
                 return self._deliver_package(picking, package)
 
         if not barcode_valid:
-            product = search.product_from_scan(
-                barcode, use_packaging=(not allow_prepackaged_product)
-            )
+            use_packaging = not allow_prepackaged_product
+            product = search.product_from_scan(barcode)
+            if not product and use_packaging:
+                packaging = search.packaging_from_scan(barcode)
+                product = packaging.product_id
             if product:
                 return self._deliver_product(picking, product)
 

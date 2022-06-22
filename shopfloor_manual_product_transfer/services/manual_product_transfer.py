@@ -233,6 +233,9 @@ class ManualProductTransfer(Component):
         initial_qty = None
         # Search by product first
         product = search.product_from_scan(barcode)
+        if not product:
+            packaging = search.packaging_from_scan(barcode)
+            product = packaging.product_id
         if product:
             if product.tracking != "none":
                 return self._response_for_scan_product(
@@ -472,6 +475,9 @@ class ManualProductTransfer(Component):
             return
         # Search by product
         scanned_product = search.product_from_scan(barcode)
+        if not scanned_product:
+            packaging = search.packaging_from_scan(barcode)
+            scanned_product = packaging.product_id
         # Barcode is not a product
         if not scanned_product:
             return self._response_for_confirm_quantity(
