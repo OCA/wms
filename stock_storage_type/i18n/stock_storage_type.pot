@@ -40,6 +40,7 @@ msgstr ""
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__active
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__active
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__active
 msgid "Active"
 msgstr ""
 
@@ -68,12 +69,39 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.package_storage_type_form_view
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.stock_location_storage_type_search_view
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.stock_package_storage_type_search_view
+#: model_terms:ir.ui.view,arch_db:stock_storage_type.stock_storage_location_sequence_cond_form_view
 msgid "Archived"
 msgstr ""
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__barcode
 msgid "Barcode"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__code_snippet
+msgid "Code Snippet"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__code_snippet_docs
+msgid "Code Snippet Docs"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__condition_type
+msgid "Condition Type"
+msgstr ""
+
+#. module: stock_storage_type
+#: code:addons/stock_storage_type/models/stock_storage_location_sequence_cond.py:0
+#, python-format
+msgid "Condition type is set to `Code`: you must provide a piece of code"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__location_sequence_cond_ids
+msgid "Conditions"
 msgstr ""
 
 #. module: stock_storage_type
@@ -86,6 +114,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__create_uid
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__create_uid
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__create_uid
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__create_uid
 msgid "Created by"
 msgstr ""
 
@@ -94,6 +123,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__create_date
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__create_date
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__create_date
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__create_date
 msgid "Created on"
 msgstr ""
 
@@ -122,6 +152,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant__display_name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant_package__display_name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__display_name
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -135,6 +166,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__do_not_mix_products
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__do_not_mix_products
 msgid "Do Not Mix Products"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields.selection,name:stock_storage_type.selection__stock_storage_location_sequence_cond__condition_type__code
+msgid "Execute code"
 msgstr ""
 
 #. module: stock_storage_type
@@ -169,6 +205,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant__id
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant_package__id
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__id
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__id
 msgid "ID"
 msgstr ""
 
@@ -234,6 +271,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant____last_update
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant_package____last_update
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence____last_update
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond____last_update
 msgid "Last Modified on"
 msgstr ""
 
@@ -242,6 +280,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__write_uid
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__write_uid
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__write_uid
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__write_uid
 msgid "Last Updated by"
 msgstr ""
 
@@ -250,6 +289,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__write_date
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__write_date
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__write_date
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__write_date
 msgid "Last Updated on"
 msgstr ""
 
@@ -405,6 +445,7 @@ msgstr ""
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__name
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__name
 msgid "Name"
 msgstr ""
 
@@ -565,6 +606,26 @@ msgid "Stock Package Level"
 msgstr ""
 
 #. module: stock_storage_type
+#: model:ir.model,name:stock_storage_type.model_stock_storage_location_sequence_cond
+msgid "Stock Storage Location Sequence Condition"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.actions.act_window,name:stock_storage_type.stock_storage_location_sequence_cond_act_window
+msgid "Stock Storage Location Sequence Conditions"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.constraint,message:stock_storage_type.constraint_stock_storage_location_sequence_cond_name
+msgid "Stock storage location sequence condition name must be unique"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.ui.menu,name:stock_storage_type.stock_storage_location_sequence_cond_menu
+msgid "Storage Location Sequence Conditions"
+msgstr ""
+
+#. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__storage_type_message
 msgid "Storage Type Message"
 msgstr ""
@@ -672,6 +733,12 @@ msgstr ""
 msgid ""
 "You cannot set 'Do not mix lots' without setting 'Do not mix products' "
 "constraint."
+msgstr ""
+
+#. module: stock_storage_type
+#: code:addons/stock_storage_type/models/stock_storage_location_sequence_cond.py:0
+#, python-format
+msgid "code_snippet should return boolean value into `result` variable."
 msgstr ""
 
 #. module: stock_storage_type
