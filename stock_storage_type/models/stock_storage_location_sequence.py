@@ -20,6 +20,11 @@ class StockStorageLocationSequence(models.Model):
     location_putaway_strategy = fields.Selection(
         related="location_id.pack_putaway_strategy"
     )
+    location_sequence_cond_ids = fields.Many2many(
+        string="Conditions",
+        comodel_name="stock.storage.location.sequence.cond",
+        relation="stock_location_sequence_cond_rel",
+    )
 
     def _format_package_storage_type_message(self, last=False):
         self.ensure_one()
@@ -84,3 +89,11 @@ class StockStorageLocationSequence(models.Model):
             ),
         ]
         return action
+
+    def can_be_applied(self, putaway_location, quant, product):
+        """Check if conditions are met."""
+        self.ensure_one()
+        for cond in self.location_sequence_cond_ids:
+            if not cond.evaluate(self, putaway_location, quant, product):
+                return False
+        return True
