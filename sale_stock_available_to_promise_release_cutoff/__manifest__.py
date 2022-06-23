@@ -16,4 +16,5 @@
     "auto_install": True,
     "license": "AGPL-3",
     "application": False,
+    "development_status": "Alpha",
 }
