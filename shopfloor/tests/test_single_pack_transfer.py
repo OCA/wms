@@ -146,9 +146,11 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         # in turns should start the operation in odoo
         with self.assertRaises(ShopfloorDispatchError) as error:
             self.service.dispatch("start", params=params)
-        self.assertIn(
-            "No pending operation for package",
-            error.exception,
+
+        self.assert_exception_response(
+            error,
+            next_state="start",
+            message=self.service.msg_store.no_pending_operation_for_pack(self.pack_a),
         )
 
     def test_start_no_operation_create(self):
@@ -210,9 +212,12 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         params = {"barcode": "THIS_BARCODE_DOES_NOT_EXIST"}
         with self.assertRaises(ShopfloorDispatchError) as error:
             self.service.dispatch("start", params=params)
-        self.assertIn(
-            "The package THIS_BARCODE_DOES_NOT_EXIST",
-            error.exception,
+        self.assert_exception_response(
+            error,
+            next_state="start",
+            message=self.service.msg_store.package_not_found_for_barcode(
+                params["barcode"]
+            ),
         )
 
     def test_start_pack_empty(self):
@@ -229,9 +234,10 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         pack_empty = self.env["stock.quant.package"].create({})
         pack_code = pack_empty.name
         params = {"barcode": pack_code}
-        response = self.service.dispatch("start", params=params)
-        self.assert_response(
-            response,
+        with self.assertRaises(ShopfloorDispatchError) as error:
+            self.service.dispatch("start", params=params)
+        self.assert_exception_response(
+            error,
             next_state="start",
             message=self.service.msg_store.package_has_no_product_to_take(pack_code),
         )
@@ -285,9 +291,14 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         params = {"barcode": barcode}
         with self.assertRaises(ShopfloorDispatchError) as error:
             self.service.dispatch("start", params=params)
-        self.assertIn(
-            "doesn't contain any package",
-            error.exception,
+        self.assert_exception_response(
+            error,
+            next_state="start",
+            message={
+                "message_type": "error",
+                "body": "Location %s doesn't contain any package."
+                % (self.shelf2.name,),
+            },
         )
 
     def test_start_pack_from_location_several_packs(self):
@@ -320,9 +331,14 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
 
         with self.assertRaises(ShopfloorDispatchError) as error:
             self.service.dispatch("start", params=params)
-        self.assertIn(
-            "Several packages found",
-            error.exception,
+        self.assert_exception_response(
+            error,
+            next_state="start",
+            message={
+                "message_type": "warning",
+                "body": "Several packages found in %s, please scan a package."
+                % (self.shelf1.name,),
+            },
         )
 
     def test_start_pack_outside_of_location(self):
@@ -342,9 +358,14 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         params = {"barcode": barcode}
         with self.assertRaises(ShopfloorDispatchError) as error:
             self.service.dispatch("start", params=params)
-        self.assertIn(
-            "You cannot work on a package",
-            error.exception,
+        self.assert_exception_response(
+            error,
+            next_state="start",
+            message={
+                "message_type": "error",
+                "body": "You cannot work on a package (%s) outside of locations: %s"
+                % (self.pack_a.name, self.picking_type.default_location_src_id.name),
+            },
         )
 
     def test_start_already_started(self):
@@ -533,9 +554,13 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
                     "location_barcode": self.shelf1.barcode,
                 },
             )
-        self.assertIn(
-            "This operation does not exist anymore",
-            error.exception,
+        self.assert_exception_response(
+            error,
+            next_state="start",
+            message={
+                "message_type": "error",
+                "body": "This operation does not exist anymore.",
+            },
         )
 
     def test_validate_location_not_found(self):
@@ -561,9 +586,14 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
                     "location_barcode": "THIS_BARCODE_DOES_NOT_EXISTS",
                 },
             )
-        self.assertIn(
-            "No location found for this barcode",
-            error.exception,
+        self.assert_exception_response(
+            error,
+            next_state="scan_location",
+            data=self.ANY,
+            message={
+                "message_type": "error",
+                "body": "No location found for this barcode.",
+            },
         )
 
     def test_validate_location_forbidden(self):
@@ -594,9 +624,11 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
                     "location_barcode": self.dispatch_location.barcode,
                 },
             )
-        self.assertIn(
-            "You cannot place it here",
-            error.exception,
+        self.assert_exception_response(
+            error,
+            next_state="scan_location",
+            data=self.ANY,
+            message={"message_type": "error", "body": "You cannot place it here"},
         )
 
     def test_validate_location_move_not_child_of_picking_allowed(self):
@@ -899,9 +931,13 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         """
         with self.assertRaises(ShopfloorDispatchError) as error:
             self.service.dispatch("cancel", params={"package_level_id": -1})
-        self.assertIn(
-            "This operation does not exist anymore",
-            error.exception,
+        self.assert_exception_response(
+            error,
+            next_state="start",
+            message={
+                "message_type": "error",
+                "body": "This operation does not exist anymore.",
+            },
         )
 
 

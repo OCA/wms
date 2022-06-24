@@ -39,7 +39,7 @@ class BaseShopfloorService(AbstractComponent):
             return super().dispatch(method_name, *args, params=params)
         except ShopfloorError as e:
             res = self._response(
-                message={"message_type": "error", "body": str(e)},
+                message={"message_type": e.message_type, "body": str(e)},
                 base_response=e.base_response,
                 data=e.data,
                 next_state=e.next_state,

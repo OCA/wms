@@ -203,3 +203,17 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
             "\n\nActual:\n%s"
             "\n\nExpected:\n%s" % (pformat(response), pformat(expected)),
         )
+
+    def assert_exception_response(
+        self, exception, next_state=None, message=None, data=None, popup=None
+    ):
+        """Assert an exception response from the webservice."""
+
+        self.assertEqual(exception.exception.name, message["body"])
+        response = exception.exception.rest_json_info.copy()
+        self.assertTrue(response["no_wrap"])
+        # This parameter is used only in exception so it's not needed for the response assertion
+        del response["no_wrap"]
+        self.assert_response(
+            response, next_state=next_state, message=message, data=data, popup=popup
+        )
