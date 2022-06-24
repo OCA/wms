@@ -66,9 +66,10 @@ class TestSinglePackTransferPutaway(SinglePackTransferCommonBase):
 
         with self.assertRaises(ShopfloorDispatchError) as error:
             self.service.dispatch("start", params={"barcode": self.shelf1.barcode})
-        self.assertIn(
-            "No putaway destination is available",
-            error.exception,
+        self.assert_exception_response(
+            error,
+            next_state="start",
+            message=self.service.msg_store.no_putaway_destination_available(),
         )
 
         package_levels = self.env["stock.package_level"].search(

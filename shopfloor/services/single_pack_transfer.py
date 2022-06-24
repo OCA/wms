@@ -6,22 +6,7 @@ from odoo import fields
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
-from odoo.addons.shopfloor_base.exceptions import (
-    AlreadyDone,
-    DestLocationNotAllowed,
-    NoLocationFound,
-    NoPackInLocation,
-    NoPendingOperationForPack,
-    NoPutawayDestinationAvailable,
-    OperationHasBeenCanceledElsewhere,
-    OperationNotFound,
-    PackageAlreadyPickedBy,
-    PackageHasNoProductToTake,
-    PackageNotAllowedInSrcLocation,
-    PackageNotFoundForBarcode,
-    PackageUnableToTransfer,
-    SeveralPacksInLocation,
-)
+from odoo.addons.shopfloor_base.exceptions import ShopfloorError
 
 
 class SinglePackTransfer(Component):
@@ -85,20 +70,34 @@ class SinglePackTransfer(Component):
                 [("location_id", "=", location.id)]
             )
             if not package:
-                raise NoPackInLocation(location, next_state="start")
+                raise ShopfloorError(
+                    self.msg_store.no_pack_in_location(location), next_state="start"
+                )
             if len(package) > 1:
-                raise SeveralPacksInLocation(location, next_state="start")
+                raise ShopfloorError(
+                    self.msg_store.several_packs_in_location(location),
+                    next_state="start",
+                )
 
         if not package:
             package = search.package_from_scan(barcode)
 
         if not package:
-            raise PackageNotFoundForBarcode(barcode, next_state="start")
+            raise ShopfloorError(
+                self.msg_store.package_not_found_for_barcode(barcode),
+                next_state="start",
+            )
         if not package.location_id:
-            raise PackageHasNoProductToTake(barcode, next_state="start")
+            raise ShopfloorError(
+                self.msg_store.package_has_no_product_to_take(barcode),
+                next_state="start",
+            )
         if not self.is_src_location_valid(package.location_id):
-            raise PackageNotAllowedInSrcLocation(
-                barcode, self.picking_types, next_state="start"
+            raise ShopfloorError(
+                self.msg_store.package_not_allowed_in_src_location(
+                    barcode, self.picking_types
+                ),
+                next_state="start",
             )
         return package
 
@@ -125,7 +124,10 @@ class SinglePackTransfer(Component):
                 other_move_lines and not self.work.menu.allow_unreserve_other_moves
             ):
                 picking = fields.first(other_move_lines).picking_id
-                raise PackageAlreadyPickedBy(package, picking, next_state="start")
+                raise ShopfloorError(
+                    self.msg_store.package_already_picked_by(package, picking),
+                    next_state="start",
+                )
             elif other_move_lines and self.work.menu.allow_unreserve_other_moves:
 
                 unreserved_moves = other_move_lines.move_id
@@ -140,22 +142,29 @@ class SinglePackTransfer(Component):
         package_level = package_level.filtered(
             lambda pl: pl.state not in ("cancel", "done", "draft")
         )
-        self.msg_store.no_pending_operation_for_pack(package)
         if not package_level and self.is_allow_move_create():
             package_level = self._create_package_level(package)
             if not self.is_dest_location_valid(
                 package_level.move_line_ids.move_id, package_level.location_dest_id
             ):
                 package_level = None
-                raise PackageUnableToTransfer(package, next_state="start")
+                raise ShopfloorError(
+                    self.msg_store.package_unable_to_transfer(package),
+                    next_state="start",
+                )
 
         if not package_level:
-            raise NoPendingOperationForPack(package, next_state="start")
+            raise ShopfloorError(
+                self.msg_store.no_pending_operation_for_pack(package),
+                next_state="start",
+            )
         stock = self._actions_for("stock")
         if self.work.menu.ignore_no_putaway_available and stock.no_putaway_available(
             self.picking_types, package_level.move_line_ids
         ):
-            raise NoPutawayDestinationAvailable(next_state="start")
+            raise ShopfloorError(
+                self.msg_store.no_putaway_destination_available(), next_state="start"
+            )
 
         if package_level.is_done and not confirmation:
             return self._response_for_confirm_start(
@@ -197,24 +206,31 @@ class SinglePackTransfer(Component):
         search = self._actions_for("search")
         package_level = self.env["stock.package_level"].browse(package_level_id)
         if not package_level.exists():
-            raise OperationNotFound(next_state="start")
+            raise ShopfloorError(
+                self.msg_store.operation_not_found(), next_state="start"
+            )
 
         # Do not use package_level.move_ids, this is only filled in when the
         # moves have been created from a manually encoded package level, not
         # when a package has been reserved for existing moves
         moves = package_level.move_line_ids.move_id
         if not self._is_move_state_valid(moves):
-            raise OperationHasBeenCanceledElsewhere(next_state="start")
+            raise ShopfloorError(
+                self.msg_store.operation_has_been_canceled_elsewhere(),
+                next_state="start",
+            )
 
         scanned_location = search.location_from_scan(location_barcode)
         if not scanned_location:
-            raise NoLocationFound(
+            raise ShopfloorError(
+                self.msg_store.no_location_found(),
                 data=self._data_after_package_scanned(package_level),
                 next_state="scan_location",
             )
 
         if not self.is_dest_location_valid(moves, scanned_location):
-            raise DestLocationNotAllowed(
+            raise ShopfloorError(
+                self.msg_store.dest_location_not_allowed(),
                 data=self._data_after_package_scanned(package_level),
                 next_state="scan_location",
             )
@@ -258,11 +274,13 @@ class SinglePackTransfer(Component):
     def cancel(self, package_level_id):
         package_level = self.env["stock.package_level"].browse(package_level_id)
         if not package_level.exists():
-            raise OperationNotFound(next_state="start")
+            raise ShopfloorError(
+                self.msg_store.operation_not_found(), next_state="start"
+            )
         # package.move_ids may be empty, it seems
         move = package_level.move_line_ids.move_id
         if move.state == "done":
-            raise AlreadyDone(next_state="start")
+            return self._response_for_start(message=self.msg_store.already_done())
 
         package_level.is_done = False
         return self._response_for_start(
