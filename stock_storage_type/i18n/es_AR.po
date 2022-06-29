@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-11-29 22:36+0000\n"
+"PO-Revision-Date: 2022-06-29 20:05+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -92,28 +92,30 @@ msgstr "Código de Barras"
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__code_snippet
 msgid "Code Snippet"
-msgstr ""
+msgstr "Snippet de Código"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__code_snippet_docs
 msgid "Code Snippet Docs"
-msgstr ""
+msgstr "Documentación de Snippet de Código"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__condition_type
 msgid "Condition Type"
-msgstr ""
+msgstr "Tipo de Condición"
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_storage_location_sequence_cond.py:0
 #, python-format
 msgid "Condition type is set to `Code`: you must provide a piece of code"
 msgstr ""
+"Tipo de Condición configurado como `Código`: debe proveer una porción de "
+"código"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__location_sequence_cond_ids
 msgid "Conditions"
-msgstr ""
+msgstr "Condiciones"
 
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.location_storage_type_form_view
@@ -185,7 +187,7 @@ msgstr "No Mezcla Productos"
 #. module: stock_storage_type
 #: model:ir.model.fields.selection,name:stock_storage_type.selection__stock_storage_location_sequence_cond__condition_type__code
 msgid "Execute code"
-msgstr ""
+msgstr "Ejecutar código"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__has_restrictions
@@ -667,22 +669,24 @@ msgstr "Nivel de Paquete de Existencias"
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_storage_location_sequence_cond
 msgid "Stock Storage Location Sequence Condition"
-msgstr ""
+msgstr "Condición de Secuencia de Ubicación de Almacenamiento de Stock"
 
 #. module: stock_storage_type
 #: model:ir.actions.act_window,name:stock_storage_type.stock_storage_location_sequence_cond_act_window
 msgid "Stock Storage Location Sequence Conditions"
-msgstr ""
+msgstr "Condiciones de Secuencia de Ubicación de Almacenamiento de Stock"
 
 #. module: stock_storage_type
 #: model:ir.model.constraint,message:stock_storage_type.constraint_stock_storage_location_sequence_cond_name
 msgid "Stock storage location sequence condition name must be unique"
 msgstr ""
+"El nombre de la condición de secuencia de ubicación de almacenamiento de "
+"stock debe ser único"
 
 #. module: stock_storage_type
 #: model:ir.ui.menu,name:stock_storage_type.stock_storage_location_sequence_cond_menu
 msgid "Storage Location Sequence Conditions"
-msgstr ""
+msgstr "Condiciones de Secuencia de Ubicación de Almacenamiento"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__storage_type_message
@@ -824,7 +828,7 @@ msgstr ""
 #: code:addons/stock_storage_type/models/stock_storage_location_sequence_cond.py:0
 #, python-format
 msgid "code_snippet should return boolean value into `result` variable."
-msgstr ""
+msgstr "code_snippet debe devolver un valor booleano en la variable `result`."
 
 #. module: stock_storage_type
 #: model:product.packaging,weight_uom_name:stock_storage_type.product_product_9_packaging_48_pallet
