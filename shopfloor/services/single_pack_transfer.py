@@ -190,7 +190,6 @@ class SinglePackTransfer(Component):
                 "company_id": self.env.company.id,
             }
         )
-        package_level._generate_moves()
         picking.action_confirm()
         picking.action_assign()
         return package_level
