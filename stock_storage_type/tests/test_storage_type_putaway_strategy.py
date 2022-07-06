@@ -568,3 +568,84 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         self.assertTrue(
             package_level.location_dest_id in self.cardboxes_location.child_ids
         )
+
+    def test_storage_strategy_with_multi_products_package(self):
+        """Check the putaway destination of a package containing several products."""
+        move1 = self._create_single_move(self.product)
+        move2 = self._create_single_move(self.product2)
+        moves = move1 | move2
+        # move.location_dest_id = self.cardboxes_location.id
+        moves._assign_picking()
+        package = self.env["stock.quant.package"].create(
+            {"product_packaging_id": self.product_lot_cardbox_product_packaging.id}
+        )
+        self._update_qty_in_location(
+            move1.location_id, move1.product_id, move1.product_qty, package=package
+        )
+        self._update_qty_in_location(
+            move2.location_id, move2.product_id, move2.product_qty, package=package
+        )
+
+        self.env["stock.storage.location.sequence"].create(
+            {
+                "package_storage_type_id": self.cardboxes_package_storage_type.id,
+                "location_id": self.cardboxes_location.id,
+                "sequence": 2,
+            }
+        )
+
+        moves._action_assign()
+        move_lines = moves.move_line_ids
+        package_level = move_lines.package_level_id
+        package_level.ensure_one()
+
+        self.assertTrue(
+            package_level.location_dest_id in self.cardboxes_location.child_ids
+        )
+
+    def test_storage_strategy_none_in_sequence_to_fixes_with_multi_products_package(
+        self,
+    ):
+        move1 = self._create_single_move(self.product)
+        move2 = self._create_single_move(self.product2)
+        moves = move1 | move2
+        # move.location_dest_id = self.cardboxes_location.id
+        moves._assign_picking()
+        package = self.env["stock.quant.package"].create(
+            {"product_packaging_id": self.product_lot_cardbox_product_packaging.id}
+        )
+        self._update_qty_in_location(
+            move1.location_id, move1.product_id, move1.product_qty, package=package
+        )
+        self._update_qty_in_location(
+            move2.location_id, move2.product_id, move2.product_qty, package=package
+        )
+
+        # configure a new sequence with none in the parent location
+        self.cardboxes_package_storage_type.storage_location_sequence_ids.unlink()
+        self.cardboxes_location.pack_putaway_strategy = "none"
+        self.env["stock.storage.location.sequence"].create(
+            {
+                "package_storage_type_id": self.cardboxes_package_storage_type.id,
+                "location_id": self.cardboxes_location.id,
+                "sequence": 1,
+            }
+        )
+
+        # create a put away rule on the product from cardboxes to bin 4
+        self.env["stock.putaway.rule"].create(
+            {
+                "location_in_id": self.cardboxes_location.id,
+                "location_out_id": self.cardboxes_bin_4_location.id,
+                "product_id": self.product.id,
+            }
+        )
+
+        moves._action_assign()
+        move_lines = moves.move_line_ids
+        package_level = move_lines.package_level_id
+
+        self.assertEqual(
+            package_level.location_dest_id,
+            self.cardboxes_bin_4_location,
+        )
