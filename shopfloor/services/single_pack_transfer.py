@@ -192,6 +192,11 @@ class SinglePackTransfer(Component):
         )
         picking.action_confirm()
         picking.action_assign()
+        # For packages that contain several products (so linked to several
+        # moves), the putaway destination computation of the strategy
+        # triggered by `action_assign()` above won't work, so we trigger
+        # the computation manually here at the package level.
+        package_level.recompute_pack_putaway()
         return package_level
 
     def _is_move_state_valid(self, moves):
