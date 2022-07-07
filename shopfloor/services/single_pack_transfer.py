@@ -275,8 +275,8 @@ class SinglePackTransfer(Component):
                 message=self.msg_store.operation_not_found()
             )
         # package.move_ids may be empty, it seems
-        move = package_level.move_line_ids.move_id
-        if move.state == "done":
+        moves = package_level.move_ids | package_level.move_line_ids.move_id
+        if "done" in moves.mapped("state"):
             return self._response_for_start(message=self.msg_store.already_done())
 
         package_level.is_done = False
