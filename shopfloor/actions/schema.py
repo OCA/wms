@@ -163,3 +163,12 @@ class ShopfloorSchemaAction(Component):
                 "nullable": True,
             },
         }
+
+    def inventory(self):
+        return {
+            "id": {"required": True, "type": "integer"},
+            "name": {"required": True, "type": "string"},
+            "date": {"required": True, "type": "string"},
+            "locations": self._schema_list_of(self.location()),
+            "products": self._schema_list_of(self.product()),
+        }

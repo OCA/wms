@@ -127,6 +127,11 @@
                 t-attf-src="/shopfloor_mobile/static/wms/src/scenario/zone_picking.js?v=#{mod_version}"
                 type="module"
             />
+            <script
+                id="script_scenario_inventory"
+                t-attf-src="/shopfloor_mobile/static/wms/src/scenario/inventory.js?v=#{mod_version}"
+                type="module"
+            />
         </script>
     </template>
     <template
