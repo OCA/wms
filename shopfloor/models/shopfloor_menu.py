@@ -113,6 +113,14 @@ class ShopfloorMenu(models.Model):
     allow_force_reservation_is_possible = fields.Boolean(
         compute="_compute_allow_force_reservation_is_possible"
     )
+    use_existing_inventory = fields.Boolean(
+        string="Use only existing inventories",
+        default=False,
+    )
+    allow_inventory_add_product = fields.Boolean(
+        string="Add product option",
+        default=False,
+    )
 
     @api.onchange("unload_package_at_destination")
     def _onchange_unload_package_at_destination(self):

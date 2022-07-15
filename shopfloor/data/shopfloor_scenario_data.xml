@@ -57,4 +57,13 @@
 }
         </field>
     </record>
+    <record id="scenario_inventory" model="shopfloor.scenario">
+        <field name="name">Inventory</field>
+        <field name="key">inventory</field>
+        <field name="options_edit">
+{
+            "use_existing_inventory": true,
+}
+        </field>
+    </record>
 </odoo>

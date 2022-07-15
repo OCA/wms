@@ -594,3 +594,9 @@ class MessageAction(Component):
                 "The system couldn't pack goods automatically."
             ).format(picking),
         }
+
+    def location_already_inventoried(self, barcode):
+        return {
+            "message_type": "error",
+            "body": _("This location has already been inventoried."),
+        }
