@@ -75,11 +75,21 @@ class DeliveryCommonCase(CommonCase):
     def _stock_picking_data(self, picking):
         return self.service.data_detail.picking_detail(picking)
 
-    def assert_response_deliver(self, response, picking=None, message=None):
+    def _stock_location_data(self, location):
+        return self.service.data.location(location)
+
+    def assert_response_deliver(
+        self, response, picking=None, message=None, location=None
+    ):
         self.assert_response(
             response,
             next_state="deliver",
-            data={"picking": self._stock_picking_data(picking) if picking else None},
+            data={
+                "picking": self._stock_picking_data(picking) if picking else None,
+                "sublocation": self._stock_location_data(location)
+                if location
+                else None,
+            },
             message=message,
         )
 

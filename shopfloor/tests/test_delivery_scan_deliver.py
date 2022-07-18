@@ -86,7 +86,12 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
 
     def test_scan_deliver_scan_picking_ok(self):
         response = self.service.dispatch(
-            "scan_deliver", params={"barcode": self.picking.name, "picking_id": None}
+            "scan_deliver",
+            params={
+                "barcode": self.picking.name,
+                "picking_id": None,
+                "location_id": None,
+            },
         )
         self.assert_response_deliver(response, picking=self.picking)
 
