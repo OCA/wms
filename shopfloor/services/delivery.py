@@ -41,7 +41,7 @@ class Delivery(Component):
     _usage = "delivery"
     _description = __doc__
 
-    def _response_for_deliver(self, picking=None, message=None):
+    def _response_for_deliver(self, picking=None, location=None, message=None):
         """Transition to the 'deliver' state
 
         If no picking is passed, the screen shows an empty screen
@@ -49,7 +49,10 @@ class Delivery(Component):
         return self._response(
             next_state="deliver",
             data={
-                "picking": self.data_detail.picking_detail(picking) if picking else None
+                "picking": self.data_detail.picking_detail(picking)
+                if picking
+                else None,
+                "sublocation": self.data.location(location) if location else None,
             },
             message=message,
         )
@@ -74,13 +77,15 @@ class Delivery(Component):
         return self._response(
             next_state="confirm_done",
             data={
-                "picking": self.data_detail.picking_detail(picking) if picking else None
+                "picking": self.data_detail.picking_detail(picking)
+                if picking
+                else None,
             },
             message=message,
         )
 
-    def scan_deliver(self, barcode, picking_id=None):
-        """Scan a stock picking or a package/product/lot
+    def scan_deliver(self, barcode, picking_id=None, location_id=None):
+        """Scan a stock picking, a package/product/lot or a stock location
 
         When a stock picking is scanned and is partially or fully available, it
         is returned to show its lines.
@@ -88,6 +93,10 @@ class Delivery(Component):
         When a package is scanned, and has an available move line part of the
         expected picking type, the package level is directly set to "done" and
         the stock picking of the line is returned to work on its other lines.
+
+        When a stock location is scanned and it is a sub-location of an operation
+        type allowed on the current shopfloor menu, the next delivery
+        operations will be put into that location.
 
         If the barcode is a product or a product's packaging, the move lines
         for this product are set to done. However, if the product is in more
@@ -118,13 +127,19 @@ class Delivery(Component):
         picking or no picking if the picking has been set to done
         """
         allow_prepackaged_product = self.work.menu.allow_prepackaged_product
+        location = (
+            self.env["stock.location"].browse(location_id) if location_id else None
+        )
+        if not barcode:
+            return self._response_for_deliver(location=location)
         search = self._actions_for("search")
         picking = search.picking_from_scan(barcode)
         barcode_valid = bool(picking)
+
         if picking:
             message = self._check_picking_status(picking)
             if message:
-                return self._response_for_deliver(message=message)
+                return self._response_for_deliver(location=location, message=message)
 
         if picking_id:
             picking = self.env["stock.picking"].browse(picking_id)
@@ -133,19 +148,19 @@ class Delivery(Component):
         if not barcode_valid:
             package = search.package_from_scan(barcode)
             if package:
-                return self._deliver_package(picking, package)
+                return self._deliver_package(picking, package, location)
 
         if not barcode_valid:
             product = search.product_from_scan(
                 barcode, use_packaging=(not allow_prepackaged_product)
             )
             if product:
-                return self._deliver_product(picking, product)
+                return self._deliver_product(picking, product, location=location)
 
         if not barcode_valid:
             lot = search.lot_from_scan(barcode)
             if lot:
-                return self._deliver_lot(picking, lot)
+                return self._deliver_lot(picking, lot, location)
 
         if not barcode_valid and allow_prepackaged_product:
             packaging = search.packaging_from_scan(barcode)
@@ -156,11 +171,24 @@ class Delivery(Component):
                     packaging.qty, packaging.product_id.uom_id
                 )
                 return self._deliver_product(
-                    picking, packaging.product_id, product_qty=packaging_qty
+                    picking,
+                    packaging.product_id,
+                    product_qty=packaging_qty,
+                    location=location,
                 )
 
+        if not barcode_valid:
+            sublocation = search.location_from_scan(barcode)
+            if sublocation and sublocation.is_sublocation_of(
+                self.picking_types.mapped("default_location_src_id")
+            ):
+                message = self.msg_store.location_src_set_to_sublocation(sublocation)
+                return self._response_for_deliver(location=sublocation, message=message)
+
         message = self.msg_store.barcode_not_found() if not barcode_valid else None
-        return self._response_for_deliver(picking=picking, message=message)
+        return self._response_for_deliver(
+            picking=picking, location=location, message=message
+        )
 
     def _set_lines_done(self, lines, product_qty=None):
         """Set done quantities on `lines`.
@@ -190,7 +218,7 @@ class Delivery(Component):
             # when the qty_done is not full
             line.qty_done = 0
 
-    def _deliver_package(self, picking, package):
+    def _deliver_package(self, picking, package, location):
         lines = package.move_line_ids.filtered(
             lambda l: l.state in ("assigned", "partially_available")
         )
@@ -205,19 +233,20 @@ class Delivery(Component):
                     message["body"],
                 ]
             )
-            return self._response_for_deliver(message=message)
+            return self._response_for_deliver(location=location, message=message)
         if not lines:
             return self._response_for_deliver(
                 picking=picking,
+                location=location,
                 message=self.msg_store.cannot_move_something_in_picking_type(),
             )
         # TODO add a message if any of the lines already had a qty_done > 0
         new_picking = fields.first(lines.mapped("picking_id"))
         if self._set_lines_done(lines):
             return self._response_for_deliver(
-                message=self.msg_store.transfer_complete(new_picking)
+                location=location, message=self.msg_store.transfer_complete(new_picking)
             )
-        return self._response_for_deliver(picking=new_picking)
+        return self._response_for_deliver(picking=new_picking, location=location)
 
     def _lines_base_domain(self, no_qty_done=True):
         domain = [
@@ -229,16 +258,27 @@ class Delivery(Component):
             domain.append(("qty_done", "=", 0))
         return domain
 
-    def _lines_from_lot_domain(self, lot, no_qty_done=True):
+    def _lines_from_lot_domain(self, lot, no_qty_done=True, location=None):
+        location_domain = (
+            [("picking_id.location_id", "=", location.id)] if location else []
+        )
         return expression.AND(
-            [self._lines_base_domain(no_qty_done), [("lot_id", "=", lot.id)]]
+            [
+                self._lines_base_domain(no_qty_done),
+                [("lot_id", "=", lot.id)],
+                location_domain,
+            ]
         )
 
-    def _lines_from_product_domain(self, product, no_qty_done=True, product_qty=None):
+    def _lines_from_product_domain(
+        self, product, no_qty_done=True, product_qty=None, location=None
+    ):
         # TODO: searching lines is common to other scenario, to refactor
         domain = expression.AND(
             [self._lines_base_domain(no_qty_done), [("product_id", "=", product.id)]]
         )
+        if location:
+            domain.extend([("picking_id.location_id", "=", location.id)])
         if product_qty:
             # Match lines corresponding to the product packaging qty
             # (in stock UoM) and exclude lines having a source package (those
@@ -256,21 +296,37 @@ class Delivery(Component):
             [self._lines_base_domain(no_qty_done), [("package_id", "=", package.id)]]
         )
 
-    def _deliver_product(self, picking, product, product_qty=None):
+    def _deliver_product(self, picking, product, product_qty=None, location=None):
         if product.tracking in ("lot", "serial"):
             return self._response_for_deliver(
-                picking, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
+                picking,
+                location=location,
+                message=self.msg_store.scan_lot_on_product_tracked_by_lot(),
             )
 
         limit = 1 if product_qty else None
         lines = self.env["stock.move.line"].search(
-            self._lines_from_product_domain(product, product_qty=product_qty),
+            self._lines_from_product_domain(
+                product, product_qty=product_qty, location=location
+            ),
             limit=limit,
             order="date_planned",
         )
         if not lines:
             return self._response_for_deliver(
-                picking, message=self.msg_store.product_not_found_in_pickings()
+                picking,
+                location=location,
+                message=self.msg_store.product_not_found_in_pickings(),
+            )
+
+        multiple_location = (
+            not location and len(lines.mapped("picking_id.location_id")) > 1
+        )
+        if multiple_location:
+            return self._response_for_deliver(
+                picking,
+                location=location,
+                message=self.msg_store.product_in_multiple_sublocation(product),
             )
 
         # State of the picking might change while we reach this point: check again!
@@ -284,7 +340,7 @@ class Delivery(Component):
                     message["body"],
                 ]
             )
-            return self._response_for_deliver(message=message)
+            return self._response_for_deliver(location=location, message=message)
 
         new_picking = fields.first(lines.mapped("picking_id"))
         # When products are as units outside of packages, we can select them for
@@ -299,6 +355,7 @@ class Delivery(Component):
         if packages and len({m.package_id for m in lines}) > 1:
             return self._response_for_deliver(
                 new_picking,
+                location=location,
                 message=self.msg_store.product_multiple_packages_scan_package(),
             )
         elif packages:
@@ -307,19 +364,34 @@ class Delivery(Component):
             if len(packages.mapped("quant_ids.product_id")) > 1:
                 return self._response_for_deliver(
                     new_picking,
+                    location=location,
                     message=self.msg_store.product_mixed_package_scan_package(),
                 )
         if self._set_lines_done(lines, product_qty):
             return self._response_for_deliver(
-                message=self.msg_store.transfer_complete(new_picking)
+                location=location, message=self.msg_store.transfer_complete(new_picking)
             )
-        return self._response_for_deliver(new_picking)
+        return self._response_for_deliver(new_picking, location=location)
 
-    def _deliver_lot(self, picking, lot):
-        lines = self.env["stock.move.line"].search(self._lines_from_lot_domain(lot))
+    def _deliver_lot(self, picking, lot, location):
+        lines = self.env["stock.move.line"].search(
+            self._lines_from_lot_domain(lot, location=location)
+        )
         if not lines:
             return self._response_for_deliver(
-                picking, message=self.msg_store.lot_not_found_in_pickings()
+                picking,
+                location=location,
+                message=self.msg_store.lot_not_found_in_pickings(),
+            )
+
+        multiple_location = (
+            not location and len(lines.mapped("picking_id.location_id")) > 1
+        )
+        if multiple_location:
+            return self._response_for_deliver(
+                picking,
+                location=location,
+                message=self.msg_store.lot_in_multiple_sublocation(lot),
             )
 
         # State of the picking might change while we reach this point: check again!
@@ -333,7 +405,7 @@ class Delivery(Component):
                     message["body"],
                 ]
             )
-            return self._response_for_deliver(message=message)
+            return self._response_for_deliver(location=location, message=message)
 
         new_picking = fields.first(lines.mapped("picking_id"))
 
@@ -348,7 +420,9 @@ class Delivery(Component):
         # package.
         if packages and len({m.package_id for m in lines}) > 1:
             return self._response_for_deliver(
-                new_picking, message=self.msg_store.lot_multiple_packages_scan_package()
+                new_picking,
+                location=location,
+                message=self.msg_store.lot_multiple_packages_scan_package(),
             )
         elif packages:
             # we have 1 package
@@ -356,14 +430,15 @@ class Delivery(Component):
             if len(packages.quant_ids) > 1:
                 return self._response_for_deliver(
                     new_picking,
+                    location=location,
                     message=self.msg_store.lot_mixed_package_scan_package(),
                 )
 
         if self._set_lines_done(lines):
             return self._response_for_deliver(
-                message=self.msg_store.transfer_complete(new_picking)
+                location=location, message=self.msg_store.transfer_complete(new_picking)
             )
-        return self._response_for_deliver(new_picking)
+        return self._response_for_deliver(new_picking, location)
 
     def _action_picking_done(self, picking, force=False):
         """Try to validate the stock picking if all quantities are satisfied.
@@ -393,7 +468,7 @@ class Delivery(Component):
             return True
         return False
 
-    def list_stock_picking(self, message=None):
+    def list_stock_picking(self, message=None, location_id=None):
         """Return the list of stock pickings for the picking types
 
         It returns only stock picking available or partially available.
@@ -401,14 +476,19 @@ class Delivery(Component):
         Transitions:
         * manual_selection: next state to show the list of stock pickings
         """
-        pickings = self.env["stock.picking"].search(self._pickings_domain(), order="id")
+        pickings = self.env["stock.picking"].search(
+            self._pickings_domain(location_id), order="id"
+        )
         return self._response_for_manual_selection(pickings, message=message)
 
-    def _pickings_domain(self):
-        return [
+    def _pickings_domain(self, location_id=None):
+        domain = [
             ("picking_type_id", "in", self.picking_types.ids),
             ("state", "=", "assigned"),
         ]
+        if location_id:
+            domain.append(("location_id", "=", location_id))
+        return domain
 
     def select(self, picking_id):
         """Select a stock picking from its ID (found using /list_stock_picking)
@@ -427,7 +507,7 @@ class Delivery(Component):
             return self._response_for_deliver(picking)
         return self.list_stock_picking(message=self.msg_store.stock_picking_not_found())
 
-    def set_qty_done_pack(self, picking_id, package_id):
+    def set_qty_done_pack(self, picking_id, package_id, location_id=None):
         """Set a package to "Done"
 
         When all the available move lines of the stock picking are done, the
@@ -442,7 +522,7 @@ class Delivery(Component):
             return self._response_for_deliver(message=message)
         package = self.env["stock.quant.package"].browse(package_id).exists()
         if package:
-            response = self._deliver_package(picking, package)
+            response = self._deliver_package(picking, package, location_id)
             self._action_picking_done(picking)
             return response
         return self._response_for_deliver(
@@ -597,10 +677,23 @@ class ShopfloorDeliveryValidator(Component):
                 "nullable": True,
                 "type": "integer",
             },
+            "location_id": {
+                "coerce": to_int,
+                "required": False,
+                "nullable": True,
+                "type": "integer",
+            },
         }
 
     def list_stock_picking(self):
-        return {}
+        return {
+            "location_id": {
+                "coerce": to_int,
+                "required": False,
+                "nullable": True,
+                "type": "integer",
+            },
+        }
 
     def select(self):
         return {"picking_id": {"coerce": to_int, "required": True, "type": "integer"}}
@@ -659,8 +752,16 @@ class ShopfloorDeliveryValidatorResponse(Component):
 
     @property
     def _schema_deliver(self):
-        schema = self.schemas_detail.picking_detail()
-        return {"picking": {"type": "dict", "nullable": True, "schema": schema}}
+        schema_picking = self.schemas_detail.picking_detail()
+        schema_location = self.schemas.location()
+        return {
+            "picking": {"type": "dict", "nullable": True, "schema": schema_picking},
+            "sublocation": {
+                "type": "dict",
+                "nullable": True,
+                "schema": schema_location,
+            },
+        }
 
     @property
     def _schema_selection_list(self):
