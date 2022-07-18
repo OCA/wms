@@ -12,6 +12,7 @@ const Delivery = {
     template: `
         <Screen :screen_info="screen_info">
             <template v-slot:header>
+                <state-display-info :info="current_location_msg()" v-if="current_location()"/>
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar
@@ -37,6 +38,11 @@ const Delivery = {
                     />
             </div>
             <div class="button-list button-vertical-list full">
+                <v-row align="center" v-if="state_is('deliver') && is_current_location_set()">
+                    <v-col class="text-center" cols="12">
+                        <btn-action @click="reset_current_location">Reset location</btn-action>
+                    </v-col>
+                </v-row>
                 <v-row align="center" v-if="state_is('deliver') && has_picking()">
                     <v-col class="text-center" cols="12">
                         <btn-action @click="state.on_mark_as_done">Make partial delivery</btn-action>
@@ -79,6 +85,30 @@ const Delivery = {
                 return {};
             }
             return data.picking;
+        },
+        current_location: function () {
+            const data = this.state_get_data("deliver");
+            if (_.isEmpty(data) || _.isEmpty(data.sublocation)) {
+                return {};
+            }
+            return data.sublocation;
+        },
+        is_current_location_set: function () {
+            return !_.isEmpty(this.current_location());
+        },
+        reset_current_location: function () {
+            this.wait_call(
+                this.odoo.call("scan_deliver", {
+                    barcode: "",
+                    picking_id: this.current_picking().id,
+                })
+            );
+        },
+        current_location_msg: function () {
+            if (this.current_location().id) {
+                return {title: "Working from location " + this.current_location().name};
+            }
+            return "";
         },
         has_picking: function () {
             return !_.isEmpty(this.current_picking());
@@ -157,7 +187,7 @@ const Delivery = {
                 select_document: {
                     display_info: {
                         title: "Start by scanning something",
-                        scan_placeholder: "Scan pack / picking",
+                        scan_placeholder: "Scan pack / product / picking / location",
                     },
                     on_scan: (scanned) => {
                         this.wait_call(
@@ -171,7 +201,7 @@ const Delivery = {
                 deliver: {
                     display_info: {
                         title: "Scan another document",
-                        scan_placeholder: "Scan pack / picking",
+                        scan_placeholder: "Scan pack / product / picking / location",
                     },
                     events: {
                         cancel_picking_line: "on_cancel",
@@ -181,11 +211,16 @@ const Delivery = {
                             this.odoo.call("scan_deliver", {
                                 barcode: scanned.text,
                                 picking_id: this.current_picking().id,
+                                location_id: this.current_location().id,
                             })
                         );
                     },
                     on_manual_selection: (evt) => {
-                        this.wait_call(this.odoo.call("list_stock_picking"));
+                        this.wait_call(
+                            this.odoo.call("list_stock_picking", {
+                                location_id: this.current_location().id,
+                            })
+                        );
                     },
                     on_cancel: (data) => {
                         let endpoint, endpoint_data;
