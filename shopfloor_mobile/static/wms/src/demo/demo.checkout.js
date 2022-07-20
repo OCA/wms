@@ -82,6 +82,14 @@ const DEMO_CHECKOUT = {
             select_line: {picking: select_line_picking},
         },
     },
+    scan_package_action: function (data) {
+        const res = data_for_select_package;
+        const line = res.data.select_package.selected_move_lines.find(function (x) {
+            return x.product.barcode == data.barcode;
+        });
+        line.qty_done++;
+        return res;
+    },
     list_stock_picking: {
         next_state: "manual_selection",
         message: null,
