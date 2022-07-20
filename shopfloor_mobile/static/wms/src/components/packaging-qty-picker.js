@@ -290,6 +290,9 @@ export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-displ
             return _.filter(this.sorted_packaging, this.display_pkg);
         },
     },
+    updated: function () {
+        this.qty_todo = parseInt(this.opts.init_value, 10);
+    },
     template: `
 <div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode: '', 'd-inline']">
     <span class="packaging" v-for="(pkg, index) in visible_packaging" :key="make_component_key([pkg.id])">
