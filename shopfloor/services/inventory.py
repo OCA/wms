@@ -44,9 +44,11 @@ class Inventory(Component):
         )
 
     def _response_for_scan_product(
-        self, inventory, location, product=None, message=None
+        self, inventory, location, inventory_line=None, message=None
     ):
-        data = self._data_inventory_location(inventory, location, product=product)
+        data = self._data_inventory_location(
+            inventory, location, inventory_line=inventory_line
+        )
         return self._response(next_state="scan_product", data=data, message=message)
 
     def _response_for_empty_location(
@@ -62,13 +64,14 @@ class Inventory(Component):
     def _response_inventory_does_not_exist(self):
         return self._response_for_start(message=self.msg_store.record_not_found())
 
-    def _data_inventory_location(self, inventory, location, product=None):
+    def _data_inventory_location(self, inventory, location, inventory_line=None):
         data = self.data.inventory(inventory)
         lines = self._find_inventory_line(inventory, location, create=False, multi=True)
         data.update(
             {
                 "location": self.data.location(location),
                 "lines": self.data_detail.inventory_lines(lines),
+                "current_line": self.data_detail.inventory_line(inventory_line),
             }
         )
         return data
@@ -195,7 +198,6 @@ class Inventory(Component):
             return self._response_for_scan_product(
                 inventory,
                 location,
-                product=product,
                 message=self.msg_store.scan_lot_on_product_tracked_by_lot(),
             )
         if not product:
@@ -207,7 +209,9 @@ class Inventory(Component):
                 self._set_quantity(line, quantity)
             else:
                 self._increase_quantity(line)
-            return self._response_for_scan_product(inventory, location, product=product)
+            return self._response_for_scan_product(
+                inventory, location, inventory_line=line
+            )
         other_location = search.location_from_scan(barcode)
         if other_location and other_location != location:
             return self._location_inventoried(inventory, location, other_location)
@@ -222,11 +226,9 @@ class Inventory(Component):
                 _("increase qty with prefill counted quantity not implemented")
             )
         line.product_qty += 1
-        line.inventoried = True
 
     def _set_quantity(self, line, quantity):
         line.product_qty = quantity
-        line.inventoried = True
 
     def _find_inventory_line(
         self, inventory, location, product=None, lot=None, create=True, multi=False
@@ -261,9 +263,7 @@ class Inventory(Component):
             raise ShopfloorError(
                 self.msg_store.product_or_lot_mandatory(),
                 next_state="scan_product",
-                data=self._data_inventory_location(
-                    inventory, location, product=product
-                ),
+                data=self._data_inventory_location(inventory, location),
             )
         if lot and not product:
             if len(lot) > 1:
@@ -417,6 +417,9 @@ class ShopfloorInventoryValidatorResponse(Component):
             {
                 "location": self.schemas._schema_dict_of(self.schemas.location()),
                 "lines": self.schemas._schema_list_of(
+                    self.schemas_detail.inventory_line()
+                ),
+                "current_line": self.schemas._schema_dict_of(
                     self.schemas_detail.inventory_line()
                 ),
             }

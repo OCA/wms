@@ -35,20 +35,29 @@ const Inventory = {
                 <div v-for="loc in state.data.locations">
                     <item-detail-card
                         :key="make_state_component_key(['location-state', loc.location.id])"
-
                         :card_color="utils.colors.color_for(location_state_color(loc.state))"
                         :record="loc"
-                        :options="{main: true, key_title: 'location_id.name'}"
+                        :options="{main: true, key_title: 'location.name'}"
                         />
                 </div>
             </div>
-            <div v-for="line in state.data.lines">
-                <inventory-location-detail
+            <div v-if="state_is('scan_product') && _.result(state, 'data.current_line')" >
+                <inventory-line-detail
                     v-if="state_is('scan_product')"
-                    :line="state.data"
+                    :line="state.data.current_line"
                     :article-scanned="state_is('scan_product')"
                     :show-qty-picker="state_is('scan_product')"
                     />
+            </div>
+            <div v-if="state_is('scan_product')" >
+                <div v-for="line in state.data.lines">
+                    <item-detail-card
+                        :key="make_state_component_key(['inventory-line-state', line.product.id])"
+                        :card_color="utils.colors.color_for(line_state_color(line))"
+                        :record="line"
+                        :options="{main: true, key_title: 'product.name'}"
+                        />
+                </div>
             </div>
             <div v-if="state_is('manual_selection')">
                 <manual-select
@@ -121,8 +130,10 @@ const Inventory = {
             if (data === "done") {
                 color = "success";
             }
-            console.log("color");
-            console.log(color);
+            return color;
+        },
+        line_state_color: function (data) {
+            const color = data.inventoried ? "screen_step_done" : "screen_step_todo";
             return color;
         },
     },

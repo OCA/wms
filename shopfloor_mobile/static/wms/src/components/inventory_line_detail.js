@@ -4,8 +4,7 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-// TODO: rename as we used this not only for batch picking
-export var inventory_location = Vue.component("inventory-location-detail", {
+export var inventory_line = Vue.component("inventory-line-detail", {
     props: {
         line: Object,
         articleScanned: {
@@ -23,10 +22,10 @@ export var inventory_location = Vue.component("inventory-location-detail", {
         };
     },
     template: `
-<div v-if="!_.isEmpty(line)" :class="'detail inventory-location-detail ' + (line.postponed ? 'line-postponed' : '')">
+<div v-if="!_.isEmpty(line)" :class="'detail inventory-line-detail ' + (line.postponed ? 'line-postponed' : '')">
 
   <item-detail-card
-    :key="'inventory-location-detail'"
+    :key="'inventory-line-detail'"
     :record="line"
     :options="utils.wms.inventory_line_product_detail_options(line, {fields_blacklist: ['quantity']})"
     :card_color="utils.colors.color_for(articleScanned ? 'screen_step_done': 'screen_step_todo')"
@@ -45,7 +44,7 @@ export var inventory_location = Vue.component("inventory-location-detail", {
 });
 
 // TODO: use `misc.line-actions-popup` instead
-export var inventory_location_actions = Vue.component("inventory-location-actions", {
+export var inventory_location_actions = Vue.component("inventory-line-actions", {
     props: ["line"],
     data() {
         return {
@@ -59,7 +58,7 @@ export var inventory_location_actions = Vue.component("inventory-location-action
         },
     },
     template: `
-  <div class="inventory-location-actions">
+  <div class="inventory-line-actions">
     <v-dialog v-model="dialog" fullscreen tile class="actions fullscreen text-center">
       <template v-slot:activator="{ on }">
         <div class="button-list button-vertical-list full">
@@ -74,7 +73,7 @@ export var inventory_location_actions = Vue.component("inventory-location-action
         <div class="button-list button-vertical-list full">
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <btn-action @click="handle_action('action_confirm_inventory_location')">Confirm</btn-action>
+              <btn-action @click="handle_action('action_confirm_inventory_line')">Confirm</btn-action>
             </v-col>
           </v-row>
         </div>

@@ -149,6 +149,8 @@ class DataDetailAction(Component):
 
     @ensure_model("stock.inventory.line")
     def inventory_line(self, record, **kw):
+        if not record:
+            record = self.env["stock.inventory.line"]
         return self._jsonify(record, self._inventory_line_parser, **kw)
 
     def inventory_lines(self, record, **kw):
