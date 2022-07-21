@@ -1,6 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import models
+from odoo import api, fields, models
 
 
 class StockInventory(models.Model):
@@ -17,3 +17,28 @@ class StockInventory(models.Model):
             if "stock.group_stock_manager" in allow_groups and self.env.su:
                 return True
         return super().user_has_groups(groups)
+
+    location_count = fields.Integer(
+        compute="_compute_inventory_info",
+        help="Technical field. Indicates number of locations included.",
+    )
+    inventory_line_count = fields.Integer(
+        compute="_compute_inventory_info",
+        help="Technical field. Indicates number of lines included.",
+    )
+
+    @api.depends("line_ids", "sub_location_ids")
+    def _compute_inventory_info(self):
+        for item in self:
+            item.update(
+                {
+                    "location_count": len(item.sub_location_ids),
+                    "inventory_line_count": len(item.line_ids),
+                }
+            )
+
+
+class StockInventoryLine(models.Model):
+    _inherit = "stock.inventory.line"
+
+    inventoried = fields.Boolean(string="Inventoried")

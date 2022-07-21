@@ -600,3 +600,15 @@ class MessageAction(Component):
             "message_type": "error",
             "body": _("This location has already been inventoried."),
         }
+
+    def location_has_on_going_operation(self, location):
+        return {
+            "message_type": "error",
+            "body": _(
+                "This location has on-going operations. "
+                "Please inventory another location and come back."
+            ),
+        }
+
+    def product_or_lot_mandatory(self):
+        return {"message_type": "error", "body": _("Product or lot is mandatory")}

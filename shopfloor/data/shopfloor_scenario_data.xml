@@ -62,7 +62,10 @@
         <field name="key">inventory</field>
         <field name="options_edit">
 {
-            "use_existing_inventory": true,
+    "use_existing_inventory": true,
+    "inventory_zero_counted_quantity": true,
+    "force_inventory_add_product": false
+
 }
         </field>
     </record>

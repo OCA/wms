@@ -106,4 +106,5 @@ class ShopfloorSchemaDetailAction(Component):
             "theoretical_qty": {"required": True, "type": "float"},
             "product": self._schema_dict_of(self.product()),
             "location": self._schema_dict_of(self.location_detail()),
+            "lot": self._schema_dict_of(self.lot()),
         }

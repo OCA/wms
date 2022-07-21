@@ -82,6 +82,16 @@
                 type="module"
             />
             <script
+                id="script_component_batch_picking_detail"
+                t-attf-src="/shopfloor_mobile/static/wms/src/components/inventory_detail.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
+                id="script_component_batch_picking_detail"
+                t-attf-src="/shopfloor_mobile/static/wms/src/components/inventory_location_detail.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
                 id="script_component_picking_select"
                 t-attf-src="/shopfloor_mobile/static/wms/src/components/scenario_picking_detail/picking_select.js?v=#{mod_version}"
                 type="module"

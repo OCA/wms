@@ -25,5 +25,10 @@
   "misc.lines_count": "Number of lines",
   "misc.stock_zero_check.confirm_stock_not_zero": "Confirm stock",
   "misc.stock_zero_check.confirm_stock_zero": "Confirm out of stock",
-  "scan_placeholder_translation": "Scan location"
+  "scan_placeholder_translation": "Scan location",
+  "inventory.scan_product.title": "Scan product",
+  "inventory.scan_product.scan_placeholder": "Scan product lot packaging",
+  "inventory.manual_selection.title": "Select an inventory and start",
+  "inventory.start_location.title": "Start location",
+  "inventory.start_location.scan_placeholder": "Scan location"
 }

@@ -160,7 +160,7 @@ class DataDetailAction(Component):
             "id",
             "product_qty",
             "theoretical_qty",
-            "created_from_shopfloor",
+            ("prod_lot_id:lot", self._lot_parser),
             ("product_id:product", self._product_parser),
             ("location_id:location", self._location_detail_parser),
         ]

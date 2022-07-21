@@ -44,6 +44,8 @@
         "product_packaging_type",
         #  OCA / delivery
         "stock_picking_delivery_link",
+        "stock_inventory_user",
+        "stock_inventory_location_state",
     ],
     "data": [
         "data/shopfloor_scenario_data.xml",

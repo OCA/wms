@@ -275,12 +275,28 @@ class DataAction(Component):
             "name",
         ]
 
-    @ensure_model("stock.inventory")
-    def inventory(self, record, **kw):
-        return self._jsonify(record, self._inventory_parser, **kw)
+    @ensure_model("stock.inventory.location")
+    def inventory_location(self, record, **kw):
+        return self._jsonify(record, self._inventory_location_parser, **kw)
 
-    def inventories(self, record, **kw):
+    def inventory_locations(self, record, **kw):
         return self.inventory(record, multi=True)
+
+    @property
+    def _inventory_location_parser(self):
+        return [("location_id:location", self._location_parser), "state"]
+
+    @ensure_model("stock.inventory")
+    def inventory(self, record, with_locations=False, **kw):
+        parser = self._inventory_parser
+        if with_locations:
+            parser.append(
+                ("sub_location_ids:locations", self._inventory_location_parser)
+            )
+        return self._jsonify(record, parser, **kw)
+
+    def inventories(self, record, with_locations=False, **kw):
+        return self.inventory(record, with_locations=with_locations, multi=True)
 
     @property
     def _inventory_parser(self):
@@ -288,6 +304,6 @@ class DataAction(Component):
             "id",
             "name",
             "date",
-            ("location_ids:locations", self._location_parser),
-            ("product_ids:products", self._product_parser),
+            "location_count",
+            "inventory_line_count",
         ]

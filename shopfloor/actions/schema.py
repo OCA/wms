@@ -164,11 +164,20 @@ class ShopfloorSchemaAction(Component):
             },
         }
 
-    def inventory(self):
+    def inventory_location(self):
         return {
+            "location": self._schema_dict_of(self.location()),
+            "state": {"required": True, "type": "string"},
+        }
+
+    def inventory(self, with_locations=False):
+        schema = {
             "id": {"required": True, "type": "integer"},
             "name": {"required": True, "type": "string"},
             "date": {"required": True, "type": "string"},
-            "locations": self._schema_list_of(self.location()),
-            "products": self._schema_list_of(self.product()),
+            "location_count": {"required": True, "type": "integer"},
+            "inventory_line_count": {"required": True, "type": "integer"},
         }
+        if with_locations:
+            schema["locations"] = self._schema_list_of(self.inventory_location())
+        return schema
