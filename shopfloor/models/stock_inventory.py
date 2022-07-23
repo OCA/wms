@@ -18,6 +18,12 @@ class StockInventory(models.Model):
                 return True
         return super().user_has_groups(groups)
 
+    shopfloor_validated = fields.Boolean(
+        string="To validate",
+        help="Shopfloor doesn't validate the inventory at the end of the process. "
+        "The manager can do it manually.",
+        tracking=True,
+    )
     location_count = fields.Integer(
         compute="_compute_inventory_info",
         help="Technical field. Indicates number of locations included.",
@@ -36,9 +42,3 @@ class StockInventory(models.Model):
                     "inventory_line_count": len(item.line_ids),
                 }
             )
-
-
-class StockInventoryLine(models.Model):
-    _inherit = "stock.inventory.line"
-
-    inventoried = fields.Boolean(string="Inventoried")

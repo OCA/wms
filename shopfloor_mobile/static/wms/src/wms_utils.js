@@ -252,15 +252,7 @@ export class WMSUtils {
             {path: "product.supplier_code", label: "Vendor code", klass: "loud"},
             //            {path: "package_src.name", label: "Pack"},
             {path: "lot.name", label: "Lot"},
-            {
-                path: "product_qty",
-                label: "Counted",
-                render_component: "packaging-qty-picker-display",
-                render_options: function (record) {
-                    return self.inventory_line_qty_picker_options(record);
-                },
-            },
-            {path: "theoretical_qty", label: "Qty on hand"},
+            {path: "product.barcode", label: "Code barre"},
         ];
         options = _.defaults({}, options, {
             main: true,
@@ -279,7 +271,8 @@ export class WMSUtils {
     }
     inventory_line_qty_picker_options(line, override = {}) {
         const opts = {
-            init_value: line.product_qty,
+            init_value: line.theoretical_qty,
+            counted_value: line.product_qty,
             available_packaging: line.product.packaging,
             uom: line.product.uom,
             non_zero_only: true,

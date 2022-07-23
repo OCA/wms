@@ -611,4 +611,30 @@ class MessageAction(Component):
         }
 
     def product_or_lot_mandatory(self):
-        return {"message_type": "error", "body": _("Product or lot is mandatory")}
+        return {"message_type": "error", "body": _("Product or lot is mandatory.")}
+
+    def location_inventoried(self, location):
+        return {
+            "message_type": "success",
+            "body": _("Location {0.name} successfully inventoried.").format(location),
+        }
+
+    def location_not_done(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "Products not inventoried, are you sure you want to change location ?"
+            ),
+        }
+
+    def inventory_location_not_done(self):
+        return {
+            "message_type": "error",
+            "body": _("Not all location have been inventoried, please finalize."),
+        }
+
+    def inventory_done(self, inventory):
+        return {
+            "message_type": "success",
+            "body": _("L'inventaire {0.name} est terminé.").format(inventory),
+        }

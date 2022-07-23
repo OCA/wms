@@ -24,9 +24,10 @@
   "misc.stock_zero_check.confirm_stock_not_zero": "Confirmer le stock",
   "misc.stock_zero_check.confirm_stock_zero": "Rupture de stock",
   "scan_placeholder_translation": "Scannez un emplacement",
-  "inventory.scan_product.title": "Scan product",
-  "inventory.scan_product.scan_placeholder": "Scan product lot packaging",
-  "inventory.manual_selection.title": "Select an inventory and start",
-  "inventory.start_location.title": "Start location",
-  "inventory.start_location.scan_placeholder": "Scan location"
+  "inventory.scan_product.title": "Comptez les produits en les scannant",
+  "inventory.scan_product.scan_placeholder": "Scannez une boite / un produit / un lot",
+  "inventory.manual_selection.title": "Sélectionnez un inventaire et démarrez",
+  "inventory.start_location.title": "Démarrer un emplacement",
+  "inventory.start_location.scan_placeholder": "Scannez un emplacement",
+  "inventory.confirm_done.title": "Confirmer emplacement terminé"
 }

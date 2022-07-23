@@ -40,16 +40,32 @@ const Inventory = {
                         :options="{main: true, key_title: 'location.name'}"
                         />
                 </div>
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn color="accent" @click="state.on_done">Done</v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn color="default" @click="state.on_back">Back</v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
             </div>
-            <div v-if="state_is('scan_product') && _.result(state, 'data.current_line')" >
-                <inventory-line-detail
-                    v-if="state_is('scan_product')"
-                    :line="state.data.current_line"
-                    :article-scanned="state_is('scan_product')"
-                    :show-qty-picker="state_is('scan_product')"
-                    />
-            </div>
+
             <div v-if="state_is('scan_product')" >
+                <div v-if="_.result(state, 'data.current_line')" >
+                    <inventory-line-detail
+                        v-if="state_is('scan_product')"
+                        :line="state.data.current_line"
+                        :article-scanned="state_is('scan_product')"
+                        :show-qty-picker="state_is('scan_product')"
+                        v-on:confirm="state.on_confirm_qty"
+                        />
+                </div>
                 <div v-for="line in state.data.lines">
                     <item-detail-card
                         :key="make_state_component_key(['inventory-line-state', line.product.id])"
@@ -58,7 +74,40 @@ const Inventory = {
                         :options="{main: true, key_title: 'product.name'}"
                         />
                 </div>
+                <div v-if="_.isEmpty(_.result(state, 'data.lines')) && _.isEmpty(_.result(state, 'data.current_line'))" >
+                    <v-card :color="utils.colors.color_for('screen_step_todo')">
+                        <v-card-title>
+                            <p> Location is empty </p>
+                        </v-card-title>
+                    </v-card>
+                    <div class="button-list button-vertical-list full">
+                        <v-row align="center">
+                            <v-col class="text-center" cols="12">
+                                <btn-action action="todo" @click="state.on_confirm_empty">Confirm</btn-action>
+                            </v-col>
+                        </v-row>
+                    </div>
+                </div>
+                <div v-if="_.result(state, 'data.current_line')" >
+                    <div class="button-list button-vertical-list full">
+                        <v-row align="center">
+                            <v-col class="text-center" cols="12">
+                                <btn-action action="todo" @click="state.on_confirm_qty">Confirm quantity</btn-action>
+                            </v-col>
+                        </v-row>
+                    </div>
+                </div>
+                <div v-if="!_.isEmpty(_.result(state, 'data.lines')) && _.isEmpty(_.result(state, 'data.current_line'))" >
+                    <div class="button-list button-vertical-list full">
+                        <v-row align="center">
+                            <v-col class="text-center" cols="12">
+                                <btn-action action="todo" @click="state.on_confirm">Confirm</btn-action>
+                            </v-col>
+                        </v-row>
+                    </div>
+                </div>
             </div>
+
             <div v-if="state_is('manual_selection')">
                 <manual-select
                     v-on:select="state.on_select"
@@ -75,8 +124,18 @@ const Inventory = {
                 </div>
             </div>
 
+           <div v-if="state_is('confirm_done')" >
+               <div class="button-list button-vertical-list full">
+                   <v-row align="center">
+                       <v-col class="text-center" cols="12">
+                           <btn-action action="todo" @click="state.on_confirm">Confirm</btn-action>
+                       </v-col>
+                   </v-row>
+               </div>
+            </div>
+
             <div class="button-list button-vertical-list full">
-                <v-row align="center" v-if="state_is('scan_product')">
+                <v-row align="center" v-if="state_is('confirm_done')">
                     <v-col class="text-center" cols="12">
                         <btn-back />
                     </v-col>
@@ -87,10 +146,12 @@ const Inventory = {
     `,
     computed: {
         manual_select_inventory_fields: function () {
-            return [{path: "id", label: "Id"}];
+            return [
+                {path: "location_count", label: "Total locations"},
+                {path: "inventory_line_count", label: "Total lines"},
+            ];
         },
     },
-
     methods: {
         screen_title: function () {
             if (_.isEmpty(this.current_inventory()) || this.state_is("confirm_start"))
@@ -112,6 +173,13 @@ const Inventory = {
             }
             return data.location;
         },
+        current_line: function () {
+            const data = this.state_get_data("scan_product") || {};
+            if (!data.current_line) {
+                return null;
+            }
+            return data.current_line;
+        },
         current_doc: function () {
             const location = this.current_location();
             if (!location) {
@@ -127,13 +195,25 @@ const Inventory = {
             if (data === "pending") {
                 color = "warning";
             }
+            if (data === "started") {
+                color = "accent";
+            }
             if (data === "done") {
                 color = "success";
             }
             return color;
         },
         line_state_color: function (data) {
-            const color = data.inventoried ? "screen_step_done" : "screen_step_todo";
+            var color = "";
+            if (data.product_qty === 0) {
+                color = "warning";
+            } else {
+                if (data.theoretical_qty === data.product_qty) {
+                    color = "success";
+                } else {
+                    color = "error";
+                }
+            }
             return color;
         },
     },
@@ -197,6 +277,17 @@ const Inventory = {
                             })
                         );
                     },
+                    on_done: () => {
+                        this.wait_call(
+                            this.odoo.call("done_inventory", {
+                                inventory_id: this.current_inventory().id,
+                            })
+                        );
+                    },
+                    on_back: () => {
+                        this.state_to("start");
+                        this.reset_notification();
+                    },
                     // Additional actions
                     on_action: (action) => {
                         this.state["on_" + action].call(this);
@@ -227,9 +318,63 @@ const Inventory = {
                                 inventory_id: this.current_inventory().id,
                                 location_id: this.current_location().id,
                                 barcode: scanned.text,
+                                line_id: this.current_line()
+                                    ? this.current_line().id
+                                    : null,
                                 quantity: this.scan_product_qty,
                             })
                         );
+                        this.scan_product_qty = 0;
+                    },
+                    on_confirm_qty: () => {
+                        this.wait_call(
+                            this.odoo.call("confirm_line_qty", {
+                                inventory_id: this.current_inventory().id,
+                                location_id: this.current_location().id,
+                                line_id: this.current_line().id,
+                                quantity: this.scan_product_qty,
+                            })
+                        );
+                        this.scan_product_qty = 0;
+                    },
+                    on_confirm_empty: () => {
+                        this.wait_call(
+                            this.odoo.call("location_inventoried", {
+                                inventory_id: this.current_inventory().id,
+                                location_id: this.current_location().id,
+                                confirmation: true,
+                            })
+                        );
+                    },
+                    on_confirm: () => {
+                        this.wait_call(
+                            this.odoo.call("location_inventoried", {
+                                inventory_id: this.current_inventory().id,
+                                location_id: this.current_location().id,
+                                confirmation: false,
+                            })
+                        );
+                    },
+                },
+                confirm_done: {
+                    display_info: {
+                        title: this.$t("inventory.confirm_done.title"),
+                    },
+                    events: {
+                        go_back: "on_back",
+                    },
+                    on_confirm: () => {
+                        this.wait_call(
+                            this.odoo.call("location_inventoried", {
+                                inventory_id: this.current_inventory().id,
+                                location_id: this.current_location().id,
+                                confirmation: true,
+                            })
+                        );
+                    },
+                    on_back: () => {
+                        this.state_to("scan_product");
+                        this.reset_notification();
                     },
                 },
             },

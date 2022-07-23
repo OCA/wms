@@ -115,13 +115,17 @@ export var PackagingQtyPickerMixin = {
     },
     created: function () {
         this.qty_todo = parseInt(this.opts.init_value, 10);
-        this.qty_done = parseInt(this.opts.init_value, 10);
+        this.qty_done = parseInt(this.opts.counted_value, 10);
+    },
+    updated: function () {
+        this.qty_done = parseInt(this.opts.counted_value, 10);
     },
     computed: {
         opts() {
             const opts = _.defaults({}, this.$props.options, {
                 input_type: "text",
                 init_value: 0,
+                counted_value: 0,
                 mode: "",
                 available_packaging: [],
                 uom: {},
@@ -292,6 +296,7 @@ export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-displ
     },
     updated: function () {
         this.qty_todo = parseInt(this.opts.init_value, 10);
+        this.qty_done = parseInt(this.opts.counted_value, 10);
     },
     template: `
 <div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode: '', 'd-inline']">

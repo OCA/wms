@@ -44,12 +44,13 @@ class Inventory(Component):
         )
 
     def _response_for_scan_product(
-        self, inventory, location, inventory_line=None, message=None
+        self, inventory, location, inventory_line=None, need_confirm=False, message=None
     ):
         data = self._data_inventory_location(
             inventory, location, inventory_line=inventory_line
         )
-        return self._response(next_state="scan_product", data=data, message=message)
+        next_state = "scan_product" if not need_confirm else "confirm_done"
+        return self._response(next_state=next_state, data=data, message=message)
 
     def _response_for_empty_location(
         self, inventory, location, message=None, popup=None
@@ -67,6 +68,8 @@ class Inventory(Component):
     def _data_inventory_location(self, inventory, location, inventory_line=None):
         data = self.data.inventory(inventory)
         lines = self._find_inventory_line(inventory, location, create=False, multi=True)
+        if inventory_line:
+            lines -= inventory_line
         data.update(
             {
                 "location": self.data.location(location),
@@ -140,7 +143,7 @@ class Inventory(Component):
         # finally take any inventory that search could return
         if inventories:
             inventory = inventories[0]
-            inventory.write({"user_id": self.env.uid})
+            inventory.sudo().write({"user_id": self.env.uid})
             return inventory
         return self.env["stock.inventory"]
 
@@ -171,23 +174,26 @@ class Inventory(Component):
             # TODO re-inventory or update location instead of raise
             raise ShopfloorError(
                 self.msg_store.location_already_inventoried(barcode),
-                data=self.data.inventory(inventory),
+                data=self.data.inventory(inventory, with_locations=True),
                 next_state="start_location",
             )
         if location.has_on_going_operation():
             raise ShopfloorError(
                 self.msg_store.location_has_on_going_operation(location),
                 next_state="start_location",
-                data=self.data.inventory(inventory),
+                data=self.data.inventory(inventory, with_locations=True),
             )
         location_state.action_start()
         return self._response_for_scan_product(inventory, location)
 
-    def scan_product(self, inventory_id, location_id, barcode, quantity=0):
+    def scan_product(
+        self, inventory_id, location_id, barcode, line_id=None, quantity=0
+    ):
         inventory = self.env["stock.inventory"].browse(inventory_id)
         if not inventory.exists():
             return self._response_inventory_does_not_exist()
         location = self.env["stock.location"].browse(location_id)
+        current_line = self.env["stock.inventory.line"].browse(line_id)
         search = self._actions_for("search")
         product = search.product_from_scan(barcode, use_packaging=False)
         lot = self.env["stock.production.lot"]
@@ -202,22 +208,41 @@ class Inventory(Component):
             )
         if not product:
             lot = search.lot_from_scan(barcode)
+        if not product and not lot:
+            other_location = search.location_from_scan(barcode)
+            if other_location and other_location != location:
+                return self._location_inventoried(inventory, location, other_location)
         line = self._find_inventory_line(inventory, location, product=product, lot=lot)
         if line:
             product = lot.product_id
-            if quantity:
-                self._set_quantity(line, quantity)
+            if quantity and current_line:
+                # we scan another product without validate the qty
+                if current_line and current_line != line:
+                    self._set_quantity(current_line, quantity)
+                    self._increase_quantity(line)
+                else:
+                    # we scan several time the same product
+                    if quantity == current_line.product_qty:
+                        self._increase_quantity(current_line)
+                    else:
+                        self._set_quantity(line, quantity)
             else:
                 self._increase_quantity(line)
             return self._response_for_scan_product(
                 inventory, location, inventory_line=line
             )
-        other_location = search.location_from_scan(barcode)
-        if other_location and other_location != location:
-            return self._location_inventoried(inventory, location, other_location)
         return self._response_for_scan_product(
             inventory, location, message=self.msg_store.no_product_for_barcode(barcode)
         )
+
+    def confirm_line_qty(self, inventory_id, location_id, line_id, quantity=0):
+        inventory = self.env["stock.inventory"].browse(inventory_id)
+        if not inventory.exists():
+            return self._response_inventory_does_not_exist()
+        location = self.env["stock.location"].browse(location_id)
+        line = self.env["stock.inventory.line"].browse(line_id)
+        self._set_quantity(line, quantity)
+        return self._response_for_scan_product(inventory, location)
 
     def _increase_quantity(self, line):
         if not self.work.menu.inventory_zero_counted_quantity:
@@ -241,7 +266,7 @@ class Inventory(Component):
             domain += [("product_id", "=", product.id)]
         if lot:
             domain += [("prod_lot_id", "in", lot.ids)]
-        line = self.env["stock.inventory.line"].search(domain)
+        line = self.env["stock.inventory.line"].search(domain, order="product_qty")
         if not line and create:
             if self.work.menu.force_inventory_add_product:
                 raise ShopfloorError(
@@ -275,26 +300,44 @@ class Inventory(Component):
                 "inventory_id": inventory.id,
                 "location_id": location.id,
                 "product_id": product.id,
-                "lot_id": lot.id,
+                "prod_lot_id": lot.id,
             },
         )
         return line
 
-    def _location_inventoried(self, inventory, location, other_location):
+    def _location_inventoried(
+        self, inventory, location, other_location=None, confirmation=False
+    ):
         lines = self._find_inventory_line(inventory, location, create=False, multi=True)
-        if lines.filtered(lambda l: not l.inventoried):
+        if lines.filtered(lambda l: l.product_qty == 0) and not confirmation:
             return self._response_for_scan_product(
-                inventory, location, message=self.msg_store.location_not_done(location)
+                inventory,
+                location,
+                need_confirm=True,
+                message=self.msg_store.location_not_done(),
             )
-        lines.write({"inventoried": True})
         location_state = inventory.sub_location_ids.filtered(
             lambda l: l.location_id == location
         )
         location_state.action_done()
-        return self._response_for_scan_product(
+        if other_location:
+            return self._response_for_scan_product(
+                inventory,
+                other_location,
+                message=self.msg_store.location_inventoried(location),
+            )
+        return self._response_for_start_location(
             inventory,
-            other_location,
             message=self.msg_store.location_inventoried(location),
+        )
+
+    def location_inventoried(self, inventory_id, location_id, confirmation=False):
+        inventory = self.env["stock.inventory"].browse(inventory_id)
+        if not inventory.exists():
+            return self._response_inventory_does_not_exist()
+        location = self.env["stock.location"].browse(location_id)
+        return self._location_inventoried(
+            inventory, location, confirmation=confirmation
         )
 
     def empty_location(self, inventory_id, location_id):
@@ -303,7 +346,6 @@ class Inventory(Component):
             return self._response_inventory_does_not_exist()
         location = self.env["stock.location"].browse(location_id)
         lines = self._find_inventory_line(inventory, location, create=False, multi=True)
-        lines = lines.filtered(lambda l: not l.inventoried)
         lines.write({"product_qty": 0})
         return self._response_for_start_location(inventory)
 
@@ -316,11 +358,12 @@ class Inventory(Component):
         )
         if location_state:
             return self._response_for_start_location(
-                next_state="start_location",
+                inventory,
                 message=self.msg_store.inventory_location_not_done(),
             )
         # TODO sudo because only manager stock can validate inventory
-        inventory.sudo().action_validate()
+        #        inventory.with_context(_sf_inventory=True).sudo().action_validate()
+        inventory.shopfloor_validated = True
         return self._response_for_start(
             message=self.msg_store.inventory_done(inventory)
         )
@@ -360,7 +403,28 @@ class ShopfloorInventoryValidator(Component):
             "inventory_id": {"coerce": to_int, "required": True, "type": "integer"},
             "location_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
+            "line_id": {
+                "coerce": to_int,
+                "required": False,
+                "type": "integer",
+                "nullable": True,
+            },
             "quantity": {"coerce": to_int, "required": False, "type": "float"},
+        }
+
+    def confirm_line_qty(self):
+        return {
+            "inventory_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "location_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "line_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "quantity": {"coerce": to_int, "required": False, "type": "float"},
+        }
+
+    def location_inventoried(self):
+        return {
+            "inventory_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "location_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "confirmation": {"type": "boolean", "nullable": True, "required": False},
         }
 
     def empty_location(self):
@@ -394,6 +458,8 @@ class ShopfloorInventoryValidatorResponse(Component):
             "confirm_start": self._schema_inventory,
             "start_location": self._schema_inventory_detail,
             "scan_product": self._schema_line_inventory,
+            "confirm_done": self._schema_inventory_detail,
+            "manual_selection": self._schema_inventory_selection,
         }
 
     @property
@@ -426,17 +492,21 @@ class ShopfloorInventoryValidatorResponse(Component):
         )
         return schema
 
+    @property
+    def _schema_inventory_selection(self):
+        return self.schemas._schema_search_results_of(self.schemas.inventory())
+
     def find_inventory(self):
         return self._response_schema(next_states={"confirm_start"})
 
     def list_inventory(self):
         return self._response_schema(
-            next_states={"start"},
+            next_states={"manual_selection"},
         )
 
     def select_inventory(self):
         return self._response_schema(
-            next_states={"scan_product"},
+            next_states={"confirm_start"},
         )
 
     def confirm_start(self):
