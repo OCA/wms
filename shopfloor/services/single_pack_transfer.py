@@ -190,9 +190,13 @@ class SinglePackTransfer(Component):
                 "company_id": self.env.company.id,
             }
         )
-        package_level._generate_moves()
         picking.action_confirm()
         picking.action_assign()
+        # For packages that contain several products (so linked to several
+        # moves), the putaway destination computation of the strategy
+        # triggered by `action_assign()` above won't work, so we trigger
+        # the computation manually here at the package level.
+        package_level.recompute_pack_putaway()
         return package_level
 
     def _is_move_state_valid(self, moves):
@@ -271,8 +275,8 @@ class SinglePackTransfer(Component):
                 message=self.msg_store.operation_not_found()
             )
         # package.move_ids may be empty, it seems
-        move = package_level.move_line_ids.move_id
-        if move.state == "done":
+        moves = package_level.move_ids | package_level.move_line_ids.move_id
+        if "done" in moves.mapped("state"):
             return self._response_for_start(message=self.msg_store.already_done())
 
         package_level.is_done = False
