@@ -50,7 +50,7 @@
                     <div
                         class="alert alert-warning"
                         role="alert"
-                        attrs="{'invisible': [('registry_sync', '=', True)]}"
+                        attrs="{'invisible': ['|', ('registry_sync', '=', True), ('id', '=', False)]}"
                     >
                         <p>
                             Registry out of sync. Likely the record has been modified but not sync'ed with the routing registry.

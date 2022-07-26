@@ -160,7 +160,10 @@ class ShopfloorApp(models.Model):
 
     def _register_controllers(self, init=False, options=None):
         super()._register_controllers(init=init, options=options)
-        self.env["rest.service.registration"]._register_rest_route(self.api_route)
+        if not self:
+            return
+        for rec in self:
+            self.env["rest.service.registration"]._register_rest_route(rec.api_route)
 
     def _registered_routes(self):
         registry = self.env["endpoint.route.handler"]._endpoint_registry
@@ -172,16 +175,17 @@ class ShopfloorApp(models.Model):
         self.env["rest.service.registration"]._prepare_non_decorated_endpoints(service)
 
     def _generate_endpoints(self, service):
-        values = self._generate_endpoints_values(service, self.api_route)
         res = []
-        for vals in values:
-            route, options = self._generate_endpoints_route(service, vals)
-            res.append((route, options))
+        for rec in self:
+            values = rec._generate_endpoints_values(service)
+            for vals in values:
+                route, options = rec._generate_endpoints_route(service, vals)
+                res.append((route, options))
         return res
 
-    def _generate_endpoints_values(self, service, api_route):
+    def _generate_endpoints_values(self, service):
         values = []
-        root_path = api_route.rstrip("/") + "/" + service._usage
+        root_path = self.api_route.rstrip("/") + "/" + service._usage
         for name, method in _inspect_methods(service.__class__):
             if not hasattr(method, "routing"):
                 continue
