@@ -49,17 +49,21 @@ class TestShopfloorApp(CommonCase):
 
     def _test_registered_routes(self, rec):
         # On class setup the registry is not ready thus endpoints are not registered yet
-        rec._register_endpoints()
+        rec._register_controllers(init=True)
         routes = rec._registered_routes()
         _check = {}
-        endpoint_func_repr = (
-            "bound method _process_endpoint "
-            "of <odoo.addons.base_rest.controllers.main.RestController"
-        )
-        for __, rule in routes:
+        for rule in routes:
             self.assertEqual(rule.route_group, rec._route_group())
             self.assertTrue(rule.endpoint_hash)
-            self.assertIn(endpoint_func_repr, repr(rule.endpoint.method.func))
+            service, endpoint = rule.route.split("/")[-2:]
+            expected_handler_opts = {
+                "default_pargs": [rec.id, service, endpoint],
+                "klass_dotted_path": (
+                    "odoo.addons.shopfloor_base.controllers.main.ShopfloorController"
+                ),
+                "method_name": "_process_endpoint",
+            }
+            self.assertEqual(rule.handler_options, expected_handler_opts)
             _check[rule.route] = set(rule.routing["methods"])
         expected = {
             # TODO: review methods

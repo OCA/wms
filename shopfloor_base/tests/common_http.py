@@ -64,7 +64,7 @@ class HttpCommonCase(HttpSavepointCase, RegistryMixin, ComponentMixin):
         HttpSavepointCase.setUp(self)
         ComponentMixin.setUp(self)
         # Make sure endpoints are available
-        self.shopfloor_app._register_endpoints()
+        self.shopfloor_app._handle_registry_sync()
 
     def _make_url(self, route):
         return "http://127.0.0.1:%s%s" % (tools.config["http_port"], route)
