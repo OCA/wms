@@ -19,6 +19,11 @@ export var PackagingQtyPickerMixin = {
         };
     },
     watch: {
+        options: function (opts, old_opts) {
+            if (opts.counted_value != old_opts.counted_value) {
+                this.qty_done = parseInt(opts.counted_value, 10);
+            }
+        },
         qty_done: function () {
             if (!this.qty_by_pkg_manual)
                 this.qty_by_pkg = this.product_qty_by_packaging();
@@ -115,9 +120,6 @@ export var PackagingQtyPickerMixin = {
     },
     created: function () {
         this.qty_todo = parseInt(this.opts.init_value, 10);
-        this.qty_done = parseInt(this.opts.counted_value, 10);
-    },
-    updated: function () {
         this.qty_done = parseInt(this.opts.counted_value, 10);
     },
     computed: {

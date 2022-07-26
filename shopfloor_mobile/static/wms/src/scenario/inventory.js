@@ -305,9 +305,9 @@ const Inventory = {
                     },
                     enter: () => {
                         // TODO: shalle we hook v-model for qty input straight to the state data?
-                        this.scan_product_qty = this.state_get_data(
-                            "start_location"
-                        ).quantity;
+                        this.scan_product_qty = this.current_line()
+                            ? this.current_line().product_qty
+                            : 0;
                     },
                     on_qty_edit: (qty) => {
                         this.scan_product_qty = parseInt(qty, 10);

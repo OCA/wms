@@ -27,7 +27,7 @@ export var inventory_line = Vue.component("inventory-line-detail", {
   <item-detail-card
     :key="'inventory-line-detail'"
     :record="line"
-    :options="utils.wms.inventory_line_product_detail_options(line, {fields_blacklist: ['quantity']})"
+    :options="utils.wms.inventory_line_product_detail_options(line, {fields_blacklist: ['product_qty']})"
     :card_color="utils.colors.color_for(articleScanned ? 'screen_step_done': 'screen_step_todo')"
     />
 

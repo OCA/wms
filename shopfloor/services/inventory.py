@@ -212,6 +212,11 @@ class Inventory(Component):
             other_location = search.location_from_scan(barcode)
             if other_location and other_location != location:
                 return self._location_inventoried(inventory, location, other_location)
+            return self._response_for_scan_product(
+                inventory,
+                location,
+                message=self.msg_store.no_product_for_barcode(barcode),
+            )
         line = self._find_inventory_line(inventory, location, product=product, lot=lot)
         if line:
             product = lot.product_id
