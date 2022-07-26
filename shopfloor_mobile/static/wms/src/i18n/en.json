@@ -30,5 +30,15 @@
   "inventory.scan_product.scan_placeholder": "Scan product lot packaging",
   "inventory.manual_selection.title": "Select an inventory and start",
   "inventory.start_location.title": "Start location",
-  "inventory.start_location.scan_placeholder": "Scan location"
+  "inventory.start_location.scan_placeholder": "Scan location",
+  "inventory.field.total_locations": "Total locations",
+  "inventory.field.remaining_locations": "Remaining locations",
+  "inventory.field.total_lines": "Total lines",
+  "inventory.button.start": "Start",
+  "inventory.button.cancel": "Cancel",
+  "inventory.button.confirm": "Confirm",
+  "inventory.button.confirm_qty": "Confirm quantity",
+  "inventory.button.back": "Back",
+  "inventory.button.done": "Done",
+  "inventory.message.location_empty": "Location is empty"
 }

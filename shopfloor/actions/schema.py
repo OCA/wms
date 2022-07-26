@@ -176,6 +176,7 @@ class ShopfloorSchemaAction(Component):
             "name": {"required": True, "type": "string"},
             "date": {"required": True, "type": "string"},
             "location_count": {"required": True, "type": "integer"},
+            "remaining_location_count": {"required": True, "type": "integer"},
             "inventory_line_count": {"required": True, "type": "integer"},
         }
         if with_locations:

@@ -43,14 +43,14 @@ const Inventory = {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="accent" @click="state.on_done">Done</v-btn>
+                            <v-btn color="accent" @click="state.on_done">{{ $t('inventory.button.done') }}</v-btn>
                         </v-col>
                     </v-row>
                 </div>
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="default" @click="state.on_back">Back</v-btn>
+                            <v-btn color="default" @click="state.on_back">{{ $t('inventory.button.back') }}</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -77,13 +77,13 @@ const Inventory = {
                 <div v-if="_.isEmpty(_.result(state, 'data.lines')) && _.isEmpty(_.result(state, 'data.current_line'))" >
                     <v-card :color="utils.colors.color_for('screen_step_todo')">
                         <v-card-title>
-                            <p> Location is empty </p>
+                            <p> {{ $t('inventory.message.location_empty') }} </p>
                         </v-card-title>
                     </v-card>
                     <div class="button-list button-vertical-list full">
                         <v-row align="center">
                             <v-col class="text-center" cols="12">
-                                <btn-action action="todo" @click="state.on_confirm_empty">Confirm</btn-action>
+                                <btn-action action="todo" @click="state.on_confirm_empty">{{ $t('inventory.button.confirm') }}</btn-action>
                             </v-col>
                         </v-row>
                     </div>
@@ -92,7 +92,7 @@ const Inventory = {
                     <div class="button-list button-vertical-list full">
                         <v-row align="center">
                             <v-col class="text-center" cols="12">
-                                <btn-action action="todo" @click="state.on_confirm_qty">Confirm quantity</btn-action>
+                                <btn-action action="todo" @click="state.on_confirm_qty">{{ $t('inventory.button.confirm_qty') }}</btn-action>
                             </v-col>
                         </v-row>
                     </div>
@@ -101,7 +101,7 @@ const Inventory = {
                     <div class="button-list button-vertical-list full">
                         <v-row align="center">
                             <v-col class="text-center" cols="12">
-                                <btn-action action="todo" @click="state.on_confirm">Confirm</btn-action>
+                                <btn-action action="todo" @click="state.on_confirm">{{ $t('inventory.button.confirm') }}</btn-action>
                             </v-col>
                         </v-row>
                     </div>
@@ -118,7 +118,7 @@ const Inventory = {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="default" @click="state.on_back">Back</v-btn>
+                            <v-btn color="default" @click="state.on_back">{{ $t('inventory.button.back') }}</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -128,7 +128,7 @@ const Inventory = {
                <div class="button-list button-vertical-list full">
                    <v-row align="center">
                        <v-col class="text-center" cols="12">
-                           <btn-action action="todo" @click="state.on_confirm">Confirm</btn-action>
+                           <btn-action action="todo" @click="state.on_confirm">{{ $t('inventory.button.confirm') }}</btn-action>
                        </v-col>
                    </v-row>
                </div>
@@ -147,8 +147,18 @@ const Inventory = {
     computed: {
         manual_select_inventory_fields: function () {
             return [
-                {path: "location_count", label: "Total locations"},
-                {path: "inventory_line_count", label: "Total lines"},
+                {
+                    path: "location_count",
+                    label: this.$t("inventory.field.total_locations"),
+                },
+                {
+                    path: "remaining_location_count",
+                    label: this.$t("inventory.field.remaining_locations"),
+                },
+                {
+                    path: "inventory_line_count",
+                    label: this.$t("inventory.field.total_lines"),
+                },
             ];
         },
     },

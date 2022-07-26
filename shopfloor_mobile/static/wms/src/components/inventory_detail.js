@@ -10,8 +10,18 @@ Vue.component("inventory-detail", {
     methods: {
         detail_fields() {
             return [
-                {path: "location_count", label: "Total locations"},
-                {path: "inventory_line_count", label: "Total lines"},
+                {
+                    path: "location_count",
+                    label: this.$t("inventory.field.total_locations"),
+                },
+                {
+                    path: "remaining_location_count",
+                    label: this.$t("inventory.field.remaining_locations"),
+                },
+                {
+                    path: "inventory_line_count",
+                    label: this.$t("inventory.field.total_lines"),
+                },
             ];
         },
     },
@@ -26,12 +36,12 @@ Vue.component("inventory-detail", {
       <div class="button-list button-vertical-list full">
         <v-row align="center">
           <v-col class="text-center" cols="12">
-            <btn-action @click="$emit('confirm')">Start</btn-action>
+            <btn-action @click="$emit('confirm')">{{ $t('inventory.button.start') }}</btn-action>
           </v-col>
         </v-row>
         <v-row align="center">
           <v-col class="text-center" cols="12">
-            <btn-action :action="'cancel'" @click="$emit('cancel')">Cancel</btn-action>
+            <btn-action :action="'cancel'" @click="$emit('cancel')">{{ $t('inventory.button.cancel') }}</btn-action>
           </v-col>
         </v-row>
       </div>
