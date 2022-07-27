@@ -151,7 +151,10 @@ class ShopfloorApp(models.Model):
             self._prepare_non_decorated_endpoints(service)
             routes.extend(self._generate_endpoints(service))
 
-        rules = [rec._make_controller_rule(options=options) for rec, options in routes]
+        rules = [
+            rec._make_controller_rule(key=rec.name, options=options)
+            for rec, options in routes
+        ]
         return rules
 
     def _registered_endpoint_rule_keys(self):
