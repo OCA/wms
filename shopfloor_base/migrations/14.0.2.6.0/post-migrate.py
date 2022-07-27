@@ -13,6 +13,6 @@ def migrate(cr, version):
         return
 
     env = api.Environment(cr, SUPERUSER_ID, {})
-    domain = [("active", "=", True), ("registry_sync", "=", False)]
+    domain = [("registry_sync", "=", False)]
     env["shopfloor.app"].search(domain).write({"registry_sync": True})
     _logger.info("Activate sync for existing apps")
