@@ -308,6 +308,7 @@ class Inventory(Component):
                 "prod_lot_id": lot.id,
             },
         )
+        line.action_refresh_quantity()
         return line
 
     def _location_inventoried(
