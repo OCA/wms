@@ -73,8 +73,8 @@ class Inventory(Component):
         data.update(
             {
                 "location": self.data.location(location),
-                "lines": self.data_detail.inventory_lines(lines),
-                "current_line": self.data_detail.inventory_line(inventory_line),
+                "lines": self.data.inventory_lines(lines),
+                "current_line": self.data.inventory_line(inventory_line),
             }
         )
         return data
@@ -116,6 +116,7 @@ class Inventory(Component):
             ("user_id", "=", False),
             ("user_id", "=", self.env.user.id),
             ("state", "=", "confirm"),
+            ("shopfloor_validated", "!=", True),
         ]
 
     def _inventory_search(self, name_fragment=None, inventory_ids=None):
@@ -488,11 +489,9 @@ class ShopfloorInventoryValidatorResponse(Component):
         schema.update(
             {
                 "location": self.schemas._schema_dict_of(self.schemas.location()),
-                "lines": self.schemas._schema_list_of(
-                    self.schemas_detail.inventory_line()
-                ),
+                "lines": self.schemas._schema_list_of(self.schemas.inventory_line()),
                 "current_line": self.schemas._schema_dict_of(
-                    self.schemas_detail.inventory_line()
+                    self.schemas.inventory_line()
                 ),
             }
         )

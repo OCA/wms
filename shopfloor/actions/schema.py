@@ -182,3 +182,14 @@ class ShopfloorSchemaAction(Component):
         if with_locations:
             schema["locations"] = self._schema_list_of(self.inventory_location())
         return schema
+
+    def inventory_line(self):
+        return {
+            "id": {"required": True, "type": "integer"},
+            "product_qty": {"required": True, "type": "float"},
+            "theoretical_qty": {"required": True, "type": "float"},
+            "product": self._schema_dict_of(self.product()),
+            "lot": self._schema_dict_of(self.lot()),
+            "location": self._schema_dict_of(self.location()),
+            "package": self._schema_dict_of(self.package()),
+        }

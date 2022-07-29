@@ -146,23 +146,3 @@ class DataDetailAction(Component):
             "product_name",
             "product_code",
         ]
-
-    @ensure_model("stock.inventory.line")
-    def inventory_line(self, record, **kw):
-        if not record:
-            record = self.env["stock.inventory.line"]
-        return self._jsonify(record, self._inventory_line_parser, **kw)
-
-    def inventory_lines(self, record, **kw):
-        return self.inventory_line(record, multi=True)
-
-    @property
-    def _inventory_line_parser(self):
-        return [
-            "id",
-            "product_qty",
-            "theoretical_qty",
-            ("prod_lot_id:lot", self._lot_parser),
-            ("product_id:product", self._product_parser),
-            ("location_id:location", self._location_detail_parser),
-        ]
