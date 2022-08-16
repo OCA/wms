@@ -71,6 +71,11 @@ const SinglePackTransfer = {
             <searchbar v-if="state_is('scan_location')" v-on:found="on_scan" :input_placeholder="search_input_placeholder" :input_data_type="'location'"></searchbar>
             <div v-if="state.key != 'show_completion_info' && _.result(state, 'data.picking')">
                 <item-detail-card
+                    :key="make_state_component_key(['package', state.data.id])"
+                    :record="state.data"
+                    :card_color="utils.colors.color_for('screen_step_done')"
+                    />
+                <item-detail-card
                     :key="make_state_component_key(['product', state.data.id])"
                     :record="state.data"
                     :options="utils.wms.move_line_product_detail_options()"
