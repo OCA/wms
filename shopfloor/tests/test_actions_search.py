@@ -22,6 +22,13 @@ class TestSearchCase(TestSearchBaseCase):
         self.assertEqual(handler(False), rec.browse())
         self.assertEqual(handler("NONE"), rec.browse())
 
+    def test_search_location_with_limit(self):
+        rec = self.customer_location
+        rec2 = self.customer_location.sudo().copy({"barcode": "CUSTOMERS2"})
+        handler = self.search.location_from_scan
+        res = handler("Customers", 2)
+        self.assertEqual(res, rec + rec2)
+
     def test_search_package(self):
         rec = self.env["stock.quant.package"].sudo().create({"name": "1234"})
         handler = self.search.package_from_scan
