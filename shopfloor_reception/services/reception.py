@@ -440,12 +440,16 @@ class Reception(Component):
             return self._response_for_set_lot(picking, selected_lines, message=message)
         lot_model = self.env["stock.production.lot"]
         search = self._actions_for("search")
+        # TODO: Are we sure lot_name and expiry_date are mutually exclusive?
         if lot_name:
             for line in selected_lines:
                 lot = search.lot_from_scan(
                     lot_name, products=selected_lines.mapped("product_id")
                 )
                 if not lot:
+                    # TODO: We should collect all the values to create
+                    # and create with a list instead.
+                    # We could then map the lot to the line using the line id.
                     lot = lot_model.create(
                         {
                             "name": lot_name,
@@ -455,7 +459,6 @@ class Reception(Component):
                         }
                     )
                 line.lot_id = lot.id
-                # TODO: Dunno why, I have to explicitely call the onchange method
                 line._onchange_lot_id()
             return self._response_for_set_lot(picking, selected_lines)
         elif expiration_date:

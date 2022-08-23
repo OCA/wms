@@ -7,6 +7,7 @@
 /* eslint-disable strict */
 /* eslint-disable no-implicit-globals */
 import {PickingDetailListMixin} from "./mixins.js";
+import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
 
 Vue.component("picking-summary", {
     mixins: [PickingDetailListMixin],
@@ -87,6 +88,7 @@ Vue.component("picking-summary", {
 });
 
 Vue.component("picking-summary-content", {
+    mixins: [ItemDetailMixin],
     props: {
         record: Object,
         options: Object,
@@ -114,7 +116,21 @@ Vue.component("picking-summary-content", {
                     <span class="item-counter">
                         <span>{{ index + 1 }} / {{ count }}</span>
                     </span>
-                    {{ record.title }}
+                    <strong>
+                        {{ options.group_header_title_key ? pkg_type.records[0].product[options.group_header_title_key] : record.title }}
+                    </strong>
+                    <template v-for="(field, index) in options.header_fields">
+                        <component
+                            v-if="field.render_component"
+                            :is="field.render_component"
+                            :options="field.render_options ? field.render_options(record) : {}"
+                            :record="record"
+                            :key="make_component_key([field.render_component, 'list', index, record.id])"
+                        />
+                        <span v-else>
+                            {{ render_field_value(record, field) }}
+                        </span>
+                    </template>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <strong class="pkg-type-name mb-2">{{ pkg_type.title }}</strong>
@@ -122,6 +138,7 @@ Vue.component("picking-summary-content", {
                         v-for="(prod, i) in pkg_type.records"
                         :record="prod"
                         :index="i"
+                        :options="options"
                         :key="make_component_key(['pkg', index, i, prod.id])"
                         :count="pkg_type.records.length"
                         />
@@ -129,38 +146,57 @@ Vue.component("picking-summary-content", {
             </v-expansion-panel>
         </v-expansion-panels>
         <div v-else v-for="(subrec, i) in record.records">
-            <picking-summary-product-detail :record="subrec" :index="index" :count="count" :key="make_component_key(['raw', index, subrec.id, i])" />
+            <picking-summary-product-detail :record="subrec" :index="index" :count="count" :options="options" :key="make_component_key(['raw', index, subrec.id, i])" />
         </div>
     </div>
     `,
 });
 
 Vue.component("picking-summary-product-detail", {
+    mixins: [ItemDetailMixin],
     props: {
         record: Object,
         index: Number,
         count: Number,
+        options: Object,
     },
     template: `
         <div class="summary-content-item">
-            <v-list-item-title>
+            <v-list-item-title v-if="options.show_title">
                 <span class="item-counter">
                     <span>{{ index + 1 }} / {{ count }}</span>
                 </span>
                 {{ record.product.display_name }}
             </v-list-item-title>
-            <v-list-item-subtitle>
-                <div class="lot" v-if="record.lot">
-                    <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
-                </div>
-                <div class="qty">
-                    <span class="label">Qty:</span>
-                    <packaging-qty-picker-display
-                        :key="make_component_key(['picking-summary', 'qty-picker-widget', 'done', record.id])"
-                        :options="utils.wms.move_line_qty_picker_options(record, {init_value: record.qty_done})"
-                        />
-                </div>
-            </v-list-item-subtitle>
+            <template v-if="_.isEmpty(options.fields)">
+                <v-list-item-subtitle>
+                    <div class="lot" v-if="record.lot">
+                        <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
+                    </div>
+                    <div class="qty">
+                        <span class="label">Qty:</span>
+                        <packaging-qty-picker-display
+                            :key="make_component_key(['picking-summary', 'qty-picker-widget', 'done', record.id])"
+                            :options="utils.wms.move_line_qty_picker_options(record, {init_value: record.qty_done})"
+                            />
+                    </div>
+                </v-list-item-subtitle>
+            </template>
+            <template v-else>
+                <v-list-item-subtitle v-for="(field, index) in options.fields">
+                    <span v-if="field.label" class="label">{{ field.label }}:</span>
+                    <component
+                        v-if="field.render_component"
+                        :is="field.render_component"
+                        :options="field.render_options ? field.render_options(record) : {}"
+                        :record="record"
+                        :key="make_component_key([field.render_component, 'list', index, record.id])"
+                    />
+                    <span v-else>
+                        {{ render_field_value(record, field) }}
+                    </span>
+                </v-list-item-subtitle>
+            </template>
         </div>
     `,
 });
