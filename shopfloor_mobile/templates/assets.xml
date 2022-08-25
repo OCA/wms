@@ -108,6 +108,11 @@
                 type="module"
             />
             <script
+                id="script_scenario_checkout_states"
+                t-attf-src="/shopfloor_mobile/static/wms/src/scenario/checkout_states.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
                 id="script_scenario_checkout"
                 t-attf-src="/shopfloor_mobile/static/wms/src/scenario/checkout.js?v=#{mod_version}"
                 type="module"
