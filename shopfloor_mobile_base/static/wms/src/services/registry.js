@@ -65,7 +65,7 @@ export class BaseRegistry {
      */
     replace(key, component, metadata) {
         console.log("Replacing component", key);
-        return this.add(key, component, metadata, true);
+        return this.add(key, component, {}, metadata, true);
     }
     /**
      * Extend an existing process.
