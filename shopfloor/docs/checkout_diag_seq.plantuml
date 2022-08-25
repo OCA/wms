@@ -1,0 +1,61 @@
+# Diagram to generate with PlantUML (https://plantuml.com/)
+#
+#   $ sudo apt install plantuml
+#   $ plantuml delivery_diag_seq.plantuml
+#
+
+@startuml
+
+skinparam roundcorner 20
+skinparam sequence {
+
+ParticipantBorderColor #875A7B
+ParticipantBackgroundColor #875A7B
+ParticipantFontSize 17
+ParticipantFontColor white
+
+LifeLineBorderColor #875A7B
+
+ArrowColor #00A09D
+}
+
+header <img:oca_logo.png>
+title <size:35>Checkout scenario</size>
+
+== /list_stock_picking ==
+select_document -> manual_selection: **/list_stock_picking**
+
+== /select ==
+manual_selection -> select_line: **/select**(picking_id)
+
+== /scan_document ==
+select_document -> select_line: **/scan_document**(barcode, picking_id=None) \n(scan a picking a product or ???)
+
+== /select_line ==
+select_line -> select_package: **/select_line**(picking_id, package_id, move_line_ids)
+
+== /list_delivery_packaging ==
+select_package -> select_delivery_packaging: **/list_delivery_packaging**(picking_id, selected_line_ids)
+
+
+== /list_dest_package ==
+select_package -> select_dest_package: **/list_dest_package**(picking_id, selected_line_ids)
+select_package -> select_package: **/list_dest_package**(picking_id, selected_line_ids) \n No Valid package to select
+
+== /set_dest_package ==
+select_dest_package -> select_line: **/set_dest_package(picking_id, selected_line_ids, package_id)
+
+== /scan_package_action ==
+select_delivery_packaging -> summary: **/scan_package_action**(picking_id, selected_line_ids, barcode)
+
+== /cancel_line ==
+summary -> select_line: **/cancel_line**(picking_id, package_id=None, line_id=None)
+
+ == /select ==
+ summary -> select_line: **/select**(picking_id) \nContinue checkout
+
+== /done ==
+summary -> select_document: **/done(picking_id)**
+
+
+@enduml
