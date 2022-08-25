@@ -1,7 +1,6 @@
 # Copyright 2022 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
-from odoo import _
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -21,12 +20,21 @@ class Checkout(Component):
             data={
                 "picking": self.data.picking(picking),
                 "package": packages_data,
+                "package_requirement": self.data.package_requirement(
+                    package.packaging_id
+                ),
             },
         )
         return res
 
     def set_package_measurement(
-        self, picking_id, package_id, height=None, length=None, width=None, weight=None
+        self,
+        picking_id,
+        package_id,
+        height=None,
+        length=None,
+        width=None,
+        shipping_weight=None,
     ):
         """Set measurements on a package."""
         picking = self.env["stock.picking"].browse(picking_id)
@@ -44,14 +52,11 @@ class Checkout(Component):
             package.pack_length = length
         if width:
             package.width = width
-        if weight:
-            package.pack_weight = weight
+        if shipping_weight:
+            package.shipping_weight = shipping_weight
         return self._response_for_summary(
             picking,
-            message={
-                "message_type": "success",
-                "body": _("Package measurement changed."),
-            },
+            message=self.msg_store.package_measurement_changed(),
         )
 
     def _put_lines_in_allowed_package(self, picking, selected_lines, package):
@@ -82,7 +87,7 @@ class ShopfloorCheckoutValidator(Component):
             "height": {"coerce": to_float, "required": False, "type": "float"},
             "length": {"coerce": to_float, "required": False, "type": "float"},
             "width": {"coerce": to_float, "required": False, "type": "float"},
-            "weight": {"coerce": to_float, "required": False, "type": "float"},
+            "shipping_weight": {"coerce": to_float, "required": False, "type": "float"},
         }
 
 
@@ -104,6 +109,10 @@ class ShopfloorCheckoutValidatorResponse(Component):
             "package": {
                 "type": "dict",
                 "schema": self.schemas.package(with_packaging=True),
+            },
+            "package_requirement": {
+                "type": "dict",
+                "schema": self.schemas.package_requirement(),
             },
             "picking": {"type": "dict", "schema": self.schemas.picking()},
         }

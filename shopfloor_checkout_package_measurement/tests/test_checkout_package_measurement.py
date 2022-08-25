@@ -23,7 +23,7 @@ class CheckoutPackageMeasurementCase(CheckoutCommonCase, CheckoutSelectPackageMi
             )
         )
         cls.carrier = cls.env.ref("delivery.normal_delivery_carrier")
-        cls.carrier.sudo().package_height_required = True
+        cls.packaging.sudo().package_height_required = True
         cls.picking = cls._create_picking(
             lines=[
                 (cls.product_a, 10),
@@ -37,13 +37,12 @@ class CheckoutPackageMeasurementCase(CheckoutCommonCase, CheckoutSelectPackageMi
         cls.picking.action_assign()
 
     def test_requested_measurement_for_new_package(self):
-        """Check package measurement are requested fro new package."""
+        """Check package measurement are requested for new package."""
         selected_lines = self.pack1_moves.move_line_ids
         move_line1, move_line2, move_line3 = selected_lines
         move_line1.qty_done = move_line1.product_uom_qty
         move_line2.qty_done = move_line2.product_uom_qty
         move_line3.qty_done = 0
-
         response = self.service.dispatch(
             "scan_package_action",
             params={
@@ -59,6 +58,7 @@ class CheckoutPackageMeasurementCase(CheckoutCommonCase, CheckoutSelectPackageMi
             data={
                 "picking": self.data.picking(self.picking),
                 "package": self.data.package(new_package, with_packaging=True),
+                "package_requirement": self.data.package_requirement(self.packaging),
             },
         )
 
@@ -99,6 +99,7 @@ class CheckoutPackageMeasurementCase(CheckoutCommonCase, CheckoutSelectPackageMi
             data={
                 "picking": self.data.picking(self.picking),
                 "package": self.data.package(new_package, with_packaging=True),
+                "package_requirement": self.data.package_requirement(self.packaging),
             },
         )
 
@@ -139,7 +140,7 @@ class CheckoutPackageMeasurementCase(CheckoutCommonCase, CheckoutSelectPackageMi
                 "picking_id": self.picking.id,
                 "package_id": package.id,
                 "length": "23",
-                "weight": "3.55",
+                "shipping_weight": "3.55",
             },
         )
         self.assert_response(
@@ -149,7 +150,7 @@ class CheckoutPackageMeasurementCase(CheckoutCommonCase, CheckoutSelectPackageMi
                 "all_processed": False,
                 "picking": self._stock_picking_data(self.picking, done=True),
             },
-            message={"message_type": "success", "body": "Package measurement changed."},
+            message={"message_type": "success", "body": "Package measure(s) changed."},
         )
         self.assertEqual(package.pack_length, 23)
-        self.assertEqual(package.pack_weight, 3.55)
+        self.assertEqual(package.shipping_weight, 3.55)
