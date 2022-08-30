@@ -103,8 +103,12 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             "scan_source",
             params={"barcode": self.customer_location.barcode},
         )
-        self.assert_response_start(
+        move_lines = self.service._find_location_move_lines()
+        self.assert_response_select_line(
             response,
+            self.zone_location,
+            self.picking_type,
+            move_lines,
             message=self.service.msg_store.location_not_allowed(),
         )
 
