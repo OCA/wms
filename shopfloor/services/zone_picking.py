@@ -458,9 +458,8 @@ class ZonePicking(Component):
             return response, message
 
         if not location.is_sublocation_of(self.zone_location):
-            response = self._response_for_start(
-                message=self.msg_store.location_not_allowed()
-            )
+            response = self._list_move_lines(self.zone_location)
+            message = self.msg_store.location_not_allowed()
             return response, message
 
         product, lot, package = self._find_product_in_location(location)
