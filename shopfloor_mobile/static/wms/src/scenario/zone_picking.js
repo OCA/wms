@@ -31,6 +31,12 @@ const template_mobile = `
                         <btn-back :router_back="false"/>
                     </v-col>
                 </v-row>
+                <v-row align="center" v-if="! _.isEmpty(state.data.buffer)">
+                    <v-col class="text-center" cols="12">
+                        <btn-action @click="state.on_unload_at_destination()">Unload at destination</btn-action>
+                    </v-col>
+                </v-row>
+
             </div>
         </div>
         <div v-if="state_is('select_picking_type')">
@@ -284,7 +290,11 @@ const ZonePicking = {
             }
             const data = this.state_get_data("select_line");
             if (_.isEmpty(data) || _.isEmpty(data.picking_type)) {
-                return {};
+                const buffer = this.state_get_data("scan_location").buffer;
+                if (_.isEmpty(buffer)) {
+                    return {};
+                }
+                return buffer.picking_type;
             }
             return data.picking_type;
         },
@@ -294,7 +304,11 @@ const ZonePicking = {
             }
             const data = this.state_get_data("select_picking_type");
             if (_.isEmpty(data) || _.isEmpty(data.zone_location)) {
-                return {};
+                const buffer = this.state_get_data("scan_location");
+                if (_.isEmpty(buffer)) {
+                    return {};
+                }
+                return buffer.zone_location;
             }
             return data.zone_location;
         },
@@ -539,6 +553,21 @@ const ZonePicking = {
                         this.wait_call(
                             this.odoo.call("scan_location", {barcode: scanned.text})
                         );
+                    },
+                    on_unload_at_destination: () => {
+                        const loaded_data = this.state.data.buffer;
+                        const odoo_params = this._get_odoo_params();
+                        // Zone and picking type are needed in the header
+                        // To call prepare_unload.
+                        _.defaults(
+                            odoo_params.headers,
+                            this._get_zone_picking_headers(
+                                loaded_data.zone_location.id,
+                                loaded_data.picking_type.id
+                            )
+                        );
+                        const odoo = this.$root.getOdoo(odoo_params);
+                        this.wait_call(odoo.call("prepare_unload", {}));
                     },
                 },
                 select_picking_type: {
