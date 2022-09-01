@@ -559,7 +559,7 @@ const ZonePicking = {
                 select_line: {
                     display_info: {
                         title: "Select move",
-                        scan_placeholder: "Scan pack or location",
+                        scan_placeholder: "Scan location / pack / product / lot",
                     },
                     events: {
                         select: "on_select",
