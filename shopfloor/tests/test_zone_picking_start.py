@@ -126,6 +126,33 @@ class ZonePickingStartCase(ZonePickingCommonCase):
         response = self.service.dispatch("select_zone")
         self.assert_response_start(response)
 
+    def test_select_zone_with_loaded_buffer(self):
+        """Check loaded buffer info in select zone answer."""
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        move_line = self.picking5.move_line_ids[1]
+        # change the destination location on the move line
+        move_line.location_dest_id = self.zone_sublocation3
+        # and set the destination package
+        self.service._set_destination_package(
+            move_line,
+            move_line.product_uom_qty,
+            self.free_package,
+        )
+        response = self.service.dispatch("select_zone")
+        data = {
+            "zones": self.service._data_for_select_zone(zone_location.child_ids),
+            "buffer": {
+                "zone_location": self.service.data.location(zone_location),
+                "picking_type": self.service.data.picking_type(picking_type),
+            },
+        }
+        self.assert_response(
+            response,
+            next_state="start",
+            data=data,
+        )
+
     def test_scan_location_wrong_barcode(self):
         """Scanned location invalid, no location found."""
         response = self.service.dispatch(

@@ -47,7 +47,7 @@ select_line -> unload_single: **/prepare_unload** \n(different destinations in b
 select_line -> unload_set_destination: **/prepare_unload** \n(only one move line in the buffer)
 select_line -> unload_all: **/prepare_unload** \n(buffer lines have all the same destination location)
 select_line -> select_line: **/prepare_unload** \n(no remaining lines in the buffer)
-
+start -> unload_all : **/prepare_unload** \n On Unload To Destination button click (any unload endpoint)
 
 == /set_destination_all ==
 unload_all -[#red]> unload_all: **/set_destination_all** \n(error, scanned destination location invalid)
