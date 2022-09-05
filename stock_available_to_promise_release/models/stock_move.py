@@ -94,7 +94,7 @@ class StockMove(models.Model):
                         OR (
                             m.priority = move.priority
                             AND m.date_priority = move.date_priority
-                            AND m.id < move.id
+                            AND m.id > move.id
                         )
                     )
                     OR (
@@ -288,6 +288,11 @@ class StockMove(models.Model):
         if self.env.context.get("release_available_to_promise"):
             vals.update({"procure_method": self.procure_method, "need_release": True})
         return vals
+
+    def _prepare_procurement_values(self):
+        res = super()._prepare_procurement_values()
+        res["date_priority"] = self.date_priority
+        return res
 
     def _run_stock_rule(self):
         """Launch procurement group run method with remaining quantity
