@@ -18,6 +18,9 @@ class StockRule(models.Model):
         related="route_id.no_backorder_at_release", store=True
     )
 
+    def _get_custom_move_fields(self):
+        return super()._get_custom_move_fields() + ["date_priority"]
+
     def _run_pull(self, procurements):
         actions_to_run = []
 
