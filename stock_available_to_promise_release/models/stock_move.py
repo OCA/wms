@@ -76,6 +76,29 @@ class StockMove(models.Model):
             GROUP BY move.id;
         """
 
+    def _previous_promised_qty_sql_moves_before(self):
+        sql = """
+            m.priority > move.priority
+            OR
+            (
+                m.priority = move.priority
+                AND m.date_priority < move.date_priority
+            )
+            OR (
+                m.priority = move.priority
+                AND m.date_priority = move.date_priority
+                AND m.picking_type_id = move.picking_type_id
+                AND m.id < move.id
+            )
+            OR (
+                m.priority = move.priority
+                AND m.date_priority = move.date_priority
+                AND m.picking_type_id != move.picking_type_id
+                AND m.id > move.id
+            )
+        """
+        return sql
+
     def _previous_promised_qty_sql_lateral_where(self):
         locations = self._ordered_available_to_promise_locations()
         sql = """
@@ -86,17 +109,7 @@ class StockMove(models.Model):
                 AND (
                     COALESCE(m.need_release, False) = COALESCE(move.need_release, False)
                     AND (
-                        m.priority > move.priority
-                        OR
-                        (
-                            m.priority = move.priority
-                            AND m.date_priority < move.date_priority
-                        )
-                        OR (
-                            m.priority = move.priority
-                            AND m.date_priority = move.date_priority
-                            AND m.id < move.id
-                        )
+                        {moves_before}
                     )
                     OR (
                         move.need_release IS true
@@ -106,7 +119,9 @@ class StockMove(models.Model):
                 AND m.state IN (
                     'waiting', 'confirmed', 'partially_available', 'assigned'
                 )
-        """
+        """.format(
+            moves_before=self._previous_promised_qty_sql_moves_before()
+        )
         params = {
             "location_paths": [
                 "{}%".format(location.parent_path) for location in locations
@@ -320,6 +335,11 @@ class StockMove(models.Model):
                 # once
                 return 0, 0
         return available_qty, remaining_qty
+
+    def _prepare_procurement_values(self):
+        res = super()._prepare_procurement_values()
+        res["date_priority"] = self.date_priority
+        return res
 
     def _run_stock_rule(self):
         """Launch procurement group run method with remaining quantity
