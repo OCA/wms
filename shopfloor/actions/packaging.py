@@ -45,3 +45,9 @@ class PackagingAction(Component):
 
     def _package_vals_without_packaging(self):
         return {}
+
+    def package_has_several_products(self, package):
+        return len(package.quant_ids.product_id) > 1
+
+    def package_has_several_lots(self, package):
+        return len(package.quant_ids.lot_id) > 1
