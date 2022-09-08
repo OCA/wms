@@ -245,6 +245,27 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             message=self.service.msg_store.barcode_not_found(),
         )
 
+    def test_scan_source_package_many_products(self):
+        """Scan source: scanned package that several product, aborting
+        next step 'select_line expected.
+        """
+        pack = self.free_package
+        self._update_qty_in_location(self.zone_location, self.product_a, 2, pack)
+        self._update_qty_in_location(self.zone_location, self.product_b, 2, pack)
+        response = self.service.dispatch(
+            "scan_source",
+            params={"barcode": pack.name},
+        )
+        move_lines = self.service._find_location_move_lines()
+        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        self.assert_response_select_line(
+            response,
+            zone_location=self.zone_location,
+            picking_type=self.picking_type,
+            move_lines=move_lines,
+            message=self.service.msg_store.several_products_in_package(pack),
+        )
+
     def test_scan_source_barcode_package_can_replace_in_line(self):
         """Scan source: scanned package has no related line but can replace
         next step 'select_line' expected with confirmation required set.
