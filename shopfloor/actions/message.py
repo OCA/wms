@@ -248,12 +248,24 @@ class MessageAction(Component):
             "body": _("Several lots found in %s, please scan a lot.") % location.name,
         }
 
+    def several_lots_in_package(self, package):
+        return {
+            "message_type": "error",
+            "body": _("Several lots found in %s, please scan the lot." % package.name),
+        }
+
     def several_products_in_location(self, location):
         return {
             "message_type": "warning",
             "body": _(
                 "Several products found in %s, please scan a product." % location.name
             ),
+        }
+
+    def several_products_in_package(self, package):
+        return {
+            "message_type": "error",
+            "body": _("Several products found in %s, please scan the product." % package.name),
         }
 
     def no_product_in_location(self, location):
