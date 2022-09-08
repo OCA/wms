@@ -304,7 +304,7 @@ const ZonePicking = {
             }
             const data = this.state_get_data("select_picking_type");
             if (_.isEmpty(data) || _.isEmpty(data.zone_location)) {
-                const buffer = this.state_get_data("scan_location");
+                const buffer = this.state_get_data("scan_location").buffer;
                 if (_.isEmpty(buffer)) {
                     return {};
                 }
