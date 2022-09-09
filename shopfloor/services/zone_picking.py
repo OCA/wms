@@ -475,9 +475,16 @@ class ZonePicking(Component):
             return response, message
 
         product, lot, package = self._find_product_in_location(location)
-        if len(product) > 1 or len(lot) > 1 or len(package) > 1:
-            response = self._list_move_lines(location)
+        if len(product) > 1:
             message = self.msg_store.several_products_in_location(location)
+        elif len(lot) > 1:
+            message = self.msg_store.several_lots_in_location(location)
+        elif len(package) > 1:
+            message = self.msg_store.several_packs_in_location(location)
+        if message:
+            # So next scan will be check in relation to
+            self._zone_location = location
+            response = self._list_move_lines(location)
             return response, message
 
         move_lines = self._find_location_move_lines(
