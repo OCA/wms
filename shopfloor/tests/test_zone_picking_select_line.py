@@ -404,6 +404,13 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         """Scan source: scanned lot has one related move line,
         next step 'set_line_destination' expected on it.
         """
+        # Product C has already one lot from test_zone_picking_base.py
+        # So lets add one more lot for that product in a different location.
+        pick = self._create_picking(lines=[(self.product_c, 10)])
+        self._fill_stock_for_moves(
+            pick.move_lines, in_lot=True, location=self.zone_sublocation1
+        )
+        pick.action_assign()
         lot = self.picking2.move_line_ids.lot_id[0]
         response = self.service.dispatch(
             "scan_source",
@@ -417,6 +424,34 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_line=move_line,
+        )
+
+    def test_scan_source_barcode_lot_in_multiple_location(self):
+        """Scan source: scanned lot is in multiple location
+        next step 'select_line' expected on it.
+        """
+        # Picking 2 has already some lot from test_zone_picking_base.py
+        # So lets add in the same lot the same product in another location.
+        lot = self.picking2.move_line_ids.lot_id[0]
+        picking = self._create_picking(lines=[(lot.product_id, 2)])
+        self._fill_stock_for_moves(
+            picking.move_lines, in_lot=lot, location=self.zone_sublocation3
+        )
+        picking.action_assign()
+        response = self.service.dispatch(
+            "scan_source",
+            params={"barcode": lot.name},
+        )
+        # FIX ME: need to filter lines only on lot scanned !!
+        move_lines = self.service._find_location_move_lines()
+        # move_lines = self.service._find_location_move_lines(lot=lot)
+        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        self.assert_response_select_line(
+            response,
+            zone_location=self.zone_location,
+            picking_type=self.picking_type,
+            move_lines=move_lines,
+            message=self.service.msg_store.several_move_in_different_location(),
         )
 
     def test_scan_source_barcode_lot_not_found(self):
