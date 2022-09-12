@@ -468,6 +468,13 @@ const ZonePicking = {
             return this.wait_call(this.odoo.call("list_move_lines", {}));
         },
         scan_source(barcode) {
+            let data = {
+                barcode: barcode,
+                confirmation: this.state.data.confirmation_required,
+            };
+            if (this.state_is("select_line") && this.state.data.product) {
+                data.product_id = this.state.data.product.id;
+            }
             return this.wait_call(
                 this.odoo.call("scan_source", {
                     barcode: barcode,
