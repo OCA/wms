@@ -606,9 +606,14 @@ class ZonePicking(Component):
             return response, message
         for lot in lots:
             move_lines = self._find_location_move_lines(lot=lot)
-            if move_lines:
+            if not move_lines:
+                continue
+            if len(move_lines.location_id) > 1:
+                message = self.msg_store.several_move_in_different_location()
+                response = self.list_move_lines()
+            else:
                 response = self._response_for_set_line_destination(first(move_lines))
-                return response, message
+            return response, message
         response = self._list_move_lines(self.zone_location)
         message = self.msg_store.lot_not_found()
         return response, message
