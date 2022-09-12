@@ -254,6 +254,20 @@ class MessageAction(Component):
             "body": _("Several lots found in %s, please scan the lot." % package.name),
         }
 
+    def several_move_in_different_location(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "Several moves found on different locations, please scan first the location."
+            ),
+        }
+
+    def several_move_with_different_lot(self):
+        return {
+            "message_type": "warning",
+            "body": _("Several moves found for different lots, please scan the lot."),
+        }
+
     def several_products_in_location(self, location):
         return {
             "message_type": "warning",

@@ -352,6 +352,54 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             message=self.service.msg_store.product_not_found(),
         )
 
+    def test_scan_source_barcode_product_multiple_moves_different_location(self):
+        """Scan source: scanned product has move lines in multiple sub location.
+
+        next step : 'select_line' expected.
+        """
+        # Using picking4 which has a product in two sublocation
+        response = self.service.dispatch(
+            "scan_source",
+            params={"barcode": self.product_e.barcode},
+        )
+        move_lines = self.service._find_location_move_lines(product=self.product_e)
+        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        self.assert_response_select_line(
+            response,
+            zone_location=self.zone_location,
+            picking_type=self.picking_type,
+            move_lines=move_lines,
+            product=self.product_e,
+            message=self.service.msg_store.several_move_in_different_location(),
+        )
+
+    def test_scan_source_barcode_product_with_multiple_lot(self):
+        """Scan source: scanned product is found with mulitple lot number.
+
+        next step : 'select_line' expected.
+        """
+        # Product C has already one lot from test_zone_picking_base.py
+        # So lets add one more lot for that product in same location.
+        pick = self._create_picking(lines=[(self.product_c, 10)])
+        self._fill_stock_for_moves(
+            pick.move_lines, in_lot=True, location=self.zone_sublocation2
+        )
+        pick.action_assign()
+        response = self.service.dispatch(
+            "scan_source",
+            params={"barcode": self.product_c.barcode},
+        )
+        move_lines = self.service._find_location_move_lines(product=self.product_c)
+        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        self.assert_response_select_line(
+            response,
+            zone_location=self.zone_location,
+            picking_type=self.picking_type,
+            move_lines=move_lines,
+            product=self.product_c,
+            message=self.service.msg_store.several_move_with_different_lot(),
+        )
+
     def test_scan_source_barcode_lot(self):
         """Scan source: scanned lot has one related move line,
         next step 'set_line_destination' expected on it.
