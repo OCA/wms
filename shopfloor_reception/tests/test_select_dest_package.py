@@ -41,9 +41,7 @@ class TestSelectDestPackage(CommonCase):
             },
             message={
                 "message_type": "warning",
-                "body": (
-                    "Do you want to create package FooBar? " "Scan it again to confirm."
-                ),
+                "body": ("Create new PACK FooBar? " "Scan it again to confirm."),
             },
         )
         # Try again with confirmation = True

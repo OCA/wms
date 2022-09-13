@@ -25,9 +25,11 @@ class TestSelectDocument(CommonCase):
         response = self.service.dispatch(
             "scan_document", params={"barcode": picking.name}
         )
-        data = self.data.picking(picking)
-        data.update({"move_lines": self.data.move_lines(picking.move_line_ids)})
-        self.assert_response(response, next_state="select_line", data={"picking": data})
+        self.assert_response(
+            response,
+            next_state="select_line",
+            data={"picking": self._data_for_picking(picking)},
+        )
 
     def test_scan_packaging_single_picking(self):
         # next step is set_lot
@@ -101,7 +103,7 @@ class TestSelectDocument(CommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            data={"pickings": self.data.pickings(p1 | p2)},
+            data={"pickings": self._data_for_pickings(p1 | p2)},
             message={"message_type": "error", "body": body},
         )
 
@@ -116,7 +118,7 @@ class TestSelectDocument(CommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            data={"pickings": self.data.pickings(p1 | p2)},
+            data={"pickings": self._data_for_pickings(p1 | p2)},
             message={"message_type": "error", "body": body},
         )
 
@@ -126,12 +128,12 @@ class TestSelectDocument(CommonCase):
         response = self.service.dispatch(
             "scan_document", params={"barcode": self.product_c.barcode}
         )
-        body = "No picking found for the scanned product."
+        body = "No product found among current transfers."
         self.assert_response(
             response,
             next_state="select_document",
-            data={"pickings": self.data.pickings(picking)},
-            message={"message_type": "error", "body": body},
+            data={"pickings": self._data_for_pickings(picking)},
+            message={"message_type": "warning", "body": body},
         )
 
     def test_scan_packaging_no_picking(self):
@@ -144,6 +146,6 @@ class TestSelectDocument(CommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            data={"pickings": self.data.pickings(picking)},
+            data={"pickings": self._data_for_pickings(picking)},
             message={"message_type": "error", "body": body},
         )

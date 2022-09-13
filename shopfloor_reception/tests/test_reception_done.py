@@ -11,13 +11,11 @@ class TestSelectDestPackage(CommonCase):
         response = self.service.dispatch(
             "done_action", params={"picking_id": picking.id}
         )
-        data = self.data.picking(picking)
-        data.update({"move_lines": self.data.move_lines(picking.move_line_ids)})
         # User is asked to confirm the action
         self.assert_response(
             response,
             next_state="select_line",
-            data={"picking": data},
+            data={"picking": self._data_for_picking(picking)},
             message={"message_type": "warning", "body": "Are you sure?"},
         )
         response = self.service.dispatch(
@@ -40,12 +38,10 @@ class TestSelectDestPackage(CommonCase):
         response = self.service.dispatch(
             "done_action", params={"picking_id": picking.id}
         )
-        data = self.data.picking(picking)
-        data.update({"move_lines": self.data.move_lines(picking.move_line_ids)})
         self.assert_response(
             response,
             next_state="select_line",
-            data={"picking": data},
+            data={"picking": self._data_for_picking(picking)},
             message={
                 "message_type": "warning",
                 "body": "No quantity has been processed, unable to complete the transfer.",
@@ -61,12 +57,10 @@ class TestSelectDestPackage(CommonCase):
         response = self.service.dispatch(
             "done_action", params={"picking_id": picking.id}
         )
-        data = self.data.picking(picking)
-        data.update({"move_lines": self.data.move_lines(picking.move_line_ids)})
         self.assert_response(
             response,
             next_state="select_line",
-            data={"picking": data},
+            data={"picking": self._data_for_picking(picking)},
             message={
                 "message_type": "warning",
                 "body": (
@@ -84,7 +78,7 @@ class TestSelectDestPackage(CommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            data={"pickings": self.data.pickings(backorder)},
+            data={"pickings": self._data_for_pickings(backorder)},
             message={
                 "message_type": "success",
                 "body": f"Transfer {picking.name} done",

@@ -121,14 +121,14 @@ class TestSelectLine(CommonCase):
             "scan_line",
             params={"picking_id": picking.id, "barcode": self.product_c.barcode},
         )
-        error_msg = "Product is not in the current transfer."
+        error_msg = "Product not found in the current transfer."
         data = self.data.picking(picking)
         data.update({"move_lines": self.data.move_lines(picking.move_line_ids)})
         self.assert_response(
             response,
             next_state="select_line",
             data={"picking": data},
-            message={"message_type": "error", "body": error_msg},
+            message={"message_type": "warning", "body": error_msg},
         )
 
     def test_scan_packaging_not_found(self):
@@ -141,12 +141,12 @@ class TestSelectLine(CommonCase):
                 "barcode": self.product_c_packaging.barcode,
             },
         )
-        error_msg = "Packaging is not in the current transfer."
+        error_msg = "Packaging not found in the current transfer."
         data = self.data.picking(picking)
         data.update({"move_lines": self.data.move_lines(picking.move_line_ids)})
         self.assert_response(
             response,
             next_state="select_line",
             data={"picking": data},
-            message={"message_type": "error", "body": error_msg},
+            message={"message_type": "warning", "body": error_msg},
         )

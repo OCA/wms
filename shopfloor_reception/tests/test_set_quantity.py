@@ -192,7 +192,7 @@ class TestSetQuantity(CommonCase):
                 "picking": data,
                 "selected_move_lines": self.data.move_lines(selected_move_line),
             },
-            message={"message_type": "error", "body": "You cannot place it here."},
+            message={"message_type": "error", "body": "You cannot place it here"},
         )
 
     def test_scan_package_without_location(self):
@@ -261,7 +261,7 @@ class TestSetQuantity(CommonCase):
                 "picking": data,
                 "selected_move_lines": self.data.move_lines(selected_move_line),
             },
-            message={"message_type": "error", "body": "You cannot place it here."},
+            message={"message_type": "error", "body": "You cannot place it here"},
         )
 
     def test_scan_new_package(self):
@@ -286,7 +286,10 @@ class TestSetQuantity(CommonCase):
                 "picking": data,
                 "selected_move_lines": self.data.move_lines(selected_move_line),
             },
-            message={"message_type": "warning", "body": "Put in this new PACK FooBar?"},
+            message={
+                "message_type": "warning",
+                "body": "Create new PACK FooBar? Scan it again to confirm.",
+            },
         )
         response = self.service.dispatch(
             "set_quantity",

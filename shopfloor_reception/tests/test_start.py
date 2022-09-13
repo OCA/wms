@@ -19,7 +19,7 @@ class TestStart(CommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            data={"pickings": self.data.pickings(pickings)},
+            data={"pickings": self._data_for_pickings(pickings)},
         )
         # And a second one
         pickings |= self._create_picking()
@@ -27,5 +27,5 @@ class TestStart(CommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            data={"pickings": self.data.pickings(pickings)},
+            data={"pickings": self._data_for_pickings(pickings)},
         )

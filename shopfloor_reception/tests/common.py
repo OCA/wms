@@ -17,6 +17,19 @@ class CommonCase(BaseCommonCase):
     def _data_for_move_lines(self, lines, **kw):
         return self.data.move_lines(lines, **kw)
 
+    def _data_for_picking(self, picking):
+        picking_data = self.data.picking(picking)
+        picking_data.update(
+            {"move_lines": self._data_for_move_lines(picking.move_line_ids)}
+        )
+        return picking_data
+
+    def _data_for_pickings(self, pickings):
+        res = []
+        for picking in pickings:
+            res.append(self._data_for_picking(picking))
+        return res
+
     @classmethod
     def _add_package(cls, picking):
         packaging_ids = [
