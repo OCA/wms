@@ -449,7 +449,7 @@ class ClusterPicking(Component):
 
         package = search.package_from_scan(barcode)
         if package and move_line.package_id == package:
-            return self._scan_line_by_package(picking, move_line, package)
+            return self._scan_line_by_package(picking, move_line, package, batch)
 
         # use the common search method so we search by packaging too
         product = search.product_from_scan(barcode)
@@ -474,8 +474,16 @@ class ClusterPicking(Component):
             move_line, message=self.msg_store.barcode_not_found()
         )
 
-    def _scan_line_by_package(self, picking, move_line, package):
+    def _scan_line_by_package(self, picking, move_line, package, batch):
         """Package scanned, just work with it."""
+        packaging = self._actions_for("packaging")
+        message = None
+        if packaging.package_has_several_products(package):
+            message = self.msg_store.several_products_in_package(package)
+        elif packaging.package_has_several_lots(package):
+            message = self.msg_store.several_lots_in_package(package)
+        if message:
+            return self._pick_next_line(batch, message=message)
         return self._response_for_scan_destination(move_line)
 
     def _scan_line_by_product(self, picking, move_line, product):
