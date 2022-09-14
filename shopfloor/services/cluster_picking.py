@@ -548,21 +548,17 @@ class ClusterPicking(Component):
         several products or a mix of several products and packages, we
         ask to scan a more precise barcode.
         """
-        location = move_line.location_id
-        ml_search = self.search_move_line
-        pending_lines = ml_search.search_move_lines_by_location(location)
-
-        lots = pending_lines.mapped("lot_id")
-
+        location_quants = move_line.location_id.quant_ids.filtered(
+            lambda quant: quant.quantity > 0
+        )
+        lots = location_quants.mapped("lot_id")
         if len(lots) > 1:
             return self._response_for_start_line(
                 move_line,
                 message=self.msg_store.several_lots_in_location(move_line.location_id),
             )
-
-        packages = pending_lines.mapped("package_id")
-        products = pending_lines.mapped("product_id")
-
+        packages = location_quants.mapped("package_id")
+        products = location_quants.mapped("product_id")
         if len(packages) > 1 or len(products) > 1:
             if move_line.package_id:
                 return self._response_for_start_line(
