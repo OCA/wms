@@ -490,21 +490,31 @@ class ClusterPicking(Component):
         """Product scanned, check if we can work with it.
 
         If scanned product is part of several packages in the same location,
-        we can't be sure it's the correct one, in such case, ask to scan a package
+        we can't be sure it's the correct one, in such case, ask to scan a package.
+
+        If the product is tracked by lot and there is only one lot id in the location
+        not in a package. It can safely be picked up.
         """
-        if move_line.product_id.tracking in ("lot", "serial"):
-            return self._response_for_start_line(
-                move_line, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
-            )
-        other_product_lines = picking.move_line_ids.filtered(
-            lambda l: l.product_id == product and l.location_id == move_line.location_id
+        message = None
+        location_quants = move_line.location_id.quant_ids.filtered(
+            lambda quant: quant.quantity > 0 and quant.product_id == product
         )
-        packages = other_product_lines.mapped("package_id")
+        packages = location_quants.mapped("package_id")
+
+        if move_line.product_id.tracking == "lot":
+            lots_at_location = location_quants.mapped("lot_id")
+            if len(lots_at_location) > 1 or packages:
+                message = self.msg_store.scan_lot_on_product_tracked_by_lot()
+        elif move_line.product_id.tracking == "serial":
+            message = self.msg_store.scan_lot_on_product_tracked_by_lot()
+        if message:
+            return self._response_for_start_line(move_line, message=message)
+
         # Do not use mapped here: we want to see if we have more than one package,
         # but also if we have one product as a package and the same product as
         # a unit in another line. In both cases, we want the user to scan the
         # package.
-        if packages and len({line.package_id for line in other_product_lines}) > 1:
+        if packages and len({quant.package_id for quant in location_quants}) > 1:
             return self._response_for_start_line(
                 move_line,
                 message=self.msg_store.product_multiple_packages_scan_package(),

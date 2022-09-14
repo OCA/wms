@@ -102,10 +102,20 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_ok(line, line.lot_id.name)
 
     def test_scan_line_error_product_tracked(self):
-        """Scan a product tracked by lot, must scan the lot"""
+        """Scan a product tracked by lot, must scan the lot.
+
+        If for the same product there is multiple lot in the location.
+        The user need to scan the lot.
+        """
         self.product_a.tracking = "lot"
         self._simulate_batch_selected(self.batch, in_lot=True)
         line = self.batch.picking_ids.move_line_ids
+        # Add another lot for the same product in the location
+        location = self.batch.picking_ids.location_id
+        new_lot = self.env["stock.production.lot"].create(
+            {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        self._update_qty_in_location(location, line.product_id, 2, lot=new_lot)
         self._scan_line_error(
             line,
             line.product_id.barcode,
@@ -114,6 +124,17 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
                 "body": "Product tracked by lot, please scan one.",
             },
         )
+
+    def test_scan_line_lot_ok_only_one_in_location(self):
+        """Scan a product tracked by lot but no error.
+
+        If only one lot for that product is in the location, it can
+        be safely picked up.
+        """
+        self.product_a.tracking = "lot"
+        self._simulate_batch_selected(self.batch, in_lot=True)
+        line = self.batch.picking_ids.move_line_ids
+        self._scan_line_ok(line, line.lot_id.name)
 
     def test_scan_line_product_error_several_packages(self):
         """When we scan a product which is in more than one package, error"""
@@ -165,11 +186,11 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         # create a second move line for the same product in a different
         # package
         move = line.move_id.copy()
+        move.location_id = line.location_id.copy()
         self._fill_stock_for_moves(move)
         move._action_confirm(merge=False)
         move._action_assign()
         move.move_line_ids[0].package_id = None
-        move.move_line_ids[0].location_id = line.location_id.copy()
         self._scan_line_ok(line, move.product_id.barcode)
 
     def test_scan_line_lot_error_several_packages(self):
