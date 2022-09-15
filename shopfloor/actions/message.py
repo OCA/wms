@@ -638,3 +638,9 @@ class MessageAction(Component):
             "message_type": "success",
             "body": _("L'inventaire {0.name} est terminé.").format(inventory),
         }
+
+    def inventory_already_done(self, inventory):
+        return {
+            "message_type": "error",
+            "body": _("The inventory {0.name} is already done.").format(inventory),
+        }

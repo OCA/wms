@@ -277,10 +277,15 @@ class Inventory(Component):
         if lot:
             domain += [("prod_lot_id", "in", lot.ids)]
         line = self.env["stock.inventory.line"].search(domain, order="product_qty")
+        if line and line.state == "done":
+            raise ShopfloorError(
+                self.msg_store.inventory_already_done(inventory),
+                next_state="start",
+            )
         if not line and create:
             if self.work.menu.force_inventory_add_product:
                 raise ShopfloorError(
-                    _("No inventory line found, please us button 'Add product'")
+                    _("No inventory line found, please use button 'Add product'")
                 )
             line = self._create_inventory_line(
                 inventory, location, product=product, lot=lot
