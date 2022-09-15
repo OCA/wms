@@ -23,6 +23,7 @@ class StockInventory(models.Model):
         help="Shopfloor doesn't validate the inventory at the end of the process. "
         "The manager can do it manually.",
         tracking=True,
+        copy=False,
     )
     inventory_line_count = fields.Integer(
         compute="_compute_inventory_info",
