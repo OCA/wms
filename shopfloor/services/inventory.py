@@ -155,8 +155,28 @@ class Inventory(Component):
             return self._response_inventory_does_not_exist()
         inventory.user_id = self.env.user.id
         if len(inventory.location_ids) == 1 and not inventory.location_ids.child_ids:
+            self._start_location_state(inventory, inventory.location_ids)
             return self._response_for_scan_product(inventory, inventory.location_ids)
         return self._response_for_start_location(inventory)
+
+    def _start_location_state(self, inventory, location):
+        location_state = inventory.sub_location_ids.filtered(
+            lambda l: l.location_id == location
+        )
+        if location_state.state == "done":
+            # TODO re-inventory or update location instead of raise
+            raise ShopfloorError(
+                self.msg_store.location_already_inventoried(location.barcode),
+                data=self.data.inventory(inventory, with_locations=True),
+                next_state="start_location",
+            )
+        if location.has_on_going_operation():
+            raise ShopfloorError(
+                self.msg_store.location_has_on_going_operation(location),
+                next_state="start_location",
+                data=self.data.inventory(inventory, with_locations=True),
+            )
+        location_state.action_start()
 
     def start_location(self, inventory_id, barcode):
         inventory = self.env["stock.inventory"].browse(inventory_id)
@@ -168,23 +188,7 @@ class Inventory(Component):
             return self._response_for_start_location(
                 inventory, message=self.msg_store.no_location_found()
             )
-        location_state = inventory.sub_location_ids.filtered(
-            lambda l: l.location_id == location
-        )
-        if location_state.state == "done":
-            # TODO re-inventory or update location instead of raise
-            raise ShopfloorError(
-                self.msg_store.location_already_inventoried(barcode),
-                data=self.data.inventory(inventory, with_locations=True),
-                next_state="start_location",
-            )
-        if location.has_on_going_operation():
-            raise ShopfloorError(
-                self.msg_store.location_has_on_going_operation(location),
-                next_state="start_location",
-                data=self.data.inventory(inventory, with_locations=True),
-            )
-        location_state.action_start()
+        self._start_location_state(inventory, location)
         return self._response_for_scan_product(inventory, location)
 
     def scan_product(
