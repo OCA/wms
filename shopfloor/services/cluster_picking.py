@@ -527,13 +527,16 @@ class ClusterPicking(Component):
         If we scanned a lot and it's part of several packages, we can't be
         sure the user scanned the correct one, in such case, ask to scan a package
         """
-        other_lot_lines = picking.move_line_ids.filtered(lambda l: l.lot_id == lot)
-        packages = other_lot_lines.mapped("package_id")
+        location_quants = move_line.location_id.quant_ids.filtered(
+            lambda quant: quant.quantity > 0 and quant.lot_id == lot
+        )
+        packages = location_quants.mapped("package_id")
+
         # Do not use mapped here: we want to see if we have more than one
         # package, but also if we have one lot as a package and the same lot as
-        # a unit in another line. In both cases, we want the user to scan the
+        # a unit in another quant. In both cases, we want the user to scan the
         # package.
-        if packages and len({line.package_id for line in other_lot_lines}) > 1:
+        if packages and len({quant.package_id for quant in location_quants}) > 1:
             return self._response_for_start_line(
                 move_line, message=self.msg_store.lot_multiple_packages_scan_package()
             )
