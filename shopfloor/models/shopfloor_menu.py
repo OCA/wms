@@ -134,6 +134,13 @@ class ShopfloorMenu(models.Model):
     force_inventory_add_product_is_possible = fields.Boolean(
         compute="_compute_force_inventory_add_product_is_possible"
     )
+    display_location_content = fields.Boolean(
+        string="Display location content",
+        default=True,
+    )
+    display_location_content_is_possible = fields.Boolean(
+        compute="_compute_display_location_content_is_possible"
+    )
 
     @api.onchange("unload_package_at_destination")
     def _onchange_unload_package_at_destination(self):
@@ -336,3 +343,26 @@ class ShopfloorMenu(models.Model):
             menu.force_inventory_add_product_is_possible = menu.scenario_id.has_option(
                 "force_inventory_add_product"
             )
+
+    @api.depends("scenario_id")
+    def _compute_display_location_content_is_possible(self):
+        for menu in self:
+            menu.display_location_content_is_possible = menu.scenario_id.has_option(
+                "display_location_content"
+            )
+
+    @api.constrains(
+        "scenario_id", "display_location_content", "inventory_zero_counted_quantity"
+    )
+    def _check_display_location_content(self):
+        for menu in self:
+            if (
+                not menu.display_location_content
+                and not menu.inventory_zero_counted_quantity
+            ):
+                raise exceptions.ValidationError(
+                    _(
+                        "Hidding location content is not allowed if inventory quantities are "
+                        "not reset to zero for menu {}."
+                    ).format(menu.name)
+                )

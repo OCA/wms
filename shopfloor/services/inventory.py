@@ -67,7 +67,11 @@ class Inventory(Component):
 
     def _data_inventory_location(self, inventory, location, inventory_line=None):
         data = self.data.inventory(inventory)
-        lines = self._find_inventory_line(inventory, location, create=False, multi=True)
+        lines = self.env["stock.inventory.line"]
+        if self.work.menu.display_location_content:
+            lines = self._find_inventory_line(
+                inventory, location, create=False, multi=True
+            )
         if inventory_line:
             lines -= inventory_line
         data.update(
@@ -75,6 +79,7 @@ class Inventory(Component):
                 "location": self.data.location(location),
                 "lines": self.data.inventory_lines(lines),
                 "current_line": self.data.inventory_line(inventory_line),
+                "display_location_content": self.work.menu.display_location_content,
             }
         )
         return data
@@ -268,6 +273,11 @@ class Inventory(Component):
     def _find_inventory_line(
         self, inventory, location, product=None, lot=None, create=True, multi=False
     ):
+        if inventory.state == "done":
+            raise ShopfloorError(
+                self.msg_store.inventory_already_done(inventory),
+                next_state="start",
+            )
         domain = [
             ("inventory_id", "=", inventory.id),
             ("location_id", "=", location.id),
@@ -276,12 +286,9 @@ class Inventory(Component):
             domain += [("product_id", "=", product.id)]
         if lot:
             domain += [("prod_lot_id", "in", lot.ids)]
-        line = self.env["stock.inventory.line"].search(domain, order="product_qty")
-        if line and line.state == "done":
-            raise ShopfloorError(
-                self.msg_store.inventory_already_done(inventory),
-                next_state="start",
-            )
+        line = self.env["stock.inventory.line"].search(
+            domain, order="product_qty", limit=15
+        )
         if not line and create:
             if self.work.menu.force_inventory_add_product:
                 raise ShopfloorError(
@@ -502,6 +509,11 @@ class ShopfloorInventoryValidatorResponse(Component):
                 "current_line": self.schemas._schema_dict_of(
                     self.schemas.inventory_line()
                 ),
+                "display_location_content": {
+                    "type": "boolean",
+                    "nullable": False,
+                    "required": True,
+                },
             }
         )
         return schema

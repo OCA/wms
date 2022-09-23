@@ -74,7 +74,7 @@ const Inventory = {
                         :options="{main: true, key_title: 'product.name'}"
                         />
                 </div>
-                <div v-if="_.isEmpty(_.result(state, 'data.lines')) && _.isEmpty(_.result(state, 'data.current_line'))" >
+                <div v-if="_.isEmpty(_.result(state, 'data.lines')) && _.isEmpty(_.result(state, 'data.current_line')) && _.result(state, 'data.display_location_content')" >
                     <v-card :color="utils.colors.color_for('screen_step_todo')">
                         <v-card-title>
                             <p> {{ $t('inventory.message.location_empty') }} </p>
@@ -97,7 +97,7 @@ const Inventory = {
                         </v-row>
                     </div>
                 </div>
-                <div v-if="!_.isEmpty(_.result(state, 'data.lines')) && _.isEmpty(_.result(state, 'data.current_line'))" >
+                <div v-if="(!_.isEmpty(_.result(state, 'data.lines')) && _.isEmpty(_.result(state, 'data.current_line'))) || !_.result(state, 'data.display_location_content')" >
                     <div class="button-list button-vertical-list full">
                         <v-row align="center">
                             <v-col class="text-center" cols="12">
