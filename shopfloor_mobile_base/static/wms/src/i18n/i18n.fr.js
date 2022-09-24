@@ -14,7 +14,7 @@ const messages_fr = {
                 login: "Se connecter",
             },
             error: {
-                login_invalid: "Iformations d'identification invalides",
+                login_invalid: "Informations d'identification invalides",
             },
         },
         home: {
@@ -53,7 +53,7 @@ const messages_fr = {
     },
     app: {
         profile_not_configured:
-            "Profil pas encore configuré. S'il vous plait sélectionner en un.",
+            "Profil pas encore configuré. Sélectionnez un profil.",
         profile_configure: "Configurer le profil",
         loading: "Chargement en cours...",
         action: {
