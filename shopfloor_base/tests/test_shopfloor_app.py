@@ -79,7 +79,7 @@ class TestShopfloorApp(CommonCase):
                 _check[route], method, f"{route}: {method} != {_check[route]}"
             )
 
-        expected = sorted([f"{k} ({', '.join(v)})" for k, v in expected.items()])
+        expected = sorted(f"{k} ({', '.join(v)})" for k, v in expected.items())
         rec.invalidate_cache(["registered_routes"])
         self.assertEqual(
             sorted(rec.registered_routes.splitlines()),
