@@ -32,7 +32,7 @@ class TestStockPickingCompletionInfo(SavepointCase):
     def _init_inventory(self, same_location=True):
         # Product 1 on shelf 1
         # Product 2 on shelf 2
-        inventory = self.env["stock.inventory"].create({"name": "Test init"})
+        inventory = self.env["stock.quant"].create({"name": "Test init"})
         inventory.action_start()
         if not same_location:
             product_location_list = [
@@ -158,7 +158,7 @@ class TestStockPickingCompletionInfo(SavepointCase):
         self.assertEqual(pick_order.completion_info, "full_order_picking")
         res = pick_order.button_validate()
         Form(
-            self.env["stock.immediate.transfer"].with_context(res["context"])
+            self.env["stock.immediate.transfer"].with_context(**res["context"])
         ).save().process()
         self.assertEqual(pick_move_1.state, "done")
         self.assertEqual(pick_move_2.state, "done")
@@ -208,7 +208,7 @@ class TestStockPickingCompletionInfo(SavepointCase):
         self.assertEqual(pick_order_2.completion_info, "no")
         res = pick_order_1.button_validate()
         Form(
-            self.env["stock.immediate.transfer"].with_context(res["context"])
+            self.env["stock.immediate.transfer"].with_context(**res["context"])
         ).save().process()
         self.assertEqual(pick_move_1.state, "done")
         self.assertEqual(pick_order_1.state, "done")
@@ -218,7 +218,7 @@ class TestStockPickingCompletionInfo(SavepointCase):
         self.assertEqual(pick_order_2.completion_info, "last_picking")
         res = pick_order_2.button_validate()
         Form(
-            self.env["stock.immediate.transfer"].with_context(res["context"])
+            self.env["stock.immediate.transfer"].with_context(**res["context"])
         ).save().process()
         self.assertEqual(pick_move_2.state, "done")
         self.assertEqual(pick_order_2.state, "done")
