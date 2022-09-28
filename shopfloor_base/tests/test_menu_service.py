@@ -8,8 +8,9 @@ from .common_misc import MenuTestMixin
 class MenuCase(CommonCase, MenuTestMixin):
     @classmethod
     def setUpClassVars(cls):
-        super().setUpClassVars()
+        res = super().setUpClassVars()
         cls.profile = cls.env.ref("shopfloor_base.profile_demo_2")
+        return res
 
     def test_menu_search(self):
         """Request /menu/search"""

@@ -74,7 +74,6 @@
     <record id="action_shopfloor_menu" model="ir.actions.act_window">
         <field name="name">Menus</field>
         <field name="res_model">shopfloor.menu</field>
-        <field name="type">ir.actions.act_window</field>
         <field name="view_mode">tree,form</field>
     </record>
 </odoo>

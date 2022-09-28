@@ -7,7 +7,7 @@ from .common_misc import MenuTestMixin
 class UserCase(CommonCase, MenuTestMixin):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
-        super().setUpClassVars(*args, **kwargs)
+        res = super().setUpClassVars(*args, **kwargs)
         ref = cls.env.ref
         profile1 = ref("shopfloor_base.profile_demo_1")
         cls.profile = profile1.sudo().copy()
@@ -19,6 +19,7 @@ class UserCase(CommonCase, MenuTestMixin):
         cls.env["shopfloor.menu"].search(
             [("id", "not in", cls.menu_items.ids)]
         ).sudo().write({"profile_id": profile1.id})
+        return res
 
     def test_menu_no_profile(self):
         """Request /user/menu"""

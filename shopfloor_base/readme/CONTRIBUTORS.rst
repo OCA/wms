@@ -4,6 +4,7 @@
 * Alexandre Fayolle <alexandre.fayolle@camptocamp.com>
 * Benoit Guillot <benoit.guillot@akretion.com>
 * Thierry Ducrest <thierry.ducrest@camptocamp.com>
+* Fernando La Chica - GreenIce <fernandolachica@gmail.com>
 
 Design
 ~~~~~~

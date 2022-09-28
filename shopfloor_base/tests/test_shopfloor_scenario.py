@@ -11,8 +11,9 @@ from .common import CommonCase
 class TestShopfloorScenario(CommonCase):
     @classmethod
     def setUpClassUsers(cls):
-        super().setUpClassUsers()
+        res = super().setUpClassUsers()
         cls.env = cls.env(user=cls.shopfloor_manager)
+        return res
 
     def test_scenario(self):
         rec = self.env["shopfloor.scenario"].create(

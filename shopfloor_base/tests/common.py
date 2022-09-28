@@ -125,7 +125,7 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
     @classmethod
     def setUpClassUsers(cls):
         Users = cls.env["res.users"].with_context(
-            {"no_reset_password": True, "mail_create_nosubscribe": True}
+            no_reset_password=True, mail_create_nosubscribe=True
         )
         cls.shopfloor_user = Users.create(cls._shopfloor_user_values())
         cls.shopfloor_manager = Users.create(cls._shopfloor_manager_values())

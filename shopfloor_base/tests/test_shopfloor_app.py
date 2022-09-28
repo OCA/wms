@@ -12,12 +12,13 @@ from .common import CommonCase
 class TestShopfloorApp(CommonCase):
     @classmethod
     def setUpClassUsers(cls):
-        super().setUpClassUsers()
+        res = super().setUpClassUsers()
         cls.env = cls.env(user=cls.shopfloor_manager)
+        return res
 
     @classmethod
     def setUpClassBaseData(cls):
-        super().setUpClassBaseData()
+        res = super().setUpClassBaseData()
         cls.records = cls.env["shopfloor.app"].create(
             {
                 "name": "A wonderful test app",
@@ -31,6 +32,7 @@ class TestShopfloorApp(CommonCase):
                 "short_name": "Test app 2",
             }
         )
+        return res
 
     def test_app_create(self):
         # fmt: off

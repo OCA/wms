@@ -7,8 +7,9 @@ from .common_misc import ActionsDataTestMixin
 class ActionsDataCase(CommonCase, ActionsDataTestMixin):
     @classmethod
     def setUpClassBaseData(cls):
-        super().setUpClassBaseData()
+        res = super().setUpClassBaseData()
         cls.partner = cls.env.ref("base.res_partner_12").sudo()
+        return res
 
     def test_data_partner(self):
         data = self.data.partner(self.partner)
