@@ -13,7 +13,7 @@
         <t t-set="mod_name" t-value="'shopfloor_mobile_base_auth_user'" />
           <script
                 id="script_login_user"
-                t-attf-src="/shopfloor_mobile_base_auth_user/static/wms/src/login.js?v=#{get_version(mod_name)}"
+                t-attf-src="/shopfloor_mobile_base_auth_user/static/wms/src/login.esm.js?v=#{get_version(mod_name)}"
                 type="module"
             />
         </script>
