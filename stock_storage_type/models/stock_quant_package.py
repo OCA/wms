@@ -16,13 +16,11 @@ class StockQuantPackage(models.Model):
     )
 
     pack_weight_in_kg = fields.Float(
-        string="Pack weight in kg",
         help="Technical field, to speed up comparaisons",
         compute="_compute_pack_weight_in_kg",
         store=True,
     )
     height_in_m = fields.Float(
-        string="Height in m",
         help="Technical field, to speed up comparaisons",
         compute="_compute_height_in_m",
         store=True,
@@ -57,12 +55,13 @@ class StockQuantPackage(models.Model):
                 )
 
     def auto_assign_packaging(self):
-        super().auto_assign_packaging()
+        res = super().auto_assign_packaging()
         for package in self:
             if not package.package_storage_type_id:
                 # if no storage type could be set by auto assign,
                 # fallback on the default product's storage type (if any)
                 package._sync_storage_type_from_single_product()
+        return res
 
     @api.model_create_multi
     def create(self, vals):

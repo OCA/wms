@@ -3,3 +3,4 @@
 * Raphaël Reverdy <raphael.reverdy@akretion.com>
 * Jacques-Etienne Baudoux <je@bcim.be>
 * Laurent Mignon <laurent.mignon@acsone.eu>
+* Fernando La Chica - GreenICe <fernandolachica@gmail.com>
