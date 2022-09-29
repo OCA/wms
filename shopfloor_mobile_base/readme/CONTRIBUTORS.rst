@@ -5,6 +5,7 @@
 * Raphaël Reverdy <raphael.reverdy@akretion.com>
 * Sébastien Beau <sebastien.beau@akretion.com>
 * Jacques-Etienne Baudoux <je@bcim.be>
+* Fernando La Chica - GreenICe <fernandolachica@gmail.com>
 
 Design
 ~~~~~~
