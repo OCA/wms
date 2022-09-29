@@ -25,7 +25,10 @@ class StockQuant(models.Model):
             )
             if not lst_allowed_for_pst:
                 raise ValidationError(
-                    _("Package storage type %s is not allowed into " "Location %s")
+                    _(
+                        "Package storage type %(storage)s is not allowed into "
+                        "Location %(location)s"
+                    )
                     % (pack_storage_type.name, location.name)
                 )
             allowed = False
@@ -51,9 +54,11 @@ class StockQuant(models.Model):
                 if loc_storage_type.only_empty and other_quants_in_location:
                     lst_fails.append(
                         _(
-                            "Location storage type %s is flagged 'only empty'"
-                            " with other quants in location." % loc_storage_type.name
+                            "Location storage type %(storage_type)s is flagged "
+                            "'only empty'"
+                            " with other quants in location."
                         )
+                        % loc_storage_type.name
                     )
                     continue
                 if loc_storage_type.do_not_mix_products and (
@@ -63,10 +68,11 @@ class StockQuant(models.Model):
                 ):
                     lst_fails.append(
                         _(
-                            "Location storage type %s is flagged 'do not mix"
+                            "Location storage type %(storage_type)s is flagged 'do not mix"
                             " products' but there are other products in "
-                            "location." % loc_storage_type.name
+                            "location."
                         )
+                        % loc_storage_type.name
                     )
                     continue
                 if loc_storage_type.do_not_mix_lots and (
@@ -76,10 +82,11 @@ class StockQuant(models.Model):
                 ):
                     lst_fails.append(
                         _(
-                            "Location storage type %s is flagged 'do not mix"
+                            "Location storage type %(storage_type)s is flagged 'do not mix"
                             " lots' but there are other lots in "
-                            "location." % loc_storage_type.name
+                            "location."
                         )
+                        % loc_storage_type.name
                     )
                     continue
                 # Check size constraint
@@ -89,13 +96,14 @@ class StockQuant(models.Model):
                 ):
                     lst_fails.append(
                         _(
-                            "Location storage type %s defines max height of %s"
-                            " but the package is bigger: %s."
-                            % (
-                                loc_storage_type.name,
-                                loc_storage_type.max_height_in_m,
-                                quant.package_id.height_in_m,
-                            )
+                            "Location storage type %(storage_type)s defines "
+                            "max height of %(max_h)s but the package is bigger: "
+                            "%(max_h)s."
+                        )
+                        % (
+                            loc_storage_type.name,
+                            loc_storage_type.max_height_in_m,
+                            quant.package_id.height_in_m,
                         )
                     )
                     continue
@@ -105,13 +113,14 @@ class StockQuant(models.Model):
                 ):
                     lst_fails.append(
                         _(
-                            "Location storage type %s defines max weight of %s"
-                            " but the package is heavier: %s."
-                            % (
-                                loc_storage_type.name,
-                                loc_storage_type.max_weight_in_kg,
-                                package_weight_kg,
-                            )
+                            "Location storage type %(storage_type)s defines "
+                            "max weight of %(max_w)s but the package is heavier: "
+                            "%(weight_kg)s."
+                        )
+                        % (
+                            loc_storage_type.name,
+                            loc_storage_type.max_weight_in_kg,
+                            package_weight_kg,
                         )
                     )
                     continue
@@ -122,9 +131,9 @@ class StockQuant(models.Model):
             if not allowed:
                 raise ValidationError(
                     _(
-                        "Package %s is not allowed into location %s, because "
-                        "there isn't any location storage type that allows "
-                        "package storage type %s into it:\n\n%s"
+                        "Package %(package)s is not allowed into location %(location)s,"
+                        " because there isn't any location storage type that allows"
+                        " package storage type %(type)s into it:\n\n%(fails)s"
                     )
                     % (
                         quant.package_id.name,

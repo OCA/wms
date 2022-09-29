@@ -107,13 +107,11 @@ class StockLocationStorageType(models.Model):
     )
 
     max_height_in_m = fields.Float(
-        string="Max height in m",
         help="Technical field, to speed up comparaisons",
         compute="_compute_max_height_in_m",
         store=True,
     )
     max_weight_in_kg = fields.Float(
-        string="Max weight in kg",
         help="Technical field, to speed up comparaisons",
         compute="_compute_max_weight_in_kg",
         store=True,

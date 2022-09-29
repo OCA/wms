@@ -34,7 +34,7 @@ class StockPackageStorageType(models.Model):
         help=("Height is mandatory for packages configured with this storage type."),
         default=False,
     )
-    barcode = fields.Char("Barcode", copy=False)
+    barcode = fields.Char(copy=False)
     active = fields.Boolean(default=True)
 
     @api.depends("storage_location_sequence_ids")
@@ -52,10 +52,10 @@ class StockPackageStorageType(models.Model):
                         sl._format_package_storage_type_message(last=last)
                     )
                 msg = _(
-                    "When a package with storage type %s is put away, the "
+                    "When a package with storage type %(name)s is put away, the "
                     "strategy will look for an allowed location in the "
                     "following locations: <br/><br/>"
-                    "%s <br/><br/>"
+                    "%(message)s <br/><br/>"
                     "<b>Note</b>: this happens as long as these locations <u>"
                     "are children of the stock move destination location</u> "
                     "or as long as these locations are children of the "

@@ -1,10 +1,10 @@
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo.exceptions import ValidationError
-from odoo.tests import SavepointCase
+from odoo.tests import TransactionCase
 
 
-class TestStorageType(SavepointCase):
+class TestStorageType(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
