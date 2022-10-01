@@ -1,4 +1,5 @@
 * Sébastien Alix <sebastien.alix@camptocamp.com>
+* Fernando La Chica <fernandolachica@gmail.com>
 
 Design
 ~~~~~~

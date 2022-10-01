@@ -7,17 +7,18 @@ from odoo.addons.shopfloor.tests.common import CommonCase
 class ManualProductTransferCommonCase(CommonCase):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
-        super().setUpClassVars(*args, **kwargs)
+        res = super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref(
             "shopfloor_manual_product_transfer.shopfloor_menu_manual_product_transfer"
         )
         cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
         cls.picking_type = cls.menu.picking_type_ids
         cls.wh = cls.picking_type.warehouse_id
+        return res
 
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
-        super().setUpClassBaseData(*args, **kwargs)
+        res = super().setUpClassBaseData(*args, **kwargs)
         cls.not_allowed_location = (
             cls.env["stock.location"]
             .sudo()
@@ -66,11 +67,13 @@ class ManualProductTransferCommonCase(CommonCase):
         cls._update_qty_in_location(
             cls.src_location, cls.product_b, 10, lot=cls.product_b_lot
         )
+        return res
 
     @classmethod
     def setUpShopfloorApp(cls):
-        super().setUpShopfloorApp()
+        res = super().setUpShopfloorApp()
         cls.shopfloor_app.sudo().profile_ids += cls.profile
+        return res
 
     def setUp(self):
         super().setUp()
