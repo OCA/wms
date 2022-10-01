@@ -10,7 +10,6 @@ class StockPicking(models.Model):
     _inherit = "stock.picking"
 
     estimated_shipping_weight = fields.Float(
-        string="Estimated shipping weight",
         compute="_compute_estimated_shipping_weight",
         help="This weight is calculated according to the move quantity "
         "available to promise and existing product packagings weight for each "

@@ -68,7 +68,7 @@
     <menuitem
         id="menu_delivery_carrier_preference"
         name="Preferred Shipping Methods"
-        parent="delivery.menu_delivery"
+        parent="stock.menu_delivery"
         action="action_delivery_carrier_preference_view"
     />
 </odoo>

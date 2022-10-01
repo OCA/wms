@@ -24,7 +24,7 @@ class DeliveryCarrierPreference(models.Model):
         default="carrier",
     )
     carrier_id = fields.Many2one("delivery.carrier", ondelete="cascade")
-    max_weight = fields.Float("Max weight", help="Leave empty for no limit")
+    max_weight = fields.Float(help="Leave empty for no limit")
     max_weight_uom_id = fields.Many2one(
         "uom.uom",
         compute="_compute_max_weight_uom_id",
@@ -95,9 +95,9 @@ class DeliveryCarrierPreference(models.Model):
         for pref in self:
             name = pref_descr.get(pref.preference)
             if pref.carrier_id:
-                name = _("%s: %s") % (name, pref.carrier_id.name)
+                name = _("{}: {}").format(name, pref.carrier_id.name)
             if pref.max_weight:
-                name = _("%s (Max weight %s %s)") % (
+                name = _("{} (Max weight {} {})").format(
                     name,
                     pref.max_weight,
                     pref.max_weight_uom_id.display_name,
