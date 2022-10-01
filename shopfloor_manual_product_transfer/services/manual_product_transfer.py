@@ -191,14 +191,14 @@ class ManualProductTransfer(Component):
             location, product, lot, with_qty_done=True
         )
         return sum(
-            [
+            
                 line.product_id.uom_id._compute_quantity(
                     line.qty_done,
                     line.product_uom_id,
                     rounding_method="HALF-UP",
                 )
                 for line in move_lines
-            ]
+            
         )
 
     def _get_initial_qty(self, location, product, lot=None):
