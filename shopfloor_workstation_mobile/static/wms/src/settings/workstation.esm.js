@@ -6,8 +6,8 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {page_registry} from "/shopfloor_mobile_base/static/wms/src/services/page_registry.js";
 import {config_registry} from "/shopfloor_mobile_base/static/wms/src/services/config_registry.js";
+import {page_registry} from "/shopfloor_mobile_base/static/wms/src/services/page_registry.js";
 import {translation_registry} from "/shopfloor_mobile_base/static/wms/src/services/translation_registry.js";
 
 var Workstation = {
