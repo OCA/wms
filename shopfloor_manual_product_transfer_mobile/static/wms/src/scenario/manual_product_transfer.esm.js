@@ -94,7 +94,6 @@ const ManualProductTransfer = {
         `,
     methods: {
         quantity_btn_label: function () {
-            const n = 200;
             return "Quantity " + this.quantity().toString();
         },
         screen_title: function () {
@@ -241,7 +240,7 @@ const ManualProductTransfer = {
                                 quantity: this.quantity(),
                                 barcode: scanned.text,
                                 lot_id: this.lot().id,
-                                // confirm: False,
+                                // Confirm: False,
                             })
                         );
                     },
