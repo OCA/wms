@@ -406,10 +406,11 @@ class StockMove(models.Model):
         # and the move is not assigned.
         new_move._assign_picking()
 
-        return new_move.with_context(context)
+        return new_move.with_context(**context)
 
     def _assign_picking_post_process(self, new=False):
-        super()._assign_picking_post_process(new)
+        res = super()._assign_picking_post_process(new)
         priorities = self.mapped("move_dest_ids.picking_id.priority")
         if priorities:
             self.picking_id.write({"priority": max(priorities)})
+        return res

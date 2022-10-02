@@ -130,16 +130,15 @@ class StockPicking(models.Model):
             for key, value in self.env.context.items()
             if not key.startswith("default_")
         }
-        self.mapped("move_lines").with_context(context).release_available_to_promise()
+        self.mapped("move_lines").with_context(**context).release_available_to_promise()
 
     def _release_link_backorder(self, origin_picking):
         self.backorder_id = origin_picking
         origin_picking.message_post(
             body=_(
                 "The backorder <a href=# data-oe-model=stock.picking"
-                " data-oe-id=%d>%s</a> has been created."
-            )
-            % (self.id, self.name)
+                " data-oe-id={}>{}</a> has been created."
+            ).format(self.id, self.name)
         )
 
     def _after_release_update_chain(self):
