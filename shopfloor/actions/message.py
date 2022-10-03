@@ -279,7 +279,9 @@ class MessageAction(Component):
     def several_products_in_package(self, package):
         return {
             "message_type": "error",
-            "body": _("Several products found in %s, please scan the product." % package.name),
+            "body": _(
+                "Several products found in %s, please scan the product." % package.name
+            ),
         }
 
     def no_product_in_location(self, location):
