@@ -530,7 +530,7 @@ class ClusterPicking(Component):
         location_quants = move_line.location_id.quant_ids.filtered(
             lambda quant: quant.quantity > 0 and quant.lot_id == lot
         )
-        packages = location_quants.mapped("package_id")
+        packages = location_quants.package_id
 
         # Do not use mapped here: we want to see if we have more than one
         # package, but also if we have one lot as a package and the same lot as
@@ -554,14 +554,14 @@ class ClusterPicking(Component):
         location_quants = move_line.location_id.quant_ids.filtered(
             lambda quant: quant.quantity > 0
         )
-        lots = location_quants.mapped("lot_id")
+        lots = location_quants.lot_id
         if len(lots) > 1:
             return self._response_for_start_line(
                 move_line,
                 message=self.msg_store.several_lots_in_location(move_line.location_id),
             )
-        packages = location_quants.mapped("package_id")
-        products = location_quants.mapped("product_id")
+        packages = location_quants.package_id
+        products = location_quants.product_id
         if len(packages) > 1 or len(products) > 1:
             if move_line.package_id:
                 return self._response_for_start_line(
