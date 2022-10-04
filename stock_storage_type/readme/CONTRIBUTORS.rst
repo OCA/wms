@@ -4,3 +4,4 @@
 * Jacques-Etienne Baudoux <je@bcim.be>
 * Laurent Mignon <laurent.mignon@acsone.eu>
 * Fernando La Chica - GreenICe <fernandolachica@gmail.com>
+* Denis Roussel <denis.roussel@acsone.eu>
