@@ -33,7 +33,7 @@ export var Searchbar = Vue.component("searchbar", {
         },
         input_placeholder: String,
         input_data_type: String,
-        reset_on_submit: {
+        should_reset_on_submit: {
             type: Boolean,
             default: true,
         },
@@ -51,6 +51,11 @@ export var Searchbar = Vue.component("searchbar", {
         autosearch_typing: {
             type: Number,
             default: 0,
+        },
+        // uses the clearable input type logic (using an X icon to clear the input)
+        clearable_input_type: {
+            type: Boolean,
+            default: false,
         },
     },
     mounted: function () {
@@ -73,9 +78,21 @@ export var Searchbar = Vue.component("searchbar", {
                 return this.search();
             }, this.debounceWait);
         },
+        reset_on_submit: function () {
+            // Made a computed property to make it depend on the two props below.
+            return this.should_reset_on_submit && !this.clearable_input_type
+                ? true
+                : false;
+        },
     },
     watch: {
         entered: function (val) {
+            if (this.clearable_input_type) {
+                // This is needed because the clearable attribute of the v-text-field
+                // resets the value to null when clicking on the clear button,
+                // and we always need a string here.
+                val = val || "";
+            }
             if (this.autotrim) {
                 let trimmed = val.trim();
                 if (trimmed !== val) {
@@ -93,9 +110,9 @@ export var Searchbar = Vue.component("searchbar", {
         },
     },
     methods: {
-        search: function () {
+        search: function (force_search = false) {
             // Talk to parent
-            if (!this.entered) return;
+            if (!this.entered && !force_search) return;
             this.$emit("found", {
                 text: this.entered,
                 type: this.input_data_type,
@@ -116,6 +133,12 @@ export var Searchbar = Vue.component("searchbar", {
             if (this.reload_steal_focus)
                 $(this.$el).find(":input[name=searchbar]").focus();
         },
+        on_clear: function () {
+            // Triggered when clicking on the clear button (clearable_input_type is true).
+            // We force a search after resetting as reset_on_submit can never be active for this input type.
+            this.reset();
+            this.search(true);
+        },
     },
 
     template: `
@@ -131,6 +154,9 @@ export var Searchbar = Vue.component("searchbar", {
       :placeholder="input_placeholder"
       :autofocus="autofocus ? 'autofocus' : null"
       :autocomplete="autocomplete"
+      :clearable="clearable_input_type"
+      @click:clear="on_clear"
+      clear-icon="mdi-close-circle"
       />
   </v-form>
   `,
