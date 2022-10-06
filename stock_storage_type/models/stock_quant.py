@@ -145,16 +145,16 @@ class StockQuant(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        self._invalidate_package_level_allowed_location_dest_domain()
+        self._invalidate_package_level_allowed_location_dest_ids()
         return res
 
-    @api.model
-    def create(self, vals):
-        res = super().create(vals)
-        self._invalidate_package_level_allowed_location_dest_domain()
+    @api.model_create_multi
+    def create(self, vals_list):
+        res = super().create(vals_list)
+        self._invalidate_package_level_allowed_location_dest_ids()
         return res
 
-    def _invalidate_package_level_allowed_location_dest_domain(self):
+    def _invalidate_package_level_allowed_location_dest_ids(self):
         self.env["stock.package_level"].invalidate_cache(
-            fnames=["allowed_location_dest_domain"]
+            fnames=["allowed_location_dest_ids"]
         )
