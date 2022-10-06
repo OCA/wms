@@ -150,6 +150,10 @@ new Vue({
             let params = _.defaults({}, odoo_params, {
                 debug: this.demo_mode,
                 base_url: this.app_info.base_url,
+                headers: {
+                    "APP-VERSION": this.app_info.version,
+                    "APP-USER-ID": this.user.id,
+                },
             });
             let OdooClass = null;
             if (this.demo_mode) {
