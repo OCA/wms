@@ -48,6 +48,7 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
                     </v-col>
                 </v-row>
             </div>
+            <app-version-footer/>
         </Screen>
     `,
 });
