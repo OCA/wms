@@ -72,6 +72,14 @@ const messages_de = {
             test: "Test",
             dev: "Entwicklung",
         },
+        report_issue: {
+            action_txt: "Benötigen Sie Unterstützung?",
+            mail: {
+                subject: "Ich benötige Unterstützung mit der {app_name} app",
+                info_warning_msg:
+                    "BITTE ÄNDERN SIE DIE FOLGENDE INFORMATION/NACHRICHT NICHT",
+            },
+        },
     },
     language: {
         name: {
