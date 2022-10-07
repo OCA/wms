@@ -75,14 +75,3 @@ class StockLocation(models.Model):
         if self.env.context.get("force_reservation"):
             return False
         return super().should_bypass_reservation()
-
-    def has_on_going_operation(self):
-        return bool(
-            self.env["stock.move.line"].search(
-                [
-                    ("state", "not in", ("cancel", "done")),
-                    ("location_id", "=", self.id),
-                    ("qty_done", ">", 0),
-                ]
-            )
-        )

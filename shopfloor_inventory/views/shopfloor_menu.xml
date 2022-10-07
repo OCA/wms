@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shopfloor_menu_form_view" model="ir.ui.view">
+        <field name="model">shopfloor.menu</field>
+        <field name="inherit_id" ref="shopfloor.shopfloor_menu_form_view" />
+        <field name="arch" type="xml">
+            <group name="multiple_move_single_pack" position="after">
+                <group
+                    name="use_existing_inventory"
+                    attrs="{'invisible': [('use_existing_inventory_is_possible', '=', False)]}"
+                >
+                    <field name="use_existing_inventory_is_possible" invisible="1" />
+                    <field name="use_existing_inventory" />
+                </group>
+                <group
+                    name="inventory_zero_counted_quantity"
+                    attrs="{'invisible': [('inventory_zero_counted_quantity_is_possible', '=', False)]}"
+                >
+                    <field
+                        name="inventory_zero_counted_quantity_is_possible"
+                        invisible="1"
+                    />
+                    <field name="inventory_zero_counted_quantity" />
+                </group>
+                <group
+                    name="force_inventory_add_product"
+                    attrs="{'invisible': [('force_inventory_add_product_is_possible', '=', False)]}"
+                >
+                    <field
+                        name="force_inventory_add_product_is_possible"
+                        invisible="1"
+                    />
+                    <field name="force_inventory_add_product" />
+                </group>
+                <group
+                    name="display_location_content"
+                    attrs="{'invisible': [('display_location_content_is_possible', '=', False)]}"
+                >
+                    <field name="display_location_content_is_possible" invisible="1" />
+                    <field name="display_location_content" />
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>

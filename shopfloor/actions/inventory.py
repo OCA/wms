@@ -22,10 +22,6 @@ class InventoryAction(Component):
         # see comment in models/stock_inventory.py
         return self.env["stock.inventory"].with_context(_sf_inventory=True)
 
-    @property
-    def inventory_line_model(self):
-        return self.env["stock.inventory.line"]
-
     def create_draft_check_empty(self, location, product, ref=None):
         """Create a draft inventory for a product with a zero quantity"""
         if ref:
@@ -140,13 +136,3 @@ class InventoryAction(Component):
         if lot.name:
             parts.append(_("Lot: ") + lot.name)
         return " - ".join(parts)
-
-    def create_inventory_line(self, inventory_id, location_id, product_id, product_qty):
-        return self.inventory_line_model.sudo().create(
-            {
-                "inventory_id": inventory_id,
-                "location_id": location_id,
-                "product_id": product_id,
-                "product_qty": product_qty,
-            }
-        )

@@ -82,16 +82,6 @@
                 type="module"
             />
             <script
-                id="script_component_batch_picking_detail"
-                t-attf-src="/shopfloor_mobile/static/wms/src/components/inventory_detail.js?v=#{mod_version}"
-                type="module"
-            />
-            <script
-                id="script_component_batch_picking_detail"
-                t-attf-src="/shopfloor_mobile/static/wms/src/components/inventory_line_detail.js?v=#{mod_version}"
-                type="module"
-            />
-            <script
                 id="script_component_picking_select"
                 t-attf-src="/shopfloor_mobile/static/wms/src/components/scenario_picking_detail/picking_select.js?v=#{mod_version}"
                 type="module"
@@ -135,11 +125,6 @@
             <script
                 id="script_scenario_zone_picking"
                 t-attf-src="/shopfloor_mobile/static/wms/src/scenario/zone_picking.js?v=#{mod_version}"
-                type="module"
-            />
-            <script
-                id="script_scenario_inventory"
-                t-attf-src="/shopfloor_mobile/static/wms/src/scenario/inventory.js?v=#{mod_version}"
                 type="module"
             />
         </script>

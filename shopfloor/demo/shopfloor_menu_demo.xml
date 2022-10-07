@@ -61,10 +61,4 @@
             eval="[(4, ref('shopfloor.picking_type_location_content_transfer_demo'))]"
         />
     </record>
-    <record id="shopfloor_menu_demo_inventory" model="shopfloor.menu">
-        <field name="name">Inventory</field>
-        <field name="sequence">70</field>
-        <field name="profile_id" ref="shopfloor.profile_demo_1" />
-        <field name="scenario_id" ref="shopfloor.scenario_inventory" />
-    </record>
 </odoo>
