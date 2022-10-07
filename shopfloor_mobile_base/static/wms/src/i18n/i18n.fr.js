@@ -71,6 +71,14 @@ const messages_fr = {
             test: "Test",
             dev: "Développement",
         },
+        report_issue: {
+            action_txt: "Besoin d'aide?",
+            mail: {
+                subject: "J'ai besoin d'aide avec l'application {app_name}",
+                info_warning_msg:
+                    "VEUILLEZ NE PAS MODIFIER LES INFORMATIONS CI-DESSOUS",
+            },
+        },
     },
     language: {
         name: {

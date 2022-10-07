@@ -75,7 +75,7 @@ export var LoginPage = Vue.component("login-page", {
                         elevation="2"
                         :icon="false"
                         >
-                        <user-session-detail :show_profile="false" :show_user="false" />
+                        <user-session-detail :show_profile="false" :show_user="false" :show_report_issue_action="false" />
                     </v-alert>
                 </v-col>
             </v-row>
@@ -94,6 +94,13 @@ export var LoginPage = Vue.component("login-page", {
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
                         <btn-fullscreen />
+                    </v-col>
+                </v-row>
+            </div>
+            <div class="button-list button-vertical-list full">
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <report-issue-action display_mode="inline" />
                     </v-col>
                 </v-row>
             </div>
