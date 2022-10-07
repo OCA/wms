@@ -74,7 +74,7 @@ class StockMove(models.Model):
             sorted_pickings, lambda pick: (pick.group_id, pick.carrier_id)
         ):
             pickings = self.env["stock.picking"].union(*iter_pickings)
-            if group.carrier_id != new_carrier:
+            if new_carrier and group.carrier_id != new_carrier:
                 # always create a new procurement group when we change carrier,
                 # the old group will be reassigned to the backorders if any,
                 # otherwise it will stay empty in the depths of nothingness
