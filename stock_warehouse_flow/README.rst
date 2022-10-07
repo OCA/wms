@@ -44,7 +44,6 @@ for instance:
 
 .. image:: https://raw.githubusercontent.com/OCA/wms/14.0/stock_warehouse_flow/static/description/flow.png
 
-
 .. IMPORTANT::
    This is an alpha version, the data model and design can change at any time without warning.
    Only for development or testing purpose, do not use in production.
@@ -77,6 +76,12 @@ you want to ship.
 
 .. image:: https://raw.githubusercontent.com/OCA/wms/14.0/stock_warehouse_flow/static/description/config.png
 
+Usage
+=====
+
+When a stock move is confirmed, if a flow is matching all the criteria then
+the new delivery route will be automatically applied.
+
 Known issues / Roadmap
 ======================
 
@@ -100,6 +105,7 @@ Authors
 ~~~~~~~
 
 * Camptocamp
+* BCIM
 
 Contributors
 ~~~~~~~~~~~~
