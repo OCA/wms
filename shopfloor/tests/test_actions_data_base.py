@@ -106,16 +106,6 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
         )
         cls.product_a_variant.flush()
         cls.product_a_vendor.flush()
-        cls.inventory = (
-            cls.env["stock.inventory"]
-            .sudo()
-            .create(
-                {
-                    "location_ids": [(6, 0, cls.stock_location.ids)],
-                    "prefill_counted_quantity": "zero",
-                }
-            )
-        )
 
     def _expected_location(self, record, **kw):
         data = {
@@ -187,16 +177,6 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
             "storage_type": None,
         }
         data.update(kw)
-        return data
-
-    def _expected_inventory(self, record, **kw):
-        data = {
-            "id": record.id,
-            "name": record.name,
-            "location_count": record.location_count,
-            "remaining_location_count": record.remaining_location_count,
-            "inventory_line_count": record.inventory_line_count,
-        }
         return data
 
 
