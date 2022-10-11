@@ -14,8 +14,6 @@
         "delivery",
         # OCA/stock-logistics-workflow
         "delivery_procurement_group_carrier",
-        # OCA/wms
-        "stock_available_to_promise_release",
     ],
     "demo": [
         "demo/stock_warehouse_flow.xml",
