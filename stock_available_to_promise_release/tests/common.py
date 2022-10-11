@@ -5,7 +5,7 @@ from odoo import fields
 from odoo.tests import common
 
 
-class PromiseReleaseCommonCase(common.SavepointCase):
+class PromiseReleaseCommonCase(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
