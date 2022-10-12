@@ -179,7 +179,7 @@ msgstr ""
 #: code:addons/stock_warehouse_flow/models/stock_warehouse_flow.py:0
 #, python-format
 msgid ""
-"No rule corresponding to '%s' operation type has been found on delivery route '%s'.\n"
+"No rule corresponding to '%(picking_type)s' operation type has been found on delivery route '%(delivery_route)s'.\n"
 "Please check your configuration."
 msgstr ""
 
@@ -237,7 +237,6 @@ msgstr ""
 #: model:ir.actions.act_window,name:stock_warehouse_flow.stock_warehouse_flow_action
 #: model:ir.ui.menu,name:stock_warehouse_flow.stock_warehouse_flow_menu
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_search
-#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_tree
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.view_delivery_carrier_form
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.view_warehouse
 msgid "Routing Flows"
