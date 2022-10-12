@@ -156,7 +156,7 @@
     <field name="name">stock.warehouse.flow.tree</field>
     <field name="model">stock.warehouse.flow</field>
     <field name="arch" type="xml">
-      <tree string="Routing Flows" decoration-warning="warning">
+      <tree decoration-warning="warning">
         <field name="warehouse_id" />
         <field name="name" />
         <field name="from_picking_type_id" />

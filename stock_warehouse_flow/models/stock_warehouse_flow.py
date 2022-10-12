@@ -17,7 +17,7 @@ class StockWarehouseFlow(models.Model):
 
     name = fields.Char(required=True)
     active = fields.Boolean(default=True)
-    sequence = fields.Integer(string="Sequence", default=10)
+    sequence = fields.Integer(default=10)
     company_id = fields.Many2one(related="warehouse_id.company_id")
     warehouse_id = fields.Many2one(
         comodel_name="stock.warehouse",
@@ -301,7 +301,10 @@ class StockWarehouseFlow(models.Model):
                 vals = self.warehouse_id.delivery_route_id.copy_data()[0]
                 raise Exception()
         except Exception:
-            pass
+            logger.info(
+                f"Routing flow {self.name}: delivery route data generated "
+                f"from WH {self.warehouse_id.name}"
+            )
         vals.update(
             {
                 "name": f"{self.warehouse_id.name}: {self.name}",
@@ -356,19 +359,19 @@ class StockWarehouseFlow(models.Model):
             lambda r: r.picking_type_id == self.to_picking_type_id
         )
         if self.delivery_route_id and not rule:
-            args = (
-                self.to_picking_type_id.display_name,
-                self.delivery_route_id.display_name,
-            )
+            args = {
+                "picking_type": self.to_picking_type_id.display_name,
+                "delivery_route": self.delivery_route_id.display_name,
+            }
             if html_exc:
-                args = (
-                    f"<strong>{self.to_picking_type_id.display_name}</strong>",
-                    f"<strong>{self.delivery_route_id.display_name}</strong>",
-                )
+                args = {
+                    "picking_type": f"<strong>{self.to_picking_type_id.display_name}</strong>",
+                    "delivery_route": f"<strong>{self.delivery_route_id.display_name}</strong>",
+                }
             raise UserError(
                 _(
-                    "No rule corresponding to '%s' operation type "
-                    "has been found on delivery route '%s'.\n"
+                    "No rule corresponding to '%(picking_type)s' operation type "
+                    "has been found on delivery route '%(delivery_route)s'.\n"
                     "Please check your configuration."
                 )
                 % args
