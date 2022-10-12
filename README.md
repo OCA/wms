@@ -63,7 +63,7 @@ addon | version | maintainers | summary
 [stock_storage_type](stock_storage_type/) | 14.0.1.12.0 |  | Manage packages and locations storage types
 [stock_storage_type_buffer](stock_storage_type_buffer/) | 14.0.1.3.0 |  | Exclude storage locations from put-away if their buffer is full
 [stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 14.0.1.0.0 |  | Advanced storage strategy ABC for WMS
-[stock_warehouse_flow](stock_warehouse_flow/) | 14.0.1.0.1 |  | Configure routing flow for stock moves
+[stock_warehouse_flow](stock_warehouse_flow/) | 14.0.1.0.2 |  | Configure routing flow for stock moves
 [stock_warehouse_flow_release](stock_warehouse_flow_release/) | 14.0.1.0.0 |  | Warehouse flows integrated with Operation Release
 
 [//]: # (end addons)
