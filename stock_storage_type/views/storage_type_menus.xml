@@ -7,13 +7,7 @@
         sequence="9"
         groups="stock.group_adv_location"
     />
-    <menuitem
-        id="menu_package_storage_type_action"
-        action="package_storage_type_action"
-        name="Package Storage Types"
-        parent="storage_type_menu"
-        sequence="10"
-    />
+
     <menuitem
         id="menu_location_storage_type_action"
         action="location_storage_type_action"
@@ -23,7 +17,7 @@
     />
     <menuitem
         id="menu_storage_type_mapping_action"
-        action="location_package_storage_type_rel_action"
+        action="location_package_type_rel_action"
         name="Storage Types Mapping"
         parent="storage_type_menu"
         sequence="12"

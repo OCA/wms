@@ -9,7 +9,9 @@
                 <field name="allowed_location_dest_ids" invisible="1" />
             </field>
             <field name="location_dest_id" position="attributes">
-                <attribute name="domain">[("id", "in", allowed_location_dest_ids)]</attribute>
+                <attribute
+                    name="domain"
+                >[("id", "in", allowed_location_dest_ids)]</attribute>
             </field>
         </field>
     </record>
@@ -22,7 +24,9 @@
                 <field name="allowed_location_dest_ids" invisible="1" />
             </field>
             <field name="location_dest_id" position="attributes">
-                <attribute name="domain">[("id", "in", allowed_location_dest_ids)]</attribute>
+                <attribute
+                    name="domain"
+                >[("id", "in", allowed_location_dest_ids)]</attribute>
             </field>
             <field name="location_dest_id" position="after">
                 <button

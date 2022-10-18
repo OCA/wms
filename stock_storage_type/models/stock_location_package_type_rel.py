@@ -5,12 +5,10 @@ from odoo import fields, models
 
 class StockStorageTypePackageLocationRel(models.Model):
 
-    _name = "stock.location.package.storage.type.rel"
+    _name = "stock.location.package.type.rel"
     _description = "Location Package storage type relation"
 
-    package_storage_type_id = fields.Many2one(
-        "stock.package.storage.type", required=True
-    )
+    package_type_id = fields.Many2one("stock.package.type", required=True)
     location_storage_type_id = fields.Many2one(
         "stock.location.storage.type", required=True
     )

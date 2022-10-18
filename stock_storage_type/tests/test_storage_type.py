@@ -1,10 +1,10 @@
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo.exceptions import ValidationError
-from odoo.tests import SavepointCase
+from odoo.tests import TransactionCase
 
 
-class TestStorageType(SavepointCase):
+class TestStorageType(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -156,10 +156,10 @@ class TestStorageType(SavepointCase):
 
     def test_archive_package_storage_type(self):
         target = self.env.ref("stock_storage_type.package_storage_type_pallets")
-        all_package_storage_types = self.env["stock.package.storage.type"].search([])
+        all_package_storage_types = self.env["stock.package.type"].search([])
         self.assertIn(target, all_package_storage_types)
         target.active = False
-        all_package_storage_types = self.env["stock.package.storage.type"].search([])
+        all_package_storage_types = self.env["stock.package.type"].search([])
         self.assertNotIn(target, all_package_storage_types)
 
     def test_archive_location_storage_type(self):

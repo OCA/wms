@@ -8,7 +8,7 @@ class TestAutoAssignStorageType(TestStorageTypeCommon):
     def setUpClass(cls):
         super().setUpClass()
         cls.product_packaging = cls.product_lot_pallets_product_packaging
-        cls.package_storage_type = cls.product_packaging.package_storage_type_id
+        cls.package_storage_type = cls.product_packaging.package_type_id
 
     def test_auto_assign_package_storage_type_without_packaging_id(self):
         """Packages without `packaging_id` are internal packages and they
@@ -18,20 +18,24 @@ class TestAutoAssignStorageType(TestStorageTypeCommon):
         package = self.env["stock.quant.package"].create(
             {"name": "TEST", "product_packaging_id": self.product_packaging.id}
         )
-        self.assertEqual(package.package_storage_type_id, self.package_storage_type)
+        self.assertEqual(package.package_type_id, self.package_storage_type)
 
     def test_auto_assign_package_storage_type_with_packaging_id(self):
         """Packages with `packaging_id` are delivery packages and they are not
         intended to be stored in the warehouse.
         On such packages storage type is not set.
         """
-        # Set a delivery packaging (which is a product.packaging without product_id set)
-        packaging = self.env["product.packaging"].create({"name": "TEST"})
-        package = self.env["stock.quant.package"].create(
-            {
-                "name": "TEST",
-                "product_packaging_id": self.product_packaging.id,
-                "packaging_id": packaging.id,
-            }
-        )
-        self.assertFalse(package.package_storage_type_id)
+        # TODO: This should not be the case now as :
+        # There is a field to check if the quant.package is related to a delivery carrier
+        # package_carrier_type: none by default
+        # Set a delivery packaging (which is a stock.package.type)
+
+        # packaging = self.env["stock.package.type"].create({"name": "TEST"})
+        # package = self.env["stock.quant.package"].create(
+        #     {
+        #         "name": "TEST",
+        #         "product_packaging_id": self.product_packaging.id,
+        #         "package_type_id": packaging.id,
+        #     }
+        # )
+        # self.assertFalse(package.package_type_id)

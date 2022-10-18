@@ -12,7 +12,7 @@
         />
         <field name="arch" type="xml">
             <field name="responsible_id" position="before">
-                <field name="product_package_storage_type_id" groups="stock.group_stock_user"/>
+                <field name="package_type_id" groups="stock.group_stock_user" />
             </field>
         </field>
     </record>

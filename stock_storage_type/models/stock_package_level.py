@@ -20,11 +20,11 @@ class StockPackageLevel(models.Model):
 
     @api.depends(
         "package_id",
-        "package_id.package_storage_type_id",
-        "package_id.package_storage_type_id.location_storage_type_ids",
-        "package_id.package_storage_type_id.storage_location_sequence_ids",
-        "package_id.package_storage_type_id.storage_location_sequence_ids.location_id",
-        "package_id.package_storage_type_id.storage_location_sequence_ids.location_id.leaf_location_ids",  # noqa
+        "package_id.package_type_id",
+        "package_id.package_type_id.location_storage_type_ids",
+        "package_id.package_type_id.storage_location_sequence_ids",
+        "package_id.package_type_id.storage_location_sequence_ids.location_id",
+        "package_id.package_type_id.storage_location_sequence_ids.location_id.leaf_location_ids",  # noqa
         # Dependency on quant_ids managed by cache invalidation on create/write
         "picking_id",
         "picking_id.location_dest_id",
@@ -42,7 +42,7 @@ class StockPackageLevel(models.Model):
             # For outgoing type, we don't set the location dest so avoid
             # computing the domain
             if (
-                pack_level.package_id.package_storage_type_id
+                pack_level.package_id.package_type_id
                 and pack_level.picking_type_code != "outgoing"
             ):
                 allowed_locations = pack_level._get_allowed_location_dest_ids()
@@ -66,9 +66,9 @@ class StockPackageLevel(models.Model):
         package_locations = self.env["stock.storage.location.sequence"].search(
             [
                 (
-                    "package_storage_type_id",
+                    "package_type_id",
                     "=",
-                    self.package_id.package_storage_type_id.id,
+                    self.package_id.package_type_id.id,
                 ),
                 ("location_id", "child_of", self.picking_id.location_dest_id.id),
             ]
@@ -79,7 +79,7 @@ class StockPackageLevel(models.Model):
             pref_loc = pack_loc.location_id
             storage_locations = pref_loc.get_storage_locations(products=products)
             allowed_locations = storage_locations.select_allowed_locations(
-                self.package_id.package_storage_type_id,
+                self.package_id.package_type_id,
                 self.package_id.quant_ids,
                 products,
             )

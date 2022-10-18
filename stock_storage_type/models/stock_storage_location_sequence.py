@@ -9,9 +9,7 @@ class StockStorageLocationSequence(models.Model):
     _description = "Sequence of locations to put-away the package storage type"
     _order = "sequence"
 
-    package_storage_type_id = fields.Many2one(
-        "stock.package.storage.type", required=True
-    )
+    package_type_id = fields.Many2one("stock.package.type", required=True)
     sequence = fields.Integer(required=True)
     location_id = fields.Many2one(
         "stock.location",
@@ -30,8 +28,8 @@ class StockStorageLocationSequence(models.Model):
         self.ensure_one()
         # TODO improve ugly code
         type_matching_locations = self.location_id.get_storage_locations().filtered(
-            lambda l: self.package_storage_type_id
-            in l.allowed_location_storage_type_ids.mapped("package_storage_type_ids")
+            lambda l: self.package_type_id
+            in l.allowed_location_storage_type_ids.mapped("package_type_ids")
         )
         if type_matching_locations:
             # Get the selection description
@@ -54,8 +52,7 @@ class StockStorageLocationSequence(models.Model):
                 loc_st = type_matching_locations.mapped(
                     "allowed_location_storage_type_ids"
                 ).filtered(
-                    lambda lst: self.package_storage_type_id
-                    in lst.package_storage_type_ids
+                    lambda lst: self.package_type_id in lst.package_type_ids
                     and not lst.has_restrictions
                 )
                 if not loc_st:
@@ -85,7 +82,7 @@ class StockStorageLocationSequence(models.Model):
             (
                 "allowed_location_storage_type_ids",
                 "in",
-                self.package_storage_type_id.location_storage_type_ids.ids,
+                self.package_type_id.location_storage_type_ids.ids,
             ),
         ]
         return action

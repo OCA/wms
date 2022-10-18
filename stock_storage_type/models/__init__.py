@@ -1,12 +1,12 @@
-from . import product_packaging
-from . import product_template
-from . import stock_location
-from . import stock_location_package_storage_type_rel
-from . import stock_location_storage_type
-from . import stock_move
-from . import stock_package_level
-from . import stock_package_storage_type
-from . import stock_quant
-from . import stock_quant_package
-from . import stock_storage_location_sequence
-from . import stock_storage_location_sequence_cond
+from . import (  # product_packaging,; stock_move,; stock_package_storage_type,
+    product_template,
+    stock_location,
+    stock_location_package_type_rel,
+    stock_location_storage_type,
+    stock_package_level,
+    stock_package_type,
+    stock_quant,
+    stock_quant_package,
+    stock_storage_location_sequence,
+    stock_storage_location_sequence_cond,
+)

@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
-                <field name="package_storage_type_ids" widget="many2many_tags" />
+                <field name="package_type_ids" widget="many2many_tags" />
             </tree>
         </field>
     </record>
@@ -39,10 +39,7 @@
                         </h1>
                     </div>
                     <group name="package_storage_types">
-                        <field
-                            name="package_storage_type_ids"
-                            widget="many2many_tags"
-                        />
+                        <field name="package_type_ids" widget="many2many_tags" />
                     </group>
                     <group name="restrictions">
                         <group name="content" string="Content restrictions">
