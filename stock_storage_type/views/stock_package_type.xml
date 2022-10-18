@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record model="ir.ui.view" id="stock_package_type_tree">
+        <field name="name">stock.package.type.tree (in stock_storage_type)</field>
+        <field name="model">stock.package.type</field>
+        <field name="inherit_id" ref="stock.stock_package_type_tree" />
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="location_storage_type_ids" widget="many2many_tags" />
+            </field>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="stock_package_type_form">
+        <field name="name">stock.package.type.form (in stock_storage_type)</field>
+        <field name="model">stock.package.type</field>
+        <field name="inherit_id" ref="stock.stock_package_type_form" />
+        <field name="arch" type="xml">
+            <!-- TODO: Add a module to add a button box here
+                <button
+                            string="Put-Away sequence"
+                            class="oe_stat_button"
+                            icon="fa-location-arrow"
+                            name="action_view_storage_locations"
+                            type="object"
+                        />
+
+            -->
+
+            <group name="storage_categories">
+                <group name="main">
+                    <group name="location_storage_types">
+                        <field
+                            name="location_storage_type_ids"
+                            widget="many2many_tags"
+                        />
+                        <field name="height_required" />
+                        <field name="barcode" />
+                    </group>
+                    <group name="msg">
+                        <div colspan="2">
+                            <label for="storage_type_message" invisible="1" />
+                            <div>
+                                <field name="storage_type_message" readonly="1" />
+                            </div>
+                        </div>
+                    </group>
+                </group>
+            </group>
+        </field>
+
+
+    </record>
+<!--
+    <record id="stock_package_storage_type_search_view" model="ir.ui.view">
+        <field name="name">stock.package.storage.type search</field>
+        <field name="model">stock.package.storage.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <filter
+                    string="Archived"
+                    name="inactive"
+                    domain="[('active', '=', False)]"
+                />
+            </search>
+        </field>
+    </record>
+    <record id="package_storage_type_action" model="ir.actions.act_window">
+        <field name="name">Package Storage Types</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.package.storage.type</field>
+        <field name="view_mode">tree,form</field>
+    </record> -->
+</odoo>

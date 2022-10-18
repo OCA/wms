@@ -7,8 +7,8 @@
             <tree editable="bottom">
                 <field name="sequence" widget="handle" />
                 <field
-                    name="package_storage_type_id"
-                    readonly="context.get('default_package_storage_type_id', False)"
+                    name="package_type_id"
+                    readonly="context.get('default_package_type_id', False)"
                     force_save="1"
                 />
                 <field name="location_id" />

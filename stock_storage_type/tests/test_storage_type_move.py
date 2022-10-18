@@ -25,7 +25,8 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         move_to_assign = self._create_single_move(self.product)
         (confirmed_move | move_to_assign)._assign_picking()
         package = self.env["stock.quant.package"].create(
-            {"product_packaging_id": self.product_pallet_product_packaging.id}
+            # {"product_packaging_id": self.product_pallet_product_packaging.id}
+            {"package_type_id": self.pallet_pack_type.id}
         )
         self._update_qty_in_location(
             move_to_assign.location_id,
@@ -80,12 +81,14 @@ class TestStorageTypeMove(TestStorageTypeCommon):
                 "picking_type_id": self.receipts_picking_type.id,
                 "location_id": self.suppliers_location.id,
                 "location_dest_id": self.input_location.id,
-                "move_lines": [
+                "move_ids": [
                     (
                         0,
                         0,
                         {
                             "name": self.product.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
                             "product_id": self.product.id,
                             "product_uom_qty": 96.0,
                             "product_uom": self.product.uom_id.id,
@@ -113,11 +116,11 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         # Validate picking
         in_picking.button_validate()
         # Assign internal picking
-        int_picking = in_picking.move_lines.move_dest_ids.picking_id
+        int_picking = in_picking.move_ids.move_dest_ids.picking_id
         int_picking.action_assign()
         self.assertEqual(int_picking.location_dest_id, self.stock_location)
         self.assertEqual(
-            int_picking.move_lines.mapped("location_dest_id"), self.stock_location
+            int_picking.move_ids.mapped("location_dest_id"), self.stock_location
         )
         # First move line goes into pallets bin 1
         # Second move line goes into pallets bin 2
@@ -130,8 +133,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             self.pallets_bin_1_location | self.pallets_bin_2_location,
         )
         package_type_locations = int_picking.package_level_ids.mapped(
-            "package_id.package_storage_type_id."
-            "storage_location_sequence_ids.location_id"
+            "package_id.package_type_id." "storage_location_sequence_ids.location_id"
         )
         possible_locations = self.env["stock.location"].search(
             [
@@ -139,7 +141,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
                     "allowed_location_storage_type_ids",
                     "in",
                     int_picking.package_level_ids.mapped(
-                        "package_id.package_storage_type_id.location_storage_type_ids"
+                        "package_id.package_type_id.location_storage_type_ids"
                     ).ids,
                 ),
                 ("location_id", "child_of", int_picking.location_dest_id.id),
@@ -151,8 +153,8 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         )
 
         for level in int_picking.package_level_ids:
-            self.assert_package_level_domain(
-                level.allowed_location_dest_domain,
+            self.assertEqual(
+                level.allowed_location_dest_ids,
                 only_empty_possible_locations
                 - (
                     # remove the destination of other levels but keep the current one
@@ -174,8 +176,8 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         )
 
         for level in int_picking.package_level_ids:
-            self.assert_package_level_domain(
-                level.allowed_location_dest_domain,
+            self.assertEqual(
+                level.allowed_location_dest_ids,
                 only_empty_possible_locations_2
                 - (
                     # remove the destination of other levels but keep the current one
@@ -190,8 +192,8 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         )
 
         for level in int_picking.package_level_ids:
-            self.assert_package_level_domain(
-                level.allowed_location_dest_domain,
+            self.assertEqual(
+                level.allowed_location_dest_ids,
                 (only_empty_possible_locations_2 | pallets_bin_4_location)
                 - (
                     # remove the destination of other levels but keep the current one
@@ -213,12 +215,14 @@ class TestStorageTypeMove(TestStorageTypeCommon):
                 "picking_type_id": self.receipts_picking_type.id,
                 "location_id": self.suppliers_location.id,
                 "location_dest_id": self.input_location.id,
-                "move_lines": [
+                "move_ids": [
                     (
                         0,
                         0,
                         {
                             "name": self.product.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
                             "product_id": self.product.id,
                             "product_uom_qty": 52.0,
                             "product_uom": self.product.uom_id.id,
@@ -229,6 +233,8 @@ class TestStorageTypeMove(TestStorageTypeCommon):
                         0,
                         {
                             "name": self.product_lot.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
                             "product_id": self.product_lot.id,
                             "product_uom_qty": 15.0,
                             "product_uom": self.product.uom_id.id,
@@ -255,14 +261,14 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_cardbox_product_packaging
         # Create lots to be used on move lines
-        lot_a0001 = self.env["stock.production.lot"].create(
+        lot_a0001 = self.env["stock.lot"].create(
             {
                 "name": "A0001",
                 "product_id": self.product_lot.id,
                 "company_id": self.env.user.company_id.id,
             }
         )
-        lot_a0002 = self.env["stock.production.lot"].create(
+        lot_a0002 = self.env["stock.lot"].create(
             {
                 "name": "A0002",
                 "product_id": self.product_lot.id,
@@ -295,11 +301,11 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         # Validate picking
         in_picking.button_validate()
         # Assign internal picking
-        int_picking = in_picking.move_lines.move_dest_ids.picking_id
+        int_picking = in_picking.move_ids.move_dest_ids.picking_id
         int_picking.action_assign()
 
         def _get_possible_locations(package_level):
-            storage_type = package_level.package_id.package_storage_type_id
+            storage_type = package_level.package_id.package_type_id
             package_type_locations = storage_type.storage_location_sequence_ids.mapped(
                 "location_id.leaf_location_ids"
             )
@@ -346,7 +352,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
 
         # Cardbox with different product go into different cardbox location
         self.assertEqual(len(third_level), 1)
-        self.assertEqual(third_level.location_dest_id, self.cardboxes_bin_2_location)
+        self.assertEqual(third_level.location_dest_id, self.cardboxes_bin_3_location)
 
         fourth_fifth_levels = _levels_for(fourth_pack | fifth_pack)
         # Cardbox with same product but different lot go into different
@@ -354,21 +360,21 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         # Cardbox with same product same lot go into same location
         self.assertEqual(len(fourth_fifth_levels), 2)
         self.assertEqual(
-            fourth_fifth_levels.location_dest_id, self.cardboxes_bin_3_location
+            fourth_fifth_levels.location_dest_id, self.cardboxes_bin_2_location
         )
 
         for pack_level in (
             first_level | second_level | third_level | fourth_fifth_levels
         ):
             # Check domain
-            self.assert_package_level_domain(
-                pack_level.allowed_location_dest_domain,
+            self.assertEqual(
+                pack_level.allowed_location_dest_ids,
                 _get_possible_locations(pack_level),
             )
 
             # Set the quantities done in order to avoid immediate transfer wizard
             for move_line in pack_level.move_line_ids:
-                move_line.qty_done = move_line.product_uom_qty
+                move_line.qty_done = move_line.reserved_qty
 
         second_level.location_dest_id = third_level.location_dest_id
         with self.assertRaises(ValidationError):

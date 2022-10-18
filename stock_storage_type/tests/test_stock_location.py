@@ -135,7 +135,7 @@ class TestStockLocation(TestStorageTypeCommon):
                 "location_id": self.stock_location.id,
                 "location_dest_id": location.id,
                 "product_uom_id": self.product3.uom_id.id,
-                "product_uom_qty": 10,
+                "reserved_uom_qty": 10,
                 "move_id": ml_move.id,
                 "company_id": self.env.company.id,
             }
@@ -157,8 +157,8 @@ class TestStockLocation(TestStorageTypeCommon):
         location.allowed_location_storage_type_ids.do_not_mix_products = True
         location.allowed_location_storage_type_ids.do_not_mix_lots = True
         lot_values = {"product_id": self.product.id, "company_id": self.env.company.id}
-        lot1 = self.env["stock.production.lot"].create(lot_values)
-        lot2 = self.env["stock.production.lot"].create(lot_values)
+        lot1 = self.env["stock.lot"].create(lot_values)
+        lot2 = self.env["stock.lot"].create(lot_values)
 
         self._update_qty_in_location(location, self.product, 10, lot=lot1)
         self.assertEqual(location.location_will_contain_lot_ids, lot1)
@@ -183,7 +183,7 @@ class TestStockLocation(TestStorageTypeCommon):
                 "location_id": self.stock_location.id,
                 "location_dest_id": location.id,
                 "product_uom_id": self.product.uom_id.id,
-                "product_uom_qty": 10,
+                "reserved_uom_qty": 10,
                 "move_id": ml_move.id,
                 "company_id": self.env.company.id,
             }
@@ -193,7 +193,7 @@ class TestStockLocation(TestStorageTypeCommon):
         location.allowed_location_storage_type_ids.do_not_mix_lots = False
         self.assertEqual(
             location.location_will_contain_lot_ids,
-            self.env["stock.production.lot"].browse(),
+            self.env["stock.lot"].browse(),
         )
 
     def test_location_is_empty_non_internal(self):

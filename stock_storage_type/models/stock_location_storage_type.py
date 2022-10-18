@@ -27,14 +27,14 @@ class StockLocationStorageType(models.Model):
         readonly=True,
     )
 
-    package_storage_type_ids = Many2manyCustom(
-        "stock.package.storage.type",
-        "stock_location_package_storage_type_rel",
+    package_type_ids = Many2manyCustom(
+        "stock.package.type",
+        "stock_location_package_type_rel",
         "location_storage_type_id",
-        "package_storage_type_id",
+        "package_type_id",
         create_table=False,
-        string="Allowed packages storage types",
-        help="Package storage types that are allowed on locations "
+        string="Allowed packages types",
+        help="Package types that are allowed on locations "
         "where this location storage type is defined.",
     )
 

@@ -5,7 +5,7 @@
         model="stock.storage.location.sequence"
     >
         <field
-            name="package_storage_type_id"
+            name="package_type_id"
             ref="stock_storage_type.package_storage_type_pallets"
         />
         <field name="sequence">10</field>
@@ -16,7 +16,7 @@
         model="stock.storage.location.sequence"
     >
         <field
-            name="package_storage_type_id"
+            name="package_type_id"
             ref="stock_storage_type.package_storage_type_pallets"
         />
         <field name="sequence">20</field>
@@ -27,7 +27,7 @@
         model="stock.storage.location.sequence"
     >
         <field
-            name="package_storage_type_id"
+            name="package_type_id"
             ref="stock_storage_type.package_storage_type_cardboxes"
         />
         <field name="sequence">10</field>
@@ -38,7 +38,7 @@
         model="stock.storage.location.sequence"
     >
         <field
-            name="package_storage_type_id"
+            name="package_type_id"
             ref="stock_storage_type.package_storage_type_cardboxes"
         />
         <field name="sequence">20</field>

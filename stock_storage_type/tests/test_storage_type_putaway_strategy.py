@@ -16,12 +16,14 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
                 "picking_type_id": self.receipts_picking_type.id,
                 "location_id": self.suppliers_location.id,
                 "location_dest_id": self.input_location.id,
-                "move_lines": [
+                "move_ids": [
                     (
                         0,
                         0,
                         {
                             "name": self.product.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
                             "product_id": self.product.id,
                             "product_uom_qty": 8.0,
                             "product_uom": self.product.uom_id.id,
@@ -49,11 +51,11 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         # Validate picking
         in_picking.button_validate()
         # Assign internal picking
-        int_picking = in_picking.move_lines.move_dest_ids.picking_id
+        int_picking = in_picking.move_ids.move_dest_ids.picking_id
         int_picking.action_assign()  # TODO drop ?
         self.assertEqual(int_picking.location_dest_id, self.stock_location)
         self.assertEqual(
-            int_picking.move_lines.mapped("location_dest_id"), self.stock_location
+            int_picking.move_ids.mapped("location_dest_id"), self.stock_location
         )
         self.assertEqual(
             int_picking.move_line_ids.mapped("location_dest_id"),
@@ -68,7 +70,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         int_picking.action_assign()
         self.assertEqual(int_picking.location_dest_id, self.stock_location)
         self.assertEqual(
-            int_picking.move_lines.mapped("location_dest_id"), self.stock_location
+            int_picking.move_ids.mapped("location_dest_id"), self.stock_location
         )
         reserve_cardbox = self.env.ref(
             "stock_storage_type.stock_location_cardboxes_reserve_bin_1"
@@ -90,12 +92,14 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
                 "picking_type_id": self.receipts_picking_type.id,
                 "location_id": self.suppliers_location.id,
                 "location_dest_id": self.input_location.id,
-                "move_lines": [
+                "move_ids": [
                     (
                         0,
                         0,
                         {
                             "name": self.product.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
                             "product_id": self.product.id,
                             "product_uom_qty": 96.0,
                             "product_uom": self.product.uom_id.id,
@@ -123,11 +127,11 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         # Validate picking
         in_picking.button_validate()
         # Assign internal picking
-        int_picking = in_picking.move_lines.move_dest_ids.picking_id
+        int_picking = in_picking.move_ids.move_dest_ids.picking_id
         int_picking.action_assign()
         self.assertEqual(int_picking.location_dest_id, self.stock_location)
         self.assertEqual(
-            int_picking.move_lines.mapped("location_dest_id"), self.stock_location
+            int_picking.move_ids.mapped("location_dest_id"), self.stock_location
         )
         # First move line goes into pallets bin 1
         # Second move line goes into pallets bin 3 as bin 1 is planned for
@@ -155,12 +159,14 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
                 "picking_type_id": self.receipts_picking_type.id,
                 "location_id": self.suppliers_location.id,
                 "location_dest_id": self.input_location.id,
-                "move_lines": [
+                "move_ids": [
                     (
                         0,
                         0,
                         {
                             "name": self.product.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
                             "product_id": self.product.id,
                             "product_uom_qty": 96.0,
                             "product_uom": self.product.uom_id.id,
@@ -191,11 +197,11 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         # Validate picking
         in_picking.button_validate()
         # Assign internal picking
-        int_picking = in_picking.move_lines.move_dest_ids.picking_id
+        int_picking = in_picking.move_ids.move_dest_ids.picking_id
         int_picking.action_assign()
         self.assertEqual(int_picking.location_dest_id, self.stock_location)
         self.assertEqual(
-            int_picking.move_lines.mapped("location_dest_id"), self.stock_location
+            int_picking.move_ids.mapped("location_dest_id"), self.stock_location
         )
         # First move line goes into pallets bin 1
         # Second move line goes into pallets bin 3 as bin 1 is planned for
@@ -221,12 +227,14 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
                 "picking_type_id": self.receipts_picking_type.id,
                 "location_id": self.suppliers_location.id,
                 "location_dest_id": self.input_location.id,
-                "move_lines": [
+                "move_ids": [
                     (
                         0,
                         0,
                         {
                             "name": self.product.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
                             "product_id": self.product.id,
                             "product_uom_qty": 8.0,
                             "product_uom": self.product.uom_id.id,
@@ -238,6 +246,8 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
                         0,
                         {
                             "name": self.product_lot.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
                             "product_id": self.product_lot.id,
                             "product_uom_qty": 10.0,
                             "product_uom": self.product_lot.uom_id.id,
@@ -293,11 +303,11 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         # Validate picking
         in_picking.button_validate()
         # Assign internal picking
-        int_picking = in_picking.move_lines.mapped("move_dest_ids.picking_id")
+        int_picking = in_picking.move_ids.mapped("move_dest_ids.picking_id")
         int_picking.action_assign()
         self.assertEqual(int_picking.location_dest_id, self.stock_location)
         self.assertEqual(
-            int_picking.move_lines.mapped("location_dest_id"), self.stock_location
+            int_picking.move_ids.mapped("location_dest_id"), self.stock_location
         )
         product_mls = int_picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product
@@ -346,14 +356,14 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         )
         self.env["stock.storage.location.sequence"].create(
             {
-                "package_storage_type_id": self.cardboxes_package_storage_type.id,
+                "package_type_id": self.cardboxes_package_storage_type.id,
                 "location_id": self.warehouse.lot_stock_id.id,
                 "sequence": 1,
             }
         )
         self.env["stock.storage.location.sequence"].create(
             {
-                "package_storage_type_id": self.cardboxes_package_storage_type.id,
+                "package_type_id": self.cardboxes_package_storage_type.id,
                 "location_id": self.cardboxes_location.id,
                 "sequence": 2,
             }
@@ -472,7 +482,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         self.cardboxes_location.pack_putaway_strategy = "none"
         self.env["stock.storage.location.sequence"].create(
             {
-                "package_storage_type_id": self.cardboxes_package_storage_type.id,
+                "package_type_id": self.cardboxes_package_storage_type.id,
                 "location_id": self.cardboxes_location.id,
                 "sequence": 1,
             }
@@ -519,7 +529,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         )
         self.none_sequence = self.env["stock.storage.location.sequence"].create(
             {
-                "package_storage_type_id": self.cardboxes_package_storage_type.id,
+                "package_type_id": self.cardboxes_package_storage_type.id,
                 "location_id": self.warehouse.lot_stock_id.id,
                 "sequence": 1,
                 "location_sequence_cond_ids": [(6, 0, condition.ids)],
@@ -527,7 +537,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         )
         self.env["stock.storage.location.sequence"].create(
             {
-                "package_storage_type_id": self.cardboxes_package_storage_type.id,
+                "package_type_id": self.cardboxes_package_storage_type.id,
                 "location_id": self.cardboxes_location.id,
                 "sequence": 2,
             }
