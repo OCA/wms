@@ -16,6 +16,7 @@
         "stock_putaway_hook",
         "base_m2m_custom_field",
         "stock_quant_package_dimension",
+        "stock_package_type_button_box",
     ],
     "data": [
         "security/ir.model.access.csv",
