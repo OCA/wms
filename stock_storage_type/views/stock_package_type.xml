@@ -17,16 +17,15 @@
         <field name="model">stock.package.type</field>
         <field name="inherit_id" ref="stock.stock_package_type_form" />
         <field name="arch" type="xml">
-            <!-- TODO: Add a module to add a button box here
+            <div name="button_box" position="inside">
                 <button
-                            string="Put-Away sequence"
-                            class="oe_stat_button"
-                            icon="fa-location-arrow"
-                            name="action_view_storage_locations"
-                            type="object"
-                        />
-
-            -->
+                    string="Put-Away sequence"
+                    class="oe_stat_button"
+                    icon="fa-location-arrow"
+                    name="action_view_storage_locations"
+                    type="object"
+                />
+            </div>
 
             <group name="storage_categories">
                 <group name="main">
