@@ -5,15 +5,13 @@ from odoo import _, api, fields, models
 from odoo.addons.base_m2m_custom_field.fields import Many2manyCustom
 
 
-class StockPackageStorageType(models.Model):
+class StockPackageType(models.Model):
 
-    _name = "stock.package.storage.type"
-    _description = "Package storage type"
+    _inherit = "stock.package.type"
 
-    name = fields.Char(required=True)
     location_storage_type_ids = Many2manyCustom(
         "stock.location.storage.type",
-        "stock_location_package_storage_type_rel",
+        "stock_location_package_type_rel",
         "package_type_id",
         "location_storage_type_id",
         create_table=False,
@@ -50,23 +48,33 @@ class StockPackageStorageType(models.Model):
                         sl._format_package_storage_type_message(last=last)
                     )
                 msg = _(
-                    "When a package with storage type %(name)s is put away, the "
+                    "When a package with storage type {name} is put away, the "
                     "strategy will look for an allowed location in the "
                     "following locations: <br/><br/>"
-                    "%(message)s <br/><br/>"
+                    "{message} <br/><br/>"
                     "<b>Note</b>: this happens as long as these locations <u>"
                     "are children of the stock move destination location</u> "
                     "or as long as these locations are children of the "
                     "destination location after the (product or category) "
                     "put-away is applied."
-                ) % (pst.name, "<br/>".join(formatted_storage_locations_msgs))
-            else:
-                msg = (
-                    _(
-                        '<span style="color: red;">The "Put-Away sequence" '
-                        "must be defined in order to put away packages using "
-                        "this package storage type (%s).</span>"
-                    )
-                    % pst.name
+                ).format(
+                    name=pst.name,
+                    message="<br/>".join(formatted_storage_locations_msgs),
                 )
+            else:
+                msg = _(
+                    '<span style="color: red;">The "Put-Away sequence" '
+                    "must be defined in order to put away packages using "
+                    "this package storage type ({storage}).</span>"
+                ).format(storage=pst.name)
             pst.storage_type_message = msg
+
+    def action_view_storage_locations(self):
+        return {
+            "name": _("Put-away sequence"),
+            "type": "ir.actions.act_window",
+            "res_model": "stock.storage.location.sequence",
+            "view_mode": "list",
+            "domain": [("package_type_id", "=", self.id)],
+            "context": {"default_package_type_id": self.id},
+        }

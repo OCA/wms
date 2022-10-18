@@ -7,10 +7,10 @@ class ProductTemplate(models.Model):
 
     _inherit = "product.template"
 
-    product_package_storage_type_id = fields.Many2one(
-        "stock.package.storage.type",
-        string="Package storage type",
-        help="Defines a 'default' package storage type for this product to be "
+    package_type_id = fields.Many2one(
+        "stock.package.type",
+        string="Package type",
+        help="Defines a 'default' package type for this product to be "
         "applied on packages without product packagings for put-away "
         "computations.",
     )

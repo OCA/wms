@@ -29,6 +29,7 @@ class StockLocation(models.Model):
         "stock_location_allowed_location_storage_type_rel",
         "location_id",
         "location_storage_type_id",
+        recursive=True,
         compute="_compute_allowed_location_storage_type_ids",
         store=True,
         recursive=True,
@@ -99,7 +100,7 @@ class StockLocation(models.Model):
         "stock.lot",
         store=True,
         compute="_compute_location_will_contain_lot_ids",
-        help="technical field: list of stock.production.lots in "
+        help="technical field: list of stock.lots in "
         "the location, either now or in pending operations",
     )
     location_will_contain_product_ids = fields.Many2many(
@@ -233,16 +234,15 @@ class StockLocation(models.Model):
     def _compute_location_will_contain_product_ids(self):
         for rec in self:
             if not rec._should_compute_will_contain_product_ids():
-                if rec.location_will_contain_product_ids:
-                    no_product = self.env["product.product"].browse()
-                    rec.location_will_contain_product_ids = no_product
-                continue
-            products = (
-                rec.mapped("quant_ids.product_id")
-                | rec.mapped("in_move_ids.product_id")
-                | rec.mapped("in_move_line_ids.product_id")
-            )
-            rec.location_will_contain_product_ids = products
+                no_product = self.env["product.product"].browse()
+                rec.location_will_contain_product_ids = no_product
+            else:
+                products = (
+                    rec.mapped("quant_ids.product_id")
+                    | rec.mapped("in_move_ids.product_id")
+                    | rec.mapped("in_move_line_ids.product_id")
+                )
+                rec.location_will_contain_product_ids = products
 
     @api.depends(
         "quant_ids",
@@ -252,14 +252,13 @@ class StockLocation(models.Model):
     def _compute_location_will_contain_lot_ids(self):
         for rec in self:
             if not rec._should_compute_will_contain_lot_ids():
-                if rec.location_will_contain_lot_ids:
-                    no_lot = self.env["stock.production.lot"].browse()
-                    rec.location_will_contain_lot_ids = no_lot
-                continue
-            lots = rec.mapped("quant_ids.lot_id") | rec.mapped(
-                "in_move_line_ids.lot_id"
-            )
-            rec.location_will_contain_lot_ids = lots
+                no_lot = self.env["stock.lot"].browse()
+                rec.location_will_contain_lot_ids = no_lot
+            else:
+                lots = rec.mapped("quant_ids.lot_id") | rec.mapped(
+                    "in_move_line_ids.lot_id"
+                )
+                rec.location_will_contain_lot_ids = lots
 
     @api.depends(
         "quant_ids.quantity",
@@ -326,32 +325,45 @@ class StockLocation(models.Model):
             location.max_height_in_m = types_sorted[:1].max_height_in_m or 0
 
     # method provided by "stock_putaway_hook"
-    def _putaway_strategy_finalizer(self, putaway_location, product):
+    def _putaway_strategy_finalizer(
+        self,
+        putaway_location,
+        product,
+        quantity=0,
+        package=None,
+        packaging=None,
+        additional_qty=None,
+    ):
         putaway_location = super()._putaway_strategy_finalizer(
-            putaway_location, product
+            putaway_location, product, quantity, package, packaging, additional_qty
         )
-        quant = self.env.context.get("storage_quant")
-        return self._get_pack_putaway_strategy(putaway_location, quant, product)
+        if package:
+            quants = package.quant_ids
+            product = package.single_product_id or product
+        else:
+            quants = self.env["stock.quant"].browse()
+        return self._get_pack_putaway_strategy(putaway_location, quants, product)
 
-    def _get_pack_putaway_strategy(self, putaway_location, quant, product):
-        package_storage_type = False
-        if quant:
-            package_storage_type = quant.package_id.package_storage_type_id
+    def _get_pack_putaway_strategy(self, putaway_location, quants, product):
+        package_type = False
+        if quants:
+            package_type = quants.package_id.package_type_id
             _logger.debug(
                 "Computing putaway for pack %s (%s)"
-                % (quant.package_id.name, quant.package_id)
+                % (quants.package_id, quants.package_id)
             )
         # I'm not sure about this. I had to add the line, because there is a
         # second call to get_putaway_strategy which is made a 'leaf' location
         # as putaway_location which does not match the package storage type in
         # the project. This could be caused by another module, I'm not sure...
-        if not package_storage_type:
+        if not package_type:
             return putaway_location
+        # TODO: Remove this and use only putaway_location as always filled in
         dest_location = putaway_location or self
         _logger.debug("putaway location: %s", dest_location.name)
         package_locations = self.env["stock.storage.location.sequence"].search(
             [
-                ("package_storage_type_id", "=", package_storage_type.id),
+                ("package_type_id", "=", package_type.id),
                 ("location_id", "child_of", dest_location.ids),
             ]
         )
@@ -359,13 +371,13 @@ class StockLocation(models.Model):
             return dest_location
 
         for package_sequence in package_locations:
-            if not package_sequence.can_be_applied(putaway_location, quant, product):
+            if not package_sequence.can_be_applied(putaway_location, quants, product):
                 continue
             pref_loc = package_sequence.location_id
             storage_locations = pref_loc.get_storage_locations(products=product)
             _logger.debug("Storage locations selected: %s" % storage_locations)
             allowed_location = storage_locations.select_first_allowed_location(
-                package_storage_type, quant, product
+                package_type, quants, product
             )
             if allowed_location:
                 _logger.debug(
@@ -423,7 +435,7 @@ class StockLocation(models.Model):
         means "no limit" and as such it should be among the last locations.
         Then, they are ordered by a sequence and name.
         """
-        self.env["stock.location"].flush(
+        self.env["stock.location"].flush_model(
             ["max_height", "pack_putaway_sequence", "name"]
         )
         orderby = []
@@ -446,7 +458,7 @@ class StockLocation(models.Model):
         if not self.leaf_child_location_ids:
             return self.leaf_child_location_ids
         query = self._where_calc([("id", "in", self.leaf_child_location_ids.ids)])
-        from_clause, where_clause, where_params = query.get_sql()
+        _, where_clause, where_params = query.get_sql()
         orderby_clause, orderby_params = self._get_sorted_leaf_locations_orderby(
             products
         )
@@ -461,15 +473,11 @@ class StockLocation(models.Model):
         location_ids = [x[0] for x in self.env.cr.fetchall()]
         return self.env["stock.location"].browse(location_ids)
 
-    def select_first_allowed_location(self, package_storage_type, quants, products):
-        allowed = self.select_allowed_locations(
-            package_storage_type, quants, products, limit=1
-        )
+    def select_first_allowed_location(self, package_type, quants, products):
+        allowed = self.select_allowed_locations(package_type, quants, products, limit=1)
         return allowed
 
-    def _domain_location_storage_type_constraints(
-        self, package_storage_type, quants, products
-    ):
+    def _domain_location_storage_type_constraints(self, package_type, quants, products):
         """Compute the domain for the location storage type which match the package
         storage type
 
@@ -485,7 +493,7 @@ class StockLocation(models.Model):
 
         pertinent_loc_storagetype_domain = [
             ("id", "in", compatible_location_storage_types.ids),
-            ("package_storage_type_ids", "=", package_storage_type.id),
+            ("package_type_ids", "=", package_type.id),
         ]
         if quants.package_id.height:
             pertinent_loc_storagetype_domain += [
@@ -532,9 +540,7 @@ class StockLocation(models.Model):
         """
         return self[:limit]
 
-    def select_allowed_locations(
-        self, package_storage_type, quants, products, limit=None
-    ):
+    def select_allowed_locations(self, package_type, quants, products, limit=None):
         """Filter allowed locations for a storage type
 
         ``self`` contains locations already ordered according to the
@@ -553,7 +559,7 @@ class StockLocation(models.Model):
         LocStorageType = self.env["stock.location.storage.type"]
         _logger.debug(
             "select allowed location for package storage type %s (q=%s, p=%s)",
-            package_storage_type.name,
+            package_type.name,
             quants,
             products.mapped("name"),
         )
@@ -564,13 +570,13 @@ class StockLocation(models.Model):
                 (
                     "allowed_location_storage_type_ids",
                     "in",
-                    package_storage_type.location_storage_type_ids.ids,
+                    package_type.location_storage_type_ids.ids,
                 ),
             ]
         )
         pertinent_loc_s_t_domain = (
             compatible_locations._domain_location_storage_type_constraints(
-                package_storage_type, quants, products
+                package_type, quants, products
             )
         )
 
@@ -592,7 +598,7 @@ class StockLocation(models.Model):
         _logger.debug(
             "select allowed location for package storage"
             " type %s (q=%s, p=%s) found %d locations",
-            package_storage_type.name,
+            package_type.name,
             quants,
             products.mapped("name"),
             len(valid_locations),

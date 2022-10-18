@@ -8,7 +8,7 @@ from .common import TestStorageTypeCommon
 class TestStorageTypeMove(TestStorageTypeCommon):
     def test_package_storage_type_height_required(self):
         packaging = self.product_lot_pallets_product_packaging
-        storage_type = packaging.package_storage_type_id
+        storage_type = packaging.package_type_id
         # Without 'height_required'
         self.env["stock.quant.package"].create(
             {"name": "TEST1", "product_packaging_id": packaging.id}
