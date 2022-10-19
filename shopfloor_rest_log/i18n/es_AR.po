@@ -22,16 +22,29 @@ msgid "A Shopfloor application"
 msgstr "Una Aplicación de Taller"
 
 #. module: shopfloor_rest_log
+#: model:ir.model.fields,field_description:shopfloor_rest_log.field_rest_log__app_version
+msgid "App Version"
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model_terms:ir.ui.view,arch_db:shopfloor_rest_log.rest_log_search_view
+msgid "App version"
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model:ir.model.fields,field_description:shopfloor_rest_log.field_rest_log__display_name
 #: model:ir.model.fields,field_description:shopfloor_rest_log.field_shopfloor_app__display_name
 msgid "Display Name"
 msgstr "Mostrar Nombre"
 
 #. module: shopfloor_rest_log
+#: model:ir.model.fields,field_description:shopfloor_rest_log.field_rest_log__id
 #: model:ir.model.fields,field_description:shopfloor_rest_log.field_shopfloor_app__id
 msgid "ID"
 msgstr "ID"
 
 #. module: shopfloor_rest_log
+#: model:ir.model.fields,field_description:shopfloor_rest_log.field_rest_log____last_update
 #: model:ir.model.fields,field_description:shopfloor_rest_log.field_shopfloor_app____last_update
 msgid "Last Modified on"
 msgstr "Última Modificación el"
@@ -41,6 +54,25 @@ msgstr "Última Modificación el"
 #: model:ir.ui.menu,name:shopfloor_rest_log.menu_action_shopfloor_log
 msgid "Logs"
 msgstr "Registros"
+
+#. module: shopfloor_rest_log
+#: model:ir.model,name:shopfloor_rest_log.model_rest_log
+msgid "REST API Logging"
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model:ir.model.fields,field_description:shopfloor_rest_log.field_rest_log__real_uid
+#: model_terms:ir.ui.view,arch_db:shopfloor_rest_log.rest_log_search_view
+msgid "Real user"
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model:ir.model.fields,help:shopfloor_rest_log.field_rest_log__real_uid
+msgid ""
+"Some services might use a different user in the environment. Whenever "
+"possible, this field will hold a reference to the real user doing the call. "
+"This information can be found in the header `App-User-Id`."
+msgstr ""
 
 #. module: shopfloor_rest_log
 #: model_terms:ir.ui.view,arch_db:shopfloor_rest_log.shopfloor_app_form_view
