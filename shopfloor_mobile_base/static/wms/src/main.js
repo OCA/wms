@@ -236,14 +236,14 @@ new Vue({
         login: function (evt, data) {
             evt.preventDefault();
             const self = this;
-            this.trigger("login:before");
+            this.trigger("login:before", {root: self});
             const auth_handler = this._get_auth_handler();
             if (!_.isUndefined(auth_handler.on_login)) {
                 return auth_handler
                     .on_login(data)
                     .then(this._on_login_default)
                     .catch((error) => {
-                        self.trigger("login:failure", error);
+                        self.trigger("login:failure", {root: self, error: error});
                     });
             } else {
                 // TODO: we might want to enforce every authentication handler
@@ -255,22 +255,22 @@ new Vue({
             const self = this;
             return this._loadConfig().then(function (result) {
                 if (!result.error) {
-                    self.trigger("login:success", self);
+                    self.trigger("login:success", {root: self});
                 } else {
-                    self.trigger("login:failure", self);
+                    self.trigger("login:failure", {root: self});
                 }
             });
         },
         logout: function () {
-            this.trigger("logout:before");
             const self = this;
+            this.trigger("logout:before", {root: self});
             const auth_handler = this._get_auth_handler();
             if (!_.isUndefined(auth_handler.on_logout)) {
                 return auth_handler
                     .on_logout()
                     .then(this._on_logout_default)
                     .catch(function () {
-                        self.trigger("logout:failure");
+                        self.trigger("logout:failure", {root: self});
                     });
             } else {
                 // TODO: we might want to enforce every authentication handler
@@ -282,7 +282,7 @@ new Vue({
             this.authenticated = false;
             this._clearAppData();
             this.$router.push({name: "login"});
-            this.trigger("logout:success");
+            this.trigger("logout:success", {root: this});
             return Promise.resolve();
         },
         is_authenticated: function () {
