@@ -70,6 +70,13 @@ const messages_en = {
             test: "Test",
             dev: "Development",
         },
+        report_issue: {
+            action_txt: "Need help?",
+            mail: {
+                subject: "I need help with the {app_name} app",
+                info_warning_msg: "PLEASE, DO NOT ALTER THE INFO BELOW",
+            },
+        },
     },
     language: {
         name: {

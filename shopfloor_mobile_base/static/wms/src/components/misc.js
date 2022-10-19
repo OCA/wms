@@ -383,10 +383,15 @@ Vue.component("user-session-detail", {
             type: Boolean,
             default: true,
         },
+        show_report_issue_action: {
+            type: Boolean,
+            default: true,
+        },
     },
     template: `
   <div :class="$options._componentTag" data-ref="user-session-detail">
     <v-list>
+        <report-issue-action v-if="show_report_issue_action" />
         <v-list-item v-if="show_env"
                 data-ref="session-detail-env"
                 :data-id="$root.app_info.running_env"
