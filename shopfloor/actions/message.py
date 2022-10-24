@@ -370,6 +370,12 @@ class MessageAction(Component):
             ),
         }
 
+    def product_not_unitary_in_package_scan_package(self):
+        return {
+            "message_type": "warning",
+            "body": _("This product is part of a package, please scan a package."),
+        }
+
     def product_not_found(self):
         return {
             "message_type": "error",
