@@ -287,10 +287,16 @@ class ShopfloorApp(models.Model):
             return []
         return self.env["rest.service.registration"]._get_services(self._name)
 
+    def _name_with_env(self):
+        name = self.name
+        if RUNNING_ENV and RUNNING_ENV != "prod":
+            name += f" ({RUNNING_ENV})"
+        return name
+
     def _make_app_info(self, demo=False):
         base_url = self.api_route.rstrip("/") + "/"
         return DotDict(
-            name=self.name,
+            name=self._name_with_env(),
             short_name=self.short_name,
             base_url=base_url,
             url=self.url,
@@ -325,7 +331,7 @@ class ShopfloorApp(models.Model):
             .rstrip("/")
         )
         manifest = {
-            "name": self.name,
+            "name": self._name_with_env(),
             "short_name": self.short_name,
             "start_url": param + self.url,
             "scope": param + self.url,
