@@ -991,6 +991,25 @@ msgstr "Se han encontrado varios lotes en %s, escanee mucho."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "Several lots found in %s, please scan the lot."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Several moves found for different lots, please scan the lot."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"Several moves found on different locations, please scan first the location."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "Several operation types found for this menu and profile."
 msgstr "Se han encontrado varios tipos de operaciones para este menú y perfil."
 
@@ -1005,6 +1024,12 @@ msgstr "Se han encontrado varios paquetes en %s, escanee un paquete."
 #, python-format
 msgid "Several products found in %s, please scan a product."
 msgstr "Se han encontrado varios productos en %s, escanee un producto."
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Several products found in %s, please scan the product."
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
