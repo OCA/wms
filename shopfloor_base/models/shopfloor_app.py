@@ -287,10 +287,16 @@ class ShopfloorApp(models.Model):
             return []
         return self.env["rest.service.registration"]._get_services(self._name)
 
+    def _name_with_env(self):
+        name = self.name
+        if RUNNING_ENV and RUNNING_ENV != "prod":
+            name += f" ({RUNNING_ENV})"
+        return name
+
     def _make_app_info(self, demo=False):
         base_url = self.api_route.rstrip("/") + "/"
         return DotDict(
-            name=self.name,
+            name=self._name_with_env(),
             short_name=self.short_name,
             base_url=base_url,
             url=self.url,
@@ -316,6 +322,25 @@ class ShopfloorApp(models.Model):
     def _app_convert_lang_code(self, code):
         # TODO: we should probably let the front decide the format
         return code.replace("_", "-")
+
+    def _make_app_manifest(self, icons=None, **kw):
+        param = (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("web.base.url", "")
+            .rstrip("/")
+        )
+        manifest = {
+            "name": self._name_with_env(),
+            "short_name": self.short_name,
+            "start_url": param + self.url,
+            "scope": param + self.url,
+            "id": self.url,
+            "display": "fullscreen",
+            "icons": icons or [],
+        }
+        manifest.update(kw)
+        return manifest
 
     @api.onchange("lang_id")
     def _onchange_lang_id(self):

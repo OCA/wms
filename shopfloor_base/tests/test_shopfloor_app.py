@@ -138,6 +138,20 @@ class TestShopfloorApp(CommonCase):
             info["lang"], {"default": "en-US", "enabled": ["en-US", "fr-FR"]}
         )
 
+    def test_make_app_manifest(self):
+        param = "http://localhost:8069"
+        manifest = self.shopfloor_app._make_app_manifest()
+        expected = {
+            "name": self.shopfloor_app.name,
+            "short_name": self.shopfloor_app.short_name,
+            "start_url": param + self.shopfloor_app.url,
+            "scope": param + self.shopfloor_app.url,
+            "id": self.shopfloor_app.url,
+            "display": "fullscreen",
+            "icons": [],
+        }
+        self.assertEqual(manifest, expected)
+
     def test_lang_onchanges(self):
         lang_en, lang_fr = self.env.ref("base.lang_en"), self.env.ref("base.lang_fr")
         lang_fr.sudo().active = True
