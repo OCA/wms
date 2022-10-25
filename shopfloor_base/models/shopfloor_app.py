@@ -317,6 +317,25 @@ class ShopfloorApp(models.Model):
         # TODO: we should probably let the front decide the format
         return code.replace("_", "-")
 
+    def _make_app_manifest(self, icons=None, **kw):
+        param = (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("web.base.url", "")
+            .rstrip("/")
+        )
+        manifest = {
+            "name": self.name,
+            "short_name": self.short_name,
+            "start_url": param + self.url,
+            "scope": param + self.url,
+            "id": self.url,
+            "display": "fullscreen",
+            "icons": icons or [],
+        }
+        manifest.update(kw)
+        return manifest
+
     @api.onchange("lang_id")
     def _onchange_lang_id(self):
         if self.env.context.get("from_onchange__lang_ids"):
