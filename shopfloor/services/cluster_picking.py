@@ -449,7 +449,7 @@ class ClusterPicking(Component):
 
         package = search.package_from_scan(barcode)
         if package and move_line.package_id == package:
-            return self._scan_line_by_package(picking, move_line, package)
+            return self._scan_line_by_package(picking, move_line, package, batch)
 
         # use the common search method so we search by packaging too
         product = search.product_from_scan(barcode)
@@ -474,29 +474,47 @@ class ClusterPicking(Component):
             move_line, message=self.msg_store.barcode_not_found()
         )
 
-    def _scan_line_by_package(self, picking, move_line, package):
+    def _scan_line_by_package(self, picking, move_line, package, batch):
         """Package scanned, just work with it."""
+        packaging = self._actions_for("packaging")
+        message = None
+        if packaging.package_has_several_products(package):
+            message = self.msg_store.several_products_in_package(package)
+        elif packaging.package_has_several_lots(package):
+            message = self.msg_store.several_lots_in_package(package)
+        if message:
+            return self._pick_next_line(batch, message=message)
         return self._response_for_scan_destination(move_line)
 
     def _scan_line_by_product(self, picking, move_line, product):
         """Product scanned, check if we can work with it.
 
         If scanned product is part of several packages in the same location,
-        we can't be sure it's the correct one, in such case, ask to scan a package
+        we can't be sure it's the correct one, in such case, ask to scan a package.
+
+        If the product is tracked by lot and there is only one lot id in the location
+        not in a package. It can safely be picked up.
         """
-        if move_line.product_id.tracking in ("lot", "serial"):
-            return self._response_for_start_line(
-                move_line, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
-            )
-        other_product_lines = picking.move_line_ids.filtered(
-            lambda l: l.product_id == product and l.location_id == move_line.location_id
+        message = None
+        location_quants = move_line.location_id.quant_ids.filtered(
+            lambda quant: quant.quantity > 0 and quant.product_id == product
         )
-        packages = other_product_lines.mapped("package_id")
+        packages = location_quants.mapped("package_id")
+
+        if move_line.product_id.tracking == "lot":
+            lots_at_location = location_quants.mapped("lot_id")
+            if len(lots_at_location) > 1 or packages:
+                message = self.msg_store.scan_lot_on_product_tracked_by_lot()
+        elif move_line.product_id.tracking == "serial":
+            message = self.msg_store.scan_lot_on_product_tracked_by_lot()
+        if message:
+            return self._response_for_start_line(move_line, message=message)
+
         # Do not use mapped here: we want to see if we have more than one package,
         # but also if we have one product as a package and the same product as
         # a unit in another line. In both cases, we want the user to scan the
         # package.
-        if packages and len({line.package_id for line in other_product_lines}) > 1:
+        if packages and len({quant.package_id for quant in location_quants}) > 1:
             return self._response_for_start_line(
                 move_line,
                 message=self.msg_store.product_multiple_packages_scan_package(),
@@ -509,13 +527,16 @@ class ClusterPicking(Component):
         If we scanned a lot and it's part of several packages, we can't be
         sure the user scanned the correct one, in such case, ask to scan a package
         """
-        other_lot_lines = picking.move_line_ids.filtered(lambda l: l.lot_id == lot)
-        packages = other_lot_lines.mapped("package_id")
+        location_quants = move_line.location_id.quant_ids.filtered(
+            lambda quant: quant.quantity > 0 and quant.lot_id == lot
+        )
+        packages = location_quants.package_id
+
         # Do not use mapped here: we want to see if we have more than one
         # package, but also if we have one lot as a package and the same lot as
-        # a unit in another line. In both cases, we want the user to scan the
+        # a unit in another quant. In both cases, we want the user to scan the
         # package.
-        if packages and len({line.package_id for line in other_lot_lines}) > 1:
+        if packages and len({quant.package_id for quant in location_quants}) > 1:
             return self._response_for_start_line(
                 move_line, message=self.msg_store.lot_multiple_packages_scan_package()
             )
@@ -530,21 +551,17 @@ class ClusterPicking(Component):
         several products or a mix of several products and packages, we
         ask to scan a more precise barcode.
         """
-        location = move_line.location_id
-        ml_search = self.search_move_line
-        pending_lines = ml_search.search_move_lines_by_location(location)
-
-        lots = pending_lines.mapped("lot_id")
-
+        location_quants = move_line.location_id.quant_ids.filtered(
+            lambda quant: quant.quantity > 0
+        )
+        lots = location_quants.lot_id
         if len(lots) > 1:
             return self._response_for_start_line(
                 move_line,
                 message=self.msg_store.several_lots_in_location(move_line.location_id),
             )
-
-        packages = pending_lines.mapped("package_id")
-        products = pending_lines.mapped("product_id")
-
+        packages = location_quants.package_id
+        products = location_quants.product_id
         if len(packages) > 1 or len(products) > 1:
             if move_line.package_id:
                 return self._response_for_start_line(
