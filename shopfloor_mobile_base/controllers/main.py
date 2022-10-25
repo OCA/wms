@@ -91,21 +91,13 @@ class ShopfloorMobileAppMixin(object):
         return all_icons
 
     def _get_manifest(self, shopfloor_app):
-        param = (
-            http.request.env["ir.config_parameter"]
-            .sudo()
-            .get_param("web.base.url", "")
-            .rstrip("/")
+        # TODO: icons should come as well from the app model.
+        # The goal is to make them editable/configurable there,
+        # but we are not ready yet.
+        # Hence, let's take only the first step: delegate manifest to the app model.
+        return shopfloor_app._make_app_manifest(
+            icons=self._get_app_icons(shopfloor_app)
         )
-        return {
-            "name": shopfloor_app.name,
-            "short_name": shopfloor_app.short_name,
-            "start_url": param + shopfloor_app.url,
-            "scope": param + shopfloor_app.url,
-            "id": shopfloor_app.url,
-            "display": "fullscreen",
-            "icons": self._get_app_icons(shopfloor_app),
-        }
 
 
 class ShopfloorMobileAppController(http.Controller, ShopfloorMobileAppMixin):
