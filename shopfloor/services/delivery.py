@@ -367,6 +367,10 @@ class Delivery(Component):
                     location=location,
                     message=self.msg_store.product_mixed_package_scan_package(),
                 )
+        # Filter lines to keep only ones from one delivery operation
+        # (we do not want to process lines of another delivery operation)
+        lines = lines._filter_on_picking(picking)
+        # Validate lines (this will validate the delivery if all lines are processed)
         if self._set_lines_done(lines, product_qty):
             return self._response_for_deliver(
                 location=location, message=self.msg_store.transfer_complete(new_picking)
