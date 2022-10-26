@@ -9,26 +9,26 @@ class StockQuant(models.Model):
     _inherit = "stock.quant"
 
     @api.constrains("package_id", "location_id", "lot_id", "product_id")
-    def _check_storage_type(self):
+    def _check_storage_capacities(self):
         """
-        Check if at least one location storage type allows the package storage
-        type into the quant's location
+        Check if at least one storage capacity allows the package type
+        into the quant's location
         """
         for quant in self:
             location = quant.location_id
-            pack_storage_type = quant.package_id.package_type_id
-            loc_storage_types = location.allowed_location_storage_type_ids
-            if not quant.package_id or not pack_storage_type or not loc_storage_types:
+            package_type = quant.package_id.package_type_id
+            storage_capacities = location.computed_storage_category_id.capacity_ids
+            if not quant.package_id or not package_type or not storage_capacities:
                 continue
-            lst_allowed_for_pst = loc_storage_types.filtered(
-                lambda lst: pack_storage_type in lst.package_type_ids
+            allowed_capacities = storage_capacities.filtered(
+                lambda capacity: package_type == capacity.package_type_id
             )
-            if not lst_allowed_for_pst:
+            if not allowed_capacities:
                 raise ValidationError(
                     _(
-                        "Package storage type {storage} is not allowed into "
+                        "Package type {storage} is not allowed into "
                         "Location {location}"
-                    ).format(storage=pack_storage_type.name, location=location.name)
+                    ).format(storage=package_type.name, location=location.name)
                 )
             allowed = False
             package_weight_kg = (
@@ -47,73 +47,75 @@ class StockQuant(models.Model):
             )
             products_in_location = other_quants_in_location.mapped("product_id")
             lots_in_location = other_quants_in_location.mapped("lot_id")
-            lst_fails = []
-            for loc_storage_type in lst_allowed_for_pst:
+            capacity_fails = []
+            for capacity in allowed_capacities:
                 # Check content constraints
-                if loc_storage_type.only_empty and other_quants_in_location:
-                    lst_fails.append(
+                if capacity.allow_new_product == "empty" and other_quants_in_location:
+                    capacity_fails.append(
                         _(
-                            "Location storage type {storage_type} is flagged "
+                            "Storage Capacity {storage_capacity} is flagged "
                             "'only empty'"
                             " with other quants in location."
-                        ).format(storage_type=loc_storage_type.name)
+                        ).format(storage_capacity=capacity.display_name)
                     )
                     continue
-                if loc_storage_type.do_not_mix_products and (
+                if capacity.allow_new_product == "same" and (
                     len(package_products) > 1
                     or len(products_in_location) >= 1
                     and package_products != products_in_location
                 ):
-                    lst_fails.append(
+                    capacity_fails.append(
                         _(
-                            "Location storage type {storage_type} is flagged 'do not mix"
+                            "Storage Capacity {storage_capacity} is flagged 'do not mix"
                             " products' but there are other products in "
                             "location."
-                        ).format(storage_type=loc_storage_type.name)
+                        ).format(storage_capacity=capacity.display_name)
                     )
                     continue
-                if loc_storage_type.do_not_mix_lots and (
+                if capacity.do_not_mix_lots and (
                     len(package_lots) > 1
                     or len(lots_in_location) >= 1
                     and package_lots != lots_in_location
                 ):
-                    lst_fails.append(
+                    capacity_fails.append(
                         _(
-                            "Location storage type {storage_type} is flagged 'do not mix"
+                            "Storage Capacity {storage_capacity} is flagged 'do not mix"
                             " lots' but there are other lots in "
                             "location."
-                        ).format(storage_type=loc_storage_type.name)
+                        ).format(storage_type=capacity.display_name)
                     )
                     continue
                 # Check size constraint
                 if (
-                    loc_storage_type.max_height_in_m
-                    and quant.package_id.height_in_m > loc_storage_type.max_height_in_m
+                    capacity.storage_category_id.max_height_in_m
+                    and quant.package_id.height_in_m
+                    > capacity.storage_category_id.max_height_in_m
                 ):
-                    lst_fails.append(
+                    capacity_fails.append(
                         _(
-                            "Location storage type {storage_type} defines "
+                            "Storage Category {storage_category} defines "
                             "max height of {max_h} but the package is bigger: "
                             "{height}."
                         ).format(
-                            storage_type=loc_storage_type.name,
-                            max_h=loc_storage_type.max_height_in_m,
+                            storage_category=capacity.storage_category_id.display_name,
+                            max_h=capacity.storage_category_id.max_height_in_m,
                             height=quant.package_id.height_in_m,
                         )
                     )
                     continue
                 if (
-                    loc_storage_type.max_weight_in_kg
-                    and package_weight_kg > loc_storage_type.max_weight_in_kg
+                    capacity.storage_category_id.max_weight_in_kg
+                    and package_weight_kg
+                    > capacity.storage_category_id.max_weight_in_kg
                 ):
-                    lst_fails.append(
+                    capacity_fails.append(
                         _(
-                            "Location storage type {storage_type} defines "
+                            "Storage Category {storage_category} defines "
                             "max weight of {max_w} but the package is heavier: "
                             "{weight_kg}."
                         ).format(
-                            storage_type=loc_storage_type.name,
-                            max_w=loc_storage_type.max_weight_in_kg,
+                            storage_category=capacity.storage_category_id.display_name,
+                            max_w=capacity.storage_category_id.max_weight_in_kg,
                             weight_kg=package_weight_kg,
                         )
                     )
@@ -126,13 +128,13 @@ class StockQuant(models.Model):
                 raise ValidationError(
                     _(
                         "Package {package} is not allowed into location {location},"
-                        " because there isn't any location storage type that allows"
-                        " package storage type {type} into it:\n\n{fails}"
+                        " because there isn't any storage capacity that allows"
+                        " package type {type} into it:\n\n{fails}"
                     ).format(
                         package=quant.package_id.name,
                         location=location.complete_name,
-                        type=pack_storage_type.name,
-                        fails="\n".join(lst_fails),
+                        type=package_type.name,
+                        fails="\n".join(capacity_fails),
                     )
                 )
 

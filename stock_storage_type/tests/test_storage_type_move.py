@@ -38,32 +38,28 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         return move_to_assign
 
     def test_not_only_empty_confirmed_move(self):
-        self.pallets_location_storage_type.write({"only_empty": False})
+        self.pallets_location_storage_type.write({"allow_new_product": "mixed"})
         move = self._test_confirmed_move()
         self.assertEqual(
             move.move_line_ids.location_dest_id, self.pallets_bin_1_location
         )
 
     def test_only_empty_confirmed_move(self):
-        self.pallets_location_storage_type.write({"only_empty": True})
+        self.pallets_location_storage_type.write({"allow_new_product": "empty"})
         move = self._test_confirmed_move()
         self.assertNotEqual(
             move.move_line_ids.location_dest_id, self.pallets_bin_1_location
         )
 
     def test_do_not_mix_products_confirmed_move_ok(self):
-        self.pallets_location_storage_type.write(
-            {"only_empty": False, "do_not_mix_products": True}
-        )
+        self.pallets_location_storage_type.write({"allow_new_product": "same"})
         move = self._test_confirmed_move()
         self.assertEqual(
             move.move_line_ids.location_dest_id, self.pallets_bin_1_location
         )
 
     def test_do_not_mix_products_confirmed_move_nok(self):
-        self.pallets_location_storage_type.write(
-            {"only_empty": False, "do_not_mix_products": True}
-        )
+        self.pallets_location_storage_type.write({"allow_new_product": "same"})
         move_other_product = self._test_confirmed_move(
             self.env.ref("product.product_product_10")
         )
@@ -74,7 +70,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
 
     def test_package_level_location_dest_domain_only_empty(self):
         # Set pallets location type as only empty
-        self.pallets_location_storage_type.write({"only_empty": True})
+        self.pallets_location_storage_type.write({"allow_new_product": "empty"})
         # Create picking
         in_picking = self.env["stock.picking"].create(
             {
@@ -138,10 +134,10 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         possible_locations = self.env["stock.location"].search(
             [
                 (
-                    "allowed_location_storage_type_ids",
+                    "computed_storage_category_id.capacity_ids",
                     "in",
                     int_picking.package_level_ids.mapped(
-                        "package_id.package_type_id.location_storage_type_ids"
+                        "package_id.package_type_id.storage_category_capacity_ids"
                     ).ids,
                 ),
                 ("location_id", "child_of", int_picking.location_dest_id.id),
@@ -207,7 +203,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         # to register two times the same lot in different packages
         self.receipts_picking_type.use_existing_lots = True
         self.cardboxes_location_storage_type.write(
-            {"do_not_mix_products": True, "do_not_mix_lots": True}
+            {"allow_new_product": "same", "do_not_mix_lots": True}
         )
         # Create picking
         in_picking = self.env["stock.picking"].create(
@@ -312,9 +308,9 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             possible_locations = self.env["stock.location"].search(
                 [
                     (
-                        "allowed_location_storage_type_ids",
+                        "computed_storage_category_id.capacity_ids",
                         "in",
-                        storage_type.location_storage_type_ids.ids,
+                        storage_type.storage_category_capacity_ids.ids,
                     ),
                     (
                         "location_id",

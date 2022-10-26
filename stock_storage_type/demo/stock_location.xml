@@ -7,10 +7,7 @@
             model="stock.location"
             eval="obj().env.ref('stock.warehouse0').lot_stock_id.id"
         />
-        <field
-            name="location_storage_type_ids"
-            eval="[(6,0,[ref('location_storage_type_cardboxes')])]"
-        />
+        <field name="storage_category_id" ref="storage_category_cardboxes" />
         <field name="pack_putaway_strategy">ordered_locations</field>
     </record>
     <record id="stock_location_cardboxes_bin_1" model="stock.location">
@@ -36,10 +33,7 @@
             model="stock.location"
             eval="obj().env.ref('stock.warehouse0').lot_stock_id.id"
         />
-        <field
-            name="location_storage_type_ids"
-            eval="[(6,0,[ref('location_storage_type_pallets')])]"
-        />
+        <field name="storage_category_id" ref="storage_category_pallets" />
         <field name="pack_putaway_strategy">ordered_locations</field>
     </record>
     <record id="stock_location_pallets_bin_1" model="stock.location">
@@ -65,10 +59,7 @@
             model="stock.location"
             eval="obj().env.ref('stock.warehouse0').lot_stock_id.id"
         />
-        <field
-            name="location_storage_type_ids"
-            eval="[(6,0,[ref('stock_storage_type.location_storage_type_pallets')])]"
-        />
+        <field name="storage_category_id" ref="storage_category_pallets" />
         <field name="pack_putaway_strategy">ordered_locations</field>
     </record>
     <record id="stock_location_pallets_reserve_bin_1" model="stock.location">
@@ -94,10 +85,7 @@
             model="stock.location"
             eval="obj().env.ref('stock.warehouse0').lot_stock_id.id"
         />
-        <field
-            name="location_storage_type_ids"
-            eval="[(6,0,[ref('stock_storage_type.location_storage_type_cardboxes')])]"
-        />
+        <field name="storage_category_id" ref="storage_category_cardboxes" />
         <field name="pack_putaway_strategy">ordered_locations</field>
     </record>
     <record id="stock_location_cardboxes_reserve_bin_1" model="stock.location">

@@ -29,7 +29,7 @@ class StockStorageLocationSequence(models.Model):
         # TODO improve ugly code
         type_matching_locations = self.location_id.get_storage_locations().filtered(
             lambda l: self.package_type_id
-            in l.allowed_location_storage_type_ids.mapped("package_type_ids")
+            in l.computed_storage_category_id.capacity_ids.mapped("package_type_id")
         )
         if type_matching_locations:
             # Get the selection description
@@ -49,29 +49,24 @@ class StockStorageLocationSequence(models.Model):
                 # If last, we want to check if restrictions are defined on
                 # location storage types accepting this package storage type
                 # TODO improve ugly code
-                loc_st = type_matching_locations.mapped(
-                    "allowed_location_storage_type_ids"
+                capacities = type_matching_locations.mapped(
+                    "computed_storage_category_id.capacity_ids"
                 ).filtered(
-                    lambda lst: self.package_type_id in lst.package_type_ids
+                    lambda lst, package_type=self.package_type_id: package_type
+                    == lst.package_type_id
                     and not lst.has_restrictions
                 )
-                if not loc_st:
-                    msg = (
-                        _(
-                            ' * <span style="color: orange;">%s (WARNING: '
-                            "restrictions are active on location storage types "
-                            "matching this package storage type)</span>"
-                        )
-                        % self.location_id.name
-                    )
+                if not capacities:
+                    msg = _(
+                        ' * <span style="color: orange;">{location} (WARNING: '
+                        "restrictions are active on location storage types "
+                        "matching this package storage type)</span>"
+                    ).format(location=self.location_id.name)
         else:
-            msg = (
-                _(
-                    ' * <span style="color: red;">%s '
-                    "(WARNING: no suitable location matching storage type)</span>"
-                )
-                % self.location_id.name
-            )
+            msg = _(
+                ' * <span style="color: red;">{location} '
+                "(WARNING: no suitable location matching storage type)</span>"
+            ).format(location=self.location_id.name)
         return msg
 
     def button_show_locations(self):
