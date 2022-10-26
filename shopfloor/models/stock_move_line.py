@@ -285,3 +285,11 @@ class StockMoveLine(models.Model):
         # triggered, force it
         to_assign_moves.move_line_ids.package_level_id.modified(["move_line_ids"])
         self.package_level_id.modified(["move_line_ids"])
+
+    def _filter_on_picking(self, picking=False):
+        """Filter a bunch of lines on a picking.
+
+        If no picking is provided the first one is taken.
+        """
+        picking = picking or fields.first(self.picking_id)
+        return self.filtered_domain([("picking_id", "=", picking.id)])
