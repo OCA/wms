@@ -28,7 +28,7 @@ class TestSelectDocument(CommonCase):
         self.assert_response(
             response,
             next_state="select_line",
-            data={"picking": self._data_for_picking(picking)},
+            data={"picking": self._data_for_picking_with_line(picking)},
         )
 
     def test_scan_packaging_single_picking(self):

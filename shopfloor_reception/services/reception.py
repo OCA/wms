@@ -69,7 +69,7 @@ class Reception(Component):
 
     def _response_for_select_line(self, picking, message=None):
         picking.user_id = self.env.user
-        data = {"picking": self._data_for_stock_picking(picking)}
+        data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
         return self._response(next_state="select_line", data=data, message=message)
 
     def _select_document_from_product(self, product):
@@ -254,13 +254,19 @@ class Reception(Component):
 
     # DATA METHODS
 
-    def _data_for_stock_picking(self, picking):
+    def _data_for_stock_picking(self, picking, with_lines=False):
         data = self.data.picking(picking)
-        data.update({"move_lines": self._data_for_move_lines(picking.move_line_ids)})
+        if with_lines:
+            data.update(
+                {"move_lines": self._data_for_move_lines(picking.move_line_ids)}
+            )
         return data
 
-    def _data_for_stock_pickings(self, pickings):
-        return [self._data_for_stock_picking(picking) for picking in pickings]
+    def _data_for_stock_pickings(self, pickings, with_lines=False):
+        return [
+            self._data_for_stock_picking(picking, with_lines=with_lines)
+            for picking in pickings
+        ]
 
     def _data_for_move_lines(self, lines, **kw):
         return self.data.move_lines(lines, **kw)
@@ -273,7 +279,7 @@ class Reception(Component):
                 self._domain_stock_picking(),
                 order=self._order_stock_picking(),
             )
-        data = {"pickings": self._data_for_stock_pickings(pickings)}
+        data = {"pickings": self._data_for_stock_pickings(pickings, with_lines=False)}
         return self._response(next_state="select_document", data=data, message=message)
 
     def _response_for_set_lot(self, picking, lines, message=None):
@@ -842,11 +848,11 @@ class ShopfloorReceptionValidatorResponse(Component):
     def _schema_select_document(self):
         return {
             "pickings": self.schemas._schema_list_of(
-                self._schema_stock_picking(), required=True
+                self.schemas.picking(), required=True
             )
         }
 
-    def _schema_stock_picking(self, lines_with_packaging=False):
+    def _schema_stock_picking_with_lines(self, lines_with_packaging=False):
         schema = self.schemas.picking()
         schema.update(
             {
@@ -861,7 +867,7 @@ class ShopfloorReceptionValidatorResponse(Component):
     def _schema_select_line(self):
         return {
             "picking": self.schemas._schema_dict_of(
-                self._schema_stock_picking(), required=True
+                self._schema_stock_picking_with_lines(), required=True
             )
         }
 

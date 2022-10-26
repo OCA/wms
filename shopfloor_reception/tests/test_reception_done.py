@@ -15,7 +15,7 @@ class TestSelectDestPackage(CommonCase):
         self.assert_response(
             response,
             next_state="select_line",
-            data={"picking": self._data_for_picking(picking)},
+            data={"picking": self._data_for_picking_with_line(picking)},
             message={"message_type": "warning", "body": "Are you sure?"},
         )
         response = self.service.dispatch(
@@ -41,7 +41,7 @@ class TestSelectDestPackage(CommonCase):
         self.assert_response(
             response,
             next_state="select_line",
-            data={"picking": self._data_for_picking(picking)},
+            data={"picking": self._data_for_picking_with_line(picking)},
             message={
                 "message_type": "warning",
                 "body": "No quantity has been processed, unable to complete the transfer.",
@@ -60,7 +60,7 @@ class TestSelectDestPackage(CommonCase):
         self.assert_response(
             response,
             next_state="select_line",
-            data={"picking": self._data_for_picking(picking)},
+            data={"picking": self._data_for_picking_with_line(picking)},
             message={
                 "message_type": "warning",
                 "body": (
