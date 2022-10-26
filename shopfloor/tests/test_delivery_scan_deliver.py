@@ -215,6 +215,8 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         )
 
     def test_scan_deliver_scan_product_packaging_ok(self):
+        # Scan a product packaging having the same qty than the qty to ship.
+        # We have 10 qties to ship and we scan a product packaging of 10 qties.
         self.menu.sudo().allow_prepackaged_product = True
         line = self.raw_move.mapped("move_line_ids")
         response = self.service.dispatch(
@@ -224,6 +226,24 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             response, message=self.service.msg_store.transfer_complete(self.picking)
         )
         self.assertEqual(line.qty_done, self.packaging.qty)
+
+    def test_scan_deliver_scan_product_packaging_partial_qty(self):
+        # Scan a product packaging with a smaller qty than the move line
+        # We have 10 qties to ship but we scan a product packaging of 5 qties.
+        # -> Ship 5 (creating a backorder for the 5 remaining)
+        self.menu.sudo().allow_prepackaged_product = True
+        self.packaging.qty = 5
+        line = self.raw_move.mapped("move_line_ids")
+        self.assertEqual(line.move_id.product_qty, 10)
+        response = self.service.dispatch(
+            "scan_deliver", params={"barcode": self.packaging.barcode}
+        )
+        self.assert_response_deliver(
+            response, message=self.service.msg_store.transfer_complete(self.picking)
+        )
+        self.assertEqual(line.qty_done, self.packaging.qty)
+        self.assertEqual(line.move_id.product_qty, self.packaging.qty)
+        self.assertEqual(line.move_id.state, "done")
 
     def test_scan_deliver_picking_done(self):
         # Set qty done for all lines (packages/raw product/lot...), picking is
