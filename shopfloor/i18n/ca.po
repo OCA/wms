@@ -420,6 +420,14 @@ msgid "Lot is not in the current transfer."
 msgstr ""
 
 #. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"Lot {lot} for product {product} found in multiple locations. Scan your "
+"location first."
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/services/delivery.py:0
 #, python-format
 msgid "Lot {} belongs to a picking without a valid state."
@@ -833,6 +841,12 @@ msgstr ""
 #: code:addons/shopfloor/services/delivery.py:0
 #, python-format
 msgid "Product {} belongs to a picking without a valid state."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Product {} found in multiple locations. Scan your location first."
 msgstr ""
 
 #. module: shopfloor
@@ -1351,6 +1365,12 @@ msgid ""
 "When active, what you scan (typically a product packaging EAN) will be ship "
 "'as-is' and the operation will be validated triggering a backorder creation "
 "with the remaining lines."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Working location changed to {}"
 msgstr ""
 
 #. module: shopfloor
