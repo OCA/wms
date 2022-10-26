@@ -7,21 +7,6 @@
         sequence="9"
         groups="stock.group_adv_location"
     />
-
-    <menuitem
-        id="menu_location_storage_type_action"
-        action="location_storage_type_action"
-        name="Location Storage Types"
-        parent="storage_type_menu"
-        sequence="11"
-    />
-    <menuitem
-        id="menu_storage_type_mapping_action"
-        action="location_package_type_rel_action"
-        name="Storage Types Mapping"
-        parent="storage_type_menu"
-        sequence="12"
-    />
     <menuitem
         id="stock_storage_location_sequence_cond_menu"
         action="stock_storage_location_sequence_cond_act_window"
