@@ -276,7 +276,7 @@ const Reception = {
                     "product"
                 ),
                 group_color_maker: function (lines) {
-                    return self.utils.wms.move_lines_completeness(lines) == 100
+                    return picking.completion == 100
                         ? "screen_step_done"
                         : "screen_step_todo";
                 },
