@@ -21,7 +21,7 @@ class StockPackageLevel(models.Model):
     @api.depends(
         "package_id",
         "package_id.package_type_id",
-        "package_id.package_type_id.location_storage_type_ids",
+        "package_id.package_type_id.storage_category_capacity_ids",
         "package_id.package_type_id.storage_location_sequence_ids",
         "package_id.package_type_id.storage_location_sequence_ids.location_id",
         "package_id.package_type_id.storage_location_sequence_ids.location_id.leaf_location_ids",  # noqa

@@ -2,22 +2,11 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo import _, api, fields, models
 
-from odoo.addons.base_m2m_custom_field.fields import Many2manyCustom
-
 
 class StockPackageType(models.Model):
 
     _inherit = "stock.package.type"
 
-    location_storage_type_ids = Many2manyCustom(
-        "stock.location.storage.type",
-        "stock_location_package_type_rel",
-        "package_type_id",
-        "location_storage_type_id",
-        create_table=False,
-        string="Allowed locations storage types",
-        help="Locations storage types that can accept such a package storage type.",
-    )
     product_packaging_ids = fields.One2many("product.packaging", "package_type_id")
     storage_location_sequence_ids = fields.One2many(
         "stock.storage.location.sequence",
@@ -31,12 +20,14 @@ class StockPackageType(models.Model):
         default=False,
     )
     barcode = fields.Char(copy=False)
+    # TODO: Check if this is convenient with the constraint on barcode field
+    # in core module
     active = fields.Boolean(default=True)
 
     @api.depends("storage_location_sequence_ids")
     def _compute_storage_type_message(self):
-        for pst in self:
-            storage_locations = pst.storage_location_sequence_ids
+        for package_type in self:
+            storage_locations = package_type.storage_location_sequence_ids
             if storage_locations:
                 formatted_storage_locations_msgs = []
                 last = False
@@ -58,7 +49,7 @@ class StockPackageType(models.Model):
                     "destination location after the (product or category) "
                     "put-away is applied."
                 ).format(
-                    name=pst.name,
+                    name=package_type.name,
                     message="<br/>".join(formatted_storage_locations_msgs),
                 )
             else:
@@ -66,8 +57,8 @@ class StockPackageType(models.Model):
                     '<span style="color: red;">The "Put-Away sequence" '
                     "must be defined in order to put away packages using "
                     "this package storage type ({storage}).</span>"
-                ).format(storage=pst.name)
-            pst.storage_type_message = msg
+                ).format(storage=package_type.name)
+            package_type.storage_type_message = msg
 
     def action_view_storage_locations(self):
         return {

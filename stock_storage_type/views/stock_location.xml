@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <record id="view_location_form_inherit" model="ir.ui.view">
-        <field name="name">stock.location.form.inherit</field>
+        <field name="name">stock.location.form.inherit (in stock_storage_type)</field>
         <field name="model">stock.location</field>
         <field name="inherit_id" ref="stock.view_location_form" />
         <field name="arch" type="xml">
+            <field name="storage_category_id" position="after">
+                <field name="computed_storage_category_id" readonly="1" />
+            </field>
             <field name="removal_strategy_id" position="after">
                 <field name="pack_putaway_strategy" />
                 <field name="pack_putaway_sequence" />
                 <field
-                    name="allowed_location_storage_type_ids"
+                    name="computed_storage_capacity_ids"
                     widget="many2many_tags"
+                    readonly="1"
                 />
-                <field name="location_storage_type_ids" widget="many2many_tags" />
             </field>
         </field>
     </record>

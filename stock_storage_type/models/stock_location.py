@@ -15,27 +15,17 @@ class StockLocation(models.Model):
 
     _inherit = "stock.location"
 
-    location_storage_type_ids = fields.Many2many(
-        "stock.location.storage.type",
-        "stock_location_location_storage_type_rel",
-        "location_id",
-        "location_storage_type_id",
-        help="Location storage types defined here will be applied on all the "
-        "children locations that do not define their own location "
-        "storage types.",
-    )
-    allowed_location_storage_type_ids = fields.Many2many(
-        "stock.location.storage.type",
-        "stock_location_allowed_location_storage_type_rel",
-        "location_id",
-        "location_storage_type_id",
-        recursive=True,
-        compute="_compute_allowed_location_storage_type_ids",
+    computed_storage_category_id = fields.Many2one(
+        comodel_name="stock.storage.category",
+        string="Computed Storage Category",
+        compute="_compute_computed_storage_category_id",
         store=True,
         recursive=True,
-        help="Locations storage types that this location can accept. (If no "
-        "location storage types are defined on this specific location, "
-        "the location storage types of the parent location are applied).",
+        help="This represents the Storage Category that will be used. It depends either "
+        "on the category set on the location or on one of its parent.",
+    )
+    computed_storage_capacity_ids = fields.One2many(
+        related="computed_storage_category_id.capacity_ids",
     )
     pack_putaway_strategy = fields.Selection(
         selection=[
@@ -67,8 +57,10 @@ class StockLocation(models.Model):
         "and there is no pending incoming products in the location. "
         " Computed only if the location needs to check for emptiness "
         '(has an "only empty" location storage type).',
+        recursive=True,
     )
-
+    # TODO: Maybe renaming these fields as there are already such fields
+    # in core but without domains. Something like 'pending_in_move_ids'
     in_move_ids = fields.One2many(
         "stock.move",
         "location_dest_id",
@@ -124,66 +116,101 @@ class StockLocation(models.Model):
         help="technical field: all the leaves sub-locations",
     )
     max_height = fields.Float(
-        string="Max height (mm)",
-        compute="_compute_max_height",
+        related="computed_storage_category_id.max_height",
         store=True,
-        help="The max height supported among allowed location storage types.",
+        recursive=True,
     )
-    do_not_mix_products = fields.Boolean(
-        compute="_compute_do_not_mix_products",
+    max_height_in_m = fields.Float(
+        related="computed_storage_category_id.max_height_in_m",
         store=True,
+        recursive=True,
+    )
+
+    do_not_mix_products = fields.Boolean(
+        compute="_compute_do_not_mix_products", store=True, recursive=True
     )
     do_not_mix_lots = fields.Boolean(
-        compute="_compute_do_not_mix_lots",
-        store=True,
+        compute="_compute_do_not_mix_lots", store=True, recursive=True
     )
     only_empty = fields.Boolean(
-        compute="_compute_only_empty",
-        store=True,
+        compute="_compute_only_empty", store=True, recursive=True
     )
 
     @api.depends(
         "usage",
-        "allowed_location_storage_type_ids",
-        "allowed_location_storage_type_ids.do_not_mix_products",
-    )
-    def _compute_do_not_mix_products(self):
-        for rec in self:
-            rec.do_not_mix_products = rec.usage == "internal" and any(
-                storage_type.do_not_mix_products
-                for storage_type in rec.allowed_location_storage_type_ids
-            )
-
-    @api.depends(
-        "usage",
-        "allowed_location_storage_type_ids",
-        "allowed_location_storage_type_ids.do_not_mix_lots",
+        "computed_storage_category_id.do_not_mix_lots",
+        "computed_storage_category_id.capacity_ids.do_not_mix_lots",
     )
     def _compute_do_not_mix_lots(self):
+        """
+        This computes the value that says if the location cannot have mixed lots from:
+           - its own Storage Category value
+           - one of its Storage Capacities value
+        """
         for rec in self:
-            rec.do_not_mix_lots = rec.usage == "internal" and any(
-                storage_type.do_not_mix_lots
-                for storage_type in rec.allowed_location_storage_type_ids
+            rec.do_not_mix_lots = rec.usage == "internal" and (
+                any(
+                    storage_type.do_not_mix_lots
+                    for storage_type in rec.computed_storage_category_id.capacity_ids
+                )
+                or rec.computed_storage_category_id.do_not_mix_lots
             )
 
     @api.depends(
         "usage",
-        "allowed_location_storage_type_ids",
-        "allowed_location_storage_type_ids.only_empty",
+        "computed_storage_category_id.allow_new_product",
+        "computed_storage_category_id.capacity_ids.allow_new_product",
     )
     def _compute_only_empty(self):
+        """
+        This computes the value that says if the location cannot have mixed lots from:
+           - its own Storage Category value
+           - one of its Storage Capacities value
+        """
         for rec in self:
-            rec.only_empty = rec.usage == "internal" and any(
-                storage_type.only_empty
-                for storage_type in rec.allowed_location_storage_type_ids
+            rec.only_empty = rec.usage == "internal" and (
+                any(
+                    storage_type.allow_new_product == "empty"
+                    for storage_type in rec.computed_storage_category_id.capacity_ids
+                )
+                or rec.computed_storage_category_id.allow_new_product == "empty"
             )
 
-    max_height_in_m = fields.Float(
-        string="Max height (m)",
-        compute="_compute_max_height",
-        store=True,
-        help="The max height supported among allowed location storage types.",
+    @api.depends(
+        "usage",
+        "computed_storage_category_id.allow_new_product",
+        "computed_storage_category_id.capacity_ids.allow_new_product",
     )
+    def _compute_do_not_mix_products(self):
+        """
+        This computes the value that says if the location cannot have mixed lots from:
+           - its own Storage Category value
+           - one of its Storage Capacities value
+        """
+        for rec in self:
+            rec.do_not_mix_products = rec.usage == "internal" and (
+                any(
+                    storage_type.allow_new_product == "same"
+                    for storage_type in rec.computed_storage_category_id.capacity_ids
+                )
+                or rec.computed_storage_category_id.allow_new_product == "same"
+            )
+
+    @api.depends(
+        "location_id", "storage_category_id", "location_id.computed_storage_category_id"
+    )
+    def _compute_computed_storage_category_id(self):
+        """
+        This computes the Storage Storage depending on:
+          - its own Storage Storage
+          - or one of its parent (along the parent path) Storage Category
+        """
+        for location in self:
+            if location.storage_category_id:
+                location.computed_storage_category_id = location.storage_category_id
+            else:
+                parent = location.location_id
+                location.computed_storage_category_id = parent.storage_category_id
 
     @api.depends("child_ids.leaf_location_ids", "child_ids.active")
     def _compute_leaf_location_ids(self):
@@ -293,36 +320,21 @@ class StockLocation(models.Model):
                 rec.location_is_empty = True
 
     @api.depends(
-        "location_storage_type_ids",
+        "storage_category_id.capacity_ids",
         "location_id",
-        "location_id.allowed_location_storage_type_ids",
+        "location_id.allowed_location_capacity_ids",
     )
-    def _compute_allowed_location_storage_type_ids(self):
+    def _compute_allowed_location_capacity_ids(self):
         for location in self:
-            if location.location_storage_type_ids:
-                location.allowed_location_storage_type_ids = [
-                    (6, 0, location.location_storage_type_ids.ids)
+            if location.storage_category_id.capacity_ids:
+                location.allowed_location_capacity_ids = [
+                    (6, 0, location.storage_category_id.capacity_ids.ids)
                 ]
             else:
                 parent = location.location_id
-                location.allowed_location_storage_type_ids = [
-                    (6, 0, parent.allowed_location_storage_type_ids.ids)
+                location.allowed_location_capacity_ids = [
+                    (6, 0, parent.storage_category_id.capacity_ids.ids)
                 ]
-
-    @api.depends("allowed_location_storage_type_ids.max_height")
-    def _compute_max_height(self):
-        """Get the max height supported by location types, knowing that a max
-        height of 0 means 'no limit', so it's considered as the maximum value.
-        """
-        for location in self:
-            allowed_types = location.allowed_location_storage_type_ids
-            types_with_max_height = allowed_types.filtered(
-                lambda o: bool(o.max_height)
-            ).sorted("max_height", reverse=True)
-            types_without_max_height = allowed_types - types_with_max_height
-            types_sorted = types_without_max_height + types_with_max_height
-            location.max_height = types_sorted[:1].max_height or 0
-            location.max_height_in_m = types_sorted[:1].max_height_in_m or 0
 
     # method provided by "stock_putaway_hook"
     def _putaway_strategy_finalizer(
@@ -486,20 +498,24 @@ class StockLocation(models.Model):
         # There can be multiple location storage types for a given
         # location, so we need to filter on the ones relative to the package
         # we consider.
-        LocStorageType = self.env["stock.location.storage.type"]
-        compatible_location_storage_types = LocStorageType.search(
-            [("location_ids", "in", self.ids)]
+        Capacity = self.env["stock.storage.category.capacity"]
+        compatible_location_storage_types = Capacity.search(
+            [("computed_location_ids", "in", self.ids)]
         )
 
         pertinent_loc_storagetype_domain = [
             ("id", "in", compatible_location_storage_types.ids),
-            ("package_type_ids", "=", package_type.id),
+            ("package_type_id", "=", package_type.id),
         ]
         if quants.package_id.height:
             pertinent_loc_storagetype_domain += [
                 "|",
-                ("max_height_in_m", "=", 0),
-                ("max_height_in_m", ">=", quants.package_id.height_in_m),
+                ("storage_category_id.max_height_in_m", "=", 0),
+                (
+                    "storage_category_id.max_height_in_m",
+                    ">=",
+                    quants.package_id.height_in_m,
+                ),
             ]
         package_weight_kg = (
             quants.package_id.pack_weight_in_kg
@@ -508,8 +524,8 @@ class StockLocation(models.Model):
         if package_weight_kg:
             pertinent_loc_storagetype_domain += [
                 "|",
-                ("max_weight_in_kg", "=", 0),
-                ("max_weight_in_kg", ">=", package_weight_kg),
+                ("storage_category_id.max_weight_in_kg", "=", 0),
+                ("storage_category_id.max_weight_in_kg", ">=", package_weight_kg),
             ]
         _logger.debug(
             "pertinent storage type domain: %s", pertinent_loc_storagetype_domain
@@ -556,7 +572,7 @@ class StockLocation(models.Model):
         # 2. On a location_ST there are some additional restrictions: a -
         # capacity (volume / height / weight) and b - properties (boolean
         # flags: only empty, don't mix lots, don't mix products)
-        LocStorageType = self.env["stock.location.storage.type"]
+        Capacity = self.env["stock.storage.category.capacity"]
         _logger.debug(
             "select allowed location for package storage type %s (q=%s, p=%s)",
             package_type.name,
@@ -568,9 +584,9 @@ class StockLocation(models.Model):
             [
                 ("id", "in", self.ids),
                 (
-                    "allowed_location_storage_type_ids",
+                    "computed_storage_category_id.capacity_ids",
                     "in",
-                    package_type.location_storage_type_ids.ids,
+                    package_type.storage_category_capacity_ids.ids,
                 ),
             ]
         )
@@ -580,7 +596,7 @@ class StockLocation(models.Model):
             )
         )
 
-        pertinent_loc_storage_types = LocStorageType.search(pertinent_loc_s_t_domain)
+        pertinent_loc_storage_types = Capacity.search(pertinent_loc_s_t_domain)
 
         # now loop over the pertinent location storage types (there should be
         # few of them) and check for properties to find suitable locations
