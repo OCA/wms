@@ -110,6 +110,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "partner": {"id": self.customer.id, "name": self.customer.name},
             "carrier": {"id": carrier.id, "name": carrier.name},
             "ship_carrier": None,
+            "completion": 0.0,
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-08-03")
         self.assertDictEqual(data, expected)
@@ -170,6 +171,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
+            "completion": 30.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -192,6 +194,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
+            "completion": 0.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -226,6 +229,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
+            "completion": 0.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -244,6 +248,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
+            "completion": 0.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -263,6 +268,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "location_dest": self._expected_location(move_line.location_dest_id),
             "picking": self.data.picking(move_line.picking_id),
             "priority": "1",
+            "completion": 0.0,
         }
         self.assertDictEqual(data, expected)
 

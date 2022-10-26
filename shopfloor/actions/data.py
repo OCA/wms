@@ -49,6 +49,7 @@ class DataAction(Component):
             "bulk_line_count",
             "total_weight:weight",
             "scheduled_date",
+            "completion",
         ]
 
     @ensure_model("stock.quant.package")
@@ -176,6 +177,7 @@ class DataAction(Component):
                 "move_id:priority",
                 lambda rec, fname: rec.move_id.priority or "",
             ),
+            "completion",
         ]
 
     @ensure_model("stock.package_level")
