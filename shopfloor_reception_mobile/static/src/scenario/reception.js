@@ -62,9 +62,18 @@ const Reception = {
                             <btn-action @click="on_mark_done">Mark as Done</btn-action>
                         </v-col>
                     </v-row>
+                </div>
+            </template>
+            <template v-if="state_is('confirm_done')">
+                <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <cancel-button v-on:cancel="on_cancel"/>
+                            <btn-action action="todo" @click="state.on_confirm">Confirm</btn-action>
+                        </v-col>
+                    </v-row>
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back />
                         </v-col>
                     </v-row>
                 </div>
@@ -119,11 +128,6 @@ const Reception = {
                             <btn-action @click="on_process_without_pack">Process without pack</btn-action>
                         </v-col>
                     </v-row>
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <cancel-button v-on:cancel="on_cancel"/>
-                        </v-col>
-                    </v-row>
                 </div>
             </template>
             <template v-if="state_is('set_destination')">
@@ -131,7 +135,13 @@ const Reception = {
                     :record="state.data"
                     :options="picking_detail_options_for_set_destination()"
                     :card_color="utils.colors.color_for('screen_step_todo')"
-                    :key="make_state_component_key(['reception-product-item-detail-set-destination', state.data.picking.id])"
+                    :key="make_state_component_key(['reception-product-item-detail-set-destination-pack', state.data.picking.id])"
+                />
+                <item-detail-card
+                    :record="state.data"
+                    :card_color="utils.colors.color_for('screen_step_done')"
+                    :options="{key_title: 'selected_move_lines[0].location_dest.barcode'}"
+                    :key="make_state_component_key(['reception-product-item-detail-set-destination-dest-location', state.data.picking.id])"
                 />
             </template>
             <template v-if="state_is('select_dest_package')">
@@ -420,7 +430,6 @@ const Reception = {
                         this.wait_call(
                             this.odoo.call("done_action", {
                                 picking_id: this.state.data.picking.id,
-                                confirmation: true,
                             })
                         );
                     },
@@ -431,6 +440,27 @@ const Reception = {
                         //         package_level_id: this.state.data.id,
                         //     })
                         // );
+                    },
+                },
+                confirm_done: {
+                    display_info: {
+                        title: "Confirm done",
+                    },
+                    events: {
+                        go_back: "on_back",
+                        confirm: "on_confirm",
+                    },
+                    on_confirm: () => {
+                        this.wait_call(
+                            this.odoo.call("done_action", {
+                                picking_id: this.state.data.picking.id,
+                                confirmation: true,
+                            })
+                        );
+                    },
+                    on_back: () => {
+                        this.state_to("select_line");
+                        this.reset_notification();
                     },
                 },
                 set_lot: {
@@ -483,11 +513,12 @@ const Reception = {
                         add_to_existing_pack: "on_add_to_existing_pack",
                         create_new_pack: "on_create_new_pack",
                         process_without_pack: "on_process_without_pack",
+                        qty_edit: "on_qty_edit",
                     },
                     on_qty_edit: (qty) => {
                         this.scan_destination_qty = parseInt(qty, 10);
                     },
-                    on_scan: () => {
+                    on_scan: (barcode) => {
                         this.wait_call(
                             this.odoo.call("set_quantity", {
                                 // TODO: add quantity from qty-picker

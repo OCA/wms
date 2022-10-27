@@ -72,6 +72,11 @@ class Reception(Component):
         data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
         return self._response(next_state="select_line", data=data, message=message)
 
+    def _response_for_confirm_done(self, picking, message=None):
+        picking.user_id = self.env.user
+        data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
+        return self._response(next_state="confirm_done", data=data, message=message)
+
     def _select_document_from_product(self, product):
         """Select the document by product
 
@@ -399,11 +404,11 @@ class Reception(Component):
             if to_backorder:
                 # Not all lines are fully done, ask the user to confirm the
                 # backorder creation
-                return self._response_for_select_line(
+                return self._response_for_confirm_done(
                     picking, message=self.msg_store.transfer_confirm_done()
                 )
             # all lines are done, ask the user to confirm anyway
-            return self._response_for_select_line(
+            return self._response_for_confirm_done(
                 picking, message=self.msg_store.need_confirmation()
             )
         self._handle_backorder(picking)
@@ -800,6 +805,7 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {
             "select_document": self._schema_select_document,
             "select_line": self._schema_select_line,
+            "confirm_done": self._schema_confirm_done,
             "set_lot": self._schema_set_lot,
             "set_quantity": self._schema_set_quantity,
             "set_destination": self._schema_set_destination,
@@ -828,7 +834,7 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {"set_lot", "select_dest_package"}
 
     def _done_next_states(self):
-        return {"select_document", "select_line"}
+        return {"select_document", "select_line", "confirm_done"}
 
     def _set_lot_confirm_action_next_states(self):
         return {"set_lot", "set_quantity"}
@@ -865,6 +871,14 @@ class ShopfloorReceptionValidatorResponse(Component):
 
     @property
     def _schema_select_line(self):
+        return {
+            "picking": self.schemas._schema_dict_of(
+                self._schema_stock_picking_with_lines(), required=True
+            )
+        }
+
+    @property
+    def _schema_confirm_done(self):
         return {
             "picking": self.schemas._schema_dict_of(
                 self._schema_stock_picking_with_lines(), required=True

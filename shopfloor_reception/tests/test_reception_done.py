@@ -14,7 +14,7 @@ class TestSelectDestPackage(CommonCase):
         # User is asked to confirm the action
         self.assert_response(
             response,
-            next_state="select_line",
+            next_state="confirm_done",
             data={"picking": self._data_for_picking_with_line(picking)},
             message={"message_type": "warning", "body": "Are you sure?"},
         )
@@ -59,7 +59,7 @@ class TestSelectDestPackage(CommonCase):
         )
         self.assert_response(
             response,
-            next_state="select_line",
+            next_state="confirm_done",
             data={"picking": self._data_for_picking_with_line(picking)},
             message={
                 "message_type": "warning",
