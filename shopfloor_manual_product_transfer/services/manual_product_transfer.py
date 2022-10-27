@@ -1,6 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo.exceptions import UserError
 from odoo.fields import first
 from odoo.tools import float_compare, float_is_zero
 
@@ -572,6 +573,31 @@ class ManualProductTransfer(Component):
             message=self.msg_store.transfer_done_success(move_lines.picking_id)
         )
 
+    def cancel(self, move_line_ids):
+        """Cancel the move we created in 'confirm_quantity' step.
+
+        Transitions:
+        * start: move has been canceled successfully
+        * scan_destination_location: unable to cancel move (error)
+        """
+        move_lines = self.env["stock.move.line"].browse(move_line_ids).exists()
+        # Get back on the start screen if record IDs do not exist
+        if not move_lines or move_lines.ids != move_line_ids:
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        try:
+            move_lines.move_id._action_cancel()
+        except UserError:
+            return self._response_for_scan_destination_location(
+                move_lines.picking_id,
+                move_lines,
+                message=self.msg_store.transfer_canceled_error(move_lines.picking_id),
+            )
+        else:
+            # We can remove the move and its picking if this one is empty
+            return self._response_for_start(
+                message=self.msg_store.transfer_canceled_success(move_lines.picking_id)
+            )
+
 
 class ShopfloorManualProductTransferValidator(Component):
     """Validators for the Manual Product Transfer endpoints"""
@@ -617,6 +643,15 @@ class ShopfloorManualProductTransferValidator(Component):
                 "schema": {"coerce": to_int, "required": True, "type": "integer"},
             },
             "barcode": {"required": True, "type": "string"},
+        }
+
+    def cancel(self):
+        return {
+            "move_line_ids": {
+                "type": "list",
+                "required": True,
+                "schema": {"coerce": to_int, "required": True, "type": "integer"},
+            },
         }
 
 

@@ -314,7 +314,11 @@ const ManualProductTransfer = {
                         );
                     },
                     on_cancel: () => {
-                        this.state_to("scan_source_location");
+                        this.wait_call(
+                            this.odoo.call("cancel", {
+                                move_line_ids: this.move_line_ids(),
+                            })
+                        );
                     },
                 },
             },

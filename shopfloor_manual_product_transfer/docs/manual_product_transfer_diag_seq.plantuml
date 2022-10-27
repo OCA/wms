@@ -1,7 +1,7 @@
 # Diagram to generate with PlantUML (https://plantuml.com/)
 #
 #   $ sudo apt install plantuml
-#   $ plantuml delivery_diag_seq.plantuml
+#   $ plantuml manual_product_transfer_diag_seq.plantuml
 #
 
 @startuml
@@ -36,6 +36,7 @@ confirm_quantity -> confirm_quantity: **/set_quantity**(location_id, product_id,
 confirm_quantity -> scan_destination_location: **/confirm_quantity**(location_id, product_id, quantity, lot_id=None, barcode=None, confirm=False) \n(create the move and assign it)
 
 == /scan_destination_location ==
-scan_destination_location -> start: **/scan_destination_location**(move_id, barcode) \n(post the move)
+scan_destination_location -> start: **/scan_destination_location**(move_line_ids, barcode) \n(post the move)
+scan_destination_location -> start: **/cancel**(move_line_ids) \n(cancel the move)
 
 @enduml
