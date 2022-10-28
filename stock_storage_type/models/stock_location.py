@@ -31,6 +31,7 @@ class StockLocation(models.Model):
         "location_storage_type_id",
         compute="_compute_allowed_location_storage_type_ids",
         store=True,
+        recursive=True,
         help="Locations storage types that this location can accept. (If no "
         "location storage types are defined on this specific location, "
         "the location storage types of the parent location are applied).",
@@ -112,11 +113,13 @@ class StockLocation(models.Model):
     leaf_location_ids = fields.Many2many(
         "stock.location",
         compute="_compute_leaf_location_ids",
+        recursive=True,
         help="technical field: all the leaves locations",
     )
     leaf_child_location_ids = fields.Many2many(
         "stock.location",
         compute="_compute_leaf_location_ids",
+        recursive=True,
         help="technical field: all the leaves sub-locations",
     )
     max_height = fields.Float(
