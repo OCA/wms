@@ -304,6 +304,24 @@ class ManualProductTransfer(Component):
                 message=self.msg_store.qty_exceeds_initial_qty(),
             )
 
+    def _check_quantity_in_stock(self, location, product, quantity, lot=None):
+        """Check if there is enough quantity of a product in the location."""
+        current_qty = self._get_product_qty(location, product, lot, free=True)
+        initial_qty = self._get_initial_qty(location, product, lot)
+        quantity_lt_current_qty = (
+            float_compare(
+                quantity, current_qty, precision_rounding=product.uom_id.rounding
+            )
+            == -1
+        )
+        quantity_gte_initial_qty = (
+            float_compare(
+                quantity, initial_qty, precision_rounding=product.uom_id.rounding
+            )
+            >= 0
+        )
+        return quantity_lt_current_qty and quantity_gte_initial_qty
+
     def set_quantity(self, location_id, product_id, quantity, lot_id=None):
         """Allows to change the initial quantity to move.
 
@@ -394,7 +412,6 @@ class ManualProductTransfer(Component):
                 lot,
             )
         # Check the input quantity
-        initial_qty = self._get_initial_qty(location, product, lot)
         response = self._check_quantity(location, product, lot, quantity)
         if response:
             return response
@@ -403,14 +420,10 @@ class ManualProductTransfer(Component):
         # Quantity has been confirmed, try to create the move
         # 1. Check there is enough stock in the location to move, otherwise
         #    unreserve existing moves if applicable
-        current_qty = self._get_product_qty(location, product, lot, free=True)
-        initial_qty = self._get_initial_qty(location, product, lot)
         unreserved_moves = self.env["stock.move"].browse()
-        if self.work.menu.allow_unreserve_other_moves and (
-            # FIXME use float_compare
-            current_qty
-            < quantity
-            <= initial_qty
+        if (
+            not self._check_quantity_in_stock(location, product, quantity, lot=lot)
+            and self.work.menu.allow_unreserve_other_moves
         ):
             # If available qty (qty non reserved) < quantity set => Unreserve
             # other moves for this product and location
