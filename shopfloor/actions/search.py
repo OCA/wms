@@ -1,5 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+from odoo.osv import expression
+
 from odoo.addons.component.core import Component
 
 
@@ -28,11 +30,19 @@ class SearchAction(Component):
             return model.browse()
         return model.search([("name", "=", barcode)], limit=1)
 
-    def picking_from_scan(self, barcode):
+    def picking_from_scan(self, barcode, accept_source_document=False):
         model = self.env["stock.picking"]
         if not barcode:
             return model.browse()
-        return model.search([("name", "=", barcode)], limit=1)
+        domain = [("name", "=", barcode)]
+        if accept_source_document:
+            source_document_domain = [
+                "&",
+                ("origin", "=", barcode),
+                ("state", "=", "assigned"),
+            ]
+            domain = expression.OR([domain, source_document_domain])
+        return model.search(domain, limit=1)
 
     def product_from_scan(self, barcode, use_packaging=True):
         model = self.env["product.product"]
