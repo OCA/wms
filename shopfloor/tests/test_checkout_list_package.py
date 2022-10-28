@@ -229,6 +229,52 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
         )
         self._assert_package_set(response)
 
+    def test_set_dest_package_ok_on_partial_qty_done(self):
+        # Partially process line three 3 quantiy out of 10
+        self.move_line3.qty_done = 3
+        response = self.service.dispatch(
+            "set_dest_package",
+            params={
+                "picking_id": self.picking.id,
+                "selected_line_ids": self.selected_lines.ids,
+                "package_id": self.delivery_package.id,
+            },
+        )
+        # self._assert_package_set(response)
+        self.assertRecordValues(
+            self.move_line1 + self.move_line2 + self.move_line3,
+            [
+                {
+                    "result_package_id": self.delivery_package.id,
+                    "shopfloor_checkout_done": True,
+                },
+                {
+                    "result_package_id": self.delivery_package.id,
+                    "shopfloor_checkout_done": True,
+                },
+                # Line 3 has been split
+                {
+                    "result_package_id": self.delivery_package.id,
+                    "shopfloor_checkout_done": True,
+                    "product_uom_qty": 3,
+                    "qty_done": 3,
+                },
+            ],
+        )
+        # Left quantity to do from line 3
+        new_move_line = self.picking.move_line_ids.filtered(
+            lambda line: line.qty_done == 0 and line.product_uom_qty == 7
+        )
+        self.assertTrue(new_move_line)
+        self.assertFalse(new_move_line.shopfloor_checkout_done)
+        self.assert_response(
+            response,
+            # go pack to the screen to select lines to put in packages
+            next_state="select_line",
+            data={"picking": self._stock_picking_data(self.picking)},
+            message=self.msg_store.goods_packed_in(self.delivery_package),
+        )
+
     def test_set_dest_package_error_not_found(self):
         response = self.service.dispatch(
             "set_dest_package",

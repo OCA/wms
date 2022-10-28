@@ -437,7 +437,9 @@ class Checkout(Component):
         )
 
     def _select_lines_from_package(self, picking, selection_lines, package):
-        lines = selection_lines.filtered(lambda l: l.package_id == package)
+        lines = selection_lines.filtered(
+            lambda l: l.package_id == package and not l.shopfloor_checkout_done
+        )
         if not lines:
             return self._response_for_select_line(
                 picking,
@@ -632,7 +634,7 @@ class Checkout(Component):
                 if qty_done > 0:
                     new_line, qty_check = move_line._split_qty_to_be_done(
                         qty_done,
-                        split_partial=True,
+                        split_partial=False,
                         result_package_id=False,
                     )
                     if qty_check == "greater":
@@ -779,6 +781,9 @@ class Checkout(Component):
 
     def _put_lines_in_allowed_package(self, picking, selected_lines, package):
         lines_to_pack = selected_lines.filtered(self._filter_lines_to_pack)
+        for line in lines_to_pack:
+            if line.qty_done < line.product_uom_qty:
+                line._split_partial_quantity_to_be_done(line.qty_done, {})
         lines_to_pack.write(
             {"result_package_id": package.id, "shopfloor_checkout_done": True}
         )
