@@ -30,7 +30,7 @@ class StockPicking(models.Model):
     state_id = fields.Many2one(related="partner_id.state_id", store=True)
     city = fields.Char(related="partner_id.city", store=True)
 
-    @api.depends("move_lines.need_release")
+    @api.depends("move_ids.need_release")
     def _compute_need_release(self):
         data = self.env["stock.move"].read_group(
             [("need_release", "=", True), ("picking_id", "in", self.ids)],
@@ -69,14 +69,14 @@ class StockPicking(models.Model):
         self.ensure_one()
         return self.move_type
 
-    @api.depends("move_lines.ordered_available_to_promise_qty")
+    @api.depends("move_ids.ordered_available_to_promise_qty")
     def _compute_release_ready(self):
         for picking in self:
             if not picking.need_release:
                 picking.release_ready = False
                 picking.release_ready_count = 0
                 continue
-            move_lines = picking.move_lines.filtered(
+            move_lines = picking.move_ids.filtered(
                 lambda move: move.state not in ("cancel", "done")
             )
             if picking._get_shipping_policy() == "one":
@@ -110,12 +110,12 @@ class StockPicking(models.Model):
         pickings = moves.picking_id.filtered("release_ready")
         return [("id", "in", pickings.ids)]
 
-    @api.depends("move_lines.date_priority")
+    @api.depends("move_ids.date_priority")
     def _compute_date_priority(self):
         for picking in self:
             dates = [
                 date_priority
-                for date_priority in picking.move_lines.mapped("date_priority")
+                for date_priority in picking.move_ids.mapped("date_priority")
                 if date_priority
             ]
             picking.date_priority = min(dates) if dates else False
@@ -130,16 +130,17 @@ class StockPicking(models.Model):
             for key, value in self.env.context.items()
             if not key.startswith("default_")
         }
-        self.mapped("move_lines").with_context(context).release_available_to_promise()
+        self.mapped("move_ids").with_context(**context).release_available_to_promise()
 
     def _release_link_backorder(self, origin_picking):
         self.backorder_id = origin_picking
         origin_picking.message_post(
             body=_(
                 "The backorder <a href=# data-oe-model=stock.picking"
-                " data-oe-id=%d>%s</a> has been created."
+                " data-oe-id=%(id)s>%(name)s</a> has been created.",
+                name=self.name,
+                id=self.id,
             )
-            % (self.id, self.name)
         )
 
     def _after_release_update_chain(self):

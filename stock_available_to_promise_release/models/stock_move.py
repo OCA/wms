@@ -138,9 +138,9 @@ class StockMove(models.Model):
     def _compute_previous_promised_qty(self):
         if not self.ids:
             return
-        self.flush()
-        self.env["stock.move.line"].flush(["move_id", "product_qty"])
-        self.env["stock.location"].flush(["parent_path"])
+        self.env.flush_all()
+        self.env["stock.move.line"].flush_model(["move_id", "reserved_qty"])
+        self.env["stock.location"].flush_model(["parent_path"])
         self.previous_promised_qty = 0
         query, params = self._previous_promised_qty_sql()
         self.env.cr.execute(query, params)
@@ -151,7 +151,7 @@ class StockMove(models.Model):
     @api.depends(
         "ordered_available_to_promise_qty",
         "picking_id.move_type",
-        "picking_id.move_lines",
+        "picking_id.move_ids",
         "need_release",
     )
     def _compute_release_ready(self):
@@ -342,7 +342,7 @@ class StockMove(models.Model):
 
         # move the unreleased moves to a backorder
         released_pickings = pulled_moves.picking_id
-        unreleased_moves = released_pickings.move_lines - pulled_moves
+        unreleased_moves = released_pickings.move_ids - pulled_moves
         for unreleased_move in unreleased_moves:
             if unreleased_move.state in ("done", "cancel"):
                 continue
@@ -411,10 +411,11 @@ class StockMove(models.Model):
         # and the move is not assigned.
         new_move._assign_picking()
 
-        return new_move.with_context(context)
+        return new_move.with_context(**context)
 
     def _assign_picking_post_process(self, new=False):
-        super()._assign_picking_post_process(new)
+        res = super()._assign_picking_post_process(new)
         priorities = self.mapped("move_dest_ids.picking_id.priority")
         if priorities:
             self.picking_id.write({"priority": max(priorities)})
+        return res

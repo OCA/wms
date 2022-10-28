@@ -5,7 +5,7 @@ from odoo import fields
 from odoo.tests import common
 
 
-class PromiseReleaseCommonCase(common.SavepointCase):
+class PromiseReleaseCommonCase(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -94,7 +94,7 @@ class PromiseReleaseCommonCase(common.SavepointCase):
                 ]
             )
         pickings = cls._pickings_in_group(group)
-        pickings.mapped("move_lines").write(
+        pickings.mapped("move_ids").write(
             {"date_priority": date or fields.Datetime.now()}
         )
         return pickings
@@ -109,7 +109,7 @@ class PromiseReleaseCommonCase(common.SavepointCase):
         # this method adds the quantity to the current quantity, so remove it
         quantity -= sum(quants.mapped("quantity"))
         cls.env["stock.quant"]._update_available_quantity(product, location, quantity)
-        cls.env["product.product"].invalidate_cache(
+        cls.env["product.product"].invalidate_model(
             fnames=[
                 "qty_available",
                 "virtual_available",
