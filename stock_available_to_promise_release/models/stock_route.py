@@ -4,8 +4,8 @@
 from odoo import fields, models
 
 
-class Route(models.Model):
-    _inherit = "stock.location.route"
+class StockRoute(models.Model):
+    _inherit = "stock.route"
 
     available_to_promise_defer_pull = fields.Boolean(
         string="Release based on Available to Promise",
