@@ -319,10 +319,27 @@ class Reception(Component):
         )
 
     def _response_for_select_dest_package(self, picking, lines, message=None):
+        # NOTE: code taken from the checkout scenario.
+        # Maybe refactor it to avoid repetitions.
+        packages = picking.mapped("move_line_ids.result_package_id").filtered(
+            "packaging_id"
+        )
+        if not packages:
+            return self._response_for_set_quantity(
+                picking,
+                lines,
+                message=self.msg_store.no_valid_package_to_select(),
+            )
+        packages_data = self.data.packages(
+            packages.with_context(picking_id=picking.id).sorted(),
+            picking=picking,
+            with_packaging=True,
+        )
         return self._response(
             next_state="select_dest_package",
             data={
                 "selected_move_lines": self._data_for_move_lines(lines),
+                "packages": packages_data,
                 "picking": self.data.picking(picking),
             },
             message=message,
@@ -921,6 +938,13 @@ class ShopfloorReceptionValidatorResponse(Component):
             "selected_move_lines": {
                 "type": "list",
                 "schema": {"type": "dict", "schema": self.schemas.move_line()},
+            },
+            "packages": {
+                "type": "list",
+                "schema": {
+                    "type": "dict",
+                    "schema": self.schemas.package(with_packaging=True),
+                },
             },
             "picking": {"type": "dict", "schema": self.schemas.picking()},
         }

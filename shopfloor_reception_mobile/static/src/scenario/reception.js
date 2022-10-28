@@ -14,7 +14,7 @@ const Reception = {
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar
-                v-if="state_in(['select_document', 'select_line', 'set_quantity', 'set_destination'])"
+                v-if="state_in(['select_document', 'select_line', 'set_quantity', 'set_destination', 'select_dest_package'])"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
             />
@@ -139,18 +139,24 @@ const Reception = {
                 />
                 <item-detail-card
                     :record="state.data"
-                    :card_color="utils.colors.color_for('screen_step_done')"
+                    :card_color="utils.colors.color_for('screen_step_todo')"
                     :options="{key_title: 'selected_move_lines[0].location_dest.barcode'}"
                     :key="make_state_component_key(['reception-product-item-detail-set-destination-dest-location', state.data.picking.id])"
                 />
             </template>
             <template v-if="state_is('select_dest_package')">
                 <item-detail-card
-                    v-if="picking.note"
+                    v-if="state.data.picking.note"
                     :record="state.data.picking"
                     :options="picking_detail_options_for_select_dest_package()"
                     :card_color="utils.colors.color_for('screen_step_todo')"
                     :key="make_state_component_key(['reception-picking-item-detail', state.data.picking.id])"
+                />
+                <manual-select
+                    :records="state.data.packages"
+                    :options="manual_select_options_for_select_dest_package()"
+                    v-on:select="on_select_dest_package"
+                    :key="make_state_component_key(['reception', 'manual-select-dest-package'])"
                 />
             </template>
         </Screen>
@@ -329,6 +335,16 @@ const Reception = {
                 ],
             };
         },
+        manual_select_options_for_select_dest_package: function () {
+            return {
+                group_title_default: "Packs available",
+                group_color: this.utils.colors.color_for("screen_step_todo"),
+                list_item_component: "list-item",
+                list_item_options: {
+                    fields: [{path: "weight", label: "Weight"}],
+                },
+            };
+        },
         on_search: function (input) {
             this.filtered_pickings = this.state.data.pickings.filter((picking) =>
                 this._apply_search_filter(picking, input.text)
@@ -364,9 +380,12 @@ const Reception = {
         get_line_being_handled: function () {
             return this.state.data.selected_move_lines[0];
         },
+        on_select_dest_package: function (selected) {
+            this.$root.trigger("select_dest_package", selected.name);
+        },
         get_next_line_id_to_handle: function () {
-            // This endpoint in the backend accepts multiple selected line ids.
-            // However, in our case, we only want to deal with one line at a time.
+            // The enpoints in the backend accept multiple selected line ids.
+            // However, in this particular scenario, we only want to deal with one line at a time.
             // For that, we select the first line we find that hasn't been completely dealt with yet.
             const next_unhandled_line = this.state.data.selected_move_lines.find(
                 (line) => line.qty_done < line.quantity
@@ -475,6 +494,8 @@ const Reception = {
                         confirm_action: "on_confirm_action",
                         date_picker_selected: "on_date_picker_selected",
                     },
+                    // NOTE: in these three calls, selected_line_ids will consist of just
+                    // one id (the next one to be handled).
                     on_scan_lot: (barcode) => {
                         this.wait_call(
                             this.odoo.call("set_lot", {
@@ -600,6 +621,18 @@ const Reception = {
                     events: {
                         scan: "on_scan",
                         back: "on_back",
+                        select_dest_package: "on_select_dest_package",
+                    },
+                    on_select_dest_package: (barcode) => {
+                        this.wait_call(
+                            this.odoo.call("select_dest_package", {
+                                picking_id: this.state.data.picking.id,
+                                selected_line_ids: this._get_selected_line_ids(
+                                    this.state.data.selected_move_lines
+                                ),
+                                barcode,
+                            })
+                        );
                     },
                 },
             },
