@@ -14,13 +14,16 @@ class SearchAction(Component):
 
     # TODO: these methods shall be probably replaced by scan anything handlers
 
-    def location_from_scan(self, barcode):
+    def location_from_scan(self, barcode, limit=1):
         model = self.env["stock.location"]
         if not barcode:
             return model.browse()
-        return model.search(
-            ["|", ("barcode", "=", barcode), ("name", "=", barcode)], limit=1
-        )
+        # First search location by barcode
+        res = model.search([("barcode", "=", barcode)], limit=limit)
+        # And only if we have not found through barcode search on the location name
+        if len(res) < limit:
+            res |= model.search([("name", "=", barcode)], limit=(limit - len(res)))
+        return res
 
     def package_from_scan(self, barcode):
         model = self.env["stock.quant.package"]
