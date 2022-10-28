@@ -95,7 +95,7 @@ class StockLocation(models.Model):
         "stock.move.lines in the location",
     )
     location_will_contain_lot_ids = fields.Many2many(
-        "stock.production.lot",
+        "stock.lot",
         store=True,
         compute="_compute_location_will_contain_lot_ids",
         help="technical field: list of stock.production.lots in "
