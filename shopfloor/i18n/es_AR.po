@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2022-06-11 23:05+0000\n"
+"PO-Revision-Date: 2022-10-30 06:44+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.3.2\n"
+"X-Generator: Weblate 4.14.1\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__pick_pack_same_time
@@ -463,6 +463,8 @@ msgid ""
 "Lot {lot} for product {product} found in multiple locations. Scan your "
 "location first."
 msgstr ""
+"El Lote {lot} para el producto {product} no se encontrado en múltiples "
+"ubicaciones. Escanée su ubicación primero."
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/delivery.py:0
@@ -900,6 +902,8 @@ msgstr "Producto {} pertenece a una entrega sin estado válido."
 #, python-format
 msgid "Product {} found in multiple locations. Scan your location first."
 msgstr ""
+"El Producto {} se ha encontrado en múltiples ubicaciones. Escanée su "
+"ubicación primero."
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
@@ -1006,13 +1010,14 @@ msgstr "Se han encontrado varios lotes en %s, escanee mucho."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Several lots found in %s, please scan the lot."
-msgstr ""
+msgstr "Demasiados lotes encontrados en %s, escanée el lote."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Several moves found for different lots, please scan the lot."
 msgstr ""
+"Demasiados movimientos encontrados para diferentes lotes, escanée el lote."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1020,6 +1025,8 @@ msgstr ""
 msgid ""
 "Several moves found on different locations, please scan first the location."
 msgstr ""
+"Demasiados movimientos encontrados en difrentes ubicaciones, escanée la "
+"primer ubicación."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1043,7 +1050,7 @@ msgstr "Se han encontrado varios productos en %s, escanee un producto."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Several products found in %s, please scan the product."
-msgstr ""
+msgstr "Demasiados productos encontrados en %s, escanée el producto."
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
@@ -1453,7 +1460,7 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Working location changed to {}"
-msgstr ""
+msgstr "Ubicación de trabajo cambiada a {}"
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/cluster_picking.py:0
