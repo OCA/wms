@@ -43,9 +43,9 @@ const Reception = {
                 <manual-select
                     class="with-progress-bar"
                     :records="visible_pickings"
-                    :options="manual_select_options()"
+                    :options="manual_select_options_for_select_document()"
                     v-on:select="on_select_document"
-                    :key="make_state_component_key(['reception', 'manual-select'])"
+                    :key="make_state_component_key(['reception', 'manual-select-document'])"
                 />
             </template>
             <template v-if="state_is('select_line')">
@@ -81,7 +81,7 @@ const Reception = {
             <template v-if="state_is('set_lot')">
                 <item-detail-card
                     :record="state.data"
-                    :options="picking_detail_options()"
+                    :options="picking_detail_options_for_set_lot()"
                     :card_color="utils.colors.color_for('screen_step_todo')"
                     :key="make_state_component_key(['reception-product-item-detail-set-lot', state.data.picking.id])"
                 />
@@ -175,7 +175,7 @@ const Reception = {
         },
     },
     methods: {
-        manual_select_options: function () {
+        manual_select_options_for_select_document: function () {
             return {
                 show_title: false,
                 showActions: false,
@@ -211,7 +211,7 @@ const Reception = {
                 ],
             };
         },
-        picking_detail_options: function () {
+        picking_detail_options_for_set_lot: function () {
             return {
                 key_title: "selected_move_lines[0].product.display_name",
                 fields: [
@@ -224,6 +224,7 @@ const Reception = {
                         label: "Product code",
                         action_val_path: "barcode",
                     },
+                    {path: "selected_move_lines[0].package_dest.name", label: "Pack"},
                     {path: "selected_move_lines[0].lot.name", label: "Lot"},
                     {
                         path: "picking.scheduled_date",
@@ -269,6 +270,7 @@ const Reception = {
                     fields: [
                         {path: "product.barcode", label: "Product code"},
                         {path: "product.supplier_code", label: "Vendor code"},
+                        {path: "package_dest.name", label: "Pack"},
                         {
                             path: "qty_done",
                             label: "Received qty",
