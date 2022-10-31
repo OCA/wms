@@ -583,11 +583,12 @@ class Reception(Component):
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids)
         return self._response_for_select_dest_package(picking, selected_lines)
 
-    def process_with_new_pack(self, picking_id, selected_line_ids):
+    def process_with_new_pack(self, picking_id, selected_line_ids, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids)
         new_pack = self.env["stock.quant.package"].create({})
         selected_lines.result_package_id = new_pack
+        selected_lines.qty_done = quantity
         return self._response_for_set_destination(picking, selected_lines)
 
     def process_without_pack(self, picking_id, selected_line_ids):
@@ -758,6 +759,7 @@ class ShopfloorReceptionValidator(Component):
                 "required": True,
                 "schema": {"coerce": to_int, "required": True, "type": "integer"},
             },
+            "quantity": {"type": "float"},
         }
 
     def process_without_pack(self):

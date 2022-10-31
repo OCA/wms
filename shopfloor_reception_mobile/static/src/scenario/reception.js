@@ -580,6 +580,7 @@ const Reception = {
                                 selected_line_ids: this._get_selected_line_ids(
                                     this.state.data.selected_move_lines
                                 ),
+                                quantity: this.scan_destination_qty,
                             })
                         );
                     },
