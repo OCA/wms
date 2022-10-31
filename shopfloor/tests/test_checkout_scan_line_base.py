@@ -5,7 +5,9 @@ from .test_checkout_select_package_base import CheckoutSelectPackageMixin
 
 
 class CheckoutScanLineCaseBase(CheckoutCommonCase, CheckoutSelectPackageMixin):
-    def _test_scan_line_ok(self, barcode, selected_lines, packing_info=""):
+    def _test_scan_line_ok(
+        self, barcode, selected_lines, related_lines=None, packing_info=""
+    ):
         """Test /scan_line with a valid return
 
         :param barcode: the barcode we scan
@@ -15,4 +17,9 @@ class CheckoutScanLineCaseBase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         response = self.service.dispatch(
             "scan_line", params={"picking_id": picking.id, "barcode": barcode}
         )
-        self._assert_selected(response, selected_lines, packing_info=packing_info)
+        self._assert_selected(
+            response,
+            selected_lines,
+            related_lines=related_lines,
+            packing_info=packing_info,
+        )

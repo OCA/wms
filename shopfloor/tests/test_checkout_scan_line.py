@@ -49,12 +49,16 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         # do not put them in a package, we'll pack units here
         self._fill_stock_for_moves(picking.move_lines)
         picking.action_assign()
+        # The product a is scanned, so selected and quantity updated
         line_a = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
-        # we have 2 different products in the picking, we scan the first
-        # one and expect to select the line
-        self._test_scan_line_ok(self.product_a.barcode, line_a)
+        # Because not part of a package other lines are selected also
+        related_lines = picking.move_line_ids - line_a
+        selected_lines = picking.move_line_ids
+        self._test_scan_line_ok(
+            self.product_a.barcode, selected_lines, related_lines=related_lines
+        )
 
     def test_scan_line_product_several_lines_ok(self):
         picking = self._create_picking(
@@ -62,12 +66,16 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         )
         self._fill_stock_for_moves(picking.move_lines)
         picking.action_assign()
+        # The product a is scanned, so selected and quantity updated
         lines_a = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
-        # expect to select all the lines with the scanned product, as long
-        # as they are in the same package
-        self._test_scan_line_ok(self.product_a.barcode, lines_a)
+        # Because not part of a package other lines are selected also
+        related_lines = picking.move_line_ids - lines_a
+        selected_lines = picking.move_line_ids
+        self._test_scan_line_ok(
+            self.product_a.barcode, selected_lines, related_lines=related_lines
+        )
 
     def test_scan_line_product_packaging_ok(self):
         picking = self._create_picking(
@@ -80,7 +88,12 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         )
         # when we scan the packaging of the product, we should select the
         # lines as if the product was scanned
-        self._test_scan_line_ok(self.product_a_packaging.barcode, lines_a)
+        # Because not part of a package other lines are selected also
+        related_lines = picking.move_line_ids - lines_a
+        selected_lines = picking.move_line_ids
+        self._test_scan_line_ok(
+            self.product_a_packaging.barcode, selected_lines, related_lines
+        )
 
     def test_scan_line_product_lot_ok(self):
         picking = self._create_picking(
