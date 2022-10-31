@@ -30,8 +30,8 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
 
     def test_scan_line_product_exist_in_two_lines(self):
         """Check scanning a product only increment the quantity done on one line."""
-        # Only the line for the product A should be selected
-        selected_lines = self.picking.move_line_ids[0:2]
+        # All lines are selected because not in a package
+        selected_lines = self.picking.move_line_ids
         response = self.service.dispatch(
             "scan_line",
             params={
@@ -42,7 +42,7 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
         self._assert_selected_qties(
             response,
             selected_lines,
-            {selected_lines[0]: 1, selected_lines[1]: 0},
+            {selected_lines[0]: 1, selected_lines[1]: 0, selected_lines[2]: 0},
         )
 
     def test_scan_line_product_no_prefill_ok(self):

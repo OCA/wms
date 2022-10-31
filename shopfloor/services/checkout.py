@@ -363,7 +363,7 @@ class Checkout(Component):
             return self._response_for_manual_selection(message=message)
         return self._select_picking(picking, "manual_selection")
 
-    def _select_lines(self, lines, prefill_qty=0):
+    def _select_lines(self, lines, prefill_qty=0, related_lines=None):
         for i, line in enumerate(lines):
             if line.shopfloor_checkout_done:
                 continue
@@ -377,6 +377,9 @@ class Checkout(Component):
         picking = lines.mapped("picking_id")
         other_lines = picking.move_line_ids - lines
         self._deselect_lines(other_lines)
+        if related_lines:
+            lines += related_lines
+        return lines
 
     def _deselect_lines(self, lines):
         lines.filtered(lambda l: not l.shopfloor_checkout_done).write(
@@ -419,13 +422,13 @@ class Checkout(Component):
 
         product = search.product_from_scan(barcode)
         if product:
-            return self._select_lines_from_product(picking, selection_lines, product)
+            return self._select_lines_from_product(picking, selection_lines, product, 1)
 
         if not product:
             packaging = search.packaging_from_scan(barcode)
             if packaging:
-                return self._select_lines_from_packaging(
-                    picking, selection_lines, packaging
+                return self._select_lines_from_product(
+                    picking, selection_lines, packaging.product_id, packaging.qty
                 )
 
         lot = search.lot_from_scan(barcode, products=picking.move_lines.product_id)
@@ -455,7 +458,9 @@ class Checkout(Component):
             lines = picking.move_line_ids
         return self._response_for_select_package(picking, lines)
 
-    def _select_lines_from_product(self, picking, selection_lines, product):
+    def _select_lines_from_product(
+        self, picking, selection_lines, product, prefill_qty
+    ):
         if product.tracking in ("lot", "serial"):
             return self._response_for_select_line(
                 picking, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
@@ -472,6 +477,7 @@ class Checkout(Component):
         # If the product is only in one package though, scanning the product selects
         # the package.
         packages = lines.mapped("package_id")
+        related_lines = self.env["stock.move.line"].browse()
         # Do not use mapped here: we want to see if we have more than one package,
         # but also if we have one product as a package and the same product as
         # a unit in another line. In both cases, we want the user to scan the
@@ -484,42 +490,17 @@ class Checkout(Component):
             # Select all the lines of the package when we scan a product in a
             # package and we have only one.
             return self._select_lines_from_package(picking, selection_lines, packages)
-
-        self._select_lines(lines, prefill_qty=1)
-        return self._response_for_select_package(picking, lines)
-
-    def _select_lines_from_packaging(self, picking, selection_lines, packaging):
-        product = packaging.product_id
-        if product.tracking in ("lot", "serial"):
-            return self._response_for_select_line(
-                picking, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
+        else:
+            # There is no package on selected lines, so also select all other lines
+            # not in a package. But only the quantity on first selected lines
+            # are updated.
+            related_lines = selection_lines.filtered(
+                lambda l: not l.package_id and l.product_id != product
             )
 
-        lines = selection_lines.filtered(lambda l: l.product_id == product)
-        if not lines:
-            return self._response_for_select_line(
-                picking, message=self.msg_store.product_not_found_in_current_picking()
-            )
-
-        # When products are as units outside of packages, we can select them for
-        # packing, but if they are in a package, we want the user to scan the packages.
-        # If the product is only in one package though, scanning the product selects
-        # the package.
-        packages = lines.mapped("package_id")
-        # Do not use mapped here: we want to see if we have more than one package,
-        # but also if we have one product as a package and the same product as
-        # a unit in another line. In both cases, we want the user to scan the
-        # package.
-        if packages and len({line.package_id for line in lines}) > 1:
-            return self._response_for_select_line(
-                picking, message=self.msg_store.product_multiple_packages_scan_package()
-            )
-        elif packages:
-            # Select all the lines of the package when we scan a product in a
-            # package and we have only one.
-            return self._select_lines_from_package(picking, selection_lines, packages)
-
-        self._select_lines(lines, prefill_qty=packaging.qty)
+        lines = self._select_lines(
+            lines, prefill_qty=prefill_qty, related_lines=related_lines
+        )
         return self._response_for_select_package(picking, lines)
 
     def _select_lines_from_lot(self, picking, selection_lines, lot):
