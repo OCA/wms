@@ -333,6 +333,16 @@ class MessageAction(Component):
             ),
         }
 
+    def source_document_multiple_pickings_scan_package(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                _(
+                    "This source document is part of multiple pickings, please scan a package."
+                )
+            ),
+        }
+
     def product_mixed_package_scan_package(self):
         return {
             "message_type": "warning",
