@@ -322,6 +322,38 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             message=self.service.msg_store.transfer_complete(self.picking),
         )
 
+    def test_scan_deliver_scan_package_tracking_ok(self):
+        """Check scanning a carrier tracking reference deliver the lines.
+
+        The tracking reference is located on the previous transfer in the chain (checkout)
+
+        """
+        tracker = "carrier-ref-123"
+        # Lets create the related checkout picking which contains the tracking_ref
+        picking_original = self.picking.copy(
+            {
+                "location_id": self.env.ref("stock.location_pack_zone").id,
+                "location_dest_id": self.env.ref("stock.stock_location_output").id,
+                "picking_type_id": self.env.ref(
+                    "shopfloor.picking_type_checkout_demo"
+                ).id,
+            }
+        )
+        picking_original.carrier_tracking_ref = tracker
+        # Link our current delivery picking to the checkout picking
+        self.picking.move_lines.write(
+            {"move_orig_ids": [(6, 0, picking_original.move_lines.ids)]}
+        )
+        response = self.service.dispatch(
+            "scan_deliver",
+            params={"barcode": tracker, "picking_id": self.picking.id},
+        )
+        self.assertEqual(self.picking.state, "done")
+        self.assert_response_deliver(
+            response,
+            message=self.service.msg_store.transfer_complete(self.picking),
+        )
+
 
 class DeliveryScanDeliverSpecialCase(DeliveryCommonCase):
     """Special cases with different setup for /scan_deliver"""

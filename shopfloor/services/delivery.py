@@ -84,8 +84,9 @@ class Delivery(Component):
             message=message,
         )
 
+    # flake8: noqa: C901
     def scan_deliver(self, barcode, picking_id=None, location_id=None):
-        """Scan a stock picking, a package/product/lot or a stock location
+        """Scan a picking, a package/product/lot, a location or a carrier tracking ref
 
         When a stock picking is scanned and is partially or fully available, it
         is returned to show its lines.
@@ -185,10 +186,32 @@ class Delivery(Component):
                 message = self.msg_store.location_src_set_to_sublocation(sublocation)
                 return self._response_for_deliver(location=sublocation, message=message)
 
+        if not barcode_valid:
+            response = self._deliver_carrier_tracking_ref(picking, barcode)
+            if response:
+                return response
+
         message = self.msg_store.barcode_not_found() if not barcode_valid else None
         return self._response_for_deliver(
             picking=picking, location=location, message=message
         )
+
+    def _deliver_carrier_tracking_ref(self, picking, barcode):
+        """Deliver lines related to a carrier tracking reference scanned."""
+        if not picking:
+            return None
+        moves = picking.move_lines.filtered(
+            lambda line: barcode
+            in line.move_orig_ids.picking_id.mapped("carrier_tracking_ref")
+        )
+        lines = moves.move_line_ids
+        if not lines:
+            return None
+        if self._set_lines_done(lines):
+            return self._response_for_deliver(
+                message=self.msg_store.transfer_complete(picking)
+            )
+        return self._response_for_deliver(picking)
 
     def _set_lines_done(self, lines, product_qty=None):
         """Set done quantities on `lines`.
