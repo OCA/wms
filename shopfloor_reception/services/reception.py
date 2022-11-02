@@ -14,6 +14,24 @@ class Reception(Component):
     [here](../docs/reception_sequence_graph.png)
     Keep [the sequence diagram](../docs/reception_sequence_graph.mermaid)
     up-to-date if you change endpoints.
+
+    Process a picking and track progress by product.
+
+    Once a transfer is opened, you first need to select a product (you can scan its
+    barcode or one of its packaging barcode). Then set the processed quantity.
+    Put it in a internal PACK (this is optional but can be made mandatory by menu
+    configuration), this PACK can be a new one (like an empty pallet) or an existing
+    one you add products to (like a pallet you continue to fill in).
+    And finally, the location where you put the product (iow. the location where
+    is the transport trolley or pallet), unless you fill an existing PACK as its
+    location was already defined when its first product was put on it.
+
+    In case of product tracked by lot, you will have to enter the lot number and its
+    expiry date (unless it is already known by the system).
+
+    Moves are not validated as they are processed. It is the responsibility of the
+    user to decide when to mark as done already processed lines.
+    Any remaining lines will be pushed to a backorder.
     """
 
     _inherit = "base.shopfloor.process"
@@ -156,7 +174,7 @@ class Reception(Component):
     def _order_stock_picking(self):
         return "scheduled_date ASC"
 
-    def _scan_document__scan_picking(self, barcode):
+    def _scan_document__by_picking(self, barcode):
         search = self._actions_for("search")
         picking = search.picking_from_scan(barcode, True)
         if picking:
@@ -169,31 +187,31 @@ class Reception(Component):
                 )
             return self._select_picking(picking)
 
-    def _scan_document__scan_product(self, barcode):
+    def _scan_document__by_product(self, barcode):
         search = self._actions_for("search")
         product = search.product_from_scan(barcode, use_packaging=False)
         if product:
             return self._select_document_from_product(product)
 
-    def _scan_document__scan_packaging(self, barcode):
+    def _scan_document__by_packaging(self, barcode):
         search = self._actions_for("search")
         packaging = search.packaging_from_scan(barcode)
         if packaging:
             return self._select_document_from_packaging(packaging)
 
-    def _scan_line__scan_product(self, picking, barcode):
+    def _scan_line__by_product(self, picking, barcode):
         search = self._actions_for("search")
         product = search.product_from_scan(barcode, use_packaging=False)
         if product:
             return self._select_line_from_product(picking, product)
 
-    def _scan_line__scan_packaging(self, picking, barcode):
+    def _scan_line__by_packaging(self, picking, barcode):
         search = self._actions_for("search")
         packaging = search.packaging_from_scan(barcode)
         if packaging:
             return self._select_line_from_packaging(picking, packaging)
 
-    def _set_quantity__scan_product(self, picking, selected_lines, barcode):
+    def _set_quantity__by_product(self, picking, selected_lines, barcode):
         # needed values:
         # selected_lines
         # picking
@@ -203,14 +221,14 @@ class Reception(Component):
             selected_lines.qty_done += 1
             return self._response_for_set_quantity(picking, selected_lines)
 
-    def _set_quantity__scan_packaging(self, picking, selected_lines, barcode):
+    def _set_quantity__by_packaging(self, picking, selected_lines, barcode):
         search = self._actions_for("search")
         packaging = search.packaging_from_scan(barcode)
         if packaging:
             selected_lines.qty_done += packaging.qty
             return self._response_for_set_quantity(picking, selected_lines)
 
-    def _set_quantity__scan_package(self, picking, selected_lines, barcode):
+    def _set_quantity__by_package(self, picking, selected_lines, barcode):
         search = self._actions_for("search")
         package = search.package_from_scan(barcode)
         if package:
@@ -239,7 +257,7 @@ class Reception(Component):
             selected_lines.result_package_id = package
             return self._response_for_set_destination(picking, selected_lines)
 
-    def _set_quantity__scan_location(self, picking, selected_lines, barcode):
+    def _set_quantity__by_location(self, picking, selected_lines, barcode):
         search = self._actions_for("search")
         location = search.location_from_scan(barcode)
         if location:
@@ -374,9 +392,9 @@ class Reception(Component):
         """
         self._actions_for("search")
         handlers = [
-            self._scan_document__scan_picking,
-            self._scan_document__scan_product,
-            self._scan_document__scan_packaging,
+            self._scan_document__by_picking,
+            self._scan_document__by_product,
+            self._scan_document__by_packaging,
         ]
         response = self._use_handlers(handlers, barcode)
         if response:
@@ -401,12 +419,9 @@ class Reception(Component):
         message = self._check_picking_status(picking)
         if message:
             return self._response_for_select_line(picking, message=message)
-        message = self._check_picking_status(picking)
-        if message:
-            return self._response_for_select_line(picking, message=message)
         handlers = [
-            self._scan_line__scan_product,
-            self._scan_line__scan_packaging,
+            self._scan_line__by_product,
+            self._scan_line__by_packaging,
         ]
         response = self._use_handlers(handlers, picking, barcode)
         if response:
@@ -473,33 +488,27 @@ class Reception(Component):
         if not selected_lines.exists():
             message = self.msg_store.record_not_found()
             return self._response_for_set_lot(picking, selected_lines, message=message)
-        lot_model = self.env["stock.production.lot"]
         search = self._actions_for("search")
-        # TODO: Are we sure lot_name and expiry_date are mutually exclusive?
+        # We are assured that all selected lines are related to the same product.
+        # See `_select_line_from_packaging` and `_select_line_from_product`.
         if lot_name:
-            for line in selected_lines:
-                lot = search.lot_from_scan(
-                    lot_name, products=selected_lines.mapped("product_id")
+            product = selected_lines.mapped("product_id")
+            lot = search.lot_from_scan(lot_name, products=product)
+            if not lot:
+                lot = self.env["stock.production.lot"].create(
+                    {
+                        "name": lot_name,
+                        "product_id": product.id,
+                        "company_id": self.env.company.id,
+                        "use_expiration_date": product.use_expiration_date,
+                    }
                 )
-                if not lot:
-                    # TODO: We should collect all the values to create
-                    # and create with a list instead.
-                    # We could then map the lot to the line using the line id.
-                    lot = lot_model.create(
-                        {
-                            "name": lot_name,
-                            "product_id": line.product_id.id,
-                            "company_id": self.env.company.id,
-                            "use_expiration_date": line.product_id.use_expiration_date,
-                        }
-                    )
-                line.lot_id = lot.id
+            selected_lines.lot_id = lot.id
+            for line in selected_lines:
                 line._onchange_lot_id()
-            return self._response_for_set_lot(picking, selected_lines)
         elif expiration_date:
             selected_lines.write({"expiration_date": expiration_date})
             selected_lines.mapped("lot_id").write({"expiration_date": expiration_date})
-            return self._response_for_set_lot(picking, selected_lines)
         return self._response_for_set_lot(picking, selected_lines)
 
     def set_lot_confirm_action(self, picking_id, selected_line_ids):
@@ -558,10 +567,10 @@ class Reception(Component):
             return self._response_for_set_quantity(picking, selected_lines)
         if barcode:
             handlers = [
-                self._set_quantity__scan_product,
-                self._set_quantity__scan_packaging,
-                self._set_quantity__scan_package,
-                self._set_quantity__scan_location,
+                self._set_quantity__by_product,
+                self._set_quantity__by_packaging,
+                self._set_quantity__by_package,
+                self._set_quantity__by_location,
             ]
             response = self._use_handlers(handlers, picking, selected_lines, barcode)
             if response:
