@@ -132,12 +132,33 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         else:
             self.assert_response_deliver(response, picking=picking)
 
-    def test_scan_deliver_scan_package_ok(self):
+    def test_scan_deliver_scan_package(self):
         move_lines = self.pack1_moves.mapped("move_line_ids")
         package = move_lines.mapped("package_id")
         self.assertEqual(self.picking.state, "assigned")
         self._test_scan_set_done_ok(move_lines, package.name)
         self.assertEqual(self.picking.state, "assigned")
+
+    def test_scan_deliver_scan_package_with_prepackaged_product(self):
+        """Check scanning a package process it entirely.
+
+        "Process as pre-packaged product" option is enabled to create a backorder.
+        """
+        self.menu.sudo().allow_prepackaged_product = True
+        move_lines = self.pack1_moves.mapped("move_line_ids")
+        package = move_lines.mapped("package_id")
+        self.assertEqual(self.picking.state, "assigned")
+        response = self.service.dispatch(
+            "scan_deliver", params={"barcode": package.name}
+        )
+        self.assert_response_deliver(
+            response, message=self.service.msg_store.transfer_complete(self.picking)
+        )
+        for line in move_lines:
+            self.assertEqual(line.move_id.product_uom_qty, line.move_id.quantity_done)
+            self.assertEqual(line.move_id.state, "done")
+        self.assertEqual(self.picking.state, "done")
+        self.assertTrue(self.picking.backorder_ids)
 
     def test_scan_deliver_scan_package_no_move_lines(self):
         response = self.service.dispatch(
@@ -260,10 +281,43 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             message=self.service.msg_store.product_not_found_in_pickings(),
         )
 
-    def test_scan_deliver_scan_lot_ok(self):
-        move_lines = self.raw_lot_move.move_line_ids
-        lot = move_lines.lot_id
-        self._test_scan_set_done_ok(move_lines, lot.name)
+    def test_scan_deliver_scan_lot(self):
+        """Check scanning a lot process only one piece/unit of this lot."""
+        line = self.raw_lot_move.move_line_ids
+        lot = line.lot_id
+        response = self.service.dispatch("scan_deliver", params={"barcode": lot.name})
+        self.assert_response_deliver(
+            response,
+            picking=self.picking,
+        )
+        self.assertEqual(line.qty_done, 1)
+        self.assertEqual(line.state, "assigned")
+        for _ in range(int(line.product_uom_qty) - 1):
+            self.service.dispatch(
+                "scan_deliver",
+                params={
+                    "barcode": lot.name,
+                    "picking_id": self.picking.id,
+                },
+            )
+        self.assertEqual(line.qty_done, self.raw_lot_move.product_uom_qty)
+
+    def test_scan_deliver_scan_lot_with_prepackaged_product(self):
+        """Check scanning a lot process only one piece/unit of this lot.
+
+        "Process as pre-packaged product" option is enabled to create a backorder.
+        """
+        self.menu.sudo().allow_prepackaged_product = True
+        line = self.raw_lot_move.move_line_ids
+        lot = line.lot_id
+        response = self.service.dispatch("scan_deliver", params={"barcode": lot.name})
+        self.assert_response_deliver(
+            response, message=self.service.msg_store.transfer_complete(self.picking)
+        )
+        self.assertEqual(line.qty_done, 1)
+        self.assertEqual(line.move_id.state, "done")
+        self.assertEqual(self.picking.state, "done")
+        self.assertTrue(self.picking.backorder_ids)
 
     def test_scan_deliver_scan_lot_not_found(self):
         response = self.service.dispatch("scan_deliver", params={"barcode": "FREE_LOT"})
@@ -282,11 +336,26 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             message=self.service.msg_store.lot_mixed_package_scan_package(),
         )
 
-    def test_scan_deliver_scan_product_packaging_ok(self):
+    def test_scan_deliver_scan_product_packaging(self):
+        """Check scanning a product packaging use the packaging quantity.
+
+        Quantity on the line is the packaging quantity
+        """
+        # Scan a product packaging having the same qty than the qty to ship.
+        # We have 10 qties to ship and we scan a product packaging of 10 qties.
+        line = self.raw_move.mapped("move_line_ids")
+        response = self.service.dispatch(
+            "scan_deliver", params={"barcode": self.packaging.barcode}
+        )
+        self.assert_response_deliver(response, picking=self.picking)
+        self.assertEqual(line.qty_done, self.packaging.qty)
+
+    def test_scan_deliver_scan_product_packaging_with_prepackaged_product(self):
         """Check scanning a product packaging use the packaging quantity.
 
         Quantity on the line is the packaging quantity
 
+        "Process as pre-packaged product" option is enabled to create a backorder.
         """
         # Scan a product packaging having the same qty than the qty to ship.
         # We have 10 qties to ship and we scan a product packaging of 10 qties.
@@ -296,17 +365,42 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             "scan_deliver", params={"barcode": self.packaging.barcode}
         )
         self.assert_response_deliver(
-            # Disabled the for on the action done.
-            # response, message=self.service.msg_store.transfer_complete(self.picking)
-            response,
-            picking=self.picking,
+            response, message=self.service.msg_store.transfer_complete(self.picking)
         )
         self.assertEqual(line.qty_done, self.packaging.qty)
 
     def test_scan_deliver_scan_product_packaging_partial_qty(self):
         # Scan a product packaging with a smaller qty than the move line
         # We have 10 qties to ship but we scan a product packaging of 5 qties.
+        # -> Processed 5 over 10 qties
+        # Then we scan a second time the product packaging all qties will be processed
+        # -> Processed 10/10
+        self.packaging.qty = 5
+        line = self.raw_move.mapped("move_line_ids")
+        self.assertEqual(line.move_id.product_qty, 10)
+        response = self.service.dispatch(
+            "scan_deliver", params={"barcode": self.packaging.barcode}
+        )
+        self.assert_response_deliver(response, picking=self.picking)
+        self.assertEqual(line.qty_done, self.packaging.qty)
+        self.assertTrue(line.move_id.product_qty > self.packaging.qty)
+        # Process the remaining qties, still by scanning the packaging
+        response = self.service.dispatch(
+            "scan_deliver", params={"barcode": self.packaging.barcode}
+        )
+        self.assert_response_deliver(response, picking=self.picking)
+        self.assertEqual(line.move_id.product_qty, line.move_id.quantity_done)
+        self.assertEqual(line.move_id.state, "assigned")
+
+    def test_scan_deliver_scan_product_packaging_partial_qty_with_prepackaged_product(
+        self,
+    ):
+        # Scan a product packaging with a smaller qty than the move line
+        # while the "Process pre-packaged product" option is enabled.
+        # We have 10 qties to ship but we scan a product packaging of 5 qties.
         # -> Ship 5 (creating a backorder for the 5 remaining)
+        # Then we scan a second time the product packaging to process the backorder
+        # -> Ship 5 (again)
         self.menu.sudo().allow_prepackaged_product = True
         self.packaging.qty = 5
         line = self.raw_move.mapped("move_line_ids")
@@ -315,11 +409,27 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             "scan_deliver", params={"barcode": self.packaging.barcode}
         )
         self.assert_response_deliver(
-            response, message=self.service.msg_store.transfer_complete(self.picking)
+            response,
+            message=self.service.msg_store.transfer_complete(self.picking),
         )
         self.assertEqual(line.qty_done, self.packaging.qty)
         self.assertEqual(line.move_id.product_qty, self.packaging.qty)
         self.assertEqual(line.move_id.state, "done")
+        self.assertTrue(self.picking.backorder_ids)
+        # Process the backorder
+        backorder = self.picking.backorder_ids
+        backorder_raw_move = backorder.move_lines.filtered_domain(
+            [("product_id", "=", self.product_d.id)]
+        )
+        backorder_line = backorder_raw_move.move_line_ids
+        response = self.service.dispatch(
+            "scan_deliver", params={"barcode": self.packaging.barcode}
+        )
+        self.assert_response_deliver(
+            response, message=self.service.msg_store.transfer_complete(backorder)
+        )
+        self.assertEqual(backorder_line.move_id.product_qty, self.packaging.qty)
+        self.assertEqual(backorder_line.move_id.state, "done")
 
     def test_scan_deliver_scan_product_alone_in_package_qty_one(self):
         """Check scanning a product alone in a package with a quantity of one."""
@@ -358,6 +468,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         )
         self.assertEqual(self.picking.state, "assigned")
 
+        # When a product is scanned, we process only one unit of it
         for _ in range(int(self.raw_move.product_uom_qty)):
             self.service.dispatch(
                 "scan_deliver",
@@ -368,11 +479,13 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             )
         self.assertEqual(self.picking.state, "assigned")
 
+        # When a lot is scanned, we process only one unit of it
         lot = self.raw_lot_move.move_line_ids.lot_id
-        response = self.service.dispatch(
-            "scan_deliver",
-            params={"barcode": lot.name, "picking_id": self.picking.id},
-        )
+        for _ in range(int(self.raw_lot_move.product_uom_qty)):
+            response = self.service.dispatch(
+                "scan_deliver",
+                params={"barcode": lot.name, "picking_id": self.picking.id},
+            )
         self.assertEqual(self.picking.state, "assigned")
         packages_f = self.pack3_move.move_line_ids.mapped("package_id")
         # While all lines are not processed, response still returns the picking
