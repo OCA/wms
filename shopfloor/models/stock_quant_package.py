@@ -92,7 +92,3 @@ class StockQuantPackage(models.Model):
             "package_id": quant.package_id.id,
             "owner_id": quant.owner_id.id,
         }
-
-    def has_one_product(self):
-        self.ensure_one()
-        return len(self.quant_ids.product_id) == 1
