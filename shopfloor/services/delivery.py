@@ -126,7 +126,6 @@ class Delivery(Component):
         * deliver: always return here with the data for the last touched
         picking or no picking if the picking has been set to done
         """
-        allow_prepackaged_product = self.work.menu.allow_prepackaged_product
         location = (
             self.env["stock.location"].browse(location_id) if location_id else None
         )
@@ -151,20 +150,13 @@ class Delivery(Component):
                 return self._deliver_package(picking, package, location)
 
         if not barcode_valid:
-            product = search.product_from_scan(
-                barcode, use_packaging=(not allow_prepackaged_product)
-            )
+            product = search.product_from_scan(barcode, use_packaging=False)
             if product:
                 return self._deliver_product(
                     picking, product, product_qty=1, location=location
                 )
 
         if not barcode_valid:
-            lot = search.lot_from_scan(barcode)
-            if lot:
-                return self._deliver_lot(picking, lot, location)
-
-        if not barcode_valid and allow_prepackaged_product:
             packaging = search.packaging_from_scan(barcode)
             if packaging:
                 # By scanning a packaging, we want to process
@@ -178,6 +170,11 @@ class Delivery(Component):
                     product_qty=packaging_qty,
                     location=location,
                 )
+
+        if not barcode_valid:
+            lot = search.lot_from_scan(barcode)
+            if lot:
+                return self._deliver_lot(picking, lot, product_qty=1, location=location)
 
         if not barcode_valid:
             sublocation = search.location_from_scan(barcode)
@@ -199,20 +196,23 @@ class Delivery(Component):
         validated automatically.
         Return `True` if the related picking has been validated.
         """
-        if product_qty:
+        allow_prepackaged_product = self.work.menu.allow_prepackaged_product
+        if product_qty:  # defined with lot/product/packaging scan
             # With a product_qty we process only one move line,
             # so one move to deal with regarding the qty
             qty_done = lines.move_id.product_id.uom_id._compute_quantity(
                 product_qty, lines.move_id.product_uom
             )
             lines.qty_done += qty_done
-            return self._action_picking_done(lines.picking_id, force=False)
+            return self._action_picking_done(
+                lines.picking_id, force=allow_prepackaged_product
+            )
         for line in lines:
             # note: the package level is automatically set to "is_done" when
             # the qty_done is full
             line.qty_done = line.product_uom_qty
         picking = fields.first(lines.mapped("picking_id"))
-        return self._action_picking_done(picking)
+        return self._action_picking_done(picking, force=allow_prepackaged_product)
 
     def _reset_lines(self, lines):
         for line in lines:
@@ -260,17 +260,26 @@ class Delivery(Component):
             domain.append(("qty_done", "=", 0))
         return domain
 
-    def _lines_from_lot_domain(self, lot, no_qty_done=True, location=None):
+    def _lines_from_lot_domain(
+        self, lot, no_qty_done=True, product_qty=None, location=None
+    ):
         location_domain = (
             [("picking_id.location_id", "=", location.id)] if location else []
         )
-        return expression.AND(
+        domain = expression.AND(
             [
                 self._lines_base_domain(no_qty_done),
                 [("lot_id", "=", lot.id)],
                 location_domain,
             ]
         )
+        if product_qty:
+            domain.extend(
+                [
+                    ("product_qty", ">=", product_qty),
+                ]
+            )
+        return domain
 
     def _lines_from_product_domain(
         self, product, no_qty_done=True, product_qty=None, location=None
@@ -377,23 +386,21 @@ class Delivery(Component):
         )
         # Filter lines to keep only ones from one delivery operation
         # (we do not want to process lines of another delivery operation)
-        # lines = lines._filter_on_picking(picking)
+        lines = lines._filter_on_picking(picking)
+        # We want to process 1 qty of one line
+        lines = fields.first(lines)
         # Validate lines (this will validate the delivery if all lines are processed)
-        # Fist handle lines without package if any
-        lines_without_package = lines.filtered(lambda line: not line.package_id)
-        if lines_without_package:
-            lines = fields.first(lines_without_package)
-        else:
-            lines = fields.first(lines)
         if self._set_lines_done(lines, product_qty):
             return self._response_for_deliver(
                 location=location, message=self.msg_store.transfer_complete(new_picking)
             )
         return self._response_for_deliver(new_picking, location=location)
 
-    def _deliver_lot(self, picking, lot, location):
+    def _deliver_lot(self, picking, lot, product_qty=None, location=None):
         lines = self.env["stock.move.line"].search(
-            self._lines_from_lot_domain(lot, location=location)
+            self._lines_from_lot_domain(
+                lot, no_qty_done=False, product_qty=product_qty, location=location
+            )
         )
         if not lines:
             return self._response_for_deliver(
@@ -452,7 +459,12 @@ class Delivery(Component):
                     message=self.msg_store.lot_mixed_package_scan_package(),
                 )
 
-        if self._set_lines_done(lines):
+        # Filter lines to keep only ones from one delivery operation
+        # (we do not want to process lines of another delivery operation)
+        lines = lines._filter_on_picking(picking)
+        # We want to process 1 qty of one line
+        lines = fields.first(lines)
+        if self._set_lines_done(lines, product_qty=product_qty):
             return self._response_for_deliver(
                 location=location, message=self.msg_store.transfer_complete(new_picking)
             )
