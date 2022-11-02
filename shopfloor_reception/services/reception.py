@@ -4,6 +4,7 @@
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
+from odoo.addons.shopfloor.utils import to_float
 
 
 class Reception(Component):
@@ -587,9 +588,10 @@ class Reception(Component):
             selected_lines.result_package_id = package
             return self._response_for_set_destination(picking, selected_lines)
 
-    def process_with_existing_pack(self, picking_id, selected_line_ids):
+    def process_with_existing_pack(self, picking_id, selected_line_ids, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids)
+        selected_lines.qty_done = quantity
         return self._response_for_select_dest_package(picking, selected_lines)
 
     def process_with_new_pack(self, picking_id, selected_line_ids, quantity):
@@ -600,9 +602,10 @@ class Reception(Component):
         selected_lines.qty_done = quantity
         return self._response_for_set_destination(picking, selected_lines)
 
-    def process_without_pack(self, picking_id, selected_line_ids):
+    def process_without_pack(self, picking_id, selected_line_ids, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids)
+        selected_lines.qty_done = quantity
         return self._response_for_set_destination(picking, selected_lines)
 
     def set_destination(
@@ -758,6 +761,7 @@ class ShopfloorReceptionValidator(Component):
                 "required": True,
                 "schema": {"coerce": to_int, "required": True, "type": "integer"},
             },
+            "quantity": {"coerce": to_float, "type": "float"},
         }
 
     def process_with_new_pack(self):
@@ -768,7 +772,7 @@ class ShopfloorReceptionValidator(Component):
                 "required": True,
                 "schema": {"coerce": to_int, "required": True, "type": "integer"},
             },
-            "quantity": {"type": "float"},
+            "quantity": {"coerce": to_float, "type": "float"},
         }
 
     def process_without_pack(self):
@@ -779,6 +783,7 @@ class ShopfloorReceptionValidator(Component):
                 "required": True,
                 "schema": {"coerce": to_int, "required": True, "type": "integer"},
             },
+            "quantity": {"coerce": to_float, "type": "float"},
         }
 
     def set_destination(self):
