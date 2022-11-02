@@ -124,7 +124,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             },
             "move_lines": self.data_detail.move_lines(picking.move_line_ids),
             "picking_type_code": "outgoing",
-            "completion": 0.0,
+            "progress": 0.0,
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-05-13")
         self.assertDictEqual(data, expected)
@@ -161,7 +161,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
-            "completion": 30.0,
+            "progress": 30.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -185,7 +185,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
-            "completion": 0.0,
+            "progress": 0.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -221,7 +221,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
-            "completion": 0.0,
+            "progress": 0.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -241,7 +241,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
-            "completion": 0.0,
+            "progress": 0.0,
         }
         self.assertDictEqual(data, expected)
 
