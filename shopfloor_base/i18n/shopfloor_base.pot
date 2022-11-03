@@ -113,6 +113,16 @@ msgid "Default language"
 msgstr ""
 
 #. module: shopfloor_base
+#: model:shopfloor.profile,name:shopfloor_base.profile_demo_1
+msgid "Demo Profile 1"
+msgstr ""
+
+#. module: shopfloor_base
+#: model:shopfloor.profile,name:shopfloor_base.profile_demo_2
+msgid "Demo Profile 2"
+msgstr ""
+
+#. module: shopfloor_base
 #: model:shopfloor.scenario,name:shopfloor_base.shopfloor_scenario_demo_1
 msgid "Demo scenario 1"
 msgstr ""
@@ -338,6 +348,7 @@ msgstr ""
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__sequence
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__sequence
 msgid "Sequence"
 msgstr ""
 
