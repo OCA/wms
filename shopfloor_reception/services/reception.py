@@ -677,7 +677,7 @@ class Reception(Component):
             barcode: The barcode of the package
 
         transitions:
-          - set_lot: User scanned a valid package
+          - select_line: User scanned a valid package
           - select_dest_package: Warning: User scanned an unknown barcode.
             Confirm to create one.
           - select_dest_package: Error: User scanned a non-empty package
@@ -707,7 +707,7 @@ class Reception(Component):
                     message=self.msg_store.package_not_empty(package),
                 )
             selected_lines.result_package_id = package
-            return self._response_for_set_lot(picking, selected_lines)
+            return self._response_for_select_line(picking)
         message = self.msg_store.create_new_pack_ask_confirmation(barcode)
         return self._response_for_select_dest_package(
             picking, selected_lines, message=message

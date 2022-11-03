@@ -55,7 +55,7 @@ sequenceDiagram
     end
     rect rgb(250, 150, 150)
     note left of select_dest_package: select_dest_package(picking_id, selected_line_ids, location_id, confirmation=False)
-	select_dest_package ->> set_lot: User scanned a valid package
+	select_dest_package ->> select_line: User scanned a valid package
 	select_dest_package ->> select_dest_package: Warning: User scanned an unknown barcode. Confirm to create one.
 	select_dest_package ->> select_dest_package: Error: User scanned a non-empty package
     end
