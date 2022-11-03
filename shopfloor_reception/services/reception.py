@@ -177,16 +177,19 @@ class Reception(Component):
 
     def _scan_document__by_picking(self, barcode):
         search = self._actions_for("search")
-        picking = search.picking_from_scan(barcode, True)
-        if picking:
+        picking_filter_result = search.picking_from_scan(
+            barcode, accept_source_document=True
+        )
+        if picking_filter_result:
             # There is a case where scanning the source document
             # could return more than one picking.
             # In this case, we ask the user to scan a package instead.
-            if len(picking) > 1:
+            if len(picking_filter_result) > 1:
                 return self._response_for_select_document(
-                    message=self.msg_store.source_document_multiple_pickings_scan_package()
+                    pickings=picking_filter_result,
+                    message=self.msg_store.source_document_multiple_pickings_scan_package(),
                 )
-            return self._select_picking(picking)
+            return self._select_picking(picking_filter_result)
 
     def _scan_document__by_product(self, barcode):
         search = self._actions_for("search")
