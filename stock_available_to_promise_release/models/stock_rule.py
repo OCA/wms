@@ -10,6 +10,14 @@ _logger = logging.getLogger(__name__)
 class StockRule(models.Model):
     _inherit = "stock.rule"
 
+    available_to_promise_defer_pull = fields.Boolean(
+        related="route_id.available_to_promise_defer_pull", store=True
+    )
+
+    no_backorder_at_release = fields.Boolean(
+        related="route_id.no_backorder_at_release", store=True
+    )
+
     def _get_custom_move_fields(self):
         return super()._get_custom_move_fields() + ["date_priority"]
 
@@ -19,7 +27,7 @@ class StockRule(models.Model):
         for procurement, rule in procurements:
             if (
                 not self.env.context.get("_rule_no_available_defer")
-                and rule.route_id.available_to_promise_defer_pull
+                and rule.available_to_promise_defer_pull
                 # We still want to create the first part of the chain
                 and not rule.picking_type_id.code == "outgoing"
             ):
