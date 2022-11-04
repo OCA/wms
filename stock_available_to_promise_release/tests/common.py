@@ -117,3 +117,18 @@ class PromiseReleaseCommonCase(common.TransactionCase):
                 "outgoing_qty",
             ]
         )
+
+    @classmethod
+    def _prev_picking(cls, picking):
+        return picking.move_ids.move_orig_ids.picking_id
+
+    @classmethod
+    def _out_picking(cls, pickings):
+        return pickings.filtered(lambda r: r.picking_type_code == "outgoing")
+
+    @classmethod
+    def _deliver(cls, picking):
+        picking.action_assign()
+        for line in picking.mapped("move_ids.move_line_ids"):
+            line.qty_done = line.reserved_qty
+        picking._action_done()

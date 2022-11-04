@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_stock_release_wizard,access.stock.release.wizard,model_stock_release,stock.group_stock_user,1,1,1,0
+access_stock_unrelease_wizard,access.stock.unrelease.wizard,model_stock_unrelease,stock.group_stock_user,1,1,1,0
