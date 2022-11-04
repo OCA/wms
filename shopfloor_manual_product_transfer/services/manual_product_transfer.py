@@ -437,6 +437,7 @@ class ManualProductTransfer(Component):
             return response
         savepoint = self._actions_for("savepoint").new()
         stock = self._actions_for("stock")
+        unreserve = self._actions_for("stock.unreserve")
         # Quantity has been confirmed, try to create the move
         # 1. Check there is enough stock in the location to move, otherwise
         #    unreserve existing moves if applicable
@@ -447,13 +448,18 @@ class ManualProductTransfer(Component):
         ):
             # If available qty (qty non reserved) < quantity set => Unreserve
             # other moves for this product and location
-            move_lines = self._find_location_move_lines(location, product, lot)
-            move_lines, unreserved_moves, response = self._unreserve_other_lines(
-                location, move_lines, product
+            move_lines_to_unreserve = self._find_location_move_lines(
+                location, product, lot
             )
-            if response:
+            message = unreserve.check_unreserve(
+                location, move_lines_to_unreserve, product
+            )
+            if message:
                 savepoint.rollback()
-                return response
+                return self._response_for_start(message=message)
+            __, unreserved_moves = unreserve.unreserve_moves(
+                move_lines_to_unreserve, self.picking_types
+            )
         # 2. Create the move and assign it
         move = self._create_move_from_location(location, product, quantity, lot)
         # 3. If the "Ignore transfers when no put-away is available" is enabled
@@ -524,48 +530,6 @@ class ManualProductTransfer(Component):
                 lot,
                 message=self.msg_store.wrong_record(scanned_product),
             )
-
-    # FIXME copy pasted from location content transfer with a new 'product'
-    # parameter', put it elsewhere?
-    def _unreserve_other_lines(self, location, move_lines, product):
-        """Unreserve move lines in location in another picking type
-
-        Returns a tuple of (
-          move lines that stays in the location to process,
-          moves to reserve again,
-          response to return to client in case of error
-        )
-        """
-        lines_other_picking_types = move_lines.filtered(
-            lambda line: line.picking_id.picking_type_id not in self.picking_types
-        )
-        if not lines_other_picking_types:
-            return (move_lines, self.env["stock.move"].browse(), None)
-        unreserved_moves = move_lines.move_id
-        location_move_lines = self.env["stock.move.line"].search(
-            [
-                ("location_id", "=", location.id),
-                ("state", "in", ("assigned", "partially_available")),
-                ("product_id", "=", product.id),
-            ]
-        )
-        extra_move_lines = location_move_lines - move_lines
-        if extra_move_lines:
-            return (
-                self.env["stock.move.line"].browse(),
-                self.env["stock.move"].browse(),
-                self._response_for_start(
-                    message=self.msg_store.picking_already_started_in_location(
-                        extra_move_lines.picking_id
-                    )
-                ),
-            )
-        package_levels = move_lines.package_level_id
-        # if we leave the package level around, it will try to reserve
-        # the same package as before
-        package_levels.explode_package()
-        unreserved_moves._do_unreserve()
-        return (move_lines - lines_other_picking_types, unreserved_moves, None)
 
     def scan_destination_location(self, move_line_ids, barcode):
         """Scan the destination location and post the move.
