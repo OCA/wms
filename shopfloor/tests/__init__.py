@@ -20,11 +20,13 @@ from . import test_checkout_base
 from . import test_checkout_scan
 from . import test_checkout_select
 from . import test_checkout_scan_line
+from . import test_checkout_scan_line_no_prefill_qty
 from . import test_checkout_scan_line_base
 from . import test_checkout_select_line
 from . import test_checkout_select_package_base
 from . import test_checkout_set_qty
 from . import test_checkout_scan_package_action
+from . import test_checkout_scan_package_action_no_prefill_qty
 from . import test_checkout_new_package
 from . import test_checkout_no_package
 from . import test_checkout_list_delivery_packaging
