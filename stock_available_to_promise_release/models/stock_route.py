@@ -14,3 +14,10 @@ class StockRoute(models.Model):
         "Transfers must be released manually when they have enough available"
         " to promise.",
     )
+
+    no_backorder_at_release = fields.Boolean(
+        string="No backorder at release",
+        default=False,
+        help="When releasing a transfer, do not create a backorder for the "
+        "moves created for the unavailable quantities.",
+    )
