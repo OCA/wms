@@ -8,6 +8,12 @@ class StockPickingType(models.Model):
     _inherit = "stock.picking.type"
 
     count_picking_need_release = fields.Integer(compute="_compute_picking_count")
+    unrelease_on_backorder = fields.Boolean(
+        string="Unrelease on backorder",
+        help="If checked, when a backorder is created the moves into the "
+        "backorder are unreleased if they come from a route configured "
+        "to manually release moves",
+    )
 
     def _compute_picking_count_need_release_domains(self):
         return {

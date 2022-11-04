@@ -188,3 +188,14 @@ class StockPicking(models.Model):
         action["domain"] = [("picking_id", "=", self.id), ("need_release", "=", True)]
         action["context"] = {}
         return action
+
+    def _create_backorder(self):
+        backorders = super()._create_backorder()
+        backorders_to_unrelease = backorders.filtered(
+            lambda p: p.picking_type_id.unrelease_on_backorder
+        )
+        if backorders_to_unrelease:
+            backorders_to_unrelease.mapped("move_ids").filtered(
+                "unrelease_allowed"
+            ).unrelease()
+        return backorders

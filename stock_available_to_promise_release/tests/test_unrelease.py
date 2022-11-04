@@ -78,3 +78,74 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             UserError, "You are not allowed to unrelease this move"
         ):
             self.shipping.move_ids.unrelease()
+
+    def test_unrelease_backorder(self):
+        """Check the unrelease of a shipping backorder move"""
+        # we do a partial pick and validate the picking to create a backorder
+        # a validation
+        line = self.picking.move_ids.move_line_ids
+        line.qty_done = line.reserved_qty - 1
+        self.picking.with_context(
+            skip_immediate=True, skip_backorder=True
+        ).button_validate()
+        self.shipping.action_assign()
+        line = self.shipping.move_ids.move_line_ids
+        line.qty_done = line.reserved_qty
+        self.shipping.with_context(
+            skip_immediate=True, skip_backorder=True
+        ).button_validate()
+        # at this stage, our backorder ship move is linked to a pick move to do
+        backorder_ship = self.shipping.backorder_ids
+        self.assertTrue(backorder_ship)
+        self.assertTrue(backorder_ship.move_ids.unrelease_allowed)
+        self.assertTrue(
+            backorder_ship.move_ids.move_orig_ids.filtered(
+                lambda m: m.state not in ("cancel", "done")
+            )
+        )
+        backorder_pick = self._prev_picking(backorder_ship) - self.picking
+        self.assertEqual(backorder_pick.state, "assigned")
+        backorder_ship.move_ids.unrelease()
+        # after the un release, our backorder ship move is not more linked to
+        # a pick move to do
+        self.assertFalse(backorder_ship.move_ids.unrelease_allowed)
+        self.assertEqual(backorder_pick.state, "cancel")
+        self.assertFalse(
+            backorder_ship.move_ids.move_orig_ids.filtered(
+                lambda m: m.state not in ("cancel", "done")
+            )
+        )
+
+    def test_auto_unrelease_on_backorder(self):
+        """Check that moves into a backorder are unreleased if specified on
+        the picking type"""
+        self.shipping.picking_type_id.unrelease_on_backorder = True
+        # we do a partial pick and validate the picking to create a backorder
+        # a validation
+        line = self.picking.move_ids.move_line_ids
+        line.qty_done = line.reserved_qty - 1
+        self.picking.with_context(
+            skip_immediate=True, skip_backorder=True
+        ).button_validate()
+        self.shipping.action_assign()
+        line = self.shipping.move_ids.move_line_ids
+        line.qty_done = line.reserved_qty
+        # at this stage, our ship move is linked to a pick move to do
+        self.assertTrue(
+            self.shipping.move_ids.move_orig_ids.filtered(
+                lambda m: m.state not in ("cancel", "done")
+            )
+        )
+        self.shipping.with_context(
+            skip_immediate=True, skip_backorder=True
+        ).button_validate()
+        backorder_ship = self.shipping.backorder_ids
+        self.assertTrue(backorder_ship)
+        self.assertTrue(backorder_ship.need_release)
+        self.assertFalse(backorder_ship.move_ids.unrelease_allowed)
+        # no move pick move to do for our move into the backorder
+        self.assertFalse(
+            backorder_ship.move_ids.move_orig_ids.filtered(
+                lambda m: m.state not in ("cancel", "done")
+            )
+        )
