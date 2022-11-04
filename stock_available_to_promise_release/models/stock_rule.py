@@ -21,6 +21,14 @@ class StockRule(models.Model):
     def _get_custom_move_fields(self):
         return super()._get_custom_move_fields() + ["date_priority"]
 
+    available_to_promise_defer_pull = fields.Boolean(
+        related="route_id.available_to_promise_defer_pull", store=True
+    )
+
+    no_backorder_at_release = fields.Boolean(
+        related="route_id.no_backorder_at_release", store=True
+    )
+
     def _run_pull(self, procurements):
         actions_to_run = []
 
