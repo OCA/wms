@@ -208,6 +208,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             zone_location,
             picking_type,
             move_line,
+            qty_done=6,
             message=self.service.msg_store.package_not_found_for_barcode(barcode),
         )
 
@@ -315,6 +316,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             zone_location,
             picking_type,
             move_line,
+            qty_done=4,
             message=self.service.msg_store.package_not_found_for_barcode(barcode),
         )
 
