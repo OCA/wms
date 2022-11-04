@@ -188,3 +188,20 @@ class StockPicking(models.Model):
         action["domain"] = [("picking_id", "=", self.id), ("need_release", "=", True)]
         action["context"] = {}
         return action
+
+    def _create_backorder(self):
+        backorders = super()._create_backorder()
+        backorders_to_unrelease = backorders.filtered(
+            lambda p: p.picking_type_id.unrelease_on_backorder
+        )
+        if backorders_to_unrelease:
+            backorders_to_unrelease.unrelease()
+        return backorders
+
+    def unrelease(self, safe_unrelease=False):
+        """Unrelease the moves of the picking.
+
+        If safe_unrelease is True, the unreleasaable moves for which the
+        processing has already started will be ignored
+        """
+        self.mapped("move_ids").unrelease(safe_unrelease=safe_unrelease)

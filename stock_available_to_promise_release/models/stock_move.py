@@ -50,8 +50,77 @@ class StockMove(models.Model):
         search="_search_release_ready",
     )
     need_release = fields.Boolean(index=True, copy=False)
+    unrelease_allowed = fields.Boolean(compute="_compute_unrelease_allowed")
     zip_code = fields.Char(related="partner_id.zip", store=True)
     city = fields.Char(related="partner_id.city", store=True)
+
+    @api.depends("rule_id", "rule_id.available_to_promise_defer_pull")
+    def _compute_unrelease_allowed(self):
+        for move in self:
+            unrelease_allowed = move._is_unreleaseable()
+            if unrelease_allowed:
+                iterator = move._get_chained_moves_iterator("move_orig_ids")
+                next(iterator)  # skip the current move
+                for origin_moves in iterator:
+                    unrelease_allowed = move._is_unrelease_allowed_on_origin_moves(
+                        origin_moves
+                    )
+                    if not unrelease_allowed:
+                        break
+            move.unrelease_allowed = unrelease_allowed
+
+    def _is_unreleaseable(self):
+        """Check if the move can be unrelease. At this stage we only check if
+        the move is at the end of a chain of moves and has the caracteristics
+        to be unrelease. We don't check the conditions on the origin moves.
+        The conditions on the origin moves are checked in the method
+        _is_unrelease_allowed_on_origin_moves.
+        """
+        self.ensure_one()
+        user_is_allowed = self.env.user.has_group("stock.group_stock_user")
+        return (
+            user_is_allowed
+            and not self.need_release
+            and self.state not in ("done", "cancel")
+            and self.picking_type_id.code == "outgoing"
+            and self.rule_id.available_to_promise_defer_pull
+        )
+
+    def _is_unrelease_allowed_on_origin_moves(self, origin_moves):
+        """We check that the origin moves are in a state that allows the unrelease
+        of the current move. At this stage, a move can't be unreleased if
+          * a picking is already printed. (The work on the picking is planed and
+            we don't want to change it)
+          * the processing of the origin moves is partially started.
+        """
+        self.ensure_one()
+        pickings = origin_moves.mapped("picking_id")
+        if pickings.filtered("printed"):
+            # The picking is printed, we can't unrelease the move
+            # because the processing of the origin moves is started.
+            return False
+        origin_moves = origin_moves.filtered(
+            lambda m: m.state not in ("done", "cancel")
+        )
+        origin_qty_todo = sum(origin_moves.mapped("product_qty"))
+        return (
+            float_compare(
+                self.product_qty,
+                origin_qty_todo,
+                precision_rounding=self.product_uom.rounding,
+            )
+            <= 0
+        )
+
+    def _check_unrelease_allowed(self):
+        for move in self:
+            if not move.unrelease_allowed:
+                raise UserError(
+                    _(
+                        "You are not allowed to unrelease this move %(move_name)s.",
+                        move_name=move.display_name,
+                    )
+                )
 
     def _previous_promised_qty_sql_main_query(self):
         return """
@@ -479,3 +548,61 @@ class StockMove(models.Model):
         while moves:
             yield moves
             moves = moves.mapped(chain_field)
+
+    def unrelease(self, safe_unrelease=False):
+        """Unrelease unreleasavbe moves
+
+        If safe_unrelease is True, the unreleasaable moves for which the
+        processing has already started will be ignored
+        """
+        moves_to_unrelease = self.filtered(lambda m: m._is_unreleaseable())
+        if safe_unrelease:
+            moves_to_unrelease = self.filtered("unrelease_allowed")
+        moves_to_unrelease._check_unrelease_allowed()
+        moves_to_unrelease.write({"need_release": True})
+        impacted_picking_ids = set()
+        for move in moves_to_unrelease:
+            iterator = move._get_chained_moves_iterator("move_orig_ids")
+            next(iterator)  # skip the current move
+            for origin_moves in iterator:
+                origin_moves = origin_moves.filtered(
+                    lambda m: m.state not in ("done", "cancel")
+                )
+                if origin_moves:
+                    origin_moves = move._split_origins(origin_moves)
+                    impacted_picking_ids.update(origin_moves.mapped("picking_id").ids)
+                    # avoid to propagate cancel to the original move
+                    origin_moves.write({"propagate_cancel": False})
+                    origin_moves._action_cancel()
+        moves_to_unrelease.write({"need_release": True})
+        for picking, moves in itertools.groupby(
+            moves_to_unrelease, lambda m: m.picking_id
+        ):
+            move_names = "\n".join([m.display_name for m in moves])
+            body = _(
+                "The following moves have been un-released: \n%(move_names)s",
+                move_names=move_names,
+            )
+            picking.message_post(body=body)
+
+    def _split_origins(self, origins):
+        """Split the origins of the move according to the quantity into the
+        move and the quantity in the origin moves.
+
+        Return the origins for the move's quantity.
+        """
+        self.ensure_one()
+        qty = self.product_qty
+        rounding = self.product_uom.rounding
+        new_origin_moves = self.env["stock.move"]
+        while float_compare(qty, 0, precision_rounding=rounding) > 0 and origins:
+            origin = fields.first(origins)
+            if float_compare(qty, origin.product_qty, precision_rounding=rounding) >= 0:
+                qty -= origin.product_qty
+                new_origin_moves |= origin
+            else:
+                new_move_vals = origin._split(qty)
+                new_origin_moves |= self.create(new_move_vals)
+                break
+            origins -= origin
+        return new_origin_moves
