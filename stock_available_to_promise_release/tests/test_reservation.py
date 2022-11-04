@@ -10,18 +10,6 @@ from .common import PromiseReleaseCommonCase
 
 
 class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
-    def _prev_picking(self, picking):
-        return picking.move_ids.move_orig_ids.picking_id
-
-    def _out_picking(self, pickings):
-        return pickings.filtered(lambda r: r.picking_type_code == "outgoing")
-
-    def _deliver(self, picking):
-        picking.action_assign()
-        for line in picking.mapped("move_ids.move_line_ids"):
-            line.qty_done = line.reserved_qty
-        picking._action_done()
-
     def test_horizon_date(self):
         move = self.env["stock.move"].create(
             {

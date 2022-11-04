@@ -41,6 +41,17 @@
                     </div>
                 </button>
             </div>
+            <button name="action_assign_serial" position="after">
+                <field name="unrelease_allowed" invisible="1" />
+                <button
+                    name="unrelease"
+                    attrs="{'invisible': [('unrelease_allowed', '=', False)]}"
+                    string="Un Release"
+                    type="object"
+                    icon="fa-cube"
+                    groups="stock.group_stock_user"
+                />
+            </button>
         </field>
     </record>
     <record id="view_picking_release_tree" model="ir.ui.view">
