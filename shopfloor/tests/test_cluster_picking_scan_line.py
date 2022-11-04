@@ -14,7 +14,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
     scanned the proper thing to pick.
     """
 
-    def _scan_line_ok(self, line, scanned):
+    def _scan_line_ok(self, line, scanned, location_scanned=False):
         batch = line.picking_id.batch_id
         response = self.service.dispatch(
             "scan_line",
@@ -24,6 +24,10 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
                 "barcode": scanned,
             },
         )
+        if not location_scanned:
+            # For any barcode scanned but a location barcode, the quantity done
+            # is set in the response data to fully done but the record is not updated
+            line.qty_done = line.product_uom_qty
         self.assert_response(
             response, next_state="scan_destination", data=self._line_data(line)
         )
@@ -191,6 +195,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         move._action_confirm(merge=False)
         move._action_assign()
         move.move_line_ids[0].package_id = None
+        move.move_line_ids[0].location_id = line.location_id.copy()
         self._scan_line_ok(line, move.product_id.barcode)
 
     def test_scan_line_lot_error_several_packages(self):
@@ -242,7 +247,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         """
         self._simulate_batch_selected(self.batch, in_package=True)
         line = self.batch.picking_ids.move_line_ids
-        self._scan_line_ok(line, line.location_id.barcode)
+        self._scan_line_ok(line, line.location_id.barcode, location_scanned=True)
 
     def test_scan_line_location_ok_single_product(self):
         """Scan to check if user scans a correct location for current line
@@ -252,7 +257,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         """
         self._simulate_batch_selected(self.batch)
         line = self.batch.picking_ids.move_line_ids
-        self._scan_line_ok(line, line.location_id.barcode)
+        self._scan_line_ok(line, line.location_id.barcode, location_scanned=True)
 
     def test_scan_line_location_ok_single_lot(self):
         """Scan to check if user scans a correct location for current line
@@ -262,7 +267,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         """
         self._simulate_batch_selected(self.batch, in_lot=True)
         line = self.batch.picking_ids.move_line_ids
-        self._scan_line_ok(line, line.location_id.barcode)
+        self._scan_line_ok(line, line.location_id.barcode, location_scanned=True)
 
     def test_scan_line_location_error_several_package(self):
         """Scan to check if user scans a correct location for current line
