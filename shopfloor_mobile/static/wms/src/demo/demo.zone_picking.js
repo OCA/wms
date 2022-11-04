@@ -78,6 +78,8 @@ const select_line_move_lines = _.orderBy(move_lines, ["priority"], ["desc"]);
 _.forEach(select_line_move_lines, function (line, i) {
     // Simulate random flag
     line.location_will_be_empty = i % 3 == 0;
+    // Simulate adding 1 qty
+    line.qty_done++;
 });
 
 const list_move_lines = {
