@@ -1,6 +1,6 @@
 # Copyright 2019-2020 Camptocamp (https://www.camptocamp.com)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
-
+import itertools
 import logging
 import operator as py_operator
 
@@ -353,7 +353,8 @@ class StockMove(models.Model):
             backorder_links[unreleased_move.picking_id] = original_picking
 
         for backorder, origin in backorder_links.items():
-            backorder._release_link_backorder(origin)
+            if backorder != origin:
+                backorder._release_link_backorder(origin)
 
         self.env["procurement.group"].run_defer(procurement_requests)
 
@@ -382,24 +383,32 @@ class StockMove(models.Model):
             pickings.write({"priority": max(priorities)})
 
     def _after_release_assign_moves(self):
-        moves = self
-        while moves:
-            moves._action_assign()
-            moves = moves.mapped("move_orig_ids")
+        move_ids = []
+        for origin_moves in self._get_chained_moves_iterator("move_orig_ids"):
+            move_ids += origin_moves.ids
+        self.env["stock.move"].browse(move_ids)._action_assign()
 
     def _release_split(self, remaining_qty):
         """Split move and create a new picking for it.
 
-        Instead of splitting the move and leave remaining qty into the same picking
-        we move it to a new one so that we can release it later as soon as
-        the qty is available.
+        By default, when we split a move at release to isolate the remaining qty
+        into a new move, we also create a new picking for it so that we can
+        release it later as soon as the qty is available.
+        This behavior can be changed by setting the flag no_backorder_at_release
+        on the stock.route of the move. This will allow to create the backorder
+        at the end of the picking process and release the unreleased moves into
+        the same picking as long as the picking is not done. By doing so, we
+        can also cleanup the backorders of the linked pickings created when
+        a released move was not processed (no qty found, or no time to do it for
+         example).
         """
         context = self.env.context
         self = self.with_context(release_available_to_promise=True)
         # Rely on `printed` flag to make _assign_picking create a new picking.
         # See `stock.move._assign_picking` and
         # `stock.move._search_picking_for_assignation`.
-        if not self.picking_id.printed:
+        original_printed = self.picking_id.printed
+        if not self.picking_id.printed and not self.rule_id.no_backorder_at_release:
             self.picking_id.printed = True
         new_move = self  # Work on the current move if split doesn't occur
         new_move_vals = self._split(remaining_qty)
@@ -411,6 +420,9 @@ class StockMove(models.Model):
         # and the move is not assigned.
         new_move._assign_picking()
 
+        # restore the original value of the printed flag only used to ensure
+        # that a backorder is created if required
+        self.picking_id.printed = original_printed
         return new_move.with_context(**context)
 
     def _assign_picking_post_process(self, new=False):
@@ -419,3 +431,14 @@ class StockMove(models.Model):
         if priorities:
             self.picking_id.write({"priority": max(priorities)})
         return res
+
+    def _get_chained_moves_iterator(self, chain_field):
+        """Return an iterator on the moves of the chain.
+
+        The iterator returns the moves in the order of the chain.
+        The loop into the iterator is the current moves.
+        """
+        moves = self
+        while moves:
+            yield moves
+            moves = moves.mapped(chain_field)
