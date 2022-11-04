@@ -50,8 +50,50 @@ class StockMove(models.Model):
         search="_search_release_ready",
     )
     need_release = fields.Boolean(index=True, copy=False)
+    unrelease_allowed = fields.Boolean(compute="_compute_unrelease_allowed")
     zip_code = fields.Char(related="partner_id.zip", store=True)
     city = fields.Char(related="partner_id.city", store=True)
+
+    @api.depends("rule_id", "rule_id.available_to_promise_defer_pull")
+    def _compute_unrelease_allowed(self):
+        user_is_allowed = self.env.user.has_group("stock.group_stock_user")
+        for move in self:
+            unrelease_allowed = (
+                user_is_allowed
+                and not move.need_release
+                and move.state not in ("done", "cancel")
+                and move.picking_type_id.code == "outgoing"
+                and move.rule_id.available_to_promise_defer_pull
+            )
+            if unrelease_allowed:
+                iterator = move._get_chained_moves_iterator("move_orig_ids")
+                next(iterator)  # skip the current move
+                for origin_moves in iterator:
+                    origin_moves = origin_moves.filtered(
+                        lambda m: m.state not in ("done", "cancel")
+                    )
+                    origin_qty_todo = sum(origin_moves.mapped("product_qty"))
+                    unrelease_allowed = (
+                        float_compare(
+                            move.product_qty,
+                            origin_qty_todo,
+                            precision_rounding=move.product_uom.rounding,
+                        )
+                        <= 0
+                    )
+                    if not unrelease_allowed:
+                        break
+            move.unrelease_allowed = unrelease_allowed
+
+    def _check_unrelease_allowed(self):
+        for move in self:
+            if not move.unrelease_allowed:
+                raise UserError(
+                    _(
+                        "You are not allowed to unrelease this move %(move_name)s.",
+                        move_name=move.display_name,
+                    )
+                )
 
     def _previous_promised_qty_sql_main_query(self):
         return """
@@ -479,3 +521,52 @@ class StockMove(models.Model):
         while moves:
             yield moves
             moves = moves.mapped(chain_field)
+
+    def unrelease(self):
+        """Unrelease moves"""
+        self._check_unrelease_allowed()
+        self.write({"need_release": True})
+        impacted_picking_ids = set()
+        for move in self:
+            iterator = move._get_chained_moves_iterator("move_orig_ids")
+            next(iterator)  # skip the current move
+            for origin_moves in iterator:
+                origin_moves = origin_moves.filtered(
+                    lambda m: m.state not in ("done", "cancel")
+                )
+                if origin_moves:
+                    origin_moves = self._split_origins(origin_moves)
+                    impacted_picking_ids.update(origin_moves.mapped("picking_id").ids)
+                    # avoid to propagate cancel to the original move
+                    origin_moves.write({"propagate_cancel": False})
+                    origin_moves._action_cancel()
+        self.write({"need_release": True})
+        for picking, moves in itertools.groupby(self, lambda m: m.picking_id):
+            move_names = "\n".join([m.display_name for m in moves])
+            body = _(
+                "The following moves have been un-released: \n%(move_names)s",
+                move_names=move_names,
+            )
+            picking.message_post(body=body)
+
+    def _split_origins(self, origins):
+        """Split the origins of the move according to the quantity into the
+        move and the quantity in the origin moves.
+
+        Return the origins for the move's quantity.
+        """
+        self.ensure_one()
+        qty = self.product_qty
+        rounding = self.product_uom.rounding
+        new_origin_moves = self.env["stock.move"]
+        while float_compare(qty, 0, precision_rounding=rounding) > 0 and origins:
+            origin = origins[0]
+            if float_compare(qty, origin.product_qty, precision_rounding=rounding) >= 0:
+                qty -= origin.product_qty
+                new_origin_moves |= origin
+            else:
+                new_move_vals = origin._split(qty)
+                new_origin_moves |= self.create(new_move_vals)
+                break
+            origins -= origin
+        return new_origin_moves
