@@ -236,7 +236,7 @@ export const checkout_states = function ($instance) {
                 $instance.wait_call(
                     $instance.odoo.call("set_custom_qty", {
                         picking_id: $instance.state.data.picking.id,
-                        selected_line_ids: $instance.selected_line_ids(),
+                        selected_line_ids: $instance.selectable_line_ids(),
                         move_line_id: $instance.state.data.line.id,
                         qty_done: $instance.state.data.qty,
                     })
