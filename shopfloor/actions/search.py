@@ -30,12 +30,12 @@ class SearchAction(Component):
             return model.browse()
         return model.search([("name", "=", barcode)], limit=1)
 
-    def picking_from_scan(self, barcode, accept_source_document=False):
+    def picking_from_scan(self, barcode, use_origin=False):
         model = self.env["stock.picking"]
         if not barcode:
             return model.browse()
         domain = [("name", "=", barcode)]
-        if not accept_source_document:
+        if not use_origin:
             return model.search(domain, limit=1)
         source_document_domain = [
             "&",

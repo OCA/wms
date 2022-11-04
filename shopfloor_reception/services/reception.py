@@ -177,9 +177,7 @@ class Reception(Component):
 
     def _scan_document__by_picking(self, barcode):
         search = self._actions_for("search")
-        picking_filter_result = search.picking_from_scan(
-            barcode, accept_source_document=True
-        )
+        picking_filter_result = search.picking_from_scan(barcode, use_origin=True)
         if picking_filter_result:
             # There is a case where scanning the source document
             # could return more than one picking.

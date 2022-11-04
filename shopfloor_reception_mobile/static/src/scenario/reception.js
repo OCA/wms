@@ -14,22 +14,16 @@ const Reception = {
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar
-                v-if="state_in(['select_document', 'select_line', 'set_quantity', 'set_destination', 'select_dest_package'])"
+                v-if="state_in(['select_document', 'select_line', 'set_lot', 'set_quantity', 'set_destination', 'select_dest_package'])"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
             />
-            <template v-if="state_is('set_lot')">
-                <searchbar
-                    v-on:found="on_scan_lot"
-                    :input_placeholder="search_input_placeholder_lot"
-                />
-                <date-picker-input/>
-            </template>
+            <date-picker-input v-if="state_is('set_lot')"/>
             <template v-if="state_in(['select_line', 'set_lot', 'set_quantity', 'set_destination'])">
                 <item-detail-card
                     :record="state.data.picking"
                     :options="operation_options()"
-                    :card_color="utils.colors.color_for('screen_step_todo')"
+                    :card_color="utils.colors.color_for('screen_step_done')"
                     :key="make_state_component_key(['reception-picking-item-detail', state.data.picking.id])"
                 />
             </template>
@@ -53,13 +47,18 @@ const Reception = {
                     :record="state.data.picking"
                     :records_grouped="picking_summary_records_grouped(state.data.picking)"
                     :action_cancel_package_key="'package_dest'"
-                    :list_options="picking_summary_options()"
+                    :list_options="picking_summary_options_for_select_line()"
                     :key="make_state_component_key(['picking-summary', 'detail-picking', state.data.picking.id])"
                 />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
                             <btn-action @click="on_mark_done">Mark as Done</btn-action>
+                        </v-col>
+                    </v-row>
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back />
                         </v-col>
                     </v-row>
                 </div>
@@ -88,7 +87,7 @@ const Reception = {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="on_confirm_action">Continue</btn-action>
+                            <btn-action @click="state.on_confirm_action">Continue</btn-action>
                         </v-col>
                     </v-row>
                     <v-row align="center">
@@ -101,8 +100,8 @@ const Reception = {
             <template v-if="state_is('set_quantity')">
                 <item-detail-card
                     :record="state.data"
-                    :options="picking_detail_extended_options()"
-                    :card_color="utils.colors.color_for('screen_step_todo')"
+                    :options="picking_detail_options_for_set_quantity()"
+                    :card_color="utils.colors.color_for('screen_step_done')"
                     :key="make_state_component_key(['reception-product-item-detail-set-quantity', state.data.picking.id])"
                 />
                 <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
@@ -115,17 +114,17 @@ const Reception = {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="on_add_to_existing_pack">Existing pack</btn-action>
+                            <btn-action @click="state.on_add_to_existing_pack">Existing pack</btn-action>
                         </v-col>
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="on_create_new_pack">New pack</btn-action>
+                            <btn-action @click="state.on_create_new_pack">New pack</btn-action>
                         </v-col>
                     </v-row>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="on_process_without_pack">Process without pack</btn-action>
+                            <btn-action @click="state.on_process_without_pack">Process without pack</btn-action>
                         </v-col>
                     </v-row>
                 </div>
@@ -149,15 +148,21 @@ const Reception = {
                     v-if="state.data.picking.note"
                     :record="state.data.picking"
                     :options="picking_detail_options_for_select_dest_package()"
-                    :card_color="utils.colors.color_for('screen_step_todo')"
+                    :card_color="utils.colors.color_for('screen_step_done')"
                     :key="make_state_component_key(['reception-picking-item-detail', state.data.picking.id])"
                 />
                 <manual-select
                     :records="state.data.packages"
                     :options="manual_select_options_for_select_dest_package()"
-                    v-on:select="on_select_dest_package"
                     :key="make_state_component_key(['reception', 'manual-select-dest-package'])"
                 />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back/>
+                        </v-col>
+                    </v-row>
+                </div>
             </template>
         </Screen>
     `,
@@ -167,32 +172,47 @@ const Reception = {
                 ? this.filtered_pickings
                 : this.state.data.pickings;
         },
-        search_input_placeholder_lot: function () {
-            return this.state.display_info.scan_input_placeholder_lot;
-        },
         search_input_placeholder_expiry: function () {
             return this.state.display_info.scan_input_placeholder_expiry;
         },
     },
     methods: {
+        screen_title: function () {
+            if (_.isEmpty(this.current_doc()) || this.state_is("select_document")) {
+                return this.menu_item().name;
+            }
+            const title = this.current_doc().record.name;
+            return title;
+        },
+        current_doc: function () {
+            const data = this.state_get_data("select_line");
+            if (_.isEmpty(data)) {
+                return null;
+            }
+            return {
+                record: data.picking,
+                identifier: data.picking.name,
+            };
+        },
         manual_select_options_for_select_document: function () {
             return {
-                show_title: false,
-                showActions: false,
                 group_title_default: "Pickings to process",
                 group_color: this.utils.colors.color_for("screen_step_todo"),
-                list_item_component: "list-item",
                 list_item_extra_component: "picking-list-item-progress-bar",
+                showActions: false,
                 list_item_options: {
+                    key_title: "name",
+                    loud_title: true,
                     fields: [
-                        {path: "carrier"},
                         {path: "origin", action_val_path: "name"},
+                        {path: "carrier"},
                         {
                             path: "scheduled_date",
                             renderer: (rec, field) => {
                                 return this.utils.display.render_field_date(rec, field);
                             },
                         },
+                        {path: "move_line_count", label: "Lines"},
                     ],
                 },
             };
@@ -236,7 +256,7 @@ const Reception = {
                 ],
             };
         },
-        picking_detail_extended_options: function () {
+        picking_detail_options_for_set_quantity: function () {
             return {
                 key_title: "selected_move_lines[0].product.display_name",
                 fields: [
@@ -261,7 +281,7 @@ const Reception = {
                 ],
             };
         },
-        picking_summary_options: function () {
+        picking_summary_options_for_select_line: function () {
             return {
                 show_title: false,
                 list_item_options: {
@@ -285,21 +305,6 @@ const Reception = {
                     list_item_klass_maker: this.utils.wms.move_line_color_klass,
                 },
             };
-        },
-        picking_summary_records_grouped: function (picking) {
-            const self = this;
-            return this.utils.wms.group_lines_by_product(picking.move_lines, {
-                prepare_records: _.partialRight(
-                    this.utils.wms.group_by_pack,
-                    "product"
-                ),
-                group_color_maker: function (lines) {
-                    return picking.completion == 100
-                        ? "screen_step_done"
-                        : "screen_step_todo";
-                },
-                group_no_title: true,
-            });
         },
         picking_detail_options_for_set_destination: function () {
             return {
@@ -347,19 +352,24 @@ const Reception = {
                 },
             };
         },
+        picking_summary_records_grouped: function (picking) {
+            return this.utils.wms.group_lines_by_product(picking.move_lines, {
+                prepare_records: _.partialRight(
+                    this.utils.wms.group_by_pack,
+                    "product"
+                ),
+                group_color_maker: function (lines) {
+                    return picking.completion == 100
+                        ? "screen_step_done"
+                        : "screen_step_todo";
+                },
+                group_no_title: true,
+            });
+        },
         on_search: function (input) {
             this.filtered_pickings = this.state.data.pickings.filter((picking) =>
                 this._apply_search_filter(picking, input.text)
             );
-        },
-        on_scan: function (scanned) {
-            this.$root.trigger("scan", scanned.text);
-        },
-        on_scan_lot: function (scanned) {
-            this.$root.trigger("scan_lot", scanned.text);
-        },
-        on_scan_expiry: function (scanned) {
-            this.$root.trigger("scan_expiry", scanned.text);
         },
         on_select_document: function (selected) {
             this.$root.trigger("scan", selected.name);
@@ -367,23 +377,8 @@ const Reception = {
         on_mark_done: function () {
             this.$root.trigger("mark_as_done");
         },
-        on_confirm_action: function () {
-            this.$root.trigger("confirm_action");
-        },
-        on_add_to_existing_pack: function () {
-            this.$root.trigger("add_to_existing_pack");
-        },
-        on_create_new_pack: function () {
-            this.$root.trigger("create_new_pack");
-        },
-        on_process_without_pack: function () {
-            this.$root.trigger("process_without_pack");
-        },
         get_line_being_handled: function () {
             return this.state.data.selected_move_lines[0];
-        },
-        on_select_dest_package: function (selected) {
-            this.$root.trigger("select_dest_package", selected.name);
         },
         get_next_line_id_to_handle: function () {
             // The enpoints in the backend accept multiple selected line ids.
@@ -419,12 +414,19 @@ const Reception = {
                         scan_placeholder: "Scan document / product / package",
                     },
                     events: {
-                        scan: "on_scan",
+                        select: "on_select",
+                    },
+                    on_select: (selected) => {
+                        this.wait_call(
+                            this.odoo.call("scan_document", {
+                                barcode: selected.name,
+                            })
+                        );
                     },
                     on_scan: (barcode) => {
                         this.wait_call(
                             this.odoo.call("scan_document", {
-                                barcode,
+                                barcode: barcode.text,
                             })
                         );
                     },
@@ -435,7 +437,6 @@ const Reception = {
                         scan_placeholder: "Scan product / package",
                     },
                     events: {
-                        scan: "on_scan",
                         mark_as_done: "on_mark_as_done",
                         cancel_picking_line: "on_cancel",
                     },
@@ -443,7 +444,7 @@ const Reception = {
                         this.wait_call(
                             this.odoo.call("scan_line", {
                                 picking_id: this.state.data.picking.id,
-                                barcode,
+                                barcode: barcode.text,
                             })
                         );
                     },
@@ -468,7 +469,6 @@ const Reception = {
                         title: "Confirm done",
                     },
                     events: {
-                        go_back: "on_back",
                         confirm: "on_confirm",
                     },
                     on_confirm: () => {
@@ -487,23 +487,20 @@ const Reception = {
                 set_lot: {
                     display_info: {
                         title: "Set lot",
-                        scan_input_placeholder_lot: "Scan lot",
+                        scan_placeholder: "Scan lot",
                         scan_input_placeholder_expiry: "Scan expiration date",
                     },
                     events: {
-                        scan_lot: "on_scan_lot",
-                        scan_expiry: "on_scan_expiry",
-                        confirm_action: "on_confirm_action",
                         date_picker_selected: "on_date_picker_selected",
                     },
                     // NOTE: in these three calls, selected_line_ids will consist of just
                     // one id (the next one to be handled).
-                    on_scan_lot: (barcode) => {
+                    on_scan: (barcode) => {
                         this.wait_call(
                             this.odoo.call("set_lot", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_ids: this.get_next_line_id_to_handle(),
-                                lot_name: barcode,
+                                lot_name: barcode.text,
                             })
                         );
                     },
@@ -532,10 +529,6 @@ const Reception = {
                             "Scan document / product / package / location",
                     },
                     events: {
-                        scan: "on_scan",
-                        add_to_existing_pack: "on_add_to_existing_pack",
-                        create_new_pack: "on_create_new_pack",
-                        process_without_pack: "on_process_without_pack",
                         qty_edit: "on_qty_edit",
                     },
                     on_qty_edit: (qty) => {
@@ -602,17 +595,14 @@ const Reception = {
                         title: "Set destination",
                         scan_placeholder: "Scan destination location",
                     },
-                    events: {
-                        scan: "on_scan",
-                    },
-                    on_scan: (location_id) => {
+                    on_scan: (location) => {
                         this.wait_call(
                             this.odoo.call("set_destination", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_ids: this._get_selected_line_ids(
                                     this.state.data.selected_move_lines
                                 ),
-                                location_id,
+                                location_id: location.text,
                                 confirmation: true,
                             })
                         );
@@ -624,11 +614,9 @@ const Reception = {
                         scan_placeholder: "Scan destination package",
                     },
                     events: {
-                        scan: "on_scan",
-                        back: "on_back",
-                        select_dest_package: "on_select_dest_package",
+                        select: "on_select",
                     },
-                    on_select_dest_package: (barcode) => {
+                    on_scan: (barcode) => {
                         this.wait_call(
                             this.odoo.call("select_dest_package", {
                                 picking_id: this.state.data.picking.id,

@@ -22,9 +22,10 @@ export var DatePicker = Vue.component("date-picker-input", {
     >
         <template v-slot:activator="{ on, attrs }">
             <v-text-field
-                v-model="expiry_date"
                 label="Select expiry date"
                 readonly
+                prepend-icon="mdi-calendar"
+                v-model="expiry_date"
                 v-bind="attrs"
                 v-on="on"
             ></v-text-field>
