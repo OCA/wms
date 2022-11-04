@@ -201,10 +201,12 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "quantity": line.product_uom_qty,
             },
         )
+        line_data = self._line_data(line)
+        line_data["qty_done"] = 10
         self.assert_response(
             response,
             next_state="scan_destination",
-            data=self._line_data(line),
+            data=line_data,
             message={
                 "message_type": "error",
                 "body": "Bin {} doesn't exist".format("⌿"),

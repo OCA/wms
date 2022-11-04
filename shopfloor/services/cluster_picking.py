@@ -100,8 +100,11 @@ class ClusterPicking(Component):
             popup=popup,
         )
 
-    def _response_for_scan_destination(self, move_line, message=None):
-        data = self._data_move_line(move_line)
+    def _response_for_scan_destination(self, move_line, message=None, qty_done=None):
+        if qty_done is None:
+            data = self._data_move_line(move_line)
+        else:
+            data = self._data_move_line(move_line, qty_done=qty_done)
         last_picked_line = self._last_picked_line(move_line.picking_id)
         if last_picked_line:
             # suggest pack to be used for the next line
@@ -451,13 +454,13 @@ class ClusterPicking(Component):
         if package and move_line.package_id == package:
             return self._scan_line_by_package(picking, move_line, package, batch)
 
-        # use the common search method so we search by packaging too
         product = search.product_from_scan(barcode)
-        if not product:
-            packaging = search.packaging_from_scan(barcode)
-            product = packaging.product_id
         if product and move_line.product_id == product:
             return self._scan_line_by_product(picking, move_line, product)
+
+        packaging = search.packaging_from_scan(barcode)
+        if move_line.product_id == packaging.product_id:
+            return self._scan_line_by_packaging(picking, move_line, packaging)
 
         lot = search.lot_from_scan(barcode, products=move_line.product_id)
         if lot and move_line.lot_id == lot:
@@ -477,6 +480,12 @@ class ClusterPicking(Component):
             move_line, message=self.msg_store.barcode_not_found()
         )
 
+    def _get_prefill_qty(self, move_line, qty=False):
+        """Returns the quantity to increment depending on no_prefill_qty optione."""
+        if self.work.menu.no_prefill_qty:
+            return qty
+        return move_line.product_uom_qty
+
     def _scan_line_by_package(self, picking, move_line, package, batch):
         """Package scanned, just work with it."""
         packaging = self._actions_for("packaging")
@@ -487,7 +496,8 @@ class ClusterPicking(Component):
             message = self.msg_store.several_lots_in_package(package)
         if message:
             return self._pick_next_line(batch, message=message)
-        return self._response_for_scan_destination(move_line)
+        quantity = self._get_prefill_qty(move_line)
+        return self._response_for_scan_destination(move_line, qty_done=quantity)
 
     def _scan_line_by_product(self, picking, move_line, product):
         """Product scanned, check if we can work with it.
@@ -522,7 +532,35 @@ class ClusterPicking(Component):
                 move_line,
                 message=self.msg_store.product_multiple_packages_scan_package(),
             )
-        return self._response_for_scan_destination(move_line)
+        quantity = self._get_prefill_qty(move_line, 1.0)
+        return self._response_for_scan_destination(move_line, qty_done=quantity)
+
+    def _scan_line_by_packaging(self, picking, move_line, packaging):
+        """Packaging scanned, check if we can work with it.
+
+        If the packaging related product is part of several packages in the same location,
+        we can't be sure it's the correct one, in such case, ask to scan a package
+        """
+        product = packaging.product_id
+        if move_line.product_id.tracking in ("lot", "serial"):
+            return self._response_for_start_line(
+                move_line, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
+            )
+        other_product_lines = picking.move_line_ids.filtered(
+            lambda l: l.product_id == product and l.location_id == move_line.location_id
+        )
+        packages = other_product_lines.mapped("package_id")
+        # Do not use mapped here: we want to see if we have more than one package,
+        # but also if we have one product as a package and the same product as
+        # a unit in another line. In both cases, we want the user to scan the
+        # package.
+        if packages and len({line.package_id for line in other_product_lines}) > 1:
+            return self._response_for_start_line(
+                move_line,
+                message=self.msg_store.product_multiple_packages_scan_package(),
+            )
+        quantity = self._get_prefill_qty(move_line, packaging.qty)
+        return self._response_for_scan_destination(move_line, qty_done=quantity)
 
     def _scan_line_by_lot(self, picking, move_line, lot):
         """Lot scanned, check if we can work with it.
@@ -543,7 +581,8 @@ class ClusterPicking(Component):
             return self._response_for_start_line(
                 move_line, message=self.msg_store.lot_multiple_packages_scan_package()
             )
-        return self._response_for_scan_destination(move_line)
+        quantity = self._get_prefill_qty(move_line, 1.0)
+        return self._response_for_scan_destination(move_line, qty_done=quantity)
 
     def _scan_line_by_location(self, picking, move_line, location):
         """Location scanned, check if we can work on goods contained into it.
@@ -583,6 +622,30 @@ class ClusterPicking(Component):
 
         return self._response_for_scan_destination(move_line)
 
+    def _set_destination_pack_update_quantity(self, move_line, quantity, barcode):
+        """Handle the done quantity increment on set_destination end point."""
+        response = None
+        if not self.work.menu.no_prefill_qty:
+            return response
+        search = self._actions_for("search")
+        # Handle barcode of product or packaging
+        product = search.product_from_scan(barcode)
+        packaging = self.env["product.packaging"].browse()
+        if not product:
+            packaging = search.packaging_from_scan(barcode)
+            product = packaging.product_id
+        if product and move_line.product_id == product:
+            quantity += packaging.qty or 1.0
+            response = self._response_for_scan_destination(move_line, qty_done=quantity)
+            return response
+        # Handle barcode of a lot
+        lot = search.lot_from_scan(barcode)
+        if lot and move_line.lot_id == lot:
+            quantity += 1.0
+            response = self._response_for_scan_destination(move_line, qty_done=quantity)
+            return response
+        return response
+
     def scan_destination_pack(self, picking_batch_id, move_line_id, barcode, quantity):
         """Scan the destination package (bin) for a move line
 
@@ -612,6 +675,12 @@ class ClusterPicking(Component):
                 batch, message=self.msg_store.operation_not_found()
             )
 
+        response = self._set_destination_pack_update_quantity(
+            move_line, quantity, barcode
+        )
+        if response:
+            return response
+
         new_line, qty_check = move_line._split_qty_to_be_done(quantity)
         if qty_check == "greater":
             return self._response_for_scan_destination(
@@ -623,7 +692,9 @@ class ClusterPicking(Component):
         bin_package = search.package_from_scan(barcode)
         if not bin_package:
             return self._response_for_scan_destination(
-                move_line, message=self.msg_store.bin_not_found_for_barcode(barcode)
+                move_line,
+                message=self.msg_store.bin_not_found_for_barcode(barcode),
+                qty_done=quantity,
             )
 
         # the scanned package can contain only move lines of the same picking
@@ -1199,7 +1270,12 @@ class ShopfloorClusterPickingValidator(Component):
             "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
-            "quantity": {"coerce": to_float, "required": True, "type": "float"},
+            "quantity": {
+                "coerce": to_float,
+                "required": True,
+                "nullable": True,
+                "type": "float",
+            },
         }
 
     def prepare_unload(self):
