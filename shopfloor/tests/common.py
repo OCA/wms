@@ -66,6 +66,7 @@ class CommonCase(BaseCommonCase):
                     "name": "Box",
                     "product_id": cls.product_a.id,
                     "barcode": "ProductABox",
+                    "qty": 3.0,
                 }
             )
         )
@@ -114,6 +115,7 @@ class CommonCase(BaseCommonCase):
                     "name": "Box",
                     "product_id": cls.product_c.id,
                     "barcode": "ProductCBox",
+                    "qty": 3,
                 }
             )
         )
