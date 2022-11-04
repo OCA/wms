@@ -7,7 +7,7 @@
 
 <!-- /!\ do not modify above this line -->
 
-# wms
+# Warehouse Management System (WMS)
 
 WMS modules for Odoo
 
