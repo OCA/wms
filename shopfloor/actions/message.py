@@ -456,6 +456,12 @@ class MessageAction(Component):
             "body": _("Place it in {}?").format(location_name),
         }
 
+    def product_not_found_in_current_picking(self):
+        return {
+            "message_type": "error",
+            "body": _("Product is not in the current transfer."),
+        }
+
     def lot_mixed_package_scan_package(self):
         return {
             "message_type": "warning",
