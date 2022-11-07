@@ -1436,6 +1436,16 @@ msgid "Unreserve Other Moves Is Possible"
 msgstr "Es posible Anular la Reserva de Otros Movimientos"
 
 #. module: shopfloor
+#: model:shopfloor.profile,name:shopfloor.profile_demo_2
+msgid "WH delivery"
+msgstr ""
+
+#. module: shopfloor
+#: model:shopfloor.profile,name:shopfloor.profile_demo_1
+msgid "WH worker"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_app__category__wms
 msgid "WMS"
 msgstr "WMS"
