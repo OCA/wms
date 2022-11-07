@@ -181,3 +181,8 @@ msgstr ""
 #, python-format
 msgid "Transfer {} has not been planned in the shipment {}."
 msgstr ""
+
+#. module: shopfloor_delivery_shipment
+#: model:shopfloor.profile,name:shopfloor_delivery_shipment.profile_demo_1
+msgid "WH delivery ship"
+msgstr ""
