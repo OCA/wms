@@ -60,6 +60,11 @@ msgid "Manage partners"
 msgstr ""
 
 #. module: shopfloor_example
+#: model:shopfloor.profile,name:shopfloor_example.shopfloor_profile_partner_manager_demo
+msgid "Partner manager"
+msgstr ""
+
+#. module: shopfloor_example
 #: model:shopfloor.app,name:shopfloor_example.app_demo_api_key
 msgid "Shopfloor Example - api key auth"
 msgstr ""
