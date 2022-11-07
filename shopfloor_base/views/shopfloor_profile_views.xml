@@ -5,6 +5,7 @@
         <field name="model">shopfloor.profile</field>
         <field name="arch" type="xml">
             <tree editable="bottom">
+              <field name="sequence" widget="handle" />
                 <field name="name" />
             </tree>
         </field>

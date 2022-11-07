@@ -6,8 +6,9 @@ from odoo import fields, models
 class ShopfloorProfile(models.Model):
     _name = "shopfloor.profile"
     _description = "Shopfloor profile settings"
+    _order = "sequence"
 
-    name = fields.Char(required=True)
+    name = fields.Char(required=True, translate=True)
     menu_ids = fields.One2many(
         comodel_name="shopfloor.menu",
         inverse_name="profile_id",
@@ -15,3 +16,4 @@ class ShopfloorProfile(models.Model):
         help="Menus visible for this profile",
     )
     active = fields.Boolean(default=True)
+    sequence = fields.Integer(default=0)
