@@ -415,7 +415,7 @@ class ManualProductTransfer(Component):
             # other moves for this product and location
             move_lines = self._find_location_move_lines(location, product, lot)
             move_lines, unreserved_moves, response = self._unreserve_other_lines(
-                location, move_lines
+                location, move_lines, product
             )
             if response:
                 savepoint.rollback()
@@ -491,8 +491,9 @@ class ManualProductTransfer(Component):
                 message=self.msg_store.wrong_record(scanned_product),
             )
 
-    # FIXME copy pasted from location content transfer, put it elsewhere?
-    def _unreserve_other_lines(self, location, move_lines):
+    # FIXME copy pasted from location content transfer with a new 'product'
+    # parameter', put it elsewhere?
+    def _unreserve_other_lines(self, location, move_lines, product):
         """Unreserve move lines in location in another picking type
 
         Returns a tuple of (
@@ -511,6 +512,7 @@ class ManualProductTransfer(Component):
             [
                 ("location_id", "=", location.id),
                 ("state", "in", ("assigned", "partially_available")),
+                ("product_id", "=", product.id),
             ]
         )
         extra_move_lines = location_move_lines - move_lines
