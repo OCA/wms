@@ -17,7 +17,11 @@ WMS modules for Odoo
 
 [//]: # (addons)
 
-This part will be replaced when running the oca-gen-addons-table script from OCA/maintainer-tools.
+Available addons
+----------------
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[stock_available_to_promise_release](stock_available_to_promise_release/) | 16.0.1.0.0 |  | Release Operations based on available to promise
 
 [//]: # (end addons)
 
