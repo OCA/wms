@@ -1,0 +1,18 @@
+import setuptools
+
+with open('VERSION.txt', 'r') as f:
+    version = f.read().strip()
+
+setuptools.setup(
+    name="odoo-addons-oca-wms",
+    description="Meta package for oca-wms Odoo addons",
+    version=version,
+    install_requires=[
+        'odoo-addon-stock_available_to_promise_release>=16.0dev,<16.1dev',
+    ],
+    classifiers=[
+        'Programming Language :: Python',
+        'Framework :: Odoo',
+        'Framework :: Odoo :: 16.0',
+    ]
+)
