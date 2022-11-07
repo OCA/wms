@@ -93,8 +93,8 @@ msgstr ""
 #: code:addons/shopfloor_delivery_shipment/actions/message.py:0
 #, python-format
 msgid ""
-"No shipment advice in progress found for this loading dock. Scan again {} to"
-" create a new one."
+"No shipment advice in progress found for this loading dock. Scan again {} to "
+"create a new one."
 msgstr ""
 "No se ha encontrado ningún aviso de envío en curso para esta dársena de "
 "carga. Escanée {} de nuevo para crear uno nuevo."
@@ -190,3 +190,8 @@ msgstr ""
 #, python-format
 msgid "Transfer {} has not been planned in the shipment {}."
 msgstr "La Transferencia {} no ha sido planeada en el envío {}."
+
+#. module: shopfloor_delivery_shipment
+#: model:shopfloor.profile,name:shopfloor_delivery_shipment.profile_demo_1
+msgid "WH delivery ship"
+msgstr ""
