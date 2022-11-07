@@ -1369,6 +1369,12 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "This product is part of a package, please scan a package."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "This product is part of multiple packages, please scan a package."
 msgstr "Este producto es parte de varios paquetes, escanee un paquete."
 
