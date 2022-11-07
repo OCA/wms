@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_picking_release_form" model="ir.ui.view">
+        <field name="name">stock.picking.release.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form" />
+        <field name="arch" type="xml">
+            <sheet position="inside">
+              <field name="need_release" invisible="1" />
+            </sheet>
+            <button name="action_confirm" position="after">
+                <field name="release_ready" invisible="1" />
+                <button
+                    name="release_available_to_promise"
+                    attrs="{'invisible': [('release_ready', '=', False)]}"
+                    string="Release"
+                    type="object"
+                    class="oe_highlight"
+                    groups="stock.group_stock_user"
+                />
+            </button>
+            <div name="button_box" position="inside">
+                <button
+                    type="object"
+                    name="action_open_move_need_release"
+                    attrs="{'invisible': [('need_release', '=', False)]}"
+                    class="oe_stat_button"
+                    icon="fa-cubes"
+                >
+                    <div class="o_field_widget o_stat_info mr4">
+                        <span class="o_stat_text">Release:</span>
+                        <span class="o_stat_text">Ready:</span>
+                    </div>
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="need_release_count" />
+                        </span>
+                        <span class="o_stat_value">
+                            <field name="release_ready_count" />
+                        </span>
+                    </div>
+                </button>
+            </div>
+        </field>
+    </record>
+    <record id="view_picking_release_tree" model="ir.ui.view">
+        <field name="name">stock.picking.release.tree</field>
+        <field name="model">stock.picking</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="stock.vpicktree" />
+        <field eval="900" name="priority" />
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="zip_code" optional="hide" />
+                <field name="city" optional="hide" />
+                <field name="state_id" options="{'no_open': True}" optional="hide" />
+            </field>
+            <field name="origin" position="after">
+                <field name="group_id" optional="hide" />
+            </field>
+            <tree position="inside">
+                <field name="date_priority" optional="show" />
+                <field name="need_release" invisible="1" />
+                <field name="release_ready" />
+                <field name="release_ready_count" />
+                <button
+                    name="action_open_move_need_release"
+                    string="View Move Allocations"
+                    title="View Move Allocations"
+                    icon="fa-cubes"
+                    type="object"
+                    attrs="{'invisible': [('need_release', '=', False)]}"
+                />
+            </tree>
+        </field>
+    </record>
+    <record id="view_picking_release_search" model="ir.ui.view">
+        <field name="name">stock.picking.release.search</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search" />
+        <field name="arch" type="xml">
+            <filter name="late" position="before">
+                <filter
+                    string="Release Ready"
+                    name="release_ready"
+                    domain="[('release_ready', '=', True)]"
+                />
+                <separator />
+            </filter>
+            <filter name="late" position="attributes">
+                <attribute
+                    name="domain"
+                >[('scheduled_date','&lt;', time.strftime('%%Y-%%m-%%d %%H:%%M:%%S')), ('state', 'in', ('assigned', 'waiting', 'confirmed')), ('need_release', '=', False)]</attribute>
+            </filter>
+            <filter name="waiting" position="attributes">
+                <attribute name="domain">
+                    [('state', 'in', ('confirmed', 'waiting')), ('need_release', '=', False)]
+                </attribute>
+            </filter>
+        </field>
+    </record>
+    <record id="stock_picking_release_action" model="ir.actions.act_window">
+        <field name="name">Transfers Allocations</field>
+        <field name="res_model">stock.picking</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="stock.view_picking_internal_search" />
+        <field
+            name="view_ids"
+            eval="[(5, 0, 0),
+                     (0, 0, {'view_mode': 'tree', 'view_id': ref('view_picking_release_tree')}),
+                     (0, 0, {'view_mode': 'kanban', 'view_id': ref('stock.stock_picking_kanban')}),
+                     (0, 0, {'view_mode': 'form', 'view_id': ref('stock.view_picking_form')}),
+                     ]"
+        />
+        <field
+            name="context"
+        >{'search_default_release_ready': 1, 'contact_display': 'partner_address'}</field>
+        <field name="domain">[('need_release', '=' , True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No transfers to release.
+            </p>
+        </field>
+    </record>
+    <menuitem
+        action="stock_picking_release_action"
+        id="stock_picking_release_menu"
+        parent="stock.menu_stock_warehouse_mgmt"
+        sequence="10"
+        groups="stock.group_stock_manager,stock.group_stock_user"
+    />
+</odoo>
