@@ -627,12 +627,12 @@ class Reception(Component):
         return self._response_for_set_destination(picking, selected_line)
 
     def set_destination(
-        self, picking_id, selected_line_id, location_id, confirmation=False
+        self, picking_id, selected_line_id, location_name, confirmation=False
     ):
         """Set the destination on the move line.
 
         input:
-            location_id: The id of the location
+            location_name: The name of the location
 
         transitions:
           - set_destination: Warning: User scanned a child location of the picking type.
@@ -652,7 +652,8 @@ class Reception(Component):
             return self._response_for_set_destination(
                 picking, selected_line, message=message
             )
-        location = self.env["stock.location"].browse(location_id)
+        search = self._actions_for("search")
+        location = search.location_from_scan(location_name)
         move_dest_location = selected_line.location_dest_id
         move_child_locations = self.env["stock.location"].search(
             [("id", "child_of", move_dest_location.id)]
@@ -812,7 +813,7 @@ class ShopfloorReceptionValidator(Component):
                 "type": "integer",
                 "required": True,
             },
-            "location_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "location_name": {"required": True, "type": "string"},
             "confirmation": {"type": "boolean"},
         }
 
