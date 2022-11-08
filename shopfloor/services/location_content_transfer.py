@@ -186,12 +186,6 @@ class LocationContentTransfer(Component):
             ("shopfloor_user_id", "=", False),
         ]
 
-    def _find_location_all_move_lines_domain(self, location):
-        return [
-            ("location_id", "=", location.id),
-            ("state", "in", ("assigned", "partially_available")),
-        ]
-
     def _find_location_move_lines(self, location):
         """Find lines that potentially are to move in the location"""
         return self.env["stock.move.line"].search(
@@ -221,42 +215,6 @@ class LocationContentTransfer(Component):
                 }
             )
         return self.env["stock.move"].create(move_vals_list)
-
-    def _unreserve_other_lines(self, location, move_lines):
-        """Unreserve move lines in location in another picking type
-
-        Returns a tuple of (
-          move lines that stays in the location to process,
-          moves to reserve again,
-          response to return to client in case of error
-        )
-        """
-        lines_other_picking_types = move_lines.filtered(
-            lambda line: line.picking_id.picking_type_id not in self.picking_types
-        )
-        if not lines_other_picking_types:
-            return (move_lines, self.env["stock.move"].browse(), None)
-        unreserved_moves = move_lines.move_id
-        location_move_lines = self.env["stock.move.line"].search(
-            self._find_location_all_move_lines_domain(location)
-        )
-        extra_move_lines = location_move_lines - move_lines
-        if extra_move_lines:
-            return (
-                self.env["stock.move.line"].browse(),
-                self.env["stock.move"].browse(),
-                self._response_for_start(
-                    message=self.msg_store.picking_already_started_in_location(
-                        extra_move_lines.picking_id
-                    )
-                ),
-            )
-        package_levels = move_lines.package_level_id
-        # if we leave the package level around, it will try to reserve
-        # the same package as before
-        package_levels.explode_package()
-        unreserved_moves._do_unreserve()
-        return (move_lines - lines_other_picking_types, unreserved_moves, None)
 
     def scan_location(self, barcode):  # noqa: C901
         """Scan start location
@@ -297,14 +255,16 @@ class LocationContentTransfer(Component):
         move_lines = self._find_location_move_lines(location)
 
         savepoint = self._actions_for("savepoint").new()
+        unreserve = self._actions_for("stock.unreserve")
 
         unreserved_moves = self.env["stock.move"].browse()
         if self.work.menu.allow_unreserve_other_moves:
-            move_lines, unreserved_moves, response = self._unreserve_other_lines(
-                location, move_lines
+            message = unreserve.check_unreserve(location, move_lines)
+            if message:
+                return self._response_for_start(message=message)
+            move_lines, unreserved_moves = unreserve.unreserve_moves(
+                move_lines, self.picking_types
             )
-            if response:
-                return response
         else:
             picking_types = move_lines.picking_id.picking_type_id
             if len(picking_types) > 1:
