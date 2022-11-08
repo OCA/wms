@@ -380,8 +380,8 @@ const Reception = {
                     this.utils.wms.group_by_pack,
                     "product"
                 ),
-                group_color_maker: function (lines) {
-                    return picking.completion == 100
+                group_color_maker: function () {
+                    return picking.progress == 100
                         ? "screen_step_done"
                         : "screen_step_todo";
                 },
