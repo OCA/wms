@@ -106,8 +106,8 @@ const Reception = {
                 />
                 <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
                     <packaging-qty-picker
-                        :key="make_state_component_key(['packaging-qty-picker', get_line_being_handled().id])"
-                        :options="utils.wms.move_line_qty_picker_options(get_line_being_handled())"
+                        :key="make_state_component_key(['packaging-qty-picker', line_being_handled.id])"
+                        :options="utils.wms.move_line_qty_picker_options(line_being_handled)"
                         :card_color="utils.colors.color_for('screen_step_todo')"
                     />
                 </v-card>
@@ -189,6 +189,9 @@ const Reception = {
         search_input_placeholder_expiry: function () {
             return this.state.display_info.scan_input_placeholder_expiry;
         },
+        line_being_handled: function () {
+            return this.state.data.selected_move_line[0] || {};
+        },
     },
     methods: {
         screen_title: function () {
@@ -247,19 +250,19 @@ const Reception = {
         },
         picking_detail_options_for_set_lot: function () {
             return {
-                key_title: "selected_move_lines[0].product.display_name",
+                key_title: "selected_move_line[0].product.display_name",
                 fields: [
                     {
-                        path: "selected_move_lines[0].product.supplier_code",
+                        path: "selected_move_line[0].product.supplier_code",
                         label: "Vendor code",
                     },
                     {
-                        path: "selected_move_lines[0].product.barcode",
+                        path: "selected_move_line[0].product.barcode",
                         label: "Product code",
                         action_val_path: "barcode",
                     },
-                    {path: "selected_move_lines[0].package_dest.name", label: "Pack"},
-                    {path: "selected_move_lines[0].lot.name", label: "Lot"},
+                    {path: "selected_move_line[0].package_dest.name", label: "Pack"},
+                    {path: "selected_move_line[0].lot.name", label: "Lot"},
                     {
                         path: "picking.scheduled_date",
                         label: "Scheduled date",
@@ -272,18 +275,18 @@ const Reception = {
         },
         picking_detail_options_for_set_quantity: function () {
             return {
-                key_title: "selected_move_lines[0].product.display_name",
+                key_title: "selected_move_line[0].product.display_name",
                 fields: [
                     {
-                        path: "selected_move_lines[0].product.supplier_code",
+                        path: "selected_move_line[0].product.supplier_code",
                         label: "Vendor code",
                     },
                     {
-                        path: "selected_move_lines[0].product.barcode",
+                        path: "selected_move_line[0].product.barcode",
                         label: "Product code",
                         action_val_path: "barcode",
                     },
-                    {path: "selected_move_lines[0].lot.name", label: "Lot"},
+                    {path: "selected_move_line[0].lot.name", label: "Lot"},
                     // TODO: need exp. date & remov. date from the backend
                     {
                         path: "picking.scheduled_date",
@@ -400,9 +403,6 @@ const Reception = {
         },
         on_mark_done: function () {
             this.$root.trigger("mark_as_done");
-        },
-        get_line_being_handled: function () {
-            return this.state.data.selected_move_lines[0];
         },
         get_next_line_id_to_handle: function () {
             // The enpoints in the backend accept multiple selected line ids.
@@ -523,7 +523,7 @@ const Reception = {
                         this.wait_call(
                             this.odoo.call("set_lot", {
                                 picking_id: this.state.data.picking.id,
-                                selected_line_ids: this.get_next_line_id_to_handle(),
+                                selected_line_id: this.line_being_handled.id,
                                 lot_name: barcode.text,
                             })
                         );
@@ -532,7 +532,7 @@ const Reception = {
                         this.wait_call(
                             this.odoo.call("set_lot", {
                                 picking_id: this.state.data.picking.id,
-                                selected_line_ids: this.get_next_line_id_to_handle(),
+                                selected_line_id: this.line_being_handled.id,
                                 expiration_date: expiration_date,
                             })
                         );
@@ -541,7 +541,7 @@ const Reception = {
                         this.wait_call(
                             this.odoo.call("set_lot_confirm_action", {
                                 picking_id: this.state.data.picking.id,
-                                selected_line_ids: this.get_next_line_id_to_handle(),
+                                selected_line_id: this.line_being_handled.id,
                             })
                         );
                     },
@@ -563,11 +563,9 @@ const Reception = {
                             this.odoo.call("set_quantity", {
                                 // TODO: add quantity from qty-picker
                                 picking_id: this.state.data.picking.id,
-                                selected_line_ids: this._get_selected_line_ids(
-                                    this.state.data.selected_move_lines
-                                ),
+                                selected_line_id: this.line_being_handled.id,
                                 quantity: this.scan_destination_qty,
-                                barcode,
+                                barcode: barcode.text,
                                 confirmation: true,
                             })
                         );
@@ -584,9 +582,7 @@ const Reception = {
                         this.wait_call(
                             this.odoo.call("process_with_existing_pack", {
                                 picking_id: this.state.data.picking.id,
-                                selected_line_ids: this._get_selected_line_ids(
-                                    this.state.data.selected_move_lines
-                                ),
+                                selected_line_id: this.line_being_handled.id,
                                 quantity: this.scan_destination_qty,
                             })
                         );
@@ -595,9 +591,7 @@ const Reception = {
                         this.wait_call(
                             this.odoo.call("process_with_new_pack", {
                                 picking_id: this.state.data.picking.id,
-                                selected_line_ids: this._get_selected_line_ids(
-                                    this.state.data.selected_move_lines
-                                ),
+                                selected_line_id: this.line_being_handled.id,
                                 quantity: this.scan_destination_qty,
                             })
                         );
@@ -606,9 +600,7 @@ const Reception = {
                         this.wait_call(
                             this.odoo.call("process_without_pack", {
                                 picking_id: this.state.data.picking.id,
-                                selected_line_ids: this._get_selected_line_ids(
-                                    this.state.data.selected_move_lines
-                                ),
+                                selected_line_id: this.line_being_handled.id,
                                 quantity: this.scan_destination_qty,
                             })
                         );
@@ -623,9 +615,7 @@ const Reception = {
                         this.wait_call(
                             this.odoo.call("set_destination", {
                                 picking_id: this.state.data.picking.id,
-                                selected_line_ids: this._get_selected_line_ids(
-                                    this.state.data.selected_move_lines
-                                ),
+                                selected_line_id: this.line_being_handled.id,
                                 location_id: location.text,
                                 confirmation: true,
                             })
@@ -638,16 +628,14 @@ const Reception = {
                         scan_placeholder: "Scan destination package",
                     },
                     events: {
-                        select: "on_select",
+                        select: "on_scan",
                     },
-                    on_scan: (barcode) => {
+                    on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("select_dest_package", {
                                 picking_id: this.state.data.picking.id,
-                                selected_line_ids: this._get_selected_line_ids(
-                                    this.state.data.selected_move_lines
-                                ),
-                                barcode: barcode.text,
+                                selected_line_id: this.line_being_handled.id,
+                                barcode: scanned.name,
                             })
                         );
                     },
@@ -664,9 +652,7 @@ const Reception = {
                         this.wait_call(
                             this.odoo.call("select_dest_package", {
                                 picking_id: this.state.data.picking.id,
-                                selected_line_ids: this._get_selected_line_ids(
-                                    this.state.data.selected_move_lines
-                                ),
+                                selected_line_id: this.line_being_handled.id,
                                 confirmation: true,
                                 barcode: this.state.data.new_package_name,
                             })
