@@ -79,9 +79,9 @@ const Reception = {
             </template>
             <template v-if="state_is('set_lot')">
                 <item-detail-card
-                    :record="state.data"
+                    :record="line_being_handled"
                     :options="picking_detail_options_for_set_lot()"
-                    :card_color="utils.colors.color_for('screen_step_todo')"
+                    :card_color="has_lot() ? utils.colors.color_for('screen_step_done') : utils.colors.color_for('screen_step_todo')"
                     :key="make_state_component_key(['reception-product-item-detail-set-lot', state.data.picking.id])"
                 />
                 <div class="button-list button-vertical-list full">
@@ -131,15 +131,15 @@ const Reception = {
             </template>
             <template v-if="state_is('set_destination')">
                 <item-detail-card
-                    :record="state.data"
+                    :record="line_being_handled"
                     :options="picking_detail_options_for_set_destination()"
-                    :card_color="utils.colors.color_for('screen_step_todo')"
+                    :card_color="utils.colors.color_for('screen_step_done')"
                     :key="make_state_component_key(['reception-product-item-detail-set-destination-pack', state.data.picking.id])"
                 />
                 <item-detail-card
-                    :record="state.data"
+                    :record="line_being_handled"
                     :card_color="utils.colors.color_for('screen_step_todo')"
-                    :options="{key_title: 'selected_move_lines[0].location_dest.barcode'}"
+                    :options="{key_title: 'location_dest.barcode'}"
                     :key="make_state_component_key(['reception-product-item-detail-set-destination-dest-location', state.data.picking.id])"
                 />
             </template>
@@ -250,26 +250,27 @@ const Reception = {
         },
         picking_detail_options_for_set_lot: function () {
             return {
-                key_title: "selected_move_line[0].product.display_name",
+                key_title: "product.display_name",
                 fields: [
                     {
-                        path: "selected_move_line[0].product.supplier_code",
+                        path: "product.supplier_code",
                         label: "Vendor code",
                     },
                     {
-                        path: "selected_move_line[0].product.barcode",
-                        label: "Product code",
+                        path: "product.barcode",
+                        label: "Barcode",
                         action_val_path: "barcode",
                     },
-                    {path: "selected_move_line[0].package_dest.name", label: "Pack"},
-                    {path: "selected_move_line[0].lot.name", label: "Lot"},
+                    {path: "package_dest.name", label: "Pack"},
                     {
-                        path: "picking.scheduled_date",
-                        label: "Scheduled date",
+                        path: "lot.expiration_date",
+                        label: "Expiry date",
+                        klass: "loud",
                         renderer: (rec, field) => {
                             return this.utils.display.render_field_date(rec, field);
                         },
                     },
+                    {path: "lot.name", label: "Lot", klass: "loud"},
                 ],
             };
         },
@@ -283,7 +284,7 @@ const Reception = {
                     },
                     {
                         path: "selected_move_line[0].product.barcode",
-                        label: "Product code",
+                        label: "Barcode",
                         action_val_path: "barcode",
                     },
                     {path: "selected_move_line[0].lot.name", label: "Lot"},
@@ -307,19 +308,18 @@ const Reception = {
                     // TODO: uncomment this line once the backend has an endpoint to cancel lines.
                     // actions: ["action_cancel_line"],
                     fields: [
-                        {path: "product.barcode", label: "Product code"},
+                        {path: "product.barcode", label: "Barcode"},
                         {path: "product.supplier_code", label: "Vendor code"},
                         {path: "package_dest.name", label: "Pack"},
                         {
                             path: "qty_done",
                             label: "Received qty",
-                            display_no_value: true,
                             renderer: (rec, field) => {
-                                return rec.qty_done ? rec.qty_done : "None";
+                                return rec.qty_done ? rec.qty_done : 0;
                             },
                         },
                     ],
-                    header_fields: [{path: "product.barcode", label: "Product code"}],
+                    header_fields: [{path: "product.barcode", label: "Barcode"}],
                     group_header_title_key: "display_name",
                     list_item_klass_maker: klass_maker,
                 },
@@ -327,25 +327,33 @@ const Reception = {
         },
         picking_detail_options_for_set_destination: function () {
             return {
-                key_title: "selected_move_lines[0].product.display_name",
+                key_title: "product.display_name",
                 fields: [
                     {
-                        path: "selected_move_lines[0].product.supplier_code",
+                        path: "product.supplier_code",
                         label: "Vendor code",
                     },
                     {
-                        path: "selected_move_lines[0].product.barcode",
-                        label: "Product code",
+                        path: "product.barcode",
+                        label: "Barcode",
                         action_val_path: "barcode",
                     },
                     {
-                        path: "picking.scheduled_date",
-                        label: "Scheduled date",
+                        path: "lot.name",
+                        label: "Lot",
+                    },
+                    {
+                        path: "lot.expiration_date",
+                        label: "Expiry date",
                         renderer: (rec, field) => {
                             return this.utils.display.render_field_date(rec, field);
                         },
                     },
-                    {path: "selected_move_lines[0].package_dest.name", label: "Pack"},
+                    {
+                        path: "selected_move_line[0].package_dest.name",
+                        label: "Pack",
+                        klass: "loud",
+                    },
                 ],
             };
         },
@@ -403,6 +411,9 @@ const Reception = {
         },
         on_mark_done: function () {
             this.$root.trigger("mark_as_done");
+        },
+        has_lot: function () {
+            return !_.isEmpty(this.line_being_handled.lot);
         },
         get_next_line_id_to_handle: function () {
             // The enpoints in the backend accept multiple selected line ids.
@@ -463,6 +474,7 @@ const Reception = {
                     events: {
                         mark_as_done: "on_mark_as_done",
                         cancel_picking_line: "on_cancel",
+                        go_back: "on_back",
                     },
                     on_scan: (barcode) => {
                         this.wait_call(
@@ -478,6 +490,9 @@ const Reception = {
                                 picking_id: this.state.data.picking.id,
                             })
                         );
+                    },
+                    on_back: () => {
+                        this.state_to("select_document");
                     },
                     on_cancel: () => {
                         // TODO: endpoint missing in backend
@@ -616,7 +631,7 @@ const Reception = {
                             this.odoo.call("set_destination", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_id: this.line_being_handled.id,
-                                location_id: location.text,
+                                location_name: location.text,
                                 confirmation: true,
                             })
                         );
