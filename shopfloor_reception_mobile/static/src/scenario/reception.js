@@ -296,6 +296,8 @@ const Reception = {
             };
         },
         picking_summary_options_for_select_line: function () {
+            // This is in its own variable to avoid issues with prettier.
+            const klass_maker = this.utils.wms.list_item_klass_maker_by_progress;
             return {
                 show_title: false,
                 list_item_options: {
@@ -316,7 +318,7 @@ const Reception = {
                     ],
                     header_fields: [{path: "product.barcode", label: "Product code"}],
                     group_header_title_key: "display_name",
-                    list_item_klass_maker: this.utils.wms.move_line_color_klass,
+                    list_item_klass_maker: klass_maker,
                 },
             };
         },
