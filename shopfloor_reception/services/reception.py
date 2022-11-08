@@ -96,6 +96,19 @@ class Reception(Component):
         data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
         return self._response(next_state="confirm_done", data=data, message=message)
 
+    def _response_for_confirm_new_package(
+        self, picking, lines, new_package_name, message=None
+    ):
+        picking.user_id = self.env.user
+        data = {
+            "selected_move_lines": self._data_for_move_lines(lines),
+            "picking": self._data_for_stock_picking(picking, with_lines=True),
+            "new_package_name": new_package_name,
+        }
+        return self._response(
+            next_state="confirm_new_package", data=data, message=message
+        )
+
     def _select_document_from_product(self, product):
         """Select the document by product
 
@@ -707,8 +720,8 @@ class Reception(Component):
             selected_lines.result_package_id = package
             return self._response_for_select_line(picking)
         message = self.msg_store.create_new_pack_ask_confirmation(barcode)
-        return self._response_for_select_dest_package(
-            picking, selected_lines, message=message
+        return self._response_for_confirm_new_package(
+            picking, selected_lines, new_package_name=barcode, message=message
         )
 
 
@@ -851,6 +864,7 @@ class ShopfloorReceptionValidatorResponse(Component):
             "set_quantity": self._schema_set_quantity,
             "set_destination": self._schema_set_destination,
             "select_dest_package": self._schema_select_dest_package,
+            "confirm_new_package": self._schema_confirm_new_package,
         }
 
     def _start_next_states(self):
@@ -872,7 +886,7 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {"set_destination", "select_line"}
 
     def _select_dest_package_next_states(self):
-        return {"set_lot", "select_dest_package"}
+        return {"set_lot", "select_dest_package", "confirm_new_package"}
 
     def _done_next_states(self):
         return {"select_document", "select_line", "confirm_done"}
@@ -971,6 +985,19 @@ class ShopfloorReceptionValidatorResponse(Component):
                 },
             },
             "picking": {"type": "dict", "schema": self.schemas.picking()},
+        }
+
+    @property
+    def _schema_confirm_new_package(self):
+        return {
+            "selected_move_lines": {
+                "type": "list",
+                "schema": {"type": "dict", "schema": self.schemas.move_line()},
+            },
+            "picking": self.schemas._schema_dict_of(
+                self._schema_stock_picking_with_lines(), required=True
+            ),
+            "new_package_name": {"type": "string"},
         }
 
     # ENDPOINTS

@@ -164,6 +164,20 @@ const Reception = {
                     </v-row>
                 </div>
             </template>
+            <template v-if="state_is('confirm_new_package')">
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-action action="todo" @click="state.on_confirm">Confirm</btn-action>
+                        </v-col>
+                    </v-row>
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back />
+                        </v-col>
+                    </v-row>
+                </div>
+            </template>
         </Screen>
     `,
     computed: {
@@ -348,7 +362,15 @@ const Reception = {
                 group_color: this.utils.colors.color_for("screen_step_todo"),
                 list_item_component: "list-item",
                 list_item_options: {
-                    fields: [{path: "weight", label: "Weight"}],
+                    fields: [
+                        {path: "weight", label: "Weight", display_no_value: true},
+                        {
+                            path: "move_line_count",
+                            label: "Lines already in pack",
+                            display_no_value: true,
+                        },
+                        {path: "storage_type", label: "Package type"},
+                    ],
                 },
             };
         },
@@ -623,9 +645,34 @@ const Reception = {
                                 selected_line_ids: this._get_selected_line_ids(
                                     this.state.data.selected_move_lines
                                 ),
-                                barcode,
+                                barcode: barcode.text,
                             })
                         );
+                    },
+                },
+                confirm_new_package: {
+                    display_info: {
+                        title: "Confirm new package",
+                    },
+                    events: {
+                        confirm: "on_confirm",
+                        go_back: "on_back",
+                    },
+                    on_confirm: () => {
+                        this.wait_call(
+                            this.odoo.call("select_dest_package", {
+                                picking_id: this.state.data.picking.id,
+                                selected_line_ids: this._get_selected_line_ids(
+                                    this.state.data.selected_move_lines
+                                ),
+                                confirmation: true,
+                                barcode: this.state.data.new_package_name,
+                            })
+                        );
+                    },
+                    on_back: () => {
+                        this.state_to("select_dest_package");
+                        this.reset_notification();
                     },
                 },
             },
