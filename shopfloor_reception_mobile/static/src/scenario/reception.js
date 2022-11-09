@@ -555,7 +555,7 @@ const Reception = {
                             // We need to wait for the call to the backend to be over
                             // to update the date-picker-input component
                             // with the expiration_date of the selected lot.
-                            return event_hub.$emit(
+                            event_hub.$emit(
                                 "datepicker:lotselected",
                                 this.line_being_handled.lot
                             );
