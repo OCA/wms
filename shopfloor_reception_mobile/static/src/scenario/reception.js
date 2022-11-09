@@ -387,18 +387,26 @@ const Reception = {
             };
         },
         picking_summary_records_grouped: function (picking) {
-            return this.utils.wms.group_lines_by_product(picking.move_lines, {
-                prepare_records: _.partialRight(
-                    this.utils.wms.group_by_pack,
-                    "product"
-                ),
-                group_color_maker: function () {
-                    return picking.progress == 100
-                        ? "screen_step_done"
-                        : "screen_step_todo";
-                },
-                group_no_title: true,
-            });
+            const grouped_lines = this.utils.wms.group_lines_by_product(
+                picking.move_lines,
+                {
+                    prepare_records: _.partialRight(
+                        this.utils.wms.group_by_pack,
+                        "product"
+                    ),
+                    group_color_maker: function (value) {
+                        return value[0].progress == 100
+                            ? "screen_step_done"
+                            : "screen_step_todo";
+                    },
+                    group_no_title: true,
+                }
+            );
+            // There are two color options for each group: done or todo.
+            // We make sure to display the todo groups on top.
+            return grouped_lines.sort((prev, next) =>
+                prev.group_color > next.group_color ? -1 : 1
+            );
         },
         on_search: function (input) {
             this.filtered_pickings = this.state.data.pickings.filter((picking) =>
