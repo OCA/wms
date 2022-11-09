@@ -166,7 +166,7 @@ const Checkout = {
                 <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
                     <packaging-qty-picker
                         :key="make_state_component_key(['packaging-qty-picker', state.data.line.id])"
-                        :options="utils.wms.move_line_qty_picker_options(state.data.line)"
+                        v-bind="utils.wms.move_line_qty_picker_props(state.data.line)"
                         />
                 </v-card>
                 <div class="button-list button-vertical-list full">

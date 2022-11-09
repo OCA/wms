@@ -8,22 +8,32 @@
 
 export var PackagingQtyPickerMixin = {
     props: {
-        options: Object,
+        options: Object, // options are replaced by props
+        mode: String,
+        qtyInit: Number,
+        uom: {type: Object, required: true},
+        availablePackaging: Array,
         pkgNameKey: String, // "code" or "name"
     },
     data: function () {
         return {
-            qty_done: 0,
-            qty_todo: 0,
+            qty: parseInt(this.qtyInit, 10),
             qty_by_pkg: {},
             qty_by_pkg_manual: false,
         };
     },
     watch: {
-        qty_done: function () {
-            if (!this.qty_by_pkg_manual)
-                this.qty_by_pkg = this.product_qty_by_packaging();
-            this.qty_by_pkg_manual = false;
+        qtyInit: function () {
+            this.qty = parseInt(this.qtyInit, 10);
+        },
+        qty: {
+            handler() {
+                if (!this.qty_by_pkg_manual) {
+                    this.qty_by_pkg = this.product_qty_by_packaging();
+                }
+                this.qty_by_pkg_manual = false;
+            },
+            immediate: true,
         },
     },
     methods: {
@@ -65,7 +75,7 @@ export var PackagingQtyPickerMixin = {
                    Default: to UoM unit.
         */
         product_qty_by_packaging: function () {
-            return this._product_qty_by_packaging(this.sorted_packaging, this.qty_done);
+            return this._product_qty_by_packaging(this.sorted_packaging, this.qty);
         },
         /**
          * Produce a list of tuple of packaging qty and packaging name.
@@ -111,45 +121,23 @@ export var PackagingQtyPickerMixin = {
             return value;
         },
         compute_qty: function () {
-            this.qty_done = this._compute_qty();
+            this.qty = this._compute_qty();
         },
-    },
-    created: function () {
-        this.qty_todo = parseInt(this.opts.init_value, 10);
-        this.qty_done = parseInt(this.opts.init_value, 10);
     },
     computed: {
-        opts() {
-            const opts = _.defaults({}, this.$props.options, {
-                input_type: "text",
-                init_value: 0,
-                mode: "",
-                available_packaging: [],
-                uom: {},
-                pkg_name_key: "code", // This comes from packaging type
-            });
-            return opts;
-        },
         unit_uom: function () {
             let unit = {};
-            if (!_.isEmpty(this.opts.uom)) {
+            if (!_.isEmpty(this.uom)) {
                 // Create an object like the packaging
                 // to be used seamlessly in the widget.
                 unit = {
-                    id: "uom-" + this.opts.uom.id,
-                    name: this.opts.uom.name,
-                    qty: this.opts.uom.factor,
-                    rounding: this.opts.uom.rounding,
+                    id: "uom-" + this.uom.id,
+                    name: this.uom.name,
+                    qty: this.uom.factor,
+                    rounding: this.uom.rounding,
                 };
             }
             return unit;
-        },
-        packaging: function () {
-            let unit = [];
-            if (!_.isEmpty(this.unit_uom)) {
-                unit = [this.unit_uom];
-            }
-            return _.concat(this.opts.available_packaging, unit);
         },
         /**
          * Sort packaging by qty and exclude the ones w/ qty = 0
@@ -203,11 +191,11 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
     mixins: [PackagingQtyPickerMixin],
     props: {
         readonly: Boolean,
+        qtyTodo: {type: Number, required: true},
         pkgNameKey: {default: "name"},
     },
     data: function () {
         return {
-            qty_todo: 0,
             panel: 0, // expand panel by default
         };
     },
@@ -215,7 +203,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
         qty_by_pkg: {
             deep: true,
             handler: function () {
-                // prevent watched qty_done to update again qty_by_pkg
+                // prevent watched qty to update again qty_by_pkg
                 this.qty_by_pkg_manual = true;
                 this.compute_qty();
                 this.qty_by_pkg_manual = false;
@@ -224,37 +212,52 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
     },
     created: function () {
         // Propagate the newly initialized quantity to the parent component
-        this.$root.trigger("qty_edit", this.qty_done);
+        this.$root.trigger("qty_edit", this.qty);
     },
     updated: function () {
-        this.$root.trigger("qty_edit", this.qty_done);
+        this.$root.trigger("qty_edit", this.qty);
     },
     computed: {
         qty_color: function () {
-            if (this.qty_done == this.qty_todo) {
+            if (this.qty == this.qtyTodo) {
                 if (this.readonly) return "";
                 return "background-color: rgb(143, 191, 68)";
             }
-            if (this.qty_done > this.qty_todo) {
+            if (this.qty > this.qtyTodo) {
                 return "background-color: orangered";
             }
             return "background-color: pink";
         },
+        qty_todo_by_pkg: function () {
+            // Used to calculate the qty needed of each package type
+            // based on the qty todo.
+            let total_qty_todo = this.qtyTodo;
+            const res = {};
+            this.sorted_packaging.forEach((pkg) => {
+                let pkg_units = 0;
+                while (pkg.qty <= total_qty_todo) {
+                    pkg_units++;
+                    total_qty_todo -= pkg.qty;
+                }
+                res[pkg.id] = pkg_units;
+            });
+            return res;
+        },
     },
     template: `
-<div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode : '']">
+<div :class="[$options._componentTag, mode ? 'mode-' + mode : '']">
     <v-expansion-panels flat v-model="panel">
         <v-expansion-panel>
             <v-expansion-panel-header expand-icon="mdi-menu-down">
                 <v-row dense align="center">
                     <v-col cols="5" md="3">
-                        <input type="number" v-model="qty_done" class="qty-done" :style="qty_color"
+                        <input type="number" v-model="qty" class="qty-done" :style="qty_color"
                             v-on:click.stop
                             :readonly="readonly"
                         />
                     </v-col>
-                    <v-col cols="3" md="2" :class="readonly ? 'd-none' : ''">
-                        <span class="qty-todo">/ {{ qty_todo }}</span>
+                    <v-col cols="3" md="2" v-if="!readonly">
+                        <span class="qty-todo">/ {{ qtyTodo }}</span>
                     </v-col>
                     <v-col>
                         {{ unit_uom.name }}
@@ -263,6 +266,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
             </v-expansion-panel-header>
             <v-expansion-panel-content v-if="sorted_packaging.length > 1">
                 <v-row dense
+                    align="center"
                     v-for="(pkg, index) in sorted_packaging"
                     :key="make_component_key([pkg.id])"
                     :class="(readonly && !qty_by_pkg[pkg.id]) ? 'd-none' : ''"
@@ -276,6 +280,9 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
                             @focus="!readonly && ($event.target.value='')"
                             @blur="$event.target.value=qty_by_pkg[pkg.id]"
                             />
+                    </v-col>
+                    <v-col cols="2" md="2" v-if="!readonly">
+                        <span class="qty-todo">/ {{ qty_todo_by_pkg[pkg.id] }}</span>
                     </v-col>
                     <v-col>
                         <div class="pkg-name"> {{ pkg[pkgNameKey] }}</div>
@@ -311,9 +318,6 @@ export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-displ
                 return [];
             return packagings;
         },
-    },
-    updated: function () {
-        this.qty_todo = parseInt(this.opts.init_value, 10);
     },
     template: `
     <div :class="[$options._componentTag, mode ? 'mode-' + mode: '', 'd-inline']">
