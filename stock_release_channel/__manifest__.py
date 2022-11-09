@@ -5,9 +5,11 @@
     "name": "Stock Release Channels",
     "summary": "Manage workload in WMS with release channels",
     "version": "14.0.1.0.0",
+    "development_status": "Beta",
     "license": "AGPL-3",
-    "author": "Camptocamp",
-    "website": "https://www.camptocamp.com",
+    "author": "Camptocamp, Odoo Community Association (OCA)",
+    "maintainers": ["sebalix"],
+    "website": "https://github.com/OCA/wms",
     "depends": [
         "sale_stock",
         "stock_available_to_promise_release",  # OCA/wms
