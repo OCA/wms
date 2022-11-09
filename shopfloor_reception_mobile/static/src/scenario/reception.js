@@ -57,11 +57,6 @@ const Reception = {
                             <btn-action @click="on_mark_done">Mark as Done</btn-action>
                         </v-col>
                     </v-row>
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <btn-back />
-                        </v-col>
-                    </v-row>
                 </div>
             </template>
             <template v-if="state_is('confirm_done')">
@@ -484,7 +479,6 @@ const Reception = {
                     events: {
                         mark_as_done: "on_mark_as_done",
                         cancel_picking_line: "on_cancel",
-                        go_back: "on_back",
                     },
                     on_scan: (barcode) => {
                         this.wait_call(
@@ -500,9 +494,6 @@ const Reception = {
                                 picking_id: this.state.data.picking.id,
                             })
                         );
-                    },
-                    on_back: () => {
-                        this.state_to("select_document");
                     },
                     on_cancel: () => {
                         // TODO: endpoint missing in backend
@@ -666,14 +657,23 @@ const Reception = {
                         scan_placeholder: "Scan destination package",
                     },
                     events: {
-                        select: "on_scan",
+                        select: "on_select",
                     },
-                    on_scan: (scanned) => {
+                    on_scan: (barcode) => {
                         this.wait_call(
                             this.odoo.call("select_dest_package", {
                                 picking_id: this.state.data.picking.id,
                                 selected_line_id: this.line_being_handled.id,
-                                barcode: scanned.name,
+                                barcode: barcode.text,
+                            })
+                        );
+                    },
+                    on_select: (selected) => {
+                        this.wait_call(
+                            this.odoo.call("select_dest_package", {
+                                picking_id: this.state.data.picking.id,
+                                selected_line_id: this.line_being_handled.id,
+                                barcode: selected.name,
                             })
                         );
                     },
