@@ -46,7 +46,7 @@ export var PackagingQtyPickerMixin = {
             // Special case for UOM ids as they can clash w/ pkg ids
             // we prefix it w/ "uom-"
             id = id.startsWith("uom-") ? id : parseInt(id, 10);
-            return _.find(this.packaging, ["id", id]);
+            return _.find(this.sorted_packaging, ["id", id]);
         },
         /**
          *
@@ -152,11 +152,20 @@ export var PackagingQtyPickerMixin = {
         },
         /**
          * Sort packaging by qty and exclude the ones w/ qty = 0
+         * Include the uom
          */
         sorted_packaging: function () {
-            return _.reverse(
-                _.sortBy(_.filter(this.packaging, _.property("qty")), _.property("qty"))
+            let packagings = _.reverse(
+                _.sortBy(
+                    _.filter(this.availablePackaging, _.property("qty")),
+                    _.property("qty")
+                )
             );
+            let unit = [];
+            if (!_.isEmpty(this.unit_uom)) {
+                unit = [this.unit_uom];
+            }
+            return _.concat(packagings, unit);
         },
         /**
          * Collect qty of contained packaging inside bigger packaging.
