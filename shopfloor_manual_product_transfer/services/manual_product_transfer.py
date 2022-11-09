@@ -266,10 +266,8 @@ class ManualProductTransfer(Component):
         # Compute the initial quantity
         initial_qty = self._get_initial_qty(location, product, lot)
         # No product available quantity to move
-        if (
-            product
-            and lot
-            and float_is_zero(initial_qty, precision_rounding=product.uom_id.rounding)
+        if (product or lot) and float_is_zero(
+            initial_qty, precision_rounding=product.uom_id.rounding
         ):
             return self._response_for_scan_product(
                 location, message=self.msg_store.no_product_in_location(location)
