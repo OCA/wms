@@ -511,8 +511,6 @@ class Reception(Component):
             message = self.msg_store.record_not_found()
             return self._response_for_set_lot(picking, selected_line, message=message)
         search = self._actions_for("search")
-        # We are assured that all selected lines are related to the same product.
-        # See `_select_line_from_packaging` and `_select_line_from_product`.
         if lot_name:
             product = selected_line.product_id
             lot = search.lot_from_scan(lot_name, products=product)
@@ -529,7 +527,7 @@ class Reception(Component):
             selected_line._onchange_lot_id()
         elif expiration_date:
             selected_line.write({"expiration_date": expiration_date})
-            selected_line.mapped("lot_id").write({"expiration_date": expiration_date})
+            selected_line.lot_id.write({"expiration_date": expiration_date})
         return self._response_for_set_lot(picking, selected_line)
 
     def set_lot_confirm_action(self, picking_id, selected_line_id):
@@ -610,12 +608,30 @@ class Reception(Component):
     def process_with_existing_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
+        new_line, qty_check = selected_line._split_qty_to_be_done(quantity)
+        if qty_check == "greater":
+            return self._response_for_set_quantity(
+                picking,
+                selected_line,
+                message=self.msg_store.unable_to_pick_more(
+                    selected_line.product_uom_qty
+                ),
+            )
         selected_line.qty_done = quantity
         return self._response_for_select_dest_package(picking, selected_line)
 
     def process_with_new_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
+        new_line, qty_check = selected_line._split_qty_to_be_done(quantity)
+        if qty_check == "greater":
+            return self._response_for_set_quantity(
+                picking,
+                selected_line,
+                message=self.msg_store.unable_to_pick_more(
+                    selected_line.product_uom_qty
+                ),
+            )
         selected_line.qty_done = quantity
         picking._put_in_pack(selected_line)
         return self._response_for_set_destination(picking, selected_line)
@@ -623,6 +639,15 @@ class Reception(Component):
     def process_without_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
+        new_line, qty_check = selected_line._split_qty_to_be_done(quantity)
+        if qty_check == "greater":
+            return self._response_for_set_quantity(
+                picking,
+                selected_line,
+                message=self.msg_store.unable_to_pick_more(
+                    selected_line.product_uom_qty
+                ),
+            )
         selected_line.qty_done = quantity
         return self._response_for_set_destination(picking, selected_line)
 
@@ -723,7 +748,6 @@ class Reception(Component):
                     message=self.msg_store.package_not_empty(package),
                 )
             selected_line.result_package_id = package
-            selected_line._split_qty_to_be_done(selected_line.qty_done)
             return self._response_for_select_line(picking)
         message = self.msg_store.create_new_pack_ask_confirmation(barcode)
         return self._response_for_confirm_new_package(
@@ -892,7 +916,7 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {"set_destination", "select_line"}
 
     def _select_dest_package_next_states(self):
-        return {"set_lot", "select_dest_package", "confirm_new_package"}
+        return {"set_lot", "select_dest_package", "confirm_new_package", "select_line"}
 
     def _done_next_states(self):
         return {"select_document", "select_line", "confirm_done"}
