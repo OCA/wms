@@ -7,15 +7,15 @@ class StockStorageCategory(models.Model):
 
     _inherit = "stock.storage.category"
 
+    allow_new_product = fields.Selection(
+        selection_add=[("same_lot", "If lots are all the same")],
+        ondelete={"same_lot": "cascade"},
+    )
+
     computed_location_ids = fields.One2many(
         comodel_name="stock.location", inverse_name="computed_storage_category_id"
     )
 
-    do_not_mix_lots = fields.Boolean(
-        help="If checked, moves to the destination location will only be "
-        "allowed if the location contains product of the same "
-        "lot."
-    )
     # TODO: Move these fields in another module ?
     max_height = fields.Float(
         string="Max height (mm)",

@@ -9,11 +9,6 @@
         <field name="arch" type="xml">
             <field name="package_type_id" position="after">
                 <field name="allow_new_product" />
-                <field
-                    name="do_not_mix_lots"
-                    attrs="{'invisible': [('allow_new_product', '!=', 'same')]}"
-                />
-
             </field>
         </field>
     </record>

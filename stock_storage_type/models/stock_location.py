@@ -138,8 +138,8 @@ class StockLocation(models.Model):
 
     @api.depends(
         "usage",
-        "computed_storage_category_id.do_not_mix_lots",
-        "computed_storage_category_id.capacity_ids.do_not_mix_lots",
+        "computed_storage_category_id.allow_new_product",
+        "computed_storage_category_id.capacity_ids.allow_new_product",
     )
     def _compute_do_not_mix_lots(self):
         """
@@ -150,10 +150,10 @@ class StockLocation(models.Model):
         for rec in self:
             rec.do_not_mix_lots = rec.usage == "internal" and (
                 any(
-                    storage_type.do_not_mix_lots
+                    storage_type.allow_new_product == "same_lot"
                     for storage_type in rec.computed_storage_category_id.capacity_ids
                 )
-                or rec.computed_storage_category_id.do_not_mix_lots
+                or rec.computed_storage_category_id.allow_new_product == "same_lot"
             )
 
     @api.depends(
@@ -190,10 +190,11 @@ class StockLocation(models.Model):
         for rec in self:
             rec.do_not_mix_products = rec.usage == "internal" and (
                 any(
-                    storage_type.allow_new_product == "same"
+                    storage_type.allow_new_product in ("same", "same_lot")
                     for storage_type in rec.computed_storage_category_id.capacity_ids
                 )
-                or rec.computed_storage_category_id.allow_new_product == "same"
+                or rec.computed_storage_category_id.allow_new_product
+                in ("same", "same_lot")
             )
 
     @api.depends(

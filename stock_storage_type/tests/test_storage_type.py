@@ -1,7 +1,6 @@
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
-from odoo.exceptions import ValidationError
-from odoo.tests import Form, TransactionCase
+from odoo.tests import TransactionCase
 
 
 class TestStorageType(TransactionCase):
@@ -95,15 +94,6 @@ class TestStorageType(TransactionCase):
             bin_1_child.computed_storage_category_id.capacity_ids, special_cardboxes
         )
 
-    def test_location_storage_type_constraints_definition(self):
-        # Cannot set do not mix lots without do not mix products
-        with self.assertRaises(ValidationError):
-            self.pallets_location_storage_type.do_not_mix_lots = True
-        self.pallets_location_storage_type.do_not_mix_lots = False
-        self.pallets_location_storage_type.allow_new_product = "empty"
-        self.pallets_location_storage_type.allow_new_product = "same"
-        self.pallets_location_storage_type.do_not_mix_lots = True
-
     def test_location_leaf_locations(self):
         cardboxes_leaves = self.env["stock.location"].search(
             [("id", "child_of", self.cardboxes_stock.id), ("child_ids", "=", False)]
@@ -186,22 +176,3 @@ class TestStorageType(TransactionCase):
         message += "strategy will look for an allowed location in the "
         message += "following locations:"
         self.assertIn(message, pallets.storage_type_message)
-
-    def test_check_do_not_mix_lots(self):
-        """
-        Check the Form behaviour on do_not_mix_lots field
-        If we set the capacity to allow same products only,
-        the field should be set to False.
-        """
-        pallets = self.env.ref("stock_storage_type.package_storage_type_pallets")
-        capacity = self.env["stock.storage.category.capacity"].create(
-            {
-                "storage_category_id": pallets.id,
-                "quantity": 1,
-            }
-        )
-        self.assertFalse(capacity.do_not_mix_lots)
-        with Form(capacity) as capacity_form:
-            capacity_form.do_not_mix_lots = True
-            capacity_form.allow_new_product = "same"
-        self.assertFalse(capacity.do_not_mix_lots)

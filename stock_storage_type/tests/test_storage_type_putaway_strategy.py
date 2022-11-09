@@ -215,9 +215,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         )
 
     def test_storage_strategy_no_products_lots_mix_ordered_locations_cardboxes(self):
-        self.cardboxes_location_storage_type.write(
-            {"allow_new_product": "same", "do_not_mix_lots": True}
-        )
+        self.cardboxes_location_storage_type.write({"allow_new_product": "same_lot"})
         # Set a quantity in cardbox bin 2 to make sure constraint is applied
         self.env["stock.quant"]._update_available_quantity(
             self.env.ref("product.product_product_10"),
