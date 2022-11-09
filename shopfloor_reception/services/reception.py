@@ -722,6 +722,7 @@ class Reception(Component):
                     selected_line,
                     message=self.msg_store.package_not_empty(package),
                 )
+            selected_line.result_package_id = package
             selected_line._split_qty_to_be_done(selected_line.qty_done)
             return self._response_for_select_line(picking)
         message = self.msg_store.create_new_pack_ask_confirmation(barcode)
