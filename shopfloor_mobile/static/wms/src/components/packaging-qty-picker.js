@@ -9,6 +9,7 @@
 export var PackagingQtyPickerMixin = {
     props: {
         options: Object,
+        pkgNameKey: String, // "code" or "name"
     },
     data: function () {
         return {
@@ -202,6 +203,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
     mixins: [PackagingQtyPickerMixin],
     props: {
         readonly: Boolean,
+        pkgNameKey: {default: "name"},
     },
     data: function () {
         return {
@@ -276,7 +278,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
                             />
                     </v-col>
                     <v-col>
-                        <div class="pkg-name"> {{ pkg.name }}</div>
+                        <div class="pkg-name"> {{ pkg[pkgNameKey] }}</div>
                         <div v-if="contained_packaging[pkg.id]" class="pkg-qty">(x{{ contained_packaging[pkg.id].qty }} {{ contained_packaging[pkg.id].pkg.name }})</div>
                     </v-col>
                 </v-row>
@@ -289,26 +291,39 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
 
 export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-display", {
     mixins: [PackagingQtyPickerMixin],
+    props: {
+        nonZeroOnly: Boolean,
+        pkgNameKey: {default: "code"},
+    },
     methods: {
         display_pkg: function (pkg) {
-            return this.opts.non_zero_only ? this.qty_by_pkg[pkg.id] > 0 : true;
+            return this.nonZeroOnly ? this.qty_by_pkg[pkg.id] > 0 : true;
         },
     },
     computed: {
         visible_packaging: function () {
-            return _.filter(this.sorted_packaging, this.display_pkg);
+            let packagings = _.filter(this.sorted_packaging, this.display_pkg);
+            // Do not display if only uom packaging
+            if (
+                packagings.length == 1 &&
+                packagings[0].id.toString().startsWith("uom-")
+            )
+                return [];
+            return packagings;
         },
     },
     updated: function () {
         this.qty_todo = parseInt(this.opts.init_value, 10);
     },
     template: `
-<div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode: '', 'd-inline']">
-    <span class="packaging" v-for="(pkg, index) in visible_packaging" :key="make_component_key([pkg.id])">
-        <span class="pkg-qty" v-text="qty_by_pkg[pkg.id]" />
-        <span class="pkg-name" v-text="pkg[opts.pkg_name_key]" /><span class="sep" v-if="index != Object.keys(visible_packaging).length - 1">, </span>
-    </span>
-    <span class="min-unit">({{ qty_todo }} {{ unit_uom.name }})</span>
-</div>
+    <div :class="[$options._componentTag, mode ? 'mode-' + mode: '', 'd-inline']">
+        <span class="min-unit">{{ qty }} {{ unit_uom.name }}</span>
+        <span class="packaging" v-for="(pkg, index) in visible_packaging" :key="make_component_key([pkg.id])">
+            <span v-if="index == 0">(</span>
+            <span class="pkg-qty" v-text="qty_by_pkg[pkg.id]" />
+            <span class="pkg-name" v-text="pkg[pkgNameKey] || unit_uom.name" /><span class="sep" v-if="index != Object.keys(visible_packaging).length - 1"> + </span>
+            <span v-if="index == visible_packaging.length - 1">)</span>
+        </span>
+    </div>
 `,
 });
