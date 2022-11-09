@@ -480,7 +480,7 @@ class ClusterPicking(Component):
             move_line, message=self.msg_store.barcode_not_found()
         )
 
-    def _get_prefill_qty(self, move_line, qty=False):
+    def _get_prefill_qty(self, move_line, qty=0):
         """Returns the quantity to increment depending on no_prefill_qty optione."""
         if self.work.menu.no_prefill_qty:
             return qty
@@ -532,7 +532,7 @@ class ClusterPicking(Component):
                 move_line,
                 message=self.msg_store.product_multiple_packages_scan_package(),
             )
-        quantity = self._get_prefill_qty(move_line, 1.0)
+        quantity = self._get_prefill_qty(move_line, qty=1)
         return self._response_for_scan_destination(move_line, qty_done=quantity)
 
     def _scan_line_by_packaging(self, picking, move_line, packaging):
@@ -619,8 +619,8 @@ class ClusterPicking(Component):
                         move_line.location_id
                     ),
                 )
-
-        return self._response_for_scan_destination(move_line)
+        quantity = self._get_prefill_qty(move_line)
+        return self._response_for_scan_destination(move_line, qty_done=quantity)
 
     def _set_destination_pack_update_quantity(self, move_line, quantity, barcode):
         """Handle the done quantity increment on set_destination end point."""
