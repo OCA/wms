@@ -202,9 +202,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         # Mark picking to allow creation and use of existing lots in order
         # to register two times the same lot in different packages
         self.receipts_picking_type.use_existing_lots = True
-        self.cardboxes_location_storage_type.write(
-            {"allow_new_product": "same", "do_not_mix_lots": True}
-        )
+        self.cardboxes_location_storage_type.write({"allow_new_product": "same_lot"})
         # Create picking
         in_picking = self.env["stock.picking"].create(
             {
