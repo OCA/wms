@@ -82,7 +82,7 @@ const Reception = {
                 <item-detail-card
                     :record="line_being_handled"
                     :options="picking_detail_options_for_set_lot()"
-                    :card_color="has_expiry_date() ? utils.colors.color_for('screen_step_done') : utils.colors.color_for('screen_step_todo')"
+                    :card_color="lot_has_expiry_date() ? utils.colors.color_for('screen_step_done') : utils.colors.color_for('screen_step_todo')"
                     :key="make_state_component_key(['reception-product-item-detail-set-lot', state.data.picking.id])"
                 />
                 <div class="button-list button-vertical-list full">
@@ -100,7 +100,7 @@ const Reception = {
             </template>
             <template v-if="state_is('set_quantity')">
                 <item-detail-card
-                    :record="state.data"
+                    :record="line_being_handled"
                     :options="picking_detail_options_for_set_quantity()"
                     :card_color="utils.colors.color_for('screen_step_done')"
                     :key="make_state_component_key(['reception-product-item-detail-set-quantity', state.data.picking.id])"
@@ -128,6 +128,13 @@ const Reception = {
                             <btn-action @click="state.on_process_without_pack">Process without pack</btn-action>
                         </v-col>
                     </v-row>
+                    <div class="button-list button-vertical-list full">
+                        <v-row align="center">
+                            <v-col class="text-center" cols="12">
+                                <btn-back/>
+                            </v-col>
+                        </v-row>
+                    </div>
                 </div>
             </template>
             <template v-if="state_is('set_destination')">
@@ -212,6 +219,20 @@ const Reception = {
                 identifier: data.picking.name,
             };
         },
+        operation_options: function () {
+            return {
+                title_action_field: {action_val_path: "name"},
+                fields: [
+                    {
+                        path: "origin",
+                        renderer: (rec, field) => {
+                            return rec.origin + " - " + rec.partner.name;
+                        },
+                    },
+                    {path: "carrier"},
+                ],
+            };
+        },
         manual_select_options_for_select_document: function () {
             return {
                 group_title_default: "Pickings to process",
@@ -235,20 +256,6 @@ const Reception = {
                 },
             };
         },
-        operation_options: function () {
-            return {
-                title_action_field: {action_val_path: "name"},
-                fields: [
-                    {
-                        path: "origin",
-                        renderer: (rec, field) => {
-                            return rec.origin + " - " + rec.partner.name;
-                        },
-                    },
-                    {path: "carrier"},
-                ],
-            };
-        },
         picking_detail_options_for_set_lot: function () {
             return {
                 key_title: "product.display_name",
@@ -260,9 +267,8 @@ const Reception = {
                     {
                         path: "product.barcode",
                         label: "Barcode",
-                        action_val_path: "barcode",
                     },
-                    {path: "package_dest.name", label: "Pack"},
+                    {path: "lot.name", label: "Lot", klass: "loud"},
                     {
                         path: "lot.expiration_date",
                         label: "Expiry date",
@@ -271,28 +277,25 @@ const Reception = {
                             return this.utils.display.render_field_date(rec, field);
                         },
                     },
-                    {path: "lot.name", label: "Lot", klass: "loud"},
                 ],
             };
         },
         picking_detail_options_for_set_quantity: function () {
             return {
-                key_title: "selected_move_line[0].product.display_name",
+                key_title: "product.display_name",
                 fields: [
                     {
-                        path: "selected_move_line[0].product.supplier_code",
+                        path: "product.barcode",
+                        label: "Barcode",
+                    },
+                    {
+                        path: "product.supplier_code",
                         label: "Vendor code",
                     },
+                    {path: "lot.name", label: "Lot"},
                     {
-                        path: "selected_move_line[0].product.barcode",
-                        label: "Barcode",
-                        action_val_path: "barcode",
-                    },
-                    {path: "selected_move_line[0].lot.name", label: "Lot"},
-                    // TODO: need exp. date & remov. date from the backend
-                    {
-                        path: "picking.scheduled_date",
-                        label: "Scheduled date",
+                        path: "lot.expiration_date",
+                        label: "Expiry date",
                         renderer: (rec, field) => {
                             return this.utils.display.render_field_date(rec, field);
                         },
@@ -351,7 +354,7 @@ const Reception = {
                         },
                     },
                     {
-                        path: "selected_move_line[0].package_dest.name",
+                        path: "package_dest.name",
                         label: "Pack",
                         klass: "loud",
                     },
@@ -383,7 +386,7 @@ const Reception = {
                             label: "Lines already in pack",
                             display_no_value: true,
                         },
-                        {path: "storage_type", label: "Package type"},
+                        {path: "storage_type.name", label: "Package type"},
                     ],
                 },
             };
@@ -413,7 +416,7 @@ const Reception = {
         on_mark_done: function () {
             this.$root.trigger("mark_as_done");
         },
-        has_expiry_date: function () {
+        lot_has_expiry_date: function () {
             // If there's a expiry date, it means there's a lot too.
             const expiry_date = _.result(
                 this.line_being_handled,
@@ -584,6 +587,7 @@ const Reception = {
                     },
                     events: {
                         qty_edit: "on_qty_edit",
+                        go_back: "on_back",
                     },
                     on_qty_edit: (qty) => {
                         this.scan_destination_qty = parseInt(qty, 10);
@@ -634,6 +638,10 @@ const Reception = {
                                 quantity: this.scan_destination_qty,
                             })
                         );
+                    },
+                    on_back: () => {
+                        this.state_to("set_lot");
+                        this.reset_notification();
                     },
                 },
                 set_destination: {
