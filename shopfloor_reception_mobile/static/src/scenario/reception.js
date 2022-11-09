@@ -5,6 +5,7 @@
 
 import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
 import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
+import event_hub from "/shopfloor_mobile_base/static/wms/src/services/event_hub.js";
 
 const Reception = {
     mixins: [ScenarioBaseMixin],
@@ -81,7 +82,7 @@ const Reception = {
                 <item-detail-card
                     :record="line_being_handled"
                     :options="picking_detail_options_for_set_lot()"
-                    :card_color="has_lot() ? utils.colors.color_for('screen_step_done') : utils.colors.color_for('screen_step_todo')"
+                    :card_color="has_expiry_date() ? utils.colors.color_for('screen_step_done') : utils.colors.color_for('screen_step_todo')"
                     :key="make_state_component_key(['reception-product-item-detail-set-lot', state.data.picking.id])"
                 />
                 <div class="button-list button-vertical-list full">
@@ -412,8 +413,14 @@ const Reception = {
         on_mark_done: function () {
             this.$root.trigger("mark_as_done");
         },
-        has_lot: function () {
-            return !_.isEmpty(this.line_being_handled.lot);
+        has_expiry_date: function () {
+            // If there's a expiry date, it means there's a lot too.
+            const expiry_date = _.result(
+                this.line_being_handled,
+                "lot.expiration_date",
+                ""
+            );
+            return !_.isEmpty(expiry_date);
         },
         get_next_line_id_to_handle: function () {
             // The enpoints in the backend accept multiple selected line ids.
@@ -541,7 +548,15 @@ const Reception = {
                                 selected_line_id: this.line_being_handled.id,
                                 lot_name: barcode.text,
                             })
-                        );
+                        ).then(() => {
+                            // We need to wait for the call to the backend to be over
+                            // to update the date-picker-input component
+                            // with the expiration_date of the selected lot.
+                            return event_hub.$emit(
+                                "datepicker:lotselected",
+                                this.line_being_handled.lot
+                            );
+                        });
                     },
                     on_date_picker_selected: (expiration_date) => {
                         this.wait_call(
