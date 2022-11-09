@@ -80,14 +80,14 @@ Vue.component("picking-select-package-content", {
                 <span class="label">Taken:</span>
                 <packaging-qty-picker-display
                     :key="make_component_key(['qty-picker-widget', 'taken', record.id])"
-                    :options="utils.wms.move_line_qty_picker_options(record, {init_value: record.qty_done})"
+                    v-bind="utils.wms.move_line_qty_picker_props(record, {qtyInit: record.qty_done})"
                     />
             </div>
             <div class="qty requested">
                 <span class="label">Requested:</span>
                 <packaging-qty-picker-display
                     :key="make_component_key(['qty-picker-widget', 'requested', record.id])"
-                    :options="utils.wms.move_line_qty_picker_options(record)"
+                    v-bind="utils.wms.move_line_qty_picker_props(record, {qtyInit: record.quantity})"
                     />
             </div>
             <div class="vendor-code">

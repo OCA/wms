@@ -187,7 +187,7 @@ Vue.component("picking-summary-product-detail", {
                         <span class="label">Qty:</span>
                         <packaging-qty-picker-display
                             :key="make_component_key(['picking-summary', 'qty-picker-widget', 'done', record.id])"
-                            :options="utils.wms.move_line_qty_picker_options(record, {init_value: record.qty_done})"
+                            v-bind="utils.wms.move_line_qty_picker_props(record, {qtyInit: record.qty_done})"
                             />
                     </div>
                 </v-list-item-subtitle>

@@ -63,16 +63,20 @@ Vue.component("detail-transfer", {
                     path: "product.qty_reserved",
                     label: "Qty reserved",
                     render_component: "packaging-qty-picker-display",
-                    render_options: function (record) {
-                        return self.utils.wms.move_line_qty_picker_options(record);
+                    render_props: function (record) {
+                        return self.utils.wms.move_line_qty_picker_props(record, {
+                            qtyInit: record.product.qty_reserved,
+                        });
                     },
                 },
                 {
                     path: "product.qty_available",
                     label: "Qty in stock",
                     render_component: "packaging-qty-picker-display",
-                    render_options: function (record) {
-                        return self.utils.wms.move_line_qty_picker_options(record);
+                    render_props: function (record) {
+                        return self.utils.wms.move_line_qty_picker_props(record, {
+                            qtyInit: record.product.qty_available,
+                        });
                     },
                 },
             ];

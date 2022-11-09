@@ -73,7 +73,7 @@ const template_mobile = `
                 <template v-slot:item.quantity="{ item }">
                     <packaging-qty-picker-display
                         :key="make_state_component_key(['qty-picker-widget', item['_origin'].id])"
-                        :options="utils.wms.move_line_qty_picker_options(item['_origin'])"
+                        v-bind="utils.wms.move_line_qty_picker_props(item['_origin'], {'qtyInit': item.quantity})"
                         />
                 </template>
                 <template v-slot:item.priority="{ item }">
@@ -133,7 +133,7 @@ const template_mobile = `
                 class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
             <packaging-qty-picker
                 :key="make_state_component_key(['packaging-qty-picker', state.data.move_line.id])"
-                :options="utils.wms.move_line_qty_picker_options(state.data.move_line)"
+                v-bind="utils.wms.move_line_qty_picker_props(state.data.move_line)"
                 />
         </v-card>
         <item-detail-card
@@ -432,8 +432,10 @@ const ZonePicking = {
                     path: "quantity",
                     label: "Qty",
                     render_component: "packaging-qty-picker-display",
-                    render_options: function (record) {
-                        return self.utils.wms.move_line_qty_picker_options(record);
+                    render_props: function (record) {
+                        return self.utils.wms.move_line_qty_picker_props(record, {
+                            qtyInit: record.quantity,
+                        });
                     },
                 },
                 {path: "package_src.weight", label: "Weight"},

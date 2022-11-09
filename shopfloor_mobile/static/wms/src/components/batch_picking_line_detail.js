@@ -58,7 +58,7 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
   <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
     <packaging-qty-picker
       :key="make_component_key(['packaging-qty-picker', line.id])"
-      :options="utils.wms.move_line_qty_picker_options(line)"
+      v-bind="utils.wms.move_line_qty_picker_props(line, {qtyInit: showQtyPicker ? line.qty_done : line.quantity})"
       :readonly="!showQtyPicker"
       />
   </v-card>
