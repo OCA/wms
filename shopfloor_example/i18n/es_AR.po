@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2022-04-10 18:05+0000\n"
+"PO-Revision-Date: 2022-11-09 22:45+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.3.2\n"
+"X-Generator: Weblate 4.14.1\n"
 
 #. module: shopfloor_example
 #: model:ir.model,name:shopfloor_example.model_shopfloor_app
@@ -65,7 +65,7 @@ msgstr "Gestionar contactos"
 #. module: shopfloor_example
 #: model:shopfloor.profile,name:shopfloor_example.shopfloor_profile_partner_manager_demo
 msgid "Partner manager"
-msgstr ""
+msgstr "Gestor de contactos"
 
 #. module: shopfloor_example
 #: model:shopfloor.app,name:shopfloor_example.app_demo_api_key
