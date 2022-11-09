@@ -72,7 +72,7 @@ class StockQuant(models.Model):
                         ).format(storage_capacity=capacity.display_name)
                     )
                     continue
-                if capacity.do_not_mix_lots and (
+                if capacity.allow_new_product == "same_lot" and (
                     len(package_lots) > 1
                     or len(lots_in_location) >= 1
                     and package_lots != lots_in_location
@@ -82,7 +82,7 @@ class StockQuant(models.Model):
                             "Storage Capacity {storage_capacity} is flagged 'do not mix"
                             " lots' but there are other lots in "
                             "location."
-                        ).format(storage_type=capacity.display_name)
+                        ).format(storage_capacity=capacity.display_name)
                     )
                     continue
                 # Check size constraint

@@ -152,7 +152,7 @@ class TestStockLocation(TestStorageTypeCommon):
 
     def test_will_contain_lot_ids(self):
         location = self.pallets_bin_1_location
-        location.computed_storage_category_id.do_not_mix_lots = True
+        location.computed_storage_category_id.allow_new_product = "same_lot"
         lot_values = {"product_id": self.product.id, "company_id": self.env.company.id}
         lot1 = self.env["stock.lot"].create(lot_values)
         lot2 = self.env["stock.lot"].create(lot_values)
@@ -187,7 +187,7 @@ class TestStockLocation(TestStorageTypeCommon):
         )
         self.assertEqual(location.location_will_contain_lot_ids, lot1 | lot2)
 
-        location.computed_storage_category_id.do_not_mix_lots = False
+        location.computed_storage_category_id.allow_new_product = "mixed"
         self.assertEqual(
             location.location_will_contain_lot_ids,
             self.env["stock.lot"].browse(),
