@@ -38,6 +38,7 @@ Vue.component("item-detail-card", {
                                 v-if="field.render_component"
                                 :is="field.render_component"
                                 :options="field.render_options ? field.render_options(record) : {}"
+                                v-bind="field.render_props ? field.render_props(record) : {}"
                                 :record="record"
                                 :key="make_component_key([field.render_component, 'list', index, record.id])"
                                 />

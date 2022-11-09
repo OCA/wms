@@ -165,6 +165,7 @@ Vue.component("list-item", {
                     <component
                         v-if="field.render_component"
                         :is="field.render_component"
+                        v-bind="field.render_props ? field.render_props(record) : {}"
                         :options="field.render_options ? field.render_options(record) : {}"
                         :record="record"
                         :key="make_component_key([field.render_component, 'list', index, record.id])"
