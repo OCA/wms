@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2022-10-30 06:44+0000\n"
+"PO-Revision-Date: 2022-11-09 22:45+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -1370,7 +1370,7 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This product is part of a package, please scan a package."
-msgstr ""
+msgstr "Este producto es parte de un paquete, escanée un paquete."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1444,12 +1444,12 @@ msgstr "Es posible Anular la Reserva de Otros Movimientos"
 #. module: shopfloor
 #: model:shopfloor.profile,name:shopfloor.profile_demo_2
 msgid "WH delivery"
-msgstr ""
+msgstr "Entrega WH"
 
 #. module: shopfloor
 #: model:shopfloor.profile,name:shopfloor.profile_demo_1
 msgid "WH worker"
-msgstr ""
+msgstr "Trabajador WH"
 
 #. module: shopfloor
 #: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_app__category__wms
