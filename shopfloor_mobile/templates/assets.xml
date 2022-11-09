@@ -27,6 +27,11 @@
                 type="module"
             />
             <script
+                id="script_manual_select_color"
+                t-attf-src="/shopfloor_mobile/static/wms/src/components/manual_select_color.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
                 id="script_misc"
                 t-attf-src="/shopfloor_mobile/static/wms/src/components/misc.js?v=#{mod_version}"
                 type="module"
