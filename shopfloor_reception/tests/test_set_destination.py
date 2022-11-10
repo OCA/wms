@@ -27,8 +27,8 @@ class TestSetDestination(CommonCase):
             "set_destination",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
-                "location_id": self.shelf2.id,
+                "selected_line_id": selected_move_line.id,
+                "location_name": self.shelf2.name,
             },
         )
         self.assertEqual(selected_move_line.location_dest_id, self.shelf2)
@@ -50,8 +50,8 @@ class TestSetDestination(CommonCase):
             "set_destination",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
-                "location_id": self.dispatch_location.id,
+                "selected_line_id": selected_move_line.id,
+                "location_name": self.dispatch_location.name,
             },
         )
         # location is a child of the picking type's location. destination location
@@ -64,7 +64,7 @@ class TestSetDestination(CommonCase):
             next_state="set_destination",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
             message={
                 "message_type": "warning",
@@ -76,8 +76,8 @@ class TestSetDestination(CommonCase):
             "set_destination",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
-                "location_id": self.dispatch_location.id,
+                "selected_line_id": selected_move_line.id,
+                "location_name": self.dispatch_location.name,
                 "confirmation": True,
             },
         )
@@ -99,8 +99,8 @@ class TestSetDestination(CommonCase):
             "set_destination",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
-                "location_id": self.shelf1.id,
+                "selected_line_id": selected_move_line.id,
+                "location_name": self.shelf1.name,
             },
         )
         data = self.data.picking(picking)
@@ -109,7 +109,7 @@ class TestSetDestination(CommonCase):
             next_state="set_destination",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
             message={"message_type": "error", "body": "You cannot place it here"},
         )

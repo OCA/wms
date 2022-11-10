@@ -48,7 +48,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "quantity": 10.0,
             },
         )
@@ -59,7 +59,7 @@ class TestSetQuantity(CommonCase):
             next_state="set_quantity",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )
 
@@ -72,7 +72,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": self.product_a.barcode,
             },
         )
@@ -83,7 +83,7 @@ class TestSetQuantity(CommonCase):
             next_state="set_quantity",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )
         # Scan again, and ensure qty increments
@@ -91,7 +91,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": self.product_a.barcode,
             },
         )
@@ -99,7 +99,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": self.product_a.barcode,
             },
         )
@@ -107,7 +107,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": self.product_a.barcode,
             },
         )
@@ -122,7 +122,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": self.product_a_packaging.barcode,
             },
         )
@@ -133,7 +133,7 @@ class TestSetQuantity(CommonCase):
             next_state="set_quantity",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )
         # Scan again, and ensure qty increments
@@ -141,7 +141,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": self.product_a_packaging.barcode,
             },
         )
@@ -157,7 +157,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": self.package_with_location_child_of_dest.name,
             },
         )
@@ -180,7 +180,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": self.package_with_location.name,
             },
         )
@@ -190,7 +190,7 @@ class TestSetQuantity(CommonCase):
             next_state="set_quantity",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
             message={"message_type": "error", "body": "You cannot place it here"},
         )
@@ -205,7 +205,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": self.package_without_location.name,
             },
         )
@@ -218,7 +218,7 @@ class TestSetQuantity(CommonCase):
             next_state="set_destination",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )
 
@@ -231,7 +231,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": self.dispatch_location.barcode,
             },
         )
@@ -249,7 +249,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": self.packing_location.barcode,
             },
         )
@@ -259,7 +259,7 @@ class TestSetQuantity(CommonCase):
             next_state="set_quantity",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
             message={"message_type": "error", "body": "You cannot place it here"},
         )
@@ -273,7 +273,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": "FooBar",
             },
         )
@@ -284,7 +284,7 @@ class TestSetQuantity(CommonCase):
             next_state="set_quantity",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
             message={
                 "message_type": "warning",
@@ -295,7 +295,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": "FooBar",
                 "confirmation": True,
             },
@@ -307,6 +307,6 @@ class TestSetQuantity(CommonCase):
             next_state="set_destination",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )

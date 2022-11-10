@@ -25,19 +25,19 @@ class TestSelectDestPackage(CommonCase):
             "select_dest_package",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": "FooBar",
             },
         )
-        # Package doesn't exists, odoo asks for a confirmation to create it
+        # Package doesn't exist, odoo asks for a confirmation to create it
         self.assertFalse(selected_move_line.result_package_id)
-        data = self.data.picking(picking)
         self.assert_response(
             response,
-            next_state="select_dest_package",
+            next_state="confirm_new_package",
             data={
-                "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "picking": self._data_for_picking_with_line(picking),
+                "selected_move_line": self.data.move_lines(selected_move_line),
+                "new_package_name": "FooBar",
             },
             message={
                 "message_type": "warning",
@@ -49,20 +49,16 @@ class TestSelectDestPackage(CommonCase):
             "select_dest_package",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "barcode": "FooBar",
                 "confirmation": True,
             },
         )
         self.assertEqual(selected_move_line.result_package_id.name, "FooBar")
-        data = self.data.picking(picking)
         self.assert_response(
             response,
-            next_state="set_lot",
-            data={
-                "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
-            },
+            next_state="select_line",
+            data={"picking": self._data_for_picking_with_line(picking)},
         )
 
     def test_scan_not_empty_package(self):
@@ -73,22 +69,34 @@ class TestSelectDestPackage(CommonCase):
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
+        # Assigning a package to a different move line
+        # so that the package is available for the picking.
+        different_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_b
+        )
+        different_move_line.result_package_id = self.package
         response = self.service.dispatch(
             "select_dest_package",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
-                "barcode": self.package.name,
+                "selected_line_id": selected_move_line.id,
+                "barcode": "FOO",
             },
         )
         self.assertFalse(selected_move_line.result_package_id.name)
-        data = self.data.picking(picking)
+        picking_data = self.data.picking(picking)
+        package_data = self.data.packages(
+            self.package.with_context(picking_id=picking.id),
+            picking=picking,
+            with_packaging=True,
+        )
         self.assert_response(
             response,
             next_state="select_dest_package",
             data={
-                "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "picking": picking_data,
+                "packages": package_data,
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
             message={
                 "message_type": "warning",
@@ -101,21 +109,23 @@ class TestSelectDestPackage(CommonCase):
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
+        # Assigning a package to a different move line
+        # so that the package is available for the picking.
+        different_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_b
+        )
+        different_move_line.result_package_id = self.package
         response = self.service.dispatch(
             "select_dest_package",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
-                "barcode": self.package.name,
+                "selected_line_id": selected_move_line.id,
+                "barcode": "FOO",
             },
         )
         self.assertEqual(selected_move_line.result_package_id.name, self.package.name)
-        data = self.data.picking(picking)
         self.assert_response(
             response,
-            next_state="set_lot",
-            data={
-                "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
-            },
+            next_state="select_line",
+            data={"picking": self._data_for_picking_with_line(picking)},
         )

@@ -22,7 +22,7 @@ class TestSetLotConfirm(CommonCase):
             "set_lot_confirm_action",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
             },
         )
         data = self.data.picking(picking)
@@ -31,7 +31,7 @@ class TestSetLotConfirm(CommonCase):
             next_state="set_lot",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
             message={"message_type": "error", "body": "Missing expiration date."},
         )
@@ -41,7 +41,7 @@ class TestSetLotConfirm(CommonCase):
             "set_lot",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
                 "expiration_date": expiration_date,
             },
         )
@@ -50,7 +50,7 @@ class TestSetLotConfirm(CommonCase):
             "set_lot_confirm_action",
             params={
                 "picking_id": picking.id,
-                "selected_line_ids": selected_move_line.ids,
+                "selected_line_id": selected_move_line.id,
             },
         )
         data = self.data.picking(picking)
@@ -59,6 +59,6 @@ class TestSetLotConfirm(CommonCase):
             next_state="set_quantity",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )

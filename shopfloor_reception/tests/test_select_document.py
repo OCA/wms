@@ -47,7 +47,7 @@ class TestSelectDocument(CommonCase):
             next_state="set_lot",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )
 
@@ -66,7 +66,7 @@ class TestSelectDocument(CommonCase):
             next_state="set_lot",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )
 
@@ -86,7 +86,7 @@ class TestSelectDocument(CommonCase):
             next_state="set_quantity",
             data={
                 "picking": data,
-                "selected_move_lines": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )
 
