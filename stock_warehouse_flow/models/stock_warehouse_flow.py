@@ -339,10 +339,10 @@ class StockWarehouseFlow(models.Model):
     def _is_valid_for_move(self, move):
         self.ensure_one()
         if not self.move_domain:
-            return self
+            return move
         domain = safe_eval(self.move_domain or "[]")
         if not domain:
-            return self
+            return move
         return move.filtered_domain(domain)
 
     @api.model
