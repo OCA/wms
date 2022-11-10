@@ -178,6 +178,12 @@ msgstr ""
 #. module: stock_warehouse_flow
 #: code:addons/stock_warehouse_flow/models/stock_warehouse_flow.py:0
 #, python-format
+msgid "No routing flow available for the move {move} in transfer {picking}."
+msgstr ""
+
+#. module: stock_warehouse_flow
+#: code:addons/stock_warehouse_flow/models/stock_warehouse_flow.py:0
+#, python-format
 msgid ""
 "No rule corresponding to '%(picking_type)s' operation type has been found on delivery route '%(delivery_route)s'.\n"
 "Please check your configuration."

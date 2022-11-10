@@ -84,6 +84,13 @@ class TestWarehouseFlow(common.CommonFlow):
         with self.assertRaisesRegex(UserError, exception_msg):
             self._run_procurement(self.product, 10, flow.carrier_ids)
 
+    def test_no_valid_flow_for_move(self):
+        flow = self._get_flow("ship_only")
+        flow.move_domain = "[('state', '=', 'unknown')]"
+        message = "^No routing flow available for the move"
+        with self.assertRaisesRegex(UserError, message):
+            self._run_procurement(self.product, 10, flow.carrier_ids)
+
     def test_flow_uniq_constraint(self):
         flow = self._get_flow("pick_ship")
         vals = flow.copy_data()[0]
