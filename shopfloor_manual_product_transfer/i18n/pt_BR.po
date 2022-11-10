@@ -30,3 +30,15 @@ msgstr ""
 #, python-format
 msgid "This quantity exceeds the initial one."
 msgstr ""
+
+#. module: shopfloor_manual_product_transfer
+#: code:addons/shopfloor_manual_product_transfer/actions/message.py:0
+#, python-format
+msgid "Transfer {} canceled."
+msgstr ""
+
+#. module: shopfloor_manual_product_transfer
+#: code:addons/shopfloor_manual_product_transfer/actions/message.py:0
+#, python-format
+msgid "Unable to cancel the transfer {}."
+msgstr ""
