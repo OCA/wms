@@ -10,6 +10,7 @@ class ManualProductTransferScanDestinationLocation(ManualProductTransferCommonCa
     Endpoints:
 
     * /scan_destination_location
+    * /cancel
     """
 
     def test_scan_destination_location_wrong_picking_id(self):
@@ -64,4 +65,15 @@ class ManualProductTransferScanDestinationLocation(ManualProductTransferCommonCa
         self.assertEqual(move_lines.state, "done")
         self.assert_response_start(
             response, message=self.service.msg_store.transfer_done_success(picking)
+        )
+
+    def test_cancel_ok(self):
+        picking, move_lines = self._confirm_quantity()
+        response = self.service.dispatch(
+            "cancel",
+            params={"move_line_ids": move_lines.ids},
+        )
+        self.assertEqual(move_lines.state, "cancel")
+        self.assert_response_start(
+            response, message=self.service.msg_store.transfer_canceled_success(picking)
         )
