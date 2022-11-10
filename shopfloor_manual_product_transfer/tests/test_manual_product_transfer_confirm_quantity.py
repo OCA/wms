@@ -146,12 +146,17 @@ class ManualProductTransferConfirmQuantity(ManualProductTransferCommonCase):
                 "confirm": True,
             },
         )
-        # we get an error message and the quantity to move is reset to 8
+        # we get:
+        #   - a warning saying that 2 reserved qties should not be taken
+        #   - an error message and the quantity to move is reset to 8
         self.assert_response_confirm_quantity(
             response,
             self.src_location,
             self.product_a,
-            8,
+            quantity=8,
+            warning=self.service.msg_store.qty_assigned_to_preserve(
+                self.product_a, 2.0
+            )["body"],
             message=self.service.msg_store.qty_exceeds_initial_qty(),
         )
         move_lines = self.service._find_user_move_lines(

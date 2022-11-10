@@ -57,6 +57,16 @@ const ManualProductTransfer = {
                 </div>
             </div>
 
+            <div class="detail item-detail-card" v-if="state_is('confirm_quantity') && warning()">
+                <v-card :color="utils.colors.color_for('warning')">
+                    <v-card-title>
+                        <span class="label">
+                            <v-icon>mdi-alert</v-icon>{{ warning() }}
+                        </span>
+                    </v-card-title>
+                </v-card>
+            </div>
+
             <v-card v-if="state_is('confirm_quantity')" class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
                 <packaging-qty-picker
                     :key="make_state_component_key(['packaging-qty-picker', 1232])"
@@ -129,6 +139,9 @@ const ManualProductTransfer = {
                 return data.move_lines[0].product;
             }
             return {};
+        },
+        warning: function () {
+            return _.result(this.state, "data.warning", "");
         },
         quantity: function () {
             const data = this.state.data;

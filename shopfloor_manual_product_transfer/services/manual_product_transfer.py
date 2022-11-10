@@ -3,7 +3,7 @@
 
 from odoo.exceptions import UserError
 from odoo.fields import first
-from odoo.tools import float_compare, float_is_zero
+from odoo.tools import float_compare, float_is_zero, float_round
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -55,10 +55,21 @@ class ManualProductTransfer(Component):
         self, location, product, quantity, lot=None, message=None
     ):
         """Transition to the 'confirm_quantity' state for the given move line."""
+        warning = None
+        if not self.work.menu.allow_unreserve_other_moves:
+            # If the option "Allow to process reserved quantities" is not enabled
+            # we should at least display a warning to the operator to not move
+            # the quantity already reserved.
+            qty_assigned = self._get_product_qty_assigned(location, product, lot)
+            if qty_assigned:
+                warning = self.msg_store.qty_assigned_to_preserve(
+                    product, qty_assigned
+                )["body"]
         data = {
             "location": self.data.location(location),
             "product": self.data.product(product),
             "quantity": quantity,
+            "warning": warning,
         }
         if lot:
             data["lot"] = self.data.lot(lot)
@@ -201,6 +212,17 @@ class ManualProductTransfer(Component):
                 for line in move_lines
             ]
         )
+
+    def _get_product_qty_assigned(self, location, product, lot=None):
+        """Returns the quantity reserved for the given location/product/lot."""
+        move_lines = self._find_location_move_lines(location, product, lot)
+        qty_assigned = sum([line.product_uom_qty for line in move_lines])
+        qty_assigned = float_round(
+            qty_assigned,
+            precision_rounding=product.uom_id.rounding,
+            rounding_method="HALF-UP",
+        )
+        return qty_assigned
 
     def _get_initial_qty(self, location, product, lot=None):
         """Compute the initial quantity for the given location/product/lot."""
@@ -699,6 +721,7 @@ class ShopfloorManualProductTransferValidatorResponse(Component):
             "product": self.schemas._schema_dict_of(self.schemas.product()),
             "lot": self.schemas._schema_dict_of(self.schemas.lot(), required=False),
             "quantity": {"type": "float", "nullable": True, "required": True},
+            "warning": {"type": "string", "nullable": True, "required": False},
         }
 
     @property
