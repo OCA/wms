@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record model="ir.ui.view" id="stock_release_channel_form_view">
+        <field name="name">stock.release.channel.form</field>
+        <field name="model">stock.release.channel</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                    </div>
+                    <field name="active" invisible="1" />
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}"
+                    />
+                    <label for="name" class="oe_edit_only" />
+                    <h1>
+                        <field name="name" />
+                    </h1>
+                    <group name="options" groups="stock.group_stock_manager">
+                        <field name="release_forbidden" />
+                        <field
+                            name="auto_release"
+                            attrs="{'invisible': [('release_forbidden', '=', True)]}"
+                        />
+                        <field
+                            name="max_auto_release"
+                            attrs="{'invisible': ['|', ('release_forbidden', '=', True), ('auto_release', '!=', 'max')]}"
+                        />
+                        <field
+                            name="rule_domain"
+                            widget="domain"
+                            options="{'model': 'stock.picking', 'in_dialog': true}"
+                        />
+
+                        <field
+                            name="code"
+                            widget="ace"
+                            options="{'mode': 'python'}"
+                            placeholder="Enter Python code here."
+                        />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="stock_release_channel_search_view">
+        <field name="name">stock.release.channel.search</field>
+        <field name="model">stock.release.channel</field>
+        <field name="arch" type="xml">
+            <search>
+                <separator />
+                <filter
+                    string="Archived"
+                    name="inactive"
+                    domain="[('active','=',False)]"
+                />
+                <separator />
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="stock_release_channel_tree_view">
+        <field name="name">stock.release.channel.tree</field>
+        <field name="model">stock.release.channel</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="count_picking_all" sum="All Total" />
+                <field name="count_picking_release_ready" sum="Release Ready Total" />
+                <field name="count_picking_released" sum="Released Total" />
+                <field name="count_picking_assigned" sum="Assigned Total" />
+                <field name="count_picking_waiting" sum="Waiting Total" />
+                <field name="count_picking_late" sum="Late Total" />
+                <field name="count_picking_priority" sum="Priority Total" />
+                <field name="count_picking_done" sum="Done Today Total" />
+                <field
+                    name="count_picking_chain_in_progress"
+                    sum="Related In Progress Total"
+                />
+                <field name="count_picking_chain_done" sum="Related Done Total" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="stock_release_channel_kanban_view" model="ir.ui.view">
+        <field name="name">stock.release.channel.kanban</field>
+        <field name="model">stock.release.channel</field>
+        <field name="arch" type="xml">
+            <kanban
+                class="oe_background_grey o_kanban_dashboard o_emphasize_colors o_stock_release_channel"
+                create="0"
+            >
+                <field name="color" />
+                <field name="name" readonly="1" />
+                <field name="count_picking_release_ready" />
+                <field name="count_move_release_ready" />
+                <field name="count_picking_released" />
+                <field name="count_move_released" />
+                <field name="count_picking_assigned" />
+                <field name="count_move_assigned" />
+                <field name="count_picking_waiting" />
+                <field name="count_move_waiting" />
+                <field name="count_picking_late" />
+                <field name="count_move_late" />
+                <field name="count_picking_priority" />
+                <field name="count_move_priority" />
+                <field name="count_picking_done" />
+                <field name="count_move_done" />
+                <field name="last_done_picking_id" />
+                <field name="last_done_picking_name" />
+                <field name="last_done_picking_date_done" />
+                <field name="count_picking_chain_done" />
+                <field name="count_picking_chain" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div
+                            t-attf-class="#{kanban_color(record.color.raw_value)}"
+                            name="release_channel"
+                        >
+                            <div>
+                                <div t-attf-class="o_kanban_card_header">
+                                    <div class="o_kanban_card_header_title">
+                                        <div class="o_primary">
+                                            <field name="name" />
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_manage_button_section">
+                                        <hr class="mt4 mb4" />
+                                        <a
+                                            class="o_kanban_manage_toggle_button"
+                                            href="#"
+                                        ><i
+                                                class="fa fa-ellipsis-v"
+                                                role="img"
+                                                aria-label="Details"
+                                                title="Details"
+                                            /></a>
+                                    </div>
+                                </div>
+                                <div class="container o_kanban_card_content">
+                                    <div class="row o_kanban_card_upper_content">
+                                        <div class="col-4 o_kanban_primary_left">
+                                            <button
+                                                class="btn btn-primary"
+                                                name="release_next_batch"
+                                                type="object"
+                                            >
+                                                <i
+                                                    class="fa fa-dropbox fa-4x"
+                                                    role="img"
+                                                    aria-label="Release"
+                                                    title="Automatic Release"
+                                                />
+                                            </button>
+                                        </div>
+                                        <div class="col-8 o_kanban_primary_right">
+                                            <div class="row">
+                                                <div class="col-7">
+                                                    <a
+                                                        name="action_picking_release_ready"
+                                                        type="object"
+                                                    >
+                                                        To Release
+                                                    </a>
+                                                </div>
+                                                <div
+                                                    class="col-5"
+                                                    style="padding-left: 0;"
+                                                >
+                                                    <field
+                                                        name="count_picking_release_ready"
+                                                    />
+                                                    <a
+                                                        name="action_move_release_ready"
+                                                        type="object"
+                                                    >
+                                                        [~<field
+                                                            name="count_move_release_ready"
+                                                        />]
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-7">
+                                                    <a
+                                                        name="action_picking_released"
+                                                        type="object"
+                                                    >
+                                                        To Do
+                                                    </a>
+                                                </div>
+                                                <div
+                                                    class="col-5"
+                                                    style="padding-left: 0;"
+                                                >
+                                                    <field
+                                                        name="count_picking_released"
+                                                    />
+                                                    <a
+                                                        name="action_move_released"
+                                                        type="object"
+                                                    >
+                                                        [~<field
+                                                            name="count_move_released"
+                                                        />]
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-7">
+                                                    <a
+                                                        name="action_picking_done"
+                                                        type="object"
+                                                    >
+                                                        Done Today
+                                                    </a>
+                                                </div>
+                                                <div
+                                                    class="col-5"
+                                                    style="padding-left: 0;"
+                                                >
+                                                    <field name="count_picking_done" />
+                                                    <a
+                                                        name="action_move_done"
+                                                        type="object"
+                                                    >
+                                                        [~<field
+                                                            name="count_move_done"
+                                                        />]
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+
+                                        <div class="col-12 middle_block">
+                                            <field
+                                                name="count_picking_full_progress"
+                                                invisible="1"
+                                            />
+                                            <field
+                                                name="count_picking_done"
+                                                widget="progressbar"
+                                                title="Overall Progress"
+                                                options="{'show_fractional': true, 'current_value': 'count_picking_done', 'max_value': 'count_picking_full_progress', 'editable': false}"
+                                            />
+                                        </div>
+
+                                    </div>
+
+                                    <div class="kanban_middle_title">
+                                        <span
+                                            class="middle_title"
+                                        >To Do Situation</span>
+                                        <hr class="mt4 mb4" />
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-4 o_kanban_primary_left">
+                                            <button
+                                                class="btn btn-primary"
+                                                name="action_picking_assigned"
+                                                type="object"
+                                            >
+                                                <span><t
+                                                        t-esc="record.count_picking_assigned.value"
+                                                    /> To Ship</span>
+                                                <br />
+                                                <span>[~<t
+                                                        t-esc="record.count_move_assigned.value"
+                                                    /> Lines]</span>
+                                            </button>
+                                        </div>
+                                        <div class="col-8 o_kanban_primary_right">
+                                            <div class="row">
+                                                <div class="col-7">
+                                                    <a
+                                                        name="action_picking_waiting"
+                                                        type="object"
+                                                    >
+                                                        Waiting
+                                                    </a>
+                                                </div>
+                                                <div
+                                                    class="col-5"
+                                                    style="padding-left: 0;"
+                                                >
+                                                    <field
+                                                        name="count_picking_waiting"
+                                                    />
+                                                    <a
+                                                        name="action_move_waiting"
+                                                        type="object"
+                                                    >
+                                                        [~<field
+                                                            name="count_move_waiting"
+                                                        />]
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                class="row"
+                                                t-attf-style="#{record.count_picking_late.value > 0 ? 'color: red' : ''}"
+                                            >
+                                                <div class="col-7">
+                                                    <a
+                                                        name="action_picking_late"
+                                                        type="object"
+                                                        t-attf-style="#{record.count_picking_late.value > 0 ? 'color: red' : ''}"
+                                                    >
+                                                        Late
+                                                    </a>
+                                                </div>
+                                                <div
+                                                    class="col-5"
+                                                    style="padding-left: 0;"
+                                                >
+                                                    <field name="count_picking_late" />
+                                                    <a
+                                                        name="action_move_late"
+                                                        type="object"
+                                                        t-attf-style="#{record.count_picking_late.value > 0 ? 'color: red' : ''}"
+                                                    >
+                                                        [~<field
+                                                            name="count_move_late"
+                                                        />]
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-7">
+                                                    <a
+                                                        name="action_picking_priority"
+                                                        type="object"
+                                                    >
+                                                        Priority
+                                                    </a>
+                                                </div>
+                                                <div
+                                                    class="col-5"
+                                                    style="padding-left: 0;"
+                                                >
+                                                    <field
+                                                        name="count_picking_priority"
+                                                    />
+                                                    <a
+                                                        name="action_move_priority"
+                                                        type="object"
+                                                    >
+                                                        [~<field
+                                                            name="count_move_priority"
+                                                        />]
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                </div>
+
+                                <div class="container o_kanban_footer mt-3">
+
+                                        <div
+                                            class="row"
+                                            t-if="record.last_done_picking_id.raw_value"
+                                        >
+                                            <div class="col-12">
+                                                <strong>Last Transfer</strong>
+                                                <br />
+                                                <a
+                                                    type="object"
+                                                    name="get_action_picking_form"
+                                                >
+                                                    <field
+                                                        name="last_done_picking_name"
+                                                    />
+                                                </a>
+                                                (<field
+                                                    name="last_done_picking_date_done"
+                                                />)
+                                            </div>
+                                        </div>
+                                </div>
+
+                                <div class="row">
+
+                                    <div
+                                            class="col-12 o_kanban_primary_bottom bottom_block"
+                                        >
+
+                                        <div
+                                                class="row mt-2 mb-2 primary_bottom_buttons"
+                                            >
+                                            <div class="col-6 bottom_buttons_left">
+                                            </div>
+                                            <div class="col-6 bottom_buttons_right">
+                                                <button
+                                                        class="btn btn-secondary"
+                                                        name="action_picking_all_related"
+                                                        type="object"
+                                                    >
+                                                    <span>Transfers</span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-3">
+                                            <div class="col-12">
+                                                <field
+                                                        name="count_picking_chain_done"
+                                                        widget="progressbar"
+                                                        title="Transfers Progress"
+                                                        options="{'current_value': 'count_picking_chain_done', 'max_value': 'count_picking_chain', 'editable': false}"
+                                                    />
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+                            <div
+                                    class="container o_kanban_card_manage_pane dropdown-menu"
+                                    role="menu"
+                                >
+                                    <div
+                                        t-if="widget.editable"
+                                        class="o_kanban_card_manage_settings row"
+                                    >
+                                        <div
+                                            class="col-8"
+                                            role="menuitem"
+                                            aria-haspopup="true"
+                                        >
+                                            <ul
+                                                class="oe_kanban_colorpicker"
+                                                data-field="color"
+                                                role="menu"
+                                            />
+                                        </div>
+                                        <div role="menuitem" class="col-4 text-center">
+                                            <a type="edit">Settings</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="stock_release_channel_act_window">
+        <field name="name">Release Channels</field>
+        <field name="res_model">stock.release.channel</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Release Channel configured
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="stock_release_channel_config_act_window">
+        <field name="name">Release Channels</field>
+        <field name="res_model">stock.release.channel</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a Release Channel
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.ui.menu" id="stock_release_channel_menu">
+        <field name="name">Release Channels</field>
+        <field name="parent_id" ref="stock.menu_stock_warehouse_mgmt" />
+        <field name="action" ref="stock_release_channel_act_window" />
+        <field name="sequence" eval="6" />
+    </record>
+
+    <record model="ir.ui.menu" id="stock_release_channel_config_menu">
+        <field name="name">Release Channels</field>
+        <field name="parent_id" ref="stock.menu_warehouse_config" />
+        <field name="action" ref="stock_release_channel_config_act_window" />
+        <field name="sequence" eval="40" />
+    </record>
+
+</odoo>
