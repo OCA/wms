@@ -77,6 +77,13 @@
                         attrs="{'readonly': [('pick_pack_same_time', '=', True)]}"
                     />
               </group>
+              <group
+                    name="get_work"
+                    attrs="{'invisible': [('allow_get_work_is_possible', '=', False)]}"
+                >
+                  <field name="allow_get_work_is_possible" invisible="1" />
+                  <field name="allow_get_work" />
+              </group>
             </group>
         </field>
     </record>

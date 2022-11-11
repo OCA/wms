@@ -53,7 +53,8 @@
 {
     "allow_create_moves": true,
     "allow_unreserve_other_moves": true,
-    "allow_ignore_no_putaway_available": true
+    "allow_ignore_no_putaway_available": true,
+    "allow_get_work": false
 }
         </field>
     </record>
