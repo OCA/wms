@@ -94,7 +94,7 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
         )
         self.assert_response(
             response,
-            next_state="start",
+            next_state="scan_location",
             message=self.service.msg_store.no_putaway_destination_available(),
         )
 
@@ -129,7 +129,7 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
         )
         self.assert_response(
             response,
-            next_state="start",
+            next_state="scan_location",
             data=self.ANY,
             message=self.service.msg_store.location_content_unable_to_transfer(
                 self.test_loc

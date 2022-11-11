@@ -56,7 +56,7 @@ class TestLocationContentTransferStart(LocationContentTransferCommonCase):
     def test_start_fresh(self):
         """Start a fresh session when there is no transfer to recover"""
         response = self.service.dispatch("start_or_recover", params={})
-        self.assert_response(response, next_state="start")
+        self.assert_response(response, next_state="scan_location")
 
     def test_start_recover_destination_all(self):
         """Recover transfers, all move lines have the same destination"""

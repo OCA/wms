@@ -595,6 +595,12 @@ class MessageAction(Component):
             "body": _("Location {} empty").format(location.name),
         }
 
+    def location_not_found(self):
+        return {
+            "message_type": "error",
+            "body": _("This location does not exist."),
+        }
+
     def unable_to_pick_more(self, quantity):
         return {
             "message_type": "error",
@@ -718,4 +724,10 @@ class MessageAction(Component):
                 "Pick + Pack mode ON: the picking {0.name} has no carrier set. "
                 "The system couldn't pack goods automatically."
             ).format(picking),
+        }
+
+    def no_work_found(self):
+        return {
+            "message_type": "warning",
+            "body": _("No available work could be found."),
         }

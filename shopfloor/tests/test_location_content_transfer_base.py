@@ -53,7 +53,9 @@ class LocationContentTransferCommonCase(CommonCase):
             line.qty_done = line.product_uom_qty
 
     def assert_response_start(self, response, message=None, popup=None):
-        self.assert_response(response, next_state="start", message=message, popup=popup)
+        self.assert_response(
+            response, next_state="scan_location", message=message, popup=popup
+        )
 
     def _assert_response_scan_destination_all(
         self, state, response, pickings, message=None, confirmation_required=False
