@@ -39,6 +39,15 @@ class CommonCase(BaseCommonCase):
         return res
 
     @classmethod
+    def _create_lot(cls, **kwargs):
+        vals = {
+            "product_id": cls.product_a.id,
+            "company_id": cls.env.company.id,
+        }
+        vals.update(kwargs)
+        return cls.env["stock.production.lot"].create(vals)
+
+    @classmethod
     def _add_package(cls, picking):
         packaging_ids = [
             cls.product_a_packaging.id,

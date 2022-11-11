@@ -10,14 +10,6 @@ class TestSetLot(CommonCase):
         super().setUpClassBaseData()
         cls.product_a.tracking = "lot"
 
-    def _create_lot(self, **kwargs):
-        vals = {
-            "product_id": self.product_a.id,
-            "company_id": self.env.company.id,
-        }
-        vals.update(kwargs)
-        return self.env["stock.production.lot"].create(vals)
-
     def test_set_existing_lot(self):
         picking = self._create_picking()
         lot = self._create_lot()

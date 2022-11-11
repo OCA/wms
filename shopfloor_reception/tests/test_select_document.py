@@ -20,10 +20,45 @@ class TestSelectDocument(CommonCase):
             message={"message_type": "error", "body": "Barcode not found"},
         )
 
-    def test_scan_picking(self):
+    def test_scan_picking_name(self):
         picking = self._create_picking()
         response = self.service.dispatch(
             "scan_document", params={"barcode": picking.name}
+        )
+        self.assert_response(
+            response,
+            next_state="select_line",
+            data={"picking": self._data_for_picking_with_line(picking)},
+        )
+
+    def test_scan_picking_origin(self):
+        picking = self._create_picking()
+        # Multiple pickings with this origin are found.
+        # Return the filtered list of pickings.
+        same_origin_picking = self._create_picking()
+        picking.origin = "Somewhere together"
+        same_origin_picking.origin = "Somewhere together"
+        response = self.service.dispatch(
+            "scan_document", params={"barcode": "Somewhere together"}
+        )
+        message = (
+            "This source document is part of multiple pickings, please scan a package."
+        )
+        self.assert_response(
+            response,
+            next_state="select_document",
+            data={"pickings": self._data_for_pickings([same_origin_picking, picking])},
+            message={
+                "message_type": "warning",
+                "body": message,
+            },
+        )
+
+        # Only 1 picking with this origin is found.
+        # Move to select_line.
+        picking.origin = "Somewhere"
+        response = self.service.dispatch(
+            "scan_document", params={"barcode": "Somewhere"}
         )
         self.assert_response(
             response,

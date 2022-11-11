@@ -150,3 +150,53 @@ class TestSelectLine(CommonCase):
             data={"picking": data},
             message={"message_type": "warning", "body": error_msg},
         )
+
+    def test_done_action(self):
+        picking = self._create_picking()
+
+        # These are needed to test that we get a valid list of pickings
+        # when returning to select_document.
+        self._create_picking(picking_type=picking.picking_type_id)
+        self._create_picking(picking_type=picking.picking_type_id)
+
+        for line in picking.move_line_ids:
+            line.qty_done = line.product_uom_qty
+            lot = (self._create_lot(product_id=line.product_id.id),)
+            line.lot_id = lot
+        # Ask for confirmation to mark the package as done.
+        response = self.service.dispatch(
+            "done_action",
+            params={
+                "picking_id": picking.id,
+            },
+        )
+        data = {"picking": self._data_for_picking_with_line(picking)}
+        self.assert_response(
+            response,
+            next_state="confirm_done",
+            data=data,
+            message={"message_type": "warning", "body": "Are you sure?"},
+        )
+        # Confirm the package is done.
+        response = self.service.dispatch(
+            "done_action",
+            params={
+                "picking_id": picking.id,
+                "confirmation": True,
+            },
+        )
+        pickings = self.env["stock.picking"].search(
+            [
+                ("state", "=", "assigned"),
+                ("picking_type_id", "=", picking.picking_type_id.id),
+                ("user_id", "=", False),
+            ],
+            order="scheduled_date ASC",
+        )
+        message = "Transfer {} done".format(picking.name)
+        self.assert_response(
+            response,
+            next_state="select_document",
+            data={"pickings": self._data_for_pickings(pickings)},
+            message={"message_type": "success", "body": message},
+        )
