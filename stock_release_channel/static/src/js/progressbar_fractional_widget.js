@@ -60,9 +60,8 @@ odoo.define("stock_release_channel.progressbar_fractional_widget", function (req
                     // This variable is a change made w.r.t. the original one,
                     // because the original one set the value to 100 if the
                     // maximum value was zero.
-                    var original_max_value = this.recordData[
-                        this.nodeOptions.max_value
-                    ];
+                    var original_max_value =
+                        this.recordData[this.nodeOptions.max_value];
                     this.$(".o_progressbar_value").text(
                         utils.human_number(value) +
                             " / " +
