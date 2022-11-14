@@ -32,12 +32,12 @@
         <field name="inherit_id" ref="stock.view_picking_type_form" />
         <field name="arch" type="xml">
              <group name="locations" position="after">
-                 <group
-                    name="release"
-                    string="Chained moves release process"
-                    attrs='{"invisible": [("code", "!=", "outgoing")]}'
-                >
-                     <field name="unrelease_on_backorder" />
+                 <group name="release" string="Chained moves release process">
+                     <field
+                        name="unrelease_on_backorder"
+                        attrs='{"invisible": [("code", "!=", "outgoing")]}'
+                    />
+                     <field name="prevent_new_move_after_release" />
                  </group>
              </group>
         </field>
