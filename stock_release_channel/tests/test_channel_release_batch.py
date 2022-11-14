@@ -44,7 +44,7 @@ class TestChannelReleaseBatch(ChannelReleaseCase):
             # nothing new to release
             self.channel.release_next_batch()
 
-        self._action_done_picking(self.pickings[0].move_lines.move_orig_ids.picking_id)
+        self._action_done_picking(self.pickings[0].move_ids.move_orig_ids.picking_id)
         self._action_done_picking(self.pickings[0])
 
         self.channel.release_next_batch()

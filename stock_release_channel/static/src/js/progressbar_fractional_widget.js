@@ -2,8 +2,8 @@ odoo.define("stock_release_channel.progressbar_fractional_widget", function (req
     "use strict";
 
     var utils = require("web.utils");
-    var field_registry = require("web.field_registry");
-    var FieldProgressBar = field_registry.get("progressbar");
+    var basic_fields = require("web.basic_fields");
+    var FieldProgressBar = basic_fields.FieldProgressBar;
 
     /**
      * New node option:

@@ -11,12 +11,12 @@
     "maintainers": ["sebalix"],
     "website": "https://github.com/OCA/wms",
     "depends": [
+        "web",
         "sale_stock",
         "stock_available_to_promise_release",  # OCA/wms
         "queue_job",  # OCA/queue
     ],
     "data": [
-        "views/assets.xml",
         "views/stock_release_channel_views.xml",
         "views/stock_picking_views.xml",
         "data/stock_release_channel_data.xml",
@@ -24,5 +24,11 @@
         "data/ir_cron_data.xml",
         "security/stock_release_channel.xml",
     ],
-    "installable": False,
+    "assets": {
+        "web.assets_backend": [
+            "stock_release_channel/static/src/scss/stock_release_channel.scss",
+            "stock_release_channel/static/src/js/progressbar_fractional_widget.js",
+        ],
+    },
+    "installable": True,
 }

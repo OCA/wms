@@ -9,7 +9,7 @@ from odoo.addons.stock_available_to_promise_release.tests.common import (
 )
 
 
-class ReleaseChannelCase(common.SavepointCase):
+class ReleaseChannelCase(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -152,5 +152,5 @@ class ChannelReleaseCase(PromiseReleaseCommonCase):
 
     def _action_done_picking(self, picking):
         for line in picking.move_line_ids:
-            line.qty_done = line.product_uom_qty
+            line.qty_done = line.reserved_qty
         picking._action_done()

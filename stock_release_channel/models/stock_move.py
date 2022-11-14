@@ -11,5 +11,6 @@ class StockMove(models.Model):
         # after releasing, we re-assign a release channel,
         # as we may release only partially, the channel may
         # change
-        super().release_available_to_promise()
+        res = super().release_available_to_promise()
         self.picking_id.assign_release_channel()
+        return res

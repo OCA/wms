@@ -289,8 +289,10 @@ class StockReleaseChannel(models.Model):
         return (query, (tuple(pickings.ids),))
 
     def _compute_picking_chain(self):
-        self.env["stock.move"].flush(["move_dest_ids", "move_orig_ids", "picking_id"])
-        self.env["stock.picking"].flush(["state"])
+        self.env["stock.move"].flush_model(
+            ["move_dest_ids", "move_orig_ids", "picking_id"]
+        )
+        self.env["stock.picking"].flush_model(["state"])
         for channel in self:
             domain = self._field_picking_domains()["count_picking_released"]
             domain += [("release_channel_id", "=", channel.id)]
@@ -421,9 +423,12 @@ class StockReleaseChannel(models.Model):
             safe_eval(expr, eval_context, mode="exec", nocopy=True)
         except Exception as err:
             raise exceptions.UserError(
-                _("Error when evaluating the channel's code:\n %s \n(%s)")
-                % (self.name, err)
-            )
+                _(
+                    "Error when evaluating the channel's code:\n %(name)s \n(%(error)s)",
+                    name=self.name,
+                    error=err,
+                )
+            ) from err
         # normally "pickings" is always set as we set it in the eval context,
         # but let assume the worst case with someone using "del pickings"
         return eval_context.get("pickings", self.env["stock.picking"].browse())
@@ -537,7 +542,7 @@ class StockReleaseChannel(models.Model):
         action["context"] = {}
         if not self.last_done_picking_id:
             raise exceptions.UserError(
-                _("Channel %s has no validated transfer yet.") % (self.name,)
+                _("Channel %(name)s has no validated transfer yet.", name=self.name)
             )
         action["res_id"] = self.last_done_picking_id.id
         return action
