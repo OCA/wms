@@ -465,9 +465,6 @@ class StockMove(models.Model):
 
         self.env["procurement.group"].run_defer(procurement_requests)
 
-        # Set all transfers released to "printed", consider the work has
-        # been planned and started and another "release" of moves should
-        # (for instance) merge new pickings with this "round of release".
         pulled_moves._after_release_assign_moves()
         pulled_moves._after_release_update_chain()
 
@@ -511,12 +508,6 @@ class StockMove(models.Model):
         """
         context = self.env.context
         self = self.with_context(release_available_to_promise=True)
-        # Rely on `printed` flag to make _assign_picking create a new picking.
-        # See `stock.move._assign_picking` and
-        # `stock.move._search_picking_for_assignation`.
-        original_printed = self.picking_id.printed
-        if not self.picking_id.printed and not self.rule_id.no_backorder_at_release:
-            self.picking_id.printed = True
         new_move = self  # Work on the current move if split doesn't occur
         new_move_vals = self._split(remaining_qty)
         if new_move_vals:
@@ -526,10 +517,6 @@ class StockMove(models.Model):
         # thus the `_should_be_assigned` condition is not satisfied
         # and the move is not assigned.
         new_move._assign_picking()
-
-        # restore the original value of the printed flag only used to ensure
-        # that a backorder is created if required
-        self.picking_id.printed = original_printed
         return new_move.with_context(**context)
 
     def _assign_picking_post_process(self, new=False):
@@ -606,3 +593,13 @@ class StockMove(models.Model):
                 break
             origins -= origin
         return new_origin_moves
+
+    def _search_picking_for_assignation_domain(self):
+        domain = super()._search_picking_for_assignation_domain()
+        if self.env.context.get("release_available_to_promise"):
+            force_new_picking = not self.rule_id.no_backorder_at_release
+            if force_new_picking:
+                domain = expression.AND([domain, [("id", "!=", self.picking_id.id)]])
+        if self.picking_type_id.prevent_new_move_after_release:
+            domain = expression.AND([domain, [("last_release_date", "=", False)]])
+        return domain
