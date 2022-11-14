@@ -22,6 +22,7 @@ Available addons
 addon | version | maintainers | summary
 --- | --- | --- | ---
 [stock_available_to_promise_release](stock_available_to_promise_release/) | 16.0.1.0.0 |  | Release Operations based on available to promise
+[stock_dynamic_routing](stock_dynamic_routing/) | 16.0.1.0.0 |  | Dynamic routing of stock moves
 
 [//]: # (end addons)
 
