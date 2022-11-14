@@ -294,11 +294,10 @@ class MakePickingBatch(models.TransientModel):
         return picking
 
     def _lock_selected_picking(self, picking):
-        """ Method hook called once a picking is qualified to be added to the
-        batch. IT allows you to lock the selected picking and ensure that
+        """ Method hook called to lock the selected picking and ensure that
         nothing has changed in the timelapse between the search request and
         the addition to the batch that will prevent a normal commit of the
-        transaction. If noting is returned by the method, the selected picking
+        transaction. If nothing is returned by the method, the selected picking
         will not be added to the batch.
 
         Implementation example:
