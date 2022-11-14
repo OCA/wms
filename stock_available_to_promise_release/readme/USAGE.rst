@@ -13,9 +13,11 @@ By default, when an outgoing transfer is released, a backorder is created for
 the remaining quantities for products not available at release time. This behaviour
 can also be changed by stock route by setting the option "No backorder at release".
 In such a case, moves created for unavailable products will remain in the original
-outgoing picking and no backorder will be created. At the same time, outgoing
-picking will not bet set to printed at release time if one move has been created
-from a route whith the option "No backorder at release" set.
+outgoing picking and no backorder will be created.
+
+One a picking is released, you can also ensure that new move will no more be
+assigned to a released picking by setting the option "Prevent new move after release".
+on the stock picking type.
 
 At the end of the picking process (when the picking is validated) of an outgoing
 transfer, if a backorder is created, the chained moves can be automatically
