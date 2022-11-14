@@ -513,12 +513,13 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                     "state": "waiting",
                     "location_id": self.wh.wh_output_stock_loc_id.id,
                     "location_dest_id": self.loc_customer.id,
-                    "printed": False,
+                    "last_release_date": False,
                 }
             ],
         )
-
-        cust_picking.release_available_to_promise()
+        release_date = datetime(2022, 11, 10, 17, 21)
+        with freeze_time(release_date):
+            cust_picking.move_ids.release_available_to_promise()
         split_cust_picking = cust_picking.backorder_ids
         self.assertEqual(len(split_cust_picking), 1)
 
@@ -535,13 +536,13 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                     "state": "assigned",
                     "location_id": self.wh.lot_stock_id.id,
                     "location_dest_id": self.wh.wh_output_stock_loc_id.id,
-                    "printed": True,
+                    "last_release_date": release_date,
                 }
             ],
         )
-        # the released customer picking is set to "printed"
-        self.assertRecordValues(cust_picking, [{"printed": True}])
-        # the split once stays in the original location
+        # the released customer picking has a last_release_date
+        self.assertRecordValues(cust_picking, [{"last_release_date": release_date}])
+        # the split one stays in the original location
         self.assertRecordValues(
             split_cust_picking,
             [
@@ -549,7 +550,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                     "state": "waiting",
                     "location_id": self.wh.wh_output_stock_loc_id.id,
                     "location_dest_id": self.loc_customer.id,
-                    "printed": False,
+                    "last_release_date": False,
                 }
             ],
         )
@@ -673,6 +674,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                     "state": "waiting",
                     "location_id": self.wh.wh_output_stock_loc_id.id,
                     "location_dest_id": self.loc_customer.id,
+                    "last_release_date": False,
                 }
             ],
         )
@@ -1190,4 +1192,18 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         pick.priority = "1"
         pick.action_confirm()
         pick.release_available_to_promise()
-        self.assertEqual(pick.move_lines.move_orig_ids.picking_id.priority, "1")
+        self.assertEqual(pick.move_ids.move_orig_ids.picking_id.priority, "1")
+
+    def test_backorder_creation_after_release(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
+        picking = self._create_picking_chain(self.wh, [(self.product1, 5)])
+        picking.release_available_to_promise()
+        move = picking.move_ids
+        new_move = move.copy()
+        new_move._assign_picking()
+        self.assertEqual(picking, new_move.picking_id)
+        picking.picking_type_id.prevent_new_move_after_release = True
+        new_move = move.copy()
+        new_move._assign_picking()
+        self.assertNotEqual(picking, new_move.picking_id)

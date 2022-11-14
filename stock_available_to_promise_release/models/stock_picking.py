@@ -29,15 +29,7 @@ class StockPicking(models.Model):
     zip_code = fields.Char(related="partner_id.zip", store=True)
     state_id = fields.Many2one(related="partner_id.state_id", store=True)
     city = fields.Char(related="partner_id.city", store=True)
-
-    set_printed_at_release = fields.Boolean(compute="_compute_set_printed_at_release")
-
-    @api.depends("move_ids")
-    def _compute_set_printed_at_release(self):
-        for picking in self:
-            picking.set_printed_at_release = not (
-                any(picking.move_ids.mapped("rule_id.no_backorder_at_release"))
-            )
+    last_release_date = fields.Datetime()
 
     @api.depends("move_ids.need_release")
     def _compute_need_release(self):
@@ -157,13 +149,11 @@ class StockPicking(models.Model):
         ``self`` contains all the stock.picking of the chain up
         to the released one.
         """
-        self._after_release_set_printed()
+        self._after_release_set_last_release_date()
         self._after_release_set_expected_date()
 
-    def _after_release_set_printed(self):
-        self.filtered(
-            lambda p: not p.printed and p.set_printed_at_release
-        ).printed = True
+    def _after_release_set_last_release_date(self):
+        self.last_release_date = fields.Datetime.now()
 
     def _after_release_set_expected_date(self):
         prep_time = self.env.company.stock_release_max_prep_time
