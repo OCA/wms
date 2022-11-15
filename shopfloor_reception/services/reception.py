@@ -195,7 +195,10 @@ class Reception(Component):
         return self._response_for_set_lot(picking, line)
 
     def _order_stock_picking(self):
-        return "scheduled_date ASC"
+        # We sort by scheduled date first. However, there might be a case
+        # where two pickings have the exact same scheduled date.
+        # In that case, we sort by id.
+        return "scheduled_date ASC, id ASC"
 
     def _scan_document__by_picking(self, barcode):
         search = self._actions_for("search")
@@ -332,6 +335,13 @@ class Reception(Component):
             pickings = self.env["stock.picking"].search(
                 self._domain_stock_picking(),
                 order=self._order_stock_picking(),
+            )
+        else:
+            # We sort by scheduled date first. However, there might be a case
+            # where two pickings have the exact same scheduled date.
+            # In that case, we sort by id.
+            pickings = pickings.sorted(
+                lambda p: (p.scheduled_date, p.id), reverse=False
             )
         data = {"pickings": self._data_for_stock_pickings(pickings, with_lines=False)}
         return self._response(next_state="select_document", data=data, message=message)

@@ -31,13 +31,14 @@ class TestSelectDocument(CommonCase):
             data={"picking": self._data_for_picking_with_line(picking)},
         )
 
-    def test_scan_picking_origin(self):
-        picking = self._create_picking()
+    def test_scan_picking_origin_multiple_pickings(self):
         # Multiple pickings with this origin are found.
         # Return the filtered list of pickings.
-        same_origin_picking = self._create_picking()
-        picking.origin = "Somewhere together"
-        same_origin_picking.origin = "Somewhere together"
+        picking_1 = self._create_picking()
+        picking_2 = self._create_picking()
+        pickings = picking_1 | picking_2
+        pickings = pickings.sorted(lambda p: (p.scheduled_date, p.id), reverse=False)
+        pickings.write({"origin": "Somewhere together"})
         response = self.service.dispatch(
             "scan_document", params={"barcode": "Somewhere together"}
         )
@@ -47,15 +48,17 @@ class TestSelectDocument(CommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            data={"pickings": self._data_for_pickings([same_origin_picking, picking])},
+            data={"pickings": self._data_for_pickings(pickings)},
             message={
                 "message_type": "warning",
                 "body": message,
             },
         )
 
+    def test_scan_picking_origin_one_picking(self):
         # Only 1 picking with this origin is found.
         # Move to select_line.
+        picking = self._create_picking()
         picking.origin = "Somewhere"
         response = self.service.dispatch(
             "scan_document", params={"barcode": "Somewhere"}
