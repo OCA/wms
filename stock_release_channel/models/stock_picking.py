@@ -28,7 +28,8 @@ class StockPicking(models.Model):
             ).assign_release_channel()
 
     def assign_release_channel(self):
-        self.env["stock.release.channel"].assign_release_channel(self)
+        for pick in self:
+            self.env["stock.release.channel"].assign_release_channel(pick)
 
     def release_available_to_promise(self):
         for record in self:
