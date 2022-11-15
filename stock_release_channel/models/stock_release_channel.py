@@ -376,6 +376,19 @@ class StockReleaseChannel(models.Model):
             and picking.state not in ("cancel", "done")
         )
         if not pickings:
+
+    @api.model
+    def _get_assignable_release_channel_domain(self):
+        return [("state", "!=", "asleep")]
+
+    @api.model
+
+    def assign_release_channel(self, picking):
+        picking.ensure_one()
+        if picking.picking_type_id.code != "outgoing" or picking.state in (
+            "cancel",
+            "done",
+        ):
             return
         # do a single query rather than one for each rule*picking
         for channel in self.sudo().search([]):
@@ -387,8 +400,11 @@ class StockReleaseChannel(models.Model):
                 current = pickings
 
             domain = channel._prepare_domain()
+
             if domain:
-                current = current.filtered_domain(domain)
+                current = picking.filtered_domain(domain)
+            else:
+                current = picking
 
             if not current:
                 continue
@@ -400,17 +416,14 @@ class StockReleaseChannel(models.Model):
                 continue
 
             current.release_channel_id = channel
+            break
 
-            pickings -= current
-            if not pickings:
-                break
-
-        if pickings:
-            # by this point, all pickings should have been assigned
+        if not picking.release_channel_id:
+            # by this point, the picking should have been assigned
             _logger.warning(
-                "%s transfers could not be assigned to a channel,"
+                "Transfer %s could not be assigned to a channel,"
                 " you should add a final catch-all rule",
-                len(pickings),
+                picking.name,
             )
         return True
 
