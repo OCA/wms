@@ -90,12 +90,20 @@ class ManualProductTransferCommonCase(CommonCase):
         )
 
     def assert_response_confirm_quantity(
-        self, response, location, product, quantity, lot=None, message=None
+        self,
+        response,
+        location,
+        product,
+        quantity,
+        lot=None,
+        warning=None,
+        message=None,
     ):
         data = {
             "location": self.data.location(location),
             "product": self.data.product(product),
             "quantity": quantity,
+            "warning": warning,
         }
         if lot:
             data.update(lot=self.data.lot(lot))

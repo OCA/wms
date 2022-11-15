@@ -52,6 +52,31 @@ class ManualProductTransferScanProduct(ManualProductTransferCommonCase):
             10,
         )
 
+    def test_scan_product_product_reserved_warning_ok(self):
+        # initial qty is 10, but we reserve 2 qties (so 8 fully free)
+        picking = self._create_picking(
+            picking_type=self.env.ref("stock.picking_type_out"),
+            lines=[(self.product_a, 2)],
+            confirm=True,
+        )
+        picking.action_assign()
+        response = self.service.dispatch(
+            "scan_product",
+            params={
+                "location_id": self.src_location.id,
+                "barcode": self.product_a.barcode,
+            },
+        )
+        self.assert_response_confirm_quantity(
+            response,
+            self.src_location,
+            self.product_a,
+            quantity=8,
+            warning=self.service.msg_store.qty_assigned_to_preserve(
+                self.product_a, 2.0
+            )["body"],
+        )
+
     def test_scan_product_lot_ok(self):
         response = self.service.dispatch(
             "scan_product",

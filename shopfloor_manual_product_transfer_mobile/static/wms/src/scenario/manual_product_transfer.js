@@ -38,7 +38,7 @@ const ManualProductTransfer = {
             <div v-if="state_is('change_quantity')">
                 <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
                     <packaging-qty-picker
-                        :key="make_state_component_key(['packaging-qty-picker', 1232])"
+                        :key="make_state_component_key(['packaging-qty-picker', product().id])"
                         :options="utils.wms.move_line_qty_picker_options(fake_line())"
                         />
                 </v-card>
@@ -57,18 +57,30 @@ const ManualProductTransfer = {
                 </div>
             </div>
 
+            <div class="detail item-detail-card" v-if="state_is('confirm_quantity') && warning()">
+                <v-card :color="utils.colors.color_for('warning')">
+                    <v-card-title>
+                        <span class="label">
+                            <v-icon>mdi-alert</v-icon>{{ warning() }}
+                        </span>
+                    </v-card-title>
+                </v-card>
+            </div>
+
             <v-card v-if="state_is('confirm_quantity')" class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
                 <packaging-qty-picker
-                    :key="make_state_component_key(['packaging-qty-picker', 1232])"
+                    :key="make_state_component_key(['packaging-qty-picker', product().id])"
                     :options="utils.wms.move_line_qty_picker_options(fake_line())"
                     />
             </v-card>
 
             <div class="detail item-detail-card" v-if="state_is('scan_destination_location')">
                 <v-card :color="utils.colors.color_for('screen_step_done')">
-                    <v-card-title>
-                        <span class="label">Quantity = {{ quantity() }}</span>
-                    </v-card-title>
+                    <packaging-qty-picker
+                        :key="make_state_component_key(['packaging-qty-picker', product().id])"
+                        :readonly="true"
+                        :options="utils.wms.move_line_qty_picker_options(fake_line())"
+                        />
                 </v-card>
             </div>
 
@@ -129,6 +141,9 @@ const ManualProductTransfer = {
                 return data.move_lines[0].product;
             }
             return {};
+        },
+        warning: function () {
+            return _.result(this.state, "data.warning", "");
         },
         quantity: function () {
             const data = this.state.data;

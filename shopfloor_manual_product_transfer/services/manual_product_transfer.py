@@ -3,7 +3,7 @@
 
 from odoo.exceptions import UserError
 from odoo.fields import first
-from odoo.tools import float_compare, float_is_zero
+from odoo.tools import float_compare, float_is_zero, float_round
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -55,10 +55,21 @@ class ManualProductTransfer(Component):
         self, location, product, quantity, lot=None, message=None
     ):
         """Transition to the 'confirm_quantity' state for the given move line."""
+        warning = None
+        if not self.work.menu.allow_unreserve_other_moves:
+            # If the option "Allow to process reserved quantities" is not enabled
+            # we should at least display a warning to the operator to not move
+            # the quantity already reserved.
+            qty_assigned = self._get_product_qty_assigned(location, product, lot)
+            if qty_assigned:
+                warning = self.msg_store.qty_assigned_to_preserve(
+                    product, qty_assigned
+                )["body"]
         data = {
             "location": self.data.location(location),
             "product": self.data.product(product),
             "quantity": quantity,
+            "warning": warning,
         }
         if lot:
             data["lot"] = self.data.lot(lot)
@@ -202,6 +213,17 @@ class ManualProductTransfer(Component):
             ]
         )
 
+    def _get_product_qty_assigned(self, location, product, lot=None):
+        """Returns the quantity reserved for the given location/product/lot."""
+        move_lines = self._find_location_move_lines(location, product, lot)
+        qty_assigned = sum([line.product_uom_qty for line in move_lines])
+        qty_assigned = float_round(
+            qty_assigned,
+            precision_rounding=product.uom_id.rounding,
+            rounding_method="HALF-UP",
+        )
+        return qty_assigned
+
     def _get_initial_qty(self, location, product, lot=None):
         """Compute the initial quantity for the given location/product/lot."""
         if self.work.menu.allow_unreserve_other_moves:
@@ -266,10 +288,8 @@ class ManualProductTransfer(Component):
         # Compute the initial quantity
         initial_qty = self._get_initial_qty(location, product, lot)
         # No product available quantity to move
-        if (
-            product
-            and lot
-            and float_is_zero(initial_qty, precision_rounding=product.uom_id.rounding)
+        if (product or lot) and float_is_zero(
+            initial_qty, precision_rounding=product.uom_id.rounding
         ):
             return self._response_for_scan_product(
                 location, message=self.msg_store.no_product_in_location(location)
@@ -303,6 +323,24 @@ class ManualProductTransfer(Component):
                 lot,
                 message=self.msg_store.qty_exceeds_initial_qty(),
             )
+
+    def _check_quantity_in_stock(self, location, product, quantity, lot=None):
+        """Check if there is enough quantity of a product in the location."""
+        current_qty = self._get_product_qty(location, product, lot, free=True)
+        initial_qty = self._get_initial_qty(location, product, lot)
+        quantity_lt_current_qty = (
+            float_compare(
+                quantity, current_qty, precision_rounding=product.uom_id.rounding
+            )
+            == -1
+        )
+        quantity_gte_initial_qty = (
+            float_compare(
+                quantity, initial_qty, precision_rounding=product.uom_id.rounding
+            )
+            >= 0
+        )
+        return quantity_lt_current_qty and quantity_gte_initial_qty
 
     def set_quantity(self, location_id, product_id, quantity, lot_id=None):
         """Allows to change the initial quantity to move.
@@ -394,7 +432,6 @@ class ManualProductTransfer(Component):
                 lot,
             )
         # Check the input quantity
-        initial_qty = self._get_initial_qty(location, product, lot)
         response = self._check_quantity(location, product, lot, quantity)
         if response:
             return response
@@ -403,14 +440,10 @@ class ManualProductTransfer(Component):
         # Quantity has been confirmed, try to create the move
         # 1. Check there is enough stock in the location to move, otherwise
         #    unreserve existing moves if applicable
-        current_qty = self._get_product_qty(location, product, lot, free=True)
-        initial_qty = self._get_initial_qty(location, product, lot)
         unreserved_moves = self.env["stock.move"].browse()
-        if self.work.menu.allow_unreserve_other_moves and (
-            # FIXME use float_compare
-            current_qty
-            < quantity
-            <= initial_qty
+        if (
+            not self._check_quantity_in_stock(location, product, quantity, lot=lot)
+            and self.work.menu.allow_unreserve_other_moves
         ):
             # If available qty (qty non reserved) < quantity set => Unreserve
             # other moves for this product and location
@@ -688,6 +721,7 @@ class ShopfloorManualProductTransferValidatorResponse(Component):
             "product": self.schemas._schema_dict_of(self.schemas.product()),
             "lot": self.schemas._schema_dict_of(self.schemas.lot(), required=False),
             "quantity": {"type": "float", "nullable": True, "required": True},
+            "warning": {"type": "string", "nullable": True, "required": False},
         }
 
     @property

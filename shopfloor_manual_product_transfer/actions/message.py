@@ -25,3 +25,12 @@ class MessageAction(Component):
             "message_type": "success",
             "body": _("Transfer {} canceled.").format(picking.name),
         }
+
+    def qty_assigned_to_preserve(self, product, qty_assigned):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "{qty_assigned} {uom} are reserved in this "
+                "location and should not be taken"
+            ).format(qty_assigned=qty_assigned, uom=product.uom_id.name),
+        }
