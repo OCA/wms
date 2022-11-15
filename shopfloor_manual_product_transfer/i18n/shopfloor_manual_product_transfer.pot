@@ -41,3 +41,10 @@ msgstr ""
 #, python-format
 msgid "Unable to cancel the transfer {}."
 msgstr ""
+
+#. module: shopfloor_manual_product_transfer
+#: code:addons/shopfloor_manual_product_transfer/actions/message.py:0
+#, python-format
+msgid ""
+"{qty_assigned} {uom} are reserved in this location and should not be taken"
+msgstr ""
