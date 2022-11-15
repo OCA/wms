@@ -377,6 +377,13 @@ class StockReleaseChannel(models.Model):
             "done",
         ):
             return
+        # get channel candidates from the picking
+        channel = picking._find_release_channel_candidate()
+        if channel:
+            picking.release_channel_id = channel
+            return True
+        # No channel provided by the picking -> try to find one be evaluating the rules
+        # of all available channels
         # do a single query rather than one for each rule*picking
         for channel in self.sudo().search([]):
             if (
