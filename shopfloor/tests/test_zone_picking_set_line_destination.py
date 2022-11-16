@@ -39,12 +39,13 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         picking_type = self.picking1.picking_type_id
         move_line = self.picking1.move_line_ids
         move_line.location_dest_id = self.shelf1
+        quantity_done = move_line.product_uom_qty
         response = self.service.dispatch(
             "set_destination",
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
-                "quantity": move_line.product_uom_qty,
+                "quantity": quantity_done,
                 "confirmation": False,
             },
         )
@@ -58,6 +59,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 move_line.location_dest_id, self.packing_location
             ),
             confirmation_required=True,
+            qty_done=quantity_done,
         )
         # Confirm the destination with a wrong destination (should not happen)
         response = self.service.dispatch(
@@ -76,6 +78,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             picking_type,
             move_line,
             message=self.service.msg_store.dest_location_not_allowed(),
+            qty_done=quantity_done,
         )
         # Confirm the destination with the right destination this time
         response = self.service.dispatch(
@@ -106,12 +109,13 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_line = self.picking1.move_line_ids
         move_line.move_id.location_dest_id = self.packing_sublocation_a
         move_line.picking_id.location_dest_id = self.packing_sublocation_a
+        quantity_done = move_line.product_uom_qty
         response = self.service.dispatch(
             "set_destination",
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.packing_sublocation_b.barcode,
-                "quantity": move_line.product_uom_qty,
+                "quantity": quantity_done,
                 "confirmation": True,
             },
         )
@@ -122,6 +126,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             picking_type,
             move_line,
             message=self.service.msg_store.dest_location_not_allowed(),
+            qty_done=quantity_done,
         )
 
     def test_set_destination_location_no_other_move_line_full_qty(self):
