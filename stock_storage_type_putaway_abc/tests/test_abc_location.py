@@ -1,10 +1,10 @@
 # Copyright 2019-2021 Camptocamp SA
 # Copyright 2019-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
-from odoo.tests import SavepointCase
+from odoo.tests import TransactionCase
 
 
-class TestAbcLocation(SavepointCase):
+class TestAbcLocation(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -162,8 +162,8 @@ class TestAbcLocation(SavepointCase):
         # Test with a product abc_storage=A
         #   - with max height on pallets storage type higher than the cardboxes one
         self.product.write({"abc_storage": "a"})
-        self.pallets_location_storage_type.max_height = 3
-        self.cardboxes_location_storage_type.max_height = 1
+        self.pallets_location_storage_type.storage_category_id.max_height = 3
+        self.cardboxes_location_storage_type.storage_category_id.max_height = 1
         ordered_locations = sublocation.get_storage_locations(self.product)
         self.assertEqual(
             ordered_locations.ids,
@@ -179,8 +179,8 @@ class TestAbcLocation(SavepointCase):
             ).ids,
         )
         #   - with max height on cardboxes storage type higher than the pallets one
-        self.pallets_location_storage_type.max_height = 1
-        self.cardboxes_location_storage_type.max_height = 2
+        self.pallets_location_storage_type.storage_category_id.max_height = 1
+        self.cardboxes_location_storage_type.storage_category_id.max_height = 2
         ordered_locations = sublocation.get_storage_locations(self.product)
         self.assertEqual(
             ordered_locations.ids,
@@ -196,8 +196,8 @@ class TestAbcLocation(SavepointCase):
             ).ids,
         )
         #   - with max height "no-limit" on pallets storage type
-        self.pallets_location_storage_type.max_height = 0
-        self.cardboxes_location_storage_type.max_height = 2
+        self.pallets_location_storage_type.storage_category_id.max_height = 0
+        self.cardboxes_location_storage_type.storage_category_id.max_height = 2
         ordered_locations = sublocation.get_storage_locations(self.product)
         self.assertEqual(
             ordered_locations.ids,
@@ -215,8 +215,8 @@ class TestAbcLocation(SavepointCase):
         # Test with a product abc_storage=B
         #   - with max height on pallets storage type higher than the cardboxes one
         self.product.write({"abc_storage": "b"})
-        self.pallets_location_storage_type.max_height = 3
-        self.cardboxes_location_storage_type.max_height = 1
+        self.pallets_location_storage_type.storage_category_id.max_height = 3
+        self.cardboxes_location_storage_type.storage_category_id.max_height = 1
         ordered_locations = sublocation.get_storage_locations(self.product)
         self.assertEqual(
             ordered_locations.ids,
@@ -232,8 +232,8 @@ class TestAbcLocation(SavepointCase):
             ).ids,
         )
         #   - with max height on cardboxes storage type higher than the pallets one
-        self.pallets_location_storage_type.max_height = 1
-        self.cardboxes_location_storage_type.max_height = 2
+        self.pallets_location_storage_type.storage_category_id.max_height = 1
+        self.cardboxes_location_storage_type.storage_category_id.max_height = 2
         ordered_locations = sublocation.get_storage_locations(self.product)
         self.assertEqual(
             ordered_locations.ids,
@@ -249,8 +249,8 @@ class TestAbcLocation(SavepointCase):
             ).ids,
         )
         #   - with max height "no-limit" on pallets storage type
-        self.pallets_location_storage_type.max_height = 0
-        self.cardboxes_location_storage_type.max_height = 2
+        self.pallets_location_storage_type.storage_category_id.max_height = 0
+        self.cardboxes_location_storage_type.storage_category_id.max_height = 2
         ordered_locations = sublocation.get_storage_locations(self.product)
         self.assertEqual(
             ordered_locations.ids,
