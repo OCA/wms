@@ -40,6 +40,34 @@ class ZonePickingSetLineDestinationNoPrefillQtyCase(ZonePickingCommonCase):
                 qty_done=qty_done,
             )
 
+    def test_set_destination_increment_with_wrong_package(self):
+        """Check scanning wrong package incremented quantity is not lost."""
+        wrong_package = self.picking1.move_line_ids.package_id
+        picking_type = self.picking2.picking_type_id
+        move_line = self.picking2.move_line_ids[0]
+        # Simulate the product has been scanned twice
+        qty_done = 2
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "move_line_id": move_line.id,
+                "barcode": wrong_package.name,
+                "quantity": qty_done,
+            },
+        )
+        # Check response
+        self.assert_response_set_line_destination(
+            response,
+            self.zone_location,
+            picking_type,
+            move_line,
+            qty_done=qty_done,
+            message={
+                "body": "Package {} is not empty.".format(wrong_package.name),
+                "message_type": "warning",
+            },
+        )
+
     def test_set_destination_increment_with_wrong_product(self):
         """Check increment quantity by scanning the wrong product."""
         picking_type = self.picking2.picking_type_id
