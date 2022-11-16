@@ -579,3 +579,25 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         self.assertTrue(
             package_level.location_dest_id in self.cardboxes_location.child_ids
         )
+
+    def test_default_product_package_type(self):
+        # We try to move a product that is not contained in a package
+        # but has a default package type
+        # Destination location should become Pallet location
+        move = self._create_single_move(self.product)
+        move._assign_picking()
+        original_location_dest = move.location_dest_id
+        # Change default product package type
+        move.product_id.package_type_id = self.pallets_package_storage_type
+        self._update_qty_in_location(
+            move.location_id, move.product_id, move.product_qty
+        )
+        move._action_assign()
+        move_line = move.move_line_ids
+
+        self.assertEqual(move_line.location_dest_id, self.pallets_bin_1_location)
+
+        self.assertNotEqual(
+            original_location_dest,
+            move_line.location_dest_id,
+        )
