@@ -310,6 +310,7 @@ msgid "Stock Rule"
 msgstr "Regla de Inventario"
 
 #. module: stock_available_to_promise_release
+#. odoo-python
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
 msgid ""
@@ -353,6 +354,7 @@ msgid "Transfers Allocations"
 msgstr "Asignaciones de Transferencia"
 
 #. module: stock_available_to_promise_release
+#. odoo-python
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
@@ -360,6 +362,7 @@ msgid "Unsupported operator %s"
 msgstr "Operador no soportado %s"
 
 #. module: stock_available_to_promise_release
+#. odoo-python
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
 msgid "Unsupported operator: %s"
