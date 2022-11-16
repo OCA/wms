@@ -339,19 +339,26 @@ class StockWarehouseFlow(models.Model):
     def _is_valid_for_move(self, move):
         self.ensure_one()
         if not self.move_domain:
-            return self
+            return move
         domain = safe_eval(self.move_domain or "[]")
         if not domain:
-            return self
+            return move
         return move.filtered_domain(domain)
 
     @api.model
     def _search_for_move(self, move):
         """Return the first flow matching the move."""
         domain = self._search_for_move_domain(move)
-        for flow in self.search(domain):
+        flows = self.search(domain)
+        for flow in flows:
             if flow._is_valid_for_move(move):
                 return flow
+        if flows:
+            raise UserError(
+                _(
+                    "No routing flow available for the move {move} in transfer {picking}."
+                ).format(move=move.display_name, picking=move.picking_id.name)
+            )
         return self.browse()
 
     def _get_rule_from_delivery_route(self, html_exc=False):
