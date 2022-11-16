@@ -14,7 +14,9 @@ class StockLocation(models.Model):
     pack_putaway_strategy = fields.Selection(
         selection_add=[("abc", "Chaotic ABC")], ondelete={"abc": "set default"}
     )
-    display_abc_storage = fields.Boolean(compute="_compute_display_abc_storage")
+    display_abc_storage = fields.Boolean(
+        compute="_compute_display_abc_storage", recursive=True
+    )
     abc_storage = fields.Selection(ABC_SELECTION, required=True, default="b")
 
     @api.depends(
