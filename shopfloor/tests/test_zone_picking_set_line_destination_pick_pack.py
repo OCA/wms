@@ -52,16 +52,18 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         picking_type = self.picking1.picking_type_id
         move_line = self.picking1.move_line_ids
         move_line.location_dest_id = self.shelf1
+        quantity_done = move_line.product_uom_qty
         # Confirm the destination with the right destination
         response = self.service.dispatch(
             "set_destination",
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
-                "quantity": move_line.product_uom_qty,
+                "quantity": quantity_done,
                 "confirmation": True,
             },
         )
+        move_line.qty_done = quantity_done
         self.assert_response_set_line_destination(
             response,
             zone_location,
@@ -70,6 +72,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
             message=self.service.msg_store.picking_without_carrier_cannot_pack(
                 move_line.picking_id
             ),
+            qty_done=quantity_done,
         )
 
     def test_set_destination_location_ok_carrier(self):
@@ -115,12 +118,13 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         self.assertEqual(len(moves_before), 1)
         self.assertEqual(len(moves_before.move_line_ids), 1)
         move_line = moves_before.move_line_ids
+        quantity_done = move_line.product_uom_qty
         response = self.service.dispatch(
             "set_destination",
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.product_uom_qty,
+                "quantity": quantity_done,
                 "confirmation": True,
             },
         )
@@ -132,6 +136,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
             message=self.service.msg_store.picking_without_carrier_cannot_pack(
                 move_line.picking_id
             ),
+            qty_done=quantity_done,
         )
 
     def test_set_destination_package_full_qty_ok_carrier_bad_package(self):
@@ -143,12 +148,13 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         self.assertEqual(len(moves_before.move_line_ids), 1)
         move_line = moves_before.move_line_ids
         move_line.picking_id.carrier_id = self.carrier
+        quantity_done = move_line.product_uom_qty
         response = self.service.dispatch(
             "set_destination",
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.product_uom_qty,
+                "quantity": quantity_done,
                 "confirmation": False,
             },
         )
@@ -160,6 +166,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
             message=self.service.msg_store.packaging_invalid_for_carrier(
                 self.free_package.packaging_id, self.carrier
             ),
+            qty_done=quantity_done,
         )
 
     def test_set_destination_package_full_qty_ok_carrier_ok_package(self):
