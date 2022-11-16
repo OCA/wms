@@ -365,6 +365,14 @@ class StockLocation(models.Model):
                 "Computing putaway for pack %s (%s)"
                 % (quants.package_id, quants.package_id)
             )
+        else:
+            # Get default package type on product if defined
+            package_type = product.package_type_id
+            if package_type:
+                _logger.debug(
+                    "Computing putaway for pack %s (%s - from product %s)"
+                    % (quants.package_id, quants.package_id, product)
+                )
         # I'm not sure about this. I had to add the line, because there is a
         # second call to get_putaway_strategy which is made a 'leaf' location
         # as putaway_location which does not match the package storage type in
