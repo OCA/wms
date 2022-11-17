@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2022 Camptocamp SA
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
-<odoo>
+<odoo noupdate="1">
 
   <record id="scenario_reception" model="shopfloor.scenario">
       <field name="name">Reception</field>
