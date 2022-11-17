@@ -40,7 +40,6 @@ class SearchAction(Component):
                 ("origin", "=", barcode),
             ]
             domain = expression.OR([domain, source_document_domain])
-        domain = expression.AND([domain, [("state", "=", "assigned")]])
         return model.search(domain)
 
     def product_from_scan(self, barcode, use_packaging=True):
