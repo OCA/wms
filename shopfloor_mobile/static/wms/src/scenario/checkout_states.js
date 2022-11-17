@@ -229,7 +229,6 @@ export const checkout_states = function ($instance) {
                 $instance.reset_notification();
             },
             on_qty_update: (qty) => {
-                console.log(qty);
                 $instance.state.data.qty = qty;
             },
             on_confirm: () => {
