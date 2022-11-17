@@ -108,29 +108,39 @@ Vue.component("picking-summary-content", {
             },
         },
     },
+    methods: {
+        get_group_title: function (record, pkg_type) {
+            return this.options.group_header_title_key
+                ? pkg_type.records[0].product[this.options.group_header_title_key]
+                : record.title;
+        },
+    },
     template: `
     <div :class="['summary-content', record.key.startsWith('raw') ? 'no-pack' : 'has-pack']">
         <v-expansion-panels v-if="record.key != 'no-pack' && record.records_by_pkg_type" flat v-model="panel">
             <v-expansion-panel v-for="pkg_type in record.records_by_pkg_type" :key="make_component_key(['pkg', index])">
                 <v-expansion-panel-header>
-                    <span class="item-counter">
-                        <span>{{ index + 1 }} / {{ count }}</span>
-                    </span>
-                    <strong>
-                        {{ options.group_header_title_key ? pkg_type.records[0].product[options.group_header_title_key] : record.title }}
-                    </strong>
-                    <template v-for="(field, index) in options.header_fields">
-                        <component
-                            v-if="field.render_component"
-                            :is="field.render_component"
-                            :options="field.render_options ? field.render_options(record) : {}"
-                            :record="record"
-                            :key="make_component_key([field.render_component, 'list', index, record.id])"
-                        />
-                        <span v-else>
-                            {{ render_field_value(record, field) }}
+                    <div class="expansion-panel-header">
+                        <span class="item-counter">
+                            <span>{{ index + 1 }} / {{ count }}</span>
                         </span>
-                    </template>
+                        <strong>
+                            {{ get_group_title(record, pkg_type) }}
+                        </strong>
+                        <div v-for="(field, index) in options.header_fields">
+                            <span v-if="field.label" class="label">{{ field.label }}:</span>
+                            <component
+                                v-if="field.render_component"
+                                :is="field.render_component"
+                                :options="field.render_options ? field.render_options(record) : {}"
+                                :record="record"
+                                :key="make_component_key([field.render_component, 'list', index, record.id])"
+                            />
+                            <span v-else>
+                                {{ render_field_value(record, field) }}
+                            </span>
+                        </div>
+                    </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <strong class="pkg-type-name mb-2">{{ pkg_type.title }}</strong>

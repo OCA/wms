@@ -307,8 +307,6 @@ const Reception = {
                     // TODO: uncomment this line once the backend has an endpoint to cancel lines.
                     // actions: ["action_cancel_line"],
                     fields: [
-                        {path: "product.barcode", label: "Barcode"},
-                        {path: "product.supplier_code", label: "Vendor code"},
                         {path: "package_dest.name", label: "Pack"},
                         {
                             path: "qty_done",
@@ -318,7 +316,15 @@ const Reception = {
                             },
                         },
                     ],
-                    header_fields: [{path: "product.barcode", label: "Barcode"}],
+                    header_fields: [
+                        // Display additional fields in the group header
+                        // that are shared for all items in the list.
+                        {path: "records[0].product.barcode", label: "Barcode"},
+                        {
+                            path: "records[0].product.supplier_code",
+                            label: "Vendor code",
+                        },
+                    ],
                     group_header_title_key: "display_name",
                     list_item_klass_maker: klass_maker,
                 },

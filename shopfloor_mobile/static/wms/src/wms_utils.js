@@ -90,9 +90,7 @@ export class WMSUtils {
         const self = this;
         // {'key': 'no-group', 'title': '', 'records': []}
         options = _.defaults(options || {}, {
-            group_key: "product",
             group_no_title: false,
-            name_prefix: "Product",
             prepare_records: function (recs) {
                 return recs;
             },
@@ -103,12 +101,11 @@ export class WMSUtils {
         const res = [];
         const products = _.uniqBy(
             _.map(lines, function (x) {
-                return x[options.group_key];
+                return x["product"];
             }),
             "id"
         );
-        const grouped = _.groupBy(lines, options.group_key + ".id");
-        // TODO: grouped.forEach?
+        const grouped = _.groupBy(lines, "product.id");
         _.forEach(grouped, function (value, prod_id) {
             const product = _.first(_.filter(products, {id: parseInt(prod_id, 10)}));
             const title = options.group_no_title
