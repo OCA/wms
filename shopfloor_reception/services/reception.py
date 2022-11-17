@@ -204,6 +204,11 @@ class Reception(Component):
         search = self._actions_for("search")
         picking_filter_result = search.picking_from_scan(barcode, use_origin=True)
         if picking_filter_result:
+            message = self._check_picking_status(picking_filter_result)
+            if message:
+                return self._response_for_select_document(
+                    pickings=picking_filter_result, message=message
+                )
             # There is a case where scanning the source document
             # could return more than one picking.
             # In this case, we ask the user to scan a package instead.
@@ -465,6 +470,9 @@ class Reception(Component):
 
     def done_action(self, picking_id, confirmation=False):
         picking = self.env["stock.picking"].browse(picking_id)
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_line(pickings=picking, message=message)
         if all(line.qty_done == 0 for line in picking.move_line_ids):
             # If no line has been processed, refuse to set the picking as done
             return self._response_for_select_line(
@@ -542,7 +550,10 @@ class Reception(Component):
 
     def set_lot_confirm_action(self, picking_id, selected_line_id):
         picking = self.env["stock.picking"].browse(picking_id)
+        message = self._check_picking_status(picking)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
+        if message:
+            return self._response_for_set_lot(picking, selected_line, message=message)
         message = self._check_expiry_date(selected_line)
         if message:
             return self._response_for_set_lot(picking, selected_line, message=message)
@@ -618,6 +629,11 @@ class Reception(Component):
     def process_with_existing_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_set_quantity(
+                picking, selected_line, message=message
+            )
         new_line, qty_check = selected_line._split_qty_to_be_done(quantity)
         if qty_check == "greater":
             return self._response_for_set_quantity(
@@ -633,6 +649,11 @@ class Reception(Component):
     def process_with_new_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_set_quantity(
+                picking, selected_line, message=message
+            )
         new_line, qty_check = selected_line._split_qty_to_be_done(quantity)
         if qty_check == "greater":
             return self._response_for_set_quantity(
@@ -649,6 +670,11 @@ class Reception(Component):
     def process_without_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_set_quantity(
+                picking, selected_line, message=message
+            )
         new_line, qty_check = selected_line._split_qty_to_be_done(quantity)
         if qty_check == "greater":
             return self._response_for_set_quantity(
