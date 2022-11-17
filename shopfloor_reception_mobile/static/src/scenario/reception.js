@@ -22,7 +22,7 @@ const Reception = {
             <date-picker-input
                 v-if="state_is('set_lot')"
                 :update_date_handler="get_expiration_date_from_lot"
-                v-on:date_picker_selected="on_date_picker_selected"
+                v-on:date_picker_selected="state.on_date_picker_selected"
             />
             <template v-if="state_in(['select_line', 'set_lot', 'set_quantity', 'set_destination'])">
                 <item-detail-card
@@ -43,7 +43,7 @@ const Reception = {
                     class="with-progress-bar"
                     :records="visible_pickings"
                     :options="manual_select_options_for_select_document()"
-                    v-on:select="on_select_document"
+                    v-on:select="state.on_select"
                     :key="make_state_component_key(['reception', 'manual-select-document'])"
                 />
             </template>
@@ -58,7 +58,7 @@ const Reception = {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="on_mark_done">Mark as Done</btn-action>
+                            <btn-action @click="state.on_mark_as_done">Mark as Done</btn-action>
                         </v-col>
                     </v-row>
                 </div>
@@ -400,6 +400,7 @@ const Reception = {
             const grouped_lines = this.utils.wms.group_lines_by_product(
                 picking.move_lines,
                 {
+                    group_no_title: true,
                     prepare_records: _.partialRight(
                         this.utils.wms.group_by_pack,
                         "product"
@@ -409,7 +410,6 @@ const Reception = {
                             ? "screen_step_done"
                             : "screen_step_todo";
                     },
-                    group_no_title: true,
                 }
             );
             // There are two color options for each group: done or todo.
@@ -423,15 +423,6 @@ const Reception = {
                 this._apply_search_filter(picking, input.text)
             );
         },
-        on_select_document: function (selected) {
-            this.$root.trigger("scan", selected.name);
-        },
-        on_mark_done: function () {
-            this.$root.trigger("mark_as_done");
-        },
-        on_date_picker_selected: function (date) {
-            this.$root.trigger("date_picker_selected", date);
-        },
         lot_has_expiry_date: function () {
             // If there's a expiry date, it means there's a lot too.
             const expiry_date = _.result(
@@ -440,15 +431,6 @@ const Reception = {
                 ""
             );
             return !_.isEmpty(expiry_date);
-        },
-        get_next_line_id_to_handle: function () {
-            // The enpoints in the backend accept multiple selected line ids.
-            // However, in this particular scenario, we only want to deal with one line at a time.
-            // For that, we select the first line we find that hasn't been completely dealt with yet.
-            const next_unhandled_line = this.state.data.selected_move_lines.find(
-                (line) => line.qty_done < line.quantity
-            );
-            return this._get_selected_line_ids([next_unhandled_line]);
         },
         get_expiration_date_from_lot: function (lot) {
             if (!lot.expiration_date) {
@@ -459,9 +441,6 @@ const Reception = {
         _apply_search_filter: function (picking, input) {
             const values = [picking.origin];
             return !_.isEmpty(values.find((v) => v.includes(input)));
-        },
-        _get_selected_line_ids: function (lines) {
-            return lines.map(_.property("id"));
         },
     },
     data: function () {
@@ -504,7 +483,6 @@ const Reception = {
                         scan_placeholder: "Scan product / package",
                     },
                     events: {
-                        mark_as_done: "on_mark_as_done",
                         cancel_picking_line: "on_cancel",
                     },
                     on_scan: (barcode) => {
@@ -556,9 +534,6 @@ const Reception = {
                         title: "Set lot",
                         scan_placeholder: "Scan lot",
                         scan_input_placeholder_expiry: "Scan expiration date",
-                    },
-                    events: {
-                        date_picker_selected: "on_date_picker_selected",
                     },
                     on_scan: (barcode) => {
                         // Scan a lot
@@ -738,5 +713,3 @@ const Reception = {
 process_registry.add("reception", Reception);
 
 export default Reception;
-
-// TODO: handle all confirmations in the scenario
