@@ -89,19 +89,18 @@ class Reception(Component):
         return self._response_for_select_line(picking)
 
     def _response_for_select_line(self, picking, message=None):
-        picking.user_id = self.env.user
+        self._assign_user_to_picking(picking)
         data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
         return self._response(next_state="select_line", data=data, message=message)
 
     def _response_for_confirm_done(self, picking, message=None):
-        picking.user_id = self.env.user
+        self._assign_user_to_picking(picking)
         data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
         return self._response(next_state="confirm_done", data=data, message=message)
 
     def _response_for_confirm_new_package(
         self, picking, line, new_package_name, message=None
     ):
-        picking.user_id = self.env.user
         data = {
             "selected_move_line": self._data_for_move_lines(line),
             "picking": self._data_for_stock_picking(picking, with_lines=True),
@@ -121,7 +120,7 @@ class Reception(Component):
         move_lines = self._move_line_by_product(product)
         pickings = move_lines.mapped("move_id.picking_id")
         if len(pickings) == 1:
-            pickings.user_id = self.env.user
+            self._assign_user_to_picking(pickings)
             if product.tracking not in ("lot", "serial"):
                 return self._response_for_set_quantity(pickings, move_lines)
             return self._response_for_set_lot(pickings, move_lines)
@@ -146,7 +145,7 @@ class Reception(Component):
         move_lines = self._move_line_by_packaging(packaging)
         pickings = move_lines.mapped("move_id.picking_id")
         if len(pickings) == 1:
-            pickings.user_id = self.env.user
+            self._assign_user_to_picking(pickings)
             if packaging.product_id.tracking not in ("lot", "serial"):
                 return self._response_for_set_quantity(pickings, move_lines)
             return self._response_for_set_lot(pickings, move_lines)
@@ -172,7 +171,7 @@ class Reception(Component):
                 picking,
                 message=self.msg_store.product_not_found_or_already_in_dest_package(),
             )
-        picking.user_id = self.env.user
+        self._assign_user_to_picking(picking)
         if product.tracking not in ("lot", "serial"):
             return self._response_for_set_quantity(picking, line)
         return self._response_for_set_lot(picking, line)
@@ -189,7 +188,7 @@ class Reception(Component):
                 picking,
                 message=self.msg_store.product_not_found_or_already_in_dest_package(),
             )
-        picking.user_id = self.env.user
+        self._assign_user_to_picking(picking)
         if packaging.product_id.tracking not in ("lot", "serial"):
             return self._response_for_set_quantity(picking, line)
         return self._response_for_set_lot(picking, line)
@@ -313,6 +312,9 @@ class Reception(Component):
             response = handler(*args, **kwargs)
             if response:
                 return response
+
+    def _assign_user_to_picking(self, picking):
+        picking.user_id = self.env.user
 
     # DATA METHODS
 
@@ -786,6 +788,7 @@ class Reception(Component):
             selected_line.result_package_id = package
             return self._response_for_select_line(picking)
         message = self.msg_store.create_new_pack_ask_confirmation(barcode)
+        self._assign_user_to_picking(picking)
         return self._response_for_confirm_new_package(
             picking, selected_line, new_package_name=barcode, message=message
         )
