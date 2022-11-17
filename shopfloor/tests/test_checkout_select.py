@@ -40,7 +40,10 @@ class CheckoutSelectCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_line",
-            data={"picking": self._stock_picking_data(self.picking)},
+            data={
+                "picking": self._stock_picking_data(self.picking),
+                "group_lines_by_location": True,
+            },
         )
 
     def _test_error(self, picking, msg):

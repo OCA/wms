@@ -61,10 +61,7 @@ const Checkout = {
                     :options="{main: true, key_title: 'name', title_icon: 'mdi-truck-outline'}"
                     />
                 <detail-picking-select
-                    :record="state.data.picking"
-                    :select_records="state.data.picking.move_lines"
-                    :select_records_grouped="utils.wms.group_lines_by_location(state.data.picking.move_lines, {'prepare_records': utils.wms.only_one_package})"
-                    :select_options="select_line_manual_select_opts()"
+                    v-bind="select_line_detail_picking_select_props()"
                     :key="make_state_component_key(['detail-picking-select'])"
                     />
                 <div class="button-list button-vertical-list full">
@@ -287,6 +284,25 @@ const Checkout = {
             return {
                 showActions: false,
             };
+        },
+        select_line_detail_picking_select_props: function () {
+            const picking = this.state.data.picking;
+            const lines = picking.move_lines;
+            let grouped_lines = undefined;
+            if (this.state.data.group_lines_by_location) {
+                grouped_lines = this.select_line_manual_select_group_lines(lines);
+            }
+            return {
+                record: picking,
+                select_records: lines,
+                select_records_grouped: grouped_lines,
+                select_options: this.select_line_manual_select_opts(),
+            };
+        },
+        select_line_manual_select_group_lines: function (lines) {
+            return this.utils.wms.group_lines_by_location(lines, {
+                prepare_records: this.utils.wms.only_one_package,
+            });
         },
         select_line_manual_select_opts: function () {
             return {
