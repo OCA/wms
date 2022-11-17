@@ -45,9 +45,15 @@ class Checkout(Component):
             return self._response_for_summary(picking, message=message)
         return self._response(
             next_state="select_line",
-            data={"picking": self._data_for_stock_picking(picking)},
+            data=self._data_for_select_line(picking),
             message=message,
         )
+
+    def _data_for_select_line(self, picking):
+        return {
+            "picking": self._data_for_stock_picking(picking),
+            "group_lines_by_location": True,
+        }
 
     def _response_for_summary(self, picking, need_confirm=False, message=None):
         return self._response(
@@ -296,7 +302,8 @@ class Checkout(Component):
         data.update(
             {
                 "move_lines": self._data_for_move_lines(
-                    line_picker(picking), with_packaging=done
+                    self._lines_prepare(picking, line_picker(picking)),
+                    with_packaging=done,
                 )
             }
         )
@@ -307,6 +314,10 @@ class Checkout(Component):
 
     def _lines_to_pack(self, picking):
         return picking.move_line_ids.filtered(self._filter_lines_unpacked)
+
+    def _lines_prepare(self, picking, selected_lines):
+        """Hook to manipulate lines' ordering or anything else before sending them back."""
+        return selected_lines
 
     def _domain_for_list_stock_picking(self):
         return [
@@ -1348,7 +1359,10 @@ class ShopfloorCheckoutValidatorResponse(Component):
 
     @property
     def _schema_stock_picking_details(self):
-        return self._schema_stock_picking()
+        return dict(
+            self._schema_stock_picking(),
+            group_lines_by_location={"type": "boolean"},
+        )
 
     @property
     def _schema_summary(self):
