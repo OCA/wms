@@ -370,6 +370,14 @@ class MessageAction(Component):
             "body": _("Product not found in the current transfer."),
         }
 
+    def product_not_found_or_already_in_dest_package(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "Product not found in the current transfer or already in a package"
+            ),
+        }
+
     def packaging_not_found_in_picking(self):
         return {
             "message_type": "warning",

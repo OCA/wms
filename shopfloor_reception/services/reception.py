@@ -170,7 +170,7 @@ class Reception(Component):
         if not line:
             return self._response_for_select_line(
                 picking,
-                message=self.msg_store.product_not_found_in_picking(),
+                message=self.msg_store.product_not_found_or_already_in_dest_package(),
             )
         picking.user_id = self.env.user
         if product.tracking not in ("lot", "serial"):
@@ -187,7 +187,7 @@ class Reception(Component):
         if not line:
             return self._response_for_select_line(
                 picking,
-                message=self.msg_store.packaging_not_found_in_picking(),
+                message=self.msg_store.product_not_found_or_already_in_dest_package(),
             )
         picking.user_id = self.env.user
         if packaging.product_id.tracking not in ("lot", "serial"):
