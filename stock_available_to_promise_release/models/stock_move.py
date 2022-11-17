@@ -139,7 +139,7 @@ class StockMove(models.Model):
         if not self.ids:
             return
         self.flush()
-        self.env["stock.move.line"].flush(["move_id", "product_qty"])
+        self.env["stock.move.line"].flush(["move_id", "reserved_qty"])
         self.env["stock.location"].flush(["parent_path"])
         self.previous_promised_qty = 0
         query, params = self._previous_promised_qty_sql()
