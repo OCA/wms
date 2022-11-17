@@ -19,7 +19,11 @@ const Reception = {
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
             />
-            <date-picker-input v-if="state_is('set_lot')"/>
+            <date-picker-input
+                v-if="state_is('set_lot')"
+                :update_date_handler="get_expiration_date_from_lot"
+                v-on:date_picker_selected="on_date_picker_selected"
+            />
             <template v-if="state_in(['select_line', 'set_lot', 'set_quantity', 'set_destination'])">
                 <item-detail-card
                     :record="state.data.picking"
@@ -425,6 +429,9 @@ const Reception = {
         on_mark_done: function () {
             this.$root.trigger("mark_as_done");
         },
+        on_date_picker_selected: function (date) {
+            this.$root.trigger("date_picker_selected", date);
+        },
         lot_has_expiry_date: function () {
             // If there's a expiry date, it means there's a lot too.
             const expiry_date = _.result(
@@ -442,6 +449,12 @@ const Reception = {
                 (line) => line.qty_done < line.quantity
             );
             return this._get_selected_line_ids([next_unhandled_line]);
+        },
+        get_expiration_date_from_lot: function (lot) {
+            if (!lot.expiration_date) {
+                return;
+            }
+            return lot.expiration_date.split("T")[0];
         },
         _apply_search_filter: function (picking, input) {
             const values = [picking.origin];
@@ -547,9 +560,8 @@ const Reception = {
                     events: {
                         date_picker_selected: "on_date_picker_selected",
                     },
-                    // NOTE: in these three calls, selected_line_ids will consist of just
-                    // one id (the next one to be handled).
                     on_scan: (barcode) => {
+                        // Scan a lot
                         this.wait_call(
                             this.odoo.call("set_lot", {
                                 picking_id: this.state.data.picking.id,
@@ -561,12 +573,13 @@ const Reception = {
                             // to update the date-picker-input component
                             // with the expiration_date of the selected lot.
                             event_hub.$emit(
-                                "datepicker:lotselected",
+                                "datepicker:newdate",
                                 this.line_being_handled.lot
                             );
                         });
                     },
                     on_date_picker_selected: (expiration_date) => {
+                        // Select expiration_date
                         this.wait_call(
                             this.odoo.call("set_lot", {
                                 picking_id: this.state.data.picking.id,

@@ -6,6 +6,11 @@
 import event_hub from "../../services/event_hub.js";
 
 export var DatePicker = Vue.component("date-picker-input", {
+    props: {
+        // Method passed from the parent to update the picker's date
+        // from outside as required.
+        update_date_handler: Function,
+    },
     data: function () {
         return {
             date: "",
@@ -13,15 +18,12 @@ export var DatePicker = Vue.component("date-picker-input", {
     },
     watch: {
         date: function () {
-            this.$root.trigger("date_picker_selected", this.date);
+            this.$emit("date_picker_selected", this.date);
         },
     },
     mounted() {
-        event_hub.$on("datepicker:lotselected", (lot) => {
-            if (!lot.expiration_date) {
-                return;
-            }
-            this.date = lot.expiration_date.split("T")[0];
+        event_hub.$on("datepicker:newdate", (data) => {
+            this.date = this.update_date_handler(data);
         });
     },
     template: `
