@@ -43,7 +43,6 @@ const Reception = {
                     class="with-progress-bar"
                     :records="visible_pickings"
                     :options="manual_select_options_for_select_document()"
-                    v-on:select="state.on_select"
                     :key="make_state_component_key(['reception', 'manual-select-document'])"
                 />
             </template>
