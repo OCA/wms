@@ -323,7 +323,7 @@ class Reception(Component):
     # DATA METHODS
 
     def _data_for_stock_picking(self, picking, with_lines=False):
-        data = self.data.picking(picking)
+        data = self.data.picking(picking, with_progress=True)
         if with_lines:
             data.update(
                 {"move_lines": self._data_for_move_lines(picking.move_line_ids)}
