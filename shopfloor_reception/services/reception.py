@@ -253,6 +253,12 @@ class Reception(Component):
         # from PR #483.
         product = search.product_from_scan(barcode, use_packaging=False)
         if product:
+            if product.id != selected_line.product_id.id:
+                return self._response_for_set_quantity(
+                    picking,
+                    selected_line,
+                    message=self.msg_store.wrong_record(product),
+                )
             selected_line.qty_done += 1
             return self._response_for_set_quantity(picking, selected_line)
 
@@ -260,6 +266,12 @@ class Reception(Component):
         search = self._actions_for("search")
         packaging = search.packaging_from_scan(barcode)
         if packaging:
+            if packaging.product_id.id != selected_line.product_id.id:
+                return self._response_for_set_quantity(
+                    picking,
+                    selected_line,
+                    message=self.msg_store.wrong_record(packaging),
+                )
             selected_line.qty_done += packaging.qty
             return self._response_for_set_quantity(picking, selected_line)
 
