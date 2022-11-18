@@ -500,7 +500,9 @@ const Reception = {
                         );
                     },
                     on_cancel: () => {
-                        // TODO: endpoint missing in backend
+                        // TODO: this endpoing is currently missing in the backend,
+                        // and it's currently in the roadmap.
+                        // Once it's implemented, uncomment this call.
                         // this.wait_call(
                         //     this.odoo.call("cancel", {
                         //         package_level_id: this.state.data.id,
@@ -597,7 +599,9 @@ const Reception = {
                         );
                     },
                     on_cancel: () => {
-                        // TODO: endpoint missing in backend
+                        // TODO: this endpoing is currently missing in the backend,
+                        // and it's currently in the roadmap.
+                        // Once it's implemented, uncomment this call.
                         // this.wait_call(
                         //     this.odoo.call("cancel", {
                         //         package_level_id: this.state.data.id,

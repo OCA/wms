@@ -1004,6 +1004,8 @@ class ShopfloorReceptionValidatorResponse(Component):
         }
 
     def _schema_stock_picking_with_lines(self, lines_with_packaging=False):
+        # TODO: ideally, we should use self.schemas_detail.picking_detail
+        # instead of this method.
         schema = self.schemas.picking()
         schema.update(
             {
