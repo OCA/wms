@@ -610,9 +610,12 @@ class Reception(Component):
                 picking, selected_line, message=message
             )
         if quantity:
+            # We set qty_done to be equal to the qty of the picker
+            # at the moment of the scan.
             selected_line.qty_done = quantity
-            return self._response_for_set_quantity(picking, selected_line)
         if barcode:
+            # Then, we add the qty of whatever was scanned
+            # on top of the qty of the picker.
             handlers = (
                 self._set_quantity__by_product,
                 self._set_quantity__by_packaging,
