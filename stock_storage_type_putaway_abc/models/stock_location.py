@@ -36,10 +36,13 @@ class StockLocation(models.Model):
                     current_location = current_location.location_id
             location.display_abc_storage = display_abc_storage
 
+    def _get_sorted_leaf_locations_orderby_abc(self, products):
+        return first(products).abc_storage or "a"
+
     def _get_sorted_leaf_locations_orderby(self, products):
         if not self.pack_putaway_strategy == "abc":
             return super()._get_sorted_leaf_locations_orderby(products)
-        product_abc = first(products).abc_storage or "a"
+        product_abc = self._get_sorted_leaf_locations_orderby_abc(products)
         if product_abc == "a":
             abc_seq = "a", "b", "c"
         elif product_abc == "b":
