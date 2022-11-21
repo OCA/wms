@@ -146,14 +146,14 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "package_src": {
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
-                "move_line_count": 1,
+                "move_line_count": 0,
                 "weight": 20.0,
                 "storage_type": None,
             },
             "package_dest": {
                 "id": result_package.id,
                 "name": result_package.name,
-                "move_line_count": 0,
+                "move_line_count": 1,
                 "weight": 6.0,
                 "storage_type": None,
             },

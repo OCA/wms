@@ -147,6 +147,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         move_line.write({"qty_done": 3.0, "result_package_id": result_package.id})
         data = self.data.move_line(move_line)
         self.assert_schema(self.schema.move_line(), data)
+        self.assertIn(self.move_a.state, ["partially_available", "assigned", "done"])
         expected = {
             "id": move_line.id,
             "qty_done": 3.0,
@@ -156,14 +157,14 @@ class ActionsDataCase(ActionsDataCaseBase):
             "package_src": {
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
-                "move_line_count": 1,
+                "move_line_count": 0,
                 "weight": 20.0,
                 "storage_type": None,
             },
             "package_dest": {
                 "id": result_package.id,
                 "name": result_package.name,
-                "move_line_count": 0,
+                "move_line_count": 1,
                 "weight": 6.0,
                 "storage_type": None,
             },
@@ -199,6 +200,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         move_line = self.move_c.move_line_ids
         data = self.data.move_line(move_line)
         self.assert_schema(self.schema.move_line(), data)
+        self.assertIn(self.move_a.state, ["partially_available", "assigned", "done"])
         expected = {
             "id": move_line.id,
             "qty_done": 0.0,
