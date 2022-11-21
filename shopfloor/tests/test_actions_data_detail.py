@@ -53,6 +53,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "id": lot.id,
             "name": lot.name,
             "ref": "#FOO",
+            "expiration_date": "2020-05-31T00:00:00",
             "product": self._expected_product_detail(self.product_b, full=True),
         }
         # ignore time and TZ, we don't care here
@@ -177,6 +178,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "id": move_line.lot_id.id,
                 "name": move_line.lot_id.name,
                 "ref": None,
+                "expiration_date": None,
             },
             "package_src": None,
             "package_dest": None,
@@ -200,6 +202,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "id": move_line.lot_id.id,
                 "name": move_line.lot_id.name,
                 "ref": None,
+                "expiration_date": None,
             },
             "package_src": {
                 "id": move_line.package_id.id,

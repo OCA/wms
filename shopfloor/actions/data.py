@@ -133,7 +133,7 @@ class DataAction(Component):
 
     @property
     def _lot_parser(self):
-        return self._simple_record_parser() + ["ref"]
+        return self._simple_record_parser() + ["ref", "expiration_date"]
 
     @ensure_model("stock.move.line")
     def move_line(self, record, with_picking=False, **kw):
