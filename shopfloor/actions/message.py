@@ -361,6 +361,16 @@ class MessageAction(Component):
             ),
         }
 
+    def source_document_multiple_pickings_scan_package(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                _(
+                    "This source document is part of multiple transfers, please scan a package."
+                )
+            ),
+        }
+
     def product_mixed_package_scan_package(self):
         return {
             "message_type": "warning",
@@ -386,6 +396,64 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("No product found among current transfers."),
+        }
+
+    def product_not_found_in_picking(self):
+        return {
+            "message_type": "warning",
+            "body": _("Product not found in the current transfer."),
+        }
+
+    def product_not_found_or_already_in_dest_package(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "Product not found in the current transfer or already in a package."
+            ),
+        }
+
+    def packaging_not_found_in_picking(self):
+        return {
+            "message_type": "warning",
+            "body": _("Packaging not found in the current transfer."),
+        }
+
+    def packaging_not_found_or_already_in_dest_package(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "Packaging not found in the current transfer or already in a package."
+            ),
+        }
+
+    def expiration_date_missing(self):
+        return {
+            "message_type": "error",
+            "body": _("Missing expiration date."),
+        }
+
+    def multiple_picks_found_select_manually(self):
+        return {
+            "message_type": "error",
+            "body": _("Several transfers found, please select a transfer manually."),
+        }
+
+    def no_transfer_for_packaging(self):
+        return {
+            "message_type": "error",
+            "body": _("No transfer found for the scanned packaging."),
+        }
+
+    def create_new_pack_ask_confirmation(self, barcode):
+        return {
+            "message_type": "warning",
+            "body": _("Create new PACK {}? Scan it again to confirm.").format(barcode),
+        }
+
+    def place_in_location_ask_confirmation(self, location_name):
+        return {
+            "message_type": "warning",
+            "body": _("Place it in {}?").format(location_name),
         }
 
     def lot_mixed_package_scan_package(self):
