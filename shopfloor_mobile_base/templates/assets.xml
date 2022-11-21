@@ -185,6 +185,11 @@
             type="module"
         />
         <script
+            id="script_component_datepicker"
+            t-attf-src="/shopfloor_mobile_base/static/wms/src/components/datepicker/date_picker.js?v=#{app_info.version}"
+            type="module"
+        />
+        <script
             id="script_component_user_confirmation"
             t-attf-src="/shopfloor_mobile_base/static/wms/src/components/userConfirmation/userConfirmation.js?v=#{app_info.version}"
         />
