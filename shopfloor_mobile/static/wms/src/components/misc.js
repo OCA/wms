@@ -161,6 +161,9 @@ Vue.component("picking-list-item-progress-bar", {
     mixins: [ItemDetailMixin],
     computed: {
         value() {
+            if (!_.isUndefined(this.record.progress)) {
+                return this.record.progress;
+            }
             return this.utils.wms.picking_completeness(this.record);
         },
     },

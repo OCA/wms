@@ -235,6 +235,27 @@ export class WMSUtils {
         }
         return "move-line-" + klass;
     }
+
+    list_item_klass_maker_by_progress(rec) {
+        const records = _.result(rec, "records", undefined);
+        if (!records) {
+            return;
+        }
+        let avg_progress =
+            records.reduce((acc, next) => {
+                return next.progress + acc;
+            }, 0) / records.length;
+        let klass = "";
+        if (avg_progress === 100) {
+            klass = "done screen_step_done lighten-1";
+        } else if (avg_progress === 0) {
+            klass = "not-done screen_step_todo lighten-1";
+        } else {
+            klass = "partial screen_step_todo lighten-2";
+        }
+        return "move-line-" + klass;
+    }
+
     /**
      * Provide display options for rendering move line product's info.
      *
