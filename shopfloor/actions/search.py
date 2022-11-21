@@ -1,5 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
 from odoo.addons.component.core import Component
 
 
@@ -31,11 +32,27 @@ class SearchAction(Component):
             return model.browse()
         return model.search([("name", "=", barcode)], limit=1)
 
-    def picking_from_scan(self, barcode):
+    def picking_from_scan(self, barcode, use_origin=False):
         model = self.env["stock.picking"]
         if not barcode:
             return model.browse()
-        return model.search([("name", "=", barcode)], limit=1)
+        picking = model.search([("name", "=", barcode)], limit=1)
+        # We need to split the domain in two different searches
+        # as there might be a case where
+        # the name of a picking is the same as the origin of another picking
+        # (e.g. in a backorder) and we need to make sure
+        # the name search takes priority.
+        if picking:
+            return picking
+        if use_origin:
+            source_document_domain = [
+                # We could have the same origin for multiple transfers
+                # but we're interested only in the "assigned" ones.
+                ("origin", "=", barcode),
+                ("state", "=", "assigned"),
+            ]
+            return model.search(source_document_domain)
+        return model.browse()
 
     def product_from_scan(self, barcode, use_packaging=True):
         model = self.env["product.product"]
