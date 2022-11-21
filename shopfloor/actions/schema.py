@@ -93,6 +93,7 @@ class ShopfloorSchemaAction(Component):
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
             "ref": {"type": "string", "nullable": True, "required": False},
+            "expiration_date": {"type": "string", "nullable": True, "required": False},
         }
 
     def location(self):
