@@ -39,6 +39,7 @@ class ClusterPickingScanDestinationPackPrefillQtyCase(ClusterPickingCommonCase):
     def test_scan_destination_pack_increment_with_product(self):
         """Check quantity increment by scanning the product."""
         line = self.batch.picking_ids.move_line_ids[0]
+        previous_qty_done = line.qty_done
         for qty_done in range(1, 2):
             response = self.service.dispatch(
                 "scan_destination_pack",
@@ -49,16 +50,20 @@ class ClusterPickingScanDestinationPackPrefillQtyCase(ClusterPickingCommonCase):
                     "quantity": qty_done,
                 },
             )
-            line.qty_done = qty_done + 1
+            # Ensure the qty has not changed.
+            self.assertEqual(line.qty_done, previous_qty_done)
+
+            expected_qty_done = qty_done + 1
             self.assert_response(
                 response,
                 next_state="scan_destination",
-                data=self._line_data(line),
+                data=self._line_data(line, qty_done=expected_qty_done),
             )
 
     def test_scan_destination_pack_increment_with_wrong_product(self):
         """Check quantity is not incremented by scanning the wrong product."""
         line = self.batch.picking_ids.move_line_ids[0]
+        previous_qty_done = line.qty_done
         qty_done = 2
         response = self.service.dispatch(
             "scan_destination_pack",
@@ -69,11 +74,14 @@ class ClusterPickingScanDestinationPackPrefillQtyCase(ClusterPickingCommonCase):
                 "quantity": qty_done,
             },
         )
-        line.qty_done = qty_done
+        # Ensure the qty has not changed.
+        self.assertEqual(line.qty_done, previous_qty_done)
+
+        expected_qty_done = qty_done
         self.assert_response(
             response,
             next_state="scan_destination",
-            data=self._line_data(line),
+            data=self._line_data(line, qty_done=expected_qty_done),
             message=self.service.msg_store.bin_not_found_for_barcode(
                 self.product_b.barcode
             ),
@@ -82,6 +90,7 @@ class ClusterPickingScanDestinationPackPrefillQtyCase(ClusterPickingCommonCase):
     def test_scan_destination_pack_increment_with_packaging(self):
         """Check quantity incremented by scanning the packaging."""
         line = self.batch.picking_ids.move_line_ids[0]
+        previous_qty_done = line.qty_done
         packaging = self.product_a_packaging
         qty_done = 2
         response = self.service.dispatch(
@@ -93,9 +102,12 @@ class ClusterPickingScanDestinationPackPrefillQtyCase(ClusterPickingCommonCase):
                 "quantity": qty_done,
             },
         )
-        line.qty_done = qty_done + packaging.qty
+        # Ensure the qty has not changed in the record.
+        self.assertEqual(line.qty_done, previous_qty_done)
+
+        expected_qty_done = qty_done + packaging.qty
         self.assert_response(
             response,
             next_state="scan_destination",
-            data=self._line_data(line),
+            data=self._line_data(line, qty_done=expected_qty_done),
         )
