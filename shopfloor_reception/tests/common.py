@@ -14,30 +14,6 @@ class CommonCase(BaseCommonCase):
         picking.user_id = False
         return picking
 
-    def _data_for_move_lines(self, lines, **kw):
-        return self.data.move_lines(lines, **kw)
-
-    def _data_for_picking_with_line(self, picking):
-        picking_data = self._data_for_picking(picking)
-        move_lines_data = self._data_for_move_lines(picking.move_line_ids)
-        picking_data.update({"move_lines": move_lines_data})
-        return picking_data
-
-    def _data_for_pickings_with_line(self, pickings):
-        res = []
-        for picking in pickings:
-            res.append(self._data_for_picking_with_line(picking))
-        return res
-
-    def _data_for_picking(self, picking):
-        return self.data.picking(picking)
-
-    def _data_for_pickings(self, pickings):
-        res = []
-        for picking in pickings:
-            res.append(self._data_for_picking(picking))
-        return res
-
     @classmethod
     def _create_lot(cls, **kwargs):
         vals = {
@@ -76,6 +52,30 @@ class CommonCase(BaseCommonCase):
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
         cls.wh.sudo().reception_steps = "two_steps"
+
+    def _data_for_move_lines(self, lines, **kw):
+        return self.data.move_lines(lines, **kw)
+
+    def _data_for_picking_with_line(self, picking):
+        picking_data = self._data_for_picking(picking)
+        move_lines_data = self._data_for_move_lines(picking.move_line_ids)
+        picking_data.update({"move_lines": move_lines_data})
+        return picking_data
+
+    def _data_for_pickings_with_line(self, pickings):
+        res = []
+        for picking in pickings:
+            res.append(self._data_for_picking_with_line(picking))
+        return res
+
+    def _data_for_picking(self, picking):
+        return self.data.picking(picking)
+
+    def _data_for_pickings(self, pickings):
+        res = []
+        for picking in pickings:
+            res.append(self._data_for_picking(picking))
+        return res
 
     def setUp(self):
         super().setUp()
