@@ -1,0 +1,61 @@
+%%{init: {'theme': 'neutral' } }%%
+sequenceDiagram
+	participant select_document
+	participant select_line
+	participant set_lot
+	participant set_quantity
+	participant set_destination
+	participant select_dest_package
+    rect rgb(0, 250, 250)
+    note left of select_document: scan_document(barcode)
+	select_document ->> select_document: Error: barcode not found
+	select_document ->> select_document: Multiple picking matching the product / packaging barcode
+	select_document ->> select_line: Picking scanned, one has been found
+	select_document ->> set_lot: Packaging / Product has been scanned, single correspondance. Tracked product
+	select_document ->> set_quantity: Packaging / Product has been scanned, single correspondance. Not tracked product
+    end
+    rect rgb(100, 250, 170)
+    note left of select_line: scan_line(picking_id, barcode)
+	select_line ->> select_line: Error: barcode not found
+	select_line ->> set_lot: Packaging / Product has been scanned, single correspondance. Tracked product
+	select_line ->> set_quantity: Packaging / Product has been scanned, single correspondance. Not tracked product
+    end
+    rect rgb(250, 220, 200)
+    note left of set_lot: set_lot(picking_id, select_line_ids, lot_name=None, expiration_date=None)
+	set_lot ->> select_line: User clicked on back
+	set_lot ->> set_lot: Barcode not found. Ask user to create one from barcode
+	set_lot ->> set_lot: expiration_date has been set on the selected line
+	set_lot ->> set_lot: lot_it has been set on the selected line
+	set_lot ->> set_lot: Error: expiration_date is required
+    note right of set_lot: set_lot_confirm_action(picking_id, select_line_ids)
+	set_lot ->> set_quantity: User clicked on the confirm button
+    end
+    rect rgb(250, 150, 250)
+    note left of set_quantity: set_quantity(picking_id, select_line_ids, quantity=None, barcode=None, confirmation=None)
+	set_quantity ->> set_quantity: Quantity has been set
+	set_quantity ->> set_quantity: User scanned a product / packaging, quantity has been incremented
+	set_quantity ->> set_quantity: Error: User tried to scan a package with a non valid location
+	set_quantity ->> set_quantity: Error: User tried to scan a non valid location
+	set_quantity ->> set_quantity: Warning: User scanned an unknown barcode. Ask to create a package
+	set_quantity ->> select_line: User scanned a package with a valid location
+	set_quantity ->> select_line: User scanned a valid location
+	set_quantity ->> set_destination: User scanner a package with no location
+    note right of set_quantity: process_with_new_pack(picking_id, select_line_ids)
+	set_quantity ->> set_destination: User confirmed the creation of a new package
+    note right of set_quantity: process_with_existing_pack(picking_id, select_line_ids)
+	set_quantity ->> select_dest_package: User asked to use an existing package
+    note right of set_quantity: process_with_new_pack(picking_id, select_line_ids)
+    set_quantity ->> set_destination: User clicked on "process with new pack"
+    end
+    rect rgb(220, 220, 220)
+    note left of set_destination: set_destination(picking_id, selected_line_ids, location_id, confirmation=False)
+	set_destination ->> set_destination: Warning: User scanned a child location of the picking type. Ask for confirmation
+	set_destination ->> set_destination: Error: User tried to scan a non-valid location
+	set_destination ->> select_line: User scanned a child location of the move's dest location
+    end
+    rect rgb(250, 150, 150)
+    note left of select_dest_package: select_dest_package(picking_id, selected_line_ids, location_id, confirmation=False)
+	select_dest_package ->> select_line: User scanned a valid package
+	select_dest_package ->> select_dest_package: Warning: User scanned an unknown barcode. Confirm to create one.
+	select_dest_package ->> select_dest_package: Error: User scanned a non-empty package
+    end
