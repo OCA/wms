@@ -1,0 +1,66 @@
+# Diagram to generate with PlantUML (https://plantuml.com/)
+#
+#   $ sudo apt install plantuml
+#   $ plantuml location_content_transfer_diag_seq.plantuml
+#
+
+@startuml
+
+skinparam roundcorner 20
+skinparam sequence {
+
+ParticipantBorderColor #875A7B
+ParticipantBackgroundColor #875A7B
+ParticipantFontSize 17
+ParticipantFontColor white
+
+LifeLineBorderColor #875A7B
+
+ArrowColor #00A09D
+}
+
+header <img:oca_logo.png>
+title <size:35>Location Content Transfer scenario</size>
+
+start_or_recover -> get_work : `get_work` option is enabled
+start_or_recover -> scan_location : `get_work` option is not enabled
+start_or_recover -> scan_destination_all : existing work to resume for the user
+start_or_recover -> start_single : existing work to resume for the user
+
+== /find_work ==
+get_work -> scan_location: **/find_work** (work found)
+get_work -> get_work: **/find_work** (no work available)
+get_work -> scan_location: click on `Manual Selection` button
+
+== /cancel_work ==
+scan_location -> get_work: **/cancel_work(location_id)** \n(Only available coming from `get_work`)
+
+== /scan_location ==
+scan_location -> scan_location: **/scan_location(barcode)** \n(Location not found)
+scan_location -> scan_destination_all: **/scan_location(barcode)** \n(lines and package levels have the same destination)
+scan_location -> start_single: **/scan_location(barcode)** \n(lines or package levels have different destination)
+
+== /scan_package ==
+start_single -> start_single: **/scan_package(barcode)** \n(barcode not found)
+start_single -> scan_destination: **/scan_package(barcode)**
+
+== /postpone_package ==
+start_single -> start_single: **/postpone_package(location_id, package_level_id)**
+
+== /dismiss_package_level ==
+start_single -> start_single: **/dismiss_package_level(location_id, package_level_id)**
+
+== /stock_out_line ==
+start_single -> start_single: **/dismiss_package_level(location_id, move_line_id)** \n(continue with next line or package level)
+start_single -> done: **/dismiss_package_level(location_id, move_line_id)** \n(no more content to move)
+
+== /set_destination_all ==
+scan_destination_all -> done: **/set_destination_all(location_id)**
+scan_destination_all -> scan_destination_all: **/set_destination_all(location_id)** \n(Invalid destination)
+
+== /go_to_single ==
+scan_destination_all -> start_single: **/go_to_single(location_id)**
+
+done -> start_or_recover:
+
+@enduml
