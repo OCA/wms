@@ -15,7 +15,7 @@ const Reception = {
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar
-                v-if="state_in(['select_document', 'select_line', 'set_lot', 'set_quantity', 'set_destination', 'select_dest_package'])"
+                v-if="state_in(['select_document', 'select_move', 'set_lot', 'set_quantity', 'set_destination', 'select_dest_package'])"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
             />
@@ -24,7 +24,7 @@ const Reception = {
                 :handler_to_update_date="get_expiration_date_from_lot"
                 v-on:date_picker_selected="state.on_date_picker_selected"
             />
-            <template v-if="state_in(['select_line', 'set_lot', 'set_quantity', 'set_destination'])">
+            <template v-if="state_in(['select_move', 'set_lot', 'set_quantity', 'set_destination'])">
                 <item-detail-card
                     :record="state.data.picking"
                     :options="operation_options()"
@@ -68,13 +68,13 @@ const Reception = {
                     </v-row>
                 </div>
             </template>
-            <template v-if="state_is('select_line')">
-                <picking-summary
-                    :record="state.data.picking"
-                    :records_grouped="picking_summary_records_grouped(state.data.picking)"
-                    :action_cancel_package_key="'package_dest'"
-                    :list_options="picking_summary_options_for_select_line()"
-                    :key="make_state_component_key(['picking-summary', 'detail-picking', state.data.picking.id])"
+            <template v-if="state_is('select_move')">
+                <item-detail-card
+                    v-for="record in ordered_moves"
+                    :card_color="move_card_color(record)"
+                    :record="record"
+                    :options="picking_detail_options_for_select_move()"
+                    :key="make_state_component_key(['reception-moves-select-move', record.id])"
                 />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -220,6 +220,17 @@ const Reception = {
         line_being_handled: function () {
             return this.state.data.selected_move_line[0] || {};
         },
+        ordered_moves: function () {
+            const moves = _.result(this.state, "data.picking.moves", []);
+            if (_.isEmpty(moves)) {
+                return;
+            }
+            // We sort the moves to ensure that the following order always takes place:
+            // Top: Partially done moves.
+            // Middle: Moves with 0 quantity_done.
+            // Bottom: Completely done moves.
+            return moves.sort((a, b) => a.progress - b.progress);
+        },
     },
     methods: {
         screen_title: function () {
@@ -230,7 +241,7 @@ const Reception = {
             return title;
         },
         current_doc: function () {
-            const data = this.state_get_data("select_line");
+            const data = this.state_get_data("select_move");
             if (_.isEmpty(data)) {
                 return null;
             }
@@ -325,36 +336,24 @@ const Reception = {
                 ],
             };
         },
-        picking_summary_options_for_select_line: function () {
-            // This is in its own variable to avoid issues with prettier.
-            const klass_maker = this.utils.wms.list_item_klass_maker_by_progress;
+        picking_detail_options_for_select_move: function () {
             return {
-                show_title: false,
-                list_item_options: {
-                    // TODO: uncomment this line once the backend has an endpoint to cancel lines.
-                    // actions: ["action_cancel_line"],
-                    fields: [
-                        {path: "package_dest.name", label: "Pack"},
-                        {
-                            path: "qty_done",
-                            label: "Received qty",
-                            renderer: (rec, field) => {
-                                return rec.qty_done ? rec.qty_done : 0;
-                            },
-                        },
-                    ],
-                    header_fields: [
-                        // Display additional fields in the group header
-                        // that are shared for all items in the list.
-                        {path: "records[0].product.barcode", label: "Barcode"},
-                        {
-                            path: "records[0].product.supplier_code",
-                            label: "Vendor code",
-                        },
-                    ],
-                    group_header_title_key: "display_name",
-                    list_item_klass_maker: klass_maker,
-                },
+                key_title: "product.display_name",
+                fields: [
+                    {
+                        path: "product.barcode",
+                        label: "Barcode",
+                    },
+                    {
+                        path: "product.supplier_code",
+                        label: "Vendor code",
+                    },
+                    {
+                        path: "quantity_done",
+                        label: "Qty done",
+                        display_no_value: true,
+                    },
+                ],
             };
         },
         picking_detail_options_for_set_destination: function () {
@@ -419,28 +418,6 @@ const Reception = {
                 },
             };
         },
-        picking_summary_records_grouped: function (picking) {
-            const grouped_lines = this.utils.wms.group_lines_by_product(
-                picking.move_lines,
-                {
-                    group_no_title: true,
-                    prepare_records: _.partialRight(
-                        this.utils.wms.group_by_pack,
-                        "product"
-                    ),
-                    group_color_maker: function (value) {
-                        return value[0].progress == 100
-                            ? "screen_step_done"
-                            : "screen_step_todo";
-                    },
-                }
-            );
-            // There are two color options for each group: done or todo.
-            // We make sure to display the todo groups on top.
-            return grouped_lines.sort((prev, next) =>
-                prev.group_color > next.group_color ? -1 : 1
-            );
-        },
         on_search: function (input) {
             this.filtered_pickings = this.state.data.pickings.filter((picking) =>
                 this._apply_search_filter(picking, input.text)
@@ -463,6 +440,13 @@ const Reception = {
                 return;
             }
             return lot.expiration_date.split("T")[0];
+        },
+        move_card_color: function (move) {
+            if (move.progress === 100) {
+                return "screen_step_done";
+            } else {
+                return "screen_step_todo";
+            }
         },
         _apply_search_filter: function (picking, input) {
             if (_.isEmpty(picking.origin)) {
@@ -527,9 +511,9 @@ const Reception = {
                         this.reset_picking_filter();
                     },
                 },
-                select_line: {
+                select_move: {
                     display_info: {
-                        title: "Select a line",
+                        title: "Select a move",
                         scan_placeholder: "Scan product / package",
                     },
                     events: {
@@ -578,7 +562,7 @@ const Reception = {
                         );
                     },
                     on_back: () => {
-                        this.state_to("select_line");
+                        this.state_to("select_move");
                         this.reset_notification();
                     },
                 },

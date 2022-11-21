@@ -277,9 +277,7 @@ class Reception(Component):
 
     def _scan_document__by_product(self, barcode):
         search = self._actions_for("search")
-        # TODO: use_packaging should be removed after merging the no_prefill_qty changes
-        # from PR #483.
-        product = search.product_from_scan(barcode, use_packaging=False)
+        product = search.product_from_scan(barcode)
         if product:
             return self._select_document_from_product(product)
 
@@ -291,9 +289,7 @@ class Reception(Component):
 
     def _scan_line__by_product(self, picking, barcode):
         search = self._actions_for("search")
-        # TODO: use_packaging should be removed after merging the no_prefill_qty changes
-        # from PR #483.
-        product = search.product_from_scan(barcode, use_packaging=False)
+        product = search.product_from_scan(barcode)
         if product:
             move = picking.move_lines.filtered(lambda m: m.product_id == product)
             message = self._check_move_available(move, "product")
@@ -332,9 +328,7 @@ class Reception(Component):
 
     def _set_quantity__by_product(self, picking, selected_line, barcode):
         search = self._actions_for("search")
-        # TODO: use_packaging should be removed after merging the no_prefill_qty changes
-        # from PR #483.
-        product = search.product_from_scan(barcode, use_packaging=False)
+        product = search.product_from_scan(barcode)
         if product:
             if product.id != selected_line.product_id.id:
                 return self._response_for_set_quantity(
