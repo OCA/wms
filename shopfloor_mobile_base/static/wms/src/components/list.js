@@ -73,6 +73,7 @@ Vue.component("list", {
         list_item_options() {
             const opts = _.defaults({}, this.opts.list_item_options, {
                 key_title: this.opts.key_title,
+                show_title: this.opts.show_title,
                 loud_title: false,
                 showCounters: this.opts.showCounters,
                 // Customize fields
