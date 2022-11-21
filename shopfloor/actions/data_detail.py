@@ -32,7 +32,14 @@ class DataDetailAction(Component):
 
     @ensure_model("stock.picking")
     def picking_detail(self, record, **kw):
-        return self._jsonify(record, self._picking_detail_parser, **kw)
+        parser = self._picking_detail_parser
+        # progress is a heavy computed field,
+        # and it may reduce performance significatively
+        # when dealing with a large number of pickings.
+        # Thus, we make it optional.
+        if "with_progress" in kw:
+            parser.append("progress")
+        return self._jsonify(record, parser, **kw)
 
     def pickings_detail(self, record, **kw):
         return self.picking_detail(record, multi=True)

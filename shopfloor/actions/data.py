@@ -29,13 +29,20 @@ class DataAction(Component):
 
     @ensure_model("stock.picking")
     def picking(self, record, **kw):
-        return self._jsonify(record, self._picking_parser, **kw)
+        parser = self._picking_parser
+        # progress is a heavy computed field,
+        # and it may reduce performance significatively
+        # when dealing with a large number of pickings.
+        # Thus, we make it optional.
+        if "with_progress" in kw:
+            parser.append("progress")
+        return self._jsonify(record, parser, **kw)
 
     def pickings(self, record, **kw):
         return self.picking(record, multi=True)
 
     @property
-    def _picking_parser(self):
+    def _picking_parser(self, **kw):
         return [
             "id",
             "name",
@@ -178,6 +185,7 @@ class DataAction(Component):
                 "move_id:priority",
                 lambda rec, fname: rec.move_id.priority or "",
             ),
+            "progress",
         ]
 
     @ensure_model("stock.package_level")

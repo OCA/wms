@@ -129,6 +129,44 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-05-13")
         self.assertDictEqual(data, expected)
 
+    def test_data_picking_with_progress(self):
+        picking = self.picking
+        carrier = picking.carrier_id.search([], limit=1)
+        picking.write(
+            {
+                "origin": "created by test",
+                "note": "read me",
+                "priority": "1",
+                "carrier_id": carrier.id,
+            }
+        )
+        picking.move_lines.write({"date": "2020-05-13"})
+        data = self.data_detail.picking_detail(picking, with_progress=True)
+        self.assert_schema(self.schema_detail.picking_detail(), data)
+        expected = {
+            "id": picking.id,
+            "move_line_count": 4,
+            "package_level_count": 2,
+            "bulk_line_count": 2,
+            "name": picking.name,
+            "note": "read me",
+            "origin": "created by test",
+            "ship_carrier": None,
+            "weight": 110.0,
+            "partner": {"id": self.customer.id, "name": self.customer.name},
+            "carrier": {"id": picking.carrier_id.id, "name": picking.carrier_id.name},
+            "priority": "Urgent",
+            "operation_type": {
+                "id": picking.picking_type_id.id,
+                "name": picking.picking_type_id.name,
+            },
+            "move_lines": self.data_detail.move_lines(picking.move_line_ids),
+            "picking_type_code": "outgoing",
+            "progress": 0.0,
+        }
+        self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-05-13")
+        self.assertDictEqual(data, expected)
+
     def test_data_move_line_package(self):
         move_line = self.move_a.move_line_ids
         result_package = self.env["stock.quant.package"].create(
@@ -161,6 +199,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
+            "progress": 30.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -185,6 +224,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
+            "progress": 0.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -221,6 +261,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
+            "progress": 0.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -240,6 +281,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
+            "progress": 0.0,
         }
         self.assertDictEqual(data, expected)
 

@@ -119,6 +119,30 @@ class ActionsDataCase(ActionsDataCaseBase):
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-08-03")
         self.assertDictEqual(data, expected)
 
+    def test_data_picking_with_progress(self):
+        carrier = self.picking.carrier_id.search([], limit=1)
+        self.picking.write(
+            {"origin": "created by test", "note": "read me", "carrier_id": carrier.id}
+        )
+        data = self.data.picking(self.picking, with_progress=True)
+        self.assert_schema(self.schema.picking(), data)
+        expected = {
+            "id": self.picking.id,
+            "move_line_count": 4,
+            "package_level_count": 2,
+            "bulk_line_count": 2,
+            "name": self.picking.name,
+            "note": "read me",
+            "origin": "created by test",
+            "weight": 110.0,
+            "partner": {"id": self.customer.id, "name": self.customer.name},
+            "carrier": {"id": carrier.id, "name": carrier.name},
+            "ship_carrier": None,
+            "progress": 0.0,
+        }
+        self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-08-03")
+        self.assertDictEqual(data, expected)
+
     def test_data_product(self):
         (
             self.env["product.packaging"]
@@ -176,6 +200,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
+            "progress": 30.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -199,6 +224,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
+            "progress": 0.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -235,6 +261,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
+            "progress": 0.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -253,6 +280,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
+            "progress": 0.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -272,6 +300,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "location_dest": self._expected_location(move_line.location_dest_id),
             "picking": self.data.picking(move_line.picking_id),
             "priority": "1",
+            "progress": 0.0,
         }
         self.assertDictEqual(data, expected)
 
