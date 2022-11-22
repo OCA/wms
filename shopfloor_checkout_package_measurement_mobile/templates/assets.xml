@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_mobile.shopfloor_app_assets"
+    >
+        <script id="script_scenario_checkout" position="after">
+
+          <t
+                t-set="mod_version"
+                t-value="get_version('shopfloor_checkout_package_measurement_mobile')"
+            />
+          <script
+                id="script_checkout_package_measurement"
+                t-attf-src="/shopfloor_checkout_package_measurement_mobile/static/src/scenario/checkout_package_measurement.js?v=#{mod_version}"
+                type="module"
+            />
+
+        </script>
+    </template>
+
+</odoo>
