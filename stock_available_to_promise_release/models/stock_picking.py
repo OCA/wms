@@ -77,8 +77,8 @@ class StockPicking(models.Model):
                 picking.release_ready = False
                 picking.release_ready_count = 0
                 continue
-            move_lines = picking.move_lines.filtered(
-                lambda move: move.state not in ("cancel", "done")
+            move_lines = picking.move_ids.filtered(
+                lambda move: move.state not in ("cancel", "done") and move.need_release
             )
             if picking._get_shipping_policy() == "one":
                 picking.release_ready_count = sum(
