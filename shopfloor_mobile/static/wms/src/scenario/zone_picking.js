@@ -108,11 +108,6 @@ const template_mobile = `
             </div>
         </div>
 
-        <detail-picking
-            v-if="state_is('set_line_destination')"
-            :record="state.data.move_line.picking"
-            :card_color="utils.colors.color_for('screen_step_done')"
-            />
         <item-detail-card
             v-if="state_in(['set_line_destination', 'change_pack_lot'])"
             :key="make_state_component_key(['detail-move-line-loc', state.data.move_line.id])"
@@ -124,7 +119,7 @@ const template_mobile = `
             v-if="state_in(['set_line_destination', 'stock_issue', 'change_pack_lot'])"
             :key="make_state_component_key(['detail-move-line-product', state.data.move_line.id])"
             :record="state.data.move_line"
-            :options="utils.wms.move_line_product_detail_options(state.data.move_line, {fields: [{path: 'picking.name', label: 'Picking'}], fields_blacklist: ['quantity']})"
+            :options="utils.wms.move_line_product_detail_options(state.data.move_line, {fields_blacklist: ['quantity']})"
             :card_color="utils.colors.color_for(state_in(['set_line_destination']) ? 'screen_step_done': 'screen_step_todo')"
             />
         <item-detail-card
@@ -269,15 +264,31 @@ const ZonePicking = {
             );
         },
         screen_title: function () {
-            const record = this.current_picking_type();
-            if (!record) return this.menu_item().name;
-            return record.name;
+            const picking = this.current_picking();
+            if (picking) {
+                return picking.name;
+            }
+            const picking_type = this.current_picking_type();
+            if (!_.isEmpty(picking_type)) {
+                return picking_type.name;
+            }
+            return this.menu_item().name;
         },
-        // TODO: if we have this working we can remove the picking detail?
+        current_picking: function () {
+            const states = ["set_line_destination", "stock_issue", "change_pack_lot"];
+            if (states.includes(this.current_state_key)) {
+                return this.state.data.move_line.picking;
+            }
+            return null;
+        },
         current_doc: function () {
-            const record = this.current_picking_type();
+            const picking = this.current_picking();
+            if (!picking) {
+                return {};
+            }
             return {
-                record: record,
+                record: picking,
+                identifier: picking.name,
             };
         },
         current_picking_type: function () {
