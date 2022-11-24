@@ -444,8 +444,9 @@ class StockReleaseChannel(models.Model):
         domain = safe_eval(self.rule_domain) or []
         return domain
 
+    @api.model
     def _get_assignable_release_channel_domain(self):
-        return []
+        return [("state", "!=", "asleep")]
 
     @api.model
     def assign_release_channel(self, picking):
