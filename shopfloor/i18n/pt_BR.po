@@ -229,6 +229,12 @@ msgid "Control stock issue in location {} for {}"
 msgstr ""
 
 #. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Create new PACK {}? Scan it again to confirm."
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid "Creation of moves is not allowed for menu {}."
@@ -453,6 +459,12 @@ msgid "Menu displayed in the scanner application"
 msgstr ""
 
 #. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Missing expiration date."
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_create_is_possible
 msgid "Move Create Is Possible"
 msgstr ""
@@ -579,6 +591,12 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No quantity has been processed, unable to complete the transfer."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "No transfer found for the scanned packaging."
 msgstr ""
 
 #. module: shopfloor
@@ -747,6 +765,18 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "Packaging not found in the current transfer or already in a package."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Packaging not found in the current transfer."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid ""
 "Pick + Pack mode ON: the picking {0.name} has no carrier set. The system "
 "couldn't pack goods automatically."
@@ -796,6 +826,12 @@ msgid "Picking type {} complete."
 msgstr ""
 
 #. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Place it in {}?"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__planned_move_line_ids
 msgid "Planned Move Line"
 msgstr ""
@@ -825,6 +861,18 @@ msgstr ""
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid "Product is not in the current transfer."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Product not found in the current transfer or already in a package."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Product not found in the current transfer."
 msgstr ""
 
 #. module: shopfloor
@@ -987,6 +1035,12 @@ msgstr ""
 #, python-format
 msgid ""
 "Several transfers found, please scan a package or select a transfer manually."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Several transfers found, please select a transfer manually."
 msgstr ""
 
 #. module: shopfloor
@@ -1286,6 +1340,13 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This product is part of multiple packages, please scan a package."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"This source document is part of multiple transfers, please scan a package."
 msgstr ""
 
 #. module: shopfloor
