@@ -6,8 +6,53 @@
         <field name="model">stock.release.channel</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <field name="is_action_lock_allowed" invisible="1" />
+                    <field name="is_action_unlock_allowed" invisible="1" />
+                    <field name="is_action_sleep_allowed" invisible="1" />
+                    <field name="is_action_wake_up_allowed" invisible="1" />
+                    <button
+                        name="action_lock"
+                        string="Lock"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-lock"
+                        attrs="{'invisible': [('is_action_lock_allowed', '=', False)]}"
+                    />
+                    <button
+                        name="action_unlock"
+                        string="Unlock"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-unlock"
+                        attrs="{'invisible': [('is_action_unlock_allowed', '=', False)]}"
+                    />
+                    <button
+                        name="action_sleep"
+                        string="Sleep"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-bed"
+                        attrs="{'invisible': [('is_action_sleep_allowed', '=', False)]}"
+                    />
+                    <button
+                        name="action_wake_up"
+                        string="Wake Up"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-bolt"
+                        attrs="{'invisible': [('is_action_wake_up_allowed', '=', False)]}"
+                    />
+                    <field
+                        name="state"
+                        widget="statusbar"
+                        statusbar_visible="open,locked,asleep"
+                        readonly="true"
+                    />
+                </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
+
                     </div>
                     <field name="active" invisible="1" />
                     <widget
@@ -69,6 +114,21 @@
             <search>
                 <field name="warehouse_id" />
                 <separator />
+                <filter
+                    string="Open"
+                    name="filter_open"
+                    domain="[('state','=','open')]"
+                />
+                <filter
+                    string="Locked"
+                    name="filter_locked"
+                    domain="[('state','=','locked')]"
+                />
+                <filter
+                    string="Aslepp"
+                    name="filter_asleep"
+                    domain="[('state','=','asleep')]"
+                />
                 <filter
                     string="Archived"
                     name="inactive"
@@ -148,8 +208,20 @@
                                     <div class="o_kanban_card_header_title">
                                         <div class="o_primary">
                                             <field name="name" />
+                                            <field name="state" invisible="1" />
+                                            <t
+                                                t-set="classname"
+                                                t-value="{'open': 'fa fa-unlock', 'locked': 'fa fa-lock', 'asleep': 'fa fa-bed'}[record.state.raw_value] || ''"
+                                            />
+                                            <i
+                                                t-attf-class="{{ classname }}"
+                                                role="img"
+                                                title="name"
+                                                style="float: right; line-height: 24px"
+                                            />
                                         </div>
                                     </div>
+
                                     <div class="o_kanban_manage_button_section">
                                         <hr class="mt4 mb4" />
                                         <a
@@ -166,10 +238,15 @@
                                 <div class="container o_kanban_card_content">
                                     <div class="row o_kanban_card_upper_content">
                                         <div class="col-4 o_kanban_primary_left">
+                                            <field
+                                                name="is_release_allowed"
+                                                invisible="1"
+                                            />
                                             <button
                                                 class="btn btn-primary"
                                                 name="release_next_batch"
                                                 type="object"
+                                                attrs="{'invisible': [('is_release_allowed', '=', False)]}"
                                             >
                                                 <i
                                                     class="fa fa-dropbox fa-4x"
@@ -459,26 +536,107 @@
                                     class="container o_kanban_card_manage_pane dropdown-menu"
                                     role="menu"
                                 >
+                                 <div class="row">
+                                     <div
+                                            class="col-6 o_kanban_card_manage_section o_kanban_manage_view"
+                                            name="dropdown-menu-left-panel"
+                                        >
+                                         <field
+                                                name="is_action_lock_allowed"
+                                                invisible="1"
+                                            />
+                                         <field
+                                                name="is_action_unlock_allowed"
+                                                invisible="1"
+                                            />
+                                         <field
+                                                name="is_action_sleep_allowed"
+                                                invisible="1"
+                                            />
+                                         <field
+                                                name="is_action_wake_up_allowed"
+                                                invisible="1"
+                                            />
+                                         <div
+                                                role="menuitem"
+                                                class="o_kanban_card_manage_title"
+                                            >
+                                            <span>Actions</span>
+                                        </div>
+                                         <t
+                                                t-if="record.is_action_lock_allowed.raw_value"
+                                            >
+                                             <div role="menuitem">
+                                                <a
+                                                        name="action_lock"
+                                                        type="object"
+                                                        icon="fa-lock"
+                                                    >Lock</a>
+                                             </div>
+                                        </t>
+                                        <t
+                                                t-if="record.is_action_unlock_allowed.raw_value"
+                                            >
+                                            <div role="menuitem">
+                                                <a
+                                                        name="action_unlock"
+                                                        type="object"
+                                                        icon="fa-unlock"
+                                                    >Unlock</a>
+                                            </div>
+                                        </t>
+                                        <t
+                                                t-if="record.is_action_sleep_allowed.raw_value"
+                                            >
+                                            <div role="menuitem">
+                                                <a
+                                                        name="action_sleep"
+                                                        type="object"
+                                                        icon="fa-bed"
+                                                    >Sleep</a>
+                                            </div>
+                                        </t>
+                                        <t
+                                                t-if="record.is_action_wake_up_allowed.raw_value"
+                                            >
+                                            <div role="menuitem">
+                                                <a
+                                                        name="action_wake_up"
+                                                        type="object"
+                                                        icon="fa-bolt"
+                                                    >Wake Up</a>
+                                            </div>
+                                        </t>
+                                     </div>
+                                     <div
+                                            class="col-6 o_kanban_card_manage_section o_kanban_manage_reporting"
+                                            name="dropdown-menu-right-panel"
+                                        >
+                                     </div>
+                                 </div>
+                                <div class="o_kanban_card_manage_settings row">
                                     <div
-                                        t-if="widget.editable"
-                                        class="o_kanban_card_manage_settings row"
-                                    >
-                                        <div
-                                            class="col-8"
                                             role="menuitem"
                                             aria-haspopup="true"
+                                            class="col-6"
                                         >
-                                            <ul
+                                        <ul
                                                 class="oe_kanban_colorpicker"
                                                 data-field="color"
-                                                role="menu"
+                                                role="popup"
                                             />
-                                        </div>
-                                        <div role="menuitem" class="col-4 text-center">
-                                            <a type="edit">Settings</a>
-                                        </div>
+                                    </div>
+                                    <div role="menuitem" class="col-6">
+                                        <t t-if="widget.editable">
+                                            <a
+                                                    role="menuitem"
+                                                    type="edit"
+                                                    class="dropdown-item"
+                                                >Settings</a>
+                                        </t>
                                     </div>
                                 </div>
+                            </div>
                             </div>
                         </div>
                     </t>
@@ -493,7 +651,9 @@
         <field name="res_model">stock.release.channel</field>
         <field name="view_mode">kanban,tree,form</field>
         <field name="domain">[]</field>
-        <field name="context">{}</field>
+        <field
+            name="context"
+        >{'search_default_filter_open': True, 'search_default_filter_locked': True}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No Release Channel configured
@@ -506,12 +666,33 @@
         <field name="res_model">stock.release.channel</field>
         <field name="view_mode">tree,form,kanban</field>
         <field name="domain">[]</field>
-        <field name="context">{}</field>
+        <field
+            name="context"
+        >{'search_default_filter_open': True, 'search_default_filter_locked': True}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Add a Release Channel
             </p>
         </field>
+    </record>
+
+    <!-- Assign Pickings in action menu -->
+    <record
+        id="model_stock_release_channel_action_assign_pickings"
+        model="ir.actions.server"
+    >
+        <field name="name">Assign Pickings</field>
+        <field
+            name="model_id"
+            ref="stock_release_channel.model_stock_release_channel"
+        />
+        <field
+            name="binding_model_id"
+            ref="stock_release_channel.model_stock_release_channel"
+        />
+        <field name="binding_view_types">form,tree,kanban</field>
+        <field name="state">code</field>
+        <field name="code">action = model.assign_pickings()</field>
     </record>
 
     <record model="ir.ui.menu" id="stock_release_channel_menu">

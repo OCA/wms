@@ -56,12 +56,13 @@ class ReleaseChannelCase(common.TransactionCase):
             in_date=in_date,
         )
 
-    def _create_single_move(self, product, qty, group=None):
+    @classmethod
+    def _create_single_move(cls, product, qty, group=None):
         # create a group so different moves are not merged in
         # the same picking
         if not group:
-            group = self.env["procurement.group"].create({})
-        picking_type = self.wh.out_type_id
+            group = cls.env["procurement.group"].create({})
+        picking_type = cls.wh.out_type_id
         move_vals = {
             "name": product.name,
             "picking_type_id": picking_type.id,
@@ -69,35 +70,37 @@ class ReleaseChannelCase(common.TransactionCase):
             "product_uom_qty": qty,
             "product_uom": product.uom_id.id,
             "location_id": picking_type.default_location_src_id.id,
-            "location_dest_id": self.customer_location.id,
+            "location_dest_id": cls.customer_location.id,
             "state": "confirmed",
             "procure_method": "make_to_stock",
             "group_id": group.id,
         }
-        move = self.env["stock.move"].create(move_vals)
+        move = cls.env["stock.move"].create(move_vals)
         move._assign_picking()
         return move
 
-    def _create_channel(self, **vals):
-        return self.env["stock.release.channel"].create(vals)
+    @classmethod
+    def _create_channel(cls, **vals):
+        return cls.env["stock.release.channel"].create(vals)
 
-    def _run_procurement(self, move, date=None):
+    @classmethod
+    def _run_procurement(cls, move, date=None):
         values = {
-            "company_id": self.wh.company_id,
+            "company_id": cls.wh.company_id,
             "group_id": move.picking_id.group_id,
             "date_planned": date or fields.Datetime.now(),
-            "warehouse_id": self.wh,
+            "warehouse_id": cls.wh,
         }
-        self.env["procurement.group"].run(
+        cls.env["procurement.group"].run(
             [
-                self.env["procurement.group"].Procurement(
+                cls.env["procurement.group"].Procurement(
                     move.product_id,
                     move.product_uom_qty,
                     move.product_uom,
-                    self.customer_location,
+                    cls.customer_location,
                     "TEST",
                     "TEST",
-                    self.wh.company_id,
+                    cls.wh.company_id,
                     values,
                 )
             ]
