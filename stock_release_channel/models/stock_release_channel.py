@@ -170,6 +170,78 @@ class StockReleaseChannel(models.Model):
     )
     last_done_picking_name = fields.Char(compute="_compute_last_done_picking")
     last_done_picking_date_done = fields.Datetime(compute="_compute_last_done_picking")
+    state = fields.Selection(
+        selection=[("open", "Open"), ("locked", "Locked"), ("asleep", "Asleep")],
+        help="The state allows you to control the availability of the release channel.\n"
+        "* Open: Manual and automatic picking assignment to the release is effective "
+        "and release operations are allowed.\n "
+        "* Locked: Release operations are forbidden. (Assignement processes are "
+        "still working)\n"
+        "* Asleep: Assigned pickings not processed are unassigned from the release "
+        "channel.\n",
+        default="open",
+    )
+    is_action_lock_allowed = fields.Boolean(
+        compute="_compute_is_action_lock_allowed",
+        help="Technical field to check if the " "action 'Lock' is allowed.",
+    )
+    is_action_unlock_allowed = fields.Boolean(
+        compute="_compute_is_action_unlock_allowed",
+        help="Technical field to check if the " "action 'Unlock' is allowed.",
+    )
+    is_action_sleep_allowed = fields.Boolean(
+        compute="_compute_is_action_sleep_allowed",
+        help="Technical field to check if the " "action 'Sleep' is allowed.",
+    )
+    is_action_wake_up_allowed = fields.Boolean(
+        compute="_compute_is_action_wake_up_allowed",
+        help="Technical field to check if the " "action 'Wake Up' is allowed.",
+    )
+    is_release_allowed = fields.Boolean(
+        compute="_compute_is_release_allowed",
+        help="Technical field to check if the "
+        "action 'Release Next Batch' is allowed.",
+    )
+
+    @api.depends("state")
+    def _compute_is_action_lock_allowed(self):
+        for rec in self:
+            rec.is_action_lock_allowed = rec.state == "open"
+
+    @api.depends("state")
+    def _compute_is_action_unlock_allowed(self):
+        for rec in self:
+            rec.is_action_unlock_allowed = rec.state == "locked"
+
+    @api.depends("state")
+    def _compute_is_action_sleep_allowed(self):
+        for rec in self:
+            rec.is_action_sleep_allowed = rec.state in ("open", "locked")
+
+    @api.depends("state")
+    def _compute_is_action_wake_up_allowed(self):
+        for rec in self:
+            rec.is_action_wake_up_allowed = rec.state == "asleep"
+
+    @api.depends("state", "release_forbidden")
+    def _compute_is_release_allowed(self):
+        for rec in self:
+            rec.is_release_allowed = rec.state == "open" and not rec.release_forbidden
+
+    def _get_picking_to_unassign_domain(self):
+        return [
+            ("release_channel_id", "in", self.ids),
+            ("state", "not in", ("done", "cancel")),
+        ]
+
+    @api.model
+    def _get_picking_to_assign_domain(self):
+        return [
+            ("release_channel_id", "=", False),
+            ("state", "not in", ("done", "cancel")),
+            ("picking_type_id.code", "=", "outgoing"),
+            ("need_release", "=", True),
+        ]
 
     def _field_picking_domains(self):
         return {
@@ -370,8 +442,9 @@ class StockReleaseChannel(models.Model):
         domain = safe_eval(self.rule_domain) or []
         return domain
 
+    @api.model
     def _get_assignable_release_channel_domain(self):
-        return []
+        return [("state", "!=", "asleep")]
 
     @api.model
     def assign_release_channel(self, picking):
@@ -625,7 +698,18 @@ class StockReleaseChannel(models.Model):
         )
         return partner_pickings
 
+    def _check_is_release_allowed(self):
+        for rec in self:
+            if not rec.is_release_allowed:
+                raise exceptions.UserError(
+                    _(
+                        "The release of pickings is not allowed for channel %(name)s.",
+                        name=rec.name,
+                    )
+                )
+
     def release_next_batch(self):
+        self._check_is_release_allowed()
         self.ensure_one()
         next_pickings = self._get_next_pickings()
         if not next_pickings:
@@ -638,3 +722,73 @@ class StockReleaseChannel(models.Model):
                 }
             }
         next_pickings.release_available_to_promise()
+
+    def _check_is_action_lock_allowed(self):
+        for rec in self:
+            if not rec.is_action_lock_allowed:
+                raise exceptions.UserError(
+                    _(
+                        "Action 'Lock' is not allowed for channel %(name)s.",
+                        name=rec.name,
+                    )
+                )
+
+    def _check_is_action_unlock_allowed(self):
+        for rec in self:
+            if not rec.is_action_unlock_allowed:
+                raise exceptions.UserError(
+                    _(
+                        "Action 'Unlock' is not allowed for channel %(name)s.",
+                        name=rec.name,
+                    )
+                )
+
+    def _check_is_action_sleep_allowed(self):
+        for rec in self:
+            if not rec.is_action_sleep_allowed:
+                raise exceptions.UserError(
+                    _(
+                        "Action 'Sleep' is not allowed for channel %(name)s.",
+                        name=rec.name,
+                    )
+                )
+
+    def _check_is_action_wake_up_allowed(self):
+        for rec in self:
+            if not rec.is_action_wake_up_allowed:
+                raise exceptions.UserError(
+                    _(
+                        "Action 'Wake Up' is not allowed for channel %(name)s.",
+                        name=rec.name,
+                    )
+                )
+
+    def action_lock(self):
+        self._check_is_action_lock_allowed()
+        self.write({"state": "locked"})
+
+    def action_unlock(self):
+        self._check_is_action_unlock_allowed()
+        self.write({"state": "open"})
+
+    def action_sleep(self):
+        self._check_is_action_sleep_allowed()
+        pickings_to_unassign = self.env["stock.picking"].search(
+            self._get_picking_to_unassign_domain()
+        )
+        pickings_to_unassign.write({"release_channel_id": False})
+        pickings_to_unassign.unrelease()
+        self.write({"state": "asleep"})
+
+    def action_wake_up(self):
+        self._check_is_action_wake_up_allowed()
+        self.write({"state": "open"})
+        self.assign_pickings()
+
+    @api.model
+    def assign_pickings(self):
+        pickings = self.env["stock.picking"].search(
+            self._get_picking_to_assign_domain()
+        )
+        for pick in pickings:
+            pick._delay_assign_release_channel()
