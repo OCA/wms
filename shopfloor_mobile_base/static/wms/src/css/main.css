@@ -242,6 +242,16 @@ main.v-content > .v-content__wrap > .header .container {
 .list .v-expansion-panel-content .v-expansion-panel-content__wrap {
     padding: 0 6px 10px;
 }
+
+.list .expansion-panel-header {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 15px;
+}
+
+.list .expansion-panel-header strong {
+    padding-bottom: 10px;
+}
 /* .list .list-item-wrapper:not(:last-child) .v-list-item__content {
     border-bottom: 1px solid #ccc;
 } */

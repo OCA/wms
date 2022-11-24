@@ -86,6 +86,44 @@ export class WMSUtils {
         return res;
     }
 
+    group_lines_by_product(lines, options) {
+        const self = this;
+        // {'key': 'no-group', 'title': '', 'records': []}
+        options = _.defaults(options || {}, {
+            group_no_title: false,
+            prepare_records: function (recs) {
+                return recs;
+            },
+            group_color_maker: function (recs) {
+                return "";
+            },
+        });
+        const res = [];
+        const products = _.uniqBy(
+            _.map(lines, function (x) {
+                return x["product"];
+            }),
+            "id"
+        );
+        const grouped = _.groupBy(lines, "product.id");
+        _.forEach(grouped, function (value, prod_id) {
+            const product = _.first(_.filter(products, {id: parseInt(prod_id, 10)}));
+            const title = options.group_no_title
+                ? ""
+                : options.name_prefix
+                ? options.name_prefix + ": " + product.name
+                : product.name;
+            res.push({
+                _is_group: true,
+                key: prod_id,
+                title: title,
+                group_color: options.group_color_maker(value),
+                records: options.prepare_records.call(self, value),
+            });
+        });
+        return res;
+    }
+
     group_by_pack(lines, package_key = "package_dest") {
         const self = this;
         const res = [];

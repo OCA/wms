@@ -64,8 +64,10 @@ class DataAction(Component):
         data = self._jsonify(record, parser, **kw)
         # handle special cases
         if data and picking:
-            # TODO: exclude canceled and done?
-            lines = picking.move_line_ids.filtered(lambda l: l.package_id == record)
+            lines = picking.move_line_ids.filtered(
+                lambda l: l.result_package_id == record
+                and l.state in ["partially_available", "assigned", "done"]
+            )
             data.update({"move_line_count": len(lines)})
         return data
 
@@ -131,7 +133,7 @@ class DataAction(Component):
 
     @property
     def _lot_parser(self):
-        return self._simple_record_parser() + ["ref"]
+        return self._simple_record_parser() + ["ref", "expiration_date"]
 
     @ensure_model("stock.move.line")
     def move_line(self, record, with_picking=False, **kw):
