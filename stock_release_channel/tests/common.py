@@ -1,6 +1,8 @@
 # Copyright 2020 Camptocamp (https://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
+import logging
+
 from odoo import fields
 from odoo.tests import common
 
@@ -19,6 +21,21 @@ class ReleaseChannelCase(common.TransactionCase):
             "stock_release_channel.stock_release_channel_default"
         )
         cls._create_base_data()
+
+    def setUp(self):
+        super(ReleaseChannelCase, self).setUp()
+        loggers = ["odoo.addons.stock_release_channel.models.stock_release_channel"]
+        for logger in loggers:
+            logging.getLogger(logger).addFilter(self)
+
+        # pylint: disable=unused-variable
+        @self.addCleanup
+        def un_mute_logger():
+            for logger_ in loggers:
+                logging.getLogger(logger_).removeFilter(self)
+
+    def filter(self, record):
+        return 0
 
     @classmethod
     def _create_base_data(cls):
