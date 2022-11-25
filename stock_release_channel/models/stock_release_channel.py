@@ -9,6 +9,7 @@ from copy import deepcopy
 from pytz import timezone
 
 from odoo import _, api, exceptions, fields, models
+from odoo.osv.expression import NEGATIVE_TERM_OPERATORS
 from odoo.tools.safe_eval import (
     datetime as safe_datetime,
     dateutil as safe_dateutil,
@@ -67,8 +68,10 @@ class StockReleaseChannel(models.Model):
         help="Write Python code to filter out pickings.",
     )
     active = fields.Boolean(default=True)
-
-    auto_release = fields.Selection(
+    release_mode = fields.Selection(
+        [("batch", "Batch (Manual)")], required=True, default="batch"
+    )
+    batch_mode = fields.Selection(
         selection=[
             ("max", "Max"),
             ("group_commercial_partner", "Grouped by Commercial Partner"),
@@ -79,7 +82,7 @@ class StockReleaseChannel(models.Model):
         " in progress.\nGrouped by Commercial Partner: release all transfers for a"
         "commercial partner at once.",
     )
-    max_auto_release = fields.Integer(
+    max_batch_mode = fields.Integer(
         string="Max Transfers to release",
         default=10,
         help="When clicking on the package icon, it releases X transfers minus "
@@ -202,6 +205,7 @@ class StockReleaseChannel(models.Model):
     )
     is_release_allowed = fields.Boolean(
         compute="_compute_is_release_allowed",
+        search="_search_is_release_allowed",
         help="Technical field to check if the "
         "action 'Release Next Batch' is allowed.",
     )
@@ -230,6 +234,25 @@ class StockReleaseChannel(models.Model):
     def _compute_is_release_allowed(self):
         for rec in self:
             rec.is_release_allowed = rec.state == "open" and not rec.release_forbidden
+
+    @api.model
+    def _get_is_release_allowed_domain(self):
+        return [("state", "=", "open"), ("release_forbidden", "=", False)]
+
+    @api.model
+    def _get_is_release_not_allowed_domain(self):
+        return ["|", ("state", "!=", "open"), ("release_forbidden", "=", True)]
+
+    @api.model
+    def _search_is_release_allowed(self, operator, value):
+        if "in" in operator:
+            raise ValueError(f"Invalid operator {operator}")
+        negative_op = operator in NEGATIVE_TERM_OPERATORS
+        is_release_allowed = (value and not negative_op) or (not value and negative_op)
+        domain = self._get_is_release_allowed_domain()
+        if not is_release_allowed:
+            domain = self._get_is_release_not_allowed_domain()
+        return domain
 
     def _get_picking_to_unassign_domain(self):
         return [
@@ -706,17 +729,23 @@ class StockReleaseChannel(models.Model):
         )
 
     def _get_next_pickings(self):
-        return getattr(self, "_get_next_pickings_{}".format(self.auto_release))()
+        return getattr(self, "_get_next_pickings_{}".format(self.batch_mode))()
+
+    def _get_pickings_to_release(self):
+        """Get the pickings to release."""
+        domain = self._field_picking_domains()["count_picking_release_ready"]
+        domain += [("release_channel_id", "in", self.ids)]
+        return self.env["stock.picking"].search(domain)
 
     def _get_next_pickings_max(self):
-        if not self.max_auto_release:
+        if not self.max_batch_mode:
             raise exceptions.UserError(_("No Max transfers to release is configured."))
 
         waiting_domain = self._field_picking_domains()["waiting"]
         waiting_domain += [("release_channel_id", "=", self.id)]
         released_in_progress = self.env["stock.picking"].search_count(waiting_domain)
 
-        release_limit = max(self.max_auto_release - released_in_progress, 0)
+        release_limit = max(self.max_batch_mode - released_in_progress, 0)
         if not release_limit:
             raise exceptions.UserError(
                 _(
@@ -740,9 +769,7 @@ class StockReleaseChannel(models.Model):
         # because "date_priority" is computed and not stored. If needed, we
         # should evaluate making it a stored field in the module
         # "stock_available_to_promise_release".
-        next_pickings = (
-            self.env["stock.picking"].search(domain).sorted(self._pickings_sort_key)
-        )
+        next_pickings = self._get_pickings_to_release().sorted(self._pickings_sort_key)
         if not next_pickings:
             return self.env["stock.picking"].browse()
         first_picking = next_pickings[0]
