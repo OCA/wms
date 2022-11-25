@@ -102,7 +102,7 @@ msgid "Assigned Total"
 msgstr ""
 
 #. module: stock_release_channel
-#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__auto_release
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__batch_mode
 msgid "Auto Release"
 msgstr ""
 
@@ -199,7 +199,7 @@ msgid "Full Progress"
 msgstr ""
 
 #. module: stock_release_channel
-#: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__auto_release__group_commercial_partner
+#: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__batch_mode__group_commercial_partner
 msgid "Grouped by Commercial Partner"
 msgstr ""
 
@@ -273,17 +273,17 @@ msgid "Lines]"
 msgstr ""
 
 #. module: stock_release_channel
-#: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__auto_release__max
+#: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__batch_mode__max
 msgid "Max"
 msgstr ""
 
 #. module: stock_release_channel
-#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__max_auto_release
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__max_batch_mode
 msgid "Max Transfers to release"
 msgstr ""
 
 #. module: stock_release_channel
-#: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__auto_release
+#: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__batch_mode
 msgid ""
 "Max: release N transfers to have a configured max of X deliveries in progress.\n"
 "Grouped by Commercial Partner: release all transfers for acommercial partner at once."
