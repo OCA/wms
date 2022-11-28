@@ -163,7 +163,10 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             response,
             # go pack to the screen to select lines to put in packages
             next_state="select_line",
-            data={"picking": self._stock_picking_data(self.picking)},
+            data={
+                "picking": self._stock_picking_data(self.picking),
+                "group_lines_by_location": True,
+            },
             message=self.msg_store.goods_packed_in(self.delivery_package),
         )
 
