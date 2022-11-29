@@ -205,6 +205,41 @@ class ManualProductTransferConfirmQuantity(ManualProductTransferCommonCase):
             response, move_lines.picking_id, move_lines
         )
 
+    def test_confirm_quantity_with_unreservation_enabled_and_picking_started(self):
+        self.menu.sudo().allow_unreserve_other_moves = True
+        # initial qty is 10, but we reserve 2 qties (so 8 fully free)
+        picking = self._create_picking(
+            picking_type=self.env.ref("stock.picking_type_out"),
+            lines=[(self.product_a, 2)],
+            confirm=True,
+        )
+        picking.action_assign()
+        # another transfer with 2 qties reserved and some done (so 6 fully free)
+        picking2 = self._create_picking(
+            picking_type=self.env.ref("stock.picking_type_out"),
+            lines=[(self.product_a, 2)],
+            confirm=True,
+        )
+        picking2.action_assign()
+        picking2.move_line_ids.qty_done = 1
+
+        # confirm 7 qties to process (more than 6)
+        response = self.service.dispatch(
+            "confirm_quantity",
+            params={
+                "location_id": self.src_location.id,
+                "product_id": self.product_a.id,
+                "quantity": 9,
+                "confirm": True,
+            },
+        )
+        self.assert_response_start(
+            response,
+            message=self.service.msg_store.picking_already_started_in_location(
+                picking2
+            ),
+        )
+
     def test_confirm_quantity_exceeds_initial_qty(self):
         # initial qty is 10, but we try to process 11
         response = self.service.dispatch(
