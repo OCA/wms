@@ -37,7 +37,7 @@ class StockPicking(models.Model):
 
     @api.depends(
         "picking_type_id.display_completion_info",
-        "move_lines.common_dest_move_ids.state",
+        "move_ids.common_dest_move_ids.state",
     )
     def _compute_completion_info(self):
         for picking in self:
@@ -49,7 +49,7 @@ class StockPicking(models.Model):
                 continue
             # Depending moves are all the origin moves linked to the
             # destination pickings' moves
-            depending_moves = picking.move_lines.mapped("common_dest_move_ids")
+            depending_moves = picking.move_ids.mapped("common_dest_move_ids")
             # If all the depending moves are done or canceled then next picking
             # is ready to be processed
             if picking.state == "done" and all(
@@ -59,12 +59,12 @@ class StockPicking(models.Model):
                 continue
             # If all the depending moves are the moves on the actual picking
             # then it's a full order and next picking is ready to be processed
-            if depending_moves == picking.move_lines:
+            if depending_moves == picking.move_ids:
                 picking.completion_info = "full_order_picking"
                 continue
             # If there aren't any depending move from another picking that is
             # not done, then actual picking is the last to process
-            other_depending_moves = (depending_moves - picking.move_lines).filtered(
+            other_depending_moves = (depending_moves - picking.move_ids).filtered(
                 lambda m: m.state not in ("done", "cancel")
             )
             if not other_depending_moves:
@@ -82,5 +82,5 @@ class StockMove(models.Model):
         if "state" in vals:
             # invalidate cache, the api.depends do not allow to find all
             # the conditions to invalidate the field
-            self.env["stock.picking"].invalidate_cache(fnames=["completion_info"])
+            self.env["stock.picking"].invalidate_model(fnames=["completion_info"])
         return True
