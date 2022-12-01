@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_shopfloor_app_user_profile,access.shopfloor.app.user.profile,model_shopfloor_app_user_profile,shopfloor_base.group_shopfloor_manager,1,1,1,1

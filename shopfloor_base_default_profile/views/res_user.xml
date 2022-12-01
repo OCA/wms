@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_users_view_form_preferences" model="ir.ui.view">
+        <field name="name">res.users.preferences.form.inherit</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif" />
+        <field name="arch" type="xml">
+            <group name="signature" position="after">
+                <group name="shopfloor">
+                    <field
+                        name="shopfloor_default_profile_ids"
+                        groups="shopfloor_base.group_shopfloor_manager"
+                    >
+                        <tree editable="bottom">
+                            <field name="shopfloor_app_id" />
+                            <field name="profile_id" />
+                        </tree>
+                    </field>
+                </group>
+            </group>
+        </field>
+    </record>
+
+    <record id="res_users_view_simple_form" model="ir.ui.view">
+        <field name="name">res.users.simple.form.inherit</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_simple_form" />
+        <field name="arch" type="xml">
+            <group name="phone_numbers" position="after">
+                <group name="shopfloor">
+                    <field
+                        name="shopfloor_default_profile_ids"
+                        groups="shopfloor_base.group_shopfloor_manager"
+                    >
+                        <tree editable="bottom">
+                            <field name="shopfloor_app_id" />
+                            <field name="profile_id" />
+                        </tree>
+                    </field>
+                </group>
+            </group>
+        </field>
+    </record>
+
+    <record id="res_users_view_form" model="ir.ui.view">
+        <field name="name">res.users.form.inherit</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form" />
+        <field name="arch" type="xml">
+            <group name="messaging" position="after">
+                <group
+                    name="shopfloor"
+                    string="Shopfloor"
+                    groups="shopfloor_base.group_shopfloor_manager"
+                >
+                    <field
+                        name="shopfloor_default_profile_ids"
+                        groups="shopfloor_base.group_shopfloor_manager"
+                    >
+                        <tree editable="bottom">
+                            <field name="shopfloor_app_id" />
+                            <field name="profile_id" />
+                        </tree>
+                    </field>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>

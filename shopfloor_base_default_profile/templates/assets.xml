@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_mobile_base.shopfloor_app_assets"
+    >
+        <t id="new_scenario_hook" position="before">
+            <t t-set="mod_name" t-value="'shopfloor_base_default_profile'" />
+            <script
+                id="script_default_profile"
+                t-attf-src="/#{mod_name}/static/src/main.js?v=#{get_version(mod_name)}"
+                type="module"
+            />
+        </t>
+    </template>
+</odoo>
