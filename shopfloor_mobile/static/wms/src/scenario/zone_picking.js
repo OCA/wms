@@ -486,12 +486,10 @@ const ZonePicking = {
             if (this.state_is("select_line") && this.state.data.product) {
                 data.product_id = this.state.data.product.id;
             }
-            return this.wait_call(
-                this.odoo.call("scan_source", {
-                    barcode: barcode,
-                    confirmation: this.state.data.confirmation_required,
-                })
-            );
+            if (this.state_is("select_line") && this.state.data.sublocation) {
+                data.sublocation_id = this.state.data.sublocation.id;
+            }
+            return this.wait_call(this.odoo.call("scan_source", data));
         },
         picking_summary_records_grouped(move_lines) {
             return this.utils.wms.group_lines_by_location(move_lines, {
