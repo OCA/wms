@@ -185,6 +185,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             message=self.service.msg_store.several_products_in_location(
                 self.zone_sublocation2
             ),
+            sublocation=self.zone_sublocation2,
         )
 
     def test_scan_source_barcode_package(self):
@@ -356,6 +357,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         """Scan source: scanned product has move lines in multiple sub location.
 
         next step : 'select_line' expected.
+
+        Then scan a location and a specific line is selected.
+
+        next step : 'set_line_destination'
         """
         # Using picking4 which has a product in two sublocation
         response = self.service.dispatch(
@@ -371,6 +376,69 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             move_lines=move_lines,
             product=self.product_e,
             message=self.service.msg_store.several_move_in_different_location(),
+        )
+        response = self.service.dispatch(
+            "scan_source",
+            params={
+                "barcode": self.zone_sublocation3.barcode,
+                "product_id": self.product_e.id,
+            },
+        )
+        self.assertEqual(response["next_state"], "set_line_destination")
+        move_line = self.service._find_location_move_lines(
+            product=self.product_e, locations=self.zone_sublocation3
+        )
+        self.assert_response_set_line_destination(
+            response,
+            zone_location=self.zone_location,
+            picking_type=self.picking_type,
+            move_line=move_line,
+        )
+
+    def test_scan_source_barcode_location_multiple_moves_different_product(self):
+        """Scan source: scanned location has move lines with multiple product.
+
+        next step : 'select_line' expected.
+
+        Then scan a product and a specific line is selected.
+
+        next step : 'set_line_destination'
+        """
+        # Using picking4 which has a product in two sublocation
+        response = self.service.dispatch(
+            "scan_source",
+            params={"barcode": self.zone_sublocation3.barcode},
+        )
+        move_lines = self.service._find_location_move_lines(
+            locations=self.zone_sublocation3
+        )
+        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        self.assert_response_select_line(
+            response,
+            zone_location=self.zone_location,
+            picking_type=self.picking_type,
+            move_lines=move_lines,
+            sublocation=self.zone_sublocation3,
+            message=self.service.msg_store.several_products_in_location(
+                self.zone_sublocation3
+            ),
+        )
+        response = self.service.dispatch(
+            "scan_source",
+            params={
+                "barcode": self.product_e.barcode,
+                "sublocation_id": self.zone_sublocation3.id,
+            },
+        )
+        self.assertEqual(response["next_state"], "set_line_destination")
+        move_line = self.service._find_location_move_lines(
+            product=self.product_e, locations=self.zone_sublocation3
+        )
+        self.assert_response_set_line_destination(
+            response,
+            zone_location=self.zone_location,
+            picking_type=self.picking_type,
+            move_line=move_line,
         )
 
     def test_scan_source_barcode_product_with_multiple_lot(self):
