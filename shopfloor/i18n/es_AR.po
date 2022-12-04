@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2022-11-09 22:45+0000\n"
+"PO-Revision-Date: 2022-12-04 20:45+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -263,7 +263,7 @@ msgstr "Error en control de inventario en ubicación {} para {}"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Create new PACK {}? Scan it again to confirm."
-msgstr ""
+msgstr "Crear un nuevo PAQUETE {}? Escanee nuevamente para confirmar."
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
@@ -505,7 +505,7 @@ msgstr "Menú mostrado en la aplicación de escaner"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Missing expiration date."
-msgstr ""
+msgstr "Falta la fecha de vencimiento."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_create_is_possible
@@ -644,7 +644,7 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No transfer found for the scanned packaging."
-msgstr ""
+msgstr "No se ha encontrado ninguna transferencia para el paquete escaneado."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -820,13 +820,13 @@ msgstr "El Empaquetado cambió en el paquete {}"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Packaging not found in the current transfer or already in a package."
-msgstr ""
+msgstr "Paquete no encontrado en la transferencia actual o ya en un paquete."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Packaging not found in the current transfer."
-msgstr ""
+msgstr "Paquete no encontrado en la transferencia actual."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -887,7 +887,7 @@ msgstr "Tipo de Entrega {} completo."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Place it in {}?"
-msgstr ""
+msgstr "¿Colocarlo en {}?"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__planned_move_line_ids
@@ -925,13 +925,13 @@ msgstr "El Producto no está en la transferencia actual."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Product not found in the current transfer or already in a package."
-msgstr ""
+msgstr "Producto no encontrado en la transferencia actual o ya en un paquete."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Product not found in the current transfer."
-msgstr ""
+msgstr "Producto no encontrado en la transferencia actual."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1114,6 +1114,8 @@ msgstr ""
 #, python-format
 msgid "Several transfers found, please select a transfer manually."
 msgstr ""
+"Demasiadas transferencias encontradas, seleccione una transferencia "
+"manualmente."
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_location_form
@@ -1438,6 +1440,8 @@ msgstr "Este producto es parte de varios paquetes, escanee un paquete."
 msgid ""
 "This source document is part of multiple transfers, please scan a package."
 msgstr ""
+"Este documento de origen es parte de múltiples transferencias, escanee un "
+"paquete."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
