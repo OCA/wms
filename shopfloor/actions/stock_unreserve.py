@@ -10,7 +10,7 @@ class StockUnreserve(Component):
     _inherit = "shopfloor.process.action"
     _usage = "stock.unreserve"
 
-    def check_unreserve(self, location, move_lines, product=None):
+    def check_unreserve(self, location, move_lines, product=None, lot=None):
         """Return a message if there is an ongoing operation in the location.
 
         It could be a move line with some qty already processed or another
@@ -20,7 +20,7 @@ class StockUnreserve(Component):
         :param move_lines: move lines to unreserve
         :param product: optional product to limit the scope in the location
         """
-        location_move_lines = self._find_location_all_move_lines(location, product)
+        location_move_lines = self._find_location_all_move_lines(location, product, lot)
         extra_move_lines = location_move_lines - move_lines
         if extra_move_lines:
             return self.msg_store.picking_already_started_in_location(
@@ -49,16 +49,18 @@ class StockUnreserve(Component):
         moves_to_unreserve._do_unreserve()
         return (move_lines - lines_other_picking_types, moves_to_unreserve)
 
-    def _find_location_all_move_lines_domain(self, location, product=None):
+    def _find_location_all_move_lines_domain(self, location, product=None, lot=None):
         domain = [
             ("location_id", "=", location.id),
             ("state", "in", ("assigned", "partially_available")),
         ]
         if product:
             domain.append(("product_id", "=", product.id))
+        if lot:
+            domain.append(("lot_id", "=", lot.id))
         return domain
 
-    def _find_location_all_move_lines(self, location, product=None):
+    def _find_location_all_move_lines(self, location, product=None, lot=None):
         return self.env["stock.move.line"].search(
-            self._find_location_all_move_lines_domain(location, product)
+            self._find_location_all_move_lines_domain(location, product, lot)
         )
