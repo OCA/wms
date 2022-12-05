@@ -13,6 +13,12 @@ _logger = logging.getLogger(__name__)
 class MessageAction(Component):
     _inherit = "shopfloor.message.action"
 
+    def no_operation_found(self):
+        return {
+            "message_type": "error",
+            "body": _("No operation found for this menu and profile."),
+        }
+
     def no_picking_type(self):
         return {
             "message_type": "error",
