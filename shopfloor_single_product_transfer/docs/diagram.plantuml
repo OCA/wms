@@ -1,0 +1,85 @@
+# Diagram to generate with PlantUML (https://plantuml.com/)
+#
+#   $ sudo apt install plantuml
+#   $ plantuml diagram.plantuml
+#
+
+@startuml
+participant start
+participant select_location
+participant select_product
+participant set_quantity
+
+skinparam roundcorner 20
+skinparam sequence {
+
+ParticipantBorderColor #875A7B
+ParticipantBackgroundColor #875A7B
+ParticipantFontSize 17
+ParticipantFontColor white
+
+LifeLineBorderColor #875A7B
+
+ArrowColor #00A09D
+}
+
+header <img:oca_logo.png>
+title <size:35>Single Product Transfer scenario</size>
+
+== start ==
+
+alt #Lightgreen Successful cases
+    start -[#green]> select_location: **/start** \n(no ongoing move_line for user)
+    start -[#green]> set_quantity: **/start** \n(when an ongoing move_line is found for current user)
+end
+
+== select_location ==
+
+alt #Pink Errors
+    select_location -[#red]> select_location: **/select_location**(barcode)\nif no stock in location (reserved or not)
+    select_location -[#red]> select_location: **/select_location**(barcode)\nif selected location doesn't match the scenario configuration
+else #Lightgreen Successful cases
+    select_location -[#green]> select_product: **/select_location**(barcode)\nscanned location is ok (see above checks)
+end
+
+== select_product ==
+
+alt #Pink Errors
+    select_product -[#red]> select_product: **/scan_product**(location_id, barcode)\nNo stock for product in location
+    select_product -[#red]> select_product: **/scan_product**(location_id, barcode)\nProduct scanned, but tracked by lot
+    select_product -[#red]> select_product: **/scan_product**(location_id, barcode)\nUnreserved stock for product\nallow_move_create disabled
+    select_product -[#red]> select_product: **/scan_product**(location_id, barcode)\nStock for product reserved by another move\nallow_unreserve_other_moves disabled
+else #Lightgreen Successful cases
+    select_product -[#green]> set_quantity: **/scan_product**(location_id, barcode)\nValid product / lot / packaging scanned\n(see above checks)
+    select_product -[#green]> select_location: **/scan_product__action_cancel**()\n(User clicked the cancel button)
+end
+
+== set_quantity ==
+
+note over set_quantity: general
+alt #Pink Errors
+    set_quantity -[#red]> set_quantity: **/set_quantity**(selected_line_id, barcode)\nbarcode not found
+else #Lightgreen Ask for confirmation
+    set_quantity -[#green]> select_location: **/set_quantity__action_cancel**(selected_line_id)\n(User clicked the cancel button)
+end
+
+note over set_quantity: product/lot/packaging scanned
+alt #Pink Errors
+    set_quantity -[#red]> set_quantity: **/set_quantity**(selected_line_id, barcode)\nScanned product/lot not in selected line
+    set_quantity -[#red]> set_quantity: **/set_quantity**(selected_line_id, barcode)\nqty_done is already >= product_uom_qty
+    set_quantity -[#red]> set_quantity: **/set_quantity**(selected_line_id, barcode)\nnot_prefill_qty is disabled
+else #Lightgreen Successful cases
+    set_quantity -[#green]> set_quantity: **/set_quantity**(selected_line_id, barcode, confirmation=False)\nall above checks are ok\n(increments qty for product / lot / packaging)
+end
+
+note over set_quantity: location scanned
+alt #Pink Errors
+    set_quantity -[#red]> set_quantity: **/set_quantity**(selected_line_id, barcode, confirmation=False)\nscanned location is invalid
+else #LightBlue Ask for confirmation
+    set_quantity -[#blue]> set_quantity: **/set_quantity**(selected_line_id, barcode, confirmation=False)\nscanned location is a child of menu's default dest location\nasks for confirmation
+else #Lightgreen Successful cases
+    set_quantity -[#green]> select_location: **/select_location**(selected_line_id, barcode, confirmation=True)\nscanned location is a child of menu's default dest location\nposts the move
+    set_quantity -[#green]> select_location: **/select_location**(selected_line_id, barcode, confirmation=True)\nscanned location is a child of move_line's default dest location\nposts the move
+end
+
+@enduml
