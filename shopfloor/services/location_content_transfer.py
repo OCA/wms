@@ -384,13 +384,6 @@ class LocationContentTransfer(Component):
                 )
             move_lines = new_moves.move_line_ids
             for line in move_lines:
-                for line in move_lines:
-                    line.write(
-                        {
-                            "qty_done": line.product_uom_qty,
-                            "shopfloor_user_id": self.env.uid,
-                        }
-                    )
                 if not self.is_dest_location_valid(line.move_id, line.location_dest_id):
                     savepoint.rollback()
                     return self._response_for_start(
