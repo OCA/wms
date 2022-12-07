@@ -4,7 +4,7 @@
 
 from werkzeug.exceptions import BadRequest
 
-from odoo import _
+from odoo import _, fields
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -838,7 +838,10 @@ class Checkout(Component):
             if self.work.menu.no_prefill_qty:
                 quantity_increment = packaging.qty if packaging else 1
                 return self._increment_custom_qty(
-                    picking, selected_lines, product_lines, quantity_increment
+                    picking,
+                    selected_lines,
+                    fields.first(product_lines),
+                    quantity_increment,
                 )
             else:
                 return self._switch_line_qty_done(
@@ -849,7 +852,9 @@ class Checkout(Component):
         if lot:
             lot_lines = selected_lines.filtered(lambda l: l.lot_id == lot)
             if self.work.menu.no_prefill_qty:
-                return self._increment_custom_qty(picking, selected_lines, lot_lines, 1)
+                return self._increment_custom_qty(
+                    picking, selected_lines, fields.first(lot_lines), 1
+                )
             else:
                 return self._switch_line_qty_done(picking, selected_lines, lot_lines)
 
