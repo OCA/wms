@@ -12,9 +12,9 @@ class StockMove(models.Model):
         # after releasing, we re-assign a release channel,
         # as we may release only partially, the channel may
         # change
-        released_moves = super().release_available_to_promise()
-        released_moves.picking_id.assign_release_channel()
-        return released_moves
+        res = super().release_available_to_promise()
+        self.picking_id.assign_release_channel()
+        return res
 
     def _action_confirm(self, merge=True, merge_into=False):
         moves = super()._action_confirm(merge=merge, merge_into=merge_into)
