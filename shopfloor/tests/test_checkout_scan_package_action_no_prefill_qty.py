@@ -35,34 +35,32 @@ class CheckoutScanPackageActionCaseNoPrefillQty(
         )
 
     def test_scan_package_action_scan_product2_to_increment_qty(self):
-        """
-        two lines with the same product
+        """Scan a product which is present in two lines.
+
+        Only one line should have its quantity incremented.
 
         """
-        # FIXME - test to be fixed
-        # picking = self._create_picking(
-        #     lines=[(self.product_a, 3), (self.product_a, 1)], confirm=False
-        # )
-        # picking.move_lines._action_confirm(merge=False)
-        # picking.action_confirm()
-        # for move in picking.move_lines:
-        #     self._fill_stock_for_moves(move, in_lot=True)
-        # # self._fill_stock_for_moves(picking.move_lines, in_package=False)
-        # picking.action_assign()
-        # move_lines = picking.move_line_ids
-        # response = self.service.dispatch(
-        #     "scan_package_action",
-        #     params={
-        #         "picking_id": picking.id,
-        #         "selected_line_ids": move_lines.ids,
-        #         "barcode": self.product_a.barcode,
-        #     },
-        # )
-        # self._assert_selected_qties(
-        #     response,
-        #     move_lines[0],
-        #     {move_lines[0]: 1, move_lines[1]: 0},
-        # )
+        picking = self._create_picking(
+            lines=[(self.product_a, 3), (self.product_a, 1)], confirm=False
+        )
+        picking.move_lines._action_confirm(merge=False)
+        picking.action_confirm()
+        self._fill_stock_for_moves(picking.move_lines, in_package=False)
+        picking.action_assign()
+        move_lines = picking.move_line_ids
+        response = self.service.dispatch(
+            "scan_package_action",
+            params={
+                "picking_id": picking.id,
+                "selected_line_ids": move_lines.ids,
+                "barcode": self.product_a.barcode,
+            },
+        )
+        self._assert_selected_qties(
+            response,
+            move_lines,
+            {move_lines[0]: 1, move_lines[1]: 0},
+        )
 
     def test_scan_package_action_scan_lot_to_increment_qty(self):
         """ """
