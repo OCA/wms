@@ -109,6 +109,11 @@ msgid "Allow Force Reservation Is Possible"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_get_work_is_possible
+msgid "Allow Get Work Is Possible"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_move_create
 msgid "Allow Move Creation"
 msgstr ""
@@ -498,6 +503,12 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "New move lines cannot be assigned: canceled."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "No available work could be found."
 msgstr ""
 
 #. module: shopfloor
@@ -1098,6 +1109,11 @@ msgid "Shopfloor weight (kg)"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_get_work
+msgid "Show Get Work on start"
+msgstr ""
+
+#. module: shopfloor
 #: model:shopfloor.scenario,name:shopfloor.scenario_single_pack_transfer
 msgid "Single Pack Transfer"
 msgstr ""
@@ -1288,6 +1304,12 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "This location does not exist."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "This lot does not exist anymore."
 msgstr ""
 
@@ -1438,6 +1460,12 @@ msgid ""
 "When active, what you scan (typically a product packaging EAN) will be ship "
 "'as-is' and the operation will be validated triggering a backorder creation "
 "with the remaining lines."
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_get_work
+msgid ""
+"When enabled the user will have the option to ask for a task to work on."
 msgstr ""
 
 #. module: shopfloor
