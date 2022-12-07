@@ -9,7 +9,7 @@
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
-    "author": "ACSONE, Odoo Community Association (OCA)",
+    "author": "ACSONE, Camptocamp, Odoo Community Association (OCA)",
     "maintainers": ["simahawk"],
     "license": "LGPL-3",
     "depends": ["rest_log", "shopfloor_base"],
