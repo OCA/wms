@@ -30,6 +30,12 @@
                             name="max_auto_release"
                             attrs="{'invisible': ['|', ('release_forbidden', '=', True), ('auto_release', '!=', 'max')]}"
                         />
+                        <field name="warehouse_id" />
+                        <field name="picking_type_ids" options="{'no_create': True}">
+                            <tree>
+                                <field name="name" />
+                            </tree>
+                        </field>
                         <field
                             name="rule_domain"
                             widget="domain"
@@ -53,6 +59,7 @@
         <field name="model">stock.release.channel</field>
         <field name="arch" type="xml">
             <search>
+                <field name="warehouse_id" />
                 <separator />
                 <filter
                     string="Archived"
@@ -60,6 +67,11 @@
                     domain="[('active','=',False)]"
                 />
                 <separator />
+                <filter
+                    name="warehouse_group"
+                    string="Warehouse"
+                    context="{'group_by': 'warehouse_id'}"
+                />
             </search>
         </field>
     </record>

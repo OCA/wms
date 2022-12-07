@@ -36,6 +36,22 @@ class StockReleaseChannel(models.Model):
     release_forbidden = fields.Boolean(string="Forbid to release this channel")
     sequence = fields.Integer(default=lambda self: self._default_sequence())
     color = fields.Integer()
+    warehouse_id = fields.Many2one(
+        "stock.warehouse",
+        string="Warehouse",
+        index=True,
+        help="Warehouse for which this channel is relevant",
+    )
+    picking_type_ids = fields.Many2many(
+        "stock.picking.type",
+        "stock_release_channel_warehouse_rel",
+        "channel_id",
+        "picking_type_id",
+        string="Operation Types",
+        domain="warehouse_id"
+        " and [('warehouse_id', '=', warehouse_id), ('code', '=', 'outgoing')]"
+        " or [('code', '=', 'outgoing')]",
+    )
     rule_domain = fields.Char(
         string="Domain",
         default=[],
@@ -365,12 +381,16 @@ class StockReleaseChannel(models.Model):
             return
         # do a single query rather than one for each rule*picking
         for channel in self.sudo().search([]):
-            domain = channel._prepare_domain()
-
-            if domain:
-                current = pickings.filtered_domain(domain)
+            if channel.picking_type_ids:
+                current = pickings.filtered(
+                    lambda p: p.picking_type_id in channel.picking_type_ids
+                )
             else:
                 current = pickings
+
+            domain = channel._prepare_domain()
+            if domain:
+                current = current.filtered_domain(domain)
 
             if not current:
                 continue
