@@ -720,11 +720,15 @@ class Checkout(Component):
         lines_to_pack.write(
             {"result_package_id": package.id, "shopfloor_checkout_done": True}
         )
+        self._post_put_lines_in_package(lines_to_pack)
         # go back to the screen to select the next lines to pack
         return self._response_for_select_line(
             picking,
             message=self.msg_store.goods_packed_in(package),
         )
+
+    def _post_put_lines_in_package(self, lines_packaged):
+        """Hook to override."""
 
     def _create_and_assign_new_packaging(self, picking, selected_lines, packaging=None):
         actions = self._actions_for("packaging")
