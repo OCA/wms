@@ -26,7 +26,7 @@ Shopfloor Workstation Label Printer
 |badge1| |badge2| |badge3| |badge4| |badge5| 
 
 With this module a default label printer can be linked to a shopfloor
-workstation profile and to an Odoo user profile.
+workstation profile based on the one set on an Odoo user profile.
 
 When the user select a workstation profile on the mobile application is
 default label printer will change on Odoo side.
