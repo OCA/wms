@@ -1,22 +1,21 @@
 # Copyright 2021 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
-from odoo import api, fields, models
+from warnings import warn
+
+from odoo import models
 
 
 class ResUsers(models.Model):
     _inherit = "res.users"
 
-    default_label_printer_id = fields.Many2one(
-        comodel_name="printing.printer", string="Default Label Printer"
-    )
-
-    @api.model
-    def _register_hook(self):
-        super()._register_hook()
-        self.SELF_WRITEABLE_FIELDS.extend(["default_label_printer_id"])
-        self.SELF_READABLE_FIELDS.extend(["default_label_printer_id"])
-
+    # TODO method to remove when migrating to 15.0+
     def get_delivery_label_printer(self, delivery_type):
         self.ensure_one()
+        warn(
+            "'res.users.get_delivery_label_printer' method is deprecated. "
+            "Consider to switch to 'ir.actions.report._get_user_default_printer' "
+            "from 'base_report_to_label_printer' module.",
+            DeprecationWarning,
+        )
         return self.default_label_printer_id
