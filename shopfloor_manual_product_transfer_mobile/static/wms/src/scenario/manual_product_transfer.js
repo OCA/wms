@@ -39,7 +39,7 @@ const ManualProductTransfer = {
                 <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
                     <packaging-qty-picker
                         :key="make_state_component_key(['packaging-qty-picker', product().id])"
-                        :options="utils.wms.move_line_qty_picker_options(fake_line())"
+                        v-bind="utils.wms.move_line_qty_picker_props(fake_line())"
                         />
                 </v-card>
 
@@ -70,7 +70,7 @@ const ManualProductTransfer = {
             <v-card v-if="state_is('confirm_quantity')" class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
                 <packaging-qty-picker
                     :key="make_state_component_key(['packaging-qty-picker', product().id])"
-                    :options="utils.wms.move_line_qty_picker_options(fake_line())"
+                    v-bind="utils.wms.move_line_qty_picker_props(fake_line())"
                     />
             </v-card>
 
@@ -79,7 +79,7 @@ const ManualProductTransfer = {
                     <packaging-qty-picker
                         :key="make_state_component_key(['packaging-qty-picker', product().id])"
                         :readonly="true"
-                        :options="utils.wms.move_line_qty_picker_options(fake_line())"
+                        v-bind="utils.wms.move_line_qty_picker_props(fake_line())"
                         />
                 </v-card>
             </div>
@@ -156,6 +156,15 @@ const ManualProductTransfer = {
             }
             return 0;
         },
+        qty_done: function () {
+            const data = this.state.data;
+            if (_.isEmpty(data)) {
+                return 0;
+            }
+            if ("qty_done" in data) return data.qty_done;
+            if ("quantity" in data) return data.quantity;
+            return 0;
+        },
         lot: function () {
             const data = this.state.data;
             if (_.isEmpty(data)) {
@@ -180,9 +189,9 @@ const ManualProductTransfer = {
             return "";
         },
         fake_line: function () {
-            const product = this.product();
             return {
                 quantity: this.quantity(),
+                qty_done: this.qty_done(),
                 product: this.product(),
             };
         },
