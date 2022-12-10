@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2022-12-04 20:45+0000\n"
+"PO-Revision-Date: 2022-12-10 21:44+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -146,7 +146,7 @@ msgstr "Permitir Forzar Reserva es Posible"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_get_work_is_possible
 msgid "Allow Get Work Is Possible"
-msgstr ""
+msgstr "Permitir Conseguir Trabajo Es Posible"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_move_create
@@ -556,7 +556,7 @@ msgstr "Los nuevos movimientos de líneas no puede ser asignados: cancelados."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No available work could be found."
-msgstr ""
+msgstr "Ningún trabajo disponible ha sido encontrado."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1186,7 +1186,7 @@ msgstr "Peso del taller (kg)"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_get_work
 msgid "Show Get Work on start"
-msgstr ""
+msgstr "Mostrar Obtener Trabajo en el inicio"
 
 #. module: shopfloor
 #: model:shopfloor.scenario,name:shopfloor.scenario_single_pack_transfer
@@ -1396,7 +1396,7 @@ msgstr "El contenido de esta ubicación no se puede mover a la vez."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This location does not exist."
-msgstr ""
+msgstr "Esta ubicación no existe."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1564,6 +1564,8 @@ msgstr ""
 msgid ""
 "When enabled the user will have the option to ask for a task to work on."
 msgstr ""
+"Cuando está habilitado el usuario tendrá la opción de solicitar una tarea "
+"para trabajar."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
