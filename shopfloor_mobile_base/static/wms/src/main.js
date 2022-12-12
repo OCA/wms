@@ -282,7 +282,9 @@ new Vue({
         _on_logout_default: function () {
             this.authenticated = false;
             this._clearAppData();
-            this.$router.push({name: "login"});
+            if (this.$route.name !== "login") {
+                this.$router.push({name: "login"});
+            }
             this.trigger("logout:success", {root: this});
             return Promise.resolve();
         },
