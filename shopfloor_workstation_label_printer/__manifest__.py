@@ -10,7 +10,7 @@
     "website": "https://github.com/OCA/wms",
     "development_status": "Alpha",
     "license": "AGPL-3",
-    "depends": ["base_report_to_printer", "shopfloor_workstation"],
+    "depends": ["base_report_to_label_printer", "shopfloor_workstation"],
     "data": ["views/res_users.xml", "views/shopfloor_workstation.xml"],
     "installable": True,
 }
