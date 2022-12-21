@@ -119,7 +119,8 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         self.assertEqual(unselected_pickings, pick_on_another_device)
 
     def test_put_2_pickings_with_volume_zero_in_one_cluster(self):
-        "2 products don't have a volume : they should still occupy at least one bin each"
+        """2 products don't have a volume :
+        they should still occupy at least one bin each"""
         device = self.env["stock.device.type"].create(
             {
                 "name": "test volume null devices",

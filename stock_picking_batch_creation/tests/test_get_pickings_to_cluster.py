@@ -14,7 +14,8 @@ class TestGetPickingsToCluster(ClusterPickingCommonFeatures):
         """
         Data: 3 picks in first area
         TestCase: Create a cluster for this area
-        Result: retrieve all pickings related to the area, check that they are properly sorted
+        Result: retrieve all pickings related to the area,
+        check that they are properly sorted
         """
         make_picking_batch = self.makePickingBatch.create(
             {

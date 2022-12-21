@@ -39,7 +39,7 @@ class MakePickingBatch(models.TransientModel):
     group_pickings_by_partner = fields.Boolean(
         default=False,
         string="Group pickings by partner",
-        help="If set to true, all the pickings related to one partner will be put in one bin",
+        help="All the pickings related to one partner will be put in one bin",
     )
 
     @api.multi
@@ -178,8 +178,9 @@ class MakePickingBatch(models.TransientModel):
 
     def _apply_limits(self, pickings, device, max_pickings=0):
         """
-        Once we have the candidates pickings for clustering, we need to decide when to stop
-        the cluster (i.e.,  when to stop adding pickings in it)
+        Once we have the candidates pickings for clustering,
+        we need to decide when to stop the cluster (i.e.,
+        when to stop adding pickings in it)
         We add pickings in the cluster as long as the conditions are respected
         """
         selected_picking_ids = []
@@ -300,4 +301,3 @@ class MakePickingBatch(models.TransientModel):
             "state": "draft",
             "picking_device_id": device.id if device else None,
         }
-        

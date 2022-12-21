@@ -8,7 +8,6 @@
     "author": "Camptocamp,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "category": "Stock Management",
-    "website": "https://github.com/OCA/wms",
     "depends": ["sale_stock", "stock_available_to_promise_release", "delivery"],
     "data": ["views/stock_move_views.xml"],
     "installable": False,

@@ -187,6 +187,8 @@ class ClusterPickingCommonFeatures(SavepointCase):
 
     @classmethod
     def _add_product_to_picking(cls, picking, product):
+        dest_location = cls.warehouse_1.wh_output_stock_loc_id.id
+        src_location = cls.env.ref("stock.stock_location_stock").id
         picking.write(
             {
                 "move_lines": [
@@ -199,8 +201,8 @@ class ClusterPickingCommonFeatures(SavepointCase):
                             "picking_type_id": cls.picking_type_1.id,
                             "product_uom_qty": 1,
                             "product_uom": product.uom_id.id,
-                            "location_id": cls.env.ref("stock.stock_location_stock").id,
-                            "location_dest_id": cls.warehouse_1.wh_output_stock_loc_id.id,
+                            "location_id": src_location,
+                            "location_dest_id": dest_location,
                             "priority": "3",
                         },
                     )
