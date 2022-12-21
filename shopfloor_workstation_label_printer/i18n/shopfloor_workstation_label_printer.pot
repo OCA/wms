@@ -14,7 +14,6 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: shopfloor_workstation_label_printer
-#: model:ir.model.fields,field_description:shopfloor_workstation_label_printer.field_res_users__default_label_printer_id
 #: model:ir.model.fields,field_description:shopfloor_workstation_label_printer.field_shopfloor_workstation__default_label_printer_id
 msgid "Default Label Printer"
 msgstr ""
