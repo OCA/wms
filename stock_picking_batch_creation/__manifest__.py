@@ -28,4 +28,5 @@
         "wizards/make_picking_batch.xml",
         "security/ir.model.access.csv",
     ],
+    "development_status": "Alpha",
 }
