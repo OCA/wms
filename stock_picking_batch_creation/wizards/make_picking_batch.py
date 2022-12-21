@@ -293,34 +293,6 @@ class MakePickingBatch(models.TransientModel):
         """
         return picking
 
-    def _lock_selected_picking(self, picking):
-        """ Method hook called to lock the selected picking and ensure that
-        nothing has changed in the timelapse between the search request and
-        the addition to the batch that will prevent a normal commit of the
-        transaction. If nothing is returned by the method, the selected picking
-        will not be added to the batch.
-
-        Implementation example:
-
-        .. code-block:: python
-
-             self.env.cr.execute('''
-                SELECT
-                    id
-                FROM
-                    stock_picking
-                WHERE
-                    id = %s
-                FOR UPDATE OF stock_picking SKIP LOCKED;
-            ''', (picking.id, ))
-            _id = [r[0] for r in self.env.cr.fetchall()]
-            if _id:
-                return self.env["stock.picking"].browse(_id)
-            return None
-
-        """
-        return picking
-
     def _create_batch_values(self, user, device, pickings):
         return {
             "picking_ids": [(6, 0, pickings.ids)],

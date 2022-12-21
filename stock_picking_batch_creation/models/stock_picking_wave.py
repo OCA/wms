@@ -45,7 +45,7 @@ class StockPickingWave(models.Model):
             batch.move_ids = batch.picking_ids.mapped("move_lines")
             batch.pack_operation_ids = batch.picking_ids.mapped("pack_operation_ids")
 
-    def _init_wave_info(self):
+    def _init_wave_info(self, used_nbr_bins):
         """Store initial result of the wave computation"""
         self.ensure_one()
         pickings = self.picking_ids.with_prefetch()
@@ -56,9 +56,7 @@ class StockPickingWave(models.Model):
             "wave_volume": sum(
                 [picking.total_volume_batch_picking for picking in pickings]
             ),
-            "wave_nbr_bins": sum(
-                [picking.nbr_bins_batch_picking for picking in pickings]
-            ),
+            "wave_nbr_bins": used_nbr_bins,
             "wave_nbr_lines": sum([picking.nbr_picking_lines for picking in pickings]),
         }
         self.write(info)

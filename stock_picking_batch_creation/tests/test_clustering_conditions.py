@@ -26,9 +26,11 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
     def test_device_with_one_bin(self):
         candidates_pickings = self.make_picking_batch._search_pickings()
         device = self.make_picking_batch._compute_device_to_use(candidates_pickings[0])
-        selected_pickings, unselected_pickings = self.make_picking_batch._apply_limits(
-            candidates_pickings, device
-        )
+        (
+            selected_pickings,
+            unselected_pickings,
+            _,
+        ) = self.make_picking_batch._apply_limits(candidates_pickings, device)
         self.assertTrue(selected_pickings)
         self.assertEqual(selected_pickings[0], candidates_pickings[0])
 
@@ -51,6 +53,7 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         (
             selected_pickings,
             unselected_pickings,
+            _,
         ) = self.make_picking_batch._apply_limits(candidates_pickings, device)
         self.assertTrue(selected_pickings)
         self.assertEqual(len(selected_pickings), 3)
@@ -107,6 +110,7 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         (
             selected_pickings,
             unselected_pickings,
+            _,
         ) = self.make_picking_batch._apply_limits(candidates_pickings, device)
         self.assertTrue(selected_pickings)
         self.assertEqual(len(selected_pickings), 3)
@@ -206,3 +210,104 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         move_line_weight = move_line.product_id.weight
         self.assertEqual(batch.wave_volume, total_volume_pickings - move_line_volume)
         self.assertEqual(batch.wave_weight, total_weight_pickings - move_line_weight)
+
+    def test_several_pickings_one_partner_one_bin_occupied(self):
+        self.device1.write({"nbr_bins": 8, "min_volume": 0, "max_volume": 300})
+        self.p1.write(
+            {"volume": 1.0, "length": 1, "height": 1, "width": 1, "weight": 1}
+        )
+        self.p2.write(
+            {"volume": 1.0, "length": 1, "height": 1, "width": 1, "weight": 1}
+        )
+        self.make_picking_batch.write(
+            {
+                "maximum_number_of_preparation_lines": 20,
+                "group_pickings_by_partner": True,
+            }
+        )
+
+        batch = self.make_picking_batch._create_batch()
+        selected_pickings = batch.picking_ids
+        self.assertTrue(selected_pickings)
+        self.assertEqual(len(selected_pickings), 3)
+        self.assertEqual(batch.wave_nbr_bins, 1)
+
+    def test_several_pickings_one_partner_two_bin_occupied(self):
+        self.device3.write({"nbr_bins": 8, "min_volume": 0, "max_volume": 300})
+        self.p1.write(
+            {"volume": 1.0, "length": 1, "height": 1, "width": 1, "weight": 1}
+        )
+        self.p2.write(
+            {"volume": 35.0, "length": 35, "height": 1, "width": 1, "weight": 1}
+        )
+        self.make_picking_batch.write(
+            {
+                "maximum_number_of_preparation_lines": 20,
+                "group_pickings_by_partner": True,
+            }
+        )
+
+        batch = self.make_picking_batch._create_batch()
+        selected_pickings = batch.picking_ids
+        self.assertTrue(selected_pickings)
+        self.assertEqual(len(selected_pickings), 3)
+        self.assertEqual(batch.wave_nbr_bins, 2)
+
+    def test_several_pickings_two_partner_two_bin_occupied(self):
+        self.device1.write({"nbr_bins": 8, "min_volume": 0, "max_volume": 300})
+        self.p1.write(
+            {"volume": 1.0, "length": 1, "height": 1, "width": 1, "weight": 1}
+        )
+        self.p2.write(
+            {"volume": 1.0, "length": 1, "height": 1, "width": 1, "weight": 1}
+        )
+        partner2 = self.env["res.partner"].create(
+            {"name": "other partner", "ref": "98098769876"}
+        )
+        self._create_picking_pick_and_assign(
+            self.picking_type_1.id, products=self.p1, partner=partner2
+        )
+        self.make_picking_batch.write(
+            {
+                "maximum_number_of_preparation_lines": 20,
+                "group_pickings_by_partner": True,
+            }
+        )
+
+        batch = self.make_picking_batch._create_batch()
+        selected_pickings = batch.picking_ids
+        self.assertTrue(selected_pickings)
+        self.assertEqual(len(selected_pickings), 4)
+        self.assertEqual(batch.wave_nbr_bins, 2)
+
+    def test_several_pickings_one_partner_volume_outreached_on_one_picking(self):
+
+        self.p1.write(
+            {"volume": 1.0, "length": 1, "height": 1, "width": 1, "weight": 1}
+        )
+        self.p2.write(
+            {"volume": 1.0, "length": 1, "height": 1, "width": 1, "weight": 1}
+        )
+        self.p5.write(
+            {"volume": 200.0, "length": 200, "height": 1, "width": 1, "weight": 1}
+        )
+
+        self._set_quantity_in_stock(self.stock_location, self.p5)
+        self.device1.write({"nbr_bins": 8, "min_volume": 0, "max_volume": 30})
+        self._create_picking_pick_and_assign(self.picking_type_1.id, products=self.p5)
+        self._create_picking_pick_and_assign(
+            self.picking_type_1.id, products=self.p1 | self.p2
+        )
+        self.make_picking_batch.write(
+            {
+                "maximum_number_of_preparation_lines": 10,
+                "group_pickings_by_partner": True,
+            }
+        )
+        picks = self._get_picks_by_type(self.picking_type_1)
+        self.assertEqual(len(picks), 5)
+        batch = self.make_picking_batch._create_batch()
+        selected_pickings = batch.picking_ids
+        self.assertTrue(selected_pickings)
+        self.assertEqual(len(selected_pickings), 4)
+        self.assertEqual(batch.wave_nbr_bins, 2)
