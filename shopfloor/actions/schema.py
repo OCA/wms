@@ -59,6 +59,12 @@ class ShopfloorSchemaAction(Component):
         return {
             "id": {"required": True, "type": "integer"},
             "priority": {"type": "string", "required": False, "nullable": True},
+            "quantity_done": {"type": "float", "required": True},
+            "quantity": {"type": "float", "required": True},
+            "product": self._schema_dict_of(self.product()),
+            "location_src": self._schema_dict_of(self.location()),
+            "location_dest": self._schema_dict_of(self.location()),
+            "progress": {"type": "float", "nullable": True},
         }
 
     def product(self):
