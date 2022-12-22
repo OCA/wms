@@ -171,6 +171,9 @@ class MessageAction(Component):
     def already_done(self):
         return {"message_type": "info", "body": _("Operation already processed.")}
 
+    def move_already_done(self):
+        return {"message_type": "warning", "body": _("Move already processed.")}
+
     def confirm_canceled_scan_next_pack(self):
         return {
             "message_type": "success",
