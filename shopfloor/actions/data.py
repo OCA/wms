@@ -188,6 +188,28 @@ class DataAction(Component):
             "progress",
         ]
 
+    @ensure_model("stock.move")
+    def move(self, record, **kw):
+        record = record.with_context(location=record.location_id.id)
+        parser = self._move_parser
+        return self._jsonify(record, parser)
+
+    def moves(self, records, **kw):
+        return [self.move(rec, **kw) for rec in records]
+
+    @property
+    def _move_parser(self):
+        return [
+            "id",
+            "quantity_done",
+            "product_uom_qty:quantity",
+            ("product_id:product", self._product_parser),
+            ("location_id:location_src", self._location_parser),
+            ("location_dest_id:location_dest", self._location_parser),
+            "priority",
+            "progress",
+        ]
+
     @ensure_model("stock.package_level")
     def package_level(self, record, **kw):
         return self._jsonify(record, self._package_level_parser)
