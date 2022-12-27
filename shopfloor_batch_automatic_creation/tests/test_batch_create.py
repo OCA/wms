@@ -238,3 +238,33 @@ class TestBatchCreate(CommonCase):
             self.picking_type, group_by_commercial_partner=True
         )
         self.assertEqual(batch.picking_ids, self.picking2 | self.picking3)
+
+    def test_create_batch_only_one_picking_type(self):
+        # Test that the created batches only include pickings of the same picking type.
+        additional_picking_type = (
+            self.env["stock.picking.type"]
+            .sudo()
+            .create(
+                {
+                    "code": "internal",
+                    "name": "Cluster Picking 2",
+                    "sequence_id": 10,
+                    "sequence_code": "CPI",
+                    "warehouse_id": self.env.ref("stock.warehouse0").id,
+                    "default_location_src_id": self.env.ref(
+                        "stock.stock_location_stock"
+                    ).id,
+                    "default_location_dest_id": self.env.ref(
+                        "stock.location_pack_zone"
+                    ).id,
+                }
+            )
+        )
+        picking_types = self.picking_type | additional_picking_type
+        additional_picking = self._create_picking(
+            picking_type=additional_picking_type,
+            lines=[(self.product_a, 10), (self.product_b, 10)],
+        )
+        additional_picking.action_assign()
+        batch = self.auto_batch.create_batch(picking_types)
+        self.assertEqual(batch.picking_ids.picking_type_id, self.picking_type)
