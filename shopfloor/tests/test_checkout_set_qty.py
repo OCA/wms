@@ -192,10 +192,10 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line1: line1.product_uom_qty, line2: line2.product_uom_qty},
+            {line1: line1.product_uom_qty + 1, line2: line2.product_uom_qty},
             message={
-                "body": "Not allowed to pack more than the quantity, "
-                "the value has been changed to the maximum.",
+                "body": "Please note that the scanned quantity "
+                "is higher than the maximum allowed.",
                 "message_type": "warning",
             },
         )
