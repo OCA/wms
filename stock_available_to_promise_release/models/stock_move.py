@@ -507,7 +507,7 @@ class StockMove(models.Model):
         return None
 
     def release_available_to_promise(self):
-        self._run_stock_rule()
+        return self._run_stock_rule()
 
     def _prepare_move_split_vals(self, qty):
         vals = super()._prepare_move_split_vals(qty)
