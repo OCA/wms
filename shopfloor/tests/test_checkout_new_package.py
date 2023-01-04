@@ -1,5 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+from odoo import fields
+
 from .test_checkout_base import CheckoutCommonCase
 from .test_checkout_select_package_base import CheckoutSelectPackageMixin
 
@@ -59,3 +61,28 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             data=self._data_for_select_line(picking),
             message=self.msg_store.goods_packed_in(new_package),
         )
+
+    def test_set_dest_package_error_qty_done_above(self):
+        picking = self._create_picking(
+            lines=[
+                (self.product_a, 10),
+                (self.product_b, 10),
+            ]
+        )
+        moves = picking.move_lines
+        self._fill_stock_for_moves(moves, in_package=True)
+        picking.action_assign()
+        # If the qty_done of a selected line goes beyond
+        # the maximum allowed, a message should be displayed
+        # and the user shouldn't be allowed to select a package.
+        selected_lines = moves.move_line_ids
+        line = fields.first(selected_lines)
+        line.qty_done = line.product_uom_qty + 1
+        response = self.service.dispatch(
+            "list_dest_package",
+            params={
+                "picking_id": picking.id,
+                "selected_line_ids": picking.move_line_ids.ids,
+            },
+        )
+        self._assert_select_package_qty_above(response, picking)

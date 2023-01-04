@@ -48,3 +48,22 @@ class CheckoutCommonCase(CommonCase):
         }
         data.update(kw)
         return data
+
+    def _assert_select_package_qty_above(self, response, picking):
+        self.assert_response(
+            response,
+            next_state="select_package",
+            data={
+                "selected_move_lines": [
+                    self._move_line_data(ml) for ml in picking.move_line_ids.sorted()
+                ],
+                "picking": self._picking_summary_data(picking),
+                "packing_info": "",
+                "no_package_enabled": True,
+            },
+            message={
+                "message_type": "warning",
+                "body": "The quantity scanned for one or more lines cannot be "
+                "higher than the maximum allowed.",
+            },
+        )
