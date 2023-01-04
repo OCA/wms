@@ -693,18 +693,15 @@ class Checkout(Component):
                         split_partial=False,
                         result_package_id=False,
                     )
-                    if qty_check == "greater":
-                        qty_done = move_line.product_uom_qty
-                        message = {
-                            "body": _(
-                                "Not allowed to pack more than the quantity, "
-                                "the value has been changed to the maximum."
-                            ),
-                            "message_type": "warning",
-                        }
                 move_line.qty_done = qty_done
                 if new_line:
                     selected_line_ids.append(new_line.id)
+                if qty_done > move_line.product_uom_qty:
+                    return self._response_for_select_package(
+                        picking,
+                        self.env["stock.move.line"].browse(selected_line_ids).exists(),
+                        message=self.msg_store.line_scanned_qty_done_higher_than_allowed(),
+                    )
         return self._response_for_select_package(
             picking,
             self.env["stock.move.line"].browse(selected_line_ids).exists(),
@@ -1051,6 +1048,9 @@ class Checkout(Component):
                 selected_lines,
                 message=self.msg_store.no_delivery_packaging_available(),
             )
+        response = self._check_allowed_qty_done(picking, selected_lines)
+        if response:
+            return response
         return self._response_for_select_delivery_packaging(picking, delivery_packaging)
 
     def new_package(self, picking_id, selected_line_ids, packaging_id=None):
@@ -1096,6 +1096,9 @@ class Checkout(Component):
         selected_lines.write(
             {"shopfloor_checkout_done": True, "result_package_id": False}
         )
+        response = self._check_allowed_qty_done(picking, selected_lines)
+        if response:
+            return response
         return self._response_for_select_line(
             picking,
             message={
@@ -1119,7 +1122,22 @@ class Checkout(Component):
         if message:
             return self._response_for_select_document(message=message)
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
+        response = self._check_allowed_qty_done(picking, lines)
+        if response:
+            return response
         return self._response_for_select_dest_package(picking, lines)
+
+    def _check_allowed_qty_done(self, picking, lines):
+        for line in lines:
+            # Do not allow to proceed if the qty_done of
+            # any of the selected lines
+            # is higher than the quantity to do.
+            if line.qty_done > line.product_uom_qty:
+                return self._response_for_select_package(
+                    picking,
+                    lines,
+                    message=self.msg_store.selected_lines_qty_done_higher_than_allowed(),
+                )
 
     def _set_dest_package_from_selection(self, picking, selected_lines, package):
         if not self._is_package_allowed(picking, package):
