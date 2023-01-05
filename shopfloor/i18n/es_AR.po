@@ -38,6 +38,16 @@ msgstr ""
 "\",\n"
 
 #. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__no_prefill_qty
+msgid ""
+"\n"
+"We assume the picker will take the suggested quantities.\n"
+"With this option, the operator will have to enter the quantity manually or\n"
+"by scanning a product or product packaging EAN to increase the quantity\n"
+"(i.e. +1 Unit or +1 Box)\n"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__multiple_move_single_pack
 msgid ""
 "\n"
@@ -306,6 +316,11 @@ msgid "Display Name"
 msgstr "Mostrar Nombre"
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__no_prefill_qty
+msgid "Do not pre-fill quantity to pick"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking_type__shopfloor_zero_check
 msgid ""
 "For Shopfloor scenarios using it (Cluster Picking, Zone Picking, Discrete "
@@ -551,6 +566,11 @@ msgstr "Cantidad negativa no permitida."
 #, python-format
 msgid "New move lines cannot be assigned: canceled."
 msgstr "Los nuevos movimientos de líneas no puede ser asignados: cancelados."
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__no_prefill_qty_is_possible
+msgid "No Prefill Qty Is Possible"
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -927,7 +947,7 @@ msgid "Product Moves (Stock Move Line)"
 msgstr "Movimientos de Producto (Stock Move Line)"
 
 #. module: shopfloor
-#: code:addons/shopfloor/services/checkout.py:0
+#: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Product is not in the current transfer."
 msgstr "El Producto no está en la transferencia actual."
