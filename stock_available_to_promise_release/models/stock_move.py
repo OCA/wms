@@ -1,4 +1,5 @@
 # Copyright 2019-2020 Camptocamp (https://www.camptocamp.com)
+# Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 import logging
@@ -278,7 +279,7 @@ class StockMove(models.Model):
         return None
 
     def release_available_to_promise(self):
-        self._run_stock_rule()
+        return self._run_stock_rule()
 
     def _prepare_move_split_vals(self, qty):
         vals = super()._prepare_move_split_vals(qty)
@@ -363,7 +364,7 @@ class StockMove(models.Model):
         pulled_moves._after_release_assign_moves()
         pulled_moves._after_release_update_chain()
 
-        return True
+        return pulled_moves
 
     def _before_release(self):
         """Hook that aims to be overridden."""
