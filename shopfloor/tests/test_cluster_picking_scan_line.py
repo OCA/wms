@@ -24,6 +24,9 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
                 "barcode": scanned,
             },
         )
+        # For any barcode scanned, the quantity done is set in
+        # the response data to fully done but the record is not updated
+        line.qty_done = line.product_uom_qty
         self.assert_response(
             response, next_state="scan_destination", data=self._line_data(line)
         )
@@ -191,6 +194,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         move._action_confirm(merge=False)
         move._action_assign()
         move.move_line_ids[0].package_id = None
+        move.move_line_ids[0].location_id = line.location_id.copy()
         self._scan_line_ok(line, move.product_id.barcode)
 
     def test_scan_line_lot_error_several_packages(self):

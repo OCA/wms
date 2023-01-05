@@ -229,14 +229,13 @@ export const checkout_states = function ($instance) {
                 $instance.reset_notification();
             },
             on_qty_update: (qty) => {
-                console.log(qty);
                 $instance.state.data.qty = qty;
             },
             on_confirm: () => {
                 $instance.wait_call(
                     $instance.odoo.call("set_custom_qty", {
                         picking_id: $instance.state.data.picking.id,
-                        selected_line_ids: $instance.selected_line_ids(),
+                        selected_line_ids: $instance.selectable_line_ids(),
                         move_line_id: $instance.state.data.line.id,
                         qty_done: $instance.state.data.qty,
                     })

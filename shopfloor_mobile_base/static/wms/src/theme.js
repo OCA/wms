@@ -48,6 +48,8 @@ color_registry.add_theme(
          * Selection
          */
         item_selected: "success",
+        item_selected_partial: "warning",
+        item_selected_excess: "error",
         /**
          * Spinner
          */

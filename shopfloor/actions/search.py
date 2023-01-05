@@ -54,15 +54,11 @@ class SearchAction(Component):
             return model.search(source_document_domain)
         return model.browse()
 
-    def product_from_scan(self, barcode, use_packaging=True):
+    def product_from_scan(self, barcode):
         model = self.env["product.product"]
         if not barcode:
             return model.browse()
-        product = model.search([("barcode", "=", barcode)], limit=1)
-        if not product and use_packaging:
-            packaging = self.packaging_from_scan(barcode)
-            product = packaging.product_id
-        return product
+        return model.search([("barcode", "=", barcode)], limit=1)
 
     def lot_from_scan(self, barcode, products=None, limit=1):
         model = self.env["stock.production.lot"]
