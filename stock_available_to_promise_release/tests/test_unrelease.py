@@ -1,6 +1,7 @@
-# Copyright 2019 Camptocamp (https://www.camptocamp.com)
+# Copyright 2022 ACSONE SA/NV (https://www.acsone.eu)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
+from contextlib import contextmanager
 from datetime import datetime
 
 from odoo.exceptions import UserError
@@ -29,11 +30,8 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         cls.picking = cls._prev_picking(cls.shipping)
         cls.picking.action_assign()
 
-    def test_unrelease_full(self):
-        """Unrelease all moves of a released ship. The pick should be deleted and
-        the moves should be mark as to release"""
-
-        self.assertEqual(self.picking.state, "assigned")
+    @contextmanager
+    def _assert_full_unreleased(self):
         self.assertRecordValues(
             self.shipping.move_ids,
             [
@@ -44,7 +42,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 }
             ],
         )
-        self.shipping.move_ids.unrelease()
+        yield
         self.assertRecordValues(
             self.shipping.move_ids,
             [
@@ -57,6 +55,12 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         )
         self.assertEqual(self.picking.move_ids.state, "cancel")
         self.assertEqual(self.picking.state, "cancel")
+
+    def test_unrelease_full(self):
+        """Unrelease all moves of a released ship. The pick should be deleted and
+        the moves should be mark as to release"""
+        with self._assert_full_unreleased():
+            self.shipping.move_ids.unrelease()
 
         # I can release again the move and a new pick is created
         self.shipping.release_available_to_promise()
@@ -73,6 +77,16 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             skip_immediate=True, skip_backorder=True
         ).button_validate()
         self.assertEqual(self.picking.state, "done")
+        self.assertFalse(self.shipping.move_ids.unrelease_allowed)
+        with self.assertRaisesRegex(
+            UserError, "You are not allowed to unrelease this move"
+        ):
+            self.shipping.move_ids.unrelease()
+
+    def test_unrelease_move_with_origin_in_printed_picking(self):
+        """Check it's not possible to unrelease a move with origin moves into a
+        printed picking"""
+        self.picking.printed = True
         self.assertFalse(self.shipping.move_ids.unrelease_allowed)
         with self.assertRaisesRegex(
             UserError, "You are not allowed to unrelease this move"
@@ -149,3 +163,18 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 lambda m: m.state not in ("cancel", "done")
             )
         )
+
+    def test_unrelease_picking_wizard(self):
+        wizard = self.env["stock.unrelease"].create({})
+        with self._assert_full_unreleased():
+            wizard.with_context(
+                active_ids=self.shipping.ids, active_model=self.shipping._name
+            ).unrelease()
+
+    def test_unrelease_moves_wizard(self):
+        wizard = self.env["stock.unrelease"].create({})
+        with self._assert_full_unreleased():
+            wizard.with_context(
+                active_ids=self.shipping.move_ids.ids,
+                active_model=self.shipping.move_ids._name,
+            ).unrelease()

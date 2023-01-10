@@ -185,7 +185,8 @@ class StockPicking(models.Model):
             lambda p: p.picking_type_id.unrelease_on_backorder
         )
         if backorders_to_unrelease:
-            backorders_to_unrelease.mapped("move_ids").filtered(
-                "unrelease_allowed"
-            ).unrelease()
+            backorders_to_unrelease.unrelease()
         return backorders
+
+    def unrelease(self):
+        self.mapped("move_ids").filtered("unrelease_allowed").unrelease()
