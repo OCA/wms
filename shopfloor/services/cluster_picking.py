@@ -114,6 +114,7 @@ class ClusterPicking(Component):
                 ),
                 picking=move_line.picking_id,
             )
+            data["disable_full_bin_action"] = self.work.menu.disable_full_bin_action
         return self._response(next_state="scan_destination", data=data, message=message)
 
     def _response_for_change_pack_lot(self, move_line, message=None):
@@ -1355,7 +1356,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             "start_line": self._schema_for_single_line_details,
             "start": {},
             "manual_selection": self._schema_for_batch_selection,
-            "scan_destination": self._schema_for_single_line_details,
+            "scan_destination": self._schema_for_scan_destination,
             "zero_check": self._schema_for_zero_check,
             "unload_all": self._schema_for_unload_all,
             "confirm_unload_all": self._schema_for_unload_all,
@@ -1541,3 +1542,9 @@ class ShopfloorClusterPickingValidatorResponse(Component):
     @property
     def _schema_for_batch_selection(self):
         return self.schemas._schema_search_results_of(self.schemas.picking_batch())
+
+    @property
+    def _schema_for_scan_destination(self):
+        schema = self._schema_for_single_line_details
+        schema["disable_full_bin_action"] = {"type": "boolean"}
+        return schema
