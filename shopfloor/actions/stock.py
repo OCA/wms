@@ -66,7 +66,11 @@ class StockAction(Component):
         for picking in moves.picking_id:
             moves_todo = picking.move_lines & moves
             if self._check_backorder(picking, moves_todo):
+                existing_backorders = picking.backorder_ids
                 picking._action_done()
+                new_backorders = picking.backorder_ids - existing_backorders
+                if new_backorders:
+                    new_backorders.write({"user_id": False})
             else:
                 moves_todo.extract_and_action_done()
 
