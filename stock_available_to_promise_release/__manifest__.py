@@ -18,6 +18,7 @@
         "views/stock_location_route_views.xml",
         "views/res_config_settings.xml",
         "wizards/stock_release_views.xml",
+        "wizards/stock_unrelease_views.xml",
     ],
     "installable": True,
     "license": "LGPL-3",

@@ -170,3 +170,6 @@ class StockPicking(models.Model):
         action["domain"] = [("picking_id", "=", self.id), ("need_release", "=", True)]
         action["context"] = {}
         return action
+
+    def unrelease(self):
+        self.mapped("move_ids").filtered("unrelease_allowed").unrelease()

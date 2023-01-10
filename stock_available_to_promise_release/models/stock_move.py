@@ -57,34 +57,61 @@ class StockMove(models.Model):
 
     @api.depends("rule_id", "rule_id.available_to_promise_defer_pull")
     def _compute_unrelease_allowed(self):
-        user_is_allowed = self.env.user.has_group("stock.group_stock_user")
         for move in self:
-            unrelease_allowed = (
-                user_is_allowed
-                and not move.need_release
-                and move.state not in ("done", "cancel")
-                and move.picking_type_id.code == "outgoing"
-                and move.rule_id.available_to_promise_defer_pull
-            )
+            unrelease_allowed = self._is_unrelease_allowed()
             if unrelease_allowed:
                 iterator = move._get_chained_moves_iterator("move_orig_ids")
                 next(iterator)  # skip the current move
                 for origin_moves in iterator:
-                    origin_moves = origin_moves.filtered(
-                        lambda m: m.state not in ("done", "cancel")
-                    )
-                    origin_qty_todo = sum(origin_moves.mapped("product_qty"))
-                    unrelease_allowed = (
-                        float_compare(
-                            move.product_qty,
-                            origin_qty_todo,
-                            precision_rounding=move.product_uom.rounding,
-                        )
-                        <= 0
+                    unrelease_allowed = move._is_unrelease_allowed_on_origin_moves(
+                        origin_moves
                     )
                     if not unrelease_allowed:
                         break
             move.unrelease_allowed = unrelease_allowed
+
+    def _is_unrelease_allowed(self):
+        """Check if the move can be unrelease. At this stage we only check if
+        the move is at the end of a chain of moves and has the caracteristics
+        to be unrelease. We don't check the conditions on the origin moves.
+        The conditions on the origin moves are checked in the method
+        _is_unrelease_allowed_on_origin_moves.
+        """
+        self.ensure_one()
+        user_is_allowed = self.env.user.has_group("stock.group_stock_user")
+        return (
+            user_is_allowed
+            and not self.need_release
+            and self.state not in ("done", "cancel")
+            and self.picking_type_id.code == "outgoing"
+            and self.rule_id.available_to_promise_defer_pull
+        )
+
+    def _is_unrelease_allowed_on_origin_moves(self, origin_moves):
+        """We check that the origin moves are in a state that allows the unrelease
+        of the current move. At this stage, a move can't be unreleased if
+          * a picking is already printed. (The work on the picking is planed and
+            we don't want to change it)
+          * the processing of the origin moves is partially started.
+        """
+        self.ensure_one()
+        pickings = origin_moves.mapped("picking_id")
+        if pickings.filtered("printed"):
+            # The picking is printed, we can't unrelease the move
+            # because the processing of the origin moves is started.
+            return False
+        origin_moves = origin_moves.filtered(
+            lambda m: m.state not in ("done", "cancel")
+        )
+        origin_qty_todo = sum(origin_moves.mapped("product_qty"))
+        return (
+            float_compare(
+                self.product_qty,
+                origin_qty_todo,
+                precision_rounding=self.product_uom.rounding,
+            )
+            <= 0
+        )
 
     def _check_unrelease_allowed(self):
         for move in self:
@@ -524,7 +551,7 @@ class StockMove(models.Model):
                     lambda m: m.state not in ("done", "cancel")
                 )
                 if origin_moves:
-                    origin_moves = self._split_origins(origin_moves)
+                    origin_moves = move._split_origins(origin_moves)
                     impacted_picking_ids.update(origin_moves.mapped("picking_id").ids)
                     # avoid to propagate cancel to the original move
                     origin_moves.write({"propagate_cancel": False})
@@ -549,7 +576,7 @@ class StockMove(models.Model):
         rounding = self.product_uom.rounding
         new_origin_moves = self.env["stock.move"]
         while float_compare(qty, 0, precision_rounding=rounding) > 0 and origins:
-            origin = origins[0]
+            origin = fields.first(origins)
             if float_compare(qty, origin.product_qty, precision_rounding=rounding) >= 0:
                 qty -= origin.product_qty
                 new_origin_moves |= origin
