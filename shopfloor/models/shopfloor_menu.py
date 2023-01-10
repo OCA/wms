@@ -113,6 +113,16 @@ class ShopfloorMenu(models.Model):
         help=UNLOAD_PACK_AT_DEST_HELP,
     )
 
+    disable_full_bin_action_is_possible = fields.Boolean(
+        compute="_compute_disable_full_bin_action_is_possible"
+    )
+    disable_full_bin_action = fields.Boolean(
+        string="Disable full bin action",
+        default=False,
+        # TODO: improve this desc w/ usecases.
+        help=("When picking, prevent unloading the whole bin when full."),
+    )
+
     allow_force_reservation = fields.Boolean(
         string="Force stock reservation",
         default=False,
@@ -249,6 +259,13 @@ class ShopfloorMenu(models.Model):
     @api.onchange("unreserve_other_moves_is_possible")
     def onchange_unreserve_other_moves_is_possible(self):
         self.allow_unreserve_other_moves = self.unreserve_other_moves_is_possible
+
+    @api.depends("scenario_id")
+    def _compute_disable_full_bin_action_is_possible(self):
+        for menu in self:
+            menu.disable_full_bin_action_is_possible = menu.scenario_id.has_option(
+                "disable_full_bin_action"
+            )
 
     @api.depends("scenario_id")
     def _compute_ignore_no_putaway_available_is_possible(self):
