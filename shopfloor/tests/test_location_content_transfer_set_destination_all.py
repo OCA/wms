@@ -125,6 +125,7 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         self.assertEqual(move_d.product_qty, 5)
         self.assertTrue(self.picking2.backorder_ids)
         self.assertNotEqual(self.picking2.backorder_ids.state, "done")
+        self.assertFalse(self.picking2.backorder_ids.user_id)
         self.assertEqual(self.picking2.backorder_ids.move_lines.product_qty, 5)
 
     def test_set_destination_all_with_partially_available_move_with_ancestor(self):
