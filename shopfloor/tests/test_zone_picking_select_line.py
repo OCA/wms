@@ -255,19 +255,22 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         next step 'select_line expected.
         """
         pack = self.free_package
-        self._update_qty_in_location(self.zone_location, self.product_a, 2, pack)
-        self._update_qty_in_location(self.zone_location, self.product_b, 2, pack)
+        self._update_qty_in_location(self.zone_sublocation1, self.product_a, 2, pack)
+        self._update_qty_in_location(self.zone_sublocation1, self.product_b, 2, pack)
         response = self.service.dispatch(
             "scan_source",
             params={"barcode": pack.name},
         )
-        move_lines = self.service._find_location_move_lines()
+        move_lines = self.service._find_location_move_lines(
+            locations=self.zone_sublocation1
+        )
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_lines=move_lines,
+            sublocation=self.zone_sublocation1,
             message=self.service.msg_store.several_products_in_package(pack),
         )
 
