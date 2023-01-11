@@ -569,7 +569,12 @@ class ZonePicking(Component):
         if packaging.package_has_several_lots(package):
             message = self.msg_store.several_lots_in_package(package)
         if message:
-            return self.list_move_lines(), message
+            return (
+                self._list_move_lines(
+                    self.zone_location, sublocation=package.location_id or False
+                ),
+                message,
+            )
         move_lines = self._find_location_move_lines(
             locations=sublocation, package=package
         )
