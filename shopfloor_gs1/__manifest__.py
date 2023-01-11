@@ -13,6 +13,6 @@
     "maintainers": ["simahawk", "sebalix"],
     "license": "AGPL-3",
     "depends": ["shopfloor"],
-    "external_dependencies": {"python": ["biip"]},
+    "external_dependencies": {"python": ["biip==2.3.0"]},
     "data": [],
 }
