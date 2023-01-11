@@ -57,7 +57,7 @@ class StockMove(models.Model):
     @api.depends("rule_id", "rule_id.available_to_promise_defer_pull")
     def _compute_unrelease_allowed(self):
         for move in self:
-            unrelease_allowed = self._is_unrelease_allowed()
+            unrelease_allowed = move._is_unreleaseable()
             if unrelease_allowed:
                 iterator = move._get_chained_moves_iterator("move_orig_ids")
                 next(iterator)  # skip the current move
@@ -69,7 +69,7 @@ class StockMove(models.Model):
                         break
             move.unrelease_allowed = unrelease_allowed
 
-    def _is_unrelease_allowed(self):
+    def _is_unreleaseable(self):
         """Check if the move can be unrelease. At this stage we only check if
         the move is at the end of a chain of moves and has the caracteristics
         to be unrelease. We don't check the conditions on the origin moves.
@@ -536,12 +536,19 @@ class StockMove(models.Model):
             yield moves
             moves = moves.mapped(chain_field)
 
-    def unrelease(self):
-        """Unrelease moves"""
-        self._check_unrelease_allowed()
-        self.write({"need_release": True})
+    def unrelease(self, safe_unrelease=False):
+        """Unrelease unreleasavbe moves
+
+        If safe_unrelease is True, the unreleasaable moves for which the
+        processing has already started will be ignored
+        """
+        moves_to_unrelease = self.filtered(lambda m: m._is_unreleaseable())
+        if safe_unrelease:
+            moves_to_unrelease = self.filtered("unrelease_allowed")
+        moves_to_unrelease._check_unrelease_allowed()
+        moves_to_unrelease.write({"need_release": True})
         impacted_picking_ids = set()
-        for move in self:
+        for move in moves_to_unrelease:
             iterator = move._get_chained_moves_iterator("move_orig_ids")
             next(iterator)  # skip the current move
             for origin_moves in iterator:
@@ -554,8 +561,10 @@ class StockMove(models.Model):
                     # avoid to propagate cancel to the original move
                     origin_moves.write({"propagate_cancel": False})
                     origin_moves._action_cancel()
-        self.write({"need_release": True})
-        for picking, moves in itertools.groupby(self, lambda m: m.picking_id):
+        moves_to_unrelease.write({"need_release": True})
+        for picking, moves in itertools.groupby(
+            moves_to_unrelease, lambda m: m.picking_id
+        ):
             move_names = "\n".join([m.display_name for m in moves])
             body = _(
                 "The following moves have been un-released: \n%(move_names)s",
