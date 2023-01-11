@@ -1,2 +1,2 @@
 # generated from manifests external_dependencies
-biip
+biip==2.3.0
