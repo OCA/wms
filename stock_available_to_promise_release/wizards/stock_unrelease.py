@@ -15,7 +15,5 @@ class StockUnRelease(models.TransientModel):
         records = (
             self.env[model].browse(self.env.context.get("active_ids", [])).exists()
         )
-        if model == "stock.move":
-            records = records.filtered("unrelease_allowed")
-        records.unrelease()
+        records.unrelease(safe_unrelease=True)
         return {"type": "ir.actions.act_window_close"}

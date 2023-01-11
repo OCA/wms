@@ -171,5 +171,10 @@ class StockPicking(models.Model):
         action["context"] = {}
         return action
 
-    def unrelease(self):
-        self.mapped("move_ids").filtered("unrelease_allowed").unrelease()
+    def unrelease(self, safe_unrelease=False):
+        """Unrelease the moves of the picking.
+
+        If safe_unrelease is True, the unreleasaable moves for which the
+        processing has already started will be ignored
+        """
+        self.mapped("move_ids").unrelease(safe_unrelease=safe_unrelease)
