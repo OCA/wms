@@ -1,4 +1,5 @@
-# Copyright 2019-2020 Camptocamp (https://www.camptocamp.com)
+# Copyright 2019 Camptocamp (https://www.camptocamp.com)
+# Copyright 2020 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 import itertools
@@ -422,19 +423,30 @@ class StockMove(models.Model):
         quantities.
         """
         procurement_requests = []
-        pulled_moves = self.env["stock.move"]
-        backorder_links = {}
+        released_moves = self.env["stock.move"]
         for move in self:
             available_qty, remaining_qty = move._is_releasable()
             if not available_qty:
                 continue
-
             if remaining_qty:
-                new_move = move._release_split(remaining_qty)
-                backorder_links[new_move.picking_id] = move.picking_id
+                move._release_split(remaining_qty)
+            released_moves |= move
 
+        # Move the unreleased moves to a backorder.
+        # This behavior can be disabled by setting the flag
+        # no_backorder_at_release on the stock.route of the move.
+        released_pickings = released_moves.picking_id
+        unreleased_moves = released_pickings.move_lines - released_moves
+        unreleased_moves_to_bo = unreleased_moves.filtered(
+            lambda m: m.state not in ("done", "cancel")
+            and not m.rule_id.no_backorder_at_release
+        )
+        if unreleased_moves_to_bo:
+            unreleased_moves_to_bo._unreleased_to_backorder()
+
+        # Pull the released moves
+        for move in released_moves:
             move._before_release()
-
             values = move._prepare_procurement_values()
             procurement_requests.append(
                 self.env["procurement.group"].Procurement(
@@ -448,30 +460,12 @@ class StockMove(models.Model):
                     values,
                 )
             )
-            pulled_moves |= move
-
-        # move the unreleased moves to a backorder
-        released_pickings = pulled_moves.picking_id
-        unreleased_moves = released_pickings.move_lines - pulled_moves
-        for unreleased_move in unreleased_moves:
-            if unreleased_move.state in ("done", "cancel"):
-                continue
-            # no split will occur as we keep the same qty, but the move
-            # will be assigned to a new stock.picking
-            original_picking = unreleased_move.picking_id
-            unreleased_move._release_split(unreleased_move.product_qty)
-            backorder_links[unreleased_move.picking_id] = original_picking
-
-        for backorder, origin in backorder_links.items():
-            if backorder != origin:
-                backorder._release_link_backorder(origin)
-
         self.env["procurement.group"].run_defer(procurement_requests)
 
-        pulled_moves._after_release_assign_moves()
-        pulled_moves._after_release_update_chain()
+        released_moves._after_release_assign_moves()
+        released_moves._after_release_update_chain()
 
-        return pulled_moves
+        return released_moves
 
     def _before_release(self):
         """Hook that aims to be overridden."""
@@ -480,8 +474,8 @@ class StockMove(models.Model):
         picking_ids = set()
         moves = self
         while moves:
-            picking_ids.update(moves.mapped("picking_id").ids)
-            moves = moves.mapped("move_orig_ids")
+            picking_ids.update(moves.picking_id.ids)
+            moves = moves.move_orig_ids
         pickings = self.env["stock.picking"].browse(picking_ids)
         pickings._after_release_update_chain()
         # Set the highest priority on all pickings in the chain
@@ -496,31 +490,25 @@ class StockMove(models.Model):
         self.env["stock.move"].browse(move_ids)._action_assign()
 
     def _release_split(self, remaining_qty):
-        """Split move and create a new picking for it.
+        """Split move and put remaining_qty to a backorder move."""
+        new_move_vals = self.with_context(release_available_to_promise=True)._split(
+            remaining_qty
+        )
+        new_move = self.create(new_move_vals)
+        new_move._action_confirm(merge=False)
+        return new_move
 
-        By default, when we split a move at release to isolate the remaining qty
-        into a new move, we also create a new picking for it so that we can
-        release it later as soon as the qty is available.
-        This behavior can be changed by setting the flag no_backorder_at_release
-        on the stock.route of the move. This will allow to create the backorder
-        at the end of the picking process and release the unreleased moves into
-        the same picking as long as the picking is not done. By doing so, we
-        can also cleanup the backorders of the linked pickings created when
-        a released move was not processed (no qty found, or no time to do it for
-         example).
-        """
-        context = self.env.context
-        self = self.with_context(release_available_to_promise=True)
-        new_move = self  # Work on the current move if split doesn't occur
-        new_move_vals = self._split(remaining_qty)
-        if new_move_vals:
-            new_move = self.create(new_move_vals)
-            new_move._action_confirm(merge=False)
-        # Picking assignment is needed here because `_split` copies the move
-        # thus the `_should_be_assigned` condition is not satisfied
-        # and the move is not assigned.
-        new_move._assign_picking()
-        return new_move.with_context(**context)
+    def _unreleased_to_backorder(self):
+        """Move the unreleased moves to a new backorder picking"""
+        origin_pickings = {m.id: m.picking_id for m in self}
+        self.with_context(release_available_to_promise=True)._assign_picking()
+        backorder_links = {}
+        for move in self:
+            origin = origin_pickings[move.id]
+            if origin:
+                backorder_links[move.picking_id] = origin
+        for backorder, origin in backorder_links.items():
+            backorder._release_link_backorder(origin)
 
     def _assign_picking_post_process(self, new=False):
         super()._assign_picking_post_process(new)
@@ -606,7 +594,7 @@ class StockMove(models.Model):
         if self.env.context.get("release_available_to_promise"):
             force_new_picking = not self.rule_id.no_backorder_at_release
             if force_new_picking:
-                domain = expression.AND([domain, [("id", "!=", self.picking_id.id)]])
+                domain = expression.AND([domain, [("id", ">", self.picking_id.id)]])
         if self.picking_type_id.prevent_new_move_after_release:
             domain = expression.AND([domain, [("last_release_date", "=", False)]])
         return domain
