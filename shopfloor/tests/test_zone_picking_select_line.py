@@ -254,9 +254,8 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         """Scan source: scanned package that several product, aborting
         next step 'select_line expected.
         """
-        pack = self.free_package
-        self._update_qty_in_location(self.zone_sublocation1, self.product_a, 2, pack)
-        self._update_qty_in_location(self.zone_sublocation1, self.product_b, 2, pack)
+        pack = self.picking1.package_level_ids[0].package_id
+        self._update_qty_in_location(pack.location_id, self.product_b, 2, pack)
         response = self.service.dispatch(
             "scan_source",
             params={"barcode": pack.name},
