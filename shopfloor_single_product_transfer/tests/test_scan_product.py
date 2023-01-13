@@ -74,7 +74,7 @@ class TestScanProduct(CommonCase):
         new_picking = self.get_new_picking()
         self.assertTrue(new_picking)
         self.assertEqual(move_line.picking_id, new_picking)
-        self.assertEqual(move_line.qty_done, 1.0)
+        self.assertEqual(move_line.qty_done, 1)
         self.assertEqual(move_line.product_uom_qty, 10.0)
 
     def test_scan_product_no_move_line(self):

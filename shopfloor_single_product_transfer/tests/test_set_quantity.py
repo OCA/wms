@@ -10,6 +10,8 @@ class TestSetQuantity(CommonCase):
         super().setUpClass()
         cls.location = cls.location_src
         cls.product = cls.product_a
+        cls.packaging = cls.product_a_packaging
+        cls.packaging.qty = 5
 
     @classmethod
     def _setup_picking(cls, lot=None):
@@ -73,7 +75,7 @@ class TestSetQuantity(CommonCase):
             "scan_product",
             params={"location_id": self.location.id, "barcode": self.product.barcode},
         )
-        self.assertEqual(move_line.qty_done, 1.0)
+        self.assertEqual(move_line.qty_done, 1)
         # We can scan the same product 9 times, and the qty will increment by 1
         # each time.
         for expected_qty in range(2, 11):
@@ -144,7 +146,7 @@ class TestSetQuantity(CommonCase):
             params={"location_id": self.location.id, "barcode": lot.name},
         )
         move_line = picking.move_line_ids
-        self.assertEqual(move_line.qty_done, 1.0)
+        self.assertEqual(move_line.qty_done, 1)
         # We can scan the same lot 9 times (until qty_done == product_uom_qty),
         # and the qty will increment by 1 each time.
         for expected_qty in range(2, 11):
@@ -281,6 +283,103 @@ class TestSetQuantity(CommonCase):
         expected_message = self.msg_store.transfer_done_success(move_line.picking_id)
         self.assert_response(
             response, next_state="select_product", message=expected_message, data=data
+        )
+
+    def test_set_quantity_scan_packaging(self):
+        """Scan a packaging to process an existing line."""
+        # First, select a picking
+        picking = self._setup_picking()
+        move_line = picking.move_line_ids
+        self.service.dispatch(
+            "scan_product",
+            params={"location_id": self.location.id, "barcode": self.packaging.barcode},
+        )
+        self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.packaging.barcode,
+            },
+        )
+        expected_message = {
+            "message_type": "error",
+            "body": f"You must not pick more than {move_line.product_uom_qty} units.",
+        }
+        data = {"move_line": self._data_for_move_line(move_line)}
+        self.assert_response(
+            response, next_state="set_quantity", message=expected_message, data=data
+        )
+
+    def test_set_quantity_scan_packaging_with_allow_move_create(self):
+        """Scan a packaging to create and then process a line.
+
+        With no_prefill_qty disabled.
+        """
+        self._add_stock_to_product(self.product, self.location, 10)
+        self._enable_create_move_line()
+        response = self.service.dispatch(
+            "scan_product",
+            params={"location_id": self.location.id, "barcode": self.packaging.barcode},
+        )
+        domain = self.service._scan_product__select_move_line_domain(
+            self.product, self.location
+        )
+        move_line = self.env["stock.move.line"].search(domain, limit=1)
+        self.assertEqual(move_line.qty_done, self.packaging.qty)
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.dispatch_location.barcode,
+            },
+        )
+        expected_message = self.msg_store.transfer_done_success(move_line.picking_id)
+        self.assert_response(
+            response, next_state="select_location", message=expected_message, data={}
+        )
+
+    def test_set_quantity_scan_packaging_with_allow_move_create_and_no_prefill_qty(
+        self,
+    ):
+        """Scan a packaging to create and then process a line.
+
+        With no_prefill_qty enabled.
+        """
+        self._add_stock_to_product(self.product, self.location, 10)
+        self._enable_create_move_line()
+        self._enable_no_prefill_qty()
+        response = self.service.dispatch(
+            "scan_product",
+            params={"location_id": self.location.id, "barcode": self.packaging.barcode},
+        )
+        domain = self.service._scan_product__select_move_line_domain(
+            self.product, self.location
+        )
+        move_line = self.env["stock.move.line"].search(domain, limit=1)
+        self.assertEqual(move_line.qty_done, self.packaging.qty)
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.packaging.barcode,
+            },
+        )
+        expected_message = self.msg_store.unable_to_pick_more(self.packaging.qty)
+        data = {"move_line": self._data_for_move_line(move_line)}
+        self.assert_response(
+            response, next_state="set_quantity", message=expected_message, data=data
+        )
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.dispatch_location.barcode,
+            },
+        )
+        expected_message = self.msg_store.transfer_done_success(move_line.picking_id)
+        self.assert_response(
+            response, next_state="select_location", message=expected_message, data={}
         )
 
     def test_set_quantity_invalid_dest_location(self):
