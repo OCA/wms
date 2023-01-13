@@ -51,7 +51,6 @@ class ShopfloorSingleProductTransfer(Component):
 
     """
 
-    # TODO check if we can remove allow_create_moves
     _inherit = "base.shopfloor.process"
     _name = "shopfloor.single.product.transfer"
     _usage = "single_product_transfer"
@@ -103,6 +102,33 @@ class ShopfloorSingleProductTransfer(Component):
             message = self.msg_store.location_empty(location)
             return self._response_for_select_location(message=message)
 
+    def _scan_product__scan_packaging(self, location, barcode):
+        search = self._actions_for("search")
+        packaging = search.packaging_from_scan(barcode)
+        handlers = [
+            self._scan_product__check_tracking,
+            self._scan_product__select_move_line,
+            # If no line is found, we might try to create one,
+            # if allow_move_create is True
+            self._scan_product__check_create_move_line,
+            # First, try to create a move line with the available quantity
+            self._scan_product__create_move_line,
+            # If no stock is available at first, try to unreserve moves if option
+            # allow_unreserve_other_moves is enabled
+            self._scan_product__unreserve_move_line,
+            # Check again if there's some unreserved qty
+            self._scan_product__create_move_line,
+            # Then return a `no product available` error
+            self._scan_product__no_stock_available,
+        ]
+        if packaging:
+            product = packaging.product_id
+            response = self._use_handlers(
+                handlers, product, location, packaging=packaging
+            )
+            if response:
+                return response
+
     def _scan_product__scan_product(self, location, barcode):
         search = self._actions_for("search")
         product = search.product_from_scan(barcode)
@@ -127,7 +153,9 @@ class ShopfloorSingleProductTransfer(Component):
             if response:
                 return response
 
-    def _scan_product__check_tracking(self, product, location, lot=None):
+    def _scan_product__check_tracking(
+        self, product, location, lot=None, packaging=None
+    ):
         if product.tracking == "lot":
             message = self.msg_store.scan_lot_on_product_tracked_by_lot()
             return self._response_for_select_product(location, message=message)
@@ -145,7 +173,9 @@ class ShopfloorSingleProductTransfer(Component):
             domain = AND([domain, lot_domain])
         return domain
 
-    def _scan_product__select_move_line(self, product, location, lot=None):
+    def _scan_product__select_move_line(
+        self, product, location, lot=None, packaging=None
+    ):
         domain = self._scan_product__select_move_line_domain(product, location, lot=lot)
         query = self.env["stock.move.line"]._search(domain, limit=1)
         order_elems = [
@@ -163,22 +193,24 @@ class ShopfloorSingleProductTransfer(Component):
                 # so the move wont be split because 0 < qty_done < product_uom_qty
                 stock.mark_move_line_as_picked(move_line, quantity=0)
                 # Then, set the no prefill qty on the move line
-                if lot:
-                    qty_done = 1
-                else:
-                    qty_done = 1
+                qty_done = 1
+                if packaging:
+                    qty_done = packaging.qty
                 move_line.qty_done = qty_done
             else:
                 stock.mark_move_line_as_picked(move_line)
             return self._response_for_set_quantity(move_line)
 
-    def _scan_product__check_create_move_line(self, product, location, lot=None):
-        # TODO this is making the `allow_move_create` flag mandatory, we do not want that
+    def _scan_product__check_create_move_line(
+        self, product, location, lot=None, packaging=None
+    ):
         if not self.is_allow_move_create():
             message = self.msg_store.no_operation_found()
             return self._response_for_select_product(location, message=message)
 
-    def _scan_product__unreserve_move_line(self, product, location, lot=None):
+    def _scan_product__unreserve_move_line(
+        self, product, location, lot=None, packaging=None
+    ):
         unreserve = self._actions_for("stock.unreserve")
         if self.work.menu.allow_unreserve_other_moves:
             move_lines = self._find_location_move_lines(location, product, lot=lot)
@@ -186,32 +218,30 @@ class ShopfloorSingleProductTransfer(Component):
             if response:
                 return response
             unreserve.unreserve_moves(move_lines, self.picking_types)
+        else:
+            # If we get there then no qty is available, and we are not allowed to unreserve
+            # other moves. No stock available for product.
+            return self._scan_product__no_stock_available(
+                product, location, lot=lot, packaging=packaging
+            )
 
-    def _scan_product__create_move_line_domain(self, product, location, lot=None):
-        domain = [
-            ("location_id", "=", location.id),
-            ("product_id", "=", product.id),
-            ("available_quantity", ">", 0),
-            # FIXME: handle the scan of packages later
-            # this will also prevent the fetch of quants with lots having
-            # a package, to check.
-            ("package_id", "=", False),
-        ]
-        if lot:
-            lot_domain = [("lot_id", "=", lot.id)]
-            domain = AND([domain, lot_domain])
-        return domain
-
-    def _scan_product__create_move_line(self, product, location, lot=None):
-        quant_domain = self._scan_product__create_move_line_domain(
-            product, location, lot=lot
+    def _scan_product__create_move_line(
+        self, product, location, lot=None, packaging=None
+    ):
+        available_quantity = product.with_context(
+            location_id=location.id, lot=lot.id if lot else None
+        ).free_qty
+        is_product_available = (
+            float_compare(
+                available_quantity,
+                packaging.qty if packaging else 1.0,
+                precision_rounding=product.uom_id.rounding,
+            )
+            >= 0
         )
-        quants_in_location = self.env["stock.quant"].search(quant_domain)
-        available_quantity = sum(quants_in_location.mapped("available_quantity"))
-        if available_quantity:
-            # Check if available qty > packaging qty if packaging qty is scanned
+        if is_product_available:
             move = self._create_move_from_location(
-                location, product, available_quantity, lot=lot
+                location, product, available_quantity, lot=lot, packaging=packaging
             )
             move_line = move.move_line_ids
             response = self._scan_product__check_putaway(move_line)
@@ -288,7 +318,9 @@ class ShopfloorSingleProductTransfer(Component):
         return self.env["stock.move.line"].search(domain)
 
     # Copied from manual_product_transfer
-    def _create_move_from_location(self, location, product, quantity, lot=None):
+    def _create_move_from_location(
+        self, location, product, quantity, lot=None, packaging=None
+    ):
         picking_type = self.picking_types
         move_vals = {
             "name": product.name,
@@ -315,18 +347,18 @@ class ShopfloorSingleProductTransfer(Component):
             # We ensure the qty_done is 0 here, so we can set it manually after
             # to avoid the split of the move line by 'mark_move_line_as_picked'.
             stock.mark_move_line_as_picked(move_line, quantity=0)
-            # Just to be explicit
-            # TODO add if packaging
-            if lot:
-                qty_done = 1
-            else:
-                qty_done = 1
+            # Set the initial qty_done to 1 for product and lot
+            qty_done = 1
+            if packaging:
+                qty_done = packaging.qty
             move_line.qty_done = qty_done
         else:
             stock.mark_move_line_as_picked(move_line)
         return move
 
-    def _set_quantity__check_product_in_line(self, move_line, product, lot=None):
+    def _set_quantity__check_product_in_line(
+        self, move_line, product, lot=None, packaging=None
+    ):
         message = False
         if lot:
             wrong_lot = move_line.lot_id != lot
@@ -337,8 +369,10 @@ class ShopfloorSingleProductTransfer(Component):
         if message:
             return self._response_for_set_quantity(move_line, message=message)
 
-    def _set_quantity__check_quantity_done(self, move_line, product, lot=None):
-        rounding = product.uom_id.rounding
+    def _set_quantity__check_quantity_done(
+        self, location, move_line, confirmation=False
+    ):
+        rounding = move_line.product_id.uom_id.rounding
         qty_done = move_line.qty_done
         qty_todo = move_line.product_uom_qty
         # If qty done is >= qty todo, then there's nothing more to pick
@@ -346,22 +380,24 @@ class ShopfloorSingleProductTransfer(Component):
             message = self.msg_store.unable_to_pick_more(qty_todo)
             return self._response_for_set_quantity(move_line, message=message)
 
-    def _set_quantity__check_no_prefill_qty(self, move_line, product, lot=None):
-        # TODO this is making the `no_prefill_qty` flag mandatory, we do not want that
+    def _set_quantity__check_no_prefill_qty(
+        self, move_line, product, lot=None, packaging=None
+    ):
         if not self.work.menu.no_prefill_qty:
             # If no_prefill_qty is False, then qty_done should have been prefilled
             # with product_uom_qty in the select_product screen
             message = self.msg_store.unable_to_pick_more(move_line.product_uom_qty)
             return self._response_for_set_quantity(move_line, message=message)
 
-    def _set_quantity__increment_qty_done(self, move_line, product, lot=None):
+    def _set_quantity__increment_qty_done(
+        self, move_line, product, lot=None, packaging=None
+    ):
         """Increment the quantity done depending on the item scanned."""
-        # TODO use no_prefill_qty option
-        # TODO if packaging
-        if lot:
-            qty_done = 1
-        else:
-            qty_done = 1
+        # When we reach this handler, the 'no_prefill_qty' is enabled
+        # For product or lot, we increment by 1 by default
+        qty_done = 1
+        if packaging:
+            qty_done = packaging.qty
         move_line.qty_done += qty_done
         return self._response_for_set_quantity(move_line)
 
@@ -391,6 +427,18 @@ class ShopfloorSingleProductTransfer(Component):
         if lot:
             product = lot.product_id
             response = self._use_handlers(handlers, move_line, product, lot=lot)
+            if response:
+                return response
+
+    def _set_quantity__scan_packaging(self, move_line, barcode, confirmation=False):
+        search = self._actions_for("search")
+        packaging = search.packaging_from_scan(barcode)
+        handlers = self._set_quantity__scan_product_handlers()
+        if packaging:
+            product = packaging.product_id
+            response = self._use_handlers(
+                handlers, move_line, product, packaging=packaging
+            )
             if response:
                 return response
 
@@ -494,8 +542,8 @@ class ShopfloorSingleProductTransfer(Component):
     def _set_quantity__by_product(self, move_line, barcode, confirmation=False):
         product_handlers = [
             self._set_quantity__scan_product,
+            self._set_quantity__scan_packaging,
             self._set_quantity__scan_lot,
-            # scan packaging
         ]
         product_response = self._use_handlers(product_handlers, move_line, barcode)
         if product_response:
@@ -552,12 +600,19 @@ class ShopfloorSingleProductTransfer(Component):
 
     @with_savepoint
     def scan_product(self, location_id, barcode):
-        """Looks for a move line in the given location, from a barcode."""
+        """Looks for a move line in the given location, from a barcode.
+
+        Barcode can be:
+            - a product
+            - a product packaging
+            - a lot
+        """
         location = self.env["stock.location"].browse(location_id)
         if not location.exists():
             return self._response_for_select_product(location)
         handlers = [
             self._scan_product__scan_product,
+            self._scan_product__scan_packaging,
             self._scan_product__scan_lot,
         ]
         response = self._use_handlers(handlers, location, barcode)
