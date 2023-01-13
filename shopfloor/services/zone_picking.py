@@ -488,7 +488,7 @@ class ZonePicking(Component):
 
     def _list_move_lines(self, location, product=False, sublocation=False):
         move_lines = self._find_location_move_lines(
-            sublocation or location, product=product
+            sublocation or location, product=product, match_user=True
         )
         return self._response_for_select_line(
             move_lines, product=product, sublocation=sublocation
