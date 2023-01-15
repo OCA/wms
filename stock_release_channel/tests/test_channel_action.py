@@ -136,3 +136,16 @@ class TestChannelAction(ChannelReleaseCase):
         self._action_done_picking(self.picking)
         action = self.channel.get_action_picking_form()
         self.assertEqual(action["res_id"], self.picking.id)
+
+    def test_return_has_no_channel(self):
+        self.assertTrue(self.picking.release_channel_id is not False)
+        self.test_action_done()
+        wizard = self.env["stock.return.picking"].new(
+            {
+                "picking_id": self.picking.id,
+            }
+        )
+        wizard._onchange_picking_id()
+        reception_picking_id, __ = wizard._create_returns()
+        reception = self.env["stock.picking"].browse(reception_picking_id)
+        self.assertFalse(reception.release_channel_id)

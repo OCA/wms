@@ -16,9 +16,9 @@ class StockMove(models.Model):
         released_moves.picking_id.assign_release_channel()
         return released_moves
 
-    def _action_confirm(self, merge=True, merge_into=False):
-        moves = super()._action_confirm(merge=merge, merge_into=merge_into)
-        pickings = moves.filtered("need_release").picking_id
+    def _assign_picking(self):
+        res = super()._assign_picking()
+        pickings = self.filtered("need_release").picking_id
         if pickings:
             pickings._delay_assign_release_channel()
-        return moves
+        return res
