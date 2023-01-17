@@ -289,7 +289,7 @@ class Delivery(Component):
             [self._lines_base_domain(no_qty_done), [("product_id", "=", product.id)]]
         )
         if location:
-            domain.extend([("picking_id.location_id", "=", location.id)])
+            domain.extend([("location_id", "=", location.id)])
         if product_qty:
             domain.extend(
                 [
