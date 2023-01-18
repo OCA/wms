@@ -1,9 +1,9 @@
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
-from odoo.tests import SavepointCase
+from odoo.tests.common import TransactionCase
 
 
-class TestPickingTypeShippingPolicy(SavepointCase):
+class TestPickingTypeShippingPolicy(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -46,7 +46,10 @@ class TestPickingTypeShippingPolicy(SavepointCase):
                             "name": self.product.name,
                             "product_id": self.product.id,
                             "product_uom_qty": 10.0,
+                            "quantity_done": 0.00,
                             "product_uom": self.product.uom_id.id,
+                            "location_id": self.output_location.id,
+                            "location_dest_id": self.customers_location.id,
                         },
                     )
                 ],
