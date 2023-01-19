@@ -44,12 +44,23 @@ class StockAction(Component):
                 "result_package_id": False,
             }
         )
-        move_lines.move_id.picking_id.write(
-            {
-                "user_id": False,
-                "printed": False,
-            }
-        )
+        pickings = move_lines.picking_id
+        for picking in pickings:
+            lines_still_assigned = picking.move_line_ids.filtered(
+                lambda l: l.shopfloor_user_id
+            )
+            if lines_still_assigned:
+                # Because there is other lines in the picking still assigned
+                # The picking has to be split
+                unmark_lines = picking.move_line_ids & move_lines
+                unmark_lines._extract_in_split_order(default={"user_id": False})
+            else:
+                pickings.write(
+                    {
+                        "user_id": False,
+                        "printed": False,
+                    }
+                )
 
     def validate_moves(self, moves):
         """Validate moves in different ways depending on several criterias:
