@@ -73,24 +73,38 @@ Vue.component("login-user", {
             const data = {login: this.username, password: this.password};
             this.$root.login(evt, data);
         },
+        should_use_type_password: function () {
+            // In some versions of iOS, using an input.type="password"
+            // causes a bug with the device keyboard not showing,
+            // which makes it impossible to introduce a password.
+            // This has been observed in all iOS versions from 13 to 16.
+
+            // For that reason, we need to use an input.type="text"
+            // with a specific class that masks the characters
+            // (thanks to CSS text-security).
+            // However, this is not supported in Firefox.
+            // Since Firefox doesn't have any known issues
+            // with type="password", we still use it for that browser.
+            return navigator.userAgent.includes("Firefox");
+        },
     },
     template: `
     <v-form v-on:submit="login">
         <v-text-field
             name="username"
             v-model="username"
-            :label="$t('screen.login.username')"
             :placeholder="$t('screen.login.username')"
             autofocus
-            autocomplete="off"></v-text-field>
+            autocomplete="username"
+        />
         <v-text-field
             name="password"
             v-model="password"
-            type="password"
-            :label="$t('screen.login.password')"
+            :type="should_use_type_password() ? 'password' : 'text'"
+            :class="should_use_type_password() ? '' : 'password-mask'"
             :placeholder="$t('screen.login.password')"
-            autofocus
-            autocomplete="off"></v-text-field>
+            autocomplete="current-password"
+        />
         <div class="button-list button-vertical-list full">
             <v-row align="center">
                 <v-col class="text-center" cols="12">
