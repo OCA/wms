@@ -380,6 +380,12 @@ main.v-content > .v-content__wrap > .header .container {
     cursor: pointer;
 }
 
+.password-mask {
+    -webkit-text-security: disc;
+    -moz-webkit-text-security: disc;
+    -moz-text-security: disc;
+}
+
 .shake-it {
     -webkit-animation: kf_shake 0.4s 1 linear;
     -moz-animation: kf_shake 0.4s 1 linear;
