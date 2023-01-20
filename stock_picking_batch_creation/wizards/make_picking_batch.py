@@ -222,6 +222,8 @@ class MakePickingBatch(models.TransientModel):
             old_volume = volume_by_partners[picking.partner_id]
             new_volume = old_volume + picking.total_volume_batch_picking
             if self.group_pickings_by_partner:
+                if not new_volume:
+                    new_volume = device.volume_per_bin
                 nbr_bins = math.ceil(new_volume / device.volume_per_bin) - math.ceil(
                     old_volume / device.volume_per_bin
                 )

@@ -312,3 +312,42 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         self.assertTrue(selected_pickings)
         self.assertEqual(len(selected_pickings), 4)
         self.assertEqual(batch.wave_nbr_bins, 2)
+
+    def test_device_with_one_bin_group_by_partners_product_volume_null(self):
+        device = self.env["stock.device.type"].create(
+            {
+                "name": "test volume null devices and one bin",
+                "min_volume": 0,
+                "max_volume": 200,
+                "max_weight": 200,
+                "nbr_bins": 1,
+                "sequence": 50,
+            }
+        )
+        wiz = self.makePickingBatch.create(
+            {
+                "user_id": self.env.user.id,
+                "picking_type_ids": [(4, self.picking_type_1.id)],
+                "stock_device_type_ids": [(4, device.id)],
+                "group_pickings_by_partner": True,
+                "maximum_number_of_preparation_lines": 6
+            }
+        )
+        self.p1.write(
+            {"volume": 0.0, "length": 0, "height": 0, "width": 0, "weight": 1}
+        )
+        self.p2.write(
+            {"volume": 0.0, "length": 0, "height": 0, "width": 0, "weight": 1}
+        )
+        self._create_picking_pick_and_assign(
+            self.picking_type_1.id, products=self.p1 | self.p2
+        )
+        candidates_pickings = wiz._candidates_pickings_to_batch()
+        device = wiz._compute_device_to_use(candidates_pickings[0])
+        (
+            selected_pickings,
+            unselected_pickings,
+            _,
+        ) = wiz._apply_limits(candidates_pickings, device)
+        self.assertTrue(selected_pickings)
+        self.assertEqual(selected_pickings[0], candidates_pickings[0])
