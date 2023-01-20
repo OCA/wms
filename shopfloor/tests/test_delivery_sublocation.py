@@ -33,8 +33,10 @@ class DeliveryScanSublocationCase(DeliveryCommonCase):
         cls.picking_sublocation.location_id = cls.sublocation
         cls.raw_move_sublocation = cls.picking_sublocation.move_lines[0]
         cls.raw_lot_move_sublocation = cls.picking_sublocation.move_lines[1]
-        cls._fill_stock_for_moves(cls.raw_move_sublocation)
-        cls._fill_stock_for_moves(cls.raw_lot_move_sublocation, in_lot=True)
+        cls._fill_stock_for_moves(cls.raw_move_sublocation, location=cls.sublocation)
+        cls._fill_stock_for_moves(
+            cls.raw_lot_move_sublocation, in_lot=True, location=cls.sublocation
+        )
         cls.picking_sublocation.action_assign()
         # Picking for the top location
         cls.picking = picking = cls._create_picking(
