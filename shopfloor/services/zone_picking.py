@@ -564,21 +564,21 @@ class ZonePicking(Component):
         package = search.package_from_scan(barcode)
         if not package:
             return response, message
-        if packaging.package_has_several_products(package):
-            message = self.msg_store.several_products_in_package(package)
-        if packaging.package_has_several_lots(package):
-            message = self.msg_store.several_lots_in_package(package)
-        if message:
-            return (
-                self._list_move_lines(
-                    self.zone_location, sublocation=package.location_id or False
-                ),
-                message,
-            )
         move_lines = self._find_location_move_lines(
             locations=sublocation, package=package
         )
         if move_lines:
+            if packaging.package_has_several_products(package):
+                message = self.msg_store.several_products_in_package(package)
+            if packaging.package_has_several_lots(package):
+                message = self.msg_store.several_lots_in_package(package)
+            if message:
+                return (
+                    self._list_move_lines(
+                        self.zone_location, sublocation=package.location_id or False
+                    ),
+                    message,
+                )
             move_line = first(move_lines)
             # Fix me for a package prefill qty is zero ?
             qty_done = self._get_prefill_qty(move_line)
