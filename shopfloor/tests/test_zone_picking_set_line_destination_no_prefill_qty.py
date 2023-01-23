@@ -115,3 +115,31 @@ class ZonePickingSetLineDestinationNoPrefillQtyCase(ZonePickingCommonCase):
                 move_line,
                 qty_done=qty_done,
             )
+
+    def test_set_destination_location_zero_quantity(self):
+        """Scanned barcode is the destination location.
+
+        Quantity to move is zero -> error raised, user can try again.
+
+        """
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        move_line = self.picking1.move_lines.move_line_ids
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "move_line_id": move_line.id,
+                "barcode": self.packing_location.barcode,
+                "quantity": 0,
+            },
+        )
+        # Check response
+        self.assert_response_set_line_destination(
+            response,
+            zone_location,
+            picking_type,
+            move_line,
+            message=self.service.msg_store.picking_zero_quantity(),
+            # And that the quantity done is zero
+            qty_done=0,
+        )
