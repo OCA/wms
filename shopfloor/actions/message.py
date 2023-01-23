@@ -587,6 +587,12 @@ class MessageAction(Component):
             ),
         }
 
+    def picking_zero_quantity(self):
+        return {
+            "message_type": "error",
+            "body": _("The picked quantity must be a value above zero."),
+        }
+
     def recovered_previous_session(self):
         return {
             "message_type": "info",

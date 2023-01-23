@@ -972,6 +972,14 @@ class ZonePicking(Component):
         if response:
             return response
 
+        if quantity <= 0:
+            message = self.msg_store.picking_zero_quantity()
+            return self._response_for_set_line_destination(
+                move_line,
+                message=message,
+                qty_done=self._get_prefill_qty(move_line, qty=0),
+            )
+
         extra_message = ""
         if not accept_only_package:
             # When the barcode is a location
