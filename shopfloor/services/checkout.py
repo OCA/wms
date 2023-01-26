@@ -557,12 +557,38 @@ class Checkout(Component):
     ):
         lines = selection_lines.filtered(lambda l: l.lot_id == lot)
         if not lines:
-            return self._response_for_select_line(
-                picking,
-                message={
-                    "message_type": "error",
-                    "body": _("Lot is not in the current transfer."),
-                },
+            change_package_lot = self._actions_for("change.package.lot")
+            if not kw.get("confirm_lot"):
+                lines_same_product = (
+                    change_package_lot.filter_lines_allowed_to_change_lot(
+                        selection_lines, lot
+                    )
+                )
+                # If there's at least one product matching we are good to go.
+                # In any case, only the 1st line matching will be affected.
+                if lines_same_product:
+                    return self._response_for_select_line(
+                        picking,
+                        message=self.msg_store.lot_different_change(),
+                        need_confirm_lot=lot.id,
+                    )
+                    # TODO: add a msg saying the lot has been changed
+                return self._response_for_select_line(
+                    picking,
+                    message=self.msg_store.lot_not_found_in_picking(lot, picking),
+                )
+            # Validate the scanned lot against the previous one
+            if lot.id != kw["confirm_lot"]:
+                expected_lot = lot.browse(kw["confirm_lot"]).exists()
+                return self._response_for_select_line(
+                    picking,
+                    message=self.msg_store.lot_change_wrong_lot(expected_lot.name),
+                )
+            # Change lot confirmed
+            line = fields.first(
+                selection_lines.filtered(
+                    lambda l: l.product_id == lot.product_id and l.lot_id != lot
+                )
             )
         # Related lines will be visible with the line picked (qty done changed)
         related_lines = self.env["stock.move.line"]

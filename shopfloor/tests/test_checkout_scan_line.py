@@ -341,7 +341,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._test_scan_line_error(
             picking,
             lot.name,
-            {"message_type": "error", "body": "Lot is not in the current transfer."},
+            self.msg_store.lot_not_found_in_picking(),
         )
 
     def test_scan_line_error_lot_in_two_packages(self):
