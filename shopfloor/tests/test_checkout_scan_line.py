@@ -4,6 +4,20 @@ from .test_checkout_scan_line_base import CheckoutScanLineCaseBase
 
 
 class CheckoutScanLineCase(CheckoutScanLineCaseBase):
+    @classmethod
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
+        cls.delivery_packaging = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "DelivBox",
+                    "barcode": "DelivBox",
+                }
+            )
+        )
+
     def test_scan_line_package_ok(self):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_b, 10)]
@@ -130,10 +144,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self.assert_response(
             response,
             next_state="select_line",
-            data={
-                "picking": self._stock_picking_data(picking),
-                "group_lines_by_location": True,
-            },
+            data=self._data_for_select_line(picking),
             message=message,
         )
 
@@ -318,4 +329,48 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
                 "picking": self._stock_picking_data(picking, done=True),
                 "all_processed": True,
             },
+        )
+
+    def test_scan_line_delivery_package_ok(self):
+        picking = self._create_picking(
+            lines=[(self.product_a, 10), (self.product_b, 10)]
+        )
+        move1 = picking.move_lines[0]
+        move2 = picking.move_lines[1]
+        # put the lines in 2 separate packages (only the first line should be selected
+        # by the package barcode)
+        self._fill_stock_for_moves(move1, in_package=True)
+        self._fill_stock_for_moves(move2, in_package=True)
+        picking.action_assign()
+        result_pkgs = picking.move_line_ids.result_package_id
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": picking.id,
+                "barcode": self.delivery_packaging.barcode,
+            },
+        )
+        # back to same state
+        self.assertEqual(response["next_state"], "select_line")
+        self.assertEqual(
+            response["message"],
+            self.msg_store.confirm_put_all_goods_in_delivery_package(
+                self.delivery_packaging
+            ),
+        )
+        self.assertTrue(response["data"]["select_line"]["need_confirm_pack_all"])
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": picking.id,
+                "barcode": self.delivery_packaging.barcode,
+                "confirm_pack_all": True,
+            },
+        )
+        # move to summary as all lines are done
+        self.assertEqual(response["next_state"], "summary")
+        self.assertTrue(response["message"]["body"].startswith("Goods packed into "))
+        self.assertNotEqual(
+            result_pkgs.sorted("id"),
+            picking.move_line_ids.result_package_id.sorted("id"),
         )
