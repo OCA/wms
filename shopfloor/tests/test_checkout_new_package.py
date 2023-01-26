@@ -56,9 +56,6 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             response,
             # go pack to the screen to select lines to put in packages
             next_state="select_line",
-            data={
-                "picking": self._stock_picking_data(picking),
-                "group_lines_by_location": True,
-            },
+            data=self._data_for_select_line(picking),
             message=self.msg_store.goods_packed_in(new_package),
         )
