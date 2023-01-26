@@ -740,3 +740,13 @@ class MessageAction(Component):
             "message_type": "warning",
             "body": _("No available work could be found."),
         }
+
+    def confirm_put_all_goods_in_delivery_package(self, packaging_type):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "Delivery package type scanned: %(name)s. "
+                "Scan again to place all goods in the same package."
+            )
+            % dict(name=packaging_type.name),
+        }
