@@ -10,6 +10,9 @@ _logger = logging.getLogger(__name__)
 class StockRule(models.Model):
     _inherit = "stock.rule"
 
+    def _get_custom_move_fields(self):
+        return super()._get_custom_move_fields() + ["date_priority"]
+
     def _run_pull(self, procurements):
         actions_to_run = []
 
