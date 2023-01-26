@@ -537,10 +537,7 @@ class Checkout(Component):
         if not lines:
             return self._response_for_select_line(
                 picking,
-                message={
-                    "message_type": "error",
-                    "body": _("Lot is not in the current transfer."),
-                },
+                message=self.msg_store.lot_not_found_in_picking(),
             )
 
         # When lots are as units outside of packages, we can select them for
