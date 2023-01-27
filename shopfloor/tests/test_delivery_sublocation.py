@@ -11,6 +11,20 @@ class DeliveryScanSublocationCase(DeliveryCommonCase):
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
         cls.product_e.tracking = "lot"
+        # Picking for the top location
+        cls.picking = picking = cls._create_picking(
+            lines=[
+                (cls.product_d, 10),  # D as raw product
+                (cls.product_e, 10),  # E as raw product with a lot
+            ]
+        )
+        cls.raw_move = picking.move_lines[0]
+        cls.raw_lot_move = picking.move_lines[1]
+        cls._fill_stock_for_moves(cls.raw_move)
+        cls._fill_stock_for_moves(cls.raw_lot_move, in_lot=True)
+        picking.action_assign()
+        cls.lot = cls.raw_lot_move.move_line_ids.lot_id
+        # Create a sublocation
         cls.sublocation = (
             cls.env["stock.location"]
             .sudo()
@@ -34,24 +48,11 @@ class DeliveryScanSublocationCase(DeliveryCommonCase):
         cls.raw_move_sublocation = cls.picking_sublocation.move_lines[0]
         cls.raw_lot_move_sublocation = cls.picking_sublocation.move_lines[1]
         cls._fill_stock_for_moves(cls.raw_move_sublocation, location=cls.sublocation)
+        # Use the same lot on product from both picking
         cls._fill_stock_for_moves(
-            cls.raw_lot_move_sublocation, in_lot=True, location=cls.sublocation
+            cls.raw_lot_move_sublocation, in_lot=cls.lot, location=cls.sublocation
         )
         cls.picking_sublocation.action_assign()
-        # Picking for the top location
-        cls.picking = picking = cls._create_picking(
-            lines=[
-                (cls.product_d, 10),  # D as raw product
-                (cls.product_e, 10),  # E as raw product with a lot
-            ]
-        )
-        cls.raw_move = picking.move_lines[0]
-        cls.raw_lot_move = picking.move_lines[1]
-        cls._fill_stock_for_moves(cls.raw_move)
-        # Use the same lot on product from both picking
-        cls.lot = cls.raw_lot_move_sublocation.move_line_ids.lot_id
-        cls._fill_stock_for_moves(cls.raw_lot_move, in_lot=cls.lot)
-        picking.action_assign()
 
     def test_scan_sublocation_exists(self):
         """Check scanning a sublocation sets it as sublocation."""
@@ -89,11 +90,11 @@ class DeliveryScanSublocationCase(DeliveryCommonCase):
 
     def test_scan_barcode_in_sublocation(self):
         """Scan product barcode that exists in sublocation."""
+
         response = self.service.dispatch(
             "scan_deliver",
             params={
                 "barcode": self.product_d.barcode,
-                "picking_id": None,
                 "location_id": self.sublocation.id,
             },
         )
