@@ -6,7 +6,7 @@
 {
     "name": "Shopfloor",
     "summary": "manage warehouse operations with barcode scanners",
-    "version": "14.0.2.17.3",
+    "version": "14.0.2.17.4",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
