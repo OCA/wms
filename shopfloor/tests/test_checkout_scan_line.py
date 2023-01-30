@@ -1,5 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+from odoo import _
+
 from .test_checkout_scan_line_base import CheckoutScanLineCaseBase
 
 
@@ -216,7 +218,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         # more than one package, it would be an error.
         self._test_scan_line_ok(self.product_a.barcode, picking.move_line_ids)
 
-    def _test_scan_line_error(self, picking, barcode, message):
+    def _test_scan_line_error(self, picking, barcode, message, need_confirm_lot=False):
         """Test errors for /scan_line
 
         :param picking: the picking we are currently working with (selected)
@@ -229,7 +231,9 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self.assert_response(
             response,
             next_state="select_line",
-            data=self._data_for_select_line(picking),
+            data=dict(
+                self._data_for_select_line(picking), need_confirm_lot=need_confirm_lot
+            ),
             message=message,
         )
 
@@ -331,17 +335,50 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             },
         )
 
-    def test_scan_line_error_lot_not_in_picking(self):
+    def test_scan_line_error_lot_different_change_success(self):
+        """Scan the wrong lot while a line with the same product exists."""
         picking = self._create_picking(lines=[(self.product_a, 10)])
         self._fill_stock_for_moves(picking.move_lines, in_lot=True)
         picking.action_assign()
+        previous_lot = picking.move_line_ids.lot_id
+        # Create a lot that is not registered in the location we are working on
+        # so a draft inventory for control is generated automatically when the
+        # lot is changed.
         lot = self.env["stock.production.lot"].create(
             {"product_id": self.product_a.id, "company_id": self.env.company.id}
         )
         self._test_scan_line_error(
             picking,
             lot.name,
-            self.msg_store.lot_not_found_in_picking(),
+            self.msg_store.lot_different_change(),
+            need_confirm_lot=True,
+        )
+        # Second scan to confirm the change of lot
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": picking.id,
+                "barcode": lot.name,
+                "confirm_lot": True,
+            },
+        )
+        message = self.msg_store.lot_replaced_by_lot(previous_lot, lot)
+        inventory_message = _("A draft inventory has been created for control.")
+        message["body"] = f"{message['body']} {inventory_message}"
+        self.assert_response(
+            response,
+            next_state="select_package",
+            data={
+                "selected_move_lines": [
+                    self._move_line_data(ml) for ml in picking.move_line_ids
+                ],
+                "picking": self.service.data.picking(picking),
+                "packing_info": self.service._data_for_packing_info(picking),
+                "no_package_enabled": not self.service.options.get(
+                    "checkout__disable_no_package"
+                ),
+            },
+            message=message,
         )
 
     def test_scan_line_error_lot_in_two_packages(self):

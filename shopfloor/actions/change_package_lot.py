@@ -215,3 +215,14 @@ class ChangePackageLot(Component):
         else:
             message = self.msg_store.units_replaced_by_package(package)
         return response_ok_func(move_line, message=message)
+
+    def filter_lines_allowed_to_change_lot(self, move_lines, lot):
+        """Filter move lines allowed to change their lot.
+
+        We cannot change a lot on a move having ancestors. That would mean we
+        already picked up the wrong lot on the previous move(s) and Odoo already
+        restricts the reservation based on the previous move(s).
+        """
+        return move_lines.filtered(
+            lambda l: (l.product_id == lot.product_id and not l.move_id.move_orig_ids)
+        )
