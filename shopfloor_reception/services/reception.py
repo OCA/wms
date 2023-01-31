@@ -233,8 +233,15 @@ class Reception(Component):
             message=self.msg_store.lot_not_found_in_pickings(),
         )
 
-    def _select_line(self, picking, line, move, increase_qty_done_by=1):
-        product = line.product_id
+    def _scan_line__find_or_create_line(self, picking, move, qty_done=1):
+        line = fields.first(
+            move.move_line_ids.filtered(
+                lambda l: (
+                    not l.result_package_id
+                    and l.shopfloor_user_id.id in [False, self.env.uid]
+                )
+            )
+        )
         if line:
             # The line quantity to do needs to correspond to
             # the remaining quantity to do of its move.
@@ -243,9 +250,13 @@ class Reception(Component):
             qty_todo_remaining = move.product_uom_qty - move.quantity_done
             values = move._prepare_move_line_vals(quantity=qty_todo_remaining)
             line = self.env["stock.move.line"].create(values)
+        return self._scan_line__assign_user(picking, line, qty_done)
+
+    def _scan_line__assign_user(self, picking, line, qty_done):
+        product = line.product_id
         self._assign_user_to_picking(picking)
         self._assign_user_to_line(line)
-        line.qty_done += increase_qty_done_by
+        line.qty_done += qty_done
         if product.tracking not in ("lot", "serial") or (line.lot_id or line.lot_name):
             return self._response_for_set_quantity(picking, line)
         return self._response_for_set_lot(picking, line)
@@ -260,27 +271,14 @@ class Reception(Component):
         )
         return self._select_line(picking, line, move)
 
-    def _select_line_from_packaging(self, picking, move, packaging):
-        line = fields.first(
-            picking.move_line_ids.filtered(
+    def _select_line__filter_lines_by_packaging(self, lines, packaging):
+        return fields.first(
+            lines.filtered(
                 lambda l: l.package_id.product_packaging_id == packaging
                 and not l.result_package_id
                 and l.shopfloor_user_id.id in [False, self.env.uid]
             )
         )
-        return self._select_line(picking, line, move, packaging.qty)
-
-    def _select_line_from_lot(self, picking, move, lot):
-        line = fields.first(
-            picking.move_line_ids.filtered(
-                lambda l: (l.lot_id.name == lot or l.lot_name == lot)
-                and not l.result_package_id
-                and l.shopfloor_user_id.id in [False, self.env.uid]
-            )
-        )
-        if not line:
-            return
-        return self._select_line(picking, line, move)
 
     def _order_stock_picking(self):
         # We sort by scheduled date first. However, there might be a case
@@ -288,9 +286,8 @@ class Reception(Component):
         # In that case, we sort by id.
         return "scheduled_date ASC, id ASC"
 
-    def _scan_document__by_picking(self, barcode):
-        search = self._actions_for("search")
-        picking_filter_result = search.picking_from_scan(barcode, use_origin=True)
+    def _scan_document__by_picking(self, pickings, barcode):
+        picking_filter_result = pickings
         reception_pickings = picking_filter_result.filtered(
             lambda p: p.picking_type_id.id in self.picking_types.ids
         )
@@ -324,24 +321,27 @@ class Reception(Component):
                 )
             return self._select_picking(reception_pickings)
 
-    def _scan_document__by_product(self, barcode):
-        search = self._actions_for("search")
-        product = search.product_from_scan(barcode)
+    def _scan_document__by_product(self, product, barcode):
         if product:
             return self._select_document_from_product(product)
 
-    def _scan_document__by_packaging(self, barcode):
-        search = self._actions_for("search")
-        packaging = search.packaging_from_scan(barcode)
+    def _scan_document__by_packaging(self, packaging, barcode):
         if packaging:
             return self._select_document_from_packaging(packaging)
 
     def _scan_document__by_lot(self, barcode):
         return self._select_document_from_lot(barcode)
 
-    def _scan_line__by_product(self, picking, barcode):
-        search = self._actions_for("search")
-        product = search.product_from_scan(barcode)
+    def _scan_document__fallback(self, empty_recordset):
+        assert not empty_recordset, "recordset in fallback handler should be empty"
+        return self._response_for_select_document(
+            message=self.msg_store.barcode_not_found()
+        )
+
+    def _scan_line__by_product(self, picking, product):
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_move(picking, message=message)
         if product:
             move = fields.first(
                 picking.move_lines.filtered(
@@ -362,9 +362,10 @@ class Reception(Component):
                 )
             return self._select_line_from_product(picking, move, product)
 
-    def _scan_line__by_packaging(self, picking, barcode):
-        search = self._actions_for("search")
-        packaging = search.packaging_from_scan(barcode)
+    def _scan_line__by_packaging(self, picking, packaging):
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_move(picking, message=message)
         if packaging:
             move = fields.first(
                 picking.move_lines.filtered(
@@ -385,30 +386,47 @@ class Reception(Component):
                 )
             return self._select_line_from_packaging(picking, move, packaging)
 
-    def _scan_line__by_lot(self, picking, barcode):
-        line = picking.move_line_ids.filtered(
-            lambda l: barcode == l.lot_id.name or barcode == l.lot_name
-        )
-        move = line.move_id
-        search = self._actions_for("search")
-        lot = search.lot_from_scan(barcode)
-        if not move:
-            line = picking.move_line_ids.filtered(
-                lambda l: not l.lot_id
-                and not l.lot_name
-                and l.product_id == lot.product_id
+    def _scan_line__by_lot(self, picking, lot):
+        lines = picking.move_line_ids.filtered(
+            lambda l: (
+                lot == l.lot_id
+                or (lot.name == l.lot_name and lot.product_id == l.product_id)
+                and not l.result_package_id
             )
-            if line:
-                return self._select_line(picking, line, move)
-        else:
-            message = self._check_move_available(move, message_code="lot")
-            if message:
-                return self._response_for_select_move(
-                    picking,
-                    message=message,
-                )
-            if lot:
-                return self._select_line_from_lot(picking, move, barcode)
+        )
+        if not lines:
+            return self._scan_line__by_product(picking, lot.product_id)
+        # TODO probably suboptimal
+        # We might have an available line, but it might be the last one.
+        # Loop over the recordset and break as soon as we find one.
+        for line in lines:
+            message = self._check_move_available(line.move_id, message_code="lot")
+            if not message:
+                break
+        if message:
+            return self._response_for_select_move(
+                picking,
+                message=message,
+            )
+        return self._scan_line__assign_user(picking, line, 1)
+
+    def _scan_line__fallback(self, picking, barcode):
+        # We might have lines with no lot, but with a lot_name.
+        lines = picking.move_line_ids.filtered(
+            lambda l: l.lot_name == barcode and not l.result_package_id
+        )
+        if not lines:
+            return self._response_for_select_move(
+                picking, message=self.msg_store.barcode_not_found()
+            )
+        for line in lines:
+            message = self._check_move_available(line.move_id, message_code="lot")
+            if not message:
+                return self._scan_line__assign_user(picking, line, 1)
+        return self._response_for_select_move(
+            picking,
+            message=message,
+        )
 
     def _check_move_available(self, move, message_code="product"):
         if not move:
@@ -420,96 +438,84 @@ class Reception(Component):
         if move.product_uom_qty - move.quantity_done < 1 and not line_without_package:
             return self.msg_store.move_already_done()
 
-    def _set_quantity__by_product(self, picking, selected_line, barcode):
-        search = self._actions_for("search")
-        product = search.product_from_scan(barcode)
-        if product:
-            if product.id != selected_line.product_id.id:
-                return self._response_for_set_quantity(
-                    picking,
-                    selected_line,
-                    message=self.msg_store.wrong_record(product),
-                )
-            selected_line.qty_done += 1
-            return self._response_for_set_quantity(picking, selected_line)
-
-    def _set_quantity__by_packaging(self, picking, selected_line, barcode):
-        search = self._actions_for("search")
-        packaging = search.packaging_from_scan(barcode)
-        if packaging:
-            if packaging.product_id.id != selected_line.product_id.id:
-                return self._response_for_set_quantity(
-                    picking,
-                    selected_line,
-                    message=self.msg_store.wrong_record(packaging),
-                )
-            selected_line.qty_done += packaging.qty
-            return self._response_for_set_quantity(picking, selected_line)
-
-    def _set_quantity__by_package(self, picking, selected_line, barcode):
-        search = self._actions_for("search")
-        package = search.package_from_scan(barcode)
-        if package:
-            pack_location = package.location_id
-            if pack_location:
-                (
-                    move_dest_location_ok,
-                    pick_type_dest_location_ok,
-                ) = self._check_location_ok(pack_location, selected_line, picking)
-                if not (move_dest_location_ok or pick_type_dest_location_ok):
-                    # If the scanned package has a location that isn't a child
-                    # of the move dest, return an error
-                    message = self.msg_store.dest_location_not_allowed()
-                    return self._response_for_set_quantity(
-                        picking, selected_line, message=message
-                    )
-                quantity = selected_line.qty_done
-                __, qty_check = selected_line._split_qty_to_be_done(
-                    quantity,
-                    lot_id=False,
-                    shopfloor_user_id=False,
-                    expiration_date=False,
-                )
-                if qty_check == "greater":
-                    return self._response_for_set_quantity(
-                        picking,
-                        selected_line,
-                        message=self.msg_store.unable_to_pick_more(
-                            selected_line.product_uom_qty
-                        ),
-                    )
-                # If the scanned package has a valid destination,
-                # set both package and destination on the package,
-                # and go back to the selection line screen
-                selected_line.result_package_id = package
-                selected_line.location_dest_id = pack_location
-                if self.work.menu.auto_post_line:
-                    # If option auto_post_line is active in the shopfloor menu,
-                    # create a split order with this line.
-                    self._auto_post_line(selected_line)
-                return self._response_for_select_move(picking)
-            # Scanned package has no location, move to the location selection
-            # screen
-            selected_line.result_package_id = package
-            return self._response_for_set_destination(picking, selected_line)
-
-    def _set_quantity__by_location(self, picking, selected_line, barcode):
-        search = self._actions_for("search")
-        location = search.location_from_scan(barcode)
-        if location:
-            move_dest_location_ok, pick_type_dest_location_ok = self._check_location_ok(
-                location, selected_line, picking
+    def _set_quantity__by_product(self, picking, selected_line, product):
+        if product.id != selected_line.product_id.id:
+            return self._response_for_set_quantity(
+                picking,
+                selected_line,
+                message=self.msg_store.wrong_record(product),
             )
+        selected_line.qty_done += 1
+        return self._response_for_set_quantity(picking, selected_line)
+
+    def _set_quantity__by_packaging(self, picking, selected_line, packaging):
+        if packaging.product_id.id != selected_line.product_id.id:
+            return self._response_for_set_quantity(
+                picking,
+                selected_line,
+                message=self.msg_store.wrong_record(packaging),
+            )
+        selected_line.qty_done += packaging.qty
+        return self._response_for_set_quantity(picking, selected_line)
+
+    def _set_quantity__by_package(self, picking, selected_line, package):
+        pack_location = package.location_id
+        if pack_location:
+            (
+                move_dest_location_ok,
+                pick_type_dest_location_ok,
+            ) = self._check_location_ok(pack_location, selected_line, picking)
             if not (move_dest_location_ok or pick_type_dest_location_ok):
-                # Scanned location isn't a child of the move's dest location
+                # If the scanned package has a location that isn't a child
+                # of the move dest, return an error
                 message = self.msg_store.dest_location_not_allowed()
                 return self._response_for_set_quantity(
                     picking, selected_line, message=message
                 )
-            # process without pack, set destination location, and go back to
-            # `select_move`
-            selected_line.location_dest_id = location
+            quantity = selected_line.qty_done
+            __, qty_check = selected_line._split_qty_to_be_done(
+                quantity,
+                lot_id=False,
+                shopfloor_user_id=False,
+                expiration_date=False,
+            )
+            if qty_check == "greater":
+                return self._response_for_set_quantity(
+                    picking,
+                    selected_line,
+                    message=self.msg_store.unable_to_pick_more(
+                        selected_line.product_uom_qty
+                    ),
+                )
+            # If the scanned package has a valid destination,
+            # set both package and destination on the package,
+            # and go back to the selection line screen
+            selected_line.result_package_id = package
+            selected_line.location_dest_id = pack_location
+            if self.work.menu.auto_post_line:
+                # If option auto_post_line is active in the shopfloor menu,
+                # create a split order with this line.
+                self._auto_post_line(selected_line, picking)
             return self._response_for_select_move(picking)
+        # Scanned package has no location, move to the location selection
+        # screen
+        selected_line.result_package_id = package
+        return self._response_for_set_destination(picking, selected_line)
+
+    def _set_quantity__by_location(self, picking, selected_line, location):
+        move_dest_location_ok, pick_type_dest_location_ok = self._check_location_ok(
+            location, selected_line, picking
+        )
+        if not (move_dest_location_ok or pick_type_dest_location_ok):
+            # Scanned location isn't a child of the move's dest location
+            message = self.msg_store.dest_location_not_allowed()
+            return self._response_for_set_quantity(
+                picking, selected_line, message=message
+            )
+        # process without pack, set destination location, and go back to
+        # `select_move`
+        selected_line.location_dest_id = location
+        return self._response_for_select_move(picking)
 
     def _set_quantity__by_lot(self, picking, selected_line, barcode):
         if selected_line.lot_id.name == barcode or selected_line.lot_name == barcode:
@@ -655,6 +661,17 @@ class Reception(Component):
     def start(self):
         return self._response_for_select_document()
 
+    def _scan_document__get_handlers_by_type(self):
+        return {
+            "picking": self._scan_document__by_picking,
+            "product": self._scan_document__by_product,
+            "packaging": self._scan_document__by_packaging,
+            "lot": self._scan_document__by_lot,
+        }
+
+    def _scan_document__get_find_kw(self):
+        return {"picking": {"use_origin": True}}
+
     def scan_document(self, barcode):
         """Scan a picking, a product or a packaging.
 
@@ -671,19 +688,16 @@ class Reception(Component):
           - set_quantity: Packaging / Product has been scanned,
                         single correspondance. Not tracked product
         """
-        handlers = (
-            self._scan_document__by_picking,
-            self._scan_document__by_product,
-            self._scan_document__by_packaging,
-            self._scan_document__by_lot,
+        handlers_by_type = self._scan_document__get_handlers_by_type()
+        search = self._actions_for("search")
+        find_kw = self._scan_document__get_find_kw()
+        search_result = search.find(
+            barcode, handlers_by_type.keys(), handler_kw=find_kw
         )
-        response = self._use_handlers(handlers, barcode)
-        if response:
-            return response
-        # If nothing has been found, return a barcode not found error message
-        return self._response_for_select_document(
-            message=self.msg_store.barcode_not_found()
-        )
+        handler = handlers_by_type.get(search_result.type)
+        if handler:
+            return handler(search_result.record, barcode)
+        return self._scan_document__fallback()
 
     def list_stock_pickings(self):
         """Select a picking manually
@@ -718,21 +732,18 @@ class Reception(Component):
           - set_quantity: Packaging / Product has been scanned. Not tracked product
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
-        if message:
-            return self._response_for_select_move(picking, message=message)
-        handlers = (
-            self._scan_line__by_product,
-            self._scan_line__by_packaging,
-            self._scan_line__by_lot,
-        )
-        response = self._use_handlers(handlers, picking, barcode)
-        if response:
-            return response
-        # Nothing has been found, return an error
-        return self._response_for_select_move(
-            picking, message=self.msg_store.barcode_not_found()
-        )
+        handlers_by_type = {
+            "product": self._scan_line__by_product,
+            "packaging": self._scan_line__by_packaging,
+            "lot": self._scan_line__by_lot,
+        }
+        search = self._actions_for("search")
+        search_result = search.find(barcode, handlers_by_type.keys())
+        # Fallback handler, returns a barcode not found error
+        handler = handlers_by_type.get(search_result.type)
+        if handler:
+            return handler(picking, search_result.record)
+        return self._scan_line__fallback(picking, barcode)
 
     def done_action(self, picking_id, confirmation=False):
         """Mark a picking as done
@@ -846,6 +857,37 @@ class Reception(Component):
         if use_expiration_date and not line.expiration_date:
             return self.msg_store.expiration_date_missing()
 
+    def _set_quantity__get_handlers_by_type(self):
+        return {
+            "product": self._set_quantity__by_product,
+            "packaging": self._set_quantity__by_packaging,
+            "package": self._set_quantity__by_package,
+            "location": self._set_quantity__by_location,
+            "lot": self._set_quantity__by_lot,
+        }
+
+    def _set_quantity__by_barcode(
+        self, picking, selected_line, barcode, confirmation=False
+    ):
+        handlers_by_type = self._set_quantity__get_handlers_by_type()
+        search = self._actions_for("search")
+        search_result = search.find(barcode, handlers_by_type.keys())
+        handler = handlers_by_type.get(search_result.type)
+        if handler:
+            return handler(picking, selected_line, search_result.record)
+        # Nothing found, ask user if we should create a new pack for the scanned
+        # barcode
+        if not confirmation:
+            return self._response_for_set_quantity(
+                picking,
+                selected_line,
+                message=self.msg_store.create_new_pack_ask_confirmation(barcode),
+                asking_confirmation=True,
+            )
+        package = self.env["stock.quant.package"].create({"name": barcode})
+        selected_line.result_package_id = package
+        return self._response_for_set_destination(picking, selected_line)
+
     def set_quantity(
         self,
         picking_id,
@@ -888,48 +930,9 @@ class Reception(Component):
         if barcode:
             # Then, we add the qty of whatever was scanned
             # on top of the qty of the picker.
-            handlers = (
-                self._set_quantity__by_product,
-                self._set_quantity__by_packaging,
-                self._set_quantity__by_package,
-                self._set_quantity__by_location,
-                self._set_quantity__by_lot,
+            return self._set_quantity__by_barcode(
+                picking, selected_line, barcode, confirmation
             )
-            response = self._use_handlers(handlers, picking, selected_line, barcode)
-            if response:
-                return response
-            # Nothing found, ask user if we should create a new pack for the scanned
-            # barcode.
-            if not confirmation:
-                return self._response_for_set_quantity(
-                    picking,
-                    selected_line,
-                    message=self.msg_store.create_new_pack_ask_confirmation(barcode),
-                    asking_confirmation=True,
-                )
-            # Nothing found and we already ask for confirmation, create the new package.
-            package = self.env["stock.quant.package"].create({"name": barcode})
-            quantity = selected_line.qty_done
-            __, qty_check = selected_line._split_qty_to_be_done(
-                quantity,
-                lot_id=False,
-                shopfloor_user_id=False,
-                expiration_date=False,
-            )
-            if qty_check == "greater":
-                return self._response_for_set_quantity(
-                    picking,
-                    selected_line,
-                    message=self.msg_store.unable_to_pick_more(
-                        selected_line.product_uom_qty
-                    ),
-                )
-            selected_line.result_package_id = package
-            if self.work.menu.auto_post_line:
-                # If option auto_post_line is active in the shopfloor menu,
-                # create a split order with this line.
-                self._auto_post_line(selected_line)
-            return self._response_for_set_destination(picking, selected_line)
         return self._response_for_set_quantity(
             picking, selected_line, message=self.msg_store.barcode_not_found()
         )
