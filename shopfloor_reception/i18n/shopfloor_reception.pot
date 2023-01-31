@@ -1,0 +1,60 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_reception
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: shopfloor_reception
+#: model:ir.model.fields,help:shopfloor_reception.field_shopfloor_menu__auto_post_line
+msgid ""
+"\n"
+"When setting result pack & destination,\n"
+"automatically post the corresponding line\n"
+"if this option is checked.\n"
+msgstr ""
+
+#. module: shopfloor_reception
+#: model:ir.model.fields,field_description:shopfloor_reception.field_shopfloor_menu__auto_post_line_is_possible
+msgid "Auto Post Line Is Possible"
+msgstr ""
+
+#. module: shopfloor_reception
+#: model:ir.model.fields,field_description:shopfloor_reception.field_shopfloor_menu__auto_post_line
+msgid "Automatically post line"
+msgstr ""
+
+#. module: shopfloor_reception
+#: model:ir.model.fields,field_description:shopfloor_reception.field_shopfloor_menu__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: shopfloor_reception
+#: model:ir.model.fields,field_description:shopfloor_reception.field_shopfloor_menu__id
+msgid "ID"
+msgstr ""
+
+#. module: shopfloor_reception
+#: model:ir.model.fields,field_description:shopfloor_reception.field_shopfloor_menu____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: shopfloor_reception
+#: model:ir.model,name:shopfloor_reception.model_shopfloor_menu
+msgid "Menu displayed in the scanner application"
+msgstr ""
+
+#. module: shopfloor_reception
+#: model:shopfloor.menu,name:shopfloor_reception.shopfloor_menu_demo_reception
+#: model:shopfloor.scenario,name:shopfloor_reception.scenario_reception
+#: model:stock.picking.type,name:shopfloor_reception.picking_type_reception_demo
+msgid "Reception"
+msgstr ""
