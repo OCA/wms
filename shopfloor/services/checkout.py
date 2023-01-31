@@ -552,14 +552,15 @@ class Checkout(Component):
                         and not l.move_id.move_orig_ids
                     )
                 )
-                # However if one line is matching the same product, invite the user
-                # to change the lot by scanning again the lot
-                if len(lines_same_product) == 1:
+                # If there's at least one product matching we are good to go.
+                # In any case, only the 1st line matching will be affected.
+                if lines_same_product:
                     return self._response_for_select_line(
                         picking,
                         message=self.msg_store.lot_different_change(),
                         need_confirm_lot=True,
                     )
+                    # TODO: add a msg saying the lot has been changed
                 return self._response_for_select_line(
                     picking,
                     message=self.msg_store.lot_not_found_in_picking(),
