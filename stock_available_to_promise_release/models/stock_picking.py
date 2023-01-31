@@ -76,7 +76,7 @@ class StockPicking(models.Model):
                 picking.release_ready = False
                 picking.release_ready_count = 0
                 continue
-            move_lines = picking.move_ids.filtered(
+            move_lines = picking.move_lines.filtered(
                 lambda move: move.state not in ("cancel", "done") and move.need_release
             )
             if picking._get_shipping_policy() == "one":
@@ -177,4 +177,4 @@ class StockPicking(models.Model):
         If safe_unrelease is True, the unreleasaable moves for which the
         processing has already started will be ignored
         """
-        self.mapped("move_ids").unrelease(safe_unrelease=safe_unrelease)
+        self.mapped("move_lines").unrelease(safe_unrelease=safe_unrelease)
