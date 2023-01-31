@@ -111,7 +111,8 @@ class MessageAction(Component):
             "message_type": "warning",
             "body": _(
                 "You scanned a different lot with the same product, "
-                "do you want to change lot? Scan it again to confirm."
+                "do you want to change lot? Scan it again to confirm. "
+                "The first line matching this product will be updated. "
             ),
         }
 
