@@ -14,6 +14,7 @@ class StockPickingType(models.Model):
         "backorder are unreleased if they come from a route configured "
         "to manually release moves",
     )
+
     prevent_new_move_after_release = fields.Boolean(
         string="Prevent new move after release",
         help="If checked, when a picking is released it's no more possible to "
