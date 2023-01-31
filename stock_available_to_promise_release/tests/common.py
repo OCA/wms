@@ -120,7 +120,7 @@ class PromiseReleaseCommonCase(common.SavepointCase):
 
     @classmethod
     def _prev_picking(cls, picking):
-        return picking.move_ids.move_orig_ids.picking_id
+        return picking.move_lines.move_orig_ids.picking_id
 
     @classmethod
     def _out_picking(cls, pickings):
@@ -129,6 +129,6 @@ class PromiseReleaseCommonCase(common.SavepointCase):
     @classmethod
     def _deliver(cls, picking):
         picking.action_assign()
-        for line in picking.mapped("move_ids.move_line_ids"):
+        for line in picking.mapped("move_lines.move_line_ids"):
             line.qty_done = line.reserved_qty
         picking._action_done()
