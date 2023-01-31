@@ -102,6 +102,7 @@ Contributors
 * Thierry Ducrest <thierry.ducrest@camptocamp.com>
 * Raphaël Reverdy <raphael.reverdy@akretion.com>
 * Jacques-Etienne Baudoux <je@bcim.be>
+* Michael Tietz (MT Software) <mtietz@mt-software.de>
 
 Design
 ~~~~~~
