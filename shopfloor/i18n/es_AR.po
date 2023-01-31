@@ -549,6 +549,12 @@ msgid "Move Line Count"
 msgstr "Cuenta de Línea de Movimiento"
 
 #. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Move already processed."
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/models/stock_move_line.py:0
 #, python-format
 msgid "Move lines processed have to share the same source location."
@@ -1034,6 +1040,11 @@ msgstr "Reinicie la operación, alguien la ha cancelado."
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_stock_move_line_detailed_operation_tree
 msgid "SF Priority"
 msgstr "Prioridad del Taller"
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.view_stock_move_line_detailed_operation_tree
+msgid "SF User"
+msgstr ""
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_stock_move_line_detailed_operation_tree
