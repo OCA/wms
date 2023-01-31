@@ -31,7 +31,7 @@ class StockPicking(models.Model):
     city = fields.Char(related="partner_id.city", store=True)
     last_release_date = fields.Datetime()
 
-    @api.depends("move_ids.need_release")
+    @api.depends("move_lines.need_release")
     def _compute_need_release(self):
         data = self.env["stock.move"].read_group(
             [("need_release", "=", True), ("picking_id", "in", self.ids)],
@@ -77,7 +77,7 @@ class StockPicking(models.Model):
                 picking.release_ready = False
                 picking.release_ready_count = 0
                 continue
-            move_lines = picking.move_ids.filtered(
+            move_lines = picking.move_lines.filtered(
                 lambda move: move.state not in ("cancel", "done") and move.need_release
             )
             if picking._get_shipping_policy() == "one":
@@ -160,7 +160,7 @@ class StockPicking(models.Model):
         new_expected_date = fields.Datetime.add(
             fields.Datetime.now(), minutes=prep_time
         )
-        move_to_update = self.move_ids.filtered(lambda m: m.state == "assigned")
+        move_to_update = self.move_lines.filtered(lambda m: m.state == "assigned")
         move_to_update_ids = move_to_update.ids
         for origin_moves in move_to_update._get_chained_moves_iterator("move_dest_ids"):
             move_to_update_ids += origin_moves.ids
@@ -194,4 +194,4 @@ class StockPicking(models.Model):
         If safe_unrelease is True, the unreleasaable moves for which the
         processing has already started will be ignored
         """
-        self.mapped("move_ids").unrelease(safe_unrelease=safe_unrelease)
+        self.mapped("move_lines").unrelease(safe_unrelease=safe_unrelease)
