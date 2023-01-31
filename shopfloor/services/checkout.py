@@ -583,7 +583,6 @@ class Checkout(Component):
                         message=self.msg_store.lot_different_change(),
                         need_confirm_lot=lot.id,
                     )
-                    # TODO: add a msg saying the lot has been changed
                 return self._response_for_select_line(
                     picking,
                     message=self.msg_store.lot_not_found_in_picking(lot, picking),
