@@ -29,6 +29,10 @@ class StockRule(models.Model):
         related="route_id.no_backorder_at_release", store=True
     )
 
+    available_to_promise_defer_pull = fields.Boolean(
+        related="route_id.available_to_promise_defer_pull", store=True
+    )
+
     def _run_pull(self, procurements):
         actions_to_run = []
 
