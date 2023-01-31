@@ -30,6 +30,8 @@ setuptools.setup(
         'odoo14-addon-shopfloor_mobile_base_auth_api_key',
         'odoo14-addon-shopfloor_mobile_base_auth_user',
         'odoo14-addon-shopfloor_packing_info',
+        'odoo14-addon-shopfloor_reception',
+        'odoo14-addon-shopfloor_reception_mobile',
         'odoo14-addon-shopfloor_rest_log',
         'odoo14-addon-shopfloor_workstation',
         'odoo14-addon-shopfloor_workstation_label_printer',
