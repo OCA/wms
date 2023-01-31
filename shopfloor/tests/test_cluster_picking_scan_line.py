@@ -14,8 +14,9 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
     scanned the proper thing to pick.
     """
 
-    def _scan_line_ok(self, line, scanned):
+    def _scan_line_ok(self, line, scanned, expected_qty_done=1):
         batch = line.picking_id.batch_id
+        previous_qty_done = line.qty_done
         response = self.service.dispatch(
             "scan_line",
             params={
@@ -25,10 +26,14 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             },
         )
         # For any barcode scanned, the quantity done is set in
-        # the response data to fully done but the record is not updated
-        line.qty_done = line.product_uom_qty
+        # the response data to fully done but the record is not updated.
+        # We ensure the qty has not changed in the record.
+        self.assertEqual(line.qty_done, previous_qty_done)
+
         self.assert_response(
-            response, next_state="scan_destination", data=self._line_data(line)
+            response,
+            next_state="scan_destination",
+            data=self._line_data(line, qty_done=expected_qty_done),
         )
 
     def _scan_line_error(self, line, scanned, message):
