@@ -61,10 +61,9 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
 
         action_cancel is called on all related pickings not set to done.
         """
-        self.assertTrue(self.picking1.move_lines.product_uom_qty == 5)
         self.shipping1.action_cancel()
         self.assertEqual(self.shipping1.state, "cancel")
-        self.assertEqual(self.picking1.move_lines.mapped("product_uom_qty"), [3.0, 2.0])
-        self.assertEqual(
-            self.picking1.move_lines.mapped("state"), ["assigned", "cancel"]
-        )
+        line_active = self.picking1.move_lines.filtered(lambda l: l.state == "assigned")
+        line_cancel = self.picking1.move_lines.filtered(lambda l: l.state == "cancel")
+        self.assertEqual(line_active.product_uom_qty, 3.0)
+        self.assertEqual(line_cancel.product_uom_qty, 2.0)
