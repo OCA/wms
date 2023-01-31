@@ -1,5 +1,6 @@
 # Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020-2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+# Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, fields
 
@@ -280,24 +281,30 @@ class LocationContentTransfer(Component):
         stock.mark_move_line_as_picked(move_lines, quantity=0)
         return self._response_for_scan_location(location=location)
 
+    def _find_move_lines_to_cancel_work(self, location):
+        unreserve = self._actions_for("stock.unreserve")
+        return self.env["stock.move.line"].search(
+            unreserve._find_location_all_move_lines_domain(location)
+        )
+
+    def _move_lines_cancel_work(self, move_lines):
+        move_lines.write({"shopfloor_user_id": False})
+        move_lines.mapped("picking_id").write({"user_id": False})
+        stock = self._actions_for("stock")
+        stock.unmark_move_line_as_picked(move_lines)
+
     def cancel_work(self, location_id):
         """Cancel work marked as picked by the user.
 
         Transitions:
         * start:
         """
-        unreserve = self._actions_for("stock.unreserve")
         location = self.env["stock.location"].browse(location_id)
         if not location:
             return self._response_for_start(message=self.msg_store.location_not_found())
-        location_move_lines = self.env["stock.move.line"].search(
-            unreserve._find_location_all_move_lines_domain(location)
-        )
 
-        location_move_lines.write({"shopfloor_user_id": False})
-        location_move_lines.mapped("picking_id").write({"user_id": False})
-        stock = self._actions_for("stock")
-        stock.unmark_move_line_as_picked(location_move_lines)
+        move_lines = self._find_move_lines_to_cancel_work(location)
+        self._move_lines_cancel_work(move_lines)
         return self._response_for_start()
 
     def scan_location(self, barcode):  # noqa: C901
