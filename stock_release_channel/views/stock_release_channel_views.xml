@@ -47,7 +47,7 @@
                         name="state"
                         widget="statusbar"
                         statusbar_visible="open,locked,asleep"
-                        readonly="true"
+                        readonly="True"
                     />
                 </header>
                 <sheet>
@@ -84,7 +84,7 @@
                         <field
                             name="rule_domain"
                             widget="domain"
-                            options="{'model': 'stock.picking', 'in_dialog': true}"
+                            options="{'model': 'stock.picking', 'in_dialog': True}"
                         />
 
                         <field
@@ -341,7 +341,7 @@
                                                 name="count_picking_done"
                                                 widget="progressbar"
                                                 title="Overall Progress"
-                                                options="{'show_fractional': true, 'current_value': 'count_picking_done', 'max_value': 'count_picking_full_progress', 'editable': false}"
+                                                options="{'show_fractional': True, 'current_value': 'count_picking_done', 'max_value': 'count_picking_full_progress', 'editable': false}"
                                             />
                                         </div>
 
