@@ -299,6 +299,33 @@ class TestSetQuantity(CommonCase):
             message={"message_type": "error", "body": "You cannot place it here"},
         )
 
+    def test_scan_location_view_usage(self):
+        picking = self._create_picking()
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        selected_move_line.shopfloor_user_id = self.env.uid
+        self.dispatch_location.sudo().quant_ids.unlink()
+        self.dispatch_location.sudo().usage = "view"
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "barcode": self.dispatch_location.barcode,
+            },
+        )
+        data = self.data.picking(picking)
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data={
+                "picking": data,
+                "selected_move_line": self.data.move_lines(selected_move_line),
+            },
+            message={"message_type": "error", "body": "You cannot place it here"},
+        )
+
     def test_scan_new_package(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(

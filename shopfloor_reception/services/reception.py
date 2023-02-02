@@ -387,7 +387,7 @@ class Reception(Component):
         if location:
             dest_location = selected_line.location_dest_id
             child_locations = self.env["stock.location"].search(
-                [("id", "child_of", dest_location.id)]
+                [("id", "child_of", dest_location.id), ("usage", "!=", "view")]
             )
             if location not in child_locations:
                 # Scanned location isn't a child of the move's dest location
