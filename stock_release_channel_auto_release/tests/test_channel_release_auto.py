@@ -18,7 +18,7 @@ class TestChannelReleaseAuto(ChannelReleaseCase):
         cls._update_qty_in_location(cls.loc_bin1, cls.product2, 1000.0)
 
         # invalidate cache for computed fields bases on qty in stock
-        cls.env.invalidate_all()
+        cls.env["product.product"].invalidate_cache()
 
     @contextmanager
     def assert_release_job_enqueued(self, channel):

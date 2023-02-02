@@ -181,6 +181,7 @@
                 create="0"
             >
                 <field name="release_mode" invisible="1" />
+                <field name="is_release_allowed" />
                 <field name="color" />
                 <field name="name" readonly="1" />
                 <field name="count_picking_release_ready" />

@@ -58,7 +58,7 @@ class StockReleaseChannel(models.Model):
         res = super().write(vals)
         release_mode = vals.get("release_mode")
         if release_mode == "auto":
-            self.invalidate_recordset(["is_auto_release_allowed"])
+            self.invalidate_cache(["is_auto_release_allowed"])
             self.auto_release_all()
         return res
 
