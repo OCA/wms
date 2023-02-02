@@ -20,6 +20,7 @@
         "wizards/stock_release_views.xml",
         "wizards/stock_unrelease_views.xml",
     ],
+    "demo": [],
     "installable": True,
     "license": "LGPL-3",
     "application": False,
