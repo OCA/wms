@@ -212,8 +212,7 @@ class Reception(Component):
             move_lines, self.msg_store.no_transfer_for_lot
         )
 
-    def _select_line(self, picking, line, increase_qty_done_by=1):
-        move = line.move_id
+    def _select_line(self, picking, line, move, increase_qty_done_by=1):
         product = line.product_id
         if line:
             # The line quantity to do needs to correspond to
@@ -238,7 +237,7 @@ class Reception(Component):
                 and l.shopfloor_user_id.id in [False, self.env.uid]
             )
         )
-        return self._select_line(picking, line)
+        return self._select_line(picking, line, move)
 
     def _select_line_from_packaging(self, picking, move, packaging):
         line = fields.first(
@@ -248,7 +247,7 @@ class Reception(Component):
                 and l.shopfloor_user_id.id in [False, self.env.uid]
             )
         )
-        return self._select_line(picking, line, packaging.qty)
+        return self._select_line(picking, line, move, packaging.qty)
 
     def _select_line_from_lot(self, picking, move, lot):
         line = fields.first(
@@ -260,7 +259,7 @@ class Reception(Component):
         )
         if not line:
             return
-        return self._select_line(picking, line)
+        return self._select_line(picking, line, move)
 
     def _order_stock_picking(self):
         # We sort by scheduled date first. However, there might be a case
@@ -333,7 +332,7 @@ class Reception(Component):
                     == -1
                 )
             )
-            message = self._check_move_available(move, "product")
+            message = self._check_move_available(move, message_code="product")
             if message:
                 return self._response_for_select_move(
                     picking,
@@ -356,7 +355,7 @@ class Reception(Component):
                     == -1
                 )
             )
-            message = self._check_move_available(move, "packaging")
+            message = self._check_move_available(move, message_code="packaging")
             if message:
                 return self._response_for_select_move(
                     picking,
@@ -365,22 +364,34 @@ class Reception(Component):
             return self._select_line_from_packaging(picking, move, packaging)
 
     def _scan_line__by_lot(self, picking, barcode):
-        move = picking.move_lines.move_line_ids.filtered(
+        line = picking.move_line_ids.filtered(
             lambda l: barcode == l.lot_id.name or barcode == l.lot_name
         )
-        message = self._check_move_available(move)
-        if message:
-            return self._response_for_select_move(
-                picking,
-                message=message,
+        move = line.move_id
+        search = self._actions_for("search")
+        lot = search.lot_from_scan(barcode)
+        if not move:
+            line = picking.move_line_ids.filtered(
+                lambda l: not l.lot_id
+                and not l.lot_name
+                and l.product_id == lot.product_id
             )
-        return self._select_line_from_lot(picking, move, barcode)
+            if line:
+                return self._select_line(picking, line, move)
+        else:
+            message = self._check_move_available(move, message_code="lot")
+            if message:
+                return self._response_for_select_move(
+                    picking,
+                    message=message,
+                )
+            if lot:
+                return self._select_line_from_lot(picking, move, barcode)
 
     def _check_move_available(self, move, message_code="product"):
-        if not move and message_code == "product":
-            return self.msg_store.product_not_found_or_already_in_dest_package()
-        if not move and message_code == "packaging":
-            return self.msg_store.packaging_not_found_or_already_in_dest_package()
+        if not move:
+            message_code = message_code.capitalize()
+            return self.msg_store.x_not_found_or_already_in_dest_package(message_code)
         line_without_package = any(
             not ml.result_package_id for ml in move.move_line_ids
         )

@@ -6,6 +6,7 @@
 * Thierry Ducrest <thierry.ducrest@camptocamp.com>
 * Raphaël Reverdy <raphael.reverdy@akretion.com>
 * Jacques-Etienne Baudoux <je@bcim.be>
+* Juan Miguel Sánchez Arce <juan.sanchez@camptocamp.com>
 * Michael Tietz (MT Software) <mtietz@mt-software.de>
 
 Design
