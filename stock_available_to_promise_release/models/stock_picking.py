@@ -31,7 +31,7 @@ class StockPicking(models.Model):
     city = fields.Char(related="partner_id.city", store=True)
     last_release_date = fields.Datetime()
 
-    @api.depends("move_ids.need_release")
+    @api.depends("move_lines.need_release")
     def _compute_need_release(self):
         data = self.env["stock.move"].read_group(
             [("need_release", "=", True), ("picking_id", "in", self.ids)],
@@ -160,7 +160,7 @@ class StockPicking(models.Model):
         new_expected_date = fields.Datetime.add(
             fields.Datetime.now(), minutes=prep_time
         )
-        move_to_update = self.move_ids.filtered(lambda m: m.state == "assigned")
+        move_to_update = self.move_lines.filtered(lambda m: m.state == "assigned")
         move_to_update_ids = move_to_update.ids
         for origin_moves in move_to_update._get_chained_moves_iterator("move_dest_ids"):
             move_to_update_ids += origin_moves.ids

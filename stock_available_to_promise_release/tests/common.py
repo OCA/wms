@@ -130,5 +130,5 @@ class PromiseReleaseCommonCase(common.SavepointCase):
     def _deliver(cls, picking):
         picking.action_assign()
         for line in picking.mapped("move_lines.move_line_ids"):
-            line.qty_done = line.reserved_qty
+            line.qty_done = line.product_uom_qty
         picking._action_done()
