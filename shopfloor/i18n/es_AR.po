@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-01-16 03:14+0000\n"
+"PO-Revision-Date: 2023-02-05 22:22+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -552,7 +552,7 @@ msgstr "Cuenta de Línea de Movimiento"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Move already processed."
-msgstr ""
+msgstr "El Movimiento ya ha sido procesado."
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/stock_move_line.py:0
@@ -1044,7 +1044,7 @@ msgstr "Prioridad del Taller"
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_stock_move_line_detailed_operation_tree
 msgid "SF User"
-msgstr ""
+msgstr "Usuario SF"
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_stock_move_line_detailed_operation_tree
