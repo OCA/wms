@@ -15,7 +15,8 @@ class LotHandler(Component):
     record_type = "lot"
 
     def search(self, identifier):
-        return self._search.lot_from_scan(identifier)
+        res = self._search.find(identifier, types=("lot",))
+        return res.record if res.record else self.env["stock.production.lot"]
 
     @property
     def converter(self):

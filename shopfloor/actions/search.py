@@ -41,8 +41,6 @@ class SearchAction(Component):
 
     _inherit = "shopfloor.search.action"
 
-    # TODO: these methods shall be probably replaced by scan anything handlers
-
     @property
     def _barcode_type_handler(self):
         return {

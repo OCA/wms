@@ -15,7 +15,8 @@ class LocationHandler(Component):
     record_type = "location"
 
     def search(self, identifier):
-        return self._search.location_from_scan(identifier)
+        res = self._search.find(identifier, types=("location",))
+        return res.record if res.record else self.env["stock.location"]
 
     @property
     def converter(self):
