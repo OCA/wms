@@ -262,10 +262,9 @@ class TestSelectLine(CommonCase):
                 ("user_id", "=", False),
                 ("scheduled_date", "=", fields.Datetime.today()),
             ],
-            order="scheduled_date ASC",
+            order="scheduled_date ASC, id ASC",
         )
         message = "Transfer {} done".format(picking.name)
-        pickings.sorted(lambda p: (p.scheduled_date, p.id), reverse=False)
         self.assert_response(
             response,
             next_state="select_document",
