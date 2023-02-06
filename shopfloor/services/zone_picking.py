@@ -206,6 +206,7 @@ class ZonePicking(Component):
             move_lines, product=product, sublocation=sublocation
         )
         data["confirmation_required"] = confirmation_required
+        data["scan_location_or_pack_first"] = self.work.menu.scan_location_or_pack_first
         return self._response(
             next_state="select_line",
             data=data,
@@ -650,7 +651,9 @@ class ZonePicking(Component):
         elif len(move_lines.lot_id) > 1:
             message = self.msg_store.several_move_with_different_lot()
         if message:
-            response = self._list_move_lines(self.zone_location, product)
+            response = self._list_move_lines(
+                self.zone_location, product, sublocation=sublocation
+            )
         elif move_lines:
             move_line = first(move_lines)
             qty_done = self._get_prefill_qty(move_line, qty=(packaging.qty or 1.0))
@@ -658,7 +661,9 @@ class ZonePicking(Component):
                 move_line, qty_done=qty_done
             )
         else:
-            response = self._list_move_lines(sublocation or self.zone_location)
+            response = self._list_move_lines(
+                sublocation or self.zone_location, sublocation=sublocation
+            )
             message = self.msg_store.product_not_found()
         return response, message
 
@@ -731,10 +736,17 @@ class ZonePicking(Component):
             self._scan_source_location,
             # then by package
             self._scan_source_package,
-            # then by product
-            self._scan_source_product,
-            # then by lot
-            self._scan_source_lot,
+        ) + (
+            # if first scan location or pack option is not set
+            # or the sublocation has already been scanned
+            (
+                # by product
+                self._scan_source_product,
+                # then by lot
+                self._scan_source_lot,
+            )
+            if not self.work.menu.scan_location_or_pack_first or sublocation_id
+            else ()
         )
         for handler in handlers:
             response, message = handler(
@@ -1779,6 +1791,11 @@ class ShopfloorZonePickingValidatorResponse(Component):
     def _schema_for_move_lines_empty_location(self):
         schema = self._schema_for_move_lines
         schema["move_lines"]["schema"]["schema"]["location_will_be_empty"] = {
+            "type": "boolean",
+            "nullable": False,
+            "required": True,
+        }
+        schema["scan_location_or_pack_first"] = {
             "type": "boolean",
             "nullable": False,
             "required": True,
