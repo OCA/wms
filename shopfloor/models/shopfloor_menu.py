@@ -158,6 +158,16 @@ class ShopfloorMenu(models.Model):
     show_oneline_package_content_is_possible = fields.Boolean(
         compute="_compute_show_oneline_package_content_is_possible"
     )
+    scan_location_or_pack_first = fields.Boolean(
+        string="Scan first location or pack",
+        help=(
+            "When selecting work, force the user to first scan a location or pack,"
+            "then the product or lot."
+        ),
+    )
+    scan_location_or_pack_first_is_possible = fields.Boolean(
+        compute="_compute_scan_location_or_pack_first_is_possible"
+    )
 
     @api.onchange("unload_package_at_destination")
     def _onchange_unload_package_at_destination(self):
@@ -366,4 +376,11 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.show_oneline_package_content_is_possible = menu.scenario_id.has_option(
                 "show_oneline_package_content"
+            )
+
+    @api.depends("scenario_id")
+    def _compute_scan_location_or_pack_first_is_possible(self):
+        for menu in self:
+            menu.scan_location_or_pack_first_is_possible = menu.scenario_id.has_option(
+                "scan_location_or_pack_first"
             )

@@ -308,12 +308,14 @@ class ZonePickingCommonCase(CommonCase):
         confirmation_required=False,
         product=None,
         sublocation=None,
+        location_first=None,
     ):
         data = {
             "zone_location": self.data.location(zone_location),
             "picking_type": self.data.picking_type(picking_type),
             "move_lines": self.data.move_lines(move_lines, with_picking=True),
             "confirmation_required": confirmation_required,
+            "scan_location_or_pack_first": location_first,
         }
         if product:
             data["product"] = self.data.product(product)
@@ -343,6 +345,7 @@ class ZonePickingCommonCase(CommonCase):
         confirmation_required=False,
         product=None,
         sublocation=None,
+        location_first=False,
     ):
         self._assert_response_select_line(
             "select_line",
@@ -355,6 +358,7 @@ class ZonePickingCommonCase(CommonCase):
             confirmation_required=confirmation_required,
             product=product,
             sublocation=sublocation,
+            location_first=location_first,
         )
 
     def _assert_response_set_line_destination(
