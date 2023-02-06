@@ -15,7 +15,8 @@ class PackageHandler(Component):
     record_type = "package"
 
     def search(self, identifier):
-        return self._search.package_from_scan(identifier)
+        res = self._search.find(identifier, types=("package",))
+        return res.record if res.record else self.env["stock.quant.package"]
 
     @property
     def converter(self):

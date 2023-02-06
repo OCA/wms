@@ -15,7 +15,8 @@ class TransferHandler(Component):
     record_type = "transfer"
 
     def search(self, identifier):
-        return self._search.picking_from_scan(identifier)
+        res = self._search.find(identifier, types=("picking",))
+        return res.record if res.record else self.env["stock.picking"]
 
     @property
     def converter(self):
