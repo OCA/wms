@@ -211,6 +211,7 @@ class LocationContentTransfer(Component):
             ("qty_done", "=", 0),
             ("state", "in", ("assigned", "partially_available")),
             ("picking_id.user_id", "in", (False, self.env.uid)),
+            ("picking_id.state", "=", "assigned"),
         ]
 
     def _find_location_move_lines(self, location):
