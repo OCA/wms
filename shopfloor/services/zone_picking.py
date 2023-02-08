@@ -590,10 +590,12 @@ class ZonePicking(Component):
         pack_location = package.location_id
         if pack_location and pack_location.is_sublocation_of(self.zone_location):
             # Check if the package selected can be a substitute on a move line
-            move_lines = self._find_location_move_lines(
-                locations=pack_location,
-                product=package.product_packaging_id.product_id,
-            )
+            products = package.quant_ids.filtered(lambda q: q.quantity > 0).product_id
+            for product in products:
+                move_lines |= self._find_location_move_lines(
+                    locations=pack_location,
+                    product=product,
+                )
         if move_lines:
             if not confirmation:
                 message = self.msg_store.package_different_change()
