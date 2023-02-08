@@ -594,6 +594,12 @@ class MessageAction(Component):
             ),
         }
 
+    def return_line_invalid_qty(self):
+        return {
+            "message_type": "error",
+            "body": _("You cannot return more quantity than what was initially sent."),
+        }
+
     def transfer_no_qty_done(self):
         return {
             "message_type": "warning",
