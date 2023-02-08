@@ -1,6 +1,8 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo.osv.expression import AND
+
 from odoo.addons.component.core import Component
 
 
@@ -53,6 +55,7 @@ class SearchAction(Component):
             "serial": self.lot_from_scan,
             "packaging": self.packaging_from_scan,
             "delivery_packaging": self.generic_packaging_from_scan,
+            "origin_move": self.origin_move_from_scan,
         }
 
     def _make_search_result(self, **kwargs):
@@ -164,3 +167,15 @@ class SearchAction(Component):
         return model.search(
             [("barcode", "=", barcode), ("product_id", "=", False)], limit=1
         )
+
+    def origin_move_from_scan(self, barcode, extra_domain=None):
+        model = self.env["stock.move"]
+        outgoing_move_domain = [
+            # We could have the same origin for multiple transfers
+            # but we're interested only in the "done" ones.
+            ("origin", "=", barcode),
+            ("state", "=", "done"),
+        ]
+        if extra_domain:
+            outgoing_move_domain = AND([outgoing_move_domain, extra_domain])
+        return model.search(outgoing_move_domain)
