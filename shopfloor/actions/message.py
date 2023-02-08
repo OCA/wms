@@ -551,6 +551,15 @@ class MessageAction(Component):
             ).format(lot=lot.name, product=lot.product_id.name),
         }
 
+    def no_default_location_on_picking_type(self):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Operation types for this menu are missing "
+                "default source and destination locations."
+            ),
+        }
+
     def location_src_set_to_sublocation(self, location_src):
         return {
             "message_type": "success",

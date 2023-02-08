@@ -48,6 +48,14 @@ class Reception(Component):
     _usage = "reception"
     _description = __doc__
 
+    def _check_picking_status(self, pickings):
+        # When returns are allowed,
+        # the created picking might be empty and cannot be assigned.
+        states = ["assigned"]
+        if self.work.menu.allow_return:
+            states.append("draft")
+        return super()._check_picking_status(pickings, states=states)
+
     def _move_line_by_product(self, product):
         return self.env["stock.move.line"].search(
             self._domain_move_line_by_product(product)
@@ -170,6 +178,12 @@ class Reception(Component):
         # return an error
         return self._response_for_select_document(message=msg_func())
 
+    def _scan_document__create_return(self, picking, return_type, barcode):
+        stock = self._actions_for("stock")
+        return_picking = stock.create_return_picking(picking, return_type, barcode)
+        return_picking.action_confirm()
+        return return_picking
+
     def _select_document_from_product(self, product):
         """Select the document by product
 
@@ -261,17 +275,24 @@ class Reception(Component):
             return self._response_for_set_quantity(picking, line)
         return self._response_for_set_lot(picking, line)
 
-    def _select_line_from_product(self, picking, move, product):
-        line = fields.first(
-            picking.move_line_ids.filtered(
-                lambda l: l.product_id == product
+    def _select_line__filter_lines_by_packaging__return(self, lines, packaging):
+        return_line = fields.first(
+            lines.filtered(
+                lambda l: not l.package_id.product_packaging_id
                 and not l.result_package_id
-                and l.shopfloor_user_id.id in [False, self.env.uid]
+                and l.shopfloor_user_id.id in (False, self.env.uid)
             )
         )
-        return self._select_line(picking, line, move)
+        if return_line:
+            return return_line
 
     def _select_line__filter_lines_by_packaging(self, lines, packaging):
+        if self.work.menu.allow_return:
+            line = self._select_line__filter_lines_by_packaging__return(
+                lines, packaging
+            )
+            if line:
+                return line
         return fields.first(
             lines.filtered(
                 lambda l: l.package_id.product_packaging_id == packaging
@@ -329,62 +350,130 @@ class Reception(Component):
         if packaging:
             return self._select_document_from_packaging(packaging)
 
-    def _scan_document__by_lot(self, barcode):
-        return self._select_document_from_lot(barcode)
+    def _scan_document__by_lot(self, lot, barcode):
+        return self._select_document_from_lot(lot)
 
-    def _scan_document__fallback(self, empty_recordset):
-        assert not empty_recordset, "recordset in fallback handler should be empty"
+    def _scan_document__by_origin_move(self, moves, barcode):
+        if self.work.menu.allow_return:
+            pickings = moves.picking_id
+            outgoing_pickings = pickings.filtered(
+                lambda p: (p.picking_type_code == "outgoing")
+            )
+            # If we find valid pickings for a return, then we create an empty
+            # return picking
+            if outgoing_pickings:
+                # But first, check that return types are correctly set up,
+                # as we cannot create a return move with empty locations.
+                return_types = self.picking_types.filtered(
+                    lambda t: t.default_location_src_id and t.default_location_dest_id
+                )
+                if not return_types:
+                    message = self.msg_store.no_default_location_on_picking_type()
+                    return self._response_for_select_document(message=message)
+                return_picking = self._scan_document__create_return(
+                    fields.first(outgoing_pickings), fields.first(return_types), barcode
+                )
+                return self._response_for_select_move(return_picking)
+        # A return picking has been scanned, but allow rma is disabled.
+        return self._scan_document__fallback()
+
+    def _scan_document__fallback(self):
         return self._response_for_select_document(
             message=self.msg_store.barcode_not_found()
         )
 
-    def _scan_line__by_product(self, picking, product):
-        message = self._check_picking_status(picking)
-        if message:
+    def _scan_line__create_return_move(self, return_picking, origin_moves):
+        # copied from odoo/src/addons/stock/wizard/stock_picking_return.py
+        stock = self._actions_for("stock")
+        return stock.create_return_move(return_picking, origin_moves)
+
+    def _scan_line__by_product__return(self, picking, product):
+        search = self._actions_for("search")
+        origin_move_domain = [
+            ("picking_id.picking_type_code", "=", "outgoing"),
+        ]
+        origin_moves = search.origin_move_from_scan(
+            picking.origin, extra_domain=origin_move_domain
+        )
+        origin_moves_for_product = origin_moves.filtered(
+            lambda m: m.product_id == product
+        )
+        # If we have an origin picking but no origin move, then user
+        # scanned a wrong product. Warn him about this.
+        if origin_moves and not origin_moves_for_product:
+            message = self.msg_store.product_not_found_in_current_picking()
             return self._response_for_select_move(picking, message=message)
-        if product:
-            move = fields.first(
-                picking.move_lines.filtered(
-                    lambda m: m.product_id == product
-                    and float_compare(
-                        m.quantity_done,
-                        m.product_uom_qty,
-                        precision_rounding=m.product_uom.rounding,
-                    )
-                    == -1
-                )
+        if origin_moves_for_product:
+            return_move = self._scan_line__create_return_move(
+                picking, origin_moves_for_product
             )
-            message = self._check_move_available(move, message_code="product")
-            if message:
-                return self._response_for_select_move(
-                    picking,
-                    message=message,
-                )
-            return self._select_line_from_product(picking, move, product)
+            if not return_move:
+                # It means that among all origin moves, none has been found with
+                # max qty to return being positive.
+                # Which means all lines have already been returned.
+                message = self.msg_store.move_already_returned()
+                return self._response_for_select_move(picking, message=message)
+            picking.action_confirm()
+            picking.action_assign()
+            # return_move._action_confirm()
+            return self._scan_line__find_or_create_line(picking, return_move)
+
+    def _scan_line__by_product(self, picking, product):
+        move = picking.move_lines.filtered(lambda m: m.product_id == product)
+        # Only create a return if don't already have a maching reception move
+        if not move and self.work.menu.allow_return:
+            response = self._scan_line__by_product__return(picking, product)
+            if response:
+                return response
+        # Otherwise, the picking isn't a return, and should be a regular reception
+        message = self._check_move_available(move, "product")
+        if message:
+            return self._response_for_select_move(
+                picking,
+                message=message,
+            )
+        return self._scan_line__find_or_create_line(picking, move)
+
+    def _scan_line__by_packaging__return(self, picking, packaging):
+        search = self._actions_for("search")
+        origin_move_domain = [
+            ("picking_id.picking_type_code", "=", "outgoing"),
+        ]
+        origin_moves = search.origin_move_from_scan(
+            picking.origin, extra_domain=origin_move_domain
+        )
+        origin_moves_for_packaging = origin_moves.filtered(
+            lambda m: packaging in m.product_id.packaging_ids
+        )
+        if origin_moves and not origin_moves_for_packaging:
+            message = self.msg_store.packaging_not_found_in_picking()
+            return self._response_for_select_move(picking, message=message)
+        # If we have an origin move, create the return move, and go to next screen
+        if origin_moves_for_packaging:
+            return_move = self._scan_line__create_return_move(
+                picking, origin_moves_for_packaging
+            )
+            return_move._action_confirm()
+            return self._scan_line__find_or_create_line(
+                picking, return_move, packaging.qty
+            )
 
     def _scan_line__by_packaging(self, picking, packaging):
-        message = self._check_picking_status(picking)
+        move = picking.move_lines.filtered(
+            lambda m: packaging in m.product_id.packaging_ids
+        )
+        # Only create a return if don't already have a maching reception move
+        if not move and self.work.menu.allow_return:
+            response = self._scan_line__by_packaging__return(picking, packaging)
+            if response:
+                return response
+        message = self._check_move_available(move, "packaging")
         if message:
-            return self._response_for_select_move(picking, message=message)
-        if packaging:
-            move = fields.first(
-                picking.move_lines.filtered(
-                    lambda m: packaging in m.product_id.packaging_ids
-                    and float_compare(
-                        m.quantity_done,
-                        m.product_uom_qty,
-                        precision_rounding=m.product_uom.rounding,
-                    )
-                    == -1
-                )
+            return self._response_for_select_move(
+                picking,
+                message=message,
             )
-            message = self._check_move_available(move, message_code="packaging")
-            if message:
-                return self._response_for_select_move(
-                    picking,
-                    message=message,
-                )
-            return self._select_line_from_packaging(picking, move, packaging)
+        return self._scan_line__find_or_create_line(picking, move)
 
     def _scan_line__by_lot(self, picking, lot):
         lines = picking.move_line_ids.filtered(
@@ -439,6 +528,14 @@ class Reception(Component):
             return self.msg_store.move_already_done()
 
     def _set_quantity__by_product(self, picking, selected_line, product):
+        # This is a general rule here. whether the return has been created from
+        # shopfloor or not, you cannot return more than what was shipped.
+        # Therefore, we cannot use the `is_shopfloor_return` here.
+        previous_vals = {
+            "qty_done": selected_line.qty_done,
+        }
+        is_return_line = bool(selected_line.move_id.origin_returned_move_id)
+        max_qty_done = selected_line.move_id.product_uom_qty
         if product.id != selected_line.product_id.id:
             return self._response_for_set_quantity(
                 picking,
@@ -446,9 +543,35 @@ class Reception(Component):
                 message=self.msg_store.wrong_record(product),
             )
         selected_line.qty_done += 1
-        return self._response_for_set_quantity(picking, selected_line)
+        response = self._response_for_set_quantity(picking, selected_line)
+        if self.work.menu.allow_return and is_return_line:
+            message_type = response.get("message", {}).get("message_type")
+            # If we have an error, return it, since this is also true for return lines
+            if message_type == "error":
+                return response
+            rounding = selected_line.product_uom_id.rounding
+            compare = float_compare(
+                selected_line.qty_done, max_qty_done, precision_rounding=rounding
+            )
+            # We cannot set a qty_done superior to what has initally been sent
+            if compare == 1:
+                # If so, reset selected_line to its previous state, and return an error
+                selected_line.write(previous_vals)
+                message = self.msg_store.return_line_invalid_qty()
+                return self._response_for_set_quantity(
+                    picking, selected_line, message=message
+                )
+        return response
 
     def _set_quantity__by_packaging(self, picking, selected_line, packaging):
+        # This is a general rule here. whether the return has been created from
+        # shopfloor or not, you cannot return more than what was shipped.
+        # Therefore, we cannot use the `is_shopfloor_return` here.
+        previous_vals = {
+            "qty_done": selected_line.qty_done,
+        }
+        is_return_line = bool(selected_line.move_id.origin_returned_move_id)
+        max_qty_done = selected_line.move_id.product_uom_qty
         if packaging.product_id.id != selected_line.product_id.id:
             return self._response_for_set_quantity(
                 picking,
@@ -456,7 +579,26 @@ class Reception(Component):
                 message=self.msg_store.wrong_record(packaging),
             )
         selected_line.qty_done += packaging.qty
-        return self._response_for_set_quantity(picking, selected_line)
+        response = self._response_for_set_quantity(picking, selected_line)
+        if self.work.menu.allow_return and is_return_line:
+            message_type = response.get("message", {}).get("message_type")
+            # If we have an error, return it, since this is also true for return lines
+            if message_type == "error":
+                return response
+            # We cannot set a qty_done superior to what has initally been sent
+            rounding = selected_line.product_uom_id.rounding
+            compare = float_compare(
+                selected_line.qty_done, max_qty_done, precision_rounding=rounding
+            )
+            # We cannot set a qty_done superior to what has initally been sent
+            if compare == 1:
+                # If so, reset selected_line to its previous state, and return an error
+                selected_line.write(previous_vals)
+                message = self.msg_store.return_line_invalid_qty()
+                return self._response_for_set_quantity(
+                    picking, selected_line, message=message
+                )
+        return response
 
     def _set_quantity__by_package(self, picking, selected_line, package):
         pack_location = package.location_id
@@ -667,13 +809,19 @@ class Reception(Component):
             "product": self._scan_document__by_product,
             "packaging": self._scan_document__by_packaging,
             "lot": self._scan_document__by_lot,
+            "origin_move": self._scan_document__by_origin_move,
         }
 
     def _scan_document__get_find_kw(self):
-        return {"picking": {"use_origin": True}}
+        return {
+            "picking": {"use_origin": True},
+            "delivered_picking": {"use_origin": True},
+        }
 
     def scan_document(self, barcode):
         """Scan a picking, a product or a packaging.
+
+        If an outgoing done move's origin is scanned, a return picking will be created.
 
         Input:
             barcode: the barcode of a product, a packaging, a picking name or a lot
@@ -732,6 +880,9 @@ class Reception(Component):
           - set_quantity: Packaging / Product has been scanned. Not tracked product
         """
         picking = self.env["stock.picking"].browse(picking_id)
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_move(picking, message=message)
         handlers_by_type = {
             "product": self._scan_line__by_product,
             "packaging": self._scan_line__by_packaging,
@@ -767,6 +918,12 @@ class Reception(Component):
                 picking, message=self.msg_store.transfer_no_qty_done()
             )
         if not confirmation:
+            # Do not create a backorder if this is a shopfloor return.
+            if picking.is_shopfloor_return and self.work.menu.allow_return:
+                picking.with_context(cancel_backorder=True)._action_done()
+                return self._response_for_select_document(
+                    message=self.msg_store.transfer_done_success(picking)
+                )
             to_backorder = picking._check_backorder()
             if to_backorder:
                 # Not all lines are fully done, ask the user to confirm the
@@ -889,6 +1046,19 @@ class Reception(Component):
         selected_line.result_package_id = package
         return self._response_for_set_destination(picking, selected_line)
 
+    def _set_quantity__assign_quantity(self, picking, selected_line, quantity):
+        # If this is a return line, we cannot assign more qty_done than what
+        # was originally sent.
+        is_return_line = bool(selected_line.move_id.origin_returned_move_id)
+        max_qty_done = selected_line.move_id.product_uom_qty
+        if is_return_line and self.work.menu.allow_return:
+            if quantity > max_qty_done:
+                message = self.msg_store.return_line_invalid_qty()
+                return self._response_for_set_quantity(
+                    picking, selected_line, message=message
+                )
+        selected_line.qty_done = quantity
+
     def set_quantity(
         self,
         picking_id,
@@ -927,16 +1097,18 @@ class Reception(Component):
         if quantity:
             # We set qty_done to be equal to the qty of the picker
             # at the moment of the scan.
-            selected_line.qty_done = quantity
+            response = self._set_quantity__assign_quantity(
+                picking, selected_line, quantity
+            )
+            if response:
+                return response
         if barcode:
             # Then, we add the qty of whatever was scanned
             # on top of the qty of the picker.
             return self._set_quantity__by_barcode(
                 picking, selected_line, barcode, confirmation
             )
-        return self._response_for_set_quantity(
-            picking, selected_line, message=self.msg_store.barcode_not_found()
-        )
+        return self._response_for_set_quantity(picking, selected_line)
 
     def process_with_existing_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)

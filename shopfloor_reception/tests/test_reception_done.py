@@ -8,7 +8,7 @@ from odoo import fields
 from .common import CommonCase
 
 
-class TestSelectDestPackage(CommonCase):
+class TestReceptionDone(CommonCase):
     def test_set_done_no_backorder(self):
         picking = self._create_picking()
         picking.move_line_ids.write({"qty_done": 10, "shopfloor_checkout_done": True})
