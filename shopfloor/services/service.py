@@ -46,7 +46,7 @@ class BaseShopfloorProcess(AbstractComponent):
         # every time.
         return self._actions_for("search_move_line", picking_types=self.picking_types)
 
-    def _check_picking_status(self, pickings):
+    def _check_picking_status(self, pickings, states=("assigned",)):
         """Check if given pickings can be processed.
 
         If the picking is already done, canceled or didn't belong to the
@@ -57,7 +57,7 @@ class BaseShopfloorProcess(AbstractComponent):
                 return self.msg_store.stock_picking_not_found()
             if picking.state == "done":
                 return self.msg_store.already_done()
-            if picking.state != "assigned":  # the picking must be ready
+            if picking.state not in states:  # the picking must be ready
                 return self.msg_store.stock_picking_not_available(picking)
             if picking.picking_type_id not in self.picking_types:
                 return self.msg_store.cannot_move_something_in_picking_type()
