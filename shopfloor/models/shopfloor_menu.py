@@ -39,6 +39,13 @@ automatically post the corresponding line
 if this option is checked.
 """
 
+RETURN_HELP = """
+When enabled, you can receive unplanned products that are returned
+from an existing delivery matched on the origin (SO name).
+A new move will be added as a return of the delivery,
+decreasing the delivered quantity of the related SO line.
+"""
+
 
 class ShopfloorMenu(models.Model):
     _inherit = "shopfloor.menu"
