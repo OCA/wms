@@ -132,6 +132,13 @@
                     />
                     <field name="allow_alternative_destination" />
               </group>
+              <group
+                    name="allow_return"
+                    attrs="{'invisible': [('allow_return_is_possible', '=', False)]}"
+                >
+                  <field name="allow_return_is_possible" invisible="1" />
+                  <field name="allow_return" />
+              </group>
             </group>
         </field>
     </record>

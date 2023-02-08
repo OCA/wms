@@ -186,6 +186,14 @@ class ShopfloorMenu(models.Model):
     allow_alternative_destination_is_possible = fields.Boolean(
         compute="_compute_allow_alternative_destination_is_possible"
     )
+    allow_return_is_possible = fields.Boolean(
+        compute="_compute_allow_return_is_possible"
+    )
+    allow_return = fields.Boolean(
+        string="Allow create returns",
+        default=False,
+        help=RETURN_HELP,
+    )
 
     auto_post_line = fields.Boolean(
         string="Automatically post line",
@@ -424,3 +432,8 @@ class ShopfloorMenu(models.Model):
             menu.allow_alternative_destination_is_possible = (
                 menu.scenario_id.has_option("allow_alternative_destination")
             )
+
+    @api.depends("scenario_id")
+    def _compute_allow_return_is_possible(self):
+        for menu in self:
+            menu.allow_return_is_possible = menu.scenario_id.has_option("allow_return")
