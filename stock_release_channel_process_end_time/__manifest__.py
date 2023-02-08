@@ -12,6 +12,7 @@
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "depends": [
+        "partner_tz",
         "stock_release_channel",
     ],
     "data": [

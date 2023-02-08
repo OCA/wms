@@ -91,3 +91,37 @@ class ReleaseChannelEndDateCase(ChannelReleaseCase):
 
         user.groups_id |= self.env.ref("stock.group_stock_manager")
         self.assertTrue(self.channel.with_user(user).process_end_time_can_edit)
+
+    @freeze_time("2023-01-27")
+    def test_channel_end_date_warehouse_timezone(self):
+        # Set a warehouse with an adress and a timezone on channel
+        self.channel.warehouse_id = self.env.ref("stock.warehouse0")
+        self.channel.warehouse_id.partner_id.tz = "Europe/Brussels"
+        # Set the end time - In UTC == 22:00
+        self.channel.process_end_time = 23.0
+        # Asleep the release channel to void the process end date
+        self.channel.action_sleep()
+        self.channel.invalidate_recordset()
+        # Wake up the channel to set the process end date
+        self.channel.action_wake_up()
+        self.assertEqual(
+            "2023-01-27 22:00:00",
+            fields.Datetime.to_string(self.channel.process_end_date),
+        )
+
+    @freeze_time("2023-01-27")
+    def test_channel_end_date_company_timezone(self):
+        # Set a warehouse with an adress and a timezone on channel
+        self.assertFalse(self.channel.warehouse_id)
+        self.env.company.partner_id.tz = "Europe/Brussels"
+        # Set the end time - In UTC == 22:00
+        self.channel.process_end_time = 23.0
+        # Asleep the release channel to void the process end date
+        self.channel.action_sleep()
+        self.channel.invalidate_recordset()
+        # Wake up the channel to set the process end date
+        self.channel.action_wake_up()
+        self.assertEqual(
+            "2023-01-27 22:00:00",
+            fields.Datetime.to_string(self.channel.process_end_date),
+        )

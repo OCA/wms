@@ -1,7 +1,8 @@
 # Copyright 2023 ACSONE SA/NV
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-
 from odoo import api, fields, models
+
+from odoo.addons.base.models.res_partner import _tz_get
 
 from ..utils import float_to_time, next_datetime
 
@@ -14,6 +15,11 @@ class StockReleaseChannel(models.Model):
         help="Fill in this to indicates when this channel release process would"
         "be ended. This information will be used to compute the channel pickings"
         "scheduled date at channel awaking.",
+    )
+    process_end_time_tz = fields.Selection(
+        selection=_tz_get,
+        compute="_compute_process_end_time_tz",
+        help="Technical field to compute the timezone for the process end time.",
     )
     process_end_time_can_edit = fields.Boolean(
         compute="_compute_process_end_time_can_edit",
@@ -39,11 +45,26 @@ class StockReleaseChannel(models.Model):
         for channel in self:
             # We check if a date is not already set (manually)
             if channel.state != "asleep" and not channel.process_end_date:
-                channel.process_end_date = next_datetime(
-                    now, float_to_time(channel.process_end_time)
+                end = next_datetime(
+                    now,
+                    float_to_time(
+                        channel.process_end_time, tz=channel.process_end_time_tz
+                    ),
                 )
+                channel.process_end_date = end
             elif channel.state == "asleep":
                 channel.process_end_date = False
+
+    @api.depends("warehouse_id.partner_id.tz")
+    @api.depends_context("company")
+    def _compute_process_end_time_tz(self):
+        # As the time is timezone-agnostic, we use the channel warehouse adress timezone
+        # or the company one, either it will be considered as UTC
+        company_tz = self.env.company.partner_id.tz
+        for channel in self:
+            channel.process_end_time_tz = (
+                channel.warehouse_id.partner_id.tz or company_tz or False
+            )
 
     @api.model
     def assign_release_channel(self, picking):

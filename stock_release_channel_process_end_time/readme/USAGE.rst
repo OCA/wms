@@ -1,3 +1,10 @@
+#. Assign a timezone on the Warehouse address if defined and if needed
+   If you have a lot of warehouses in the same timezone, you can also define
+   the timezone on the company partner.
+   If you don't define a timezone on the warehouse(s) nor the company, the process
+   end time on channels will be considered as UTC.
+
+
 #. Go To Release Channels
 #. Set an end time
 #. Wake up the channel
