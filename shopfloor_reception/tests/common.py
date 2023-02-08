@@ -50,11 +50,6 @@ class CommonCase(BaseCommonCase):
         cls.picking_type = cls.menu.picking_type_ids
         cls.wh = cls.picking_type.warehouse_id
 
-    @classmethod
-    def setUpClassBaseData(cls, *args, **kwargs):
-        super().setUpClassBaseData(*args, **kwargs)
-        cls.wh.sudo().reception_steps = "two_steps"
-
     def _data_for_move_lines(self, lines, **kw):
         return self.data.move_lines(lines, **kw)
 

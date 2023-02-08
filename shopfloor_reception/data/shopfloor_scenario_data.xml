@@ -8,7 +8,8 @@
       <field name="key">reception</field>
       <field name="options_edit">
 {
-  "auto_post_line": true
+      "auto_post_line": true,
+      "allow_return": true
 }
       </field>
   </record>

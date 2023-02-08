@@ -9,3 +9,7 @@ from . import test_set_quantity
 from . import test_set_quantity_action
 from . import test_set_destination
 from . import test_select_dest_package
+from . import test_return_scan_document
+from . import test_return_scan_line
+from . import test_return_set_quantity
+from . import test_return_reception_done
