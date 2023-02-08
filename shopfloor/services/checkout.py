@@ -539,7 +539,7 @@ class Checkout(Component):
 
     def _select_lines_from_lot(self, picking, selection_lines, lot, **kw):
         message = None
-        lines = selection_lines.filtered(lambda l: l.lot_id == lot)
+        lines = self._picking_lines_by_lot(picking, selection_lines, lot)
         if not lines:
             if not kw.get("confirm_lot"):
                 lines_same_product = selection_lines.filtered(
@@ -614,6 +614,10 @@ class Checkout(Component):
 
         self._select_lines(lines, prefill_qty=1)
         return self._response_for_select_package(picking, lines, message=message)
+
+    def _picking_lines_by_lot(self, picking, selection_lines, lot):
+        """Control filtering of selected lines by given lot."""
+        return selection_lines.filtered(lambda l: l.lot_id == lot)
 
     def _change_lot_response_handler_ok(self, move_line, message=None):
         return message
