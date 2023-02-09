@@ -25,7 +25,9 @@ def float_to_time(hours, tz=False) -> time:
 
 
 def next_datetime(current: datetime, hours: time, **kwargs) -> datetime:
-    repl = current.replace(hour=hours.hour, minute=hours.minute, **kwargs)
+    repl = current.replace(
+        hour=hours.hour, minute=hours.minute, second=0, microsecond=0, **kwargs
+    )
     if hours.tzinfo:
         repl += hours.utcoffset()
     while repl <= current:
