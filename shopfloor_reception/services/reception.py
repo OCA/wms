@@ -858,6 +858,12 @@ class Reception(Component):
         for line in lines:
             if not line.move_id:
                 line.unlink()
+        # When assigning the new move a new picking
+        # the old picking's state is reverted to 'confirmed'.
+        # We need to ensure the state of the old picking
+        # is kept as 'assigned' to allow processing
+        # the rest of the lines.
+        picking.action_assign()
 
     def set_destination(
         self, picking_id, selected_line_id, location_name, confirmation=False
