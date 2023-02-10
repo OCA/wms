@@ -30,16 +30,19 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 "available_to_promise_defer_pull": True,
             }
         )
-        cls.shipping1.release_available_to_promise()
-        cls.shipping2.release_available_to_promise()
+        shippings = cls.shipping1 | cls.shipping2
+        cls.deliveries = shippings
+        shippings.release_available_to_promise()
         cls.picking1 = cls._prev_picking(cls.shipping1)
         cls.picking1.action_assign()
         cls.picking2 = cls._prev_picking(cls.shipping2)
         cls.picking2.action_assign()
 
+
     def test_unrelease_delivery_no_picking_done(self):
-        # the pick moves for delivery 1 and 2 are merged
-        self.assertEqual(self.picking1, self.picking2)
+        # the picking for delivery 1 and 2 are merged into one move
+        self.assertEqual(self.picking1.move_lines.move_line_ids.product_uom_qty, 5)
+        self.assertEqual(self.picking1.move_lines.move_dest_ids, self.deliveries.move_lines)
         self.shipping1.unrelease()
         self.assertEqual(len(self.picking1.move_lines), 2)
         move_cancel = self.picking1.move_lines.filtered(lambda m: m.state == "cancel")
@@ -63,7 +66,8 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         """
         self.shipping1.action_cancel()
         self.assertEqual(self.shipping1.state, "cancel")
-        line_active = self.picking1.move_lines.filtered(lambda l: l.state == "assigned")
-        line_cancel = self.picking1.move_lines.filtered(lambda l: l.state == "cancel")
-        self.assertEqual(line_active.product_uom_qty, 3.0)
-        self.assertEqual(line_cancel.product_uom_qty, 2.0)
+        move_active = self.picking1.move_lines.filtered(lambda l: l.state == "assigned")
+        move_cancel = self.picking1.move_lines.filtered(lambda l: l.state == "cancel")
+        self.assertEqual(move_active.product_uom_qty, 3.0)
+        self.assertEqual(move_cancel.product_uom_qty, 2.0)
+        self.assertEqual(move_active.move_dest_ids, self.shipping2.move_lines)

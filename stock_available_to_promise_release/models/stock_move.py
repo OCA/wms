@@ -557,8 +557,10 @@ class StockMove(models.Model):
         moves_to_unrelease._check_unrelease_allowed()
         moves_to_unrelease.write({"need_release": True})
         impacted_picking_ids = set()
+
         for move in moves_to_unrelease:
             iterator = move._get_chained_moves_iterator("move_orig_ids")
+            moves_to_cancel = self.env["stock.move"]
             next(iterator)  # skip the current move
             for origin_moves in iterator:
                 origin_moves = origin_moves.filtered(
@@ -569,7 +571,9 @@ class StockMove(models.Model):
                     impacted_picking_ids.update(origin_moves.mapped("picking_id").ids)
                     # avoid to propagate cancel to the original move
                     origin_moves.write({"propagate_cancel": False})
-                    origin_moves._action_cancel()
+                    # origin_moves._action_cancel()
+                    moves_to_cancel |= origin_moves
+            moves_to_cancel._action_cancel()
         moves_to_unrelease.write({"need_release": True})
         for picking, moves in itertools.groupby(
             moves_to_unrelease, lambda m: m.picking_id
