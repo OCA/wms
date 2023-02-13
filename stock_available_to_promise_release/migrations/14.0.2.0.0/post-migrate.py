@@ -13,10 +13,10 @@ def migrate(cr, version):
     )
     cr.execute("update stock_picking_type set prevent_new_move_after_release = true")
     _logger.info(
-        "stock_available_to_promise_release: Set last release date on"
-        " some pickings"
+        "stock_available_to_promise_release: Set last release date on" " some pickings"
     )
-    cr.execute("""
+    cr.execute(
+        """
 with picks as (
     select sp.id  from stock_picking sp
         left join stock_picking_type spt on sp.picking_type_id = spt.id
@@ -30,4 +30,5 @@ update stock_picking
     set last_release_date = create_date
     from picks
     where stock_picking.id = picks.id
-    """)
+    """
+    )
