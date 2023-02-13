@@ -38,11 +38,12 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         cls.picking2 = cls._prev_picking(cls.shipping2)
         cls.picking2.action_assign()
 
-
     def test_unrelease_delivery_no_picking_done(self):
         # the picking for delivery 1 and 2 are merged into one move
         self.assertEqual(self.picking1.move_lines.move_line_ids.product_uom_qty, 5)
-        self.assertEqual(self.picking1.move_lines.move_dest_ids, self.deliveries.move_lines)
+        self.assertEqual(
+            self.picking1.move_lines.move_dest_ids, self.deliveries.move_lines
+        )
         self.shipping1.unrelease()
         self.assertEqual(len(self.picking1.move_lines), 2)
         move_cancel = self.picking1.move_lines.filtered(lambda m: m.state == "cancel")

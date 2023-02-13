@@ -44,7 +44,10 @@ class TestAvailableToPromiseRelease3steps(PromiseReleaseCommonCase):
 
     def test_unrelease_delivery_no_picking_done(self):
         self.assertEqual(self.pick1.move_lines.move_line_ids.product_uom_qty, 5)
-        self.assertEqual(self.pick1.move_lines.move_dest_ids, self.pack1.move_lines | self.pack2.move_lines)
+        self.assertEqual(
+            self.pick1.move_lines.move_dest_ids,
+            self.pack1.move_lines | self.pack2.move_lines,
+        )
         self.ship1.unrelease()
         self.assertEqual(self.pack1.state, "cancel")
         self.assertTrue(self.ship1.need_release)
