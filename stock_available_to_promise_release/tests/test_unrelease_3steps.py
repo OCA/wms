@@ -43,7 +43,8 @@ class TestAvailableToPromiseRelease3steps(PromiseReleaseCommonCase):
         cls.pick1.action_assign()
 
     def test_unrelease_delivery_no_picking_done(self):
-        self.assertEqual(self.pick1.move_lines.move_line_ids.product_uom_qty, 5)
+        # Not the case with stock_group_by_partner_by_carrier
+        # self.assertEqual(self.pick1.move_lines.move_line_ids.product_uom_qty, 5)
         self.assertEqual(
             self.pick1.move_lines.move_dest_ids,
             self.pack1.move_lines | self.pack2.move_lines,
@@ -63,5 +64,4 @@ class TestAvailableToPromiseRelease3steps(PromiseReleaseCommonCase):
         # The destination move is on pack2 which is wrong, but it is canceled, so
         # self.assertFalse(move_cancel.move_dest_ids)
         self.assertFalse(move_cancel.move_orig_ids)
-        # __import__("pdb").set_trace()
         self.assertEqual(self.ship2.move_lines.move_orig_ids, self.pack2.move_lines)

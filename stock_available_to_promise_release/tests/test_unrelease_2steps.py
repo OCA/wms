@@ -40,7 +40,8 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
 
     def test_unrelease_delivery_no_picking_done(self):
         # the picking for delivery 1 and 2 are merged into one move
-        self.assertEqual(self.picking1.move_lines.move_line_ids.product_uom_qty, 5)
+        # Not the case with stock_group_by_partner_by_carrier
+        # self.assertEqual(self.picking1.move_lines.move_line_ids.product_uom_qty, 5)
         self.assertEqual(
             self.picking1.move_lines.move_dest_ids, self.deliveries.move_lines
         )
