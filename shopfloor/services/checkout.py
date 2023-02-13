@@ -1314,9 +1314,11 @@ class Checkout(Component):
                         "body": _("Remaining raw product not packed, proceed anyway?"),
                     },
                 )
-        picking._action_done()
+        stock = self._actions_for("stock")
+        lines_done = self._lines_checkout_done(picking)
+        stock.validate_moves(lines_done.move_id)
         return self._response_for_select_document(
-            message=self.msg_store.transfer_done_success(picking)
+            message=self.msg_store.transfer_done_success(lines_done.picking_id)
         )
 
 
