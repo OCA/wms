@@ -601,6 +601,8 @@ class StockMove(models.Model):
             origins -= origin
         return new_origin_moves
 
+    # This hook has been added to Odoo standard implemenation
+    # But if the stock_move_assign_picking_hook module is installed it will not work !
     def _search_picking_for_assignation_domain(self):
         domain = super()._search_picking_for_assignation_domain()
         if self.env.context.get("release_available_to_promise"):
@@ -610,3 +612,13 @@ class StockMove(models.Model):
         if self.picking_type_id.prevent_new_move_after_release:
             domain = expression.AND([domain, [("last_release_date", "=", False)]])
         return domain
+
+    # def _domain_search_picking_for_assignation(self):
+    #     domain = super()._domain_search_picking_for_assignation()
+    #     if self.env.context.get("release_available_to_promise"):
+    #         force_new_picking = not self.rule_id.no_backorder_at_release
+    #         if force_new_picking:
+    #             domain = expression.AND([domain, [("id", "!=", self.picking_id.id)]])
+    #     if self.picking_type_id.prevent_new_move_after_release:
+    #         domain = expression.AND([domain, [("last_release_date", "=", False)]])
+    #     return domain
