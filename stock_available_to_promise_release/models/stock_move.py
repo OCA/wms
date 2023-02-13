@@ -346,16 +346,10 @@ class StockMove(models.Model):
         )
 
     def _action_cancel(self):
-        # Check that it is a released move...
-        # If yes unreleased it
+        # Unrelease moves that can be, before canceling them.
         moves_to_unrelease = self.filtered(lambda m: m.unrelease_allowed)
         moves_to_unrelease.unrelease()
-        # moves_origin = self.move_orig_ids
-        # __import__("pdb").set_trace()
         super()._action_cancel()
-        # mc = self.filtered(lambda m: m.state=="cancel")
-        # __import__("pdb").set_trace()
-        # mc.move_orig_ids.unrelease()
         self.write({"need_release": False})
         return True
 
