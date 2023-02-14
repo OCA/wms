@@ -722,7 +722,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertEqual(len(pickings), 1, "expect only the last out->customer")
 
         cust_picking = pickings
-        move_state = cust_picking.mapped("move_ids").mapped("state")
+        move_state = cust_picking.mapped("move_lines").mapped("state")
         self.assertTrue(len(move_state) == 1 and move_state[0] == "waiting")
         self.assertEqual(cust_picking.state, "waiting")
         self.assertRecordValues(
@@ -757,11 +757,11 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         # the released customer picking is not set to "printed"
         self.assertRecordValues(cust_picking, [{"printed": False}])
 
-        self.assertRecordValues(out_picking.move_ids, [{"product_qty": 7.0}])
+        self.assertRecordValues(out_picking.move_lines, [{"product_qty": 7.0}])
 
         # the splite moves remains into the customer picking
         self.assertRecordValues(
-            cust_picking.move_ids,
+            cust_picking.move_lines,
             [
                 {"product_qty": 7.0, "state": "waiting"},
                 {"product_qty": 13.0, "state": "waiting"},
@@ -773,7 +773,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertRecordValues(out_picking, [{"state": "done"}])
         self.assertRecordValues(cust_picking, [{"state": "assigned"}])
         self.assertRecordValues(
-            cust_picking.move_ids,
+            cust_picking.move_lines,
             [
                 {
                     "state": "assigned",
@@ -798,7 +798,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         )
         self.assertEqual(len(cust_backorder), 1)
 
-        self.env["stock.move"].invalidate_model(
+        self.env["stock.move"].invalidate_cache(
             fnames=[
                 "previous_promised_qty",
                 "ordered_available_to_promise_uom_qty",
@@ -810,7 +810,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         cust_backorder.release_available_to_promise()
         self.assertEqual(len(self._pickings_in_group(cust_picking.group_id)), 3)
 
-        self.env["stock.move"].invalidate_model(
+        self.env["stock.move"].invalidate_cache(
             fnames=[
                 "previous_promised_qty",
                 "ordered_available_to_promise_uom_qty",
@@ -828,7 +828,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             - out_picking
         )
         self.assertRecordValues(
-            out_backorder.move_ids,
+            out_backorder.move_lines,
             [
                 {
                     "state": "assigned",
@@ -876,7 +876,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         backorder = cust_picking.backorder_ids
         self.assertFalse(backorder)
         self.assertRecordValues(
-            cust_picking.move_ids.sorted("id"),
+            cust_picking.move_lines.sorted("id"),
             [
                 # product 1 is partially available -> split
                 {
@@ -922,7 +922,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             ],
         )
         self.assertRecordValues(
-            out_picking.move_ids,
+            out_picking.move_lines,
             [
                 {"product_qty": 10.0, "product_id": self.product1.id},
                 {"product_qty": 10.0, "product_id": self.product2.id},
