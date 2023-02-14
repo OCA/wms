@@ -155,4 +155,39 @@ const DEMO_CLUSTER_PICKING_1 = {
     },
 };
 
-demotools.add_case("cluster_picking", DEMO_CLUSTER_PICKING_1);
+const DEMO_CLUSTER_PICKING_2 = _.cloneDeep(DEMO_CLUSTER_PICKING_1);
+
+DEMO_CLUSTER_PICKING_2.scan_line = {
+    next_state: "scan_destination",
+    data: {
+        scan_destination: {
+            ...demotools.makeBatchPickingLine(),
+            disable_full_bin_action: true,
+        },
+    },
+};
+
+const DEMO_CASE = {
+    by_menu_id: {},
+};
+
+const cluster_picking_menu_case1 = demotools.addAppMenu(
+    {
+        name: "Cluster picking: case 1",
+        scenario: "cluster_picking",
+        picking_types: [{id: 27, name: "Random type"}],
+    },
+    "cp_1"
+);
+const cluster_picking_menu_case2 = demotools.addAppMenu(
+    {
+        name: "Cluster picking: case 2 (no full bin)",
+        scenario: "cluster_picking",
+        picking_types: [{id: 28, name: "Random type"}],
+    },
+    "cp_2"
+);
+DEMO_CASE.by_menu_id[cluster_picking_menu_case1] = DEMO_CLUSTER_PICKING_1;
+DEMO_CASE.by_menu_id[cluster_picking_menu_case2] = DEMO_CLUSTER_PICKING_2;
+
+demotools.add_case("cluster_picking", DEMO_CASE);

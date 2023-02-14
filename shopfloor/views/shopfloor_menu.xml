@@ -68,6 +68,13 @@
                     />
               </group>
               <group
+                    name="disable_full_bin_action"
+                    attrs="{'invisible': [('disable_full_bin_action_is_possible', '=', False)]}"
+                >
+                  <field name="disable_full_bin_action_is_possible" invisible="1" />
+                  <field name="disable_full_bin_action" />
+              </group>
+              <group
                     name="multiple_move_single_pack"
                     attrs="{'invisible': [('multiple_move_single_pack_is_possible', '=', False)]}"
                 >
