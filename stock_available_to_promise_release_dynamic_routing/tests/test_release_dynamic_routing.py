@@ -86,7 +86,7 @@ class TestAvailableToPromiseReleaseDynamicRouting(PromiseReleaseCommonCase):
         # this picking is created by standard 2-step rules
         pick_picking = pick_moves.picking_id
         # this flag is set by stock_available_to_promise_release
-        self.assertTrue(pick_picking.printed)
+        self.assertTrue(pick_picking.last_release_date)
 
         routing_moves = pick_moves.move_orig_ids
         # if we put "printed" after we assign the 1st move only, the 2nd
@@ -95,7 +95,7 @@ class TestAvailableToPromiseReleaseDynamicRouting(PromiseReleaseCommonCase):
         routing_picking = routing_moves.picking_id
         self.assertEqual(routing_picking.picking_type_id, pick_type_routing_op)
 
-        self.assertTrue(routing_picking.printed)
+        self.assertTrue(routing_picking.last_release_date)
 
     def test_dynamic_routing_change_picking_type_printed(self):
         """Type Dynamic routing applied after release get "printed" flag"""
@@ -158,7 +158,7 @@ class TestAvailableToPromiseReleaseDynamicRouting(PromiseReleaseCommonCase):
         pick_picking = pick_moves.picking_id
         self.assertEqual(pick_picking.picking_type_id, pick_type_routing_op)
         # this flag is set by stock_available_to_promise_release
-        self.assertTrue(pick_picking.printed)
+        self.assertTrue(pick_picking.last_release_date)
 
     def test_dynamic_routing_change_picking_type_out_printed(self):
         """Type Dynamic routing (on OUT) applied after release get "printed" flag
@@ -224,7 +224,7 @@ class TestAvailableToPromiseReleaseDynamicRouting(PromiseReleaseCommonCase):
                     "location_id": self.wh.wh_output_stock_loc_id.id,
                     "location_dest_id": self.loc_customer.id,
                     "picking_type_id": out_type_routing.id,
-                    "printed": True,
                 }
             ],
         )
+        self.assertTrue(new_cust_picking.last_release_date)
