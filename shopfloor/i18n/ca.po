@@ -278,6 +278,16 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__disable_full_bin_action_is_possible
+msgid "Disable Full Bin Action Is Possible"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__disable_full_bin_action
+msgid "Disable full bin action"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app__display_name
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__display_name
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__display_name
@@ -1515,6 +1525,11 @@ msgstr ""
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_get_work
 msgid ""
 "When enabled the user will have the option to ask for a task to work on."
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__disable_full_bin_action
+msgid "When picking, prevent unloading the whole bin when full."
 msgstr ""
 
 #. module: shopfloor
