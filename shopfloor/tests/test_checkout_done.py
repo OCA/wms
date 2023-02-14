@@ -52,13 +52,16 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
         )
 
     def test_done_partial_confirm(self):
-        # line is done
+        # lines are done
         response = self.service.dispatch(
             "done", params={"picking_id": self.picking.id, "confirmation": True}
         )
-
+        # as they are all the lines that relate to the picking, they didn't have
+        # been extracted in a separate transfer. An usual backorder has been
+        # created for the unprocessed qty.
         self.assertRecordValues(self.picking, [{"state": "done"}])
         self.assertTrue(self.picking.backorder_ids)
+        self.assertEqual(self.picking.backorder_ids.move_line_ids.product_uom_qty, 8)
 
         self.assert_response(
             response,
@@ -110,14 +113,20 @@ class CheckoutDoneRawUnpackedCase(CheckoutCommonCase):
             "done", params={"picking_id": self.picking.id, "confirmation": True}
         )
 
-        self.assertRecordValues(self.picking, [{"state": "done", "backorder_ids": []}])
+        # it has been extracted in its own picking, the current one staying open
+        picking_done = self.line1.picking_id
+        self.assertRecordValues(picking_done, [{"state": "done", "backorder_ids": []}])
+        self.assertRecordValues(
+            self.picking, [{"state": "assigned", "backorder_ids": [picking_done.id]}]
+        )
         self.assertRecordValues(
             self.line1 + self.line2,
             [{"result_package_id": self.package.id}, {"result_package_id": False}],
         )
+        self.assertIn(self.line2, self.picking.move_line_ids)
 
         self.assert_response(
             response,
             next_state="select_document",
-            message=self.service.msg_store.transfer_done_success(self.picking),
+            message=self.service.msg_store.transfer_done_success(picking_done),
         )
