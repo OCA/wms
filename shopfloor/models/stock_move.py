@@ -39,8 +39,8 @@ class StockMove(models.Model):
                 )
             split_move_vals = self._split(qty_to_split)
             split_move = self.create(split_move_vals)
-            split_move._action_confirm(merge=False)
             split_move.move_line_ids = to_move
+            split_move._action_confirm(merge=False)
             split_move._recompute_state()
             split_move._action_assign()
             self._recompute_state()
