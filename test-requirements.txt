@@ -1,2 +1,3 @@
 freezegun
 odoo_test_helper
+odoo14-addon-stock-move-assign-picking-hook @ git+https://github.com/oca/stock-logistics-workflow.git@refs/pull/1222/head#subdirectory=setup/stock_move_assign_picking_hook
