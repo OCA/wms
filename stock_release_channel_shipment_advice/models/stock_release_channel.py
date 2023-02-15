@@ -23,6 +23,9 @@ class StockReleaseChannel(models.Model):
         string="Shipment Advices",
         readonly=True,
     )
+    dock_id = fields.Many2one(
+        comodel_name="stock.dock", domain='[("warehouse_id", "=", warehouse_id)]'
+    )
 
     def button_show_shipment_advice(self):
         self.ensure_one()
@@ -66,9 +69,12 @@ class StockReleaseChannel(models.Model):
         }
 
     def _get_new_planner(self):
+        self.ensure_one()
         planner = self.env["shipment.advice.planner"].new({})
         planner.shipment_planning_method = self.shipment_planning_method
         planner.release_channel_id = self
+        planner.warehouse_id = self.warehouse_id
+        planner.dock_id = self.dock_id
         return planner
 
     def _plan_shipments(self):
@@ -78,3 +84,7 @@ class StockReleaseChannel(models.Model):
             planner = channel._get_new_planner()
             shipment_advices |= planner._plan_shipments_for_method()
         return shipment_advices
+
+    @api.onchange("warehouse_id")
+    def _onchange_warehouse_unset_dock(self):
+        self.update({"dock_id": False})
