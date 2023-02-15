@@ -33,6 +33,12 @@
                     context="{'default_release_channel_id':active_id}"
                 />
             </xpath>
+            <xpath expr="//field[@name='warehouse_id']" position="after">
+                <field
+                    name="dock_id"
+                    attrs="{'invisible': [('warehouse_id', '=', False)]}"
+                />
+            </xpath>
         </field>
     </record>
 

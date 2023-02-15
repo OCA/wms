@@ -16,6 +16,7 @@ class TestStockReleaseChannelShipmentAdvice(ChannelReleaseCase):
         cls._update_qty_in_location(output_loc, cls.product2, 100)
         cls.channel.picking_ids.move_ids.write({"procure_method": "make_to_stock"})
         cls.channel.picking_ids.action_assign()
+        cls.dock = cls.env.ref("shipment_advice.stock_dock_demo")
 
     def test_can_plan_shipment(self):
         """plan shipment isn't allowed when the planning method is none or when no
@@ -43,3 +44,16 @@ class TestStockReleaseChannelShipmentAdvice(ChannelReleaseCase):
         self.assertEqual(shipment_advice.planned_pickings_count, 3)
         self.assertEqual(shipment_advice.shipment_type, "outgoing")
         self.assertEqual(shipment_advice.warehouse_id, self.wh)
+
+    def test_plan_shipment_simple_with_dock(self):
+        self.channel.shipment_planning_method = "simple"
+        self.channel.dock_id = self.dock
+        pickings = self.channel.picking_to_plan_ids
+        self.channel.button_plan_shipments()
+        shipment_advice = self.channel.shipment_advice_ids
+        self.assertTrue(shipment_advice)
+        self.assertEqual(shipment_advice.planned_picking_ids, pickings)
+        self.assertEqual(shipment_advice.planned_pickings_count, 3)
+        self.assertEqual(shipment_advice.shipment_type, "outgoing")
+        self.assertEqual(shipment_advice.warehouse_id, self.wh)
+        self.assertEqual(shipment_advice.dock_id, self.dock)
