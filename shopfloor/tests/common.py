@@ -200,7 +200,7 @@ class CommonCase(BaseCommonCase):
             else:
                 package = cls.env["stock.quant.package"].create({})
         for move in moves:
-            key = (move.product_id, location or move.location_id)
+            key = (move, location or move.location_id)
             product_locations.setdefault(key, 0)
             product_locations[key] += move.product_qty
             if in_package:
@@ -209,14 +209,17 @@ class CommonCase(BaseCommonCase):
                 if not package or package and not same_package:
                     package = cls.env["stock.quant.package"].create({})
                 product_packages[key] = package
-        for (product, location), qty in product_locations.items():
+        for (move, location), qty in product_locations.items():
             lot = None
             if in_lot:
                 if isinstance(in_lot, models.BaseModel):
                     lot = in_lot
                 else:
                     lot = cls.env["stock.production.lot"].create(
-                        {"product_id": product.id, "company_id": cls.env.company.id}
+                        {
+                            "product_id": move.product_id.id,
+                            "company_id": cls.env.company.id,
+                        }
                     )
             if not (in_lot or in_package):
                 # always add more quantity in stock to avoid to trigger the
@@ -225,7 +228,7 @@ class CommonCase(BaseCommonCase):
                 # of units to pick a package
                 qty *= 2
             cls._update_qty_in_location(
-                location, product, qty, package=package, lot=lot
+                location, move.product_id, qty, package=package, lot=lot
             )
 
     # used by _create_package_in_location
