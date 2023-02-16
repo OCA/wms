@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class StockReleaseChannel(models.Model):
@@ -26,6 +26,7 @@ class StockReleaseChannel(models.Model):
     dock_id = fields.Many2one(
         comodel_name="stock.dock", domain='[("warehouse_id", "=", warehouse_id)]'
     )
+    warehouse_id = fields.Many2one(inverse="_inverse_warehouse_id")
 
     def button_show_shipment_advice(self):
         self.ensure_one()
@@ -49,7 +50,8 @@ class StockReleaseChannel(models.Model):
     def _compute_picking_to_plan_ids(self):
         for rec in self:
             rec.picking_to_plan_ids = rec.picking_ids.filtered(
-                "can_be_planned_in_shipment_advice"
+                lambda p, wh=rec.warehouse_id: p.can_be_planned_in_shipment_advice
+                and (not wh or p.warehouse_id == wh)
             )
 
     def button_plan_shipments(self):
@@ -88,3 +90,21 @@ class StockReleaseChannel(models.Model):
     @api.onchange("warehouse_id")
     def _onchange_warehouse_unset_dock(self):
         self.update({"dock_id": False})
+
+    def _inverse_warehouse_id(self):
+        self.filtered(lambda c: not c.warehouse_id).update({"dock_id": False})
+
+    @api.constrains("warehouse_id", "dock_id")
+    def _check_warehouse(self):
+        for rec in self:
+            if not rec.warehouse_id:
+                continue
+            if rec.dock_id and rec.dock_id.warehouse_id != rec.warehouse_id:
+                raise ValidationError(
+                    _("The dock doesn't belong to the selected warehouse.")
+                )
+
+    @api.onchange("warehouse_id", "dock_id", "picking_to_plan_ids")
+    def _onchange_check_warehouse(self):
+        self.ensure_one()
+        self._check_warehouse()
