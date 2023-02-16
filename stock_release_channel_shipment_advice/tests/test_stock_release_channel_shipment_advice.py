@@ -2,7 +2,8 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
+from odoo.tests.common import Form
 
 from odoo.addons.stock_release_channel.tests.common import ChannelReleaseCase
 
@@ -17,6 +18,8 @@ class TestStockReleaseChannelShipmentAdvice(ChannelReleaseCase):
         cls.channel.picking_ids.move_ids.write({"procure_method": "make_to_stock"})
         cls.channel.picking_ids.action_assign()
         cls.dock = cls.env.ref("shipment_advice.stock_dock_demo")
+        cls.dock.warehouse_id = cls.wh
+        cls.warehouse2 = cls.env.ref("stock.stock_warehouse_shop0")
 
     def test_can_plan_shipment(self):
         """plan shipment isn't allowed when the planning method is none or when no
@@ -57,3 +60,33 @@ class TestStockReleaseChannelShipmentAdvice(ChannelReleaseCase):
         self.assertEqual(shipment_advice.shipment_type, "outgoing")
         self.assertEqual(shipment_advice.warehouse_id, self.wh)
         self.assertEqual(shipment_advice.dock_id, self.dock)
+
+    def test_release_channel_unset_dock_1(self):
+        channel_form = Form(self.channel)
+        with self.assertRaises(
+            AssertionError, msg="can't write on invisible field dock_id"
+        ):
+            channel_form.dock_id = self.dock
+        channel_form.warehouse_id = self.wh
+        channel_form.dock_id = self.dock
+        channel_form.warehouse_id = self.env["stock.warehouse"]
+        channel_form.warehouse_id = self.wh
+        self.assertFalse(channel_form.dock_id)
+
+    def test_release_channel_unset_dock_2(self):
+        self.channel.write({"warehouse_id": self.wh.id, "dock_id": self.dock.id})
+        self.assertEqual(self.channel.dock_id, self.dock)
+        self.channel.warehouse_id = False
+        self.assertFalse(self.channel.dock_id)
+
+    def test_check_warehouse(self):
+        channel_form = Form(self.channel)
+        channel_form.warehouse_id = self.warehouse2
+        with self.assertRaises(
+            ValidationError, msg="The dock doesn't belong to the selected warehouse"
+        ):
+            channel_form.dock_id = self.dock
+        with self.assertRaises(
+            ValidationError, msg="The dock doesn't belong to the selected warehouse"
+        ):
+            channel_form.save()
