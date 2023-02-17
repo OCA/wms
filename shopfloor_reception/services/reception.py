@@ -358,7 +358,7 @@ class Reception(Component):
         if package:
             dest_location = selected_line.location_dest_id
             child_locations = self.env["stock.location"].search(
-                [("id", "child_of", dest_location.id)]
+                [("id", "child_of", dest_location.id), ("usage", "!=", "view")]
             )
             pack_location = package.location_id
             if pack_location:
@@ -889,11 +889,11 @@ class Reception(Component):
         location = search.location_from_scan(location_name)
         move_dest_location = selected_line.location_dest_id
         move_child_locations = self.env["stock.location"].search(
-            [("id", "child_of", move_dest_location.id)]
+            [("id", "child_of", move_dest_location.id), ("usage", "!=", "view")]
         )
         pick_type_dest_location = picking.picking_type_id.default_location_dest_id
         pick_type_child_locations = self.env["stock.location"].search(
-            [("id", "child_of", pick_type_dest_location.id)]
+            [("id", "child_of", pick_type_dest_location.id), ("usage", "!=", "view")]
         )
         if location not in move_child_locations | pick_type_child_locations:
             return self._response_for_set_destination(
