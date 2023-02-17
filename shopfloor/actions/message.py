@@ -594,6 +594,12 @@ class MessageAction(Component):
             ),
         }
 
+    def move_already_returned(self):
+        return {
+            "message_type": "error",
+            "body": _("The product/packaging you selected has already been returned."),
+        }
+
     def return_line_invalid_qty(self):
         return {
             "message_type": "error",
