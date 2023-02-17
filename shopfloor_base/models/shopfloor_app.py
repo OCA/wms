@@ -246,7 +246,7 @@ class ShopfloorApp(models.Model):
 
     def _generate_endpoints_route(self, service, vals):
         method_name = vals.pop("_method_name")
-        route_handler = self.env["endpoint.route.handler"]
+        route_handler = self.env["endpoint.route.handler.tool"]
         new_route = route_handler.new(vals)
         new_route._refresh_endpoint_data()
         options = {
