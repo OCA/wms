@@ -370,11 +370,30 @@ class Reception(Component):
                         picking, selected_line, message=message
                     )
                 else:
+                    quantity = selected_line.qty_done
+                    new_line, qty_check = selected_line._split_qty_to_be_done(
+                        quantity,
+                        lot_id=False,
+                        shopfloor_user_id=False,
+                        expiration_date=False,
+                    )
+                    if qty_check == "greater":
+                        return self._response_for_set_quantity(
+                            picking,
+                            selected_line,
+                            message=self.msg_store.unable_to_pick_more(
+                                selected_line.product_uom_qty
+                            ),
+                        )
                     # If the scanned package has a valid destination,
                     # set both package and destination on the package,
                     # and go back to the selection line screen
                     selected_line.result_package_id = package
                     selected_line.location_dest_id = pack_location
+                    if self.work.menu.auto_post_line:
+                        # If option auto_post_line is active in the shopfloor menu,
+                        # create a split order with this line.
+                        self._auto_post_line(selected_line, picking)
                     return self._response_for_select_move(picking)
             # Scanned package has no location, move to the location selection
             # screen
@@ -888,23 +907,21 @@ class Reception(Component):
         search = self._actions_for("search")
         location = search.location_from_scan(location_name)
         move_dest_location = selected_line.location_dest_id
-        move_child_locations = self.env["stock.location"].search(
-            [("id", "child_of", move_dest_location.id), ("usage", "!=", "view")]
-        )
         pick_type_dest_location = picking.picking_type_id.default_location_dest_id
-        pick_type_child_locations = self.env["stock.location"].search(
-            [("id", "child_of", pick_type_dest_location.id), ("usage", "!=", "view")]
-        )
-        if location not in move_child_locations | pick_type_child_locations:
+        # TODO: Extract in different method, use everywhere to check locations
+        if location.usage == "view" or not (
+            move_dest_location.parent_path.startswith(location.parent_path)
+            or pick_type_dest_location.parent_path.startswith(location.parent_path)
+        ):
             return self._response_for_set_destination(
                 picking,
                 selected_line,
                 message=self.msg_store.dest_location_not_allowed(),
             )
-        if location in move_child_locations:
+        if move_dest_location.parent_path.startswith(location.parent_path):
             # If location is a child of move's dest location, assign it without asking
             selected_line.location_dest_id = location
-        elif location in pick_type_child_locations:
+        elif pick_type_dest_location.parent_path.startswith(location.parent_path):
             # If location is a child of picking types's dest location,
             # ask for confirmation before assigning
             if not confirmation:
