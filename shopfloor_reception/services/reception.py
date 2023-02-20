@@ -356,13 +356,13 @@ class Reception(Component):
         search = self._actions_for("search")
         package = search.package_from_scan(barcode)
         if package:
-            dest_location = selected_line.location_dest_id
-            child_locations = self.env["stock.location"].search(
-                [("id", "child_of", dest_location.id), ("usage", "!=", "view")]
-            )
             pack_location = package.location_id
             if pack_location:
-                if pack_location not in child_locations:
+                (
+                    move_dest_location_ok,
+                    pick_type_dest_location_ok,
+                ) = self._check_location_ok(pack_location, selected_line, picking)
+                if not (move_dest_location_ok or pick_type_dest_location_ok):
                     # If the scanned package has a location that isn't a child
                     # of the move dest, return an error
                     message = self.msg_store.dest_location_not_allowed()
@@ -371,7 +371,7 @@ class Reception(Component):
                     )
                 else:
                     quantity = selected_line.qty_done
-                    new_line, qty_check = selected_line._split_qty_to_be_done(
+                    __, qty_check = selected_line._split_qty_to_be_done(
                         quantity,
                         lot_id=False,
                         shopfloor_user_id=False,
@@ -404,11 +404,10 @@ class Reception(Component):
         search = self._actions_for("search")
         location = search.location_from_scan(barcode)
         if location:
-            dest_location = selected_line.location_dest_id
-            child_locations = self.env["stock.location"].search(
-                [("id", "child_of", dest_location.id), ("usage", "!=", "view")]
+            move_dest_location_ok, pick_type_dest_location_ok = self._check_location_ok(
+                location, selected_line, picking
             )
-            if location not in child_locations:
+            if not (move_dest_location_ok or pick_type_dest_location_ok):
                 # Scanned location isn't a child of the move's dest location
                 message = self.msg_store.dest_location_not_allowed()
                 return self._response_for_set_quantity(
@@ -418,6 +417,24 @@ class Reception(Component):
             # `select_move`
             selected_line.location_dest_id = location
             return self._response_for_select_move(picking)
+
+    def _check_location_ok(self, location, selected_line, picking):
+        if location.usage == "view":
+            return (False, False)
+
+        move_dest_location = selected_line.location_dest_id
+        pick_type_dest_location = picking.picking_type_id.default_location_dest_id
+
+        move_dest_location_ok = move_dest_location.parent_path.startswith(
+            location.parent_path
+        )
+        pick_type_dest_location_ok = pick_type_dest_location.parent_path.startswith(
+            location.parent_path
+        )
+        if move_dest_location_ok or pick_type_dest_location_ok:
+            return (move_dest_location_ok, pick_type_dest_location_ok)
+
+        return (False, False)
 
     def _use_handlers(self, handlers, *args, **kwargs):
         for handler in handlers:
@@ -800,7 +817,7 @@ class Reception(Component):
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
             )
-        new_line, qty_check = selected_line._split_qty_to_be_done(
+        __, qty_check = selected_line._split_qty_to_be_done(
             quantity, lot_id=False, shopfloor_user_id=False, expiration_date=False
         )
         if qty_check == "greater":
@@ -822,7 +839,7 @@ class Reception(Component):
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
             )
-        new_line, qty_check = selected_line._split_qty_to_be_done(
+        __, qty_check = selected_line._split_qty_to_be_done(
             quantity, lot_id=False, shopfloor_user_id=False, expiration_date=False
         )
         if qty_check == "greater":
@@ -845,7 +862,7 @@ class Reception(Component):
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
             )
-        new_line, qty_check = selected_line._split_qty_to_be_done(
+        __, qty_check = selected_line._split_qty_to_be_done(
             quantity, lot_id=False, shopfloor_user_id=False, expiration_date=False
         )
         if qty_check == "greater":
@@ -905,23 +922,21 @@ class Reception(Component):
                 picking, selected_line, message=message
             )
         search = self._actions_for("search")
+
         location = search.location_from_scan(location_name)
-        move_dest_location = selected_line.location_dest_id
-        pick_type_dest_location = picking.picking_type_id.default_location_dest_id
-        # TODO: Extract in different method, use everywhere to check locations
-        if location.usage == "view" or not (
-            move_dest_location.parent_path.startswith(location.parent_path)
-            or pick_type_dest_location.parent_path.startswith(location.parent_path)
-        ):
+        move_dest_location_ok, pick_type_dest_location_ok = self._check_location_ok(
+            location, selected_line, picking
+        )
+        if not (move_dest_location_ok or pick_type_dest_location_ok):
             return self._response_for_set_destination(
                 picking,
                 selected_line,
                 message=self.msg_store.dest_location_not_allowed(),
             )
-        if move_dest_location.parent_path.startswith(location.parent_path):
+        if move_dest_location_ok:
             # If location is a child of move's dest location, assign it without asking
             selected_line.location_dest_id = location
-        elif pick_type_dest_location.parent_path.startswith(location.parent_path):
+        elif pick_type_dest_location_ok:
             # If location is a child of picking types's dest location,
             # ask for confirmation before assigning
             if not confirmation:
@@ -933,6 +948,7 @@ class Reception(Component):
                     ),
                 )
             selected_line.location_dest_id = location
+
         if self.work.menu.auto_post_line:
             # If option auto_post_line is active in the shopfloor menu,
             # create a split order with this line.
