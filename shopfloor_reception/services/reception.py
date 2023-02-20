@@ -5,6 +5,7 @@
 import pytz
 
 from odoo import fields
+from odoo.tools import float_compare
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -291,7 +292,17 @@ class Reception(Component):
         search = self._actions_for("search")
         product = search.product_from_scan(barcode)
         if product:
-            move = picking.move_lines.filtered(lambda m: m.product_id == product)
+            move = fields.first(
+                picking.move_lines.filtered(
+                    lambda m: m.product_id == product
+                    and float_compare(
+                        m.quantity_done,
+                        m.product_uom_qty,
+                        precision_rounding=m.product_uom.rounding,
+                    )
+                    == -1
+                )
+            )
             message = self._check_move_available(move, "product")
             if message:
                 return self._response_for_select_move(
@@ -304,8 +315,16 @@ class Reception(Component):
         search = self._actions_for("search")
         packaging = search.packaging_from_scan(barcode)
         if packaging:
-            move = picking.move_lines.filtered(
-                lambda m: packaging in m.product_id.packaging_ids
+            move = fields.first(
+                picking.move_lines.filtered(
+                    lambda m: packaging in m.product_id.packaging_ids
+                    and float_compare(
+                        m.quantity_done,
+                        m.product_uom_qty,
+                        precision_rounding=m.product_uom.rounding,
+                    )
+                    == -1
+                )
             )
             message = self._check_move_available(move, "packaging")
             if message:
