@@ -926,6 +926,15 @@ class MessageAction(Component):
             "body": _("Lot changed"),
         }
 
+    def lot_change_wrong_lot(self, lot_name):
+        return {
+            "message_type": "error",
+            "body": _("Scanned lot differs from the previous scan: %(lot)s.")
+            % {
+                "lot": lot_name,
+            },
+        }
+
     def lot_change_no_line_found(self):
         return {
             "message_type": "error",
