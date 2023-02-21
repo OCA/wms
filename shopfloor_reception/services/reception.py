@@ -958,6 +958,10 @@ class Reception(Component):
         search = self._actions_for("search")
 
         location = search.location_from_scan(location_name)
+        if not location:
+            return self._response_for_set_destination(
+                picking, selected_line, message=self.msg_store.no_location_found()
+            )
         move_dest_location_ok, pick_type_dest_location_ok = self._check_location_ok(
             location, selected_line, picking
         )
