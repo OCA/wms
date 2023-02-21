@@ -133,7 +133,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         # more than one package, it would be an error.
         self._test_scan_line_ok(self.product_a.barcode, picking.move_line_ids)
 
-    def _test_scan_line_error(self, picking, barcode, message, need_confirm_lot=False):
+    def _test_scan_line_error(self, picking, barcode, message, need_confirm_lot=None):
         """Test errors for /scan_line
 
         :param picking: the picking we are currently working with (selected)
@@ -266,7 +266,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             picking,
             lot.name,
             self.msg_store.lot_different_change(),
-            need_confirm_lot=True,
+            need_confirm_lot=lot.name,
         )
         # Second scan to confirm the change of lot
         response = self.service.dispatch(
@@ -274,7 +274,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             params={
                 "picking_id": picking.id,
                 "barcode": lot.name,
-                "confirm_lot": True,
+                "confirm_lot": lot.name,
             },
         )
         message = self.msg_store.lot_replaced_by_lot(previous_lot, lot)
