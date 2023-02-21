@@ -1,4 +1,5 @@
 # Copyright 2022 Camptocamp SA
+# Copyright 2023 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 
@@ -388,32 +389,31 @@ class Reception(Component):
                     return self._response_for_set_quantity(
                         picking, selected_line, message=message
                     )
-                else:
-                    quantity = selected_line.qty_done
-                    __, qty_check = selected_line._split_qty_to_be_done(
-                        quantity,
-                        lot_id=False,
-                        shopfloor_user_id=False,
-                        expiration_date=False,
+                quantity = selected_line.qty_done
+                __, qty_check = selected_line._split_qty_to_be_done(
+                    quantity,
+                    lot_id=False,
+                    shopfloor_user_id=False,
+                    expiration_date=False,
+                )
+                if qty_check == "greater":
+                    return self._response_for_set_quantity(
+                        picking,
+                        selected_line,
+                        message=self.msg_store.unable_to_pick_more(
+                            selected_line.product_uom_qty
+                        ),
                     )
-                    if qty_check == "greater":
-                        return self._response_for_set_quantity(
-                            picking,
-                            selected_line,
-                            message=self.msg_store.unable_to_pick_more(
-                                selected_line.product_uom_qty
-                            ),
-                        )
-                    # If the scanned package has a valid destination,
-                    # set both package and destination on the package,
-                    # and go back to the selection line screen
-                    selected_line.result_package_id = package
-                    selected_line.location_dest_id = pack_location
-                    if self.work.menu.auto_post_line:
-                        # If option auto_post_line is active in the shopfloor menu,
-                        # create a split order with this line.
-                        self._auto_post_line(selected_line, picking)
-                    return self._response_for_select_move(picking)
+                # If the scanned package has a valid destination,
+                # set both package and destination on the package,
+                # and go back to the selection line screen
+                selected_line.result_package_id = package
+                selected_line.location_dest_id = pack_location
+                if self.work.menu.auto_post_line:
+                    # If option auto_post_line is active in the shopfloor menu,
+                    # create a split order with this line.
+                    self._auto_post_line(selected_line, picking)
+                return self._response_for_select_move(picking)
             # Scanned package has no location, move to the location selection
             # screen
             selected_line.result_package_id = package
@@ -822,6 +822,21 @@ class Reception(Component):
                     message=self.msg_store.create_new_pack_ask_confirmation(barcode),
                 )
             package = self.env["stock.quant.package"].create({"name": barcode})
+            quantity = selected_line.qty_done
+            __, qty_check = selected_line._split_qty_to_be_done(
+                quantity,
+                lot_id=False,
+                shopfloor_user_id=False,
+                expiration_date=False,
+            )
+            if qty_check == "greater":
+                return self._response_for_set_quantity(
+                    picking,
+                    selected_line,
+                    message=self.msg_store.unable_to_pick_more(
+                        selected_line.product_uom_qty
+                    ),
+                )
             selected_line.result_package_id = package
             return self._response_for_set_destination(picking, selected_line)
         return self._response_for_set_quantity(
