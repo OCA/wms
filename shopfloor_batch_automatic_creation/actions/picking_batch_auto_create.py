@@ -1,9 +1,8 @@
 # Copyright 2020 Camptocamp
+# Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-import hashlib
 import logging
-import struct
 
 from odoo import fields, tools
 
@@ -69,14 +68,7 @@ class PickingBatchAutoCreateAction(Component):
         _logger.info(
             "trying to acquire lock to create a picking batch (%s)", self.env.user.login
         )
-        hasher = hashlib.sha1(str(self._advisory_lock_name).encode())
-        # pg_lock accepts an int8 so we build an hash composed with
-        # contextual information and we throw away some bits
-        int_lock = struct.unpack("q", hasher.digest()[:8])
-
-        self.env.cr.execute("SELECT pg_advisory_xact_lock(%s);", (int_lock,))
-        self.env.cr.fetchone()[0]
-        # Note: if the lock had to wait, the snapshot of the transaction is
+        self._actions_for("lock").advisory(self._advisory_lock_name)
         # very much probably outdated already (i.e. if the transaction which
         # had the lock before this one set a 'batch_id' on stock.picking this
         # transaction will not be aware of), we'll probably have a retry. But

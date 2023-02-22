@@ -139,6 +139,7 @@ Contributors
 * Alexandre Fayolle <alexandre.fayolle@camptocamp.com>
 * Benoit Guillot <benoit.guillot@akretion.com>
 * Thierry Ducrest <thierry.ducrest@camptocamp.com>
+* Michael Tietz (MT Software) <mtietz@mt-software.de>
 
 Design
 ~~~~~~
