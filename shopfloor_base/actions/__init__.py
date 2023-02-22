@@ -24,6 +24,7 @@ from . import schema_detail
 from . import message
 from . import search
 from . import savepoint
+from . import lock
 
 # TODO: kept in shopfloor -> review if these must stay there
 # from . import change_package_lot
