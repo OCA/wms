@@ -1,5 +1,6 @@
 # Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+# Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 import functools
 from collections import defaultdict
@@ -589,12 +590,10 @@ class ZonePicking(Component):
         pack_location = package.location_id
         if pack_location and pack_location.is_sublocation_of(self.zone_location):
             # Check if the package selected can be a substitute on a move line
-            products = package.quant_ids.filtered(lambda q: q.quantity > 0).product_id
-            for product in products:
-                move_lines |= self._find_location_move_lines(
-                    locations=pack_location,
-                    product=product,
-                )
+            move_lines = self._find_location_move_lines(
+                locations=pack_location,
+                product=package.product_packaging_id.product_id,
+            )
         if move_lines:
             if not confirmation:
                 message = self.msg_store.package_different_change()
@@ -1434,8 +1433,7 @@ class ZonePicking(Component):
 
     def _lock_lines(self, lines):
         """Lock move lines"""
-        sql = "SELECT id FROM %s WHERE ID IN %%s FOR UPDATE" % lines._table
-        self.env.cr.execute(sql, (tuple(lines.ids),), log_exceptions=False)
+        self._actions_for("lock").for_update(lines)
 
     def unload_set_destination(self, package_id, barcode, confirmation=False):
         """Scan the final destination for move lines in the buffer with the
