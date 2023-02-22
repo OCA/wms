@@ -4,7 +4,7 @@
 {
     "name": "Shopfloor - Batch Transfer Automatic Creation",
     "summary": "Create batch transfers for Cluster Picking",
-    "version": "14.0.1.1.0",
+    "version": "14.0.1.2.0",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
