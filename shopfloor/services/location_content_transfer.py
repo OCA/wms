@@ -1,5 +1,6 @@
 # Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020-2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+# Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, fields
 
@@ -440,8 +441,7 @@ class LocationContentTransfer(Component):
 
     def _lock_lines(self, lines):
         """Lock move lines"""
-        sql = "SELECT id FROM %s WHERE ID IN %%s FOR UPDATE" % lines._table
-        self.env.cr.execute(sql, (tuple(lines.ids),), log_exceptions=False)
+        self._actions_for("lock").for_update(lines)
 
     def set_destination_all(self, location_id, barcode, confirmation=False):
         """Scan destination location for all the moves of the location
