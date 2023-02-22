@@ -1077,7 +1077,8 @@ class ClusterPicking(Component):
         Returns to `start_line` transition if some lines could still be processed,
         otherwise try to validate all the transfers of the batch.
         """
-        if all(picking.state == "done" for picking in batch.picking_ids):
+        all_pickings = batch.picking_ids
+        if all(picking.state == "done" for picking in all_pickings):
             # do not use the 'done()' method because it does many things we
             # don't care about
             batch.state = "done"
@@ -1097,13 +1098,12 @@ class ClusterPicking(Component):
             # TODO add tests for this (for instance a picking is not 'done'
             # because a move was unassigned, we want to validate the batch to
             # produce backorders)
-            batch.mapped("picking_ids")._action_done()
+            all_pickings.filtered(lambda x: x.state == "assigned")._action_done()
             batch.state = "done"
             # Unassign not validated pickings from the batch, they will be
             # processed in another batch automatically later on
-            pickings_not_done = batch.mapped("picking_ids").filtered(
-                lambda p: p.state != "done"
-            )
+            all_pickings.invalidate_cache(["state"])
+            pickings_not_done = all_pickings.filtered(lambda p: p.state != "done")
             pickings_not_done.batch_id = False
             return self._response_for_start(
                 message=self.msg_store.batch_transfer_complete(),
