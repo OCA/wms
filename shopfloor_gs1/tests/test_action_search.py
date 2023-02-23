@@ -2,14 +2,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo.addons.shopfloor.tests.test_actions_search import TestSearchBaseCase
 
-PROD_BARCODE = "09506000117843"
-MANUF_CODE = "K000075"
-DATE = "141231"
-LOT1 = "1234AB"
-LOT2 = "1234AC"
-GS1_GTIN_BARCODE_1 = f"(01){PROD_BARCODE}(11){DATE}(10){LOT1}"
-GS1_GTIN_BARCODE_2 = f"(01){PROD_BARCODE}(11){DATE}(10){LOT2}"
-GS1_MANUF_BARCODE = f"(240){MANUF_CODE}(11){DATE}(10){LOT1}"
+from .common import (
+    GS1_GTIN_BARCODE_1,
+    GS1_MANUF_BARCODE,
+    LOT1,
+    MANUF_CODE,
+    PROD_BARCODE,
+)
 
 
 class TestFind(TestSearchBaseCase):
