@@ -76,7 +76,9 @@ class SearchAction(Component):
         _types = types or self._barcode_type_handler.keys()
         # TODO: decide the best default order in case we don't pass `types`
         for btype in _types:
-            handler = self._barcode_type_handler[btype]
+            handler = self._barcode_type_handler.get(btype)
+            if not handler:
+                continue
             record = handler(barcode, **handler_kw.get(btype, {}))
             if record:
                 return self._make_search_result(record=record, code=barcode, type=btype)
@@ -126,7 +128,14 @@ class SearchAction(Component):
         model = self.env["product.product"]
         if not barcode:
             return model.browse()
-        return model.search([("barcode", "=", barcode)], limit=1)
+        return model.search(
+            [
+                "|",
+                ("barcode", "=", barcode),
+                ("default_code", "=", barcode),
+            ],
+            limit=1,
+        )
 
     def lot_from_scan(self, barcode, products=None, limit=1):
         model = self.env["stock.production.lot"]
