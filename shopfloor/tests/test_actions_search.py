@@ -107,6 +107,7 @@ class TestFindCase(TestSearchBaseCase):
     def test_find_api(self):
         self.assertEqual(self.search.find(False).record, None)
         self.assertEqual(self.search.find("NONE").record, None)
+        self.assertEqual(self.search.find("foo", types=("not_existing",)).record, None)
         # TODO: test SearchResult class
 
     def test_find_location(self):
