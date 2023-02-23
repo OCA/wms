@@ -11,10 +11,13 @@ from .test_actions_data_base import ActionsDataDetailCaseBase
 class ScanAnythingCase(ActionsDataDetailCaseBase, ScanAnythingTestMixin):
     def test_scan_product(self):
         record = self.product_b
+        record.default_code = "PROD-B-code"
         record.barcode = "PROD-B"
         rec_type = "product"
         identifier = record.barcode
         data = self.data_detail.product_detail(record)
+        self._test_response_ok(rec_type, data, identifier)
+        identifier = record.default_code
         self._test_response_ok(rec_type, data, identifier)
 
     def test_scan_location(self):

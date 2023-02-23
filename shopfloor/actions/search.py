@@ -126,7 +126,14 @@ class SearchAction(Component):
         model = self.env["product.product"]
         if not barcode:
             return model.browse()
-        return model.search([("barcode", "=", barcode)], limit=1)
+        return model.search(
+            [
+                "|",
+                ("barcode", "=", barcode),
+                ("default_code", "=", barcode),
+            ],
+            limit=1,
+        )
 
     def lot_from_scan(self, barcode, products=None, limit=1):
         model = self.env["stock.production.lot"]
