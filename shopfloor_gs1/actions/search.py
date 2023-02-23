@@ -37,6 +37,9 @@ class SearchAction(Component):
             ai = self._search_type_to_gs1_ai(_type)
             if ai:
                 ai_whitelist += ai
+        if types and not ai_whitelist:
+            # A specific type was asked but no AI could be found.
+            return
         parsed = GS1Barcode.parse(barcode, ai_whitelist=ai_whitelist, safe=safe)
         # Return the 1st record found if parsing was successful
         for item in parsed:
