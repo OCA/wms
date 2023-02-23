@@ -76,7 +76,9 @@ class SearchAction(Component):
         _types = types or self._barcode_type_handler.keys()
         # TODO: decide the best default order in case we don't pass `types`
         for btype in _types:
-            handler = self._barcode_type_handler[btype]
+            handler = self._barcode_type_handler.get(btype)
+            if not handler:
+                continue
             record = handler(barcode, **handler_kw.get(btype, {}))
             if record:
                 return self._make_search_result(record=record, code=barcode, type=btype)
