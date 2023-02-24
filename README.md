@@ -33,6 +33,8 @@ addon | version | maintainers | summary
 [shopfloor_checkout_package_measurement](shopfloor_checkout_package_measurement/) | 14.0.1.0.1 | [![TDu](https://github.com/TDu.png?size=30px)](https://github.com/TDu) | Add a screen on checkout scenario for required package measurements.
 [shopfloor_checkout_package_measurement_mobile](shopfloor_checkout_package_measurement_mobile/) | 14.0.1.0.1 |  | Frontend for package measurement on the checkout shopfloor scenario
 [shopfloor_checkout_sync](shopfloor_checkout_sync/) | 14.0.1.0.0 | [![guewen](https://github.com/guewen.png?size=30px)](https://github.com/guewen) | Glue module
+[shopfloor_dangerous_goods](shopfloor_dangerous_goods/) | 14.0.1.0.0 | [![mmequignon](https://github.com/mmequignon.png?size=30px)](https://github.com/mmequignon) | Glue Module Between Shopfloor and Stock Dangerous Goods
+[shopfloor_dangerous_goods_mobile](shopfloor_dangerous_goods_mobile/) | 14.0.1.0.0 |  | Glue module between Shopfloor Mobile and Shopfloor Dangerous Goods
 [shopfloor_delivery_shipment](shopfloor_delivery_shipment/) | 14.0.1.2.0 | [![sebalix](https://github.com/sebalix.png?size=30px)](https://github.com/sebalix) [![TDu](https://github.com/TDu.png?size=30px)](https://github.com/TDu) | Manage delivery process with shipment advices
 [shopfloor_delivery_shipment_mobile](shopfloor_delivery_shipment_mobile/) | 14.0.1.0.0 |  | Frontend for delivery shipment scenario for shopfloor
 [shopfloor_example](shopfloor_example/) | 14.0.1.2.0 |  | Show how to customize the Shopfloor app frontend.
