@@ -20,6 +20,8 @@ setuptools.setup(
         'odoo14-addon-shopfloor_checkout_package_measurement',
         'odoo14-addon-shopfloor_checkout_package_measurement_mobile',
         'odoo14-addon-shopfloor_checkout_sync',
+        'odoo14-addon-shopfloor_dangerous_goods',
+        'odoo14-addon-shopfloor_dangerous_goods_mobile',
         'odoo14-addon-shopfloor_delivery_shipment',
         'odoo14-addon-shopfloor_delivery_shipment_mobile',
         'odoo14-addon-shopfloor_example',
