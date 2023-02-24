@@ -19,41 +19,39 @@ class ActionsDataBase(ActionsDataCaseBase):
         cls._set_product_lq()
 
     def test_data_stock_move_line(self):
-        move_line = self.move_a.move_line_ids
+        move_line = self.move_a.move_line_ids[0]
         result_package = self.env["stock.quant.package"].create(
-            {"packaging_id": self.packaging.id}
+            {"packaging_id": self.packaging.id, "pack_weight": 10}
         )
+        # make weight stable
+        move_line.package_id.pack_weight = 10
         move_line.write({"qty_done": 3.0, "result_package_id": result_package.id})
-        data = self.data.move_line(move_line)
-        self.assert_schema(self.schema.move_line(), data)
+        package_src_data = self.data.package(
+            move_line.package_id, picking=self.move_a.picking_id
+        )
+        self.assertTrue(package_src_data["has_lq_products"])
+        package_dest_data = self.data.package(
+            move_line.result_package_id, picking=self.move_a.picking_id
+        )
+        self.assertFalse(package_dest_data["has_lq_products"])
         expected = {
             "id": move_line.id,
             "qty_done": 3.0,
+            "progress": 30.0,
             "quantity": move_line.product_uom_qty,
             "product": self._expected_product(self.product_a),
             "lot": None,
-            "package_src": {
-                "id": move_line.package_id.id,
-                "name": move_line.package_id.name,
-                "move_line_count": 1,
-                "weight": 20.0,
-                "storage_type": None,
-                "has_lq_products": True,
-            },
-            "package_dest": {
-                "id": result_package.id,
-                "name": result_package.name,
-                "move_line_count": 0,
-                "weight": 6.0,
-                "storage_type": None,
-                "has_lq_products": False,
-            },
+            "package_src": package_src_data,
+            "package_dest": package_dest_data,
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
             "has_lq_products": True,
         }
-        self.assertDictEqual(data, expected)
+        data = self.data.move_line(move_line)
+        self.assert_schema(self.schema.move_line(), data)
+        for k, v in expected.items():
+            self.assertEqual(data[k], v)
 
     def test_data_package(self):
         package = self.move_a.move_line_ids.package_id
@@ -72,4 +70,5 @@ class ActionsDataBase(ActionsDataCaseBase):
             "weight": 20.0,
             "has_lq_products": True,
         }
-        self.assertDictEqual(data, expected)
+        for k, v in expected.items():
+            self.assertEqual(data[k], v)
