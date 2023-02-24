@@ -38,28 +38,50 @@ Vue.component("picking-select-line-content", {
         count: Number,
     },
     methods: {
-        no_pack_list_item_options(record) {
+        with_pack_list_item_options(record) {
+            let fields = [];
+            // Display detail fields on demand if the package contains only 1 line
+            if (
+                this.options.show_oneline_package_content &&
+                record.package_dest.move_line_count == 1
+            ) {
+                fields = [
+                    {path: "product.display_name", label: "Product"},
+                    {path: "lot.name", label: "Lot"},
+                ];
+            }
+            return {
+                main: true,
+                show_title: true,
+                loud_title: true,
+                key_title: "package_dest.name",
+                title_action_field: {action_val_path: "package_dest.name"},
+                fields: fields,
+            };
+        },
+        without_pack_list_item_options(record) {
             const opts = this.utils.wms.move_line_product_detail_options(record);
-            opts.fields.unshift({
-                path: "product.display_name",
-                action_val_path: "product.barcode",
-            });
+            const action_val_path = record.product.barcode
+                ? "product.barcode"
+                : "product.default_code";
+            opts.title_action_field = {action_val_path: action_val_path};
+            opts.show_title = true;
+            opts.loud_title = true;
             return opts;
         },
-        get_wrapper_klass(record) {
-            return "";
+    },
+    computed: {
+        pack_list_item_options() {
+            if (this.record.package_dest) {
+                return this.with_pack_list_item_options(this.record);
+            }
+            return this.without_pack_list_item_options(this.record);
         },
     },
     template: `
     <div>
-        <div :class="['has-pack', get_wrapper_klass(record)]" v-if="record.package_dest">
-            <span class="clickable record-name" @click="on_detail_action(record.package_dest, {action_val_path: 'name'})">
-                <btn-info-icon />
-                {{ record.package_dest.name }}
-            </span>
-        </div>
-        <div class="no_pack" v-if="!record.package_dest">
-            <list-item v-bind="$props" :options="no_pack_list_item_options(record)" />
+        <div :class="[record.package_dest ? 'has-pack' : 'no-pack', get_wrapper_klass(record)]">
+            <list-item v-bind="$props" :options="pack_list_item_options" />
         </div>
     </div>
   `,

@@ -57,6 +57,7 @@ class Checkout(Component):
         return {
             "picking": self._data_for_stock_picking(picking),
             "group_lines_by_location": True,
+            "show_oneline_package_content": self.work.menu.show_oneline_package_content,
             "need_confirm_pack_all": need_confirm_pack_all,
         }
 
@@ -1550,6 +1551,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
         return dict(
             self._schema_stock_picking(),
             group_lines_by_location={"type": "boolean"},
+            show_oneline_package_content={"type": "boolean"},
             need_confirm_pack_all={"type": "boolean"},
         )
 
