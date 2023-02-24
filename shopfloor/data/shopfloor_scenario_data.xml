@@ -39,7 +39,8 @@
         <field name="key">checkout</field>
         <field name="options_edit">
 {
-    "no_prefill_qty": true
+    "no_prefill_qty": true,
+    "show_oneline_package_content": true
 }
         </field>
     </record>

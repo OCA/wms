@@ -43,6 +43,7 @@ class CheckoutCommonCase(CommonCase):
         data = {
             "picking": self._stock_picking_data(picking),
             "group_lines_by_location": True,
+            "show_oneline_package_content": False,
             "need_confirm_pack_all": False,
         }
         data.update(kw)
