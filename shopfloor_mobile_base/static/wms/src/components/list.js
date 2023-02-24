@@ -150,13 +150,28 @@ Vue.component("list", {
 
 Vue.component("list-item", {
     mixins: [ItemDetailMixin],
+    computed: {
+        show_title_action() {
+            return this.opts.on_title_action || this.opts.title_action_field;
+        },
+        title_action_position() {
+            return this.opts.title_action_position || "left";
+        },
+    },
+    methods: {
+        show_title_action_by_position(position) {
+            return this.show_title_action && position == this.title_action_position;
+        },
+    },
     template: `
     <div class="list-item">
         <v-list-item-title v-if="opts.show_title" :class="{'font-weight-bold mb-2': opts.loud_title}">
+            <list-item-title-action v-bind="$props" v-if="show_title_action_by_position('left')"/>
             <div class="item-counter" v-if="opts.showCounters">
                 <span>{{ index + 1 }} / {{ count }}</span>
             </div>
             <span v-text="_.result(record, opts.key_title)" />
+            <list-item-title-action v-bind="$props" v-if="show_title_action_by_position('right')"/>
         </v-list-item-title>
         <div class="details">
             <div v-for="(field, index) in options.fields" :class="'field-detail ' + field.path.replace('.', '-') + ' ' + (field.klass || '')">
@@ -183,4 +198,23 @@ Vue.component("list-item", {
         </div>
     </div>
   `,
+});
+
+Vue.component("list-item-title-action", {
+    mixins: [ItemDetailMixin],
+    methods: {
+        action_handler(record) {
+            if (this.opts.on_title_action) {
+                return this.opts.on_title_action(record);
+            }
+            return this.on_detail_action(record, this.opts.title_action_field);
+        },
+    },
+    template: `
+<v-btn icon class="detail-action" :class="{'theme--dark': opts.theme_dark}" link
+        @click="action_handler(record)">
+    <btn-info-icon size="small" v-if="!opts.title_action_icon"/>
+    <v-icon v-if="opts.title_action_icon">{{ opts.title_action_icon }}</v-icon>
+</v-btn>
+`,
 });
