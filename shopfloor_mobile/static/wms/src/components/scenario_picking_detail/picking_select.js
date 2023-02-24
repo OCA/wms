@@ -46,11 +46,14 @@ Vue.component("picking-select-line-content", {
             });
             return opts;
         },
+        get_wrapper_klass(record) {
+            return "";
+        },
     },
     template: `
     <div>
-        <div class="has_pack" v-if="record.package_dest">
-            <span class="clickable" @click="on_detail_action(record.package_dest, {action_val_path: 'name'})">
+        <div :class="['has-pack', get_wrapper_klass(record)]" v-if="record.package_dest">
+            <span class="clickable record-name" @click="on_detail_action(record.package_dest, {action_val_path: 'name'})">
                 <btn-info-icon />
                 {{ record.package_dest.name }}
             </span>
@@ -69,10 +72,15 @@ Vue.component("picking-select-package-content", {
         index: Number,
         count: Number,
     },
+    methods: {
+        get_wrapper_klass(record) {
+            return "";
+        },
+    },
     template: `
     <div>
-        <div :class="record.package_dest ? 'has-pack' : 'no-pack'">
-            <span>{{ record.product.display_name }}</span>
+        <div :class="[record.package_dest ? 'has-pack' : 'no-pack', get_wrapper_klass(record)]">
+            <span class="record-name">{{ record.product.display_name }}</span>
             <div class="lot" v-if="record.lot">
                 <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
             </div>
