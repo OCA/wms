@@ -309,6 +309,10 @@ const Checkout = {
             return {
                 group_color: this.utils.colors.color_for("screen_step_todo"),
                 card_klass: "loud-labels",
+                list_item_options: {
+                    show_oneline_package_content: this.state.data
+                        .show_oneline_package_content,
+                },
             };
         },
         select_package_manual_select_opts: function () {
