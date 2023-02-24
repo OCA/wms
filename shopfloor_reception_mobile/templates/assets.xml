@@ -21,6 +21,12 @@
                 t-attf-src="/shopfloor_reception_mobile/static/src/scenario/reception.js?v=#{mod_version}"
                 type="module"
             />
+            <script
+                id="script_scenario_reception_states"
+                t-attf-src="/shopfloor_reception_mobile/static/src/scenario/reception_states.js?v=#{mod_version}"
+                type="module"
+            />
+
         </script>
     </template>
     <template
