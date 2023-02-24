@@ -150,6 +150,14 @@ class ShopfloorMenu(models.Model):
     no_prefill_qty_is_possible = fields.Boolean(
         compute="_compute_no_prefill_qty_is_possible"
     )
+    show_oneline_package_content = fields.Boolean(
+        string="Show one-line package content",
+        help="Display the content of package if it contains 1 line only",
+        default=False,
+    )
+    show_oneline_package_content_is_possible = fields.Boolean(
+        compute="_compute_show_oneline_package_content_is_possible"
+    )
 
     @api.onchange("unload_package_at_destination")
     def _onchange_unload_package_at_destination(self):
@@ -351,4 +359,11 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.no_prefill_qty_is_possible = menu.scenario_id.has_option(
                 "no_prefill_qty"
+            )
+
+    @api.depends("scenario_id")
+    def _compute_show_oneline_package_content_is_possible(self):
+        for menu in self:
+            menu.show_oneline_package_content_is_possible = menu.scenario_id.has_option(
+                "show_oneline_package_content"
             )

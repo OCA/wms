@@ -98,6 +98,16 @@
                   <field name="no_prefill_qty_is_possible" invisible="1" />
                   <field name="no_prefill_qty" />
               </group>
+              <group
+                    name="show_oneline_package_content"
+                    attrs="{'invisible': [('show_oneline_package_content_is_possible', '=', False)]}"
+                >
+                  <field
+                        name="show_oneline_package_content_is_possible"
+                        invisible="1"
+                    />
+                  <field name="show_oneline_package_content" />
+              </group>
             </group>
         </field>
     </record>
