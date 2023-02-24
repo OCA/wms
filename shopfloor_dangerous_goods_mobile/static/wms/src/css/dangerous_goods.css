@@ -1,0 +1,10 @@
+.detail-picking-select .has-lq-products .v-list-item__title::after {
+    display: inline-block;
+    width: 0.9em;
+    height: 0.9em;
+    background-image: url(limited_quantity_label.png);
+    background-size: cover;
+    background-position: center;
+    content: " ";
+    margin-left: 0.3em;
+}
