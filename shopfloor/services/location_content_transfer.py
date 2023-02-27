@@ -253,9 +253,9 @@ class LocationContentTransfer(Component):
             [
                 ("picking_type_id", "in", self.picking_types.ids),
                 ("state", "=", "assigned"),
-                ("printed", "=", False),
+                ("user_id", "in", (False, self.env.user.id)),
             ],
-            order="create_date",
+            order="user_id, priority desc, scheduled_date asc, id desc",
         )
 
         for next_picking in pickings:
