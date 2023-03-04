@@ -17,7 +17,7 @@ class StockMove(models.Model):
         unconfirmed_moves = unconfirmed_moves.filtered(
             lambda m: m.state in ["confirmed", "partially_available"]
         )
-        unconfirmed_moves._apply_source_relocate()
+        return unconfirmed_moves._apply_source_relocate()
 
     def _apply_source_relocate(self):
         # Read the `reserved_availability` field of the moves out of the loop

@@ -4,7 +4,7 @@ from odoo import exceptions
 from odoo.tests import common
 
 
-class SourceRelocateCommon(common.SavepointCase):
+class SourceRelocateCommon(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
