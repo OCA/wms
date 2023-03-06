@@ -9,7 +9,12 @@ class TestSetDestination(CommonCase):
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
         cls.packing_location.sudo().active = True
-        cls.location_dest = cls.env.ref("stock.stock_location_stock")
+        cls.parent_location_dest = cls.env.ref("stock.stock_location_stock")
+        cls.location_dest = cls.shelf2
+        cls.another_location = cls.env["stock.location"].search(
+            [("parent_path", "not ilike", cls.parent_location_dest.parent_path)],
+            limit=1,
+        )
 
     @classmethod
     def _change_line_dest(cls, line):
@@ -19,6 +24,7 @@ class TestSetDestination(CommonCase):
 
     def test_scan_location_child_of_dest_location(self):
         picking = self._create_picking()
+        picking.sudo().picking_type_id.default_location_dest_id = self.another_location
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
@@ -28,10 +34,10 @@ class TestSetDestination(CommonCase):
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
-                "location_name": self.shelf2.name,
+                "location_name": self.parent_location_dest.name,
             },
         )
-        self.assertEqual(selected_move_line.location_dest_id, self.shelf2)
+        self.assertEqual(selected_move_line.location_dest_id, self.parent_location_dest)
         data = self.data.picking(picking, with_progress=True)
         data.update({"moves": self.data.moves(picking.move_lines)})
         self.assert_response(
@@ -42,21 +48,24 @@ class TestSetDestination(CommonCase):
 
     def test_scan_location_child_of_pick_type_dest_location(self):
         picking = self._create_picking()
+        picking.sudo().picking_type_id.default_location_dest_id = self.shelf2
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
-        self._change_line_dest(selected_move_line)
+        selected_move_line.location_dest_id = self.another_location
         response = self.service.dispatch(
             "set_destination",
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
-                "location_name": self.dispatch_location.name,
+                "location_name": self.parent_location_dest.name,
             },
         )
         # location is a child of the picking type's location. destination location
         # hasn't been set
-        self.assertNotEqual(selected_move_line.location_dest_id, self.dispatch_location)
+        self.assertNotEqual(
+            selected_move_line.location_dest_id, self.parent_location_dest
+        )
         # But a confirmation has been asked
         data = self.data.picking(picking)
         self.assert_response(
@@ -68,7 +77,7 @@ class TestSetDestination(CommonCase):
             },
             message={
                 "message_type": "warning",
-                "body": f"Place it in {self.dispatch_location.name}?",
+                "body": f"Place it in {self.parent_location_dest.name}?",
             },
         )
         # Send the same message with confirmation=True to confirm
@@ -77,11 +86,11 @@ class TestSetDestination(CommonCase):
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
-                "location_name": self.dispatch_location.name,
+                "location_name": self.parent_location_dest.name,
                 "confirmation": True,
             },
         )
-        self.assertEqual(selected_move_line.location_dest_id, self.dispatch_location)
+        self.assertEqual(selected_move_line.location_dest_id, self.parent_location_dest)
         data = self.data.picking(picking, with_progress=True)
         data.update({"moves": self.data.moves(picking.move_lines)})
         self.assert_response(
@@ -120,6 +129,7 @@ class TestSetDestination(CommonCase):
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
+        self._change_line_dest(selected_move_line)
 
         # User has previously scanned a total of 3 units (with 7 still to do).
         # A new pack has been created and assigned to the line.
@@ -141,7 +151,7 @@ class TestSetDestination(CommonCase):
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
-                "location_name": self.dispatch_location.name,
+                "location_name": self.parent_location_dest.name,
             },
         )
         # The line has been moved to a different picking.
