@@ -29,6 +29,7 @@ class StockPicking(models.Model):
     zip_code = fields.Char(related="partner_id.zip", store=True)
     state_id = fields.Many2one(related="partner_id.state_id", store=True)
     city = fields.Char(related="partner_id.city", store=True)
+    last_release_date = fields.Datetime()
 
     @api.depends("move_lines.need_release")
     def _compute_need_release(self):
@@ -77,7 +78,7 @@ class StockPicking(models.Model):
                 picking.release_ready_count = 0
                 continue
             move_lines = picking.move_lines.filtered(
-                lambda move: move.state not in ("cancel", "done")
+                lambda move: move.state not in ("cancel", "done") and move.need_release
             )
             if picking._get_shipping_policy() == "one":
                 picking.release_ready_count = sum(
@@ -148,18 +149,25 @@ class StockPicking(models.Model):
         ``self`` contains all the stock.picking of the chain up
         to the released one.
         """
-        self._after_release_set_printed()
+        self._after_release_set_last_release_date()
         self._after_release_set_expected_date()
 
-    def _after_release_set_printed(self):
-        self.filtered(lambda p: not p.printed).printed = True
+    def _after_release_set_last_release_date(self):
+        self.last_release_date = fields.Datetime.now()
 
     def _after_release_set_expected_date(self):
         prep_time = self.env.company.stock_release_max_prep_time
         new_expected_date = fields.Datetime.add(
             fields.Datetime.now(), minutes=prep_time
         )
-        self.scheduled_date = new_expected_date
+        move_to_update = self.move_lines.filtered(lambda m: m.state == "assigned")
+        move_to_update_ids = move_to_update.ids
+        for origin_moves in move_to_update._get_chained_moves_iterator("move_dest_ids"):
+            move_to_update_ids += origin_moves.ids
+
+        self.env["stock.move"].browse(move_to_update_ids).write(
+            {"date": new_expected_date}
+        )
 
     def action_open_move_need_release(self):
         self.ensure_one()
@@ -170,3 +178,20 @@ class StockPicking(models.Model):
         action["domain"] = [("picking_id", "=", self.id), ("need_release", "=", True)]
         action["context"] = {}
         return action
+
+    def _create_backorder(self):
+        backorders = super()._create_backorder()
+        backorders_to_unrelease = backorders.filtered(
+            lambda p: p.picking_type_id.unrelease_on_backorder
+        )
+        if backorders_to_unrelease:
+            backorders_to_unrelease.unrelease()
+        return backorders
+
+    def unrelease(self, safe_unrelease=False):
+        """Unrelease the moves of the picking.
+
+        If safe_unrelease is True, the unreleasaable moves for which the
+        processing has already started will be ignored
+        """
+        self.mapped("move_lines").unrelease(safe_unrelease=safe_unrelease)
