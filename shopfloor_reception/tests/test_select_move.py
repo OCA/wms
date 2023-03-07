@@ -68,6 +68,30 @@ class TestSelectLine(CommonCase):
             },
         )
 
+    def test_scan_lot(self):
+        picking = self._create_picking()
+        lot = self._create_lot()
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        selected_move_line.lot_id = lot
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": picking.id,
+                "barcode": lot.name,
+            },
+        )
+        data = self.data.picking(picking)
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data={
+                "picking": data,
+                "selected_move_line": self.data.move_lines(selected_move_line),
+            },
+        )
+
     def test_scan_not_tracked_product(self):
         self.product_a.tracking = "none"
         picking = self._create_picking()
