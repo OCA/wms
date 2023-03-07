@@ -20,16 +20,22 @@
                     <h1>
                         <field name="name" />
                     </h1>
-                    <group name="options" groups="stock.group_stock_manager">
+                    <notebook>
+                        <page
+                            string="Options"
+                            name="options"
+                            groups="stock.group_stock_manager"
+                        >
+                            <group name="options" groups="stock.group_stock_manager">
                         <field name="release_forbidden" />
                         <field
-                            name="auto_release"
-                            attrs="{'invisible': [('release_forbidden', '=', True)]}"
-                        />
+                                    name="auto_release"
+                                    attrs="{'invisible': [('release_forbidden', '=', True)]}"
+                                />
                         <field
-                            name="max_auto_release"
-                            attrs="{'invisible': ['|', ('release_forbidden', '=', True), ('auto_release', '!=', 'max')]}"
-                        />
+                                    name="max_auto_release"
+                                    attrs="{'invisible': ['|', ('release_forbidden', '=', True), ('auto_release', '!=', 'max')]}"
+                                />
                         <field name="warehouse_id" />
                         <field name="picking_type_ids" options="{'no_create': True}">
                             <tree>
@@ -37,18 +43,20 @@
                             </tree>
                         </field>
                         <field
-                            name="rule_domain"
-                            widget="domain"
-                            options="{'model': 'stock.picking', 'in_dialog': true}"
-                        />
+                                    name="rule_domain"
+                                    widget="domain"
+                                    options="{'model': 'stock.picking', 'in_dialog': true}"
+                                />
 
                         <field
-                            name="code"
-                            widget="ace"
-                            options="{'mode': 'python'}"
-                            placeholder="Enter Python code here."
-                        />
+                                    name="code"
+                                    widget="ace"
+                                    options="{'mode': 'python'}"
+                                    placeholder="Enter Python code here."
+                                />
                     </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
