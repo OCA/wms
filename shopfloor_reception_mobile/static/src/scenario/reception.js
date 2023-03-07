@@ -167,7 +167,7 @@ const Reception = {
                 <item-detail-card
                     :record="line_being_handled"
                     :card_color="utils.colors.color_for('screen_step_todo')"
-                    :options="{key_title: 'location_dest.barcode'}"
+                    :options="{key_title: 'location_dest.name'}"
                     :key="make_state_component_key(['reception-product-item-detail-set-destination-dest-location', state.data.picking.id])"
                 />
             </template>
