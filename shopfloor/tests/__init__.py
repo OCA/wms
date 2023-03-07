@@ -61,6 +61,7 @@ from . import test_zone_picking_start
 from . import test_zone_picking_select_picking_type
 from . import test_zone_picking_select_line
 from . import test_zone_picking_select_line_no_prefill_qty
+from . import test_zone_picking_select_line_first_scan_location
 from . import test_zone_picking_set_line_destination
 from . import test_zone_picking_set_line_destination_no_prefill_qty
 from . import test_zone_picking_set_line_destination_pick_pack

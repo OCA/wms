@@ -606,7 +606,19 @@ const ZonePicking = {
                 select_line: {
                     display_info: {
                         title: "Select move",
-                        scan_placeholder: "Scan location / pack / product / lot",
+                        scan_placeholder: () => {
+                            const sublocation = this.state.data.sublocation;
+                            if (
+                                this.state.data.scan_location_or_pack_first &&
+                                !sublocation
+                            ) {
+                                return "Scan location / pack";
+                            }
+                            if (sublocation) {
+                                return "Scan product / lot / package";
+                            }
+                            return "Scan location / pack / product / lot";
+                        },
                     },
                     events: {
                         select: "on_select",
