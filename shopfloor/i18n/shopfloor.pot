@@ -1023,6 +1023,16 @@ msgid "Same package {} is already assigned."
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first_is_possible
+msgid "Scan Location Or Pack First Is Possible"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+msgid "Scan first location or pack"
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Scan the destination location"
@@ -1541,6 +1551,13 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__disable_full_bin_action
 msgid "When picking, prevent unloading the whole bin when full."
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+msgid ""
+"When selecting work, force the user to first scan a location or pack,then "
+"the product or lot."
 msgstr ""
 
 #. module: shopfloor
