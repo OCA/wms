@@ -1,0 +1,4 @@
+odoo-addon-stock_checkout_sync@ git+https://github.com/oca/timesheet@refs/pull/573/head#subdirectory=setup/stock_checkout_sync
+odoo-addon-stock_dynamic_routing@ git+https://github.com/oca/wms@refs/pull/590/head#subdirectory=setup/stock_dynamic_routing
+odoo-addon-stock_helper@ git+https://github.com/oca/stock-logistics-warehouse@refs/pull/1324/head#subdirectory=setup/stock_helper
+odoo-addon-stock_move_common_dest@ git+https://github.com/oca/stock-logistics-warehouse@refs/pull/1490/head#subdirectory=setup/stock_move_common_dest
