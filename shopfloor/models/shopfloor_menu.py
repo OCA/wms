@@ -168,6 +168,18 @@ class ShopfloorMenu(models.Model):
     scan_location_or_pack_first_is_possible = fields.Boolean(
         compute="_compute_scan_location_or_pack_first_is_possible"
     )
+    allow_alternative_destination = fields.Boolean(
+        string="Allow to scan alternative destination locations",
+        help=(
+            "When enabled the user will have the option to scan "
+            "destination locations other than the expected ones "
+            "(ask for confirmation)."
+        ),
+        default=False,
+    )
+    allow_alternative_destination_is_possible = fields.Boolean(
+        compute="_compute_allow_alternative_destination_is_possible"
+    )
 
     @api.onchange("unload_package_at_destination")
     def _onchange_unload_package_at_destination(self):
@@ -383,4 +395,10 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.scan_location_or_pack_first_is_possible = menu.scenario_id.has_option(
                 "scan_location_or_pack_first"
+            )
+
+    def _compute_allow_alternative_destination_is_possible(self):
+        for menu in self:
+            menu.allow_alternative_destination_is_possible = (
+                menu.scenario_id.has_option("allow_alternative_destination")
             )
