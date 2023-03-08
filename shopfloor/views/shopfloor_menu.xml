@@ -122,6 +122,16 @@
                   <field name="auto_post_line_is_possible" invisible="1" />
                   <field name="auto_post_line" />
               </group>
+              <group
+                    name="allow_alternative_destination"
+                    attrs="{'invisible': [('allow_alternative_destination_is_possible', '=', False)]}"
+                >
+                    <field
+                        name="allow_alternative_destination_is_possible"
+                        invisible="1"
+                    />
+                    <field name="allow_alternative_destination" />
+              </group>
             </group>
         </field>
     </record>
