@@ -400,7 +400,7 @@ class StockReleaseChannel(models.Model):
 
             if not current:
                 continue
-
+            current = channel._assign_release_channel_additional_filter(current)
             current.release_channel_id = channel
 
             pickings -= current
@@ -415,6 +415,10 @@ class StockReleaseChannel(models.Model):
                 len(pickings),
             )
         return True
+
+    def _assign_release_channel_additional_filter(self, pickings):
+        self.ensure_one()
+        return pickings
 
     def _eval_context(self, pickings):
         """Prepare the context used when for the python rule evaluation
