@@ -11,6 +11,7 @@
     "allow_create_moves": true,
     "allow_unreserve_other_moves": true,
     "allow_ignore_no_putaway_available": true,
+    "allow_alternative_destination": true,
     "no_prefill_qty": true
 }
       </field>
