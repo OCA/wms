@@ -131,10 +131,14 @@ const SingleProductTransfer = {
                         scan_placeholder: "Scan product / package / lot / location",
                     },
                     on_scan: (scanned) => {
+                        const confirmation = this.state.data.asking_confirmation
+                            ? true
+                            : false;
                         this.wait_call(
                             this.odoo.call("set_quantity", {
                                 selected_line_id: this.state.data.move_line.id,
                                 barcode: scanned.text,
+                                confirmation,
                             })
                         );
                     },
