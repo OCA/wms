@@ -174,6 +174,18 @@ class ShopfloorMenu(models.Model):
     scan_location_or_pack_first_is_possible = fields.Boolean(
         compute="_compute_scan_location_or_pack_first_is_possible"
     )
+    allow_alternative_destination = fields.Boolean(
+        string="Allow to scan alternative destination locations",
+        help=(
+            "When enabled the user will have the option to scan "
+            "destination locations other than the expected ones "
+            "(ask for confirmation)."
+        ),
+        default=False,
+    )
+    allow_alternative_destination_is_possible = fields.Boolean(
+        compute="_compute_allow_alternative_destination_is_possible"
+    )
 
     auto_post_line = fields.Boolean(
         string="Automatically post line",
@@ -405,4 +417,10 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.auto_post_line_is_possible = menu.scenario_id.has_option(
                 "auto_post_line"
+            )
+
+    def _compute_allow_alternative_destination_is_possible(self):
+        for menu in self:
+            menu.allow_alternative_destination_is_possible = (
+                menu.scenario_id.has_option("allow_alternative_destination")
             )
