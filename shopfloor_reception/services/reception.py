@@ -975,19 +975,6 @@ class Reception(Component):
             selected_line, intersection=True
         )
         new_move.extract_and_action_done()
-        # TODO: by using split_other_move_lines above in reception,
-        # we encounter a strange behaviour where a line is created in the original picking
-        # with qty_done=0 and no related move_id.
-        # This is probably caused by package_level_id.
-
-        # The workaround is to look for any orphan lines and delete them,
-        # but this should be investigated to find a better solution.
-        lines = picking.move_line_ids.filtered(
-            lambda l: l.product_id == selected_line.product_id
-        )
-        for line in lines:
-            if not line.move_id:
-                line.unlink()
 
     def set_destination(
         self, picking_id, selected_line_id, location_name, confirmation=False

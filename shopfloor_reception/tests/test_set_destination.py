@@ -169,3 +169,4 @@ class TestSetDestination(CommonCase):
         )
         self.assertEqual(line_in_picking.product_uom_qty, 7)
         self.assertEqual(line_in_picking.qty_done, 0)
+        self.assertEqual(picking.state, "assigned")
