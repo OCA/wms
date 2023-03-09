@@ -12,7 +12,6 @@
     "website": "https://github.com/OCA/wms",
     "depends": [
         "web",
-        "sale_stock",
         "stock_available_to_promise_release",  # OCA/wms
         "queue_job",  # OCA/queue
     ],
