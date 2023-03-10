@@ -131,7 +131,7 @@ class StockPicking(models.Model):
             for key, value in self.env.context.items()
             if not key.startswith("default_")
         }
-        self.mapped("move_ids").with_context(**context).release_available_to_promise()
+        self.move_ids.with_context(**context).release_available_to_promise()
 
     def _release_link_backorder(self, origin_picking):
         self.backorder_id = origin_picking
@@ -190,3 +190,11 @@ class StockPicking(models.Model):
                 "unrelease_allowed"
             ).unrelease()
         return backorders
+
+    def unrelease(self, safe_unrelease=False):
+        """Unrelease the moves of the picking.
+
+        If safe_unrelease is True, the unreleasable moves for which the
+        processing has already started will be ignored
+        """
+        self.mapped("move_ids").unrelease(safe_unrelease=safe_unrelease)
