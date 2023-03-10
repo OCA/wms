@@ -32,7 +32,7 @@ addon | version | maintainers | summary
 [shopfloor_base_multicompany](shopfloor_base_multicompany/) | 14.0.1.0.0 |  | Provide multi-company support and validation to Shopfloor applications.
 [shopfloor_batch_automatic_creation](shopfloor_batch_automatic_creation/) | 14.0.1.2.0 | [![guewen](https://github.com/guewen.png?size=30px)](https://github.com/guewen) | Create batch transfers for Cluster Picking
 [shopfloor_checkout_package_measurement](shopfloor_checkout_package_measurement/) | 14.0.1.0.1 | [![TDu](https://github.com/TDu.png?size=30px)](https://github.com/TDu) | Add a screen on checkout scenario for required package measurements.
-[shopfloor_checkout_package_measurement_mobile](shopfloor_checkout_package_measurement_mobile/) | 14.0.1.0.2 |  | Frontend for package measurement on the checkout shopfloor scenario
+[shopfloor_checkout_package_measurement_mobile](shopfloor_checkout_package_measurement_mobile/) | 14.0.1.0.3 |  | Frontend for package measurement on the checkout shopfloor scenario
 [shopfloor_checkout_sync](shopfloor_checkout_sync/) | 14.0.1.0.0 | [![guewen](https://github.com/guewen.png?size=30px)](https://github.com/guewen) | Glue module
 [shopfloor_dangerous_goods](shopfloor_dangerous_goods/) | 14.0.1.0.0 | [![mmequignon](https://github.com/mmequignon.png?size=30px)](https://github.com/mmequignon) | Glue Module Between Shopfloor and Stock Dangerous Goods
 [shopfloor_dangerous_goods_mobile](shopfloor_dangerous_goods_mobile/) | 14.0.1.0.0 |  | Glue module between Shopfloor Mobile and Shopfloor Dangerous Goods
