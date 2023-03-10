@@ -4,7 +4,7 @@
 {
     "name": "Shopfloor Checkout Package Measurement Mobile",
     "summary": "Frontend for package measurement on the checkout shopfloor scenario",
-    "version": "14.0.1.0.1",
+    "version": "14.0.1.0.2",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
