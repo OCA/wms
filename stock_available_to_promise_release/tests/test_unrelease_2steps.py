@@ -41,13 +41,11 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
     def test_unrelease_delivery_no_picking_done(self):
         # the picking for delivery 1 and 2 are merged into one move
         # Not the case with stock_group_by_partner_by_carrier
-        # self.assertEqual(self.picking1.move_lines.move_line_ids.product_uom_qty, 5)
-        self.assertEqual(
-            self.picking1.move_lines.move_dest_ids, self.deliveries.move_lines
-        )
+        # self.assertEqual(self.picking1.move_ids.move_line_ids.product_uom_qty, 5)
+        self.assertEqual(self.picking1.move_ids.move_dest_ids, self.deliveries.move_ids)
         self.shipping1.unrelease()
-        self.assertEqual(len(self.picking1.move_lines), 2)
-        move_cancel = self.picking1.move_lines.filtered(lambda m: m.state == "cancel")
+        self.assertEqual(len(self.picking1.move_ids), 2)
+        move_cancel = self.picking1.move_ids.filtered(lambda m: m.state == "cancel")
         self.assertEqual(move_cancel.product_uom_qty, 2)
         self.assertTrue(self.shipping1.need_release)
 
@@ -68,8 +66,8 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         """
         self.shipping1.action_cancel()
         self.assertEqual(self.shipping1.state, "cancel")
-        move_active = self.picking1.move_lines.filtered(lambda l: l.state == "assigned")
-        move_cancel = self.picking1.move_lines.filtered(lambda l: l.state == "cancel")
+        move_active = self.picking1.move_ids.filtered(lambda l: l.state == "assigned")
+        move_cancel = self.picking1.move_ids.filtered(lambda l: l.state == "cancel")
         self.assertEqual(move_active.product_uom_qty, 3.0)
         self.assertEqual(move_cancel.product_uom_qty, 2.0)
-        self.assertEqual(move_active.move_dest_ids, self.shipping2.move_lines)
+        self.assertEqual(move_active.move_dest_ids, self.shipping2.move_ids)

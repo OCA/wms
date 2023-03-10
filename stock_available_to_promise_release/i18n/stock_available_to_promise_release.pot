@@ -46,7 +46,13 @@ msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_release_form
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
 msgid "Cancel"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.stock_picking_type_form
+msgid "Chained moves release process"
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -91,11 +97,13 @@ msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_release__create_uid
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_unrelease__create_uid
 msgid "Created by"
 msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_release__create_date
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_unrelease__create_date
 msgid "Created on"
 msgstr ""
 
@@ -114,11 +122,13 @@ msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_release__display_name
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_unrelease__display_name
 msgid "Display Name"
 msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_route__available_to_promise_defer_pull
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_rule__available_to_promise_defer_pull
 msgid ""
 "Do not create chained moved automatically for delivery. Transfers must be "
 "released manually when they have enough available to promise."
@@ -126,7 +136,26 @@ msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_release__id
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_unrelease__id
 msgid "ID"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_picking_type__prevent_new_move_after_release
+msgid ""
+"If checked, once a delivery picking has been released, no more moves will be"
+" added to it. For example, if you add lines in the origin sales order, the "
+"new moves will be added to a new delivery."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_picking_type__unrelease_on_backorder
+msgid ""
+"If checked, when a backorder is created (i.e. at the validation of the "
+"delivery), the moves into the backorder are unreleased as long as they came "
+"from a route configured to manually release moves. This means that the moves"
+" that were not delivered are put back in need for release and the "
+"unprocessed internal pulled moves are canceled."
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -136,16 +165,24 @@ msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_release____last_update
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_unrelease____last_update
 msgid "Last Modified on"
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__last_release_date
+msgid "Last Release Date"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_release__write_uid
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_unrelease__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_release__write_date
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_unrelease__write_date
 msgid "Last Updated on"
 msgstr ""
 
@@ -166,6 +203,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__need_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.stock_picking_type_kanban
 msgid "Need Release"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_route__no_backorder_at_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_rule__no_backorder_at_release
+msgid "No backorder at release"
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -191,6 +234,11 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_tree
 msgid "Postcode"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking_type__prevent_new_move_after_release
+msgid "Prevent new move after release"
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -247,6 +295,7 @@ msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_route__available_to_promise_defer_pull
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_rule__available_to_promise_defer_pull
 msgid "Release based on Available to Promise"
 msgstr ""
 
@@ -269,6 +318,12 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
 msgid "Stock Allocations Releases"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model,name:stock_available_to_promise_release.model_stock_unrelease
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
+msgid "Stock Allocations Un Release"
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -297,8 +352,22 @@ msgid ""
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#. odoo-python
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
+msgid ""
+"The following moves have been un-released: \n"
+"%(move_names)s"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_release_form
 msgid "The selected records will be released."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
+msgid "The selected records will be un released."
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -327,6 +396,32 @@ msgid "Transfers Allocations"
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_picking_release_form
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
+msgid "Un Release"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_move_unrelease_form
+msgid "Un Release Move Allocations"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_picking_unrelease_form
+msgid "Un Release Transfers Allocations"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__unrelease_allowed
+msgid "Unrelease Allowed"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking_type__unrelease_on_backorder
+msgid "Unrelease on backorder"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #. odoo-python
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
@@ -348,6 +443,14 @@ msgid "View Move Allocations"
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_route__no_backorder_at_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_rule__no_backorder_at_release
+msgid ""
+"When releasing a transfer, do not create a backorder for the moves created "
+"for the unavailable quantities."
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
 msgid ""
 "When your release transfers, their expected date\n"
@@ -365,6 +468,13 @@ msgid ""
 "this preparation time (in minutes). Their scheduled date represents the "
 "latest the transfers should be done, and therefore, past this timestamp, "
 "considered late."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#. odoo-python
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
+msgid "You are not allowed to unrelease this move %(move_name)s."
 msgstr ""
 
 #. module: stock_available_to_promise_release
