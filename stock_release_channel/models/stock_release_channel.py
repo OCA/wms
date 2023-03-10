@@ -36,6 +36,22 @@ class StockReleaseChannel(models.Model):
     release_forbidden = fields.Boolean(string="Forbid to release this channel")
     sequence = fields.Integer(default=lambda self: self._default_sequence())
     color = fields.Integer()
+    warehouse_id = fields.Many2one(
+        "stock.warehouse",
+        string="Warehouse",
+        index=True,
+        help="Warehouse for which this channel is relevant",
+    )
+    picking_type_ids = fields.Many2many(
+        "stock.picking.type",
+        "stock_release_channel_warehouse_rel",
+        "channel_id",
+        "picking_type_id",
+        string="Operation Types",
+        domain="warehouse_id"
+        " and [('warehouse_id', '=', warehouse_id), ('code', '=', 'outgoing')]"
+        " or [('code', '=', 'outgoing')]",
+    )
     rule_domain = fields.Char(
         string="Domain",
         default=[],
@@ -289,8 +305,10 @@ class StockReleaseChannel(models.Model):
         return (query, (tuple(pickings.ids),))
 
     def _compute_picking_chain(self):
-        self.env["stock.move"].flush(["move_dest_ids", "move_orig_ids", "picking_id"])
-        self.env["stock.picking"].flush(["state"])
+        self.env["stock.move"].flush_model(
+            ["move_dest_ids", "move_orig_ids", "picking_id"]
+        )
+        self.env["stock.picking"].flush_model(["state"])
         for channel in self:
             domain = self._field_picking_domains()["count_picking_released"]
             domain += [("release_channel_id", "=", channel.id)]
@@ -363,12 +381,16 @@ class StockReleaseChannel(models.Model):
             return
         # do a single query rather than one for each rule*picking
         for channel in self.sudo().search([]):
-            domain = channel._prepare_domain()
-
-            if domain:
-                current = pickings.filtered_domain(domain)
+            if channel.picking_type_ids:
+                current = pickings.filtered(
+                    lambda p: p.picking_type_id in channel.picking_type_ids
+                )
             else:
                 current = pickings
+
+            domain = channel._prepare_domain()
+            if domain:
+                current = current.filtered_domain(domain)
 
             if not current:
                 continue
@@ -378,7 +400,7 @@ class StockReleaseChannel(models.Model):
 
             if not current:
                 continue
-
+            current = channel._assign_release_channel_additional_filter(current)
             current.release_channel_id = channel
 
             pickings -= current
@@ -393,6 +415,10 @@ class StockReleaseChannel(models.Model):
                 len(pickings),
             )
         return True
+
+    def _assign_release_channel_additional_filter(self, pickings):
+        self.ensure_one()
+        return pickings
 
     def _eval_context(self, pickings):
         """Prepare the context used when for the python rule evaluation
@@ -421,9 +447,12 @@ class StockReleaseChannel(models.Model):
             safe_eval(expr, eval_context, mode="exec", nocopy=True)
         except Exception as err:
             raise exceptions.UserError(
-                _("Error when evaluating the channel's code:\n %s \n(%s)")
-                % (self.name, err)
-            )
+                _(
+                    "Error when evaluating the channel's code:\n %(name)s \n(%(error)s)",
+                    name=self.name,
+                    error=err,
+                )
+            ) from err
         # normally "pickings" is always set as we set it in the eval context,
         # but let assume the worst case with someone using "del pickings"
         return eval_context.get("pickings", self.env["stock.picking"].browse())
@@ -537,7 +566,7 @@ class StockReleaseChannel(models.Model):
         action["context"] = {}
         if not self.last_done_picking_id:
             raise exceptions.UserError(
-                _("Channel %s has no validated transfer yet.") % (self.name,)
+                _("Channel %(name)s has no validated transfer yet.", name=self.name)
             )
         action["res_id"] = self.last_done_picking_id.id
         return action

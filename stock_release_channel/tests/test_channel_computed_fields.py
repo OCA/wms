@@ -28,13 +28,13 @@ class TestChannelComputedFields(ChannelReleaseCase):
         self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
         self._update_qty_in_location(self.loc_bin1, self.product2, 20.0)
 
-        channel.invalidate_cache()
+        channel.env.invalidate_all()
         self.assertEqual(channel.count_picking_release_ready, 3)
 
         picking.release_available_to_promise()
-        pick_picking = picking.move_lines.move_orig_ids.picking_id
+        pick_picking = picking.move_ids.move_orig_ids.picking_id
 
-        channel.invalidate_cache()
+        channel.env.invalidate_all()
 
         self.assertEqual(channel.count_picking_all, 3)
         self.assertEqual(channel.count_move_all, 6)
@@ -53,18 +53,18 @@ class TestChannelComputedFields(ChannelReleaseCase):
         self.assertEqual(channel.picking_chain_ids, pick_picking)
 
         picking.scheduled_date = fields.Datetime.now() - timedelta(hours=1)
-        channel.invalidate_cache()
+        channel.env.invalidate_all()
         self.assertEqual(channel.count_picking_late, 1)
         self.assertEqual(channel.count_move_late, 2)
 
         self._action_done_picking(pick_picking)
 
-        channel.invalidate_cache()
+        channel.env.invalidate_all()
         self.assertEqual(channel.count_picking_assigned, 1)
         self.assertEqual(channel.count_move_assigned, 2)
         self._action_done_picking(picking)
 
-        channel.invalidate_cache()
+        channel.env.invalidate_all()
         self.assertEqual(channel.count_picking_done, 1)
         self.assertEqual(channel.count_picking_chain, 0)
         self.assertEqual(channel.count_picking_chain_in_progress, 0)

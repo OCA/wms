@@ -66,7 +66,7 @@ class TestChannelAction(ChannelReleaseCase):
             self.channel.action_move_released(), self.picking + self.picking2
         )
 
-        pick_picking = self.picking.move_lines.move_orig_ids.picking_id
+        pick_picking = self.picking.move_ids.move_orig_ids.picking_id
         self._action_done_picking(pick_picking)
 
         self._assert_picking_action(
@@ -87,7 +87,7 @@ class TestChannelAction(ChannelReleaseCase):
     def test_action_all_related(self):
         self._release_all()
         pickings = self.picking + self.picking2 + self.picking3
-        related = pickings.move_lines.move_orig_ids.picking_id
+        related = pickings.move_ids.move_orig_ids.picking_id
 
         action = self.channel.action_picking_all_related()
         self._assert_picking_action(
@@ -120,7 +120,7 @@ class TestChannelAction(ChannelReleaseCase):
 
     def test_action_done(self):
         self._release_all()
-        self._action_done_picking(self.picking.move_lines.move_orig_ids.picking_id)
+        self._action_done_picking(self.picking.move_ids.move_orig_ids.picking_id)
         self._action_done_picking(self.picking)
 
         self._assert_picking_action(self.channel.action_picking_done(), self.picking)
@@ -132,7 +132,7 @@ class TestChannelAction(ChannelReleaseCase):
 
     def test_action_last_picking_done(self):
         self._release_all()
-        self._action_done_picking(self.picking.move_lines.move_orig_ids.picking_id)
+        self._action_done_picking(self.picking.move_ids.move_orig_ids.picking_id)
         self._action_done_picking(self.picking)
         action = self.channel.get_action_picking_form()
         self.assertEqual(action["res_id"], self.picking.id)
