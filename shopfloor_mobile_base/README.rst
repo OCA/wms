@@ -196,6 +196,7 @@ Contributors
 * Raphaël Reverdy <raphael.reverdy@akretion.com>
 * Sébastien Beau <sebastien.beau@akretion.com>
 * Jacques-Etienne Baudoux <je@bcim.be>
+* Michael Tietz (MT Software) <mtietz@mt-software.de>
 
 Design
 ~~~~~~

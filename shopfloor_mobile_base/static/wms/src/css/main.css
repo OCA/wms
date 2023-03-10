@@ -472,6 +472,22 @@ main.v-content > .v-content__wrap > .header .container {
     margin-right: 1.2em;
 }
 
+.detail-with-action-box .v-card {
+    display: flex;
+}
+.detail-with-action-box .v-card .v-card-inner-content {
+    float: left;
+    width: 80%;
+}
+.detail-with-action-box .v-card .v-card-inner-box {
+    margin: auto;
+    text-align: center;
+    float: left;
+    width: 20%;
+    max-width: 20%;
+    cursor: pointer;
+}
+
 @media screen and (max-width: 320px) {
     #app header.has-main-doc .app-bar-actions {
         display: none;

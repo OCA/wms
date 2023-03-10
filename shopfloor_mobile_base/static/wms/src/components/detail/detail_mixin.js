@@ -79,6 +79,7 @@ export var ItemDetailMixin = {
                 this.opts.loud ? "loud" : "",
                 this.opts.loud_labels ? "loud-labels" : "",
                 this.opts.klass || "",
+                this.opts.action_box ? "detail-with-action-box" : "",
             ].join(" ");
         },
         opts() {
