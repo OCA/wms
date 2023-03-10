@@ -25,6 +25,13 @@ addon | version | maintainers | summary
 [stock_dynamic_routing](stock_dynamic_routing/) | 16.0.1.0.1 |  | Dynamic routing of stock moves
 [stock_picking_completion_info](stock_picking_completion_info/) | 16.0.1.0.1 |  | Display on current document completion information according to next operations
 
+
+Unported addons
+---------------
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[stock_release_channel](stock_release_channel/) | 14.0.1.0.0 (unported) | [![sebalix](https://github.com/sebalix.png?size=30px)](https://github.com/sebalix) | Manage workload in WMS with release channels
+
 [//]: # (end addons)
 
 <!-- prettier-ignore-end -->
