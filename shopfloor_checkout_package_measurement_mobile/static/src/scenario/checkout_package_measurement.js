@@ -30,16 +30,6 @@ const new_template =
         <v-container>
             <v-row>
                 <v-text-field
-                    label="Height"
-                    type="number"
-                    :suffix="state.data.package.dimension_uom.name"
-                    placeholder="Package Height"
-                    v-if="state.data.package_requirement.height"
-                    v-model="state.data.package.height"
-                ></v-text-field>
-            </v-row>
-            <v-row>
-                <v-text-field
                     label="Length"
                     type="number"
                     :suffix="state.data.package.dimension_uom.name"
@@ -56,6 +46,16 @@ const new_template =
                     placeholder="Package Width"
                     v-if="state.data.package_requirement.width"
                     v-model="state.data.package.width"
+                ></v-text-field>
+            </v-row>
+            <v-row>
+                <v-text-field
+                    label="Height"
+                    type="number"
+                    :suffix="state.data.package.dimension_uom.name"
+                    placeholder="Package Height"
+                    v-if="state.data.package_requirement.height"
+                    v-model="state.data.package.height"
                 ></v-text-field>
             </v-row>
             <v-row>
