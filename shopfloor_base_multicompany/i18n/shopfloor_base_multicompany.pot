@@ -1,0 +1,57 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_base_multicompany
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: shopfloor_base_multicompany
+#: model:ir.model,name:shopfloor_base_multicompany.model_shopfloor_app
+msgid "A Shopfloor application"
+msgstr ""
+
+#. module: shopfloor_base_multicompany
+#: model:ir.model.fields,field_description:shopfloor_base_multicompany.field_shopfloor_app__company_ids
+msgid "Allowed companies"
+msgstr ""
+
+#. module: shopfloor_base_multicompany
+#: code:addons/shopfloor_base_multicompany/services/service.py:0
+#, python-format
+msgid "Current user belongs to a company that is not allowed on this app."
+msgstr ""
+
+#. module: shopfloor_base_multicompany
+#: model:ir.model.fields,field_description:shopfloor_base_multicompany.field_shopfloor_app__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: shopfloor_base_multicompany
+#: model:ir.model.fields,field_description:shopfloor_base_multicompany.field_shopfloor_app__id
+msgid "ID"
+msgstr ""
+
+#. module: shopfloor_base_multicompany
+#: model:ir.model.fields,field_description:shopfloor_base_multicompany.field_shopfloor_app____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: shopfloor_base_multicompany
+#: model:ir.model.fields,help:shopfloor_base_multicompany.field_shopfloor_app__company_ids
+msgid ""
+"Limit access to this app only to selected companies' users. If a non "
+"authorized user calls an endpoint of this app, an exception will be raised."
+msgstr ""
+
+#. module: shopfloor_base_multicompany
+#: model:ir.model.fields,field_description:shopfloor_base_multicompany.field_shopfloor_app__must_validate_company
+msgid "Must Validate Company"
+msgstr ""
