@@ -16,6 +16,7 @@ setuptools.setup(
         'odoo14-addon-sale_stock_available_to_promise_release_dropshipping',
         'odoo14-addon-shopfloor',
         'odoo14-addon-shopfloor_base',
+        'odoo14-addon-shopfloor_base_multicompany',
         'odoo14-addon-shopfloor_batch_automatic_creation',
         'odoo14-addon-shopfloor_checkout_package_measurement',
         'odoo14-addon-shopfloor_checkout_package_measurement_mobile',
