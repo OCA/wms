@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template
+        id="assets_backend"
+        name="stock_release_channel assets"
+        inherit_id="web.assets_backend"
+    >
+        <xpath expr="." position="inside">
+            <link
+                rel="stylesheet"
+                type="text/scss"
+                href="/stock_release_channel/static/src/scss/stock_release_channel.scss"
+            />
+            <script
+                type="text/javascript"
+                src="/stock_release_channel/static/src/js/progressbar_fractional_widget.js"
+            />
+        </xpath>
+    </template>
+</odoo>

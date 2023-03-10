@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="view_picking_form" model="ir.ui.view">
+        <field name="name">stock.picking.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form" />
+        <field name="arch" type="xml">
+            <group name="other_infos" position="inside">
+                <field name="release_channel_id" />
+            </group>
+        </field>
+    </record>
+
+    <record id="view_picking_internal_search" model="ir.ui.view">
+        <field name="name">stock.picking.internal.search</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search" />
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="commercial_partner_id" />
+            </field>
+            <field name="picking_type_id" position="after">
+                <field name="release_channel_id" />
+            </field>
+            <filter name="backorder" position="after">
+                <separator />
+                <filter
+                    name="no_release_channel"
+                    string="No Release Channel"
+                    domain="[('release_channel_id', '=', False)]"
+                    help="Transfers that couldn't be assigned in a release channel"
+                />
+            </filter>
+            <group position="inside">
+                <filter
+                    string="Release Channel"
+                    name="groupby_release_channel_id"
+                    domain="[]"
+                    context="{'group_by': 'release_channel_id'}"
+                />
+                <filter
+                    string="Commercial Partner"
+                    name="groupby_commercial_partner_id"
+                    domain="[]"
+                    context="{'group_by': 'commercial_partner_id'}"
+                />
+            </group>
+        </field>
+    </record>
+
+    <record id="view_picking_release_tree" model="ir.ui.view">
+        <field name="name">stock.picking.release.tree</field>
+        <field name="model">stock.picking</field>
+        <field
+            name="inherit_id"
+            ref="stock_available_to_promise_release.view_picking_release_tree"
+        />
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="commercial_partner_id" optional="hide" />
+            </field>
+            <field name="location_id" position="before">
+                <field
+                    name="release_channel_id"
+                    optional="show"
+                    invisible="context.get('hide_release_channel_id')"
+                />
+            </field>
+        </field>
+    </record>
+
+</odoo>
