@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2022 Camptocamp SA
+     Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo noupdate="1">
 
@@ -8,7 +9,8 @@
       <field name="key">reception</field>
       <field name="options_edit">
 {
-  "auto_post_line": true
+  "auto_post_line": true,
+  "select_move_by_click": true
 }
       </field>
   </record>

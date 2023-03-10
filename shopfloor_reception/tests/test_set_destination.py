@@ -38,12 +38,10 @@ class TestSetDestination(CommonCase):
             },
         )
         self.assertEqual(selected_move_line.location_dest_id, self.parent_location_dest)
-        data = self.data.picking(picking, with_progress=True)
-        data.update({"moves": self.data.moves(picking.move_lines)})
         self.assert_response(
             response,
             next_state="select_move",
-            data={"picking": data},
+            data=self._data_for_select_move(picking),
         )
 
     def test_scan_location_child_of_pick_type_dest_location(self):
@@ -91,12 +89,10 @@ class TestSetDestination(CommonCase):
             },
         )
         self.assertEqual(selected_move_line.location_dest_id, self.parent_location_dest)
-        data = self.data.picking(picking, with_progress=True)
-        data.update({"moves": self.data.moves(picking.move_lines)})
         self.assert_response(
             response,
             next_state="select_move",
-            data={"picking": data},
+            data=self._data_for_select_move(picking),
         )
 
     def test_scan_location_not_child_of_dest_locations(self):

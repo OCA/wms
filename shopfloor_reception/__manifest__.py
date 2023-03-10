@@ -5,7 +5,7 @@
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
-    "author": "Camptocamp, Odoo Community Association (OCA)",
+    "author": "Camptocamp, MT Software, Odoo Community Association (OCA)",
     "maintainers": ["mmequignon", "JuMiSanAr"],
     "license": "AGPL-3",
     "installable": True,

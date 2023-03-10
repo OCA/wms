@@ -130,7 +130,10 @@ class Reception(Component):
 
     def _response_for_select_move(self, picking, message=None):
         self._assign_user_to_picking(picking)
-        data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
+        data = {
+            "picking": self._data_for_stock_picking(picking, with_lines=True),
+            "select_move_by_click": self.work.menu.select_move_by_click,
+        }
         return self._response(next_state="select_move", data=data, message=message)
 
     def _response_for_confirm_done(self, picking, message=None):
@@ -229,12 +232,22 @@ class Reception(Component):
             return self._response_for_set_quantity(picking, line)
         return self._response_for_set_lot(picking, line)
 
+    def _check_select_line(self, line):
+        return not line.result_package_id and line.shopfloor_user_id.id in [
+            False,
+            self.env.uid,
+        ]
+
+    def _select_line_from_move(self, picking, move, record):
+        line = fields.first(
+            move.move_line_ids.filtered(lambda l: self._check_select_line(l))
+        )
+        return self._select_line(picking, line, move)
+
     def _select_line_from_product(self, picking, move, product):
         line = fields.first(
             picking.move_line_ids.filtered(
-                lambda l: l.product_id == product
-                and not l.result_package_id
-                and l.shopfloor_user_id.id in [False, self.env.uid]
+                lambda l: l.product_id == product and self._check_select_line(l)
             )
         )
         return self._select_line(picking, line, move)
@@ -243,8 +256,7 @@ class Reception(Component):
         line = fields.first(
             picking.move_line_ids.filtered(
                 lambda l: l.package_id.product_packaging_id == packaging
-                and not l.result_package_id
-                and l.shopfloor_user_id.id in [False, self.env.uid]
+                and self._check_select_line(l)
             )
         )
         return self._select_line(picking, line, move, packaging.qty)
@@ -253,8 +265,7 @@ class Reception(Component):
         line = fields.first(
             picking.move_line_ids.filtered(
                 lambda l: (l.lot_id.name == lot or l.lot_name == lot)
-                and not l.result_package_id
-                and l.shopfloor_user_id.id in [False, self.env.uid]
+                and self._check_select_line(l)
             )
         )
         if not line:
@@ -317,51 +328,45 @@ class Reception(Component):
     def _scan_document__by_lot(self, barcode):
         return self._select_document_from_lot(barcode)
 
+    def _scan_line__by_record(self, record_type, picking, record, check):
+        if not record:
+            return
+
+        move = fields.first(
+            picking.move_lines.filtered(
+                lambda m: check(m, record)
+                and float_compare(
+                    m.quantity_done,
+                    m.product_uom_qty,
+                    precision_rounding=m.product_uom.rounding,
+                )
+                == -1
+            )
+        )
+        message = self._check_move_available(move, message_code=record_type)
+        if message:
+            return self._response_for_select_move(
+                picking,
+                message=message,
+            )
+        return getattr(self, f"_select_line_from_{record_type}")(picking, move, record)
+
     def _scan_line__by_product(self, picking, barcode):
         search = self._actions_for("search")
         product = search.product_from_scan(barcode)
-        if product:
-            move = fields.first(
-                picking.move_lines.filtered(
-                    lambda m: m.product_id == product
-                    and float_compare(
-                        m.quantity_done,
-                        m.product_uom_qty,
-                        precision_rounding=m.product_uom.rounding,
-                    )
-                    == -1
-                )
-            )
-            message = self._check_move_available(move, message_code="product")
-            if message:
-                return self._response_for_select_move(
-                    picking,
-                    message=message,
-                )
-            return self._select_line_from_product(picking, move, product)
+        return self._scan_line__by_record(
+            "product", picking, product, lambda m, record: m.product_id == record
+        )
 
     def _scan_line__by_packaging(self, picking, barcode):
         search = self._actions_for("search")
         packaging = search.packaging_from_scan(barcode)
-        if packaging:
-            move = fields.first(
-                picking.move_lines.filtered(
-                    lambda m: packaging in m.product_id.packaging_ids
-                    and float_compare(
-                        m.quantity_done,
-                        m.product_uom_qty,
-                        precision_rounding=m.product_uom.rounding,
-                    )
-                    == -1
-                )
-            )
-            message = self._check_move_available(move, message_code="packaging")
-            if message:
-                return self._response_for_select_move(
-                    picking,
-                    message=message,
-                )
-            return self._select_line_from_packaging(picking, move, packaging)
+        return self._scan_line__by_record(
+            "packaging",
+            picking,
+            packaging,
+            lambda m, record: record in m.product_id.packaging_ids,
+        )
 
     def _scan_line__by_lot(self, picking, barcode):
         line = picking.move_line_ids.filtered(
@@ -1090,6 +1095,15 @@ class Reception(Component):
             picking, selected_line, new_package_name=barcode, message=message
         )
 
+    def on_select_move_click(self, move_id):
+        if not self.work.menu.select_move_by_click:
+            return
+
+        move = self.env["stock.move"].browse(move_id)
+        return self._scan_line__by_record(
+            "move", move.picking_id, move, lambda m, record: m.id == record.id
+        )
+
 
 class ShopfloorReceptionValidator(Component):
     _inherit = "base.shopfloor.validator"
@@ -1209,6 +1223,11 @@ class ShopfloorReceptionValidator(Component):
             },
         }
 
+    def on_select_move_click(self):
+        return {
+            "move_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
+
 
 class ShopfloorReceptionValidatorResponse(Component):
     _inherit = "base.shopfloor.validator.response"
@@ -1311,7 +1330,8 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {
             "picking": self.schemas._schema_dict_of(
                 self._schema_stock_picking_with_lines(), required=True
-            )
+            ),
+            "select_move_by_click": {"type": "boolean"},
         }
 
     @property

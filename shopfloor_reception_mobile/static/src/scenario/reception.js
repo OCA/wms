@@ -75,7 +75,7 @@ const Reception = {
                     v-for="record in ordered_moves"
                     :card_color="move_card_color(record)"
                     :record="record"
-                    :options="picking_detail_options_for_select_move()"
+                    :options="picking_detail_options_for_select_move(record)"
                     :key="make_state_component_key(['reception-moves-select-move', record.id])"
                 />
                 <div class="button-list button-vertical-list full">
@@ -338,8 +338,15 @@ const Reception = {
                 ],
             };
         },
-        picking_detail_options_for_select_move: function () {
-            return {
+        on_select_move_click: function (record) {
+            this.wait_call(
+                this.odoo.call("on_select_move_click", {
+                    move_id: record.id,
+                })
+            );
+        },
+        picking_detail_options_for_select_move: function (record) {
+            var result = {
                 key_title: "product.display_name",
                 fields: [
                     {
@@ -357,6 +364,10 @@ const Reception = {
                     },
                 ],
             };
+            if (this.state.data.select_move_by_click) {
+                result["on_card_click"] = this.on_select_move_click;
+            }
+            return result;
         },
         picking_detail_options_for_set_destination: function () {
             return {
