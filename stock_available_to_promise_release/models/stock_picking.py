@@ -77,13 +77,13 @@ class StockPicking(models.Model):
                 picking.release_ready = False
                 picking.release_ready_count = 0
                 continue
-            move_lines = picking.move_ids.filtered(
+            move_ids = picking.move_ids.filtered(
                 lambda move: move.state not in ("cancel", "done") and move.need_release
             )
             if picking._get_shipping_policy() == "one":
                 picking.release_ready_count = sum(
                     1
-                    for move in move_lines
+                    for move in move_ids
                     if float_compare(
                         move.ordered_available_to_promise_qty,
                         move.product_qty,
@@ -91,12 +91,10 @@ class StockPicking(models.Model):
                     )
                     == 0
                 )
-                picking.release_ready = picking.release_ready_count == len(move_lines)
+                picking.release_ready = picking.release_ready_count == len(move_ids)
             else:
                 picking.release_ready_count = sum(
-                    1
-                    for move in move_lines
-                    if move.ordered_available_to_promise_qty > 0
+                    1 for move in move_ids if move.ordered_available_to_promise_qty > 0
                 )
                 picking.release_ready = bool(picking.release_ready_count)
 

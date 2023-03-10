@@ -44,24 +44,24 @@ class TestAvailableToPromiseRelease3steps(PromiseReleaseCommonCase):
 
     def test_unrelease_delivery_no_picking_done(self):
         # Not the case with stock_group_by_partner_by_carrier
-        # self.assertEqual(self.pick1.move_lines.move_line_ids.product_uom_qty, 5)
+        # self.assertEqual(self.pick1.move_ids.move_line_ids.product_uom_qty, 5)
         self.assertEqual(
-            self.pick1.move_lines.move_dest_ids,
-            self.pack1.move_lines | self.pack2.move_lines,
+            self.pick1.move_ids.move_dest_ids,
+            self.pack1.move_ids | self.pack2.move_ids,
         )
         self.ship1.unrelease()
         self.assertEqual(self.pack1.state, "cancel")
         self.assertTrue(self.ship1.need_release)
         self.assertFalse(self.ship2.need_release)
         # Check pick has one move cancel and one still assign
-        move_active = self.pick1.move_lines.filtered(lambda l: l.state == "assigned")
-        move_cancel = self.pick1.move_lines.filtered(lambda l: l.state == "cancel")
+        move_active = self.pick1.move_ids.filtered(lambda l: l.state == "assigned")
+        move_cancel = self.pick1.move_ids.filtered(lambda l: l.state == "cancel")
         # Check the move chain
         self.assertEqual(self.pack1.state, "cancel")
         self.assertEqual(self.pack2.state, "waiting")
         # Active move only for pack2
-        self.assertEqual(move_active.move_dest_ids, self.pack2.move_lines)
+        self.assertEqual(move_active.move_dest_ids, self.pack2.move_ids)
         # The destination move is on pack2 which is wrong, but it is canceled, so
         # self.assertFalse(move_cancel.move_dest_ids)
         self.assertFalse(move_cancel.move_orig_ids)
-        self.assertEqual(self.ship2.move_lines.move_orig_ids, self.pack2.move_lines)
+        self.assertEqual(self.ship2.move_ids.move_orig_ids, self.pack2.move_ids)
