@@ -26,7 +26,7 @@ const Checkout = {
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar
-                v-if="state.on_scan"
+                v-show="state.on_scan"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
                 />
