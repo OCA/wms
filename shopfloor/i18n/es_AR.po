@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-03-12 19:20+0000\n"
+"PO-Revision-Date: 2023-03-12 20:14+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -1421,7 +1421,7 @@ msgstr "El paquete %s no existe"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The picked quantity must be a value above zero."
-msgstr ""
+msgstr "La cantidad seleccionada debe ser un valor por encima de cero."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_location__shopfloor_picking_sequence
