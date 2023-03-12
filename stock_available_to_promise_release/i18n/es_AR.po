@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-02-07 05:44+0000\n"
+"PO-Revision-Date: 2023-03-12 20:14+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.3.2\n"
+"X-Generator: Weblate 4.14.1\n"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__release_ready_count
@@ -64,7 +64,7 @@ msgstr "Cancelar"
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.stock_picking_type_form
 msgid "Chained moves release process"
-msgstr ""
+msgstr "Proceso de liberación de movimientos encadenados"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__city
@@ -184,6 +184,9 @@ msgid ""
 "If checked, when a backorder is created the moves into the backorder are "
 "unreleased if they come from a route configured to manually release moves"
 msgstr ""
+"Si está marcado, cuando se crea un pedido pendiente, los movimientos en el "
+"pedido pendiente no se liberan si provienen de una ruta configurada para "
+"liberar movimientos manualmente"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_picking_type__prevent_new_move_after_release
@@ -191,6 +194,8 @@ msgid ""
 "If checked, when a picking is released it's no more possible to assign new "
 "moves to it."
 msgstr ""
+"Si está marcado, cuando se libera un picking ya no es posible asignarle "
+"nuevos movimientos."
 
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_location_route
@@ -215,7 +220,7 @@ msgstr "Última Modificación el"
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__last_release_date
 msgid "Last Release Date"
-msgstr ""
+msgstr "Última Fecha de Liberación"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_release__write_uid
@@ -252,7 +257,7 @@ msgstr "Necesita Liberarse"
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_location_route__no_backorder_at_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_rule__no_backorder_at_release
 msgid "No backorder at release"
-msgstr ""
+msgstr "Sin pedidos pendientes en el momento del lanzamiento"
 
 #. module: stock_available_to_promise_release
 #: model_terms:ir.actions.act_window,help:stock_available_to_promise_release.stock_picking_release_action
@@ -282,7 +287,7 @@ msgstr "Código Postal"
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking_type__prevent_new_move_after_release
 msgid "Prevent new move after release"
-msgstr ""
+msgstr "Evitar un nuevo movimiento después del lanzamiento"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__date_priority
@@ -369,7 +374,7 @@ msgstr "Asignaciones de Inventario Liberadas"
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_unrelease
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
 msgid "Stock Allocations Un Release"
-msgstr ""
+msgstr "Asignaciones de acciones sin liberación"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_move
@@ -404,6 +409,8 @@ msgid ""
 "The following moves have been un-released: \n"
 "%(move_names)s"
 msgstr ""
+"Los siguientes movimientos están sin liberación:\n"
+"%(move_names)s"
 
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_release_form
@@ -413,7 +420,7 @@ msgstr "Los registros seleccionados han sido liberados."
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
 msgid "The selected records will be un released."
-msgstr ""
+msgstr "Los registros seleccionados no se liberarán."
 
 #. module: stock_available_to_promise_release
 #: model_terms:ir.actions.act_window,help:stock_available_to_promise_release.stock_move_release_action
@@ -449,27 +456,27 @@ msgstr "Asignaciones de Transferencia"
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_picking_release_form
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
 msgid "Un Release"
-msgstr ""
+msgstr "Sin Liberar"
 
 #. module: stock_available_to_promise_release
 #: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_move_unrelease_form
 msgid "Un Release Move Allocations"
-msgstr ""
+msgstr "Asignaciones de Movimientos Sin Liberar"
 
 #. module: stock_available_to_promise_release
 #: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_picking_unrelease_form
 msgid "Un Release Transfers Allocations"
-msgstr ""
+msgstr "Asignaciones de Transferencias Sin Liberar"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__unrelease_allowed
 msgid "Unrelease Allowed"
-msgstr ""
+msgstr "No liberado permitido"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking_type__unrelease_on_backorder
 msgid "Unrelease on backorder"
-msgstr ""
+msgstr "No Liberado en pedido pendiente"
 
 #. module: stock_available_to_promise_release
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
@@ -496,6 +503,8 @@ msgid ""
 "When releasing a transfer, do not create a backorder for the moves created "
 "for the unavailable quantities."
 msgstr ""
+"Al liberar una transferencia, no crea un pedido pendiente para los "
+"movimientos creados para las cantidades no disponibles."
 
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
@@ -538,6 +547,7 @@ msgstr ""
 #, python-format
 msgid "You are not allowed to unrelease this move %(move_name)s."
 msgstr ""
+"No tiene permiso para anular la liberación de este movimiento %(move_name)s."
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__zip_code
