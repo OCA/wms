@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-03-04 17:23+0000\n"
+"PO-Revision-Date: 2023-03-12 19:20+0000\n"
 "Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es_AR\n"
@@ -717,7 +717,7 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No transfer found for the scanned lot."
-msgstr ""
+msgstr "No se encontraron transferencias para el lote escaneado."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1090,12 +1090,12 @@ msgstr "El mismo paquete {} ya está asignado."
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first_is_possible
 msgid "Scan Location Or Pack First Is Possible"
-msgstr ""
+msgstr "Escanear Ubicación O Paquete Primero es Posible"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
 msgid "Scan first location or pack"
-msgstr ""
+msgstr "Escanear ubicación o paquete primero"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1660,6 +1660,8 @@ msgid ""
 "When selecting work, force the user to first scan a location or pack,then "
 "the product or lot."
 msgstr ""
+"Cuando seleccione un trabajo, fuerza al usuario a escanear primero una "
+"ubicación o paquete, después el producto o lote."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1776,7 +1778,7 @@ msgstr "{} no es un paquete de destino válido."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "{} not found in the current transfer or already in a package."
-msgstr ""
+msgstr "{} no encontrado en la transferencia actual o ya está en un paquete."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
