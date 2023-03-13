@@ -44,7 +44,11 @@ class StockLocation(models.Model):
         "locations according to the restrictions defined on their "
         "respective location storage types.",
     )
-    pack_putaway_sequence = fields.Integer()
+    package_type_putaway_sequence = fields.Integer(
+        string="Putaway Sequence",
+        help="Allow to sort the valid locations by sequence for the storage "
+        "strategy based on package type",
+    )
     storage_location_sequence_ids = fields.One2many(
         "stock.storage.location.sequence",
         "location_id",
@@ -453,13 +457,13 @@ class StockLocation(models.Model):
         Then, they are ordered by a sequence and name.
         """
         self.env["stock.location"].flush_model(
-            ["max_height", "pack_putaway_sequence", "name"]
+            ["max_height", "package_type_putaway_sequence", "name"]
         )
         orderby = []
         if self.pack_putaway_strategy == "ordered_locations":
             orderby = [
                 "CASE WHEN max_height > 0 THEN max_height ELSE 'Infinity' END",
-                "pack_putaway_sequence",
+                "package_type_putaway_sequence",
                 "name",
                 "id",
             ]
