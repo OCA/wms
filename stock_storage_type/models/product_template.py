@@ -11,6 +11,6 @@ class ProductTemplate(models.Model):
         "stock.package.type",
         string="Package type",
         help="Defines a 'default' package type for this product to be "
-        "applied on packages without product packagings for put-away "
-        "computations.",
+        "applied on packages without product packagings and on put-away "
+        "computation based on package type for product not in a package",
     )
