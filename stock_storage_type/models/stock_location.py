@@ -202,8 +202,8 @@ class StockLocation(models.Model):
     )
     def _compute_computed_storage_category_id(self):
         """
-        This computes the Storage Storage depending on:
-          - its own Storage Storage
+        This computes the Storage Category depending on:
+          - its own Storage Category
           - or one of its parent (along the parent path) Storage Category
         """
         for location in self:
