@@ -75,9 +75,9 @@ class StockStorageLocationSequence(models.Model):
         action["domain"] = [
             ("parent_path", "=ilike", "{}%".format(self.location_id.parent_path)),
             (
-                "allowed_location_storage_type_ids",
+                "computed_storage_capacity_ids",
                 "in",
-                self.package_type_id.location_storage_type_ids.ids,
+                self.package_type_id.storage_category_capacity_ids.ids,
             ),
         ]
         return action
