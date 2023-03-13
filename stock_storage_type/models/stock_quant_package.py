@@ -40,7 +40,7 @@ class StockQuantPackage(models.Model):
             )
 
     @api.constrains("height", "package_type_id", "product_packaging_id")
-    def _check_storage_type_height_required(self):
+    def _check_package_type_height_required(self):
         for package in self:
             if package.package_type_id.height_required and not package.height:
                 raise ValidationError(
@@ -53,22 +53,22 @@ class StockQuantPackage(models.Model):
             if not package.package_type_id:
                 # if no storage type could be set by auto assign,
                 # fallback on the default product's storage type (if any)
-                package._sync_storage_type_from_single_product()
+                package._sync_package_type_from_single_product()
         return res
 
     @api.model_create_multi
     def create(self, vals):
         records = super().create(vals)
-        records._sync_storage_type_from_packaging()
+        records._sync_package_type_from_packaging()
         return records
 
     def write(self, vals):
         result = super().write(vals)
         if vals.get("product_packaging_id"):
-            self._sync_storage_type_from_packaging()
+            self._sync_package_type_from_packaging()
         return result
 
-    def _sync_storage_type_from_packaging(self):
+    def _sync_package_type_from_packaging(self):
         for package in self:
             if package.package_type_id:
                 # Do not set package storage type for delivery packages
@@ -80,7 +80,7 @@ class StockQuantPackage(models.Model):
                 continue
             package.package_type_id = package_type
 
-    def _sync_storage_type_from_single_product(self):
+    def _sync_package_type_from_single_product(self):
         for package in self:
             if package.packaging_id:
                 # Do not set package type for delivery packages
