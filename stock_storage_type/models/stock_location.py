@@ -34,12 +34,12 @@ class StockLocation(models.Model):
         ],
         required=True,
         default="none",
-        string="Packs Put-Away Strategy",
-        help="This defines the storage strategy to use when packs are put "
-        "away in this location.\n"
-        "None: when a pack is moved to this location, it will not be put"
+        string="Put-Away Strategy",
+        help="This defines the storage strategy based on package type to use when "
+        "a product or package is put away in this location.\n"
+        "None: when moved to this location, it will not be put"
         " away any further.\n"
-        "Ordered Children Locations: when a pack is moved to this "
+        "Ordered Children Locations: when moved to this "
         "location, a suitable location will be searched in its children "
         "locations according to the restrictions defined on their "
         "respective location storage types.",
@@ -362,22 +362,18 @@ class StockLocation(models.Model):
         if quants:
             package_type = quants.package_id.package_type_id
             _logger.debug(
-                "Computing putaway for pack %s (%s)"
+                "Computing putaway for package %s of package type %s"
                 % (quants.package_id, quants.package_id)
             )
-        else:
+        elif product.package_type_id:
             # Get default package type on product if defined
             package_type = product.package_type_id
-            if package_type:
-                _logger.debug(
-                    "Computing putaway for pack %s (%s - from product %s)"
-                    % (quants.package_id, quants.package_id, product)
-                )
-        # I'm not sure about this. I had to add the line, because there is a
-        # second call to get_putaway_strategy which is made a 'leaf' location
-        # as putaway_location which does not match the package storage type in
-        # the project. This could be caused by another module, I'm not sure...
-        if not package_type:
+            _logger.debug(
+                "Computing putaway for product %s of package type %s"
+                % (product, product.package_type_id)
+            )
+        else:
+            # Fallback on standard one
             return putaway_location
         # TODO: Remove this and use only putaway_location as always filled in
         dest_location = putaway_location or self
