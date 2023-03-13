@@ -8,6 +8,9 @@ class TestStorageType(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
+        cls.location_sequence_pallet = cls.env.ref(
+            "stock_storage_type.stock_package_storage_location_pallets"
+        )
 
         cls.stock_location = cls.env.ref("stock.stock_location_stock")
         cls.pallets_location_storage_type = cls.env.ref(
@@ -176,3 +179,21 @@ class TestStorageType(TransactionCase):
         message += "strategy will look for an allowed location in the "
         message += "following locations:"
         self.assertIn(message, pallets.storage_type_message)
+
+        message = (
+            "Pallets reserve storage area (WARNING: restrictions are active on "
+            "location storage types matching this package storage type)"
+        )
+
+        self.assertIn(message, pallets.storage_type_message)
+
+    def test_sequence_to_location_menu(self):
+        action = self.location_sequence_pallet.button_show_locations()
+        self.assertIn(
+            (
+                "computed_storage_capacity_ids",
+                "in",
+                self.location_sequence_pallet.package_type_id.storage_category_capacity_ids.ids,
+            ),
+            action["domain"],
+        )

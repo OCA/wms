@@ -25,7 +25,9 @@ class TestStorageTypeCommon(TransactionCase):
         cls.areas = (
             cls.cardboxes_location | cls.pallets_location | cls.pallets_reserve_location
         )
-        # cls.putaway_locations = cls.cardboxes_location | cls.pallets_location
+        cls.location_sequence_pallet = ref(
+            "stock_storage_type.stock_package_storage_location_pallets"
+        )
 
         cls.cardboxes_bin_1_location = ref(
             "stock_storage_type.stock_location_cardboxes_bin_1"
