@@ -15,6 +15,7 @@
     "depends": [
         "stock_putaway_hook",
         "stock_quant_package_dimension",
+        "stock_storage_category_capacity_name",
     ],
     "data": [
         "security/ir.model.access.csv",

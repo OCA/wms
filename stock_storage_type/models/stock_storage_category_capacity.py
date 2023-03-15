@@ -1,6 +1,6 @@
 # Copyright 2022 ACSONE SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 
 
 class StorageCategoryProductCapacity(models.Model):
@@ -8,7 +8,7 @@ class StorageCategoryProductCapacity(models.Model):
     _inherit = "stock.storage.category.capacity"
 
     allow_new_product = fields.Selection(
-        [
+        selection=[
             ("empty", "If the location is empty"),
             ("same", "If all products are same"),
             ("mixed", "Allow mixed products"),
@@ -25,6 +25,25 @@ class StorageCategoryProductCapacity(models.Model):
         compute="_compute_has_restrictions",
         help="Technical: This is used to check if we need to display warning message",
     )
+
+    @api.model
+    def _get_display_name_attributes(self):
+        """
+        Adds the storage capacity attributes to compose the display name
+        """
+        attributes = super()._get_display_name_attributes()
+        value = self._fields["allow_new_product"].convert_to_export(
+            self.allow_new_product, self
+        )
+        attributes.append(_("Allow New Product: ") + value)
+        return attributes
+
+    @api.model
+    def _compute_display_name_depends(self):
+        depends = super()._compute_display_name_depends()
+        depends.append("allow_new_product")
+        return depends
+
     # TODO: Check if this is convenient with the constraint on barcode field
     # in core module
     active = fields.Boolean(default=True)

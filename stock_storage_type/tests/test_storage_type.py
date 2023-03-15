@@ -197,3 +197,9 @@ class TestStorageType(TransactionCase):
             ),
             action["domain"],
         )
+
+    def test_storage_capacity_display(self):
+        self.assertEqual(
+            self.cardboxes_stock.computed_storage_category_id.capacity_ids.display_name,
+            "Cardboxes x 1.0 (Package: Cardboxes - Allow New Product: Allow mixed products)",
+        )
