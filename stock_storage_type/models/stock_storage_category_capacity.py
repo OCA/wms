@@ -44,10 +44,6 @@ class StorageCategoryProductCapacity(models.Model):
         depends.append("allow_new_product")
         return depends
 
-    # TODO: Check if this is convenient with the constraint on barcode field
-    # in core module
-    active = fields.Boolean(default=True)
-
     @api.depends(
         "allow_new_product",
         "storage_category_id.max_height",
