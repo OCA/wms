@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_reception_mobile.shopfloor_app_assets"
+        priority="1"
+    >
+        <script id="script_scenario_reception" position="after">
+            <t
+                t-set="mod_version"
+                t-value="get_version('shopfloor_reception_purchase_partner_ref_mobile')"
+            />
+            <script
+                id="script_scenario_reception_purchase_partner_ref"
+                t-attf-src="/shopfloor_reception_purchase_partner_ref_mobile/static/src/scenario/reception.js?v=#{mod_version}"
+                type="module"
+            />
+        </script>
+    </template>
+</odoo>
