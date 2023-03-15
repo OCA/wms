@@ -30,6 +30,6 @@ update stock_picking
     set last_release_date = create_date
     from picks
     where stock_picking.id = picks.id
-        and not last_release_date
+        and last_release_date is null
     """
     )
