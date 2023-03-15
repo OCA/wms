@@ -412,13 +412,7 @@ class MessageAction(Component):
     def product_not_found_in_pickings(self):
         return {
             "message_type": "warning",
-            "body": _("No product found among current transfers."),
-        }
-
-    def product_not_found_in_picking(self):
-        return {
-            "message_type": "warning",
-            "body": _("Product not found in the current transfer."),
+            "body": _("No transfer found for this product."),
         }
 
     def x_not_found_or_already_in_dest_package(self, message_code):
@@ -494,16 +488,10 @@ class MessageAction(Component):
             "body": _("This lot is part of multiple packages, please scan a package."),
         }
 
-    def lot_not_found(self):
-        return {
-            "message_type": "error",
-            "body": _("This lot does not exist anymore."),
-        }
-
     def lot_not_found_in_pickings(self):
         return {
             "message_type": "warning",
-            "body": _("No lot found among current transfers."),
+            "body": _("No transfer found for this lot."),
         }
 
     def batch_transfer_complete(self):
