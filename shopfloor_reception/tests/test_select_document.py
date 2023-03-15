@@ -134,12 +134,12 @@ class TestSelectDocument(CommonCase):
         response = self.service.dispatch(
             "scan_document", params={"barcode": self.product_c.barcode}
         )
-        body = "Barcode not found"
+        message = self.service.msg_store.product_not_found_in_pickings()
         self.assert_response(
             response,
             next_state="select_document",
             data={"pickings": self._data_for_pickings(picking)},
-            message={"message_type": "error", "body": body},
+            message=message,
         )
 
     def test_scan_packaging_no_picking(self):
@@ -149,10 +149,10 @@ class TestSelectDocument(CommonCase):
         response = self.service.dispatch(
             "scan_document", params={"barcode": self.product_c_packaging.barcode}
         )
-        body = "Barcode not found"
+        message = self.service.msg_store.product_not_found_in_pickings()
         self.assert_response(
             response,
             next_state="select_document",
             data={"pickings": self._data_for_pickings(picking)},
-            message={"message_type": "error", "body": body},
+            message=message,
         )

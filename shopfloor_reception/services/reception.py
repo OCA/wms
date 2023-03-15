@@ -186,6 +186,10 @@ class Reception(Component):
                 pickings=pickings,
                 message=self.msg_store.multiple_picks_found_select_manually(),
             )
+        return self._response_for_select_document(
+            pickings=pickings,
+            message=self.msg_store.product_not_found_in_pickings(),
+        )
 
     def _select_document_from_packaging(self, packaging):
         """Select the document by packaging
@@ -203,6 +207,10 @@ class Reception(Component):
                 pickings=pickings,
                 message=self.msg_store.multiple_picks_found_select_manually(),
             )
+        return self._response_for_select_document(
+            pickings=pickings,
+            message=self.msg_store.product_not_found_in_pickings(),
+        )
 
     def _select_document_from_lot(self, lot):
         """Select the document by lot
@@ -220,6 +228,10 @@ class Reception(Component):
                 pickings=pickings,
                 message=self.msg_store.multiple_picks_found_select_manually(),
             )
+        return self._response_for_select_document(
+            pickings=pickings,
+            message=self.msg_store.lot_not_found_in_pickings(),
+        )
 
     def _select_line(self, picking, line, move, increase_qty_done_by=1):
         product = line.product_id

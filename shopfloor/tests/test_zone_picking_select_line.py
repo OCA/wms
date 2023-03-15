@@ -359,7 +359,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_lines=move_lines,
-            message=self.service.msg_store.product_not_found(),
+            message=self.service.msg_store.product_not_found_in_pickings(),
         )
 
     def test_scan_source_barcode_product_multiple_moves_different_location(self):
@@ -550,7 +550,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_lines=move_lines,
-            message=self.service.msg_store.lot_not_found(),
+            message=self.service.msg_store.lot_not_found_in_pickings(),
         )
 
     def test_scan_source_barcode_not_found(self):
