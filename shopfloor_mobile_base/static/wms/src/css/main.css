@@ -500,6 +500,7 @@ main.v-content > .v-content__wrap > .header .container {
     margin-bottom: 8px;
     padding: 5px;
     line-height: 1.5;
+    border-style: none none solid none;
 }
 @keyframes scanning {
     0%,
