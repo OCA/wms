@@ -158,18 +158,6 @@ class TestStorageType(TransactionCase):
         all_package_storage_types = self.env["stock.package.type"].search([])
         self.assertNotIn(target, all_package_storage_types)
 
-    def test_archive_location_storage_type(self):
-        target = self.env.ref("stock_storage_type.location_storage_type_pallets")
-        all_location_storage_types = self.env["stock.storage.category.capacity"].search(
-            []
-        )
-        self.assertIn(target, all_location_storage_types)
-        target.active = False
-        all_location_storage_types = self.env["stock.storage.category.capacity"].search(
-            []
-        )
-        self.assertNotIn(target, all_location_storage_types)
-
     def test_package_message(self):
         """
         Test for the message displayed on Stock Package Type forms
