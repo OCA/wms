@@ -1,0 +1,3 @@
+odoo-addon-stock_move_assign_picking_hook @ git+https://github.com/OCA/stock-logistics-workflow.git@refs/pull/1184/head#subdirectory=setup/stock_move_assign_picking_hook
+odoo-addon-stock_picking_group_by_partner_by_carrier @ git+https://github.com/OCA/stock-logistics-workflow.git@refs/pull/1229/head#subdirectory=setup/stock_picking_group_by_partner_by_carrier
+odoo-addon-stock_picking_type_shipping_policy @ git+https://github.com/OCA/wms.git@refs/pull/540/head#subdirectory=setup/stock_picking_type_shipping_policy
