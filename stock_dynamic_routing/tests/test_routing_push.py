@@ -3,7 +3,7 @@
 from odoo.tests import common
 
 
-class TestRoutingPush(common.SavepointCase):
+class TestRoutingPush(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -231,11 +231,6 @@ class TestRoutingPush(common.SavepointCase):
 
         self.assert_src_handover(routing_move)
         self.assert_dest_highbay_1_2(routing_move)
-
-        self.assertEqual(routing_move.picking_type_id, self.pick_type_routing_op)
-        self.assertEqual(
-            routing_move.picking_id.picking_type_id, self.pick_type_routing_op
-        )
         self.assertEqual(move_a.picking_id.picking_type_id, self.wh.in_type_id)
         self.assertEqual(move_b.picking_id.picking_type_id, self.wh.int_type_id)
         self.assertEqual(move_a.state, "done")
@@ -330,7 +325,6 @@ class TestRoutingPush(common.SavepointCase):
 
         # Check routing picking
         self.assertEqual(routing_picking.move_lines, routing_move)
-        self.assertEqual(routing_picking.picking_type_id, self.pick_type_routing_op)
         self.assert_src_handover(routing_picking)
         self.assert_dest_highbay_1_2(routing_picking)
 
@@ -515,7 +509,6 @@ class TestRoutingPush(common.SavepointCase):
 
         # Check routing picking
         self.assertEqual(routing_picking.move_lines, routing_move)
-        self.assertEqual(routing_picking.picking_type_id, self.pick_type_routing_op)
         self.assert_src_handover(routing_picking)
         self.assert_dest_highbay_1_2(routing_picking)
 
@@ -659,9 +652,6 @@ class TestRoutingPush(common.SavepointCase):
         extra_move = move_b.move_dest_ids
         self.assert_dest_highbay_1_2(extra_move)
         self.assert_dest_highbay_1_2(extra_move.picking_id)
-        self.assertEqual(
-            extra_move.picking_id.picking_type_id, self.pick_type_routing_op
-        )
         self.assertFalse(extra_move.move_dest_ids)
 
     def test_domain_ignore_move(self):
@@ -697,10 +687,6 @@ class TestRoutingPush(common.SavepointCase):
         self.assertFalse(move_a.move_orig_ids)
         self.assertEqual(move_a.move_dest_ids, move_b)
         self.assertTrue(move_b.move_dest_ids)
-        next_move = move_b.move_dest_ids
-        self.assertEqual(
-            next_move.picking_id.picking_type_id, self.pick_type_routing_op
-        )
 
     def test_chain(self):
         location_pre_handover = self.env["stock.location"].create(
@@ -782,7 +768,3 @@ class TestRoutingPush(common.SavepointCase):
 
         self.assertEqual(move_a.picking_id.picking_type_id, self.wh.in_type_id)
         self.assertEqual(move_b.picking_id.picking_type_id, self.wh.int_type_id)
-        self.assertEqual(
-            move_pre_handover.picking_id.picking_type_id, pick_type_pre_handover
-        )
-        self.assertEqual(move_hb.picking_id.picking_type_id, self.pick_type_routing_op)

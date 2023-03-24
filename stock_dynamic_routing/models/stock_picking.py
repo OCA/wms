@@ -14,10 +14,11 @@ class StockPicking(models.Model):
 
     @api.depends("canceled_by_routing")
     def _compute_state(self):
-        super()._compute_state()
+        result = super()._compute_state()
         for picking in self:
             if picking.canceled_by_routing:
                 picking.state = "cancel"
+        return result
 
     def _dynamic_routing_handle_empty(self):
         """Handle pickings emptied during a dynamic routing"""

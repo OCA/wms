@@ -60,12 +60,12 @@ class StockMove(models.Model):
 
     def _action_assign(self):
         if self.env.context.get("exclude_apply_dynamic_routing"):
-            super()._action_assign()
+            return super()._action_assign()
         else:
             # these methods will call _action_assign in a savepoint
             # and modify the routing if necessary
             moves = self._split_and_apply_routing()
-            super(StockMove, moves)._action_assign()
+            return super(StockMove, moves)._action_assign()
 
     def _split_and_apply_routing(self):
         """Apply routing rules
