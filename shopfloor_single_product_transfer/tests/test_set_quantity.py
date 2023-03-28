@@ -20,6 +20,23 @@ class TestSetQuantity(CommonCase):
         cls._add_stock_to_product(cls.product, cls.location, 10, lot=lot)
         return cls._create_picking(lines=[(cls.product, 10)])
 
+    @classmethod
+    def _setup_chained_picking(cls, picking):
+        next_moves = picking.move_lines.browse()
+        for move in picking.move_lines:
+            next_moves |= move.copy(
+                {
+                    "move_orig_ids": [(6, 0, move.ids)],
+                    "location_id": move.location_dest_id.id,
+                    "location_dest_id": cls.customer_location.id,
+                }
+            )
+        next_moves._assign_picking()
+        next_picking = next_moves.picking_id
+        next_picking.action_confirm()
+        next_picking.action_assign()
+        return next_picking
+
     def test_set_quantity_barcode_not_found(self):
         # First, select a picking
         picking = self._setup_picking()
@@ -393,3 +410,33 @@ class TestSetQuantity(CommonCase):
         # Ensure the qty_done and user has been reset.
         self.assertFalse(move_line.picking_id.user_id)
         self.assertEqual(move_line.qty_done, 0.0)
+
+    def test_set_quantity_done_with_completion_info(self):
+        self.picking_type.sudo().display_completion_info = "next_picking_ready"
+        picking = self._setup_picking()
+        self._setup_chained_picking(picking)
+        location = self.location
+        self.service.dispatch(
+            "scan_product",
+            params={"location_id": location.id, "barcode": self.product.barcode},
+        )
+        # Change the destination on the move_line
+        move_line = picking.move_line_ids
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.dispatch_location.name,
+            },
+        )
+        expected_message = self.msg_store.transfer_done_success(move_line.picking_id)
+        completion_info = self.service._actions_for("completion.info")
+        expected_popup = completion_info.popup(move_line)
+        data = {"location": self._data_for_location(location)}
+        self.assert_response(
+            response,
+            next_state="select_product",
+            message=expected_message,
+            data=data,
+            popup=expected_popup,
+        )
