@@ -26,9 +26,6 @@ class StockPicking(models.Model):
         help="Date/time used to sort moves to deliver first. "
         "Used to calculate the ordered available to promise.",
     )
-    zip_code = fields.Char(related="partner_id.zip", store=True)
-    state_id = fields.Many2one(related="partner_id.state_id", store=True)
-    city = fields.Char(related="partner_id.city", store=True)
     last_release_date = fields.Datetime()
 
     @api.depends("move_ids.need_release")
