@@ -593,9 +593,19 @@ const ZonePicking = {
                     },
                     on_select: (selected) => {
                         this.list_move_lines(selected.id);
+                        this.force_lines_refresh = true;
                     },
                 },
                 select_line: {
+                    enter: () => {
+                        if (!this.force_lines_refresh) {
+                            // Ensure that the list of lines is always refreshed
+                            // when landing on this screen.
+                            // We don't need to call this method on enter
+                            // if we come from select_picking_type, as it takes care of that already.
+                            this.list_move_lines(this.state.data.picking_type.id);
+                        }
+                    },
                     display_info: {
                         title: "Select move",
                         scan_placeholder: () => {
@@ -788,6 +798,7 @@ const ZonePicking = {
                     },
                 },
             },
+            force_lines_refresh: false,
         };
     },
     // TODO: move this lovely feature to a mixin or provide it to all components.
