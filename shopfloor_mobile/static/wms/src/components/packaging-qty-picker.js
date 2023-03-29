@@ -104,13 +104,9 @@ export var PackagingQtyPickerMixin = {
          */
         _qty_by_pkg: function (pkg_qty, qty) {
             const precision = this.unit_uom.rounding || 3;
-            let qty_per_pkg = 0;
-            // TODO: anything better to do like `float_compare`?
-            while (_.round(qty - pkg_qty, precision) >= 0.0) {
-                qty -= pkg_qty;
-                qty_per_pkg += 1;
-            }
-            return [qty_per_pkg, qty];
+            const remainder = _.round(qty % pkg_qty, precision);
+            const qty_for_pkg = (qty - remainder) / pkg_qty;
+            return [qty_for_pkg, remainder];
         },
         _compute_qty: function () {
             const self = this;
