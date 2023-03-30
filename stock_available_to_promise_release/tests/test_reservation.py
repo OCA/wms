@@ -10,18 +10,6 @@ from .common import PromiseReleaseCommonCase
 
 
 class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
-    def _prev_picking(self, picking):
-        return picking.move_ids.move_orig_ids.picking_id
-
-    def _out_picking(self, pickings):
-        return pickings.filtered(lambda r: r.picking_type_code == "outgoing")
-
-    def _deliver(self, picking):
-        picking.action_assign()
-        for line in picking.mapped("move_ids.move_line_ids"):
-            line.qty_done = line.reserved_qty
-        picking._action_done()
-
     def test_horizon_date(self):
         move = self.env["stock.move"].create(
             {
@@ -509,12 +497,13 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                     "state": "waiting",
                     "location_id": self.wh.wh_output_stock_loc_id.id,
                     "location_dest_id": self.loc_customer.id,
-                    "printed": False,
+                    "last_release_date": False,
                 }
             ],
         )
-
-        cust_picking.release_available_to_promise()
+        release_date = datetime(2022, 11, 10, 17, 21)
+        with freeze_time(release_date):
+            cust_picking.move_ids.release_available_to_promise()
         split_cust_picking = cust_picking.backorder_ids
         self.assertEqual(len(split_cust_picking), 1)
 
@@ -531,13 +520,13 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                     "state": "assigned",
                     "location_id": self.wh.lot_stock_id.id,
                     "location_dest_id": self.wh.wh_output_stock_loc_id.id,
-                    "printed": True,
+                    "last_release_date": release_date,
                 }
             ],
         )
-        # the released customer picking is set to "printed"
-        self.assertRecordValues(cust_picking, [{"printed": True}])
-        # the split once stays in the original location
+        # the released customer picking has a last_release_date
+        self.assertRecordValues(cust_picking, [{"last_release_date": release_date}])
+        # the split one stays in the original location
         self.assertRecordValues(
             split_cust_picking,
             [
@@ -545,7 +534,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                     "state": "waiting",
                     "location_id": self.wh.wh_output_stock_loc_id.id,
                     "location_dest_id": self.loc_customer.id,
-                    "printed": False,
+                    "last_release_date": False,
                 }
             ],
         )
@@ -669,6 +658,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                     "state": "waiting",
                     "location_id": self.wh.wh_output_stock_loc_id.id,
                     "location_dest_id": self.loc_customer.id,
+                    "last_release_date": False,
                 }
             ],
         )
@@ -687,6 +677,224 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         out_picking = (
             self._pickings_in_group(pickings.group_id) - cust_picking - backorder
         )
+        self.assertRecordValues(
+            out_picking,
+            [
+                {
+                    "state": "assigned",
+                    "location_id": self.wh.lot_stock_id.id,
+                    "location_dest_id": self.wh.wh_output_stock_loc_id.id,
+                }
+            ],
+        )
+        self.assertRecordValues(
+            out_picking.move_ids,
+            [
+                {"product_qty": 10.0, "product_id": self.product1.id},
+                {"product_qty": 10.0, "product_id": self.product2.id},
+            ],
+        )
+
+    def test_defer_creation_no_backorder_partial_available(self):
+        """Test that the creation of a backorder is not done at release time
+        when the field `ǹo_backorder_at_release` is set on the stock.route"""
+        self.wh.delivery_route_id.write(
+            {"available_to_promise_defer_pull": True, "no_backorder_at_release": True}
+        )
+        self._update_qty_in_location(self.loc_bin1, self.product1, 7.0)
+        pickings = self._create_picking_chain(self.wh, [(self.product1, 20)])
+        self.assertEqual(len(pickings), 1, "expect only the last out->customer")
+
+        cust_picking = pickings
+        move_state = cust_picking.mapped("move_ids").mapped("state")
+        self.assertTrue(len(move_state) == 1 and move_state[0] == "waiting")
+        self.assertEqual(cust_picking.state, "waiting")
+        self.assertRecordValues(
+            cust_picking,
+            [
+                {
+                    "state": "waiting",
+                    "location_id": self.wh.wh_output_stock_loc_id.id,
+                    "location_dest_id": self.loc_customer.id,
+                    "printed": False,
+                }
+            ],
+        )
+
+        cust_picking.release_available_to_promise()
+        split_cust_picking = cust_picking.backorder_ids
+        self.assertEqual(len(split_cust_picking), 0)
+
+        out_picking = self._pickings_in_group(pickings.group_id) - cust_picking
+        # the complete one is assigned and placed into stock output
+        self.assertRecordValues(
+            out_picking,
+            [
+                {
+                    "state": "assigned",
+                    "location_id": self.wh.lot_stock_id.id,
+                    "location_dest_id": self.wh.wh_output_stock_loc_id.id,
+                    "printed": False,
+                }
+            ],
+        )
+        # the released customer picking is not set to "printed"
+        self.assertRecordValues(cust_picking, [{"printed": False}])
+
+        self.assertRecordValues(out_picking.move_ids, [{"product_qty": 7.0}])
+
+        # the splite moves remains into the customer picking
+        self.assertRecordValues(
+            cust_picking.move_ids,
+            [
+                {"product_qty": 7.0, "state": "waiting"},
+                {"product_qty": 13.0, "state": "waiting"},
+            ],
+        )
+
+        # let's deliver what we can
+        self._deliver(out_picking)
+        self.assertRecordValues(out_picking, [{"state": "done"}])
+        self.assertRecordValues(cust_picking, [{"state": "assigned"}])
+        self.assertRecordValues(
+            cust_picking.move_ids,
+            [
+                {
+                    "state": "assigned",
+                    "product_qty": 7.0,
+                    "reserved_availability": 7.0,
+                    "procure_method": "make_to_order",
+                },
+                {
+                    "state": "waiting",
+                    "product_qty": 13.0,
+                    "reserved_availability": 0.0,
+                    "procure_method": "make_to_order",
+                },
+            ],
+        )
+
+        self._deliver(cust_picking)
+        self.assertRecordValues(cust_picking, [{"state": "done"}])
+
+        cust_backorder = (
+            self._pickings_in_group(cust_picking.group_id) - cust_picking - out_picking
+        )
+        self.assertEqual(len(cust_backorder), 1)
+
+        self.env["stock.move"].invalidate_model(
+            fnames=[
+                "previous_promised_qty",
+                "ordered_available_to_promise_uom_qty",
+                "ordered_available_to_promise_qty",
+            ]
+        )
+        # nothing happen, no stock
+        self.assertEqual(len(self._pickings_in_group(cust_picking.group_id)), 3)
+        cust_backorder.release_available_to_promise()
+        self.assertEqual(len(self._pickings_in_group(cust_picking.group_id)), 3)
+
+        self.env["stock.move"].invalidate_model(
+            fnames=[
+                "previous_promised_qty",
+                "ordered_available_to_promise_uom_qty",
+                "ordered_available_to_promise_qty",
+            ]
+        )
+        # We add stock, so now the release must create the next
+        # chained move
+        self._update_qty_in_location(self.loc_bin1, self.product1, 30)
+        cust_backorder.release_available_to_promise()
+        out_backorder = (
+            self._pickings_in_group(cust_picking.group_id)
+            - cust_backorder
+            - cust_picking
+            - out_picking
+        )
+        self.assertRecordValues(
+            out_backorder.move_ids,
+            [
+                {
+                    "state": "assigned",
+                    "product_qty": 13.0,
+                    "reserved_availability": 13.0,
+                    "procure_method": "make_to_stock",
+                    "location_id": self.wh.lot_stock_id.id,
+                    "location_dest_id": self.wh.wh_output_stock_loc_id.id,
+                }
+            ],
+        )
+
+    def test_defer_creation_no_backorder_not_available(self):
+        """Unreleased moves are not put in a backorder if
+        `ǹo_backorder_at_release` is set to True"""
+        self.wh.delivery_route_id.write(
+            {"available_to_promise_defer_pull": True, "no_backorder_at_release": True}
+        )
+        self._update_qty_in_location(self.loc_bin1, self.product1, 10.0)
+        self._update_qty_in_location(self.loc_bin1, self.product2, 10.0)
+        pickings = self._create_picking_chain(
+            self.wh,
+            [
+                (self.product1, 20),
+                (self.product2, 10),
+                (self.product3, 20),
+                (self.product4, 10),
+            ],
+        )
+        self.assertEqual(len(pickings), 1, "expect only the last out->customer")
+
+        cust_picking = pickings
+        self.assertRecordValues(
+            cust_picking,
+            [
+                {
+                    "state": "waiting",
+                    "location_id": self.wh.wh_output_stock_loc_id.id,
+                    "location_dest_id": self.loc_customer.id,
+                },
+            ],
+        )
+
+        cust_picking.release_available_to_promise()
+        backorder = cust_picking.backorder_ids
+        self.assertFalse(backorder)
+        self.assertRecordValues(
+            cust_picking.move_ids.sorted("id"),
+            [
+                # product 1 is partially available -> split
+                {
+                    "product_qty": 10.0,
+                    "product_id": self.product1.id,
+                    "state": "waiting",
+                },
+                # product 2 is fully available
+                {
+                    "product_qty": 10.0,
+                    "product_id": self.product2.id,
+                    "state": "waiting",
+                },
+                # these 2 moves were not released
+                {
+                    "product_qty": 20.0,
+                    "product_id": self.product3.id,
+                    "state": "waiting",
+                },
+                {
+                    "product_qty": 10.0,
+                    "product_id": self.product4.id,
+                    "state": "waiting",
+                },
+                # remaining 10 on product 1 because it was partially available
+                {
+                    "product_qty": 10.0,
+                    "product_id": self.product1.id,
+                    "state": "waiting",
+                },
+            ],
+        )
+
+        out_picking = self._pickings_in_group(pickings.group_id) - cust_picking
         self.assertRecordValues(
             out_picking,
             [
@@ -971,3 +1179,17 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         pick.action_confirm()
         pick.release_available_to_promise()
         self.assertEqual(pick.move_ids.move_orig_ids.picking_id.priority, "1")
+
+    def test_backorder_creation_after_release(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
+        picking = self._create_picking_chain(self.wh, [(self.product1, 5)])
+        picking.release_available_to_promise()
+        move = picking.move_ids
+        new_move = move.copy()
+        new_move._assign_picking()
+        self.assertEqual(picking, new_move.picking_id)
+        picking.picking_type_id.prevent_new_move_after_release = True
+        new_move = move.copy()
+        new_move._assign_picking()
+        self.assertNotEqual(picking, new_move.picking_id)

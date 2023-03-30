@@ -25,4 +25,22 @@
             </xpath>
         </field>
     </record>
+
+    <record id="stock_picking_type_form" model="ir.ui.view">
+        <field name="name">stock.picking.type.form</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_picking_type_form" />
+        <field name="arch" type="xml">
+             <group name="locations" position="after">
+                 <group name="release" string="Chained moves release process">
+                     <field
+                        name="unrelease_on_backorder"
+                        attrs='{"invisible": [("code", "!=", "outgoing")]}'
+                    />
+                     <field name="prevent_new_move_after_release" />
+                 </group>
+             </group>
+        </field>
+    </record>
+
 </odoo>

@@ -41,6 +41,20 @@
                     </div>
                 </button>
             </div>
+            <button name="action_assign_serial" position="after">
+                <field name="unrelease_allowed" invisible="1" />
+                <button
+                    name="unrelease"
+                    attrs="{'invisible': [('unrelease_allowed', '=', False)]}"
+                    string="Un Release"
+                    type="object"
+                    icon="fa-cube"
+                    groups="stock.group_stock_user"
+                />
+            </button>
+            <field name="date_done" position="before">
+                <field name="last_release_date" />
+            </field>
         </field>
     </record>
     <record id="view_picking_release_tree" model="ir.ui.view">
@@ -57,6 +71,9 @@
             </field>
             <field name="origin" position="after">
                 <field name="group_id" optional="hide" />
+            </field>
+            <field name="scheduled_date" position="after">
+                <field name="last_release_date" optional="hide" />
             </field>
             <tree position="inside">
                 <field name="date_priority" optional="show" />
