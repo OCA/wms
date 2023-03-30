@@ -3,7 +3,7 @@
 
 import logging
 
-from odoo import fields
+from odoo import _, fields
 from odoo.tests import common
 
 from odoo.addons.stock_available_to_promise_release.tests.common import (
@@ -174,3 +174,16 @@ class ChannelReleaseCase(PromiseReleaseCommonCase):
         for line in picking.move_line_ids:
             line.qty_done = line.reserved_qty
         picking._action_done()
+
+    def _assert_action_nothing_in_the_queue(self, action):
+        self.assertEqual(
+            action,
+            {
+                "effect": {
+                    "fadeout": "fast",
+                    "message": _("Nothing in the queue!"),
+                    "img_url": "/web/static/src/img/smile.svg",
+                    "type": "rainbow_man",
+                }
+            },
+        )

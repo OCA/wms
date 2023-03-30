@@ -12,13 +12,6 @@ class StockPicking(models.Model):
     release_channel_id = fields.Many2one(
         comodel_name="stock.release.channel", index=True, ondelete="restrict"
     )
-    commercial_partner_id = fields.Many2one(
-        comodel_name="res.partner",
-        string="Commercial Entity",
-        related="partner_id.commercial_partner_id",
-        store=True,
-        readonly=True,
-    )
 
     def _delay_assign_release_channel(self):
         for picking in self:

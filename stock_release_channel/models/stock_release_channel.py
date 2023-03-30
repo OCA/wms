@@ -69,15 +69,11 @@ class StockReleaseChannel(models.Model):
         [("batch", "Batch (Manual)")], required=True, default="batch"
     )
     batch_mode = fields.Selection(
-        selection=[
-            ("max", "Max"),
-            ("group_commercial_partner", "Grouped by Commercial Partner"),
-        ],
+        selection=[("max", "Max")],
         default="max",
         required=True,
         help="Max: release N transfers to have a configured max of X deliveries"
-        " in progress.\nGrouped by Commercial Partner: release all transfers for a"
-        "commercial partner at once.",
+        " in progress.",
     )
     max_batch_mode = fields.Integer(
         string="Max Transfers to release",
@@ -693,21 +689,6 @@ class StockReleaseChannel(models.Model):
         # should evaluate making it a stored field in the module
         # "stock_available_to_promise_release".
         return next_pickings.sorted(self._pickings_sort_key)[:release_limit]
-
-    def _get_next_pickings_group_commercial_partner(self):
-        # We have to use a python sort and not a order + limit on the search
-        # because "date_priority" is computed and not stored. If needed, we
-        # should evaluate making it a stored field in the module
-        # "stock_available_to_promise_release".
-        next_pickings = self._get_pickings_to_release().sorted(self._pickings_sort_key)
-        if not next_pickings:
-            return self.env["stock.picking"].browse()
-        first_picking = next_pickings[0]
-        commercial_partner = first_picking.commercial_partner_id
-        partner_pickings = next_pickings.filtered(
-            lambda p: p.commercial_partner_id == commercial_partner
-        )
-        return partner_pickings
 
     def _check_is_release_allowed(self):
         for rec in self:
