@@ -111,11 +111,16 @@ export const checkout_states = function ($instance) {
             },
             on_scan: (scanned) => {
                 $instance.wait_call(
-                    $instance.odoo.call("scan_package_action", {
-                        picking_id: $instance.state.data.picking.id,
-                        selected_line_ids: $instance.selectable_line_ids(),
-                        barcode: scanned.text,
-                    })
+                    $instance.odoo
+                        .call("scan_package_action", {
+                            picking_id: $instance.state.data.picking.id,
+                            selected_line_ids: $instance.selectable_line_ids(),
+                            barcode: scanned.text,
+                        })
+                        .then((res) => {
+                            $instance.handle_manual_select_highlight_on_scan(res);
+                            return res;
+                        })
                 );
             },
             on_select: (selected) => {

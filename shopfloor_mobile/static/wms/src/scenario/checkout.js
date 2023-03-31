@@ -7,6 +7,7 @@
 import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
 import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
 import {checkout_states} from "./checkout_states.js";
+import event_hub from "/shopfloor_mobile_base/static/wms/src/services/event_hub.js";
 
 const Checkout = {
     mixins: [ScenarioBaseMixin],
@@ -280,6 +281,19 @@ const Checkout = {
                     ],
                 },
             };
+        },
+        handle_manual_select_highlight_on_scan: function (res) {
+            const new_selected_package_data = res.data.select_package;
+            new_selected_package_data.selected_move_lines.forEach((line) => {
+                let checked = false;
+                if (line.qty_done > 0) {
+                    checked = true;
+                }
+                event_hub.$emit("manual_select:select_item", {
+                    rec_id: line.id,
+                    checked,
+                });
+            });
         },
         select_delivery_packaging_manual_select_options: function () {
             return {
