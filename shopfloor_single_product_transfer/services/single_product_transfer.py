@@ -496,6 +496,9 @@ class ShopfloorSingleProductTransfer(Component):
                 move_line, message=message, asking_confirmation=asking_confirmation
             )
 
+    def _lock_lines(self, lines):
+        self._actions_for("lock").for_update(lines)
+
     def _write_destination_on_lines(self, lines, location):
         # TODO
         # '_write_destination_on_lines' is implemented in:
@@ -511,9 +514,12 @@ class ShopfloorSingleProductTransfer(Component):
             # yet another glue module. In the long term we should make
             # 'shopfloor_checkout_sync' use events and trash the overrides made
             # on all scenarios.
-            self._actions_for("checkout.sync")._sync_checkout(lines, location)
+            checkout_sync = self._actions_for("checkout.sync")
         except NoComponentError:
-            pass
+            self._lock_lines(lines)
+        else:
+            self._lock_lines(checkout_sync._all_lines_to_lock(lines))
+            checkout_sync._sync_checkout(lines, location)
         lines.location_dest_id = location
         lines.package_level_id.location_dest_id = location
 
