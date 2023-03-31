@@ -3,6 +3,7 @@
  * @author Simone Orsi <simahawk@gmail.com>
  * License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
  */
+import event_hub from "../services/event_hub.js";
 
 /* eslint-disable strict */
 Vue.component("manual-select", {
@@ -45,6 +46,13 @@ Vue.component("manual-select", {
     mounted() {
         // Relies on properties
         this.selected = this._initSelected();
+
+        // Select item from outside this component.
+        event_hub.$on("manual_select:select_item", (data) => {
+            // TODO: We should consider using a 'ref' to hook to this
+            // in case there are many mounted manual_select components.
+            this._updateValue(data.rec_id, data.checked);
+        });
     },
     methods: {
         _initSelected() {
