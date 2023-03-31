@@ -49,6 +49,7 @@ class StockMove(models.Model):
         search="_search_release_ready",
     )
     need_release = fields.Boolean(index=True, copy=False)
+    unrelease_allowed = fields.Boolean(compute="_compute_unrelease_allowed")
 
     @api.depends("rule_id", "rule_id.available_to_promise_defer_pull")
     def _compute_unrelease_allowed(self):
