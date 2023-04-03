@@ -32,6 +32,11 @@ msgstr ""
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
+msgid "<span>Actions</span>"
+msgstr ""
+
+#. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "<span>Transfers</span>"
 msgstr ""
 
@@ -40,6 +45,34 @@ msgstr ""
 msgid ""
 "<strong>Last Transfer</strong>\n"
 "                                                <br/>"
+msgstr ""
+
+#. module: stock_release_channel
+#. odoo-python
+#: code:addons/stock_release_channel/models/stock_release_channel.py:0
+#, python-format
+msgid "Action 'Lock' is not allowed for channel %(name)s."
+msgstr ""
+
+#. module: stock_release_channel
+#. odoo-python
+#: code:addons/stock_release_channel/models/stock_release_channel.py:0
+#, python-format
+msgid "Action 'Sleep' is not allowed for channel %(name)s."
+msgstr ""
+
+#. module: stock_release_channel
+#. odoo-python
+#: code:addons/stock_release_channel/models/stock_release_channel.py:0
+#, python-format
+msgid "Action 'Unlock' is not allowed for channel %(name)s."
+msgstr ""
+
+#. module: stock_release_channel
+#. odoo-python
+#: code:addons/stock_release_channel/models/stock_release_channel.py:0
+#, python-format
+msgid "Action 'Wake Up' is not allowed for channel %(name)s."
 msgstr ""
 
 #. module: stock_release_channel
@@ -89,6 +122,21 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_search_view
 msgid "Archived"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__state__asleep
+msgid "Asleep"
+msgstr ""
+
+#. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_search_view
+msgid "Aslepp"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.actions.server,name:stock_release_channel.model_stock_release_channel_action_assign_pickings
+msgid "Assign Pickings"
 msgstr ""
 
 #. module: stock_release_channel
@@ -216,6 +264,31 @@ msgid "In progress Related Transfers"
 msgstr ""
 
 #. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_lock_allowed
+msgid "Is Action Lock Allowed"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_sleep_allowed
+msgid "Is Action Sleep Allowed"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_unlock_allowed
+msgid "Is Action Unlock Allowed"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_wake_up_allowed
+msgid "Is Action Wake Up Allowed"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_release_allowed
+msgid "Is Release Allowed"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__last_done_picking_date_done
 msgid "Last Done Picking Date Done"
 msgstr ""
@@ -271,6 +344,18 @@ msgid "Lines]"
 msgstr ""
 
 #. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
+msgid "Lock"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__state__locked
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_search_view
+msgid "Locked"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__auto_release__max
 msgid "Max"
 msgstr ""
@@ -320,6 +405,12 @@ msgstr ""
 #: code:addons/stock_release_channel/tests/test_channel_release_batch.py:0
 #, python-format
 msgid "Nothing in the queue!"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__state__open
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_search_view
+msgid "Open"
 msgstr ""
 
 #. module: stock_release_channel
@@ -438,6 +529,17 @@ msgid "Settings"
 msgstr ""
 
 #. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
+msgid "Sleep"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__state
+msgid "State"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model,name:stock_release_channel.model_stock_move
 msgid "Stock Move"
 msgstr ""
@@ -448,11 +550,53 @@ msgid "Stock Release Channels"
 msgstr ""
 
 #. module: stock_release_channel
+#: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_action_lock_allowed
+msgid "Technical field to check if the action 'Lock' is allowed."
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_release_allowed
+msgid ""
+"Technical field to check if the action 'Release Next Batch' is allowed."
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_action_sleep_allowed
+msgid "Technical field to check if the action 'Sleep' is allowed."
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_action_unlock_allowed
+msgid "Technical field to check if the action 'Unlock' is allowed."
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_action_wake_up_allowed
+msgid "Technical field to check if the action 'Wake Up' is allowed."
+msgstr ""
+
+#. module: stock_release_channel
 #. odoo-python
 #: code:addons/stock_release_channel/models/stock_release_channel.py:0
 #, python-format
 msgid ""
 "The number of released transfers in progress is already at the maximum."
+msgstr ""
+
+#. module: stock_release_channel
+#. odoo-python
+#: code:addons/stock_release_channel/models/stock_release_channel.py:0
+#, python-format
+msgid "The release of pickings is not allowed for channel %(name)s."
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__state
+msgid ""
+"The state allows you to control the availability of the release channel.\n"
+"* Open: Manual and automatic picking assignment to the release is effective and release operations are allowed.\n"
+" * Locked: Release operations are forbidden. (Assignement processes are still working)\n"
+"* Asleep: Assigned pickings not processed are unassigned from the release channel.\n"
 msgstr ""
 
 #. module: stock_release_channel
@@ -501,6 +645,12 @@ msgid "Transfers that couldn't be assigned in a release channel"
 msgstr ""
 
 #. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
+msgid "Unlock"
+msgstr ""
+
+#. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Waiting"
 msgstr ""
@@ -518,6 +668,12 @@ msgstr ""
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_waiting
 msgid "Waiting Transfers"
+msgstr ""
+
+#. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
+msgid "Wake Up"
 msgstr ""
 
 #. module: stock_release_channel
@@ -550,4 +706,9 @@ msgstr ""
 msgid ""
 "You cannot release delivery of the channel %s because it has been forbidden "
 "in the release channel configuration"
+msgstr ""
+
+#. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
+msgid "name"
 msgstr ""
