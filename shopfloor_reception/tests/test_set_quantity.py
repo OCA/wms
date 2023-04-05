@@ -65,6 +65,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": False,
             },
         )
 
@@ -91,6 +92,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": False,
             },
         )
 
@@ -116,6 +118,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": False,
             },
         )
         # Scan again, and ensure qty increments
@@ -167,6 +170,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": False,
             },
         )
         # Scan again, and ensure qty increments
@@ -227,6 +231,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": False,
             },
             message={"message_type": "error", "body": "You cannot place it here"},
         )
@@ -300,6 +305,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": False,
             },
             message={"message_type": "error", "body": "You cannot place it here"},
         )
@@ -327,6 +333,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": False,
             },
             message={"message_type": "error", "body": "You cannot place it here"},
         )
@@ -353,6 +360,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": picking_data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": True,
             },
             message={
                 "message_type": "warning",

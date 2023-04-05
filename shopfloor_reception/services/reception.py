@@ -580,12 +580,15 @@ class Reception(Component):
             message=message,
         )
 
-    def _response_for_set_quantity(self, picking, line, message=None):
+    def _response_for_set_quantity(
+        self, picking, line, message=None, asking_confirmation=False
+    ):
         return self._response(
             next_state="set_quantity",
             data={
                 "selected_move_line": self._data_for_move_lines(line),
                 "picking": self.data.picking(picking),
+                "confirmation_required": asking_confirmation,
             },
             message=message,
         )
@@ -880,6 +883,7 @@ class Reception(Component):
                     picking,
                     selected_line,
                     message=self.msg_store.create_new_pack_ask_confirmation(barcode),
+                    asking_confirmation=True,
                 )
             package = self.env["stock.quant.package"].create({"name": barcode})
             quantity = selected_line.qty_done
@@ -1340,6 +1344,11 @@ class ShopfloorReceptionValidatorResponse(Component):
                 "schema": {"type": "dict", "schema": self.schemas.move_line()},
             },
             "picking": {"type": "dict", "schema": self.schemas.picking()},
+            "confirmation_required": {
+                "type": "boolean",
+                "nullable": True,
+                "required": False,
+            },
         }
 
     @property

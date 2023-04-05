@@ -175,7 +175,7 @@ export const reception_states = function () {
                         selected_line_id: this.line_being_handled.id,
                         quantity: this.scan_destination_qty,
                         barcode: barcode.text,
-                        confirmation: true,
+                        confirmation: this.state.data.confirmation_required,
                     })
                 );
             },
