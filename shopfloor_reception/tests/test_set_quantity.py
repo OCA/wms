@@ -11,8 +11,6 @@ class TestSetQuantity(CommonCase):
         cls.product_a_packaging.qty = 5.0
         cls.packing_location.sudo().active = True
         package_model = cls.env["stock.quant.package"]
-        cls.parent_location_dest = cls.env.ref("stock.stock_location_stock")
-        cls.location_dest = cls.shelf2
         cls.package_without_location = package_model.create(
             {
                 "name": "PKG_WO_LOCATION",
@@ -31,12 +29,11 @@ class TestSetQuantity(CommonCase):
                 "packaging_id": cls.product_a_packaging.id,
             }
         )
-        cls.package_with_location_child_of_dest.location_id = cls.location_dest
         cls._update_qty_in_location(
             cls.packing_location, cls.product_a, 10, package=cls.package_with_location
         )
         cls._update_qty_in_location(
-            cls.parent_location_dest,
+            cls.dispatch_location,
             cls.product_a,
             10,
             package=cls.package_with_location_child_of_dest,
@@ -190,7 +187,6 @@ class TestSetQuantity(CommonCase):
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
-        selected_move_line.location_dest_id = self.parent_location_dest
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
             "set_quantity",
@@ -204,7 +200,7 @@ class TestSetQuantity(CommonCase):
             selected_move_line.result_package_id,
             self.package_with_location_child_of_dest,
         )
-        self.assertEqual(selected_move_line.location_dest_id, self.parent_location_dest)
+        self.assertEqual(selected_move_line.location_dest_id, self.dispatch_location)
         data = self.data.picking(picking, with_progress=True)
         data.update({"moves": self.data.moves(picking.move_lines)})
         self.assert_response(response, next_state="select_move", data={"picking": data})
@@ -269,17 +265,16 @@ class TestSetQuantity(CommonCase):
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
-        selected_move_line.location_dest_id = self.location_dest
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
-                "barcode": self.parent_location_dest.barcode,
+                "barcode": self.dispatch_location.barcode,
             },
         )
-        self.assertEqual(selected_move_line.location_dest_id, self.parent_location_dest)
+        self.assertEqual(selected_move_line.location_dest_id, self.dispatch_location)
         data = self.data.picking(picking, with_progress=True)
         data.update({"moves": self.data.moves(picking.move_lines)})
         self.assert_response(response, next_state="select_move", data={"picking": data})
