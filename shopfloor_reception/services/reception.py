@@ -474,7 +474,7 @@ class Reception(Component):
                 if self.work.menu.auto_post_line:
                     # If option auto_post_line is active in the shopfloor menu,
                     # create a split order with this line.
-                    self._auto_post_line(selected_line, picking)
+                    self._auto_post_line(selected_line)
                 return self._response_for_select_move(picking)
             # Scanned package has no location, move to the location selection
             # screen
@@ -887,7 +887,7 @@ class Reception(Component):
             if response:
                 return response
             # Nothing found, ask user if we should create a new pack for the scanned
-            # barcode
+            # barcode.
             if not confirmation:
                 return self._response_for_set_quantity(
                     picking,
@@ -895,6 +895,7 @@ class Reception(Component):
                     message=self.msg_store.create_new_pack_ask_confirmation(barcode),
                     asking_confirmation=True,
                 )
+            # Nothing found and we already ask for confirmation, create the new package.
             package = self.env["stock.quant.package"].create({"name": barcode})
             quantity = selected_line.qty_done
             __, qty_check = selected_line._split_qty_to_be_done(
@@ -912,6 +913,10 @@ class Reception(Component):
                     ),
                 )
             selected_line.result_package_id = package
+            if self.work.menu.auto_post_line:
+                # If option auto_post_line is active in the shopfloor menu,
+                # create a split order with this line.
+                self._auto_post_line(selected_line)
             return self._response_for_set_destination(picking, selected_line)
         return self._response_for_set_quantity(
             picking, selected_line, message=self.msg_store.barcode_not_found()
@@ -984,7 +989,7 @@ class Reception(Component):
         selected_line.qty_done = quantity
         return self._response_for_set_destination(picking, selected_line)
 
-    def _auto_post_line(self, selected_line, picking):
+    def _auto_post_line(self, selected_line):
         new_move = selected_line.move_id.split_other_move_lines(
             selected_line, intersection=True
         )
@@ -1051,7 +1056,7 @@ class Reception(Component):
         if self.work.menu.auto_post_line:
             # If option auto_post_line is active in the shopfloor menu,
             # create a split order with this line.
-            self._auto_post_line(selected_line, picking)
+            self._auto_post_line(selected_line)
         return self._response_for_select_move(picking)
 
     def select_dest_package(
@@ -1096,7 +1101,7 @@ class Reception(Component):
             if self.work.menu.auto_post_line:
                 # If option auto_post_line is active in the shopfloor menu,
                 # create a split order with this line.
-                self._auto_post_line(selected_line, picking)
+                self._auto_post_line(selected_line)
             return self._response_for_select_move(picking)
         message = self.msg_store.create_new_pack_ask_confirmation(barcode)
         self._assign_user_to_picking(picking)
