@@ -95,66 +95,6 @@ class TestSelectDocument(CommonCase):
             data={"picking": self._data_for_picking_with_moves(picking)},
         )
 
-    def test_scan_packaging_single_picking(self):
-        # next step is set_lot
-        picking = self._create_picking()
-        self._add_package(picking)
-        response = self.service.dispatch(
-            "scan_document", params={"barcode": self.product_a_packaging.barcode}
-        )
-        data = self.data.picking(picking)
-        selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
-        )
-        self.assert_response(
-            response,
-            next_state="set_lot",
-            data={
-                "picking": data,
-                "selected_move_line": self.data.move_lines(selected_move_line),
-            },
-        )
-
-    def test_scan_product_single_picking(self):
-        # next_step is set_lot
-        picking = self._create_picking()
-        response = self.service.dispatch(
-            "scan_document", params={"barcode": self.product_a.barcode}
-        )
-        data = self.data.picking(picking)
-        selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
-        )
-        self.assert_response(
-            response,
-            next_state="set_lot",
-            data={
-                "picking": data,
-                "selected_move_line": self.data.move_lines(selected_move_line),
-            },
-        )
-
-    def test_scan_not_tracked_product_single_picking(self):
-        # next_step is set_quantity
-        self.product_a.tracking = "none"
-        picking = self._create_picking()
-        response = self.service.dispatch(
-            "scan_document", params={"barcode": self.product_a.barcode}
-        )
-        data = self.data.picking(picking)
-        selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
-        )
-        self.assert_response(
-            response,
-            next_state="set_quantity",
-            data={
-                "picking": data,
-                "selected_move_line": self.data.move_lines(selected_move_line),
-                "confirmation_required": False,
-            },
-        )
-
     def test_scan_packaging_multiple_pickings(self):
         # next step is select_document, with documents filtered based on the product
         p1 = self._create_picking()
@@ -194,12 +134,12 @@ class TestSelectDocument(CommonCase):
         response = self.service.dispatch(
             "scan_document", params={"barcode": self.product_c.barcode}
         )
-        body = "No product found among current transfers."
+        body = "Barcode not found"
         self.assert_response(
             response,
             next_state="select_document",
             data={"pickings": self._data_for_pickings(picking)},
-            message={"message_type": "warning", "body": body},
+            message={"message_type": "error", "body": body},
         )
 
     def test_scan_packaging_no_picking(self):
@@ -209,7 +149,7 @@ class TestSelectDocument(CommonCase):
         response = self.service.dispatch(
             "scan_document", params={"barcode": self.product_c_packaging.barcode}
         )
-        body = "No transfer found for the scanned packaging."
+        body = "Barcode not found"
         self.assert_response(
             response,
             next_state="select_document",

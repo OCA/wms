@@ -151,7 +151,7 @@ class Reception(Component):
         )
 
     def _select_document_from_move_lines(self, move_lines, msg_func):
-        pickings = move_lines.mapped("move_id.picking_id")
+        pickings = move_lines.move_id.picking_id
         if len(pickings) == 1:
             self._assign_user_to_picking(pickings)
             if (
@@ -180,9 +180,12 @@ class Reception(Component):
         move_lines = self._move_line_by_product(product).filtered(
             lambda l: l.picking_id.picking_type_id.id in self.picking_types.ids
         )
-        return self._select_document_from_move_lines(
-            move_lines, self.msg_store.product_not_found_in_pickings
-        )
+        pickings = move_lines.move_id.picking_id
+        if pickings:
+            return self._response_for_select_document(
+                pickings=pickings,
+                message=self.msg_store.multiple_picks_found_select_manually(),
+            )
 
     def _select_document_from_packaging(self, packaging):
         """Select the document by packaging
@@ -194,9 +197,12 @@ class Reception(Component):
         move_lines = self._move_line_by_packaging(packaging).filtered(
             lambda l: l.picking_id.picking_type_id.id in self.picking_types.ids
         )
-        return self._select_document_from_move_lines(
-            move_lines, self.msg_store.no_transfer_for_packaging
-        )
+        pickings = move_lines.move_id.picking_id
+        if pickings:
+            return self._response_for_select_document(
+                pickings=pickings,
+                message=self.msg_store.multiple_picks_found_select_manually(),
+            )
 
     def _select_document_from_lot(self, lot):
         """Select the document by lot
@@ -208,9 +214,12 @@ class Reception(Component):
         move_lines = self._move_line_by_lot(lot)
         if not move_lines:
             return
-        return self._select_document_from_move_lines(
-            move_lines, self.msg_store.no_transfer_for_lot
-        )
+        pickings = move_lines.move_id.picking_id
+        if pickings:
+            return self._response_for_select_document(
+                pickings=pickings,
+                message=self.msg_store.multiple_picks_found_select_manually(),
+            )
 
     def _select_line(self, picking, line, move, increase_qty_done_by=1):
         product = line.product_id
@@ -294,6 +303,7 @@ class Reception(Component):
                 < today_end
             )
             if len(picking_filter_result_due_today) == 1:
+                self._assign_user_to_picking(picking_filter_result_due_today)
                 return self._select_picking(picking_filter_result_due_today)
             if len(picking_filter_result) > 1:
                 return self._response_for_select_document(
