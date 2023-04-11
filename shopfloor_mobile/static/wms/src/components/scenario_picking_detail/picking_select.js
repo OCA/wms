@@ -69,6 +69,9 @@ Vue.component("picking-select-line-content", {
             opts.loud_title = true;
             return opts;
         },
+        get_wrapper_klass(record) {
+            return "";
+        },
     },
     computed: {
         pack_list_item_options() {
