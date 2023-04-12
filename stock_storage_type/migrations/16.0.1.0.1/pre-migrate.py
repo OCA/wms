@@ -79,7 +79,7 @@ def _create_categories(env):
     for location_id in ids:
         query = """
             SELECT id, name FROM stock_location_storage_type
-                WHERE id = (
+                WHERE id in (
                     SELECT location_storage_type_id
                         FROM stock_location_location_storage_type_rel
                         WHERE location_id = %s
@@ -110,13 +110,13 @@ def _create_categories(env):
 
         # Get all the linked package storage types (former package_storage_type_ids)
         query = """
-            SELECT spt.id, location_storage_type_id
-                FROM stock_location_package_storage_type_rel
+            SELECT spt.id, rel.location_storage_type_id
+                FROM stock_location_package_storage_type_rel rel
                 JOIN stock_package_type spt
-                    ON spt.old_storage_type_id = package_storage_type_id
-                WHERE location_storage_type_id IN (%s)
+                    ON spt.old_storage_type_id = rel.package_storage_type_id
+                WHERE location_storage_type_id IN %s
         """
-        openupgrade.logged_query(env.cr, query, tuple(list(location_type_ids)))
+        openupgrade.logged_query(env.cr, query, (tuple(list(location_type_ids)),))
         results = env.cr.fetchall()
         for result in results:
             query = """
