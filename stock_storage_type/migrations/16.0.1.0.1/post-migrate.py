@@ -83,9 +83,22 @@ def _update_quant_package(env):
     openupgrade.logged_query(env.cr, query)
 
 
+def _update_product_template(env):
+    query = """
+        ALTER TABLE product_template
+            DROP CONSTRAINT product_template_product_package_storage_type_id_fkey;
+        UPDATE product_template pt
+            SET product_package_storage_type_id = spt.id
+            FROM stock_package_type spt
+            WHERE spt.old_storage_type_id = pt.product_package_storage_type_id;
+    """
+    openupgrade.logged_query(env.cr, query)
+
+
 @openupgrade.migrate()
 def migrate(env, version):
     _move_product_package_type(env)
     _move_location_storage_type(env)
     _update_location_sequence(env)
     _update_quant_package(env)
+    _update_product_template(env)
