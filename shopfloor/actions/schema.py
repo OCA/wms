@@ -109,6 +109,14 @@ class ShopfloorSchemaAction(Component):
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
             "barcode": {"type": "string", "nullable": True, "required": False},
+            "operation_progress": {
+                "type": "dict",
+                "required": False,
+                "schema": {
+                    "done": {"type": "float", "required": False},
+                    "to_do": {"type": "float", "required": False},
+                },
+            },
         }
 
     def packaging(self):
