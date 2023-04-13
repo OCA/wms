@@ -65,6 +65,14 @@ export var Searchbar = Vue.component("searchbar", {
         // Force focus because when the widget is injected in the DOM
         // `inputmode` is set to `none`.
         this.capture_focus();
+        /* When you click on other elements on the page
+        the focus is normally obtainable via the `onblur` binding.
+        However, when `click` triggers a screen reload after an api call
+        that is not enough.
+        */
+        event_hub.$on("screen:reload", () => {
+            if (this.autofocus) this.capture_focus();
+        });
     },
     updated: function () {
         this.capture_focus();
