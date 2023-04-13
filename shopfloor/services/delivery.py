@@ -52,7 +52,11 @@ class Delivery(Component):
                 "picking": self.data_detail.picking_detail(picking)
                 if picking
                 else None,
-                "sublocation": self.data.location(location) if location else None,
+                "sublocation": self.data.location(
+                    location, with_operation_progress=True
+                )
+                if location
+                else None,
             },
             message=message,
         )

@@ -100,7 +100,7 @@ class DeliveryCommonCase(CommonCase):
         return self.service.data_detail.picking_detail(picking)
 
     def _stock_location_data(self, location):
-        return self.service.data.location(location)
+        return self.service.data.location(location, with_operation_progress=True)
 
     def assert_response_deliver(
         self, response, picking=None, message=None, location=None
