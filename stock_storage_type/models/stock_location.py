@@ -355,19 +355,20 @@ class StockLocation(models.Model):
             putaway_location, product, quantity, package, packaging, additional_qty
         )
         if package:
-            quants = package.quant_ids
+            # If package provided, the product is not set (in the get_putaway_strategy() method)
             product = package.single_product_id or product
-        else:
-            quants = self.env["stock.quant"].browse()
-        return self._get_pack_putaway_strategy(putaway_location, quants, product)
+        return self._get_package_type_putaway_strategy(
+            putaway_location, package, product
+        )
 
-    def _get_pack_putaway_strategy(self, putaway_location, quants, product):
-        package_type = False
-        if quants:
-            package_type = quants.package_id.package_type_id
+    def _get_package_type(self, package, product):
+        # Returns the package type either from the package, either from the product
+        package_type = self.env["stock.package.type"].browse()
+        if package:
+            package_type = package.package_type_id
             _logger.debug(
                 "Computing putaway for package %s of package type %s"
-                % (quants.package_id, quants.package_id)
+                % (package, package_type)
             )
         elif product.package_type_id:
             # Get default package type on product if defined
@@ -376,7 +377,20 @@ class StockLocation(models.Model):
                 "Computing putaway for product %s of package type %s"
                 % (product, product.package_type_id)
             )
-        else:
+        return package_type
+
+    def _get_package_type_putaway_strategy(self, putaway_location, package, product):
+        package_type = self._get_package_type(package, product)
+        # exclude_sml_ids are passed into the context during the get_putaway_strategy
+        # call.
+        stock_move_line_ids = self.env.context.get("exclude_sml_ids", [])
+        stock_move_lines = self.env["stock.move.line"].browse(stock_move_line_ids)
+        quants = (
+            package.quant_ids
+            if package
+            else stock_move_lines.mapped("reserved_quant_id")
+        )
+        if not package_type:
             # Fallback on standard one
             return putaway_location
         # TODO: Remove this and use only putaway_location as always filled in
