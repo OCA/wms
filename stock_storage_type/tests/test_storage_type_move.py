@@ -373,3 +373,96 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         second_level.location_dest_id = third_level.location_dest_id
         with self.assertRaises(ValidationError):
             int_picking.button_validate()
+
+    def test_stock_move_no_package(self):
+        """
+        Create a stock move for a product with lot restriction
+        Don't put it in a package
+        Check that lot restriction is well applied
+        """
+        # Constrain Cardbox Capacity to accept same lots only
+        self.cardboxes_location_storage_type.write({"allow_new_product": "same_lot"})
+        # Set a quantity in cardbox bin 2 to make sure constraint is applied
+        self.env["stock.quant"]._update_available_quantity(
+            self.env.ref("product.product_product_10"),
+            self.cardboxes_bin_2_location,
+            1.0,
+        )
+
+        # As we don't put in pack in this flow, we need to set a default
+        # package type on the product level in order to get the specialized putaway
+        # to be applied
+        self.product_lot.package_type_id = self.cardboxes_package_storage_type
+
+        # Create picking
+        in_picking = self.env["stock.picking"].create(
+            {
+                "picking_type_id": self.receipts_picking_type.id,
+                "location_id": self.suppliers_location.id,
+                "location_dest_id": self.input_location.id,
+                "move_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "name": self.product.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
+                            "product_id": self.product.id,
+                            "product_uom_qty": 8.0,
+                            "product_uom": self.product.uom_id.id,
+                            "picking_type_id": self.receipts_picking_type.id,
+                        },
+                    ),
+                    (
+                        0,
+                        0,
+                        {
+                            "name": self.product_lot.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
+                            "product_id": self.product_lot.id,
+                            "product_uom_qty": 10.0,
+                            "product_uom": self.product_lot.uom_id.id,
+                            "picking_type_id": self.receipts_picking_type.id,
+                        },
+                    ),
+                ],
+            }
+        )
+        # Mark as todo
+        in_picking.action_confirm()
+
+        # Fill in the lots during the incoming process
+        product_lot_ml = in_picking.move_line_ids.filtered(
+            lambda ml: ml.product_id == self.product_lot
+        )
+        product_lot_ml.write({"qty_done": 5.0, "lot_name": "A0001"})
+        product_lot_ml.copy({"qty_done": 3.0, "lot_name": "A0002"})
+
+        product_ml = in_picking.move_line_ids.filtered(
+            lambda ml: ml.product_id == self.product
+        )
+
+        product_ml.write({"qty_done": 8.0})
+
+        in_picking._action_done()
+
+        int_picking = in_picking.move_ids.mapped("move_dest_ids.picking_id")
+
+        lot_lines = int_picking.move_line_ids.filtered(
+            lambda line: line.product_id == self.product_lot
+        )
+        destination_ids = lot_lines.mapped("location_dest_id.id")
+        # Check if the destinations are all different
+        self.assertAlmostEqual(
+            list(set(destination_ids)),
+            destination_ids,
+        )
+
+        lot_ids = lot_lines.mapped("lot_id.id")
+        # Check if the lots are all different
+        self.assertAlmostEqual(
+            list(set(lot_ids)),
+            lot_ids,
+        )
