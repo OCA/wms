@@ -13,6 +13,7 @@
     "application": False,
     "installable": True,
     "depends": [
+        "stock_move_line_reserved_quant",
         "stock_putaway_hook",
         "stock_quant_package_dimension",
         "stock_storage_category_capacity_name",

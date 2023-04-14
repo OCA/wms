@@ -405,7 +405,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         package = self.env["stock.quant.package"].create(
             {"name": "TEST1", "product_packaging_id": packaging.id}
         )
-        quant = self.env["stock.quant"].create(
+        self.env["stock.quant"].create(
             {
                 "product_id": product.id,
                 "package_id": package.id,
@@ -413,8 +413,8 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             }
         )
 
-        location = StockLocation._get_pack_putaway_strategy(
-            dest_location, quant, product
+        location = StockLocation._get_package_type_putaway_strategy(
+            dest_location, package, product
         )
 
         # No location with given product -> the first bin should be returned
@@ -427,8 +427,8 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             self.cardboxes_bin_3_location,
             10.0,
         )
-        location = StockLocation._get_pack_putaway_strategy(
-            dest_location, quant, product
+        location = StockLocation._get_package_type_putaway_strategy(
+            dest_location, package, product
         )
         self.assertEqual(location, self.cardboxes_bin_3_location)
 
@@ -439,8 +439,8 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             self.cardboxes_bin_4_location,
             1.0,
         )
-        location = StockLocation._get_pack_putaway_strategy(
-            dest_location, quant, product
+        location = StockLocation._get_package_type_putaway_strategy(
+            dest_location, package, product
         )
         self.assertEqual(location, self.cardboxes_bin_4_location)
 
