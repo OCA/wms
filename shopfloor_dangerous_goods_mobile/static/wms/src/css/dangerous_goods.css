@@ -1,10 +1,16 @@
+.detail-picking-select .has-lq-products .record-name::after,
 .detail-picking-select .has-lq-products .v-list-item__title::after {
+    /* TODO: This PR fixes a bug that made the dangerous product logo
+    not visible: https: //github.com/OCA/wms/pull/619.
+    However, we should consider improving it
+    to make it look a bit prettier. */
     display: inline-block;
-    width: 0.9em;
-    height: 0.9em;
+    width: 1.5em;
+    height: 1.5em;
     background-image: url(limited_quantity_label.png);
     background-size: cover;
     background-position: center;
     content: " ";
     margin-left: 0.3em;
+    vertical-align: middle;
 }
