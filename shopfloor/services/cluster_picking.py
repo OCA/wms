@@ -688,6 +688,7 @@ class ClusterPicking(Component):
             return self._response_for_scan_destination(
                 move_line,
                 message=self.msg_store.unable_to_pick_more(move_line.product_uom_qty),
+                qty_done=quantity,
             )
 
         search = self._actions_for("search")
@@ -716,6 +717,7 @@ class ClusterPicking(Component):
                         "The destination bin {} is not empty, please take another."
                     ).format(bin_package.name),
                 },
+                qty_done=quantity,
             )
         move_line.write({"qty_done": quantity, "result_package_id": bin_package.id})
 
