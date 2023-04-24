@@ -234,6 +234,21 @@ const Checkout = {
                     </v-row>
                 </div>
             </div>
+            <div v-if="state_is('select_child_location')">
+                <item-detail-card
+                    :key="make_state_component_key(['picking'])"
+                    :record="state.data.picking"
+                    :options="{key_title: 'location_dest.name'}"
+                    :card_color="utils.colors.color_for('screen_step_todo')"
+                />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back />
+                        </v-col>
+                    </v-row>
+                </div>
+            </div>
         </Screen>
         `,
     computed: {

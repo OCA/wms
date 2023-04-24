@@ -26,6 +26,7 @@ class ShopfloorSchemaAction(Component):
             "ship_carrier": self._schema_dict_of(self._simple_record(), required=False),
             "scheduled_date": {"type": "string", "nullable": False, "required": True},
             "progress": {"type": "float", "nullable": True},
+            "location_dest": self._schema_dict_of(self.location(), required=False),
         }
 
     def move_line(self, with_packaging=False, with_picking=False):

@@ -39,6 +39,13 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
         cls.line1.write({"qty_done": 10, "shopfloor_checkout_done": True})
         cls.line2.write({"qty_done": 2, "shopfloor_checkout_done": True})
 
+        cls.dest_location = picking.location_dest_id
+        cls.child_location = (
+            cls.env["stock.location"]
+            .sudo()
+            .create({"name": "Child Location", "location_id": cls.dest_location.id})
+        )
+
     def test_done_partial(self):
         # line is done
         response = self.service.dispatch("done", params={"picking_id": self.picking.id})
@@ -57,18 +64,17 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
         response = self.service.dispatch(
             "done", params={"picking_id": self.picking.id, "confirmation": True}
         )
-        # as they are all the lines that relate to the picking, they didn't have
-        # been extracted in a separate transfer. An usual backorder has been
-        # created for the unprocessed qty.
-        self.assertRecordValues(self.picking, [{"state": "done"}])
-        self.assertTrue(self.picking.backorder_ids)
-        self.assertEqual(self.picking.backorder_ids.move_line_ids.product_uom_qty, 8)
+
+        self.assertRecordValues(self.picking, [{"state": "assigned"}])
 
         self.assert_response(
             response,
-            next_state="select_document",
-            message=self.service.msg_store.transfer_done_success(self.picking),
-            data={"restrict_scan_first": False},
+            next_state="select_child_location",
+            data={
+                "picking": self._stock_picking_data(
+                    self.picking, done=True, with_lines=False, with_location=True
+                ),
+            },
         )
 
 
