@@ -376,5 +376,26 @@ export const checkout_states = function ($instance) {
                 $instance.reset_notification();
             },
         },
+        select_child_location: {
+            display_info: {
+                title: "Set destination location",
+                scan_placeholder: "Scan location",
+            },
+            events: {
+                go_back: "on_back",
+            },
+            on_scan: (scanned) => {
+                $instance.wait_call(
+                    $instance.odoo.call("scan_dest_location", {
+                        picking_id: $instance.state.data.picking.id,
+                        barcode: scanned.text,
+                    })
+                );
+            },
+            on_back: () => {
+                $instance.state_to("summary");
+                $instance.reset_notification();
+            },
+        },
     };
 };
