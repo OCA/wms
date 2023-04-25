@@ -958,7 +958,7 @@ class ClusterPicking(Component):
         ]
         return domain
 
-    def change_pack_lot(self, picking_batch_id, move_line_id, barcode):
+    def change_pack_lot(self, picking_batch_id, move_line_id, barcode, quantity=None):
         """Change the expected pack or the lot for a line
 
         If the expected lot is at the very bottom of the location or a stock
@@ -994,13 +994,18 @@ class ClusterPicking(Component):
                 move_line, lot, response_ok_func, response_error_func
             )
             if response:
+                if "scan_destination" in response["data"]:
+                    response["data"]["scan_destination"].update({"qty_done": quantity})
                 return response
 
         package = search.package_from_scan(barcode)
         if package:
-            return change_package_lot.change_package(
+            response = change_package_lot.change_package(
                 move_line, package, response_ok_func, response_error_func
             )
+            if "scan_destination" in response["data"]:
+                response["data"]["scan_destination"].update({"qty_done": quantity})
+            return response
 
         return self._response_for_change_pack_lot(
             move_line,
@@ -1310,6 +1315,7 @@ class ShopfloorClusterPickingValidator(Component):
             "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
+            "quantity": {"required": False, "type": "float"},
         }
 
     def set_destination_all(self):
