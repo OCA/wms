@@ -255,7 +255,11 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
     def test_scan_source_package_many_products(self):
         """Scan source: scanned package that several product, aborting
         next step 'select_line expected.
+
+        This is only when no prefill quantity option is enabled. If not
+        the related package will be move in one step.
         """
+        self.menu.sudo().no_prefill_qty = True
         pack = self.picking1.package_level_ids[0].package_id
         self._update_qty_in_location(pack.location_id, self.product_b, 2, pack)
         response = self.service.dispatch(
