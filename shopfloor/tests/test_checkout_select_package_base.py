@@ -61,4 +61,5 @@ class CheckoutSelectPackageMixin:
             )
         for line in unselected_lines + related_lines:
             self.assertEqual(line.qty_done, 0)
-        self._assert_selected_response(response, selected_lines, message=message, **kw)
+        package_lines = selected_lines + related_lines
+        self._assert_selected_response(response, package_lines, message=message, **kw)

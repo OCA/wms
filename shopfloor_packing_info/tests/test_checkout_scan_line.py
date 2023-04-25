@@ -27,5 +27,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         picking.action_assign()
         move_line = move1.move_line_ids
         self._test_scan_line_ok(
-            move_line.package_id.name, move_line, packing_info=packing_info_text
+            move_line.package_id.name,
+            move_line,
+            packing_info=packing_info_text,
         )

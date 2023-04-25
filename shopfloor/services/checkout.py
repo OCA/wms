@@ -486,9 +486,9 @@ class Checkout(Component):
         return self._response_for_select_package(picking, lines)
 
     def _select_lines_from_product(
-        self, picking, selection_lines, product, prefill_qty=1, **kw
+        self, picking, selection_lines, product, prefill_qty=1, check_lot=True, **kw
     ):
-        if product.tracking in ("lot", "serial"):
+        if product.tracking in ("lot", "serial") and check_lot:
             return self._response_for_select_line(
                 picking, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
             )
@@ -570,8 +570,14 @@ class Checkout(Component):
                 picking, selection_lines, packages, prefill_qty=prefill_qty, **kw
             )
 
-        self._select_lines(lines, prefill_qty=prefill_qty)
-        return self._response_for_select_package(picking, lines)
+        first_allowed_line = fields.first(lines)
+        return self._select_lines_from_product(
+            picking,
+            selection_lines,
+            first_allowed_line.product_id,
+            prefill_qty=prefill_qty,
+            check_lot=False,
+        )
 
     def _select_lines_from_serial(self, picking, selection_lines, lot, **kw):
         # Search for serial number is actually the same as searching for lot (as of v14...)
@@ -634,8 +640,12 @@ class Checkout(Component):
             return self._select_lines_from_package(
                 picking, selection_lines, move_line.package_id
             )
-        self._select_lines(move_line)
-        return self._response_for_select_package(picking, move_line)
+
+        related_lines = selection_lines.filtered(
+            lambda l: not l.package_id and l.product_id != move_line.product_id
+        )
+        lines = self._select_lines(move_line, related_lines=related_lines)
+        return self._response_for_select_package(picking, lines)
 
     def select_line(self, picking_id, package_id=None, move_line_id=None):
         """Select move lines of the stock picking
