@@ -418,11 +418,15 @@ const ClusterPicking = {
                         ),
                     },
                     on_scan: (scanned) => {
+                        const quantity =
+                            this.scan_destination ||
+                            this.state_get_data("start_line").quantity;
                         this.wait_call(
                             this.odoo.call("change_pack_lot", {
                                 picking_batch_id: this.current_batch().id,
                                 move_line_id: this.state.data.id,
                                 barcode: scanned.text,
+                                quantity: quantity,
                             })
                         );
                     },
