@@ -73,6 +73,7 @@ class StockReleaseChannel(models.Model):
         # if different to avoid unnecessary write
         if (
             picking.release_channel_id
+            and picking.release_channel_id.process_end_date
             and picking.scheduled_date != picking.release_channel_id.process_end_date
         ):
             picking.scheduled_date = picking.release_channel_id.process_end_date
