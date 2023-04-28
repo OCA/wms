@@ -82,7 +82,7 @@ class StockQuantPackage(models.Model):
 
     def _sync_package_type_from_single_product(self):
         for package in self:
-            if package.packaging_id:
+            if package.package_type_id:
                 # Do not set package type for delivery packages
                 # to not trigger constraint like height requirement
                 # (we are delivering them, not storing them)
