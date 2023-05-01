@@ -378,6 +378,12 @@ class MessageAction(Component):
             "body": _("Please scan the location first."),
         }
 
+    def scan_the_package(self):
+        return {
+            "message_type": "warning",
+            "body": _("Please scan the package."),
+        }
+
     def product_multiple_packages_scan_package(self):
         return {
             "message_type": "warning",
@@ -635,6 +641,12 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Location {} empty").format(location.name),
+        }
+
+    def location_empty_scan_package(self, location):
+        return {
+            "message_type": "warning",
+            "body": _("Location empty. Try scanning a package"),
         }
 
     def location_not_found(self):

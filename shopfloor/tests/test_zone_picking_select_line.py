@@ -218,6 +218,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         """Scan source: scanned package has no related move line,
         next step 'select_line' expected.
         """
+        self.free_package.location_id = self.zone_location
         pack_code = self.free_package.name
         response = self.service.dispatch(
             "scan_source",
@@ -270,7 +271,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_lines=move_lines,
-            sublocation=self.zone_sublocation1,
+            package=pack,
             message=self.service.msg_store.several_products_in_package(pack),
             location_first=False,
         )
@@ -607,7 +608,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             self.assertEqual(response["next_state"], "select_line")
             self.assertEqual(
                 response["message"],
-                self.service.msg_store.location_empty(self.zone_sublocation1),
+                self.service.msg_store.wrong_record(self.zone_sublocation1),
             )
 
     def test_prepare_unload_buffer_empty(self):
