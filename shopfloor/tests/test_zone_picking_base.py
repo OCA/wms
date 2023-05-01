@@ -309,6 +309,7 @@ class ZonePickingCommonCase(CommonCase):
         product=None,
         sublocation=None,
         location_first=None,
+        package=None,
     ):
         data = {
             "zone_location": self.data.location(zone_location),
@@ -319,6 +320,8 @@ class ZonePickingCommonCase(CommonCase):
         }
         if product:
             data["product"] = self.data.product(product)
+        if package:
+            data["package"] = self.data.package(package)
         if sublocation:
             data["sublocation"] = self.data.location(sublocation)
         for data_move_line in data["move_lines"]:
@@ -346,6 +349,7 @@ class ZonePickingCommonCase(CommonCase):
         product=None,
         sublocation=None,
         location_first=False,
+        package=False,
     ):
         self._assert_response_select_line(
             "select_line",
@@ -359,6 +363,7 @@ class ZonePickingCommonCase(CommonCase):
             product=product,
             sublocation=sublocation,
             location_first=location_first,
+            package=package,
         )
 
     def _assert_response_set_line_destination(
