@@ -483,6 +483,9 @@ const ZonePicking = {
             if (this.state_is("select_line") && this.state.data.sublocation) {
                 data.sublocation_id = this.state.data.sublocation.id;
             }
+            if (this.state_is("select_line") && this.state.data.package) {
+                data.package_id = this.state.data.package.id;
+            }
             return this.wait_call(this.odoo.call("scan_source", data));
         },
         picking_summary_records_grouped(move_lines) {
