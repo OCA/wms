@@ -338,6 +338,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         data["package_dest"] = None
         data["picking"] = self.data.picking(picking)
         data["batch"] = self.data.picking_batch(batch)
+        data["scan_location_or_pack_first"] = False
         self.assert_response(
             response,
             data=data,

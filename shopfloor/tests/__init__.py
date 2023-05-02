@@ -11,6 +11,7 @@ from . import test_cluster_picking_base
 from . import test_cluster_picking_batch
 from . import test_cluster_picking_select
 from . import test_cluster_picking_scan_line
+from . import test_cluster_picking_scan_line_location_or_pack_first
 from . import test_cluster_picking_scan_line_no_prefill_qty
 from . import test_cluster_picking_scan_destination
 from . import test_cluster_picking_scan_destination_no_prefill_qty
