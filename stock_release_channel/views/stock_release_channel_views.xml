@@ -112,6 +112,7 @@
         <field name="model">stock.release.channel</field>
         <field name="arch" type="xml">
             <search>
+                <field name="name" />
                 <field name="warehouse_id" />
                 <separator />
                 <filter
