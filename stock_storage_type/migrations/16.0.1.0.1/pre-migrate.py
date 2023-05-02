@@ -108,6 +108,22 @@ def _create_categories(env):
             result = env.cr.fetchone()
             category_id = result[0]
 
+        # Update the location by setting the category
+        query = """
+            UPDATE stock_location
+                SET storage_category_id = %s
+                WHERE id = %s
+                AND storage_category_id IS NULL;
+        """
+        openupgrade.logged_query(
+            env.cr,
+            query,
+            (
+                category_id,
+                location_id,
+            ),
+        )
+
         # Get all the linked package storage types (former package_storage_type_ids)
         query = """
             SELECT spt.id, rel.location_storage_type_id
