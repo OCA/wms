@@ -41,7 +41,8 @@
         <field name="options_edit">
 {
     "no_prefill_qty": true,
-    "show_oneline_package_content": true
+    "show_oneline_package_content": true,
+    "auto_post_line": true
 }
         </field>
     </record>
