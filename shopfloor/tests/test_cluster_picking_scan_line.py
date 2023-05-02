@@ -36,7 +36,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             data=self._line_data(line, qty_done=expected_qty_done),
         )
 
-    def _scan_line_error(self, line, scanned, message):
+    def _scan_line_error(self, line, scanned, message, sublocation=None):
         batch = line.picking_id.batch_id
         response = self.service.dispatch(
             "scan_line",
@@ -46,10 +46,11 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
                 "barcode": scanned,
             },
         )
+        kw = {"sublocation": self.data.location(sublocation)} if sublocation else {}
         self.assert_response(
             response,
             next_state="start_line",
-            data=self._line_data(line),
+            data=self._line_data(line, **kw),
             message=message,
         )
 
@@ -294,6 +295,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
                 "message_type": "warning",
                 "body": "Several packages found in Stock, please scan a package.",
             },
+            sublocation=location,
         )
         # scanning the package works
         self._scan_line_ok(line, pack_1.name)
@@ -315,6 +317,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
                 "message_type": "warning",
                 "body": "Several products found in Stock, please scan a product.",
             },
+            sublocation=location,
         )
         self._scan_line_ok(line, self.product_a.barcode)
 
@@ -347,6 +350,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
                 "message_type": "warning",
                 "body": "Several lots found in Stock, please scan a lot.",
             },
+            sublocation=location,
         )
         self._scan_line_ok(line, line.lot_id.name)
 
