@@ -10,6 +10,8 @@
   "cluster_picking.scan_destination.scan_placeholder": "Scan destination bin",
   "cluster_picking.scan_destination.title": "Check qty and scan a destination bin",
   "cluster_picking.start_line.scan_placeholder": "Scan location / pack / product / lot",
+  "cluster_picking.start_line.scan_placeholder_location_pack": "Scan location / pack",
+  "cluster_picking.start_line.scan_placeholder_product_lot_pack": "Scan product / lot / pack",
   "cluster_picking.start_line.title": "Pick the product by scanning something",
   "cluster_picking.unload_all.title": "Unload all bins",
   "cluster_picking.unload_set_destination.title": "Set destination",

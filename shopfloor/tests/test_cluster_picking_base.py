@@ -37,6 +37,7 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
             {
                 "batch": self.data.picking_batch(picking.batch_id),
                 "picking": self.data.picking(picking),
+                "scan_location_or_pack_first": False,
             }
         )
         data.update(kw)

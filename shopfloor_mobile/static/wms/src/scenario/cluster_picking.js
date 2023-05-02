@@ -226,20 +226,41 @@ const ClusterPicking = {
                 start_line: {
                     display_info: {
                         title: this.$t("cluster_picking.start_line.title"),
-                        scan_placeholder: this.$t(
-                            "cluster_picking.start_line.scan_placeholder"
-                        ),
+                        scan_placeholder: () => {
+                            const sublocation = this.state.data.sublocation;
+                            if (
+                                this.state.data.scan_location_or_pack_first &&
+                                !sublocation
+                            ) {
+                                return this.$t(
+                                    "cluster_picking.start_line.scan_placeholder_location_pack"
+                                );
+                            }
+                            if (sublocation) {
+                                return this.$t(
+                                    "cluster_picking.start_line.scan_placeholder_product_lot_pack"
+                                );
+                            }
+                            return this.$t(
+                                "cluster_picking.start_line.scan_placeholder"
+                            );
+                        },
                     },
                     // Here we have to use some info sent back from `select`
                     // or from `find_batch` that we pass to scan line
                     on_scan: (scanned) => {
-                        this.wait_call(
-                            this.odoo.call("scan_line", {
-                                picking_batch_id: this.current_batch().id,
-                                move_line_id: this.state.data.id,
-                                barcode: scanned.text,
-                            })
-                        );
+                        const data = {
+                            picking_batch_id: this.current_batch().id,
+                            move_line_id: this.state.data.id,
+                            barcode: scanned.text,
+                        };
+                        if (
+                            this.state_is("start_line") &&
+                            this.state.data.sublocation
+                        ) {
+                            data.sublocation_id = this.state.data.sublocation.id;
+                        }
+                        this.wait_call(this.odoo.call("scan_line", data));
                     },
                     // Additional actions
                     on_action: (action) => {
