@@ -54,13 +54,17 @@ class Checkout(Component):
             package.width = width
         if shipping_weight:
             package.shipping_weight = shipping_weight
+        if self.work.menu.auto_post_line:
+            # If option auto_post_line is active in the shopfloor menu,
+            # create a split order with these packed lines.
+            self._auto_post_lines(package.move_line_ids)
         return self._response_for_summary(
             picking,
             message=self.msg_store.package_measurement_changed(),
         )
 
-    def _put_lines_in_allowed_package(self, picking, selected_lines, package):
-        res = super()._put_lines_in_allowed_package(picking, selected_lines, package)
+    def _put_lines_in_allowed_package(self, picking, lines_to_pack, package):
+        res = super()._put_lines_in_allowed_package(picking, lines_to_pack, package)
         # Only check if the packaging used requires measurements
         # Because even if the measurements are set on the package, when changing
         # its content, the measurements need to be updated.
@@ -72,7 +76,7 @@ class Checkout(Component):
         )
         if package_measurement_required:
             return self._response_for_package_measurement(
-                picking, selected_lines, package
+                picking, lines_to_pack, package
             )
         return res
 
