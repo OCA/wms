@@ -833,26 +833,20 @@ class Checkout(Component):
                 selected_lines,
                 message=self.msg_store.dest_package_not_valid(package),
             )
-        return self._put_lines_in_allowed_package(picking, selected_lines, package)
+        return self._pack_lines(picking, selected_lines, package)
 
-    def _put_lines_in_allowed_package(self, picking, selected_lines, package):
-        lines_to_pack = selected_lines.filtered(self._filter_lines_to_pack)
-        if lines_to_pack:
-            for line in lines_to_pack:
-                if line.qty_done < line.product_uom_qty:
-                    line._split_partial_quantity_to_be_done(line.qty_done, {})
-            lines_to_pack.write(
-                {"result_package_id": package.id, "shopfloor_checkout_done": True}
-            )
-            self._post_put_lines_in_package(lines_to_pack)
-            message = self.msg_store.goods_packed_in(package)
-        else:
-            message = _("No line to pack found")
-        # go back to the screen to select the next lines to pack
-        return self._response_for_select_line(
-            picking,
-            message=message,
+    def _put_lines_in_allowed_package(self, picking, lines_to_pack, package):
+        for line in lines_to_pack:
+            if line.qty_done < line.product_uom_qty:
+                line._split_partial_quantity_to_be_done(line.qty_done, {})
+        lines_to_pack.write(
+            {"result_package_id": package.id, "shopfloor_checkout_done": True}
         )
+        self._post_put_lines_in_package(lines_to_pack)
+        # Hook to this method to override the response
+        # if anything else has to be handled
+        # before auto posting the lines.
+        return {}
 
     def _post_put_lines_in_package(self, lines_packaged):
         """Hook to override."""
@@ -860,7 +854,28 @@ class Checkout(Component):
     def _create_and_assign_new_packaging(self, picking, selected_lines, packaging=None):
         actions = self._actions_for("packaging")
         package = actions.create_package_from_packaging(packaging=packaging)
-        return self._put_lines_in_allowed_package(picking, selected_lines, package)
+        return self._pack_lines(picking, selected_lines, package)
+
+    def _pack_lines(self, picking, selected_lines, package):
+        lines_to_pack = selected_lines.filtered(self._filter_lines_to_pack)
+        if not lines_to_pack:
+            return self._response_for_select_line(
+                picking,
+                message=_("No line to pack found"),
+            )
+        response = self._put_lines_in_allowed_package(picking, lines_to_pack, package)
+        if response:
+            return response
+        if self.work.menu.auto_post_line:
+            # If option auto_post_line is active in the shopfloor menu,
+            # create a split order with these packed lines.
+            self._auto_post_lines(lines_to_pack)
+        message = self.msg_store.goods_packed_in(package)
+        # go back to the screen to select the next lines to pack
+        return self._response_for_select_line(
+            picking,
+            message=message,
+        )
 
     def scan_package_action(self, picking_id, selected_line_ids, barcode):
         """Scan a package, a lot, a product or a package to handle a line
@@ -1113,7 +1128,7 @@ class Checkout(Component):
                 selected_lines,
                 message=self.msg_store.dest_package_not_valid(package),
             )
-        return self._put_lines_in_allowed_package(picking, selected_lines, package)
+        return self._pack_lines(picking, selected_lines, package)
 
     def scan_dest_package(self, picking_id, selected_line_ids, barcode):
         """Scan destination package for lines
@@ -1172,6 +1187,13 @@ class Checkout(Component):
                 message=self.msg_store.record_not_found(),
             )
         return self._set_dest_package_from_selection(picking, lines, package)
+
+    def _auto_post_lines(self, selected_lines):
+        moves = self.env["stock.move"]
+        for line in selected_lines:
+            move = line.move_id.split_other_move_lines(line, intersection=True)
+            moves = moves | move
+        moves.extract_and_action_done()
 
     def summary(self, picking_id):
         """Return information for the summary screen
