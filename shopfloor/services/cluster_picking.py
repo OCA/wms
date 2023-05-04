@@ -994,8 +994,8 @@ class ClusterPicking(Component):
                 move_line, lot, response_ok_func, response_error_func
             )
             if response:
-                if "scan_destination" in response["data"]:
-                    response["data"]["scan_destination"].update({"qty_done": quantity})
+                if "scan_destination" in response["data"] and quantity is not None:
+                    response["data"]["scan_destination"]["qty_done"] = quantity
                 return response
 
         package = search.package_from_scan(barcode)
@@ -1003,8 +1003,8 @@ class ClusterPicking(Component):
             response = change_package_lot.change_package(
                 move_line, package, response_ok_func, response_error_func
             )
-            if "scan_destination" in response["data"]:
-                response["data"]["scan_destination"].update({"qty_done": quantity})
+            if "scan_destination" in response["data"] and quantity is not None:
+                response["data"]["scan_destination"]["qty_done"] = quantity
             return response
 
         return self._response_for_change_pack_lot(
