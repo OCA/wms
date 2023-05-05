@@ -1,7 +1,7 @@
 # Copyright 2020 Camptocamp (https://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
-from odoo import _, exceptions
+from odoo import exceptions
 
 from .common import ChannelReleaseCase
 
@@ -28,12 +28,12 @@ class TestChannelReleaseBatch(ChannelReleaseCase):
             self.channel.release_next_batch()
 
     def test_release_auto_max_next_batch_no_config(self):
-        self.channel.max_auto_release = 0
+        self.channel.max_batch_mode = 0
         with self.assertRaises(exceptions.UserError):
             self.channel.release_next_batch()
 
     def test_release_auto_max_next_batch(self):
-        self.channel.max_auto_release = 2
+        self.channel.max_batch_mode = 2
         self.channel.release_next_batch()
         # 2 have been released
         self.assertEqual(
@@ -58,30 +58,3 @@ class TestChannelReleaseBatch(ChannelReleaseCase):
         self.pickings.need_release = False  # cheat for getting the right condition
         action = self.channel.release_next_batch()
         self._assert_action_nothing_in_the_queue(action)
-
-    def test_release_auto_group_commercial_partner(self):
-        self.channel.auto_release = "group_commercial_partner"
-        self.channel.release_next_batch()
-        self.assertFalse(self.picking.need_release)
-        self.assertFalse(self.picking2.need_release)
-        other_pickings = self.pickings - (self.picking | self.picking2)
-        self.assertTrue(all(p.need_release) for p in other_pickings)
-
-    def test_release_auto_group_commercial_partner_no_next_batch(self):
-        self.channel.auto_release = "group_commercial_partner"
-        self.pickings.need_release = False  # cheat for getting the right condition
-        action = self.channel.release_next_batch()
-        self._assert_action_nothing_in_the_queue(action)
-
-    def _assert_action_nothing_in_the_queue(self, action):
-        self.assertEqual(
-            action,
-            {
-                "effect": {
-                    "fadeout": "fast",
-                    "message": _("Nothing in the queue!"),
-                    "img_url": "/web/static/src/img/smile.svg",
-                    "type": "rainbow_man",
-                }
-            },
-        )

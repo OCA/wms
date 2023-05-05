@@ -17,9 +17,6 @@
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_internal_search" />
         <field name="arch" type="xml">
-            <field name="partner_id" position="after">
-                <field name="commercial_partner_id" />
-            </field>
             <field name="picking_type_id" position="after">
                 <field name="release_channel_id" />
             </field>
@@ -39,12 +36,6 @@
                     domain="[]"
                     context="{'group_by': 'release_channel_id'}"
                 />
-                <filter
-                    string="Commercial Partner"
-                    name="groupby_commercial_partner_id"
-                    domain="[]"
-                    context="{'group_by': 'commercial_partner_id'}"
-                />
             </group>
         </field>
     </record>
@@ -57,9 +48,6 @@
             ref="stock_available_to_promise_release.view_picking_release_tree"
         />
         <field name="arch" type="xml">
-            <field name="partner_id" position="after">
-                <field name="commercial_partner_id" optional="hide" />
-            </field>
             <field name="location_id" position="before">
                 <field
                     name="release_channel_id"

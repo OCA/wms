@@ -1,7 +1,9 @@
 # Copyright 2020 Camptocamp (https://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
-from odoo import fields
+import logging
+
+from odoo import _, fields
 from odoo.tests import common
 
 from odoo.addons.stock_available_to_promise_release.tests.common import (
@@ -19,6 +21,21 @@ class ReleaseChannelCase(common.TransactionCase):
             "stock_release_channel.stock_release_channel_default"
         )
         cls._create_base_data()
+
+    def setUp(self):
+        super(ReleaseChannelCase, self).setUp()
+        loggers = ["odoo.addons.stock_release_channel.models.stock_release_channel"]
+        for logger in loggers:
+            logging.getLogger(logger).addFilter(self)
+
+        # pylint: disable=unused-variable
+        @self.addCleanup
+        def un_mute_logger():
+            for logger_ in loggers:
+                logging.getLogger(logger_).removeFilter(self)
+
+    def filter(self, record):
+        return 0
 
     @classmethod
     def _create_base_data(cls):
@@ -157,3 +174,16 @@ class ChannelReleaseCase(PromiseReleaseCommonCase):
         for line in picking.move_line_ids:
             line.qty_done = line.reserved_qty
         picking._action_done()
+
+    def _assert_action_nothing_in_the_queue(self, action):
+        self.assertEqual(
+            action,
+            {
+                "effect": {
+                    "fadeout": "fast",
+                    "message": _("Nothing in the queue!"),
+                    "img_url": "/web/static/src/img/smile.svg",
+                    "type": "rainbow_man",
+                }
+            },
+        )

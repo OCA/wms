@@ -71,35 +71,42 @@
                             name="options"
                             groups="stock.group_stock_manager"
                         >
-                            <group name="options" groups="stock.group_stock_manager">
+                            <group name="options">
                         <field name="release_forbidden" />
                         <field
-                                    name="auto_release"
+                                    name="release_mode"
                                     attrs="{'invisible': [('release_forbidden', '=', True)]}"
                                 />
                         <field
-                                    name="max_auto_release"
-                                    attrs="{'invisible': ['|', ('release_forbidden', '=', True), ('auto_release', '!=', 'max')]}"
+                                    name="batch_mode"
+                                    attrs="{'invisible': ['|', ('release_mode','!=', 'batch'), ('release_forbidden', '=', True)]}"
                                 />
-                        <field name="warehouse_id" />
-                        <field name="picking_type_ids" options="{'no_create': True}">
-                            <tree>
-                                <field name="name" />
-                            </tree>
-                        </field>
                         <field
+                                    name="max_batch_mode"
+                                    attrs="{'invisible': ['|', '|', ('release_mode','!=', 'batch'), ('release_forbidden', '=', True), ('batch_mode', '!=', 'max')]}"
+                                />
+                    </group>
+                        </page>
+                        <page string="Selection criteria" name="criteria">
+                            <group name="criteria">
+                                <field
+                                    name="picking_type_ids"
+                                    options="{'no_create': True}"
+                                    widget="many2many_tags"
+                                />
+                                <field name="warehouse_id" />
+                                <field
                                     name="rule_domain"
                                     widget="domain"
                                     options="{'model': 'stock.picking', 'in_dialog': true}"
                                 />
-
-                        <field
+                                <field
                                     name="code"
                                     widget="ace"
                                     options="{'mode': 'python'}"
                                     placeholder="Enter Python code here."
                                 />
-                    </group>
+                            </group>
                         </page>
                     </notebook>
                 </sheet>
@@ -112,6 +119,7 @@
         <field name="model">stock.release.channel</field>
         <field name="arch" type="xml">
             <search>
+                <field name="name" />
                 <field name="warehouse_id" />
                 <separator />
                 <filter
@@ -150,7 +158,15 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="sequence" widget="handle" />
+                <field
+                    name="state"
+                    widget="badge"
+                    decoration-muted="state == 'asleep'"
+                    decoration-info="state  == 'locked'"
+                    decoration-success="state == 'open'"
+                />
                 <field name="name" />
+                <field name="release_mode" optional="hide" />
                 <field name="count_picking_all" sum="All Total" />
                 <field name="count_picking_release_ready" sum="Release Ready Total" />
                 <field name="count_picking_released" sum="Released Total" />
@@ -176,6 +192,7 @@
                 class="oe_background_grey o_kanban_dashboard o_emphasize_colors o_stock_release_channel"
                 create="0"
             >
+                <field name="release_mode" />
                 <field name="color" />
                 <field name="name" readonly="1" />
                 <field name="count_picking_release_ready" />
@@ -197,6 +214,8 @@
                 <field name="last_done_picking_date_done" />
                 <field name="count_picking_chain_done" />
                 <field name="count_picking_chain" />
+                <field name="state" />
+                <field name="is_release_allowed" />
                 <templates>
                     <t t-name="kanban-box">
                         <div
@@ -246,7 +265,7 @@
                                                 class="btn btn-primary"
                                                 name="release_next_batch"
                                                 type="object"
-                                                attrs="{'invisible': [('is_release_allowed', '=', False)]}"
+                                                attrs="{'invisible': ['|', ('is_release_allowed', '=', False), ('release_mode', '!=', 'batch')]}"
                                             >
                                                 <i
                                                     class="fa fa-dropbox fa-4x"
