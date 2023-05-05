@@ -152,11 +152,6 @@ msgid "Assigned Total"
 msgstr ""
 
 #. module: stock_release_channel
-#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__batch_mode
-msgid "Auto Release"
-msgstr ""
-
-#. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_move_assigned
 msgid "Available Moves (Estimate)"
 msgstr ""
@@ -164,6 +159,16 @@ msgstr ""
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_assigned
 msgid "Available Transfers"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__release_mode__batch
+msgid "Batch (Manual)"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__batch_mode
+msgid "Batch Mode"
 msgstr ""
 
 #. module: stock_release_channel
@@ -176,16 +181,6 @@ msgstr ""
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__color
 msgid "Color"
-msgstr ""
-
-#. module: stock_release_channel
-#: model:ir.model.fields,field_description:stock_release_channel.field_stock_picking__commercial_partner_id
-msgid "Commercial Entity"
-msgstr ""
-
-#. module: stock_release_channel
-#: model_terms:ir.ui.view,arch_db:stock_release_channel.view_picking_internal_search
-msgid "Commercial Partner"
 msgstr ""
 
 #. module: stock_release_channel
@@ -246,11 +241,6 @@ msgstr ""
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_full_progress
 msgid "Full Progress"
-msgstr ""
-
-#. module: stock_release_channel
-#: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__batch_mode__group_commercial_partner
-msgid "Grouped by Commercial Partner"
 msgstr ""
 
 #. module: stock_release_channel
@@ -344,6 +334,18 @@ msgid "Lines]"
 msgstr ""
 
 #. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
+msgid "Lock"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__state__locked
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_search_view
+msgid "Locked"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__batch_mode__max
 msgid "Max"
 msgstr ""
@@ -356,8 +358,8 @@ msgstr ""
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__batch_mode
 msgid ""
-"Max: release N transfers to have a configured max of X deliveries in progress.\n"
-"Grouped by Commercial Partner: release all transfers for acommercial partner at once."
+"Max: release N transfers to have a configured max of X deliveries in "
+"progress."
 msgstr ""
 
 #. module: stock_release_channel
@@ -390,7 +392,7 @@ msgstr ""
 #. module: stock_release_channel
 #. odoo-python
 #: code:addons/stock_release_channel/models/stock_release_channel.py:0
-#: code:addons/stock_release_channel/tests/test_channel_release_batch.py:0
+#: code:addons/stock_release_channel/tests/common.py:0
 #, python-format
 msgid "Nothing in the queue!"
 msgstr ""
@@ -477,6 +479,11 @@ msgid "Release Channels"
 msgstr ""
 
 #. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__release_mode
+msgid "Release Mode"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_move_release_ready
 msgid "Release Ready Moves (Estimate)"
 msgstr ""
@@ -504,6 +511,11 @@ msgstr ""
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_released
 msgid "Released Transfers"
+msgstr ""
+
+#. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
+msgid "Selection criteria"
 msgstr ""
 
 #. module: stock_release_channel
