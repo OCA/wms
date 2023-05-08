@@ -471,6 +471,7 @@ class StockReleaseChannel(models.Model):
             "done",
         ):
             return
+        message = ""
         for channel in picking._find_release_channel_possible_candidate():
             current = picking
             domain = channel._prepare_domain()
@@ -491,13 +492,13 @@ class StockReleaseChannel(models.Model):
             break
 
         if not picking.release_channel_id:
-            # by this point, the picking should have been assigned
-            _logger.warning(
-                "Transfer %s could not be assigned to a channel,"
-                " you should add a final catch-all rule",
-                picking.name,
+            message = (
+                f"Transfer {picking.name} could not be assigned to a "
+                "channel, you should add a final catch-all rule"
             )
-        return True
+            # by this point, the picking should have been assigned
+            _logger.warning(message)
+        return message
 
     def _assign_release_channel_additional_filter(self, pickings):
         self.ensure_one()

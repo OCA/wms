@@ -21,8 +21,12 @@ class StockPicking(models.Model):
             ).assign_release_channel()
 
     def assign_release_channel(self):
+        messages = ""
         for pick in self:
-            self.env["stock.release.channel"].assign_release_channel(pick)
+            result = self.env["stock.release.channel"].assign_release_channel(pick)
+            if result:
+                messages += result + "\n"
+        return messages
 
     def release_available_to_promise(self):
         for record in self:
