@@ -1,6 +1,10 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from psycopg2 import IntegrityError
+
+from odoo.tools import mute_logger
+
 from odoo.addons.shopfloor.tests.common import CommonCase
 
 
@@ -60,3 +64,20 @@ class ShopfloorWorkstationCase(CommonCase):
             },
         )
         self.assertEqual(self.env.user.printing_printer_id, self.printer1)
+
+    def test_workstation_constraints(self):
+        # Name constraint
+        with self.assertRaisesRegex(
+            IntegrityError, "name_unique"
+        ), self.env.cr.savepoint(), mute_logger("odoo.sql_db"):
+            self.env["shopfloor.workstation"].sudo().create(
+                {"name": self.ws1.name, "barcode": "new barcode"}
+            )
+
+        # Barcode constraint
+        with self.assertRaisesRegex(
+            IntegrityError, "barcode_unique"
+        ), self.env.cr.savepoint(), mute_logger("odoo.sql_db"):
+            self.env["shopfloor.workstation"].sudo().create(
+                {"name": "new name", "barcode": self.ws1.barcode}
+            )
