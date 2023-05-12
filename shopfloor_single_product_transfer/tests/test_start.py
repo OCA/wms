@@ -7,7 +7,7 @@ from .common import CommonCase
 class TestStart(CommonCase):
     def test_start(self):
         response = self.service.dispatch("start")
-        self.assert_response(response, next_state="select_location", data={})
+        self.assert_response(response, next_state="select_location_or_package", data={})
 
     def test_recover(self):
         product = self.product_a
