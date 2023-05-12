@@ -20,8 +20,15 @@ const SingleProductTransfer = {
             />
             <template v-if="state_is('select_product')">
                 <item-detail-card
+                    v-if="state.data.location"
                     :key="make_state_component_key(['location_src', state.data.location.id])"
                     :record="state.data.location"
+                    :card_color="utils.colors.color_for('screen_step_done')"
+                />
+                <item-detail-card
+                    v-if="state.data.package"
+                    :key="make_state_component_key(['package', state.data.package.id])"
+                    :record="state.data.package"
                     :card_color="utils.colors.color_for('screen_step_done')"
                 />
             </template>
@@ -77,6 +84,32 @@ const SingleProductTransfer = {
                 identifier: data.move_line.product.name,
             };
         },
+        current_location: function () {
+            const data = this.state_get_data("select_product");
+            if (_.isEmpty(data) || _.isEmpty(data.location)) {
+                return {};
+            }
+            return data.location;
+        },
+        current_location_msg: function () {
+            if (this.current_location().id) {
+                return {title: "Working from location " + this.current_location().name};
+            }
+            return {};
+        },
+        current_package: function () {
+            const data = this.state_get_data("select_product");
+            if (_.isEmpty(data) || _.isEmpty(data.package)) {
+                return {};
+            }
+            return data.package;
+        },
+        current_package_msg: function () {
+            if (this.current_package().id) {
+                return {title: "Working on package " + this.current_package().name};
+            }
+            return {};
+        },
         product_detail_options_for_set_quantity: function () {
             return {
                 title_action_field: {action_val_path: "product.barcode"},
@@ -97,12 +130,12 @@ const SingleProductTransfer = {
                 },
                 select_location: {
                     display_info: {
-                        title: "Scan a location",
-                        scan_placeholder: "Scan location",
+                        title: "Scan a location or a package",
+                        scan_placeholder: "Scan location / package",
                     },
                     on_scan: (scanned) => {
                         this.wait_call(
-                            this.odoo.call("scan_location", {
+                            this.odoo.call("scan_location_or_package", {
                                 barcode: scanned.text,
                             })
                         );
