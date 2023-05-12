@@ -492,7 +492,7 @@ class TestScanProduct(CommonCase):
 
     def test_action_cancel(self):
         response = self.service.dispatch("scan_product__action_cancel")
-        self.assert_response(response, next_state="select_location", data={})
+        self.assert_response(response, next_state="select_location_or_package", data={})
 
     def test_scan_product_packaging(self):
         location = self.location_src

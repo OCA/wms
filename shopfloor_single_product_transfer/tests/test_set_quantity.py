@@ -406,7 +406,9 @@ class TestSetQuantity(CommonCase):
             "set_quantity__action_cancel", params={"selected_line_id": move_line.id}
         )
         data = {}
-        self.assert_response(response, next_state="select_location", data=data)
+        self.assert_response(
+            response, next_state="select_location_or_package", data=data
+        )
         # Ensure the qty_done and user has been reset.
         self.assertFalse(move_line.picking_id.user_id)
         self.assertEqual(move_line.qty_done, 0.0)
