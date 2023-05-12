@@ -4,10 +4,14 @@
         <field name="name">shopfloor app tree</field>
         <field name="model">shopfloor.app</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree
+                decoration-muted="(not active)"
+                decoration-warning="(not registry_sync)"
+            >
                 <field name="name" />
                 <field name="tech_name" />
                 <field name="active" />
+                <field name="registry_sync" />
             </tree>
         </field>
     </record>
@@ -42,6 +46,19 @@
                     <h1>
                         <field name="name" />
                     </h1>
+                    <field name="registry_sync" invisible="1" />
+                    <div
+                        class="alert alert-warning"
+                        role="alert"
+                        attrs="{'invisible': ['|', ('registry_sync', '=', True), ('id', '=', False)]}"
+                    >
+                        <p>
+                            Registry out of sync. Likely the record has been modified but not sync'ed with the routing registry.
+                        </p>
+                        <p>
+                            Use the action "Sync registry" to make changes effective once you are done with edits and creates.
+                        </p>
+                    </div>
                     <notebook>
                         <page name="main" string="Main">
                             <group name="one">
@@ -88,6 +105,7 @@
                 <field name="name" />
                 <field name="tech_name" />
                 <field name="category" />
+                <field name="registry_sync" />
                 <separator />
                 <group string="Group By">
                     <filter
@@ -99,9 +117,14 @@
                 </group>
                 <separator />
                 <filter
-                    string="Archived"
-                    name="inactive"
-                    domain="[('active', '=', False)]"
+                    string="All"
+                    name="all"
+                    domain="['|', ('active', '=', False), ('active', '=', True)]"
+                />
+                <filter
+                    string="To sync"
+                    name="sync"
+                    domain="[('registry_sync', '=', False), ('active', 'in', (True, False))]"
                 />
             </search>
         </field>
