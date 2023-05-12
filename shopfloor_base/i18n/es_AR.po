@@ -48,6 +48,11 @@ msgid "Active"
 msgstr "Activo"
 
 #. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
+msgid "All"
+msgstr ""
+
+#. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__api_docs_url
 msgid "Api Docs Url"
 msgstr "Api Docs Url"
@@ -64,7 +69,6 @@ msgstr "Versión de la App"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
-#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_menu_form_view
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_menu_search_view
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_profile_form_view
@@ -268,6 +272,15 @@ msgid "None"
 msgstr "Ninguno"
 
 #. module: shopfloor_base
+#: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__registry_sync
+msgid ""
+"ON: the record has been modified and registry was not notified.\n"
+"No change will be active until this flag is set to false via proper action.\n"
+"\n"
+"OFF: record in line with the registry, nothing to do."
+msgstr ""
+
+#. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "Open app"
 msgstr "Abrir app"
@@ -348,6 +361,18 @@ msgid "Registered Routes"
 msgstr "Rutas Registradas"
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__registry_sync
+msgid "Registry Sync"
+msgstr ""
+
+#. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
+msgid ""
+"Registry out of sync. Likely the record has been modified but not sync'ed "
+"with the routing registry."
+msgstr ""
+
+#. module: shopfloor_base
 #: model:ir.actions.act_window,name:shopfloor_base.action_shopfloor_scenario
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__scenario_id
 #: model:ir.ui.menu,name:shopfloor_base.menu_action_shopfloor_scenario
@@ -409,6 +434,11 @@ msgid "Simple Thing To Do"
 msgstr "Cosas Simples Para Hacer"
 
 #. module: shopfloor_base
+#: model:ir.actions.server,name:shopfloor_base.server_action_registry_sync
+msgid "Sync registry"
+msgstr ""
+
+#. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__tech_name
 msgid "Tech Name"
 msgstr "Nombre Técnico"
@@ -428,9 +458,21 @@ msgid "The record %s %s does not exist"
 msgstr "El registro %s %s no existe"
 
 #. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
+msgid "To sync"
+msgstr ""
+
+#. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__url
 msgid "Url"
 msgstr "Url"
+
+#. module: shopfloor_base
+#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
+msgid ""
+"Use the action \"Sync registry\" to make changes effective once you are done "
+"with edits and creates."
+msgstr ""
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
