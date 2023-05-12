@@ -764,3 +764,12 @@ class MessageAction(Component):
             )
             % dict(name=packaging_type.name),
         }
+
+    def location_contains_only_lines_with_package_scan_one(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "This location only contains lines with a package, "
+                "please scan one of those packages."
+            ),
+        }
