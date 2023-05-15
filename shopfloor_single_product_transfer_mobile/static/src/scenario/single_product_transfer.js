@@ -14,7 +14,7 @@ const SingleProductTransfer = {
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar
-                v-if="state_in(['select_location', 'select_product', 'set_quantity'])"
+                v-if="state_in(['select_location_or_package', 'select_product', 'set_quantity'])"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
             />
@@ -117,18 +117,28 @@ const SingleProductTransfer = {
                 fields: [{path: "lot.name", label: "Lot", action_val_path: "lot.name"}],
             };
         },
+        get_select_product_scan_params: function (scanned) {
+            const params = {
+                barcode: scanned.text,
+            };
+            const state_location = _.result(this.state.data, "location", false);
+            params.location_id = state_location.id;
+            const state_package = _.result(this.state.data, "package", false);
+            params.package_id = state_package.id;
+            return params;
+        },
     },
     data: function () {
         return {
             usage: "single_product_transfer",
-            initial_state_key: "select_location",
+            initial_state_key: "select_location_or_package",
             states: {
                 init: {
                     enter: () => {
                         this.wait_call(this.odoo.call("start"));
                     },
                 },
-                select_location: {
+                select_location_or_package: {
                     display_info: {
                         title: "Scan a location or a package",
                         scan_placeholder: "Scan location / package",
@@ -147,12 +157,8 @@ const SingleProductTransfer = {
                         scan_placeholder: "Scan product / lot",
                     },
                     on_scan: (scanned) => {
-                        this.wait_call(
-                            this.odoo.call("scan_product", {
-                                location_id: this.state.data.location.id,
-                                barcode: scanned.text,
-                            })
-                        );
+                        const params = this.get_select_product_scan_params(scanned);
+                        this.wait_call(this.odoo.call("scan_product", params));
                     },
                     on_cancel: () => {
                         this.wait_call(this.odoo.call("scan_product__action_cancel"));
@@ -192,7 +198,7 @@ const SingleProductTransfer = {
                 },
                 show_completion_info: {
                     on_confirm: () => {
-                        this.state_to("select_location");
+                        this.state_to("select_location_or_package");
                     },
                 },
             },
