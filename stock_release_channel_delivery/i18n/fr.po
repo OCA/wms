@@ -1,0 +1,31 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_release_channel_delivery
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-05-15 17:33+0000\n"
+"PO-Revision-Date: 2023-05-15 17:33+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_release_channel_delivery
+#: model:ir.model,name:stock_release_channel_delivery.model_stock_release_channel
+msgid "Stock Release Channels"
+msgstr ""
+
+#. module: stock_release_channel_delivery
+#: model:ir.model.fields,help:stock_release_channel_delivery.field_stock_release_channel__carrier_id
+msgid "The carrier linked to the release channel."
+msgstr "Le transporteur associé au release channel"
+
+#. module: stock_release_channel_delivery
+#: model:ir.model.fields,field_description:stock_release_channel_delivery.field_stock_release_channel__carrier_id
+msgid "Transporter"
+msgstr "Transporteur"
