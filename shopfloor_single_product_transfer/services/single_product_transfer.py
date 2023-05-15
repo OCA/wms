@@ -57,8 +57,8 @@ class ShopfloorSingleProductTransfer(Component):
 
     # Responses
 
-    def _response_for_select_location(self, message=None):
-        return self._response(next_state="select_location", message=message)
+    def _response_for_select_location_or_package(self, message=None):
+        return self._response(next_state="select_location_or_package", message=message)
 
     def _response_for_select_product(
         self, location=None, package=None, message=None, popup=None
@@ -87,7 +87,7 @@ class ShopfloorSingleProductTransfer(Component):
         """Check that the location exists."""
         if not location:
             message = self.msg_store.no_location_found()
-            return self._response_for_select_location(message=message)
+            return self._response_for_select_location_or_package(message=message)
 
     def _scan_location__check_location(self, location):
         """Check that `location` belongs to the source location of the operation type."""
@@ -97,7 +97,7 @@ class ShopfloorSingleProductTransfer(Component):
         )
         if location not in (locations | child_locations):
             message = self.msg_store.location_content_unable_to_transfer(location)
-            return self._response_for_select_location(message=message)
+            return self._response_for_select_location_or_package(message=message)
 
     def _scan_location__check_stock(self, location):
         """Check if the location has products to move."""
@@ -106,7 +106,7 @@ class ShopfloorSingleProductTransfer(Component):
         )
         if not quants_in_location:
             message = self.msg_store.location_empty(location)
-            return self._response_for_select_location(message=message)
+            return self._response_for_select_location_or_package(message=message)
 
     def _scan_location__check_package(self, location):
         """Check if the location has lines without an assigned package."""
@@ -114,14 +114,13 @@ class ShopfloorSingleProductTransfer(Component):
             [
                 ("location_id", "=", location.id),
                 ("package_id", "=", False),
-                ("picking_id.picking_type_id", "in", self.picking_types.ids),
             ]
         )
         if not lines_without_package:
             message = (
                 self.msg_store.location_contains_only_lines_with_package_scan_one()
             )
-            return self._response_for_select_location(message=message)
+            return self._response_for_select_location_or_package(message=message)
 
     def _scan_package__check_location(self, package):
         """Check if this package corresponds to any of the allowed locations."""
@@ -134,9 +133,9 @@ class ShopfloorSingleProductTransfer(Component):
             message = self.msg_store.package_not_allowed_in_src_location(
                 package.name, self.picking_types
             )
-            return self._response_for_select_location(message=message)
+            return self._response_for_select_location_or_package(message=message)
 
-    def _scan_product__scan_packaging(self, location, barcode):
+    def _scan_product__scan_packaging(self, barcode, location=None, package=None):
         search = self._actions_for("search")
         packaging = search.packaging_from_scan(barcode)
         handlers = [
@@ -158,12 +157,16 @@ class ShopfloorSingleProductTransfer(Component):
         if packaging:
             product = packaging.product_id
             response = self._use_handlers(
-                handlers, product, location, packaging=packaging
+                handlers,
+                product,
+                location=location,
+                package=package,
+                packaging=packaging,
             )
             if response:
                 return response
 
-    def _scan_product__scan_product(self, location, barcode):
+    def _scan_product__scan_product(self, barcode, location=None, package=None):
         search = self._actions_for("search")
         product = search.product_from_scan(barcode)
         handlers = [
@@ -183,34 +186,40 @@ class ShopfloorSingleProductTransfer(Component):
             self._scan_product__no_stock_available,
         ]
         if product:
-            response = self._use_handlers(handlers, product, location)
+            response = self._use_handlers(
+                handlers, product, location=location, package=package
+            )
             if response:
                 return response
 
     def _scan_product__check_tracking(
-        self, product, location, lot=None, packaging=None
+        self, product, location=None, package=None, lot=None, packaging=None
     ):
         if product.tracking == "lot":
             message = self.msg_store.scan_lot_on_product_tracked_by_lot()
-            return self._response_for_select_product(location=location, message=message)
+            return self._response_for_select_product(
+                location=location, package=package, message=message
+            )
 
-    def _scan_product__select_move_line_domain(self, product, location, lot=None):
+    def _scan_product__select_move_line_domain(
+        self, product, location=None, package=None, lot=None
+    ):
         domain = [
-            ("location_id", "=", location.id),
             ("product_id", "=", product.id),
             ("state", "in", ("assigned", "partially_available")),
             ("picking_id.user_id", "in", (False, self.env.uid)),
             ("picking_id.picking_type_id", "in", self.picking_types.ids),
         ]
-        if lot:
-            lot_domain = [("lot_id", "=", lot.id)]
-            domain = AND([domain, lot_domain])
-        return domain
+        return self._add_location_package_lot_domain(
+            domain, location=location, package=package, lot=lot
+        )
 
     def _scan_product__select_move_line(
-        self, product, location, lot=None, packaging=None
+        self, product, location=None, package=None, lot=None, packaging=None
     ):
-        domain = self._scan_product__select_move_line_domain(product, location, lot=lot)
+        domain = self._scan_product__select_move_line_domain(
+            product, location=location, package=package, lot=lot
+        )
         move_line = self.env["stock.move.line"].search(domain, limit=1)
         if move_line:
             stock = self._actions_for("stock")
@@ -228,18 +237,22 @@ class ShopfloorSingleProductTransfer(Component):
             return self._response_for_set_quantity(move_line)
 
     def _scan_product__check_create_move_line(
-        self, product, location, lot=None, packaging=None
+        self, product, location=None, package=None, lot=None, packaging=None
     ):
         if not self.is_allow_move_create():
             message = self.msg_store.no_operation_found()
-            return self._response_for_select_product(location=location, message=message)
+            return self._response_for_select_product(
+                location=location, package=package, message=message
+            )
 
     def _scan_product__unreserve_move_line(
-        self, product, location, lot=None, packaging=None
+        self, product, location=None, package=None, lot=None, packaging=None
     ):
         unreserve = self._actions_for("stock.unreserve")
         if self.work.menu.allow_unreserve_other_moves:
-            move_lines = self._find_location_move_lines(location, product, lot=lot)
+            move_lines = self._find_location_or_package_move_lines(
+                product, location=location, package=package, lot=lot
+            )
             response = unreserve.check_unreserve(location, move_lines, product, lot)
             if response:
                 return response
@@ -248,14 +261,21 @@ class ShopfloorSingleProductTransfer(Component):
             # If we get there then no qty is available, and we are not allowed to unreserve
             # other moves. No stock available for product.
             return self._scan_product__no_stock_available(
-                product, location, lot=lot, packaging=packaging
+                product,
+                location=location,
+                package=package,
+                lot=lot,
+                packaging=packaging,
             )
 
     def _scan_product__create_move_line(
-        self, product, location, lot=None, packaging=None
+        self, product, location=None, package=None, lot=None, packaging=None
     ):
+
         available_quantity = product.with_context(
-            location_id=location.id, lot=lot.id if lot else None
+            location_id=location.id if location else None,
+            package_id=package.id if package else None,
+            lot=lot.id if lot else None,
         ).free_qty
         is_product_available = (
             float_compare(
@@ -269,7 +289,12 @@ class ShopfloorSingleProductTransfer(Component):
             if packaging:
                 available_quantity = packaging.qty
             move = self._create_move_from_location(
-                location, product, available_quantity, lot=lot, packaging=packaging
+                product,
+                available_quantity,
+                location=location,
+                package=package,
+                lot=lot,
+                packaging=packaging,
             )
             move_line = move.move_line_ids
             response = self._scan_product__check_putaway(move_line)
@@ -278,10 +303,12 @@ class ShopfloorSingleProductTransfer(Component):
             return self._response_for_set_quantity(move_line)
 
     def _scan_product__no_stock_available(
-        self, product, location, lot=None, packaging=None
+        self, product, location=None, package=None, lot=None, packaging=None
     ):
         message = self.msg_store.no_operation_found()
-        return self._response_for_select_product(location=location, message=message)
+        return self._response_for_select_product(
+            location=location, package=package, message=message
+        )
 
     def _scan_product__check_putaway(self, move_line):
         stock = self._actions_for("stock")
@@ -293,7 +320,7 @@ class ShopfloorSingleProductTransfer(Component):
                 location=move_line.location_id, message=message
             )
 
-    def _scan_product__scan_lot(self, location, barcode):
+    def _scan_product__scan_lot(self, barcode, location=None, package=None):
         search = self._actions_for("search")
         handlers = [
             self._scan_product__select_move_line,
@@ -313,7 +340,9 @@ class ShopfloorSingleProductTransfer(Component):
         lot = search.lot_from_scan(barcode)
         if lot:
             product = lot.product_id
-            product_response = self._use_handlers(handlers, product, location, lot=lot)
+            product_response = self._use_handlers(
+                handlers, product, location=location, package=package, lot=lot
+            )
             if product_response:
                 return product_response
 
@@ -325,29 +354,45 @@ class ShopfloorSingleProductTransfer(Component):
             if response:
                 return response
 
-    # Copied from manual_product_transfer
-    def _find_location_move_lines_domain(self, location, product, lot=None):
-        domain = [
-            ("location_id", "=", location.id),
-            ("product_id", "=", product.id),
-            ("state", "in", ("assigned", "partially_available")),
-            ("picking_id.user_id", "in", (False, self.env.uid)),
-        ]
+    def _add_location_package_lot_domain(
+        self, domain, location=None, package=None, lot=None
+    ):
+        if location:
+            domain = AND([domain, [("location_id", "=", location.id)]])
+        if package:
+            domain = AND([domain, [("package_id", "=", package.id)]])
         if lot:
             domain = AND([domain, [("lot_id", "=", lot.id)]])
         return domain
 
     # Copied from manual_product_transfer
-    def _find_location_move_lines(self, location, product, lot=None):
+    def _find_location_or_package_move_lines_domain(
+        self, product, location=None, package=None, lot=None
+    ):
+        domain = [
+            ("product_id", "=", product.id),
+            ("state", "in", ("assigned", "partially_available")),
+            ("picking_id.user_id", "in", (False, self.env.uid)),
+        ]
+        return self._add_location_package_lot_domain(
+            domain, location=location, package=package, lot=lot
+        )
+
+    # Copied from manual_product_transfer
+    def _find_location_or_package_move_lines(
+        self, product, location=None, package=None, lot=None
+    ):
         """Find existing move lines in progress related to the source location
         but not linked to any user.
         """
-        domain = self._find_location_move_lines_domain(location, product, lot=lot)
+        domain = self._find_location_or_package_move_lines_domain(
+            product, location=location, package=package, lot=lot
+        )
         return self.env["stock.move.line"].search(domain)
 
     # Copied from manual_product_transfer
     def _create_move_from_location(
-        self, location, product, quantity, lot=None, packaging=None
+        self, product, quantity, location=None, package=None, lot=None, packaging=None
     ):
         picking_type = self.picking_types
         move_vals = {
@@ -356,11 +401,14 @@ class ShopfloorSingleProductTransfer(Component):
             "product_id": product.id,
             "product_uom": product.uom_id.id,
             "product_uom_qty": quantity,
-            "location_id": location.id,
             "location_dest_id": picking_type.default_location_dest_id.id,
             "origin": self.work.menu.name,
             "picking_type_id": picking_type.id,
         }
+        if location:
+            move_vals["location_id"] = location.id
+        if package:
+            move_vals["package_id"] = package.id
         move = self.env["stock.move"].create(move_vals)
         move._action_confirm(merge=False)
         move.with_context(
@@ -631,7 +679,7 @@ class ShopfloorSingleProductTransfer(Component):
         if move_line:
             message = self.msg_store.recovered_previous_session()
             return self._response_for_set_quantity(move_line, message=message)
-        return self._response_for_select_location()
+        return self._response_for_select_location_or_package()
 
     def scan_location_or_package(self, barcode):
         """Scan a source location or a source package.
@@ -653,8 +701,16 @@ class ShopfloorSingleProductTransfer(Component):
         return self._scan_location(location)
 
     @with_savepoint
-    def scan_product(self, location_id, barcode):
-        """Looks for a move line in the given location, from a barcode.
+    def scan_product(self, barcode, location_id=None, package_id=None):
+        """Looks for a move line in the given location or package, from a barcode.
+
+        This endpoint will take either a location_id or a package_id,
+        depending on what the user has scanned in the previous screen.
+        This will be used as context to handle the scan and apply the necessary checks.
+
+        We will receive either:
+            - location_id
+            - package_id
 
         Barcode can be:
             - a product
@@ -662,21 +718,24 @@ class ShopfloorSingleProductTransfer(Component):
             - a lot
         """
         location = self.env["stock.location"].browse(location_id)
-        if not location.exists():
-            return self._response_for_select_product(location=location)
+        package = self.env["stock.quant.package"].browse(package_id)
+        if not location.exists() and not package.exists():
+            return self._response_for_select_location_or_package()
         handlers = [
             self._scan_product__scan_product,
             self._scan_product__scan_packaging,
             self._scan_product__scan_lot,
         ]
-        response = self._use_handlers(handlers, location, barcode)
+        response = self._use_handlers(
+            handlers, barcode, location=location, package=package
+        )
         if response:
             return response
         message = self.msg_store.barcode_not_found()
         return self._response_for_select_product(location=location, message=message)
 
     def scan_product__action_cancel(self):
-        return self._response_for_select_location()
+        return self._response_for_select_location_or_package()
 
     def set_quantity(self, selected_line_id, barcode, confirmation=False):
         """Sets quantity done if a product is scanned,
@@ -704,7 +763,7 @@ class ShopfloorSingleProductTransfer(Component):
         stock = self._actions_for("stock")
         move_line = self.env["stock.move.line"].browse(selected_line_id).exists()
         stock.unmark_move_line_as_picked(move_line)
-        return self._response_for_select_location()
+        return self._response_for_select_location_or_package()
 
 
 class ShopfloorSingleProductTransferValidator(Component):
@@ -720,7 +779,8 @@ class ShopfloorSingleProductTransferValidator(Component):
 
     def scan_product(self):
         return {
-            "location_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "location_id": {"coerce": to_int, "required": False, "type": "integer"},
+            "package_id": {"coerce": to_int, "required": False, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
         }
 
@@ -745,11 +805,11 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
     _name = "shopfloor.single.product.transfer.validator.response"
     _usage = "single_product_transfer.validator.response"
 
-    _start_state = "select_location"
+    _start_state = "select_location_or_package"
 
     def _states(self):
         return {
-            "select_location": self._schema_select_location,
+            "select_location_or_package": self._schema_select_location_or_package,
             "select_product": self._schema_select_product,
             "set_quantity": self._schema_set_quantity,
         }
@@ -777,25 +837,25 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
         )
 
     def _start_next_states(self):
-        return {"select_location", "set_quantity"}
+        return {"select_location_or_package", "set_quantity"}
 
     def _scan_location_next_states(self):
-        return {"select_location", "select_product"}
+        return {"select_location_or_package", "select_product"}
 
     def _scan_product_next_states(self):
         return {"select_product", "set_quantity"}
 
     def _scan_product__action_cancel_next_states(self):
-        return {"select_location"}
+        return {"select_location_or_package"}
 
     def _set_quantity_next_states(self):
         return {"set_quantity", "select_product"}
 
     def _set_quantity__action_cancel_next_states(self):
-        return {"select_location"}
+        return {"select_location_or_package"}
 
     @property
-    def _schema_select_location(self):
+    def _schema_select_location_or_package(self):
         return {}
 
     @property
