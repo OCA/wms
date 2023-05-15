@@ -54,6 +54,8 @@ class ReleaseChannelCase(common.TransactionCase):
         cls.product2 = cls.env["product.product"].create(
             {"name": "Test Product 2", "barcode": "test2", "type": "product"}
         )
+        # Set product1 as default product
+        cls.product = cls.product1
 
     @classmethod
     def _update_qty_in_location(
@@ -99,6 +101,39 @@ class ReleaseChannelCase(common.TransactionCase):
     @classmethod
     def _create_channel(cls, **vals):
         return cls.env["stock.release.channel"].create(vals)
+
+    def _run_customer_procurement(self, date=None):
+        """
+        Call this in order to create a procurement on customer
+        location.
+
+        Before, set self.product as the product to be used
+        """
+        self.customer_procurement = self.env["procurement.group"].create(
+            {
+                "name": "Customer procurement",
+            }
+        )
+        values = {
+            "company_id": self.wh.company_id,
+            "group_id": self.customer_procurement,
+            "date_planned": date or fields.Datetime.now(),
+            "warehouse_id": self.wh,
+        }
+        self.env["procurement.group"].run(
+            [
+                self.env["procurement.group"].Procurement(
+                    self.product,
+                    10.0,
+                    self.product.uom_id,
+                    self.customer_location,
+                    "TEST",
+                    "TEST",
+                    self.wh.company_id,
+                    values,
+                )
+            ]
+        )
 
     @classmethod
     def _run_procurement(cls, move, date=None):
