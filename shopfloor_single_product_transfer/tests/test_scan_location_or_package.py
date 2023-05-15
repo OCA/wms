@@ -53,6 +53,7 @@ class TestScanLocation(CommonCase):
         )
 
     def test_scan_location_ok(self):
+        self._enable_create_move_line()
         location = self.location_src
 
         response = self.service.dispatch(
@@ -62,6 +63,26 @@ class TestScanLocation(CommonCase):
             response,
             next_state="select_product",
             data={"location": self._data_for_location(location)},
+        )
+
+    def test_scan_location_stock_packages(self):
+        location = self.location_src
+        package = self.env["stock.quant.package"].sudo().create({})
+        for quant in location.quant_ids:
+            quant.sudo().package_id = package
+
+        response = self.service.dispatch(
+            "scan_location_or_package", params={"barcode": location.name}
+        )
+        expected_message = {
+            "message_type": "warning",
+            "body": "This location only contains packages, please scan one of them.",
+        }
+        self.assert_response(
+            response,
+            next_state="select_location_or_package",
+            data={},
+            message=expected_message,
         )
 
     def test_scan_location_only_lines_with_package(self):
@@ -77,8 +98,7 @@ class TestScanLocation(CommonCase):
         )
         expected_message = {
             "message_type": "warning",
-            "body": "This location only contains lines with a package, "
-            "please scan one of those packages.",
+            "body": "This location only contains packages, please scan one of them.",
         }
         self.assert_response(
             response,
