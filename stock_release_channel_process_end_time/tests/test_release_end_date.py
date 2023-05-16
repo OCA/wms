@@ -82,6 +82,18 @@ class ReleaseChannelEndDateCase(ChannelReleaseCase):
             self.assertEqual(
                 "2023-01-27 23:00:00", fields.Datetime.to_string(picking.scheduled_date)
             )
+        # at this stage, the pickings are not ready to be released as the
+        # qty available is not enough
+        self.assertFalse(self.channel._get_pickings_to_release())
+        self._update_qty_in_location(self.loc_bin1, self.product1, 100.0)
+        self._update_qty_in_location(self.loc_bin1, self.product2, 100.0)
+        pickings.refresh()
+        # the pickings are now ready to be released
+        self.assertEqual(pickings, self.channel._get_pickings_to_release())
+        # if the scheduled date of one picking is changed to be after the
+        # process end date, it should not be releasable anymore
+        pickings[0].scheduled_date = fields.Datetime.from_string("2023-01-28 00:00:00")
+        self.assertEqual(pickings[1:], self.channel._get_pickings_to_release())
 
     def test_can_edit_time(self):
         user = self.env.ref("base.user_demo")

@@ -48,7 +48,8 @@ class StockReleaseChannel(models.Model):
                 end = next_datetime(
                     now,
                     float_to_time(
-                        channel.process_end_time, tz=channel.process_end_time_tz
+                        channel.process_end_time,
+                        tz=channel.process_end_time_tz,
                     ),
                 )
                 channel.process_end_date = end
@@ -77,4 +78,30 @@ class StockReleaseChannel(models.Model):
             and picking.scheduled_date != picking.release_channel_id.process_end_date
         ):
             picking.scheduled_date = picking.release_channel_id.process_end_date
+        return res
+
+    def _field_picking_domains(self):
+        res = super()._field_picking_domains()
+        release_ready_domain = res["count_picking_release_ready"]
+        # the initial scheduled_date condition based on datetime.now() must
+        # be replaced by a condition based on the process_end_date
+        # since the processe_end_date is a field on the release channel
+        # and not on the picking we all use an 'inselect' operator
+        # (join in where clause is not possible). The 'inselect' operator
+        # is not available in the ORM so we use a search with a domain
+        # on a specialized field defined in the stock.picking model
+        # (see stock.picking._search_schedule_date_prior_to_channel_process_end_date)
+        new_domain = []
+        for criteria in release_ready_domain:
+            if criteria[0] == "scheduled_date":
+                new_domain.append(
+                    (
+                        "schedule_date_prior_to_channel_process_end_date_search",
+                        "=",
+                        True,
+                    )
+                )
+            else:
+                new_domain.append(criteria)
+        res["count_picking_release_ready"] = new_domain
         return res
