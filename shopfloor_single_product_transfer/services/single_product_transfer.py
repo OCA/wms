@@ -66,7 +66,9 @@ class ShopfloorSingleProductTransfer(Component):
     ):
         data = {}
         if location:
-            data["location"] = self.data.location(location)
+            data["location"] = self.data.location(
+                location, with_operation_progress=True
+            )
         if package:
             data["package"] = self.data.package(package)
         return self._response(

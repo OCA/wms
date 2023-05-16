@@ -113,7 +113,7 @@ class CommonCase(BaseCommonCase):
     # Data methods
 
     def _data_for_location(self, location):
-        return self.data.location(location)
+        return self.data.location(location, with_operation_progress=True)
 
     def _data_for_move_line(self, move_line):
         return self.data.move_line(move_line)
