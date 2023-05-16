@@ -20,6 +20,13 @@ const SingleProductTransfer = {
             />
             <template v-if="state_is('select_product')">
                 <item-detail-card
+                    v-if="display_location_operations_progress()"
+                    :key="make_state_component_key(['deliver-operations-progress', state.data.location.id])"
+                    :record="state.data.location.operation_progress"
+                    :options="detail_card_location_operation_progress_options()"
+                    :card_color="detail_card_location_operation_progress_color()"
+                />
+                <item-detail-card
                     v-if="state.data.location"
                     :key="make_state_component_key(['location_src', state.data.location.id])"
                     :record="state.data.location"
@@ -160,6 +167,40 @@ const SingleProductTransfer = {
             const state_package = _.result(this.state.data, "package", false);
             params.package_id = state_package.id;
             return params;
+        },
+        display_location_operations_progress: function () {
+            const operation_progress = this._get_operation_progress_data();
+            if (operation_progress) {
+                return operation_progress.to_do > 0;
+            }
+        },
+        detail_card_location_operation_progress_options: function () {
+            return {
+                no_title: true,
+                fields: [
+                    {
+                        path: "to_do",
+                        klass: "loud",
+                        label: "Available",
+                    },
+                    {
+                        path: "done",
+                        klass: "loud",
+                        label: "Ongoing",
+                    },
+                ],
+            };
+        },
+        detail_card_location_operation_progress_color: function () {
+            const operation_progress = this._get_operation_progress_data();
+            if (operation_progress.done === operation_progress.to_do) {
+                return this.utils.colors.color_for("screen_step_done");
+            } else {
+                return this.utils.colors.color_for("screen_step_todo");
+            }
+        },
+        _get_operation_progress_data: function () {
+            return _.result(this.state, "data.location.operation_progress", false);
         },
     },
     data: function () {
