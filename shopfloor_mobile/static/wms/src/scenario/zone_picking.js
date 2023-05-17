@@ -56,11 +56,13 @@ const template_mobile = `
         </div>
 
         <div v-if="state_is('select_line')">
-            <manual-select
+            <item-detail-card
                 v-if="device_mode == 'mobile'"
-                :records="state.data.move_lines"
+                v-for="line in state.data.move_lines"
+                :key="make_state_component_key(['line', line.id])"
+                :record="line"
                 :options="select_line_move_line_detail_options()"
-                :key="make_state_component_key(['manual-select'])"
+                :card_color="utils.colors.color_for('screen_step_todo')"
                 />
 
             <v-data-table
@@ -399,19 +401,9 @@ const ZonePicking = {
         select_line_move_line_detail_options: function () {
             const options = {
                 key_title: "location_src.name",
-                group_color: this.utils.colors.color_for("screen_step_todo"),
-                card_klass: "loud-labels",
+                loud_labels: true,
                 title_action_field: {action_val_path: "product.barcode"},
-                showActions: false,
-                list_item_options: {
-                    loud_title: true,
-                    fields: this.move_line_list_fields(),
-                    list_item_klass_maker: function (rec) {
-                        return rec.location_will_be_empty
-                            ? "location-will-be-empty"
-                            : "";
-                    },
-                },
+                fields: this.move_line_list_fields(),
             };
             return options;
         },
