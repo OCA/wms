@@ -43,7 +43,8 @@ class StockPicking(models.Model):
         )
         packages = pickings.mapped("move_line_ids.package_id")
         internal_packages = packages.filtered("is_internal")
-        internal_packages.unpack()
+        if internal_packages:
+            internal_packages.unpack()
 
     def _move_lines_clear_internal_result_packages(self):
         """
