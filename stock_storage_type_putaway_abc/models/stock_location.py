@@ -49,7 +49,7 @@ class StockLocation(models.Model):
             abc_seq = "b", "c", "a"
         elif product_abc == "c":
             abc_seq = "c", "b", "a"
-        self.env["stock.location"].flush(
+        self.env["stock.location"].flush_model(
             ["abc_storage", "max_height", "package_type_putaway_sequence", "name"]
         )
         orderby = [
