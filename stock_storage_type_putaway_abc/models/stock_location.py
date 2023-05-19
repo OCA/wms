@@ -50,12 +50,12 @@ class StockLocation(models.Model):
         elif product_abc == "c":
             abc_seq = "c", "b", "a"
         self.env["stock.location"].flush(
-            ["abc_storage", "max_height", "pack_putaway_sequence", "name"]
+            ["abc_storage", "max_height", "package_type_putaway_sequence", "name"]
         )
         orderby = [
             "CASE WHEN max_height > 0 THEN max_height ELSE 'Infinity' END",
             "array_position(%s, abc_storage::text)",
-            "pack_putaway_sequence",
+            "package_type_putaway_sequence",
             "random()",
         ]
         return ", ".join(orderby), [list(abc_seq)]

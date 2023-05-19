@@ -88,16 +88,16 @@ class TestAbcLocation(TransactionCase):
     def test_abc_ordered(self):
         self.cardboxes_location.write({"pack_putaway_strategy": "abc"})
         self.cardboxes_bin_a_location.write(
-            {"abc_storage": "a", "pack_putaway_sequence": 3}
+            {"abc_storage": "a", "package_type_putaway_sequence": 3}
         )
         self.cardboxes_bin_b1_location.write(
-            {"abc_storage": "b", "pack_putaway_sequence": 1}
+            {"abc_storage": "b", "package_type_putaway_sequence": 1}
         )
         self.cardboxes_bin_b2_location.write(
-            {"abc_storage": "b", "pack_putaway_sequence": 2}
+            {"abc_storage": "b", "package_type_putaway_sequence": 2}
         )
         self.cardboxes_bin_c_location.write(
-            {"abc_storage": "c", "pack_putaway_sequence": 1}
+            {"abc_storage": "c", "package_type_putaway_sequence": 1}
         )
         self.product.write({"abc_storage": "a"})
         ordered_locations = self.cardboxes_location.get_storage_locations(self.product)
@@ -145,18 +145,18 @@ class TestAbcLocation(TransactionCase):
         # configure abc storage on locations
         self.cardboxes_bin_a_location.write({"abc_storage": "a"})
         self.cardboxes_bin_b1_location.write(
-            {"abc_storage": "b", "pack_putaway_sequence": 1}
+            {"abc_storage": "b", "package_type_putaway_sequence": 1}
         )
         self.cardboxes_bin_b2_location.write(
-            {"abc_storage": "b", "pack_putaway_sequence": 2}
+            {"abc_storage": "b", "package_type_putaway_sequence": 2}
         )
         self.cardboxes_bin_c_location.write({"abc_storage": "c"})
         self.pallets_bin_a_location.write({"abc_storage": "a"})
         self.pallets_bin_b1_location.write(
-            {"abc_storage": "b", "pack_putaway_sequence": 1}
+            {"abc_storage": "b", "package_type_putaway_sequence": 1}
         )
         self.pallets_bin_b2_location.write(
-            {"abc_storage": "b", "pack_putaway_sequence": 2}
+            {"abc_storage": "b", "package_type_putaway_sequence": 2}
         )
         self.pallets_bin_c_location.write({"abc_storage": "c"})
         # Test with a product abc_storage=A
