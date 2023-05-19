@@ -524,6 +524,7 @@ class ShopfloorSingleProductTransfer(Component):
         self._write_destination_on_lines(move_line, location)
         stock = self._actions_for("stock")
         stock.validate_moves(move_line.move_id)
+        move_line.result_package_id = False
         message = self.msg_store.transfer_done_success(move_line.picking_id)
         completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(move_line)
