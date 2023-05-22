@@ -46,6 +46,15 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__auto_post_line
+msgid ""
+"\n"
+"When setting result pack & destination,\n"
+"automatically post the corresponding line\n"
+"if this option is checked.\n"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__unload_package_at_destination
 msgid ""
 "\n"
@@ -141,6 +150,16 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Are you sure?"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__auto_post_line_is_possible
+msgid "Auto Post Line Is Possible"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__auto_post_line
+msgid "Automatically post line"
 msgstr ""
 
 #. module: shopfloor
