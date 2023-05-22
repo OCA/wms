@@ -769,7 +769,16 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                "This location only contains lines with a package, "
+                "This location only contains lines in packages, "
+                "please scan one of those packages."
+            ),
+        }
+
+    def location_contains_only_stock_with_package_scan_one(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "This location only contains stock in packages, "
                 "please scan one of those packages."
             ),
         }
