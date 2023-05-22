@@ -115,6 +115,13 @@
                   <field name="scan_location_or_pack_first_is_possible" invisible="1" />
                   <field name="scan_location_or_pack_first" />
               </group>
+              <group
+                    name="auto_post_line"
+                    attrs="{'invisible': [('auto_post_line_is_possible', '=', False)]}"
+                >
+                  <field name="auto_post_line_is_possible" invisible="1" />
+                  <field name="auto_post_line" />
+              </group>
             </group>
         </field>
     </record>
