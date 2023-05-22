@@ -4,7 +4,7 @@
 {
     "name": "Shopfloor - Checkout Package Measurement",
     "summary": "Add a screen on checkout scenario for required package measurements.",
-    "version": "14.0.1.0.1",
+    "version": "14.0.1.1.0",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
