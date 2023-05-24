@@ -14,7 +14,7 @@ const SingleProductTransfer = {
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar
-                v-if="state_in(['select_location_or_package', 'select_product', 'set_quantity'])"
+                v-if="state_in(['select_location_or_package', 'select_product', 'set_quantity', 'set_location'])"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
             />
@@ -55,6 +55,33 @@ const SingleProductTransfer = {
                         v-bind="utils.wms.move_line_qty_picker_props(state.data.move_line)"
                     />
                 </v-card>
+            </template>
+            <template v-if="state_is('set_location')">
+                <item-detail-card
+                    :key="make_state_component_key(['move_line', state.data.move_line.id])"
+                    :record="state.data.move_line"
+                    :options="move_line_options_for_set_location()"
+                    :card_color="utils.colors.color_for('screen_step_done')"
+                />
+                <item-detail-card
+                    :key="make_state_component_key(['package_dest', state.data.package.id])"
+                    :record="state.data.package"
+                    :options="{title_action_field: {path: 'name', action_val_path: 'name'}}"
+                    :card_color="utils.colors.color_for('screen_step_done')"
+                />
+                <item-detail-card
+                    :key="make_state_component_key(['location_dest', state.data.move_line.location_dest.id])"
+                    :record="state.data.move_line.location_dest"
+                    :options="{title_action_field: {path: 'name', action_val_path: 'name'}}"
+                    :card_color="utils.colors.color_for('screen_step_todo')"
+                />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back />
+                        </v-col>
+                    </v-row>
+                </div>
             </template>
             <div v-if="state_in(['select_product', 'set_quantity'])" class="button-list button-vertical-list full">
                 <v-row align="center">
@@ -117,6 +144,13 @@ const SingleProductTransfer = {
                 fields: [{path: "lot.name", label: "Lot", action_val_path: "lot.name"}],
             };
         },
+        move_line_options_for_set_location: function () {
+            return {
+                key_title: "product.display_name",
+                loud_labels: true,
+                fields: [{path: "location_src.name", label: "Source Location"}],
+            };
+        },
         get_select_product_scan_params: function (scanned) {
             const params = {
                 barcode: scanned.text,
@@ -167,7 +201,8 @@ const SingleProductTransfer = {
                 set_quantity: {
                     display_info: {
                         title: "Set quantity",
-                        scan_placeholder: "Scan product / package / lot / location",
+                        scan_placeholder:
+                            "Scan product / packaging / lot / location / package",
                     },
                     events: {
                         qty_edit: "on_qty_update",
@@ -194,6 +229,25 @@ const SingleProductTransfer = {
                                 selected_line_id: this.state.data.move_line.id,
                             })
                         );
+                    },
+                },
+                set_location: {
+                    display_info: {
+                        title: "Set location",
+                        scan_placeholder: "Scan location",
+                    },
+                    on_scan: (scanned) => {
+                        this.wait_call(
+                            this.odoo.call("set_location", {
+                                selected_line_id: this.state.data.move_line.id,
+                                package_id: this.state.data.package.id,
+                                barcode: scanned.text,
+                            })
+                        );
+                    },
+                    on_back: () => {
+                        $instance.state_to("set_quantity");
+                        $instance.reset_notification();
                     },
                 },
                 show_completion_info: {
