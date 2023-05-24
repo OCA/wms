@@ -6,13 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-05-24 17:09+0000\n"
+"Last-Translator: Hughes Damry <hughes@damry.org>\n"
 "Language-Team: none\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
@@ -84,7 +86,7 @@ msgstr ""
 #. module: stock_release_channel
 #: model_terms:ir.actions.act_window,help:stock_release_channel.stock_release_channel_config_act_window
 msgid "Add a Release Channel"
-msgstr ""
+msgstr "Ajouter un canal de livraison"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_chain_done
@@ -145,7 +147,7 @@ msgstr ""
 #: code:addons/stock_release_channel/models/stock_picking.py:0
 #, python-format
 msgid "Assign release channel on %s"
-msgstr ""
+msgstr "Assigner un canal de livraison à %s"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
@@ -383,12 +385,12 @@ msgstr ""
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.view_picking_internal_search
 msgid "No Release Channel"
-msgstr ""
+msgstr "Pas de canal de livraison"
 
 #. module: stock_release_channel
 #: model_terms:ir.actions.act_window,help:stock_release_channel.stock_release_channel_act_window
 msgid "No Release Channel configured"
-msgstr ""
+msgstr "Aucun canal de livraison configuré"
 
 #. module: stock_release_channel
 #. odoo-python
@@ -453,7 +455,7 @@ msgstr ""
 #: model:ir.actions.server,name:stock_release_channel.ir_cron_stock_picking_assign_release_channel_ir_actions_server
 #: model:ir.cron,cron_name:stock_release_channel.ir_cron_stock_picking_assign_release_channel
 msgid "Re-assign release channel"
-msgstr ""
+msgstr "Réassigner le canal de livraison"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
@@ -469,7 +471,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_picking__release_channel_id
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.view_picking_internal_search
 msgid "Release Channel"
-msgstr ""
+msgstr "Canal de livraison"
 
 #. module: stock_release_channel
 #: model:ir.actions.act_window,name:stock_release_channel.stock_release_channel_act_window
@@ -477,7 +479,7 @@ msgstr ""
 #: model:ir.ui.menu,name:stock_release_channel.stock_release_channel_config_menu
 #: model:ir.ui.menu,name:stock_release_channel.stock_release_channel_menu
 msgid "Release Channels"
-msgstr ""
+msgstr "Canaux de livraison"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__release_mode
@@ -548,7 +550,7 @@ msgstr ""
 #. module: stock_release_channel
 #: model:ir.model,name:stock_release_channel.model_stock_release_channel
 msgid "Stock Release Channels"
-msgstr ""
+msgstr "Canaux de livraison"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_action_lock_allowed
@@ -708,6 +710,8 @@ msgid ""
 "You cannot release delivery of the channel %s because it has been forbidden "
 "in the release channel configuration"
 msgstr ""
+"Vous ne pouvez pas libérer la livraison du canal %s car c'est interdit dans "
+"sa configuration"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
