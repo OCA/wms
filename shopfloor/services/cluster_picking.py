@@ -533,14 +533,6 @@ class ClusterPicking(Component):
 
     def _scan_line_by_package(self, picking, move_line, package, batch, sublocation):
         """Package scanned, just work with it."""
-        packaging = self._actions_for("packaging")
-        message = None
-        if packaging.package_has_several_products(package):
-            message = self.msg_store.several_products_in_package(package)
-        elif packaging.package_has_several_lots(package):
-            message = self.msg_store.several_lots_in_package(package)
-        if message:
-            return self._pick_next_line(batch, message=message)
         quantity = self._get_prefill_qty(move_line)
         return self._response_for_scan_destination(move_line, qty_done=quantity)
 
