@@ -107,6 +107,7 @@ class ShopfloorRestCerberusValidator(Component):
 class BaseShopfloorValidator(AbstractComponent):
     """Base class for Validators"""
 
+    # pylint: disable = consider-merging-classes-inherited
     _inherit = "base.rest.service"
     _name = "base.shopfloor.validator"
     _collection = "shopfloor.app"

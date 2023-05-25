@@ -14,6 +14,7 @@ class TestShopfloorApp(CommonCase):
     def setUpClassUsers(cls):
         super().setUpClassUsers()
         cls.env = cls.env(user=cls.shopfloor_manager)
+        return
 
     @classmethod
     def setUpClassBaseData(cls):
@@ -31,6 +32,7 @@ class TestShopfloorApp(CommonCase):
                 "short_name": "Test app 2",
             }
         )
+        return
 
     def test_app_create(self):
         # fmt: off

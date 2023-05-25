@@ -4,7 +4,7 @@
 import os
 from functools import wraps
 
-from odoo.modules.module import load_information_from_description_file
+from odoo.modules.module import get_manifest
 from odoo.tools.config import config as odoo_config
 
 
@@ -36,7 +36,7 @@ def get_version(module_name, module_path=None):
     if APP_VERSIONS.get(module_name):
         return APP_VERSIONS[module_name]
     try:
-        info = load_information_from_description_file(module_name, mod_path=module_path)
+        info = get_manifest(module_name, mod_path=module_path)
         APP_VERSIONS[module_name] = info["version"]
         return APP_VERSIONS[module_name]
     except Exception:

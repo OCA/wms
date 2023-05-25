@@ -438,7 +438,7 @@ msgstr ""
 #. module: shopfloor_base
 #: code:addons/shopfloor_base/services/service.py:0
 #, python-format
-msgid "The record %s %s does not exist"
+msgid "The record {model} {_id} does not exist"
 msgstr ""
 
 #. module: shopfloor_base

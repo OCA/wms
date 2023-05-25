@@ -9,6 +9,7 @@ class AppCase(CommonCase):
         super().setUpClassVars()
         cls.profile = cls.env.ref("shopfloor_base.profile_demo_1")
         cls.profile2 = cls.env.ref("shopfloor_base.profile_demo_2")
+        return
 
     def test_user_config(self):
         """Request /app/user_config"""

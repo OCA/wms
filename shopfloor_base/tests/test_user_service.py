@@ -19,6 +19,7 @@ class UserCase(CommonCase, MenuTestMixin):
         cls.env["shopfloor.menu"].search(
             [("id", "not in", cls.menu_items.ids)]
         ).sudo().write({"profile_id": profile1.id})
+        return
 
     def test_menu_no_profile(self):
         """Request /user/menu"""

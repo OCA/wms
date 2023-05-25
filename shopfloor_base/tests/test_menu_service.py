@@ -10,6 +10,7 @@ class MenuCase(CommonCase, MenuTestMixin):
     def setUpClassVars(cls):
         super().setUpClassVars()
         cls.profile = cls.env.ref("shopfloor_base.profile_demo_2")
+        return
 
     def test_menu_search(self):
         """Request /menu/search"""

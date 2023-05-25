@@ -2,10 +2,9 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 from contextlib import contextmanager
 from pprint import pformat
+from unittest import mock
 
-import mock
-
-from odoo.tests.common import SavepointCase
+from odoo.tests.common import TransactionCase
 
 from odoo.addons.base_rest.controllers.main import _PseudoCollection
 from odoo.addons.base_rest.tests.common import RegistryMixin
@@ -27,7 +26,7 @@ class AnyObject:
         return True
 
 
-class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
+class CommonCase(TransactionCase, RegistryMixin, ComponentMixin):
     """Base class for writing Shopfloor tests
 
     All tests are run as normal stock user by default, to check that all the
@@ -93,7 +92,7 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
     def setUp(self):
         # Have to initialize both odoo env and stuff +
         # the Component registry of the mixin
-        SavepointCase.setUp(self)
+        TransactionCase.setUp(self)
         ComponentMixin.setUp(self)
 
     @classmethod
@@ -125,7 +124,7 @@ class CommonCase(SavepointCase, RegistryMixin, ComponentMixin):
     @classmethod
     def setUpClassUsers(cls):
         Users = cls.env["res.users"].with_context(
-            {"no_reset_password": True, "mail_create_nosubscribe": True}
+            no_reset_password=True, mail_create_nosubscribe=True
         )
         cls.shopfloor_user = Users.create(cls._shopfloor_user_values())
         cls.shopfloor_manager = Users.create(cls._shopfloor_manager_values())

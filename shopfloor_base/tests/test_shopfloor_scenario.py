@@ -13,6 +13,7 @@ class TestShopfloorScenario(CommonCase):
     def setUpClassUsers(cls):
         super().setUpClassUsers()
         cls.env = cls.env(user=cls.shopfloor_manager)
+        return
 
     def test_scenario(self):
         rec = self.env["shopfloor.scenario"].create(

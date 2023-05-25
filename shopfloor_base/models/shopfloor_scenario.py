@@ -58,10 +58,11 @@ class ShopfloorScenario(models.Model):
             # make sure is normalized
             self.key = self._normalize_key(self.key)
 
-    @api.model
-    def create(self, vals):
-        self._handle_key(vals)
-        return super().create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            self._handle_key(vals)
+        return super().create(vals_list)
 
     def write(self, vals):
         self._handle_key(vals)

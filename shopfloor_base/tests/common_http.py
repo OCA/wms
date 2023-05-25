@@ -78,4 +78,4 @@ class HttpCommonCase(HttpSavepointCase, RegistryMixin, ComponentMixin):
             headers["SERVICE-CTX-MENU-ID"] = str(menu.id)
         if profile:
             headers["SERVICE-CTX-PROFILE-ID"] = str(profile.id)
-        return requests.get(self._make_url(route), headers=headers)
+        return requests.get(self._make_url(route), headers=headers, timeout=10)

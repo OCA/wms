@@ -454,8 +454,8 @@ msgstr ""
 #. module: shopfloor_base
 #: code:addons/shopfloor_base/services/service.py:0
 #, python-format
-msgid "The record %s %s does not exist"
-msgstr "El registro %s %s no existe"
+msgid "The record {model} {_id} does not exist"
+msgstr "El registro {model} {_id} no existe"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
