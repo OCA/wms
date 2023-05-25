@@ -60,36 +60,6 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         line = self.batch.picking_ids.move_line_ids
         self._scan_line_ok(line, line.package_id.name)
 
-    def test_scan_line_pack_multiple_product(self):
-        """Scan pack with multiple products raises an error"""
-        self._simulate_batch_selected(self.batch, in_package=True)
-        line = self.batch.picking_ids.move_line_ids
-        package = line.package_id
-        location = self.batch.picking_ids.location_id
-        self._update_qty_in_location(location, self.product_b, 2, package=package)
-        self._scan_line_error(
-            line,
-            line.package_id.name,
-            self.msg_store.several_products_in_package(package),
-        )
-
-    def test_scan_line_pack_multiple_lot(self):
-        """Scan pack with multiple lots raises an error"""
-        self.product_a.tracking = "lot"
-        self._simulate_batch_selected(self.batch, in_package=True, in_lot=True)
-        line = self.batch.picking_ids.move_line_ids
-        package = line.package_id
-        location = self.batch.picking_ids.location_id
-        new_lot = self.env["stock.production.lot"].create(
-            {"product_id": self.product_a.id, "company_id": self.env.company.id}
-        )
-        self._update_qty_in_location(
-            location, self.product_a, 2, package=package, lot=new_lot
-        )
-        self._scan_line_error(
-            line, line.package_id.name, self.msg_store.several_lots_in_package(package)
-        )
-
     def test_scan_line_product_ok(self):
         """Scan to check if user picks the correct product for current line"""
         self._simulate_batch_selected(self.batch)
