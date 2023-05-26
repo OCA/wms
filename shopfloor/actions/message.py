@@ -13,6 +13,12 @@ _logger = logging.getLogger(__name__)
 class MessageAction(Component):
     _inherit = "shopfloor.message.action"
 
+    def no_operation_found(self):
+        return {
+            "message_type": "error",
+            "body": _("No operation found for this menu and profile."),
+        }
+
     def no_picking_type(self):
         return {
             "message_type": "error",
@@ -221,6 +227,7 @@ class MessageAction(Component):
             "stock.production.lot": _("Wrong lot."),
             "stock.location": _("Wrong location."),
             "stock.quant.package": _("Wrong pack."),
+            "product.packaging": _("Wrong packaging."),
         }.get(model_name, _("Wrong."))
 
     def wrong_record(self, record):
