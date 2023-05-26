@@ -11,12 +11,36 @@ class DataAction(Component):
 
     @ensure_model("stock.location")
     def location(self, record, **kw):
-        return self._jsonify(
-            record.with_context(location=record.id), self._location_parser, **kw
-        )
+        parser = self._location_parser
+        data = self._jsonify(record.with_context(location=record.id), parser, **kw)
+        if "with_operation_progress" in kw:
+            operation_progress = self._get_location_operations_progress(record)
+            data.update({"operation_progress": operation_progress})
+        return data
 
     def locations(self, record, **kw):
         return self.location(record, multi=True)
+
+    def _get_location_operations_progress(self, location):
+        lines = self.env["stock.move.line"].search(
+            [
+                ("location_id", "=", location.id),
+                ("state", "in", ["partially_available", "assigned"]),
+                ("picking_id.state", "=", "assigned"),
+            ]
+        )
+        # operations_to_do = number of total operations that are pending for this location.
+        # operations_done = number of operations already done.
+        # A line with an assigned package counts as 1 operation.
+        operations_to_do = 0
+        operations_done = 0
+        for line in lines:
+            operations_done += line.qty_done if not line.package_id else 1
+            operations_to_do += line.product_uom_qty if not line.package_id else 1
+        return {
+            "done": operations_done,
+            "to_do": operations_to_do,
+        }
 
     @property
     def _location_parser(self):

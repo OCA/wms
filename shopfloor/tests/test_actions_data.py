@@ -40,6 +40,22 @@ class ActionsDataCase(ActionsDataCaseBase):
         }
         self.assertDictEqual(data, expected)
 
+    def test_data_location_with_operation_progress(self):
+        location = self.stock_location
+        location.sudo().barcode = None
+        data = self.data.location(location, with_operation_progress=True)
+        self.assert_schema(self.schema.location(), data)
+        expected = {
+            "id": location.id,
+            "name": location.name,
+            "barcode": location.name,
+            "operation_progress": {
+                "done": 18.0,
+                "to_do": 165.0,
+            },
+        }
+        self.assertDictEqual(data, expected)
+
     def test_data_lot(self):
         lot = self.env["stock.production.lot"].create(
             {
