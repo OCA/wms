@@ -1,0 +1,21 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_single_product_transfer
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: shopfloor_single_product_transfer
+#: model:shopfloor.menu,name:shopfloor_single_product_transfer.shopfloor_menu_demo_single_product_transfer
+#: model:shopfloor.scenario,name:shopfloor_single_product_transfer.scenario_single_product_transfer
+#: model:stock.picking.type,name:shopfloor_single_product_transfer.picking_type_single_product_transfer_demo
+msgid "Single Product Transfer"
+msgstr ""
