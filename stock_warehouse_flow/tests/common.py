@@ -1,4 +1,5 @@
 # Copyright 2022 Camptocamp SA
+# Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from odoo import fields
@@ -68,3 +69,24 @@ class CommonFlow(SavepointCase):
         for move_line in picking.move_line_ids:
             move_line.qty_done = move_line.product_uom_qty
         picking._action_done()
+
+    def _prepare_split_test(self, qty=None):
+        ship_flow = self._get_flow("ship_only")
+        ship_flow.sequence = 100
+        pick_flow = self._get_flow("pick_ship")
+        pick_flow.write(
+            {
+                "sequence": 1,
+                "split_method": "simple",
+                "qty": qty or 2,
+                "carrier_ids": [(6, 0, ship_flow.carrier_ids.ids)],
+            }
+        )
+        return ship_flow, pick_flow
+
+    def _run_split_flow(self, qty=None):
+        pick_flow = self._get_flow("pick_ship")
+        moves_before = self.env["stock.move"].search([])
+        self._run_procurement(self.product, qty or 5, pick_flow.carrier_ids)
+        moves_after = self.env["stock.move"].search([])
+        return (moves_after - moves_before).sorted(lambda m: m.id)
