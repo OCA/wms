@@ -1,10 +1,13 @@
 # Copyright 2022 Camptocamp SA
+# Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 import logging
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.osv import expression
+from odoo.tools import float_compare
 from odoo.tools.safe_eval import safe_eval
 
 logger = logging.getLogger(__name__)
@@ -136,6 +139,20 @@ class StockWarehouseFlow(models.Model):
             "global overview of the flow configuration."
         ),
     )
+    qty = fields.Float(
+        "Qty",
+        default=0,
+        help="If a qty is set the flow can be applied on moves "
+        "where the move's qty >= the qty set on the flow\n",
+    )
+    uom_id = fields.Many2one(
+        "uom.uom", "Uom", default=lambda self: self.env.ref("uom.product_uom_unit")
+    )
+    split_method = fields.Selection(
+        [("simple", "Simple")],
+        "Split method",
+        help="Simple => move will be split by the qty of the flow or a multiple of it",
+    )
 
     def _default_warehouse_id(self):
         warehouse = self.env["stock.warehouse"].search([])
@@ -176,24 +193,52 @@ class StockWarehouseFlow(models.Model):
             except UserError as exc:
                 flow.warning = str(exc)
 
-    @api.constrains(
-        "warehouse_id", "from_picking_type_id", "carrier_ids", "move_domain"
-    )
-    def _constrains_uniq(self):
-        args = [
-            ("warehouse_id", "=", self.warehouse_id.id),
-            ("from_picking_type_id", "=", self.from_picking_type_id.id),
-        ]
-        flows = self.search(args) - self
-        for flow in flows:
-            if (
+    def _are_apply_conditions_equal(self, flow):
+        self.ensure_one()
+        flow.ensure_one()
+        if (
+            (
                 self.carrier_ids & flow.carrier_ids
                 or not self.carrier_ids
                 and not flow.carrier_ids
-            ) and self.move_domain == flow.move_domain:
+            )
+            and self.move_domain == flow.move_domain
+            and self.qty == flow.qty
+            and self.uom_id == flow.uom_id
+            and self.split_method == flow.split_method
+        ):
+            return True
+        return False
+
+    @api.constrains(
+        "warehouse_id",
+        "from_picking_type_id",
+        "carrier_ids",
+        "move_domain",
+        "qty",
+        "uom_id",
+        "split_method",
+    )
+    def _constrains_uniq(self):
+        for record in self:
+            args = [
+                ("warehouse_id", "=", record.warehouse_id.id),
+                ("from_picking_type_id", "=", record.from_picking_type_id.id),
+            ]
+            flows = record.search(args) - record
+            for flow in flows:
+                if record._are_apply_conditions_equal(flow):
+                    raise UserError(
+                        _("Existing flow '%s' already applies on these kind of moves.")
+                        % flow.name
+                    )
+
+    @api.constrains("qty", "uom_id")
+    def _constrains_qty_uom(self):
+        for record in self:
+            if record.qty and not record.uom_id:
                 raise UserError(
-                    _("Existing flow '%s' already applies on these kind of moves.")
-                    % flow.name
+                    _("Please set the uom field in addition to the qty field")
                 )
 
     @api.onchange("name")
@@ -334,10 +379,17 @@ class StockWarehouseFlow(models.Model):
             domain.append(("carrier_ids", "in", move.group_id.carrier_id.ids))
         else:
             domain.append(("carrier_ids", "=", False))
-        return domain
+        qty_uom_domain = expression.OR(
+            [
+                [("qty", "=", False)],
+                [
+                    ("uom_id.category_id", "=", move.product_uom_category_id.id),
+                ],
+            ]
+        )
+        return expression.AND([domain, qty_uom_domain])
 
-    def _is_valid_for_move(self, move):
-        self.ensure_one()
+    def _is_domain_valid_for_move(self, move):
         if not self.move_domain:
             return move
         domain = safe_eval(self.move_domain or "[]")
@@ -345,21 +397,55 @@ class StockWarehouseFlow(models.Model):
             return move
         return move.filtered_domain(domain)
 
+    def _is_qty_valid_for_move(self, move):
+        if not self.qty:
+            return move
+        if self.uom_id.category_id != move.product_uom_category_id:
+            return move.browse()
+        qty = self.uom_id._compute_quantity(self.qty, move.product_id.uom_id)
+        if qty <= move.product_qty:
+            return move
+        return move.browse()
+
+    def _is_valid_for_move(self, move):
+        self.ensure_one()
+        move = self._is_domain_valid_for_move(move)
+        if not move:
+            return move
+        return self._is_qty_valid_for_move(move)
+
     @api.model
     def _search_for_move(self, move):
-        """Return the first flow matching the move."""
+        """Return matching flows for given move"""
         domain = self._search_for_move_domain(move)
-        flows = self.search(domain)
-        for flow in flows:
-            if flow._is_valid_for_move(move):
-                return flow
-        if flows:
-            raise UserError(
-                _(
-                    "No routing flow available for the move {move} in transfer {picking}."
-                ).format(move=move.display_name, picking=move.picking_id.name)
-            )
-        return self.browse()
+        return self.search(domain)
+
+    @api.model
+    def _search_and_apply_for_move(self, move):
+        move.ensure_one()
+        flows = self._search_for_move(move)
+        if not flows:
+            return move
+        return flows.apply_on_move(move)
+
+    def apply_on_move(self, move):
+        move_ids = []
+        flows = self
+        for flow in self:
+            if not flow._is_valid_for_move(move):
+                continue
+            move_ids.append(move.id)
+            split_moves = flow.split_move(move)
+            # Try to apply the rest of the flows to the split move
+            for split_move in split_moves:
+                move_ids += (flows - flow).apply_on_move(split_move).ids
+            flow._apply_on_move(move)
+            return move.browse(move_ids)
+        raise UserError(
+            _(
+                "No routing flow available for the move {move} in transfer {picking}."
+            ).format(move=move.display_name, picking=move.picking_id.name)
+        )
 
     def _get_rule_from_delivery_route(self, html_exc=False):
         rule = self.delivery_route_id.rule_ids.filtered(
@@ -384,6 +470,51 @@ class StockWarehouseFlow(models.Model):
                 % args
             )
         return rule
+
+    def _prepare_move_split_vals(self, move, split_qty):
+        split_qty_uom = move.product_id.uom_id._compute_quantity(
+            split_qty, move.product_uom, rounding_method="HALF-UP"
+        )
+        return move._prepare_move_split_vals(split_qty_uom)
+
+    def _split_move(self, move, split_qty):
+        split_move = move.copy(self._prepare_move_split_vals(move, split_qty))
+        new_product_qty = move.product_id.uom_id._compute_quantity(
+            move.product_qty - split_qty, move.product_uom, round=False
+        )
+        move.product_uom_qty = new_product_qty
+        return split_move
+
+    def _get_split_qty_multiple_of(self, move, qty, uom=None):
+        """Returns the qty to split
+        split qty = move.product_qty - (a multiple of the given qty)"""
+        product_uom = move.product_id.uom_id
+        if uom:
+            qty = uom._compute_quantity(qty, product_uom)
+        rounding = product_uom.rounding
+        if float_compare(qty, move.product_qty, precision_rounding=rounding) > 0:
+            return
+        multiple_qty = int(move.product_qty / qty) * qty
+        split_qty = move.product_qty - multiple_qty
+        # There is nothing to split if the split_qty is 0
+        # then the move qty is the same or a multiple of the qty
+        if float_compare(split_qty, 0, precision_rounding=rounding) <= 0:
+            return
+        return split_qty
+
+    def _split_move_simple(self, move):
+        split_moves = move.browse([])
+        split_qty = self._get_split_qty_multiple_of(move, self.qty, self.uom_id)
+        if not split_qty:
+            return split_moves
+        return self._split_move(move, split_qty)
+
+    def split_move(self, move):
+        self.ensure_one()
+        split_moves = move.browse([])
+        if self.split_method == "simple":
+            return self._split_move_simple(move)
+        return split_moves
 
     def _apply_on_move(self, move):
         """Apply the flow configuration on the move."""

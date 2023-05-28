@@ -1,4 +1,5 @@
 # Copyright 2022 Camptocamp SA
+# Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from odoo.exceptions import UserError
@@ -99,3 +100,35 @@ class TestWarehouseFlow(common.CommonFlow):
                 (6, 0, self.env.ref("delivery.delivery_carrier").ids)
             ]
             self.env["stock.warehouse.flow"].create(vals)
+
+    def test_flow_qty_uom_constraint(self):
+        flow = self._get_flow("pick_ship")
+        flow.write({"qty": 0, "uom_id": False})
+        with self.assertRaises(UserError):
+            flow.write({"qty": 2})
+
+    def test_split(self):
+        self._prepare_split_test()
+        moves = self._run_split_flow()
+        self.assertEqual(moves.mapped("product_qty"), [4, 1, 4])
+        self.assertEqual(
+            moves.mapped("picking_type_id.code"), ["outgoing", "outgoing", "internal"]
+        )
+
+    def test_nothing_to_split(self):
+        self._prepare_split_test()
+        moves = self._run_split_flow(4)
+        self.assertEqual(moves.mapped("product_qty"), [4, 4])
+        self.assertEqual(moves.mapped("picking_type_id.code"), ["outgoing", "internal"])
+
+    def test_split_no_qty_match(self):
+        ship_flow, pick_flow = self._prepare_split_test(5)
+        ship_flow.unlink()
+        with self.assertRaises(UserError):
+            self._run_split_flow(4)
+
+    def test_split_no_flow_for_split_move(self):
+        ship_flow, pick_flow = self._prepare_split_test()
+        ship_flow.unlink()
+        with self.assertRaises(UserError):
+            self._run_split_flow()
