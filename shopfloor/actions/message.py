@@ -364,6 +364,12 @@ class MessageAction(Component):
             "body": _("This line has a package, please select the package instead."),
         }
 
+    def scan_the_location_first(self):
+        return {
+            "message_type": "warning",
+            "body": _("Please scan the location first."),
+        }
+
     def product_multiple_packages_scan_package(self):
         return {
             "message_type": "warning",
