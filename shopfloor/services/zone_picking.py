@@ -666,7 +666,7 @@ class ZonePicking(Component):
             response = self._list_move_lines(
                 sublocation or self.zone_location, sublocation=sublocation
             )
-            message = self.msg_store.product_not_found()
+            message = self.msg_store.product_not_found_in_pickings()
         return response, message
 
     def _scan_source_lot(
@@ -696,7 +696,7 @@ class ZonePicking(Component):
                 )
             return response, message
         response = self._list_move_lines(sublocation or self.zone_location)
-        message = self.msg_store.lot_not_found()
+        message = self.msg_store.lot_not_found_in_pickings()
         return response, message
 
     def scan_source(
