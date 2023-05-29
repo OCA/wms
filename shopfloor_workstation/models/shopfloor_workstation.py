@@ -23,6 +23,7 @@ class ShopfloorWorkstation(models.Model):
             # TODO : should the default action be checked ?
             user.printing_printer_id = self.printing_printer_id
 
-    sql_constraints = [
-        ("barcode", "unique(barcode)", "This barcode value is already in use.")
+    _sql_constraints = [
+        ("name_unique", "unique(name)", "This name is already in use."),
+        ("barcode_unique", "unique(barcode)", "This barcode is already in use."),
     ]
