@@ -1003,6 +1003,12 @@ msgid "Planned Move Line"
 msgstr "Línea de Movimiento Planificada"
 
 #. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Please scan the location first."
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__prepackaged_product_is_possible
 msgid "Prepackaged Product Is Possible"
 msgstr "Producto PreEmpaquetado Es Posible"
