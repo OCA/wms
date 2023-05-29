@@ -151,7 +151,7 @@ class Reception(Component):
         )
 
     def _select_document_from_move_lines(self, move_lines, msg_func):
-        pickings = move_lines.mapped("move_id.picking_id")
+        pickings = move_lines.move_id.picking_id
         if len(pickings) == 1:
             self._assign_user_to_picking(pickings)
             if (
@@ -180,9 +180,12 @@ class Reception(Component):
         move_lines = self._move_line_by_product(product).filtered(
             lambda l: l.picking_id.picking_type_id.id in self.picking_types.ids
         )
-        return self._select_document_from_move_lines(
-            move_lines, self.msg_store.product_not_found_in_pickings
-        )
+        pickings = move_lines.move_id.picking_id
+        if pickings:
+            return self._response_for_select_document(
+                pickings=pickings,
+                message=self.msg_store.multiple_picks_found_select_manually(),
+            )
 
     def _select_document_from_packaging(self, packaging):
         """Select the document by packaging
@@ -194,9 +197,12 @@ class Reception(Component):
         move_lines = self._move_line_by_packaging(packaging).filtered(
             lambda l: l.picking_id.picking_type_id.id in self.picking_types.ids
         )
-        return self._select_document_from_move_lines(
-            move_lines, self.msg_store.no_transfer_for_packaging
-        )
+        pickings = move_lines.move_id.picking_id
+        if pickings:
+            return self._response_for_select_document(
+                pickings=pickings,
+                message=self.msg_store.multiple_picks_found_select_manually(),
+            )
 
     def _select_document_from_lot(self, lot):
         """Select the document by lot
@@ -208,9 +214,12 @@ class Reception(Component):
         move_lines = self._move_line_by_lot(lot)
         if not move_lines:
             return
-        return self._select_document_from_move_lines(
-            move_lines, self.msg_store.no_transfer_for_lot
-        )
+        pickings = move_lines.move_id.picking_id
+        if pickings:
+            return self._response_for_select_document(
+                pickings=pickings,
+                message=self.msg_store.multiple_picks_found_select_manually(),
+            )
 
     def _select_line(self, picking, line, move, increase_qty_done_by=1):
         product = line.product_id
@@ -294,6 +303,7 @@ class Reception(Component):
                 < today_end
             )
             if len(picking_filter_result_due_today) == 1:
+                self._assign_user_to_picking(picking_filter_result_due_today)
                 return self._select_picking(picking_filter_result_due_today)
             if len(picking_filter_result) > 1:
                 return self._response_for_select_document(
@@ -464,7 +474,7 @@ class Reception(Component):
                 if self.work.menu.auto_post_line:
                     # If option auto_post_line is active in the shopfloor menu,
                     # create a split order with this line.
-                    self._auto_post_line(selected_line, picking)
+                    self._auto_post_line(selected_line)
                 return self._response_for_select_move(picking)
             # Scanned package has no location, move to the location selection
             # screen
@@ -501,11 +511,11 @@ class Reception(Component):
         move_dest_location = selected_line.location_dest_id
         pick_type_dest_location = picking.picking_type_id.default_location_dest_id
 
-        move_dest_location_ok = move_dest_location.parent_path.startswith(
-            location.parent_path
+        move_dest_location_ok = location.parent_path.startswith(
+            move_dest_location.parent_path
         )
-        pick_type_dest_location_ok = pick_type_dest_location.parent_path.startswith(
-            location.parent_path
+        pick_type_dest_location_ok = location.parent_path.startswith(
+            pick_type_dest_location.parent_path
         )
         if move_dest_location_ok or pick_type_dest_location_ok:
             return (move_dest_location_ok, pick_type_dest_location_ok)
@@ -580,12 +590,15 @@ class Reception(Component):
             message=message,
         )
 
-    def _response_for_set_quantity(self, picking, line, message=None):
+    def _response_for_set_quantity(
+        self, picking, line, message=None, asking_confirmation=False
+    ):
         return self._response(
             next_state="set_quantity",
             data={
                 "selected_move_line": self._data_for_move_lines(line),
                 "picking": self.data.picking(picking),
+                "confirmation_required": asking_confirmation,
             },
             message=message,
         )
@@ -874,13 +887,15 @@ class Reception(Component):
             if response:
                 return response
             # Nothing found, ask user if we should create a new pack for the scanned
-            # barcode
+            # barcode.
             if not confirmation:
                 return self._response_for_set_quantity(
                     picking,
                     selected_line,
                     message=self.msg_store.create_new_pack_ask_confirmation(barcode),
+                    asking_confirmation=True,
                 )
+            # Nothing found and we already ask for confirmation, create the new package.
             package = self.env["stock.quant.package"].create({"name": barcode})
             quantity = selected_line.qty_done
             __, qty_check = selected_line._split_qty_to_be_done(
@@ -898,6 +913,10 @@ class Reception(Component):
                     ),
                 )
             selected_line.result_package_id = package
+            if self.work.menu.auto_post_line:
+                # If option auto_post_line is active in the shopfloor menu,
+                # create a split order with this line.
+                self._auto_post_line(selected_line)
             return self._response_for_set_destination(picking, selected_line)
         return self._response_for_set_quantity(
             picking, selected_line, message=self.msg_store.barcode_not_found()
@@ -970,7 +989,7 @@ class Reception(Component):
         selected_line.qty_done = quantity
         return self._response_for_set_destination(picking, selected_line)
 
-    def _auto_post_line(self, selected_line, picking):
+    def _auto_post_line(self, selected_line):
         new_move = selected_line.move_id.split_other_move_lines(
             selected_line, intersection=True
         )
@@ -1037,7 +1056,7 @@ class Reception(Component):
         if self.work.menu.auto_post_line:
             # If option auto_post_line is active in the shopfloor menu,
             # create a split order with this line.
-            self._auto_post_line(selected_line, picking)
+            self._auto_post_line(selected_line)
         return self._response_for_select_move(picking)
 
     def select_dest_package(
@@ -1082,7 +1101,7 @@ class Reception(Component):
             if self.work.menu.auto_post_line:
                 # If option auto_post_line is active in the shopfloor menu,
                 # create a split order with this line.
-                self._auto_post_line(selected_line, picking)
+                self._auto_post_line(selected_line)
             return self._response_for_select_move(picking)
         message = self.msg_store.create_new_pack_ask_confirmation(barcode)
         self._assign_user_to_picking(picking)
@@ -1340,6 +1359,11 @@ class ShopfloorReceptionValidatorResponse(Component):
                 "schema": {"type": "dict", "schema": self.schemas.move_line()},
             },
             "picking": {"type": "dict", "schema": self.schemas.picking()},
+            "confirmation_required": {
+                "type": "boolean",
+                "nullable": True,
+                "required": False,
+            },
         }
 
     @property

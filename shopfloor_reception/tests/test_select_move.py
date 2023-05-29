@@ -89,6 +89,7 @@ class TestSelectLine(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": False,
             },
         )
 
@@ -113,6 +114,7 @@ class TestSelectLine(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": False,
             },
         )
 
@@ -137,6 +139,7 @@ class TestSelectLine(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": False,
             },
         )
 

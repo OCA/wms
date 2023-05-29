@@ -26,7 +26,7 @@ const Reception = {
                 :handler_to_update_date="get_expiration_date_from_lot"
                 v-on:date_picker_selected="state.on_date_picker_selected"
             />
-            <template v-if="state_in(['select_move', 'set_lot', 'set_quantity', 'set_destination'])">
+            <template v-if="state_is('select_move')">
                 <item-detail-card
                     :record="state.data.picking"
                     :options="operation_options()"
@@ -256,13 +256,18 @@ const Reception = {
             return {
                 title_action_field: {action_val_path: "name"},
                 fields: [
+                    {path: "origin", label: "Source Document"},
+                    {path: "partner.name", label: "Partner"},
+                    {path: "carrier"},
                     {
-                        path: "origin",
+                        path: "scheduled_date",
                         renderer: (rec, field) => {
-                            return rec.origin + " - " + rec.partner.name;
+                            return (
+                                "Scheduled Date: " +
+                                this.utils.display.render_field_date(rec, field)
+                            );
                         },
                     },
-                    {path: "carrier"},
                 ],
             };
         },
@@ -277,13 +282,20 @@ const Reception = {
                 list_item_options: {
                     key_title: "name",
                     loud_title: true,
+                    title_action_field: {
+                        action_val_path: "name",
+                    },
                     fields: [
-                        {path: "origin", action_val_path: "name"},
+                        {path: "origin", label: "Source Document"},
+                        {path: "partner.name", label: "Partner"},
                         {path: "carrier"},
                         {
                             path: "scheduled_date",
                             renderer: (rec, field) => {
-                                return this.utils.display.render_field_date(rec, field);
+                                return (
+                                    "Scheduled Date: " +
+                                    this.utils.display.render_field_date(rec, field)
+                                );
                             },
                         },
                         {path: "move_line_count", label: "Lines"},
