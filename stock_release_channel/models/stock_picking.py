@@ -1,4 +1,5 @@
 # Copyright 2020 Camptocamp
+# Copyright 2023 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 from odoo import _, exceptions, fields, models
@@ -10,7 +11,10 @@ class StockPicking(models.Model):
     _inherit = "stock.picking"
 
     release_channel_id = fields.Many2one(
-        comodel_name="stock.release.channel", index=True, ondelete="restrict"
+        comodel_name="stock.release.channel",
+        index=True,
+        ondelete="restrict",
+        copy=False,
     )
     commercial_partner_id = fields.Many2one(
         comodel_name="res.partner",

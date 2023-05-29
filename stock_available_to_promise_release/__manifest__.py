@@ -5,7 +5,7 @@
     "name": "Stock Available to Promise Release",
     "version": "14.0.2.0.1",
     "summary": "Release Operations based on available to promise",
-    "author": "Camptocamp,Odoo Community Association (OCA)",
+    "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "category": "Stock Management",
     "depends": ["stock"],
