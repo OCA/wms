@@ -91,6 +91,16 @@ msgid "Standard Printer"
 msgstr ""
 
 #. module: shopfloor_workstation
+#: model:ir.model.constraint,message:shopfloor_workstation.constraint_shopfloor_workstation_barcode_unique
+msgid "This barcode is already in use."
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model.constraint,message:shopfloor_workstation.constraint_shopfloor_workstation_name_unique
+msgid "This name is already in use."
+msgstr ""
+
+#. module: shopfloor_workstation
 #: model:ir.actions.act_window,name:shopfloor_workstation.action_shopfloor_workstation
 #: model:ir.ui.menu,name:shopfloor_workstation.menu_action_shopfloor_workstation
 msgid "Workstation"
