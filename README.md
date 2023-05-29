@@ -51,7 +51,7 @@ addon | version | maintainers | summary
 [shopfloor_rest_log](shopfloor_rest_log/) | 14.0.1.2.1 | [![simahawk](https://github.com/simahawk.png?size=30px)](https://github.com/simahawk) | Integrate rest_log into Shopfloor app
 [shopfloor_single_product_transfer](shopfloor_single_product_transfer/) | 14.0.1.1.0 | [![mmequignon](https://github.com/mmequignon.png?size=30px)](https://github.com/mmequignon) | Move an item from one location to another.
 [shopfloor_single_product_transfer_mobile](shopfloor_single_product_transfer_mobile/) | 14.0.1.0.0 | [![JuMiSanAr](https://github.com/JuMiSanAr.png?size=30px)](https://github.com/JuMiSanAr) | Mobile frontend for single product transfer scenario
-[shopfloor_workstation](shopfloor_workstation/) | 14.0.1.2.0 |  | Manage warehouse workstation with barcode scanners
+[shopfloor_workstation](shopfloor_workstation/) | 14.0.1.3.0 |  | Manage warehouse workstation with barcode scanners
 [shopfloor_workstation_label_printer](shopfloor_workstation_label_printer/) | 14.0.1.1.0 |  | Adds a label printer configuration to the user and shopfloor workstation.
 [shopfloor_workstation_mobile](shopfloor_workstation_mobile/) | 14.0.1.0.1 |  | Shopfloor mobile app integration for workstation
 [stock_available_to_promise_release](stock_available_to_promise_release/) | 14.0.2.1.0 |  | Release Operations based on available to promise
