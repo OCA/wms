@@ -54,7 +54,7 @@ addon | version | maintainers | summary
 [shopfloor_workstation](shopfloor_workstation/) | 14.0.1.2.0 |  | Manage warehouse workstation with barcode scanners
 [shopfloor_workstation_label_printer](shopfloor_workstation_label_printer/) | 14.0.1.1.0 |  | Adds a label printer configuration to the user and shopfloor workstation.
 [shopfloor_workstation_mobile](shopfloor_workstation_mobile/) | 14.0.1.0.1 |  | Shopfloor mobile app integration for workstation
-[stock_available_to_promise_release](stock_available_to_promise_release/) | 14.0.2.0.1 |  | Release Operations based on available to promise
+[stock_available_to_promise_release](stock_available_to_promise_release/) | 14.0.2.1.0 |  | Release Operations based on available to promise
 [stock_available_to_promise_release_dynamic_routing](stock_available_to_promise_release_dynamic_routing/) | 14.0.1.0.0 |  | Glue between moves release and dynamic routing
 [stock_checkout_sync](stock_checkout_sync/) | 14.0.1.1.0 |  | Sync location for Checkout operations
 [stock_dynamic_routing](stock_dynamic_routing/) | 14.0.1.0.2 |  | Dynamic routing of stock moves
@@ -69,7 +69,7 @@ addon | version | maintainers | summary
 [stock_reception_screen](stock_reception_screen/) | 14.0.1.0.1 |  | Dedicated screen to receive/scan goods.
 [stock_reception_screen_measuring_device](stock_reception_screen_measuring_device/) | 14.0.1.0.0 | [![gurneyalex](https://github.com/gurneyalex.png?size=30px)](https://github.com/gurneyalex) | Allow to use a measuring device from a reception screen.for packaging measurement
 [stock_reception_screen_qty_by_packaging](stock_reception_screen_qty_by_packaging/) | 14.0.1.1.0 |  | Glue module for `stock_product_qty_by_packaging` and `stock_vertical_lift`.
-[stock_release_channel](stock_release_channel/) | 14.0.1.2.0 | [![sebalix](https://github.com/sebalix.png?size=30px)](https://github.com/sebalix) | Manage workload in WMS with release channels
+[stock_release_channel](stock_release_channel/) | 14.0.1.3.0 | [![sebalix](https://github.com/sebalix.png?size=30px)](https://github.com/sebalix) | Manage workload in WMS with release channels
 [stock_storage_type](stock_storage_type/) | 14.0.1.12.0 |  | Manage packages and locations storage types
 [stock_storage_type_buffer](stock_storage_type_buffer/) | 14.0.1.3.0 |  | Exclude storage locations from put-away if their buffer is full
 [stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 14.0.1.0.0 |  | Advanced storage strategy ABC for WMS
