@@ -136,6 +136,18 @@ class MessageAction(Component):
             "body": _("Package {} is not empty.").format(package.name),
         }
 
+    def package_selected_is_empty(self, package):
+        return {
+            "message_type": "info",
+            "body": _("Package %s is empty, scan a location.", package.name),
+        }
+
+    def package_not_empty_anymore(self, package):
+        return {
+            "message_type": "warning",
+            "body": _("Package %s is not empty anmyore.", package.name),
+        }
+
     def package_already_used(self, package):
         return {
             "message_type": "warning",
