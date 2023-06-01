@@ -217,6 +217,9 @@ class LocationContentTransfer(Component):
             ("picking_id.state", "=", "assigned"),
         ]
 
+    def _find_location_move_lines_from_scan_location(self, *args, **kwargs):
+        return self._find_location_move_lines(*args, **kwargs)
+
     def _find_location_move_lines(self, location):
         """Find lines that potentially are to move in the location"""
         return self.env["stock.move.line"].search(
@@ -353,7 +356,7 @@ class LocationContentTransfer(Component):
                 message=self.msg_store.cannot_move_something_in_picking_type()
             )
 
-        move_lines = self._find_location_move_lines(location)
+        move_lines = self._find_location_move_lines_from_scan_location(location)
 
         savepoint = self._actions_for("savepoint").new()
         unreserve = self._actions_for("stock.unreserve")
