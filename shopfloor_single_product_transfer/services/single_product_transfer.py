@@ -139,40 +139,15 @@ class ShopfloorSingleProductTransfer(Component):
             )
             return self._response_for_select_location_or_package(message=message)
 
-    def _scan_product__scan_packaging(self, barcode, location=None, package=None):
-        search = self._actions_for("search")
-        packaging = search.packaging_from_scan(barcode)
-        handlers = [
-            self._scan_product__check_tracking,
-            self._scan_product__select_move_line,
-            # If no line is found, we might try to create one,
-            # if allow_move_create is True
-            self._scan_product__check_create_move_line,
-            # First, try to create a move line with the available quantity
-            self._scan_product__create_move_line,
-            # If no stock is available at first, try to unreserve moves if option
-            # allow_unreserve_other_moves is enabled
-            self._scan_product__unreserve_move_line,
-            # Check again if there's some unreserved qty
-            self._scan_product__create_move_line,
-            # Then return a `no product available` error
-            self._scan_product__no_stock_available,
-        ]
-        if packaging:
-            product = packaging.product_id
-            response = self._use_handlers(
-                handlers,
-                product,
-                location=location,
-                package=package,
-                packaging=packaging,
+    def _scan_package__check_stock(self, package):
+        """Check if this package corresponds to any of the allowed locations."""
+        if not package.quant_ids:
+            message = self.msg_store.package_not_allowed_in_src_location(
+                package.name, self.picking_types
             )
-            if response:
-                return response
+            return self._response_for_select_location_or_package(message=message)
 
-    def _scan_product__scan_product(self, barcode, location=None, package=None):
-        search = self._actions_for("search")
-        product = search.product_from_scan(barcode)
+    def _scan_product__scan_packaging(self, packaging, location=None, package=None):
         handlers = [
             self._scan_product__check_tracking,
             self._scan_product__select_move_line,
@@ -189,12 +164,33 @@ class ShopfloorSingleProductTransfer(Component):
             # Then return a `no product available` error
             self._scan_product__no_stock_available,
         ]
-        if product:
-            response = self._use_handlers(
-                handlers, product, location=location, package=package
-            )
-            if response:
-                return response
+        product = packaging.product_id
+        return self._use_handlers(
+            handlers,
+            product,
+            location=location,
+            package=package,
+            packaging=packaging,
+        )
+
+    def _scan_product__scan_product(self, product, location=None, package=None):
+        handlers = [
+            self._scan_product__check_tracking,
+            self._scan_product__select_move_line,
+            # If no line is found, we might try to create one,
+            # if allow_move_create is True
+            self._scan_product__check_create_move_line,
+            # First, try to create a move line with the available quantity
+            self._scan_product__create_move_line,
+            # If no stock is available at first, try to unreserve moves if option
+            # allow_unreserve_other_moves is enabled
+            self._scan_product__unreserve_move_line,
+            # Check again if there's some unreserved qty
+            self._scan_product__create_move_line,
+            # Then return a `no product available` error
+            self._scan_product__no_stock_available,
+        ]
+        return self._use_handlers(handlers, product, location=location, package=package)
 
     def _scan_product__check_tracking(
         self, product, location=None, package=None, lot=None, packaging=None
@@ -327,11 +323,12 @@ class ShopfloorSingleProductTransfer(Component):
         if ignore_no_putaway_available and no_putaway_available:
             message = self.msg_store.no_putaway_destination_available()
             return self._response_for_select_product(
-                location=move_line.location_id, package=move_line.package_id, message=message
+                location=move_line.location_id,
+                package=move_line.package_id,
+                message=message,
             )
 
-    def _scan_product__scan_lot(self, barcode, location=None, package=None):
-        search = self._actions_for("search")
+    def _scan_product__scan_lot(self, lot, location=None, package=None):
         handlers = [
             self._scan_product__select_move_line,
             # If no line is found, we might try to create one,
@@ -347,14 +344,12 @@ class ShopfloorSingleProductTransfer(Component):
             # Then return a `no product available` error
             self._scan_product__no_stock_available,
         ]
-        lot = search.lot_from_scan(barcode)
-        if lot:
-            product = lot.product_id
-            product_response = self._use_handlers(
-                handlers, product, location=location, package=package, lot=lot
-            )
-            if product_response:
-                return product_response
+        product = lot.product_id
+        product_response = self._use_handlers(
+            handlers, product, location=location, package=package, lot=lot
+        )
+        if product_response:
+            return product_response
 
     def _use_handlers(self, handlers, *args, **kwargs):
         # TODO: each handler should raise a Shopfloor dedicated exception
@@ -507,36 +502,19 @@ class ShopfloorSingleProductTransfer(Component):
             self._set_quantity__increment_qty_done,
         )
 
-    def _set_quantity__scan_product(self, move_line, barcode, confirmation=False):
-        search = self._actions_for("search")
-        product = search.product_from_scan(barcode)
+    def _set_quantity__by_product(self, move_line, product, confirmation=False):
         handlers = self._set_quantity__scan_product_handlers()
-        if product:
-            response = self._use_handlers(handlers, move_line, product)
-            if response:
-                return response
+        return self._use_handlers(handlers, move_line, product)
 
-    def _set_quantity__scan_lot(self, move_line, barcode, confirmation=False):
-        search = self._actions_for("search")
-        lot = search.lot_from_scan(barcode)
+    def _set_quantity__by_lot(self, move_line, lot, confirmation=False):
         handlers = self._set_quantity__scan_product_handlers()
-        if lot:
-            product = lot.product_id
-            response = self._use_handlers(handlers, move_line, product, lot=lot)
-            if response:
-                return response
+        product = lot.product_id
+        return self._use_handlers(handlers, move_line, product, lot=lot)
 
-    def _set_quantity__scan_packaging(self, move_line, barcode, confirmation=False):
-        search = self._actions_for("search")
-        packaging = search.packaging_from_scan(barcode)
+    def _set_quantity__by_packaging(self, move_line, packaging, confirmation=False):
         handlers = self._set_quantity__scan_product_handlers()
-        if packaging:
-            product = packaging.product_id
-            response = self._use_handlers(
-                handlers, move_line, product, packaging=packaging
-            )
-            if response:
-                return response
+        product = packaging.product_id
+        return self._use_handlers(handlers, move_line, product, packaging=packaging)
 
     def _set_quantity__valid_dest_location_for_move_line_domain(self, move_line):
         move_line_dest_location = move_line.location_dest_id
@@ -626,7 +604,10 @@ class ShopfloorSingleProductTransfer(Component):
         completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(move_line)
         return self._response_for_select_product(
-            location=move_line.location_id, package=move_line.package_id, message=message, popup=completion_info_popup
+            location=move_line.location_id,
+            package=move_line.package_id,
+            message=message,
+            popup=completion_info_popup,
         )
 
     def _post_move(self, move_line):
@@ -645,27 +626,6 @@ class ShopfloorSingleProductTransfer(Component):
         # In case of full quantity, post the initial move
         move_line.move_id.extract_and_action_done()
 
-    def _set_quantity__package_not_empty(self, move_line, package, confirmation=False):
-        if any(package.quant_ids):
-            location = package.location_id
-            handlers = [
-                # Cannot confirm if qty_done is not valid (> qty todo)
-                self._set_quantity__check_location,
-                self._set_quantity__post_move,
-            ]
-            if location:
-                response = self._use_handlers(
-                    handlers, move_line, location=location, confirmation=confirmation
-                )
-                if response:
-                    move_line.result_package_id = package
-                    return response
-
-    def _set_quantity__package_empty(self, move_line, package, confirmation=False):
-        if not package.quant_ids:
-            move_line.result_package_id = package
-            return self._response_for_set_location(move_line, package)
-
     def _find_user_move_line_domain(self, user):
         return [
             ("picking_id.user_id", "in", (False, self.env.uid)),
@@ -680,58 +640,61 @@ class ShopfloorSingleProductTransfer(Component):
         domain = self._find_user_move_line_domain(user)
         return self.env["stock.move.line"].search(domain, limit=1)
 
-    def _set_quantity__by_product(self, move_line, barcode, confirmation=False):
-        product_handlers = [
-            self._set_quantity__scan_product,
-            self._set_quantity__scan_packaging,
-            self._set_quantity__scan_lot,
+    def _set_quantity__by_location_handlers(self):
+        return [
+            self._set_quantity__check_location,
+            self._set_quantity__post_move,
         ]
-        product_response = self._use_handlers(product_handlers, move_line, barcode)
-        if product_response:
-            return product_response
 
-    def _set_quantity__by_location(self, move_line, barcode, confirmation=False):
-        search = self._actions_for("search")
-        location = search.location_from_scan(barcode)
-        if location:
-            move_line.result_package_id = False
-            handlers = [
-                # Cannot confirm if qty_done is not valid (> qty todo)
-                self._set_quantity__check_quantity_done,
-                self._set_quantity__check_location,
-                self._set_quantity__post_move,
-            ]
+    def _set_quantity__by_location(self, move_line, location, confirmation=False):
+        # We're about to leave the `set_quantity` screen.
+        # First ensure that quantity is valid.
+        invalid_qty_response = self._set_quantity__check_quantity_done(move_line)
+        if invalid_qty_response:
+            return invalid_qty_response
+        move_line.result_package_id = False
+        handlers = self._set_quantity__by_location_handlers()
+        response = self._use_handlers(
+            handlers, move_line, location, confirmation=confirmation
+        )
+        if response:
+            return response
+
+    def _set_quantity__by_package(self, move_line, package, confirmation=False):
+        # We're about to leave the `set_quantity` screen.
+        # First ensure that quantity is valid.
+        invalid_qty_response = self._set_quantity__check_quantity_done(move_line)
+        if invalid_qty_response:
+            return invalid_qty_response
+        # If package isn't empty, then check its location then post the move
+        if package.quant_ids:
+            location = package.location_id
+            handlers = self._set_quantity__by_location_handlers()
             response = self._use_handlers(
-                handlers, move_line, location=location, confirmation=confirmation
+                handlers, move_line, location, confirmation=confirmation
             )
-            if response:
-                return response
+            move_line.result_package_id = package
+            return response
+        # Else, go to `set_location` screen
+        move_line.result_package_id = package
+        return self._response_for_set_location(move_line, package)
 
-    def _set_quantity__by_package(self, move_line, barcode, confirmation=False):
-        search = self._actions_for("search")
-        package = search.package_from_scan(barcode)
-        handlers = [
-            self._set_quantity__check_quantity_done,
-            self._set_quantity__package_not_empty,
-            self._set_quantity__package_empty,
-        ]
-        if package:
-            response = self._use_handlers(
-                handlers, move_line, package=package, confirmation=confirmation
-            )
-            if response:
-                return response
-
-    def _scan_package(self, package):
+    def _scan_location_or_package__by_package(self, package):
         handlers = [
             self._scan_package__check_location,
+            self._scan_package__check_stock,
         ]
         response = self._use_handlers(handlers, package)
         if response:
             return response
-        return self._response_for_select_product(package=package)
+        return self._response_for_select_product(
+            package=package, location=package.location_id
+        )
 
-    def _scan_location(self, location, quants):
+    def _scan_location_or_package__by_location(self, location):
+        quants_in_location = self.env["stock.quant"].search(
+            [("location_id", "=", location.id), ("quantity", ">", 0)]
+        )
         handlers = [
             self._scan_location__location_found,
             self._scan_location__check_location,
@@ -739,7 +702,7 @@ class ShopfloorSingleProductTransfer(Component):
             self._scan_location__check_stock_packages,
             self._scan_location__check_line_packages,
         ]
-        response = self._use_handlers(handlers, location, quants)
+        response = self._use_handlers(handlers, location, quants_in_location)
         if response:
             return response
         return self._response_for_select_product(location=location)
@@ -766,14 +729,16 @@ class ShopfloorSingleProductTransfer(Component):
         * start: no stock found or wrong barcode
         """
         search = self._actions_for("search")
-        package = search.package_from_scan(barcode)
-        if package:
-            return self._scan_package(package)
-        location = search.location_from_scan(barcode)
-        quants_in_location = self.env["stock.quant"].search(
-            [("location_id", "=", location.id), ("quantity", ">", 0)]
-        )
-        return self._scan_location(location, quants_in_location)
+        handlers_by_type = {
+            "package": self._scan_location_or_package__by_package,
+            "location": self._scan_location_or_package__by_location,
+        }
+        search_result = search.find(barcode, types=handlers_by_type.keys())
+        handler = handlers_by_type.get(search_result.type)
+        if handler:
+            return handler(search_result.record)
+        message = self.msg_store.barcode_not_found()
+        return self._response_for_select_location_or_package(message=message)
 
     @with_savepoint
     def scan_product(self, barcode, location_id=None, package_id=None):
@@ -796,16 +761,16 @@ class ShopfloorSingleProductTransfer(Component):
         package = self.env["stock.quant.package"].browse(package_id)
         if not location.exists() and not package.exists():
             return self._response_for_select_location_or_package()
-        handlers = [
-            self._scan_product__scan_product,
-            self._scan_product__scan_packaging,
-            self._scan_product__scan_lot,
-        ]
-        response = self._use_handlers(
-            handlers, barcode, location=location, package=package
-        )
-        if response:
-            return response
+        handlers_by_type = {
+            "product": self._scan_product__scan_product,
+            "packaging": self._scan_product__scan_packaging,
+            "lot": self._scan_product__scan_lot,
+        }
+        search = self._actions_for("search")
+        search_result = search.find(barcode, types=handlers_by_type.keys())
+        handler = handlers_by_type.get(search_result.type)
+        if handler:
+            return handler(search_result.record, location=location, package=package)
         message = self.msg_store.barcode_not_found()
         return self._response_for_select_product(
             location=location, package=package, message=message
@@ -824,19 +789,21 @@ class ShopfloorSingleProductTransfer(Component):
             # TODO Should probably return to scan_product or scan_location?
             return self._response_for_set_quantity(move_line)
         self._set_quantity__set_picker_qty(move_line, quantity)
-        handlers = [
+        handlers_by_type = {
             # Increment qty done if a product / lot / packaging is scanned
-            self._set_quantity__by_product,
+            "product": self._set_quantity__by_product,
+            "lot": self._set_quantity__by_lot,
+            "packaging": self._set_quantity__by_packaging,
             # Post the move if a location is scanned
-            self._set_quantity__by_location,
+            "location": self._set_quantity__by_location,
             # Puts the product in a new or an existing pack
-            self._set_quantity__by_package,
-        ]
-        response = self._use_handlers(
-            handlers, move_line, barcode, confirmation=confirmation
-        )
-        if response:
-            return response
+            "package": self._set_quantity__by_package,
+        }
+        search = self._actions_for("search")
+        search_result = search.find(barcode, types=handlers_by_type.keys())
+        handler = handlers_by_type.get(search_result.type)
+        if handler:
+            return handler(move_line, search_result.record, confirmation=confirmation)
         message = self.msg_store.barcode_not_found()
         return self._response_for_set_quantity(move_line, message=message)
 
@@ -851,10 +818,15 @@ class ShopfloorSingleProductTransfer(Component):
         if a package is scanned using the set_quantity endpoint.
         """
         move_line = self.env["stock.move.line"].browse(selected_line_id)
-        response = self._set_quantity__by_location(move_line, barcode)
-        if response:
-            move_line.result_package_id = package_id
-            return response
+        handlers_by_type = {
+            # Post the move if a location is scanned
+            "location": self._set_quantity__by_location,
+        }
+        search = self._actions_for("search")
+        search_result = search.find(barcode, types=handlers_by_type.keys())
+        handler = handlers_by_type.get(search_result.type)
+        if handler:
+            return handler(move_line, search_result.record)
         package = self.env["stock.quant.package"].browse(package_id)
         message = self.msg_store.barcode_not_found()
         return self._response_for_set_location(move_line, package, message=message)
