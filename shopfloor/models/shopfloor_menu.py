@@ -199,13 +199,9 @@ class ShopfloorMenu(models.Model):
     @api.onchange("unload_package_at_destination")
     def _onchange_unload_package_at_destination(self):
         # Uncheck pick_pack_same_time when unload_package_at_destination is set to True
-        # Ensure that multiple_move_single_pack is False when
-        # unload_package_at_destination is checked out
         for record in self:
             if record.unload_package_at_destination:
                 record.pick_pack_same_time = False
-            else:
-                record.multiple_move_single_pack = False
 
     @api.onchange("pick_pack_same_time")
     def _onchange_pick_pack_same_time(self):
@@ -219,10 +215,8 @@ class ShopfloorMenu(models.Model):
     @api.onchange("multiple_move_single_pack")
     def _onchange_multiple_move_single_pack(self):
         # multiple_move_single_pack is incompatible with pick_pack_same_time,
-        # and requires unload_package_at_destination to be set
         for record in self:
             if record.multiple_move_single_pack:
-                record.unload_package_at_destination = True
                 record.pick_pack_same_time = False
 
     @api.constrains(
@@ -243,13 +237,6 @@ class ShopfloorMenu(models.Model):
                 _(
                     "'Pick and pack at the same time' is incompatible with "
                     "'Multiple moves same destination package'."
-                )
-            )
-        elif self.multiple_move_single_pack and not self.unload_package_at_destination:
-            raise exceptions.UserError(
-                _(
-                    "'Multiple moves same destination package' is mandatory when "
-                    "'Pick and pack at the same time' is set."
                 )
             )
 
