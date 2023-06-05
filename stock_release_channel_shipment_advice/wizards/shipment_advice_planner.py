@@ -28,9 +28,9 @@ class ShipmentAdvicePlanner(models.TransientModel):
                 super(ShipmentAdvicePlanner, rec)._compute_picking_to_plan_ids()
         return True
 
-    def _prepare_shipment_advice_common_vals(self, warehouse):
+    def _prepare_shipment_advice_common_vals(self, picking_type):
         self.ensure_one()
-        vals = super()._prepare_shipment_advice_common_vals(warehouse)
+        vals = super()._prepare_shipment_advice_common_vals(picking_type)
         if self.release_channel_id:
             vals["release_channel_id"] = self.release_channel_id.id
         return vals
