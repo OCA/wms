@@ -782,15 +782,6 @@ msgstr ""
 "operación parcial?"
 
 #. module: shopfloor
-#: code:addons/shopfloor/services/checkout.py:0
-#, python-format
-msgid ""
-"Not allowed to pack more than the quantity, the value has been changed to "
-"the maximum."
-msgstr ""
-"No se permite empacar más de la cantidad, el valor se ha cambiado al máximo."
-
-#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__picking_type_ids
 msgid "Operation Types"
 msgstr "Tipos de Operación"
@@ -1000,6 +991,13 @@ msgstr "¿Colocarlo en {}?"
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__planned_move_line_ids
 msgid "Planned Move Line"
 msgstr "Línea de Movimiento Planificada"
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"Please note that the scanned quantity is higher than the maximum allowed."
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1475,6 +1473,14 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid ""
+"The quantity scanned for one or more lines cannot be higher than the maximum "
+"allowed."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "The record you were working on does not exist anymore."
 msgstr "El registro en el que estaba trabajando ya no existe."
 
@@ -1832,6 +1838,14 @@ msgstr "{} no encontrado en la transferencia actual o ya está en un paquete."
 #, python-format
 msgid "{} {} put in {}"
 msgstr "{} {} poner en {}"
+
+#, python-format
+#~ msgid ""
+#~ "Not allowed to pack more than the quantity, the value has been changed to "
+#~ "the maximum."
+#~ msgstr ""
+#~ "No se permite empacar más de la cantidad, el valor se ha cambiado al "
+#~ "máximo."
 
 #, python-format
 #~ msgid "No lot found among current transfers."
