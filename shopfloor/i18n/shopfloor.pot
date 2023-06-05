@@ -724,14 +724,6 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
-#: code:addons/shopfloor/services/checkout.py:0
-#, python-format
-msgid ""
-"Not allowed to pack more than the quantity, the value has been changed to "
-"the maximum."
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__picking_type_ids
 msgid "Operation Types"
 msgstr ""
@@ -932,6 +924,13 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__planned_move_line_ids
 msgid "Planned Move Line"
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"Please note that the scanned quantity is higher than the maximum allowed."
 msgstr ""
 
 #. module: shopfloor
@@ -1373,6 +1372,14 @@ msgid ""
 "side-level'. Pay attention to the padding ('09' is before '19', '9' is not)."
 " It is recommended to use an Export then an Import to populate this field "
 "using a spreadsheet."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"The quantity scanned for one or more lines cannot be higher than the maximum"
+" allowed."
 msgstr ""
 
 #. module: shopfloor
