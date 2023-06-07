@@ -272,7 +272,7 @@ class Reception(Component):
         self._assign_user_to_line(line)
         line.qty_done += qty_done
         if product.tracking not in ("lot", "serial") or (line.lot_id or line.lot_name):
-            return self._response_for_set_quantity(picking, line)
+            return self._before_state__set_quantity(picking, line)
         return self._response_for_set_lot(picking, line)
 
     def _select_line__filter_lines_by_packaging__return(self, lines, packaging):
@@ -782,6 +782,10 @@ class Reception(Component):
             for line in lines:
                 line.product_uom_qty = line.qty_done + remaining_todo
 
+    def _before_state__set_quantity(self, picking, line, message=None):
+        # Used by inherting module  see shopfloor_reception_packaging_dimension
+        return self._response_for_set_quantity(picking, line, message=message)
+
     def _response_for_set_quantity(
         self, picking, line, message=None, asking_confirmation=False
     ):
@@ -1043,7 +1047,7 @@ class Reception(Component):
         message = self._check_expiry_date(selected_line)
         if message:
             return self._response_for_set_lot(picking, selected_line, message=message)
-        return self._response_for_set_quantity(picking, selected_line)
+        return self._before_state__set_quantity(picking, selected_line)
 
     def _check_expiry_date(self, line):
         use_expiration_date = (
