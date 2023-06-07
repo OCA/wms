@@ -51,7 +51,7 @@ class StockReleaseChannel(models.Model):
         for rec in self:
             rec.picking_to_plan_ids = rec.picking_ids.filtered(
                 lambda p, wh=rec.warehouse_id: p.can_be_planned_in_shipment_advice
-                and (not wh or p.warehouse_id == wh)
+                and (not wh or p.picking_type_id.warehouse_id == wh)
             )
 
     def button_plan_shipments(self):
