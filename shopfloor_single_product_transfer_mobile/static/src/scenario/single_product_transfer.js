@@ -20,22 +20,16 @@ const SingleProductTransfer = {
             />
             <template v-if="state_is('select_product')">
                 <item-detail-card
-                    v-if="display_location_operations_progress()"
-                    :key="make_state_component_key(['deliver-operations-progress', state.data.location.id])"
-                    :record="state.data.location.operation_progress"
-                    :options="detail_card_location_operation_progress_options()"
-                    :card_color="detail_card_location_operation_progress_color()"
+                    v-if="display_operations_progress()"
+                    :key="make_state_component_key(['operations-progress', get_select_product_package_or_location_data().id])"
+                    :record="get_select_product_package_or_location_data().operation_progress"
+                    :options="detail_card_operation_progress_options()"
+                    :card_color="detail_card_operation_progress_color()"
                 />
                 <item-detail-card
-                    v-if="state.data.location"
-                    :key="make_state_component_key(['location_src', state.data.location.id])"
-                    :record="state.data.location"
-                    :card_color="utils.colors.color_for('screen_step_done')"
-                />
-                <item-detail-card
-                    v-if="state.data.package"
-                    :key="make_state_component_key(['package', state.data.package.id])"
-                    :record="state.data.package"
+                    v-if="get_select_product_package_or_location_data()"
+                    :key="make_state_component_key(['location-or-package', get_select_product_package_or_location_data().id])"
+                    :record="get_select_product_package_or_location_data()"
                     :card_color="utils.colors.color_for('screen_step_done')"
                 />
             </template>
@@ -168,13 +162,19 @@ const SingleProductTransfer = {
             params.package_id = state_package.id;
             return params;
         },
-        display_location_operations_progress: function () {
+        get_select_product_package_or_location_data: function () {
+            if (this.state.data.location) {
+                return this.state.data.location;
+            }
+            return this.state.data.package;
+        },
+        display_operations_progress: function () {
             const operation_progress = this._get_operation_progress_data();
             if (operation_progress) {
                 return operation_progress.to_do > 0;
             }
         },
-        detail_card_location_operation_progress_options: function () {
+        detail_card_operation_progress_options: function () {
             return {
                 no_title: true,
                 fields: [
@@ -191,7 +191,7 @@ const SingleProductTransfer = {
                 ],
             };
         },
-        detail_card_location_operation_progress_color: function () {
+        detail_card_operation_progress_color: function () {
             const operation_progress = this._get_operation_progress_data();
             if (operation_progress.done === operation_progress.to_do) {
                 return this.utils.colors.color_for("screen_step_done");
@@ -200,7 +200,11 @@ const SingleProductTransfer = {
             }
         },
         _get_operation_progress_data: function () {
-            return _.result(this.state, "data.location.operation_progress", false);
+            return _.result(
+                this.get_select_product_package_or_location_data(),
+                "operation_progress",
+                false
+            );
         },
     },
     data: function () {
