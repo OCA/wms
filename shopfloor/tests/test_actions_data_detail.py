@@ -32,9 +32,10 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         )
 
     def test_data_packaging(self):
-        data = self.data_detail.packaging(self.packaging)
-        self.assert_schema(self.schema_detail.packaging(), data)
-        self.assertDictEqual(data, self._expected_packaging(self.packaging))
+        self.packaging.barcode = "barcode"
+        data = self.data_detail.packaging_detail(self.packaging)
+        self.assert_schema(self.schema_detail.packaging_detail(), data)
+        self.assertDictEqual(data, self._expected_packaging_detail(self.packaging))
 
     def test_data_lot(self):
         lot = self.env["stock.production.lot"].create(

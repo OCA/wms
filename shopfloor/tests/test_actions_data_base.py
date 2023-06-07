@@ -242,3 +242,17 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
                 }
             )
         return dict(**self._expected_product(record), **detail)
+
+    def _expected_packaging_detail(self, record, **kw):
+        return dict(
+            **self._expected_packaging(record),
+            **{
+                "length": record.packaging_length,
+                "width": record.width,
+                "height": record.height,
+                "max_weight": record.max_weight,
+                "length_uom": record.length_uom_name,
+                "weight_uom": record.weight_uom_name,
+                "barcode": record.barcode,
+            }
+        )
