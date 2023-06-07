@@ -10,10 +10,6 @@
     "license": "AGPL-3",
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
-    "depends": [
-        "stock_release_channel",
-    ],
-    "data": [
-        "views/stock_release_channel.xml",
-    ],
+    "depends": ["stock_release_channel"],
+    "data": ["views/stock_picking_type.xml"],
 }

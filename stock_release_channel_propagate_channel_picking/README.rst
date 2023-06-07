@@ -19,9 +19,9 @@ Stock Release Channel Propagate Channel Picking
 .. |badge4| image:: https://img.shields.io/badge/weblate-Translate%20me-F47D42.png
     :target: https://translation.odoo-community.org/projects/wms-16-0/wms-16-0-stock_release_channel_propagate_channel_picking
     :alt: Translate me on Weblate
-.. |badge5| image:: https://img.shields.io/badge/runbot-Try%20me-875A7B.png
-    :target: https://runbot.odoo-community.org/runbot/285/16.0
-    :alt: Try me on Runbot
+.. |badge5| image:: https://img.shields.io/badge/runboat-Try%20me-875A7B.png
+    :target: https://runboat.odoo-community.org/webui/builds.html?repo=OCA/wms&target_branch=16.0
+    :alt: Try me on Runboat
 
 |badge1| |badge2| |badge3| |badge4| |badge5| 
 
@@ -36,10 +36,9 @@ outgoing picking (the source of release) to the internal pickings.
 Configuration
 =============
 
-* Go to Inventory > Operations > Release Channels
-* For the channel you want to configure, click on the three dots on the
-  right of channel card and click on Settings.
-* Then, check the 'Propagate to Pickings Chain' box.
+* Go to Inventory > Configuration > Settings > Operations Types
+* Select the outgoing operation type.
+* Then, check the 'Propagate the release channel to pickings chain' box.
 
 Usage
 =====

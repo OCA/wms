@@ -14,7 +14,7 @@ class TestReleaseChannelProcurement(ReleaseChannelCase):
         super().setUpClass()
         cls._update_qty_in_location(cls.wh.lot_stock_id, cls.product1, 20.0)
         cls._update_qty_in_location(cls.wh.lot_stock_id, cls.product2, 20.0)
-        cls.default_channel.propagate_to_pickings_chain = True
+        cls.wh.out_type_id.propagate_to_pickings_chain = True
 
     @classmethod
     def _create_propagate_channel(cls):
@@ -23,7 +23,6 @@ class TestReleaseChannelProcurement(ReleaseChannelCase):
                 "name": "Propagate Channel",
                 "sequence": 200,
                 "rule_domain": [],
-                "propagate_to_pickings_chain": True,
             }
         )
 
@@ -62,7 +61,7 @@ class TestReleaseChannelProcurement(ReleaseChannelCase):
         Release the channel
         Check the picking is well created and channel is not set
         """
-        self.default_channel.propagate_to_pickings_chain = False
+        self.wh.out_type_id.propagate_to_pickings_chain = False
         self.product = self.product1
         pickings_before = self.env["stock.picking"].search(
             [("product_id", "=", self.product.id)]

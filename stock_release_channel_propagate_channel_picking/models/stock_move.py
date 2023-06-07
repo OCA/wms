@@ -16,10 +16,7 @@ class StockMove(models.Model):
         """
         pickings_per_channel = defaultdict(set)
         for move in self:
-            if (
-                not move.picking_id.release_channel_id
-                or not move.picking_id.release_channel_id.propagate_to_pickings_chain
-            ):
+            if not move.picking_type_id.propagate_to_pickings_chain:
                 continue
             moves = move.mapped("move_orig_ids")
             while moves:
