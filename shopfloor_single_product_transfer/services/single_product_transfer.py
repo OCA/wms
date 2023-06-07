@@ -70,7 +70,7 @@ class ShopfloorSingleProductTransfer(Component):
                 location, with_operation_progress=True
             )
         if package:
-            data["package"] = self.data.package(package)
+            data["package"] = self.data.package(package, with_operation_progress=True)
         return self._response(
             next_state="select_product", data=data, message=message, popup=popup
         )

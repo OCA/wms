@@ -118,7 +118,11 @@ class CommonCase(BaseCommonCase):
     def _data_for_move_line(self, move_line):
         return self.data.move_line(move_line)
 
-    def _data_for_package(self, package):
+    def _data_for_package(self, package, with_operation_progress=False):
+        if with_operation_progress:
+            return self.data.package(
+                package, with_operation_progress=with_operation_progress
+            )
         return self.data.package(package)
 
     @classmethod

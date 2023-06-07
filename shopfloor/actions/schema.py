@@ -91,6 +91,14 @@ class ShopfloorSchemaAction(Component):
             "weight": {"required": True, "nullable": True, "type": "float"},
             "move_line_count": {"required": False, "nullable": True, "type": "integer"},
             "storage_type": self._schema_dict_of(self._simple_record()),
+            "operation_progress": {
+                "type": "dict",
+                "required": False,
+                "schema": {
+                    "done": {"type": "float", "required": False},
+                    "to_do": {"type": "float", "required": False},
+                },
+            },
         }
         if with_packaging:
             schema["packaging"] = self._schema_dict_of(self.packaging())

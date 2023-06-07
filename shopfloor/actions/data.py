@@ -14,33 +14,17 @@ class DataAction(Component):
         parser = self._location_parser
         data = self._jsonify(record.with_context(location=record.id), parser, **kw)
         if "with_operation_progress" in kw:
-            operation_progress = self._get_location_operations_progress(record)
+            domain = [
+                ("location_id", "=", record.id),
+                ("state", "in", ["partially_available", "assigned"]),
+                ("picking_id.state", "=", "assigned"),
+            ]
+            operation_progress = self._get_operation_progress(domain)
             data.update({"operation_progress": operation_progress})
         return data
 
     def locations(self, record, **kw):
         return self.location(record, multi=True)
-
-    def _get_location_operations_progress(self, location):
-        lines = self.env["stock.move.line"].search(
-            [
-                ("location_id", "=", location.id),
-                ("state", "in", ["partially_available", "assigned"]),
-                ("picking_id.state", "=", "assigned"),
-            ]
-        )
-        # operations_to_do = number of total operations that are pending for this location.
-        # operations_done = number of operations already done.
-        # A line with an assigned package counts as 1 operation.
-        operations_to_do = 0
-        operations_done = 0
-        for line in lines:
-            operations_done += line.qty_done if not line.package_id else 1
-            operations_to_do += line.product_uom_qty if not line.package_id else 1
-        return {
-            "done": operations_done,
-            "to_do": operations_to_do,
-        }
 
     @property
     def _location_parser(self):
@@ -94,6 +78,14 @@ class DataAction(Component):
             parser += self._package_packaging_parser
         data = self._jsonify(record, parser, **kw)
         # handle special cases
+        if "with_operation_progress" in kw:
+            domain = [
+                ("result_package_id", "=", record.id),
+                ("state", "in", ["partially_available", "assigned"]),
+                ("picking_id.state", "=", "assigned"),
+            ]
+            operation_progress = self._get_operation_progress(domain)
+            data.update({"operation_progress": operation_progress})
         if data and picking:
             lines = picking.move_line_ids.filtered(
                 lambda l: l.result_package_id == record
@@ -330,3 +322,18 @@ class DataAction(Component):
             "id",
             "name",
         ]
+
+    def _get_operation_progress(self, domain):
+        lines = self.env["stock.move.line"].search(domain)
+        # operations_to_do = number of total operations that are pending for this location.
+        # operations_done = number of operations already done.
+        # A line with an assigned package counts as 1 operation.
+        operations_to_do = 0
+        operations_done = 0
+        for line in lines:
+            operations_done += line.qty_done if not line.package_id else 1
+            operations_to_do += line.product_uom_qty if not line.package_id else 1
+        return {
+            "done": operations_done,
+            "to_do": operations_to_do,
+        }
