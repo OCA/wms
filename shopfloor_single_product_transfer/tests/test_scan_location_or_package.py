@@ -115,7 +115,9 @@ class TestScanLocation(CommonCase):
             response,
             next_state="select_product",
             data={
-                "package": self._data_for_package(package),
                 "location": self._data_for_location(package.location_id),
+                "package": self._data_for_package(
+                    package, with_operation_progress=True
+                ),
             },
         )
