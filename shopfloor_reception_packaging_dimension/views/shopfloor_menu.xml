@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shopfloor_menu_form_view" model="ir.ui.view">
+        <field name="model">shopfloor.menu</field>
+        <field name="inherit_id" ref="shopfloor.shopfloor_menu_form_view" />
+        <field name="arch" type="xml">
+
+          <xpath expr="//group[@name='options']" position="inside">
+              <group
+                    name="set_packaging_dimension"
+                    attrs="{'invisible': [('set_packaging_dimension_is_possible', '=', False)]}"
+                >
+                  <field name="set_packaging_dimension_is_possible" invisible="1" />
+                  <field name="set_packaging_dimension" />
+              </group>
+          </xpath>
+
+        </field>
+    </record>
+</odoo>
