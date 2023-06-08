@@ -409,11 +409,8 @@ const DeliveryShipment = {
                         );
                     },
                     on_back: () => {
-                        this.wait_call(
-                            this.odoo.call("scan_dock", {
-                                barcode: "",
-                            })
-                        );
+                        this.state_to("init");
+                        this.reset_notification();
                     },
                     on_go2loading_list: () => {
                         this.wait_call(
