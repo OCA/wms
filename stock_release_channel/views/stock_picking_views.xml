@@ -58,4 +58,17 @@
         </field>
     </record>
 
+    <record id="vpicktree_view_tree" model="ir.ui.view">
+        <field
+            name="name"
+        >stock.picking.delivery.tree in (stock_release_channel)</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="before">
+                <field name="release_channel_id" optional="show" />
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
