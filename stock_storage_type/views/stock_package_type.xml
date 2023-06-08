@@ -32,6 +32,12 @@
                     </group>
                 </group>
             </group>
+            <xpath
+                expr="//field[@name='storage_category_capacity_ids']/tree/field[@name='storage_category_id']"
+                position="after"
+            >
+                <field name="allow_new_product" />
+            </xpath>
         </field>
 
 
