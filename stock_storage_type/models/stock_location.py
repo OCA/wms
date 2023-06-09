@@ -324,23 +324,6 @@ class StockLocation(models.Model):
             else:
                 rec.location_is_empty = True
 
-    @api.depends(
-        "storage_category_id.capacity_ids",
-        "location_id",
-        "location_id.allowed_location_capacity_ids",
-    )
-    def _compute_allowed_location_capacity_ids(self):
-        for location in self:
-            if location.storage_category_id.capacity_ids:
-                location.allowed_location_capacity_ids = [
-                    (6, 0, location.storage_category_id.capacity_ids.ids)
-                ]
-            else:
-                parent = location.location_id
-                location.allowed_location_capacity_ids = [
-                    (6, 0, parent.storage_category_id.capacity_ids.ids)
-                ]
-
     # method provided by "stock_putaway_hook"
     def _putaway_strategy_finalizer(
         self,
