@@ -95,5 +95,6 @@ class StockPackageLevel(models.Model):
                     level.location_dest_id,
                     level.package_id,
                     level.mapped("move_line_ids.product_id"),
+                    1.0,
                 )
             )
