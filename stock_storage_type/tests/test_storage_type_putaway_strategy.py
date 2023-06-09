@@ -414,7 +414,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         )
 
         location = StockLocation._get_package_type_putaway_strategy(
-            dest_location, package, product
+            dest_location, package, product, 1.0
         )
 
         # No location with given product -> the first bin should be returned
@@ -428,7 +428,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             10.0,
         )
         location = StockLocation._get_package_type_putaway_strategy(
-            dest_location, package, product
+            dest_location, package, product, 1.0
         )
         self.assertEqual(location, self.cardboxes_bin_3_location)
 
@@ -440,7 +440,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             1.0,
         )
         location = StockLocation._get_package_type_putaway_strategy(
-            dest_location, package, product
+            dest_location, package, product, 1.0
         )
         self.assertEqual(location, self.cardboxes_bin_4_location)
 
@@ -600,4 +600,99 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         self.assertNotEqual(
             original_location_dest,
             move_line.location_dest_id,
+        )
+
+    def test_storage_strategy_ordered_locations_cardboxes_with_new_leaf_putaway(self):
+        """
+        In this scenario, we check that a storage strategy is well applied
+        but, then, check that a standard putaway rule has been applied too.
+
+        Storage rule applied: for Cardboxes
+        Putaway rule: From Carboxes bin location 1 to Cardbox leaf 1
+
+        Location Structure:
+
+        Stock
+        -- Cardbox Bin
+        ----- Cardbox leaf
+        """
+
+        # Create the fixed location
+        self.fix_location = self.env["stock.location"].create(
+            {
+                "name": "Cardbox 1 Fixed",
+                "location_id": self.cardboxes_bin_1_location.id,
+            }
+        )
+
+        # Create the putaway rule
+        self.env["stock.putaway.rule"].create(
+            {
+                "product_id": self.product.id,
+                "location_in_id": self.cardboxes_bin_1_location.id,
+                "location_out_id": self.fix_location.id,
+            }
+        )
+        self.cardboxes_bin_1_location.pack_putaway_strategy = "none"
+
+        # Create the sequence for Bin 1
+
+        self.env["stock.storage.location.sequence"].create(
+            {
+                "package_type_id": self.cardboxes_package_storage_type.id,
+                "location_id": self.cardboxes_bin_1_location.id,
+                "sequence": 1,
+            }
+        )
+
+        # Create picking
+        in_picking = self.env["stock.picking"].create(
+            {
+                "picking_type_id": self.receipts_picking_type.id,
+                "location_id": self.suppliers_location.id,
+                "location_dest_id": self.input_location.id,
+                "move_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "name": self.product.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
+                            "product_id": self.product.id,
+                            "product_uom_qty": 8.0,
+                            "product_uom": self.product.uom_id.id,
+                        },
+                    )
+                ],
+            }
+        )
+        # Mark as todo
+        in_picking.action_confirm()
+        # Put in pack
+        in_picking.move_line_ids.qty_done = 4.0
+        first_package = in_picking.action_put_in_pack()
+        # Ensure packaging is set properly on pack
+        first_package.product_packaging_id = self.product_cardbox_product_packaging
+        # Put in pack again
+        ml_without_package = in_picking.move_line_ids.filtered(
+            lambda ml: not ml.result_package_id
+        )
+        ml_without_package.qty_done = 4.0
+        second_pack = in_picking.action_put_in_pack()
+        # Ensure packaging is set properly on pack
+        second_pack.product_packaging_id = self.product_cardbox_product_packaging
+
+        # Validate picking
+        in_picking.button_validate()
+        # Assign internal picking
+        int_picking = in_picking.move_ids.move_dest_ids.picking_id
+        int_picking.action_assign()  # TODO drop ?
+        self.assertEqual(int_picking.location_dest_id, self.stock_location)
+        self.assertEqual(
+            int_picking.move_ids.mapped("location_dest_id"), self.stock_location
+        )
+        self.assertEqual(
+            int_picking.move_line_ids.mapped("location_dest_id"),
+            self.fix_location,
         )
