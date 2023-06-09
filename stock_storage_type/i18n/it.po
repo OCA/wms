@@ -6,13 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-06-09 19:09+0000\n"
+"Last-Translator: Francesco Foresti <francesco.foresti@ooops404.com>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_storage_location_sequence.py:0
@@ -43,7 +45,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__active
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__active
 msgid "Active"
-msgstr ""
+msgstr "Attivo"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_level__allowed_location_dest_domain
@@ -72,12 +74,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.stock_package_storage_type_search_view
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.stock_storage_location_sequence_cond_form_view
 msgid "Archived"
-msgstr ""
+msgstr "In archivio"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__barcode
 msgid "Barcode"
-msgstr ""
+msgstr "Codice a barre"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__code_snippet
@@ -103,7 +105,7 @@ msgstr ""
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__location_sequence_cond_ids
 msgid "Conditions"
-msgstr ""
+msgstr "Condizioni"
 
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.location_storage_type_form_view
@@ -155,7 +157,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__display_name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__do_not_mix_lots
@@ -208,7 +210,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__id
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location_storage_type__do_not_mix_lots
