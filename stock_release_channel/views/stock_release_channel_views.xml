@@ -90,6 +90,11 @@
                         <page string="Selection criteria" name="criteria">
                             <group name="criteria">
                                 <field
+                                    name="partner_ids"
+                                    options="{'no_create': True}"
+                                    widget="many2many_tags"
+                                />
+                                <field
                                     name="picking_type_ids"
                                     options="{'no_create': True}"
                                     widget="many2many_tags"

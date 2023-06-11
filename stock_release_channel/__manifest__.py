@@ -16,6 +16,7 @@
         "queue_job",  # OCA/queue
     ],
     "data": [
+        "views/res_partner.xml",
         "views/stock_release_channel_views.xml",
         "views/stock_picking_views.xml",
         "data/stock_release_channel_data.xml",

@@ -5,4 +5,5 @@ from . import (
     test_channel_release_batch,
     test_release_channel,
     test_release_channel_lifecycle,
+    test_release_channel_partner,
 )

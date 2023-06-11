@@ -70,8 +70,10 @@ class StockPicking(models.Model):
         :return: release channels
         """
         self.ensure_one()
-        return self.env["stock.release.channel"].search(
-            self._get_release_channel_possible_candidate_domain()
+        return (
+            self.env["stock.release.channel"]
+            .search(self._get_release_channel_possible_candidate_domain())
+            .sorted(key=lambda r: (not bool(r.partner_ids), r.sequence))
         )
 
     def _get_release_channel_possible_candidate_domain(self):
@@ -84,4 +86,7 @@ class StockPicking(models.Model):
             "|",
             ("warehouse_id", "=", False),
             ("warehouse_id", "=", self.picking_type_id.warehouse_id.id),
+            "|",
+            ("partner_ids", "=", False),
+            ("partner_ids", "in", self.partner_id.ids),
         ]
