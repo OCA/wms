@@ -17,7 +17,7 @@ class TestReleaseChannel(ReleaseChannelCase):
             picking2 = move2.picking_id
             (picking1 + picking2)._delay_assign_release_channel()
             trap.assert_jobs_count(1, only=picking1.assign_release_channel)
-            trap.assert_jobs_count(1, only=picking1.assign_release_channel)
+            trap.assert_jobs_count(1, only=picking2.assign_release_channel)
             trap.perform_enqueued_jobs()
             self.assertEqual(f"{message}", trap.enqueued_jobs[0].result)
         self.assertEqual(move.picking_id.release_channel_id, expected)
