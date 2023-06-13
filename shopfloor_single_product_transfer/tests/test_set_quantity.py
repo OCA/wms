@@ -285,7 +285,7 @@ class TestSetQuantity(CommonCase):
             }
             self.assert_response(response, next_state="set_quantity", data=data)
             self.assertEqual(move_line.qty_done, expected_qty)
-        # Nothign prevents the user to set qty_done > qty_todo
+        # Nothing prevents the user to set qty_done > qty_todo
         response = self.service.dispatch(
             "set_quantity",
             params={
@@ -616,6 +616,66 @@ class TestSetQuantity(CommonCase):
             data=data,
             popup=expected_popup,
         )
+
+    def test_set_quantity_scan_location(self):
+        self.menu.sudo().allow_move_create = False
+        picking = self._setup_picking()
+        self._setup_chained_picking(picking)
+        location = self.location
+        self.service.dispatch(
+            "scan_product",
+            params={"location_id": location.id, "barcode": self.product.barcode},
+        )
+        # Change the destination on the move_line and take less than the total amount required.
+        move_line = picking.move_line_ids
+        self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "quantity": 6,
+                "barcode": self.dispatch_location.name,
+            },
+        )
+        # If allow_move_create is disabled, a backorder is created.
+        backorder = self.env["stock.picking"].search(
+            [("backorder_id", "=", picking.id)]
+        )
+        self.assertEqual(
+            backorder.move_line_ids.product_id, picking.move_line_ids.product_id
+        )
+        self.assertEqual(backorder.move_line_ids.qty_done, 6.0)
+        self.assertEqual(backorder.move_line_ids.state, "done")
+        self.assertEqual(picking.move_line_ids.product_uom_qty, 4.0)
+        self.assertEqual(picking.move_line_ids.qty_done, 0.0)
+        self.assertEqual(picking.move_line_ids.state, "assigned")
+
+    def test_set_quantity_scan_location_allow_move_create(self):
+        self.menu.sudo().allow_move_create = True
+        picking = self._setup_picking()
+        self._setup_chained_picking(picking)
+        location = self.location
+        self.service.dispatch(
+            "scan_product",
+            params={"location_id": location.id, "barcode": self.product.barcode},
+        )
+        # Change the destination on the move_line and take less than the total amount required.
+        move_line = picking.move_line_ids
+        self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "quantity": 6,
+                "barcode": self.dispatch_location.name,
+            },
+        )
+        # If allow_move_create is enabled, a backorder is not created
+        # and the picking is marked as done with the scanned qty.
+        backorder = self.env["stock.picking"].search(
+            [("backorder_id", "=", picking.id)]
+        )
+        self.assertFalse(backorder)
+        self.assertEqual(picking.move_line_ids.qty_done, 6.0)
+        self.assertEqual(picking.move_line_ids.state, "done")
 
     def test_set_quantity_scan_package_not_empty(self):
         # We scan a package that's not empty
