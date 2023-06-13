@@ -211,15 +211,22 @@ class StockReleaseChannel(models.Model):
             ],
         }
 
+@api.model
+    def _compute_picking_count_additional_fields(self):
+        return []
+
     # TODO maybe we have to do raw SQL to include the picking + moves counts in
     # a single query
     def _compute_picking_count(self):
         domains = self._field_picking_domains()
         picking_ids_per_field = {}
+
+        domain_data = {}
+
         for field, domain in domains.items():
             data = self.env["stock.picking"].read_group(
                 domain + [("release_channel_id", "in", self.ids)],
-                ["release_channel_id", "picking_ids:array_agg(id)"],
+                ["release_channel_id", "picking_ids:array_agg(id)"] + self._compute_picking_count_additional_fields(),
                 ["release_channel_id"],
             )
             count = {
@@ -237,6 +244,7 @@ class StockReleaseChannel(models.Model):
 
             for record in self:
                 record[field] = count.get(record.id, 0)
+            domain_data[field] = data
 
         all_picking_ids = [
             pid for picking_ids in picking_ids_per_field.values() for pid in picking_ids
@@ -245,7 +253,7 @@ class StockReleaseChannel(models.Model):
             # TODO for now we do estimates, later we may improve the domains per
             # field, but now we can run one sql query on stock.move for all fields
             [("picking_id", "in", all_picking_ids), ("state", "!=", "cancel")],
-            ["picking_id"],
+            ["picking_id"] + self._compute_picking_count_additional_fields(),
             ["picking_id"],
         )
         move_count = {
@@ -253,6 +261,14 @@ class StockReleaseChannel(models.Model):
             for row in data
             if row["picking_id"]
         }
+        stock_move_aggregated_by_picking = {}
+        for additional_sum in self._compute_picking_count_additional_fields():
+            # additional_sum e.g. 'volume'
+            stock_move_aggregated_by_picking.setdefault(additional_sum, {
+                row['picking_id'][0]: row[additional_sum]
+                for row in data
+                if row['picking_id']
+            })
         for field, __ in domains.items():
             move_field = field.replace("picking", "move")
             for record in self:
@@ -268,6 +284,7 @@ class StockReleaseChannel(models.Model):
                 + record.count_picking_released
                 + record.count_picking_done
             )
+        return domains, domain_data, stock_move_aggregated_by_picking, picking_ids_per_field
 
     def _query_get_chain(self, pickings):
         """Get all stock.picking before an outgoing one
