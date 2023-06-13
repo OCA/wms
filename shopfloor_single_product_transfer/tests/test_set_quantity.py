@@ -559,6 +559,32 @@ class TestSetQuantity(CommonCase):
         # Ensure the qty_done and user has been reset.
         self.assertFalse(move_line.picking_id.user_id)
         self.assertEqual(move_line.qty_done, 0.0)
+        # Ensure the picking is not cancelled if allow_move_create is not enabled
+        self.assertTrue(move_line.picking_id.state == "assigned")
+
+    def test_action_cancel_allow_move_create(self):
+        # We perform the same actions as in test_action_cancel,
+        # but with the allow_move_create option enabled
+        self.menu.sudo().allow_move_create = True
+        picking = self._setup_picking()
+        self.service.dispatch(
+            "scan_product",
+            params={
+                "location_id": self.location.id,
+                "barcode": self.product.barcode,
+            },
+        )
+        move_line = picking.move_line_ids
+        move_line.qty_done = 10.0
+        response = self.service.dispatch(
+            "set_quantity__action_cancel", params={"selected_line_id": move_line.id}
+        )
+        data = {}
+        self.assert_response(
+            response, next_state="select_location_or_package", data=data
+        )
+        # Ensure the picking is cancelled if allow_move_create is enabled
+        self.assertTrue(move_line.picking_id.state == "cancel")
 
     def test_set_quantity_done_with_completion_info(self):
         self.picking_type.sudo().display_completion_info = "next_picking_ready"
