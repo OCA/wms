@@ -530,7 +530,7 @@ class Reception(Component):
     def _set_quantity__by_product(self, picking, selected_line, product):
         # This is a general rule here. whether the return has been created from
         # shopfloor or not, you cannot return more than what was shipped.
-        # Therefore, we cannot use the `is_shopfloor_return` here.
+        # Therefore, we cannot use the `is_shopfloor_created` here.
         previous_vals = {
             "qty_done": selected_line.qty_done,
         }
@@ -566,7 +566,7 @@ class Reception(Component):
     def _set_quantity__by_packaging(self, picking, selected_line, packaging):
         # This is a general rule here. whether the return has been created from
         # shopfloor or not, you cannot return more than what was shipped.
-        # Therefore, we cannot use the `is_shopfloor_return` here.
+        # Therefore, we cannot use the `is_shopfloor_created` here.
         previous_vals = {
             "qty_done": selected_line.qty_done,
         }
@@ -919,7 +919,7 @@ class Reception(Component):
             )
         if not confirmation:
             # Do not create a backorder if this is a shopfloor return.
-            if picking.is_shopfloor_return and self.work.menu.allow_return:
+            if picking.is_shopfloor_created and self.work.menu.allow_return:
                 picking.with_context(cancel_backorder=True)._action_done()
                 return self._response_for_select_document(
                     message=self.msg_store.transfer_done_success(picking)
