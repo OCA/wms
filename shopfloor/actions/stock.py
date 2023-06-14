@@ -98,7 +98,7 @@ class StockAction(Component):
             "origin": origin,
             "location_id": return_type.default_location_src_id.id,
             "location_dest_id": return_type.default_location_dest_id.id,
-            "is_shopfloor_return": True,
+            "is_shopfloor_created": True,
         }
 
     def create_return_picking(self, picking, return_types, origin):
