@@ -7,4 +7,4 @@ from odoo import fields, models
 class StockPicking(models.Model):
     _inherit = "stock.picking"
 
-    is_shopfloor_return = fields.Boolean()
+    is_shopfloor_created = fields.Boolean()
