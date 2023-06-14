@@ -48,11 +48,29 @@ class StockReleaseChannel(models.Model):
 
     @api.depends("picking_ids", "picking_ids.can_be_planned_in_shipment_advice")
     def _compute_picking_to_plan_ids(self):
-        for rec in self:
-            rec.picking_to_plan_ids = rec.picking_ids.filtered(
-                lambda p, wh=rec.warehouse_id: p.can_be_planned_in_shipment_advice
-                and (not wh or p.picking_type_id.warehouse_id == wh)
+        result = self.env["stock.picking"].read_group(
+            domain=[
+                ("release_channel_id", "in", self.ids),
+                ("can_be_planned_in_shipment_advice", "=", True),
+            ],
+            fields=["release_channel_id", "picking_ids:array_agg(id)"],
+            groupby=["release_channel_id"],
+        )
+        channel_ids_to_reset = set(self.ids)
+        for res in result:
+            channel_id = res["release_channel_id"][0]
+            channel_ids_to_reset.discard(channel_id)
+            channel = self.browse(channel_id)
+            can_be_planned_pickings = (
+                self.env["stock.picking"]
+                .browse(res["picking_ids"])
+                .filtered(
+                    lambda p, wh=channel.warehouse_id: not wh or p.warehouse_id == wh
+                )
             )
+            channel.picking_to_plan_ids = can_be_planned_pickings
+        if channel_ids_to_reset:
+            self.browse(channel_ids_to_reset).picking_to_plan_ids = False
 
     def button_plan_shipments(self):
         self.ensure_one()
