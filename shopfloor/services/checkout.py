@@ -856,9 +856,10 @@ class Checkout(Component):
     def _pack_lines(self, picking, selected_lines, package):
         lines_to_pack = selected_lines.filtered(self._filter_lines_to_pack)
         if not lines_to_pack:
+            message = self.msg_store.no_line_to_pack()
             return self._response_for_select_line(
                 picking,
-                message=_("No line to pack found"),
+                message=message,
             )
         response = self._put_lines_in_allowed_package(picking, lines_to_pack, package)
         if response:
