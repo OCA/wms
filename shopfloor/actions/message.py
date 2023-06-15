@@ -801,3 +801,9 @@ class MessageAction(Component):
             "message_type": "warning",
             "body": _("This location only contains packages, please scan one of them."),
         }
+
+    def no_line_to_pack(self):
+        return {
+            "message_type": "warning",
+            "body": _("No line to pack found."),
+        }
