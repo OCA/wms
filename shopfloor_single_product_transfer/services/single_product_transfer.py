@@ -454,9 +454,9 @@ class ShopfloorSingleProductTransfer(Component):
         if lot:
             wrong_lot = move_line.lot_id != lot
             if wrong_lot:
-                message = self.msg_store.wrong_record(lot._name)
+                message = self.msg_store.wrong_record(lot)
         if move_line.product_id != product:
-            message = self.msg_store.wrong_record(product._name)
+            message = self.msg_store.wrong_record(product)
         if message:
             return self._response_for_set_quantity(move_line, message=message)
 
