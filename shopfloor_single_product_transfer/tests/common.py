@@ -118,6 +118,9 @@ class CommonCase(BaseCommonCase):
     def _data_for_move_line(self, move_line):
         return self.data.move_line(move_line)
 
+    def _data_for_package(self, package):
+        return self.data.package(package)
+
     @classmethod
     def get_new_move_line(cls):
         return cls.env["stock.move.line"].search(

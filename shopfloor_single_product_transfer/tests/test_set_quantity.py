@@ -553,7 +553,9 @@ class TestSetQuantity(CommonCase):
             "set_quantity__action_cancel", params={"selected_line_id": move_line.id}
         )
         data = {}
-        self.assert_response(response, next_state="select_location", data=data)
+        self.assert_response(
+            response, next_state="select_location_or_package", data=data
+        )
         # Ensure the qty_done and user has been reset.
         self.assertFalse(move_line.picking_id.user_id)
         self.assertEqual(move_line.qty_done, 0.0)
@@ -588,3 +590,69 @@ class TestSetQuantity(CommonCase):
             data=data,
             popup=expected_popup,
         )
+
+    def test_set_quantity_scan_package_not_empty(self):
+        # We scan a package that's not empty
+        # and its location is selected.
+        package = (
+            self.env["stock.quant.package"].sudo().create({"name": "test-package"})
+        )
+        self.env["stock.quant"].sudo().create(
+            {
+                "package_id": package.id,
+                "location_id": self.dispatch_location.id,
+                "product_id": self.product.id,
+                "quantity": 10.0,
+            }
+        )
+        picking = self._setup_picking()
+        move_line = picking.move_line_ids
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "quantity": 10.0,
+                "barcode": package.name,
+            },
+        )
+        expected_data = {
+            "location": self._data_for_location(self.location),
+        }
+        expected_message = self.msg_store.transfer_done_success(move_line.picking_id)
+        completion_info = self.service._actions_for("completion.info")
+        expected_popup = completion_info.popup(move_line)
+        self.assert_response(
+            response,
+            next_state="select_product",
+            data=expected_data,
+            message=expected_message,
+            popup=expected_popup,
+        )
+        self.assertEqual(package, move_line.result_package_id)
+
+    def test_set_quantity_scan_package_empty(self):
+        # We scan an empty package
+        # and are redirected to set_location.
+        package = (
+            self.env["stock.quant.package"].sudo().create({"name": "test-package"})
+        )
+        picking = self._setup_picking()
+        move_line = picking.move_line_ids
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "quantity": 10.0,
+                "barcode": package.name,
+            },
+        )
+        expected_data = {
+            "move_line": self._data_for_move_line(move_line),
+            "package": self._data_for_package(package),
+        }
+        self.assert_response(
+            response,
+            next_state="set_location",
+            data=expected_data,
+        )
+        self.assertEqual(package, move_line.result_package_id)

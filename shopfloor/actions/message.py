@@ -56,6 +56,14 @@ class MessageAction(Component):
             ),
         }
 
+    def location_requires_package(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "This location requires packages. Please scan a destination package."
+            ),
+        }
+
     def already_running_ask_confirmation(self):
         return {
             "message_type": "warning",
@@ -774,4 +782,10 @@ class MessageAction(Component):
                 "Scan again to place all goods in the same package."
             )
             % dict(name=packaging_type.name),
+        }
+
+    def location_contains_only_packages_scan_one(self):
+        return {
+            "message_type": "warning",
+            "body": _("This location only contains packages, please scan one of them."),
         }
