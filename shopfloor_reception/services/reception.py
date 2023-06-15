@@ -629,14 +629,13 @@ class Reception(Component):
                     ),
                 )
             # If the scanned package has a valid destination,
-            # set both package and destination on the package,
-            # and go back to the selection line screen
+            # set both package and destination on the package.
             selected_line.result_package_id = package
             selected_line.location_dest_id = pack_location
-            if self.work.menu.auto_post_line:
-                # If option auto_post_line is active in the shopfloor menu,
-                # create a split order with this line.
-                self._auto_post_line(selected_line, picking)
+
+            response = self._post_line(selected_line)
+            if response:
+                return response
             return self._response_for_select_move(picking)
         # Scanned package has no location, move to the location selection
         # screen
@@ -1175,6 +1174,27 @@ class Reception(Component):
         selected_line.qty_done = quantity
         return self._response_for_set_destination(picking, selected_line)
 
+    def _post_line(self, selected_line):
+        if (
+            selected_line.picking_id.is_shopfloor_created
+            and self.work.menu.allow_return
+        ):
+            # If the transfer is not planned, and we allow unplanned returns,
+            # process the returned qty and mark it as done.
+            return self._post_shopfloor_created_line(selected_line)
+
+        if self.work.menu.auto_post_line:
+            # If option auto_post_line is active in the shopfloor menu,
+            # create a split order with this line.
+            self._auto_post_line(selected_line)
+
+    def _post_shopfloor_created_line(self, selected_line):
+        selected_line.product_uom_qty = selected_line.qty_done
+        selected_line.picking_id.with_context(cancel_backorder=True)._action_done()
+        return self._response_for_select_document(
+            message=self.msg_store.transfer_done_success(selected_line.picking_id)
+        )
+
     def _auto_post_line(self, selected_line):
         new_move = selected_line.move_id.split_other_move_lines(
             selected_line, intersection=True
@@ -1238,11 +1258,9 @@ class Reception(Component):
                     ),
                 )
             selected_line.location_dest_id = location
-
-        if self.work.menu.auto_post_line:
-            # If option auto_post_line is active in the shopfloor menu,
-            # create a split order with this line.
-            self._auto_post_line(selected_line)
+        response = self._post_line(selected_line)
+        if response:
+            return response
         return self._response_for_select_move(picking)
 
     def select_dest_package(
@@ -1284,10 +1302,9 @@ class Reception(Component):
                     message=self.msg_store.package_not_empty(package),
                 )
             selected_line.result_package_id = package
-            if self.work.menu.auto_post_line:
-                # If option auto_post_line is active in the shopfloor menu,
-                # create a split order with this line.
-                self._auto_post_line(selected_line)
+            response = self._post_line(selected_line)
+            if response:
+                return response
             return self._response_for_select_move(picking)
         message = self.msg_store.create_new_pack_ask_confirmation(barcode)
         self._assign_user_to_picking(picking)
