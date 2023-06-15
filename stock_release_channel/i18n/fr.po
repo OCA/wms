@@ -19,13 +19,15 @@ msgstr ""
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid ""
-"<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Release\" "
-"title=\"Automatic Release\"/>"
+"<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Release\" title="
+"\"Automatic Release\"/>"
 msgstr ""
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
-msgid "<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Details\" title=\"Details\"/>"
+msgid ""
+"<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Details\" title="
+"\"Details\"/>"
 msgstr ""
 
 #. module: stock_release_channel
@@ -184,6 +186,11 @@ msgstr ""
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__color
 msgid "Color"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model,name:stock_release_channel.model_res_partner
+msgid "Contact"
 msgstr ""
 
 #. module: stock_release_channel
@@ -422,6 +429,11 @@ msgid "Overall Progress"
 msgstr ""
 
 #. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__partner_ids
+msgid "Partners"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__picking_chain_ids
 msgid "Picking Chain"
 msgstr ""
@@ -476,8 +488,11 @@ msgstr "Canal de livraison"
 #. module: stock_release_channel
 #: model:ir.actions.act_window,name:stock_release_channel.stock_release_channel_act_window
 #: model:ir.actions.act_window,name:stock_release_channel.stock_release_channel_config_act_window
+#: model:ir.model.fields,field_description:stock_release_channel.field_res_partner__stock_release_channel_ids
+#: model:ir.model.fields,field_description:stock_release_channel.field_res_users__stock_release_channel_ids
 #: model:ir.ui.menu,name:stock_release_channel.stock_release_channel_config_menu
 #: model:ir.ui.menu,name:stock_release_channel.stock_release_channel_menu
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.res_partner_form_view
 msgid "Release Channels"
 msgstr "Canaux de livraison"
 
@@ -559,8 +574,7 @@ msgstr ""
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_release_allowed
-msgid ""
-"Technical field to check if the action 'Release Next Batch' is allowed."
+msgid "Technical field to check if the action 'Release Next Batch' is allowed."
 msgstr ""
 
 #. module: stock_release_channel
@@ -582,8 +596,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/stock_release_channel/models/stock_release_channel.py:0
 #, python-format
-msgid ""
-"The number of released transfers in progress is already at the maximum."
+msgid "The number of released transfers in progress is already at the maximum."
 msgstr ""
 
 #. module: stock_release_channel
@@ -597,9 +610,12 @@ msgstr ""
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__state
 msgid ""
 "The state allows you to control the availability of the release channel.\n"
-"* Open: Manual and automatic picking assignment to the release is effective and release operations are allowed.\n"
-" * Locked: Release operations are forbidden. (Assignement processes are still working)\n"
-"* Asleep: Assigned pickings not processed are unassigned from the release channel.\n"
+"* Open: Manual and automatic picking assignment to the release is effective "
+"and release operations are allowed.\n"
+" * Locked: Release operations are forbidden. (Assignement processes are "
+"still working)\n"
+"* Asleep: Assigned pickings not processed are unassigned from the release "
+"channel.\n"
 msgstr ""
 
 #. module: stock_release_channel
