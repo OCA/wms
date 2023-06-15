@@ -1325,6 +1325,12 @@ msgstr ""
 "activo cuando se selecciona un tipo."
 
 #. module: shopfloor
+#: code:addons/shopfloor/actions/stock.py:0
+#, python-format
+msgid "Someone is already working on these transfers"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_location__source_move_line_ids
 msgid "Source Move Line"
 msgstr "Recurso del Movimiento de Línea"
