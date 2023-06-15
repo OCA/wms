@@ -184,6 +184,11 @@ msgid "Color"
 msgstr ""
 
 #. module: stock_release_channel
+#: model:ir.model,name:stock_release_channel.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__create_uid
 msgid "Created by"
 msgstr ""
@@ -419,6 +424,11 @@ msgid "Overall Progress"
 msgstr ""
 
 #. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__partner_ids
+msgid "Partners"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__picking_chain_ids
 msgid "Picking Chain"
 msgstr ""
@@ -473,8 +483,11 @@ msgstr ""
 #. module: stock_release_channel
 #: model:ir.actions.act_window,name:stock_release_channel.stock_release_channel_act_window
 #: model:ir.actions.act_window,name:stock_release_channel.stock_release_channel_config_act_window
+#: model:ir.model.fields,field_description:stock_release_channel.field_res_partner__stock_release_channel_ids
+#: model:ir.model.fields,field_description:stock_release_channel.field_res_users__stock_release_channel_ids
 #: model:ir.ui.menu,name:stock_release_channel.stock_release_channel_config_menu
 #: model:ir.ui.menu,name:stock_release_channel.stock_release_channel_menu
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.res_partner_form_view
 msgid "Release Channels"
 msgstr ""
 
