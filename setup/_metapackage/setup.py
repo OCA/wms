@@ -37,6 +37,7 @@ setuptools.setup(
         'odoo14-addon-shopfloor_reception_mobile',
         'odoo14-addon-shopfloor_rest_log',
         'odoo14-addon-shopfloor_single_product_transfer',
+        'odoo14-addon-shopfloor_single_product_transfer_force_package',
         'odoo14-addon-shopfloor_single_product_transfer_mobile',
         'odoo14-addon-shopfloor_workstation',
         'odoo14-addon-shopfloor_workstation_label_printer',
