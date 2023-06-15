@@ -90,16 +90,29 @@
                         <page string="Selection criteria" name="criteria">
                             <group name="criteria">
                                 <field
-                                    name="picking_type_ids"
+                                    name="warehouse_id"
                                     options="{'no_create': True}"
-                                    widget="many2many_tags"
                                 />
-                                <field name="warehouse_id" />
+                                <label for="picking_type_ids" colspan="2" />
+                                <field name="picking_type_ids" colspan="2"><tree
+                                        create="0"
+                                    >
+                                    <field name="warehouse_id" />
+                                    <field name="name" />
+                                    <field name="code" />
+                                </tree></field>
                                 <field
                                     name="rule_domain"
                                     widget="domain"
                                     options="{'model': 'stock.picking', 'in_dialog': true}"
                                 />
+                                <field name="partner_ids">
+                                    <tree create="0">
+                                    <field name="display_name" />
+                                    <field name="city" />
+                                    <field name="country_id" />
+                                </tree>
+                                </field>
                                 <field
                                     name="code"
                                     widget="ace"
