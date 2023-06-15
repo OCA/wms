@@ -3,6 +3,7 @@
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.models import NewId
 
 
 class StockReleaseChannel(models.Model):
@@ -48,7 +49,7 @@ class StockReleaseChannel(models.Model):
 
     @api.depends("picking_ids", "picking_ids.can_be_planned_in_shipment_advice")
     def _compute_picking_to_plan_ids(self):
-        result = self.env["stock.picking"].read_group(
+        groups = self.env["stock.picking"].read_group(
             domain=[
                 ("release_channel_id", "in", self.ids),
                 ("can_be_planned_in_shipment_advice", "=", True),
@@ -56,21 +57,24 @@ class StockReleaseChannel(models.Model):
             fields=["release_channel_id", "picking_ids:array_agg(id)"],
             groupby=["release_channel_id"],
         )
-        channel_ids_to_reset = set(self.ids)
-        for res in result:
-            channel_id = res["release_channel_id"][0]
-            channel_ids_to_reset.discard(channel_id)
-            channel = self.browse(channel_id)
+        result = {
+            group["release_channel_id"][0]: group["picking_ids"] for group in groups
+        }
+        for rec in self:
+            channel_id = rec._origin.id if isinstance(rec.id, NewId) else rec.id
+            if channel_id not in result:
+                rec.picking_to_plan_ids = False
+                continue
+            picking_ids = result.get(channel_id)
             can_be_planned_pickings = (
                 self.env["stock.picking"]
-                .browse(res["picking_ids"])
+                .browse(picking_ids)
                 .filtered(
-                    lambda p, wh=channel.warehouse_id: not wh or p.warehouse_id == wh
+                    lambda p, wh=rec.warehouse_id: not wh
+                    or p.picking_type_id.warehouse_id == wh
                 )
             )
-            channel.picking_to_plan_ids = can_be_planned_pickings
-        if channel_ids_to_reset:
-            self.browse(channel_ids_to_reset).picking_to_plan_ids = False
+            rec.picking_to_plan_ids = can_be_planned_pickings
 
     def button_plan_shipments(self):
         self.ensure_one()
