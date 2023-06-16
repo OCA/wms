@@ -100,6 +100,7 @@ class ShopfloorSchemaAction(Component):
                     "to_do": {"type": "float", "required": False},
                 },
             },
+            "total_quantity": {"required": False, "type": "float"},
         }
         if with_packaging:
             schema["packaging"] = self._schema_dict_of(self.packaging())
