@@ -47,8 +47,15 @@ export var ItemDetailMixin = {
         _render_date(record, field) {
             return this.utils.display.format_date_display(_.result(record, field.path));
         },
+        get_action_value_path(record, field) {
+            if (typeof field.action_val_path == "function") {
+                return field.action_val_path(record);
+            } else {
+                return field.action_val_path;
+            }
+        },
         has_detail_action(record, field) {
-            return _.result(record, field.action_val_path);
+            return _.result(record, this.get_action_value_path(record, field));
         },
         on_detail_action(record, field, options = {}) {
             let handler = this.default_detail_action_handler;
@@ -58,7 +65,10 @@ export var ItemDetailMixin = {
             handler.call(this, record, field);
         },
         default_detail_action_handler(record, field) {
-            const identifier = _.result(record, field.action_val_path);
+            const identifier = _.result(
+                record,
+                this.get_action_value_path(record, field)
+            );
             if (identifier) {
                 // TODO: we should probably delegate this to a global event
                 this.$router.push({
