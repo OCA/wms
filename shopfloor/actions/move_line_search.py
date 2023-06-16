@@ -29,6 +29,8 @@ class MoveLineSearch(Component):
         lot=None,
         match_user=False,
         picking_ready=True,
+        # When True, adds the package in the domain even if the package is False
+        enforce_empty_package=False,
     ):
         domain = [
             ("location_id", "child_of", locations.ids),
@@ -40,8 +42,8 @@ class MoveLineSearch(Component):
             domain += [("picking_id.picking_type_id", "=", picking_type.id)]
         elif self.picking_types:
             domain += [("picking_id.picking_type_id", "in", self.picking_types.ids)]
-        if package:
-            domain += [("package_id", "=", package.id)]
+        if package or package is not None and enforce_empty_package:
+            domain += [("package_id", "=", package.id if package else False)]
         if product:
             domain += [("product_id", "=", product.id)]
         if lot:
@@ -67,6 +69,7 @@ class MoveLineSearch(Component):
         match_user=False,
         sort_keys_func=None,
         picking_ready=True,
+        enforce_empty_package=False,
     ):
         """Find lines that potentially need work in given locations."""
         move_lines = self.env["stock.move.line"].search(
@@ -78,6 +81,7 @@ class MoveLineSearch(Component):
                 lot,
                 match_user=match_user,
                 picking_ready=picking_ready,
+                enforce_empty_package=enforce_empty_package,
             )
         )
         sort_keys_func = sort_keys_func or self._sort_key_move_lines(order)
