@@ -87,6 +87,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "storage_type": self._expected_storage_type(
                 package.package_storage_type_id
             ),
+            "total_quantity": 10.0,
             "weight": 20.0,
         }
         self.assertDictEqual(data, expected)
@@ -111,6 +112,7 @@ class ActionsDataCase(ActionsDataCaseBase):
                 package.package_storage_type_id
             ),
             "weight": 20.0,
+            "total_quantity": sum(package.quant_ids.mapped("quantity")),
         }
         self.assertDictEqual(data, expected)
 
@@ -226,12 +228,16 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "name": move_line.package_id.name,
                 "weight": 20.0,
                 "storage_type": None,
+                "total_quantity": sum(
+                    move_line.package_id.quant_ids.mapped("quantity")
+                ),
             },
             "package_dest": {
                 "id": result_package.id,
                 "name": result_package.name,
                 "weight": 6.0,
                 "storage_type": None,
+                "total_quantity": sum(result_package.quant_ids.mapped("quantity")),
             },
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
@@ -289,12 +295,18 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "name": move_line.package_id.name,
                 "weight": 30,
                 "storage_type": None,
+                "total_quantity": sum(
+                    move_line.package_id.quant_ids.mapped("quantity")
+                ),
             },
             "package_dest": {
                 "id": move_line.result_package_id.id,
                 "name": move_line.result_package_id.name,
                 "weight": 0,
                 "storage_type": None,
+                "total_quantity": sum(
+                    move_line.result_package_id.quant_ids.mapped("quantity")
+                ),
             },
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),

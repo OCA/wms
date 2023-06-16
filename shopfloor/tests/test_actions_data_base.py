@@ -175,6 +175,7 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
             "name": record.name,
             "weight": record.pack_weight or record.estimated_pack_weight_kg,
             "storage_type": None,
+            "total_quantity": sum(record.quant_ids.mapped("quantity")),
         }
         data.update(kw)
         return data
