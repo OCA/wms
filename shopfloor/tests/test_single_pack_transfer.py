@@ -80,7 +80,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             "location_src": self.data.location(package_level.location_id),
             "location_dest": self.data.location(package_level.location_dest_id),
             "picking": self.data.picking(self.picking),
-            "product": self.data.product(self.product_a),
+            "products": self.data.products(self.product_a),
         }
 
     def test_start(self):
@@ -192,7 +192,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
                 self.picking_type.default_location_dest_id
             ),
             "picking": self.data.picking(package_level.picking_id),
-            "product": self.data.product(self.product_a),
+            "products": self.data.products(self.product_a),
             "confirmation_required": False,
         }
 
