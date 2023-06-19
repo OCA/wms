@@ -64,7 +64,7 @@ addon | version | maintainers | summary
 [stock_move_source_relocate](stock_move_source_relocate/) | 14.0.1.1.0 |  | Change source location of unavailable moves
 [stock_move_source_relocate_dynamic_routing](stock_move_source_relocate_dynamic_routing/) | 14.0.1.0.1 |  | Glue module
 [stock_picking_completion_info](stock_picking_completion_info/) | 14.0.1.1.0 |  | Display on current document completion information according to next operations
-[stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.0.2 |  | Raise priority of all transfers for a chain when started
+[stock_picking_consolidation_priority](stock_picking_consolidation_priority/) | 14.0.1.1.0 |  | Raise priority of all transfers for a chain when started
 [stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 14.0.1.1.0 |  | Define different shipping policies according to picking type
 [stock_picking_type_shipping_policy_group_by](stock_picking_type_shipping_policy_group_by/) | 14.0.1.0.0 |  | Glue module for Picking Type Shipping Policy and Group Transfers by Partner and Carrier
 [stock_reception_screen](stock_reception_screen/) | 14.0.1.0.1 |  | Dedicated screen to receive/scan goods.
