@@ -49,15 +49,43 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertEqual(move_cancel.product_uom_qty, 2)
         self.assertTrue(self.shipping1.need_release)
 
-    # def test_unrelease_picking_is_done(self):
-    #     # the pick moves for delivery 1 and 2 are merged
-    #     self.assertEqual(self.picking1, self.picking2)
-    #     # do the first step
-    #     for line in self.picking1.move_line_ids:
-    #         line.qty_done = line.product_uom_qty
-    #     self.picking1.button_validate()
-    #     self.assertEqual(self.picking1.state, "done")
-    #     self.shipping1.unrelease()
+    def test_unrelease_after_backorder(self):
+        """In this test we all partially process the picking, then validate it
+        and create a backorder. Then we partially process the shipping, validate
+        it and create a backorder. At this stage we have a backorder shipping
+        with a move with 2 origins. The first origin is the processed picking
+        and the second origin is the picking to do to complete the backorder
+        delivery. At this stage, the unrelease of the backorder shipping should
+        be possible.
+        """
+        # partially process the picking
+        self.picking1.move_line_ids[0].qty_done = 1
+        # set printed since we are processing the picking
+        self.picking1.printed = True
+        # validate the picking
+        self.picking1.with_context(
+            skip_immediate=True, skip_backorder=True
+        ).button_validate()
+        picking1_backorder = self.picking1.backorder_ids
+        # partially process the shipping
+        self.shipping1.move_line_ids[0].qty_done = 1
+        # validate the shipping
+        self.shipping1.with_context(
+            skip_immediate=True, skip_backorder=True
+        ).button_validate()
+        # at this stage we have a backorder shipping with a move with 2 origins
+        # the first origin is the processed picking and the second origin is the
+        # picking to do to complete the backorder delivery
+        backorder = self.shipping1.backorder_ids
+        self.assertEqual(len(backorder), 1)
+        self.assertEqual(len(backorder.move_ids), 1)
+        self.assertEqual(len(backorder.move_ids.move_orig_ids), 2)
+        # unrelease the backorder
+        backorder.unrelease()
+        # we should have 1 move into the picking1 backorder canceled
+        self.assertEqual(
+            len(picking1_backorder.move_ids.filtered(lambda m: m.state == "cancel")), 1
+        )
 
     def test_simulate_cancel_so(self):
         """Simulate a sale order cancelation.

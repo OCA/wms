@@ -85,21 +85,25 @@ class StockMove(models.Model):
 
     def _is_unrelease_allowed_on_origin_moves(self, origin_moves):
         """We check that the origin moves are in a state that allows the unrelease
-        of the current move. At this stage, a move can't be unreleased if
-          * a picking is already printed. (The work on the picking is planed and
-            we don't want to change it)
-          * the processing of the origin moves is partially started.
+        of the current move. At this stage, a move can be unreleased if the
+        remaining quantity to process into origin moves not done or cancelled
+        and not part of a picking that is printed (because the processing of the
+        origin moves is started) is greater or equal to the quantity of the
+        move we want to unrelease.
         """
         self.ensure_one()
-        pickings = origin_moves.mapped("picking_id")
-        if pickings.filtered("printed"):
-            # The picking is printed, we can't unrelease the move
-            # because the processing of the origin moves is started.
-            return False
+        # We filter out the origin moves that are done or cancelled
         origin_moves = origin_moves.filtered(
             lambda m: m.state not in ("done", "cancel")
         )
+        # we filter out the origin moves that are part of a picking that is
+        # printed
+        origin_moves = origin_moves.filtered(lambda m: not m.picking_id.printed)
+        # We compute the remaining quantity to process into origin moves
         origin_qty_todo = sum(origin_moves.mapped("product_qty"))
+
+        # We check that the remaining quantity to process into origin moves
+        # is greater or equal to the quantity of the move we want to unrelease.
         return (
             float_compare(
                 self.product_qty,
