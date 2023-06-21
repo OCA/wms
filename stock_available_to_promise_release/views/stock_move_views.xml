@@ -12,8 +12,6 @@
                 <field name="origin" optional="show" />
                 <field name="group_id" optional="show" />
                 <field name="priority" optional="show" />
-                <field name="zip_code" optional="show" string="Postcode" />
-                <field name="city" optional="show" />
             </field>
             <field name="product_uom_qty" position="after">
                 <field name="ordered_available_to_promise_uom_qty" />

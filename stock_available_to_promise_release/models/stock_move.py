@@ -50,8 +50,6 @@ class StockMove(models.Model):
     )
     need_release = fields.Boolean(index=True, copy=False)
     unrelease_allowed = fields.Boolean(compute="_compute_unrelease_allowed")
-    zip_code = fields.Char(related="partner_id.zip", store=True)
-    city = fields.Char(related="partner_id.city", store=True)
 
     @api.depends("rule_id", "rule_id.available_to_promise_defer_pull")
     def _compute_unrelease_allowed(self):

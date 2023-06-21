@@ -64,11 +64,6 @@
         <field name="inherit_id" ref="stock.vpicktree" />
         <field eval="900" name="priority" />
         <field name="arch" type="xml">
-            <field name="partner_id" position="after">
-                <field name="zip_code" optional="hide" />
-                <field name="city" optional="hide" />
-                <field name="state_id" options="{'no_open': True}" optional="hide" />
-            </field>
             <field name="origin" position="after">
                 <field name="group_id" optional="hide" />
             </field>
