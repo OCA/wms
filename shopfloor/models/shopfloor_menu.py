@@ -33,7 +33,7 @@ by scanning a product or product packaging EAN to increase the quantity
 (i.e. +1 Unit or +1 Box)
 """
 
-AUTO_POST_LINE = """
+AUTO_POST_LINE_HELP = """
 When setting result pack & destination,
 automatically post the corresponding line
 if this option is checked.
@@ -206,7 +206,7 @@ class ShopfloorMenu(models.Model):
     auto_post_line = fields.Boolean(
         string="Automatically post line",
         default=False,
-        help=AUTO_POST_LINE,
+        help=AUTO_POST_LINE_HELP,
     )
     auto_post_line_is_possible = fields.Boolean(
         compute="_compute_auto_post_line_is_possible"
@@ -422,6 +422,7 @@ class ShopfloorMenu(models.Model):
                 "auto_post_line"
             )
 
+    @api.depends("scenario_id")
     def _compute_allow_alternative_destination_is_possible(self):
         for menu in self:
             menu.allow_alternative_destination_is_possible = (
