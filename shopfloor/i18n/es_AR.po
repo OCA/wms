@@ -103,16 +103,6 @@ msgstr ""
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid ""
-"'Multiple moves same destination package' is mandatory when 'Pick and pack "
-"at the same time' is set."
-msgstr ""
-"'Múltiples movimientos en el mismo paquete de destino' es obligatorio cuando "
-"'Recoger y empaquetar al mismo tiempo' está configurado."
-
-#. module: shopfloor
-#: code:addons/shopfloor/models/shopfloor_menu.py:0
-#, python-format
-msgid ""
 "'Pick and pack at the same time' is incompatible with 'Multiple moves same "
 "destination package'."
 msgstr ""
@@ -1868,6 +1858,14 @@ msgstr "{} no encontrado en la transferencia actual o ya está en un paquete."
 #, python-format
 msgid "{} {} put in {}"
 msgstr "{} {} poner en {}"
+
+#, python-format
+#~ msgid ""
+#~ "'Multiple moves same destination package' is mandatory when 'Pick and "
+#~ "pack at the same time' is set."
+#~ msgstr ""
+#~ "'Múltiples movimientos en el mismo paquete de destino' es obligatorio "
+#~ "cuando 'Recoger y empaquetar al mismo tiempo' está configurado."
 
 #, python-format
 #~ msgid ""

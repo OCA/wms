@@ -73,14 +73,6 @@ msgstr ""
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid ""
-"'Multiple moves same destination package' is mandatory when 'Pick and pack "
-"at the same time' is set."
-msgstr ""
-
-#. module: shopfloor
-#: code:addons/shopfloor/models/shopfloor_menu.py:0
-#, python-format
-msgid ""
 "'Pick and pack at the same time' is incompatible with 'Multiple moves same "
 "destination package'."
 msgstr ""
