@@ -658,21 +658,50 @@ const ZonePicking = {
                     },
                 },
                 set_line_destination: {
+                    enter: () => {
+                        // When entering this screen, we show a different message if:
+                        // - We only allow scanning locations.
+                        // - We allow scanning locations and packages.
+                        const is_scan_package_allowed = this.state.data
+                            .allow_scan_destination_package;
+                        const placeholder = is_scan_package_allowed
+                            ? this.state.display_info.scan_placeholder_full
+                            : this.state.display_info.scan_placeholder_location;
+                        this.state.display_info.scan_placeholder = placeholder;
+                    },
                     display_info: {
                         title: "Set destination",
                         scan_placeholder: "Scan location or package",
                         scan_placeholder_full: "Scan location or package",
-                        scan_placeholder_partial: "Scan package",
+                        scan_placeholder_package: "Scan package",
+                        scan_placeholder_location: "Scan location",
                     },
                     events: {
                         qty_edit: "on_qty_update",
                     },
                     on_qty_update: (qty) => {
                         this.scan_destination_qty = parseInt(qty, 10);
-                        if (this.state.data.move_line.quantity != qty) {
-                            this.state.display_info.scan_placeholder = this.state.display_info.scan_placeholder_partial;
+
+                        // Display different placeholder messages (package / location / both).
+                        const is_scan_package_allowed = this.state.data
+                            .allow_scan_destination_package;
+                        const full_qty = this.state.data.move_line.quantity === qty;
+
+                        const display_info = this.state.display_info;
+                        if (!is_scan_package_allowed) {
+                            // Only locations are allowed.
+                            display_info.scan_placeholder =
+                                display_info.scan_placeholder_location;
                         } else {
-                            this.state.display_info.scan_placeholder = this.state.display_info.scan_placeholder_full;
+                            if (!full_qty) {
+                                // Only packages are allowed.
+                                display_info.scan_placeholder =
+                                    display_info.scan_placeholder_package;
+                            } else {
+                                // Both are allowed.
+                                display_info.scan_placeholder =
+                                    display_info.scan_placeholder_full;
+                            }
                         }
                     },
                     on_scan: (scanned) => {

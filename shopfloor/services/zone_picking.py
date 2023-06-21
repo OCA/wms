@@ -228,6 +228,9 @@ class ZonePicking(Component):
         data = self._data_for_move_line(move_line)
         data["move_line"].update(kw)
         data["confirmation_required"] = confirmation_required
+        data[
+            "allow_scan_destination_package"
+        ] = self.work.menu.allow_scan_destination_package
         return self._response(
             next_state="set_line_destination", data=data, message=message
         )
@@ -1913,6 +1916,11 @@ class ShopfloorZonePickingValidatorResponse(Component):
             },
             "product_id": {
                 "type": "integer",
+                "nullable": True,
+                "required": False,
+            },
+            "allow_scan_destination_package": {
+                "type": "boolean",
                 "nullable": True,
                 "required": False,
             },
