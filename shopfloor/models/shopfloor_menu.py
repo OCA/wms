@@ -46,6 +46,13 @@ A new move will be added as a return of the delivery,
 decreasing the delivered quantity of the related SO line.
 """
 
+ALLOW_SCAN_DESTINATION_PACKAGE_HELP = """
+When moving a whole package, the user normally scans
+a destination location.
+If enabled, they will also be allowed
+to scan a destination package.
+"""
+
 
 class ShopfloorMenu(models.Model):
     _inherit = "shopfloor.menu"
@@ -210,6 +217,14 @@ class ShopfloorMenu(models.Model):
     )
     auto_post_line_is_possible = fields.Boolean(
         compute="_compute_auto_post_line_is_possible"
+    )
+    allow_scan_destination_package = fields.Boolean(
+        string="Allow to scan a destination package",
+        default=False,
+        help=ALLOW_SCAN_DESTINATION_PACKAGE_HELP,
+    )
+    allow_scan_destination_package_is_possible = fields.Boolean(
+        compute="_compute_allow_scan_destination_package_is_possible"
     )
 
     @api.onchange("unload_package_at_destination")
@@ -433,3 +448,9 @@ class ShopfloorMenu(models.Model):
     def _compute_allow_return_is_possible(self):
         for menu in self:
             menu.allow_return_is_possible = menu.scenario_id.has_option("allow_return")
+
+    def _compute_allow_scan_destination_package_is_possible(self):
+        for menu in self:
+            menu.allow_scan_destination_package_is_possible = (
+                menu.scenario_id.has_option("allow_scan_destination_package")
+            )
