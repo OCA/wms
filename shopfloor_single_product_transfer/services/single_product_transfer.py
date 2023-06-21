@@ -599,7 +599,12 @@ class ShopfloorSingleProductTransfer(Component):
         # TODO qty_done = 0: transfer_no_qty_done
         # TODO qty done < product_qty: transfer_confirm_done
         self._write_destination_on_lines(move_line, location)
-        self._post_move(move_line)
+        if self.is_allow_move_create():
+            self._post_move(move_line)
+        else:
+            # If allow_move_create is not enabled,
+            # we create a backorder.
+            self._split_move(move_line)
         message = self.msg_store.transfer_done_success(move_line.picking_id)
         completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(move_line)
@@ -611,6 +616,9 @@ class ShopfloorSingleProductTransfer(Component):
         )
 
     def _post_move(self, move_line):
+        move_line.picking_id.with_context({"cancel_backorder": True})._action_done()
+
+    def _split_move(self, move_line):
         # TODO: when we split the move, we still get a
         # backorder, which should not be the case.
         # See if there's a way to identify the moves
@@ -808,9 +816,13 @@ class ShopfloorSingleProductTransfer(Component):
         return self._response_for_set_quantity(move_line, message=message)
 
     def set_quantity__action_cancel(self, selected_line_id):
-        stock = self._actions_for("stock")
         move_line = self.env["stock.move.line"].browse(selected_line_id).exists()
-        stock.unmark_move_line_as_picked(move_line)
+        picking = move_line.picking_id
+        if self.is_allow_move_create() and self.env.user == picking.create_uid:
+            picking.action_cancel()
+        else:
+            stock = self._actions_for("stock")
+            stock.unmark_move_line_as_picked(move_line)
         return self._response_for_select_location_or_package()
 
     def set_location(self, selected_line_id, package_id, barcode):
