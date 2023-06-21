@@ -882,3 +882,11 @@ class MessageAction(Component):
             "message_type": "warning",
             "body": _("No line to pack found."),
         }
+
+    def package_not_allowed_scan_location(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "Scanning a package is not allowed, please scan a location instead."
+            ),
+        }
