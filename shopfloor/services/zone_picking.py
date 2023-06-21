@@ -1097,7 +1097,14 @@ class ZonePicking(Component):
 
         pkg_moved = False
         search = self._actions_for("search")
-        accept_only_package = not self._move_line_full_qty(move_line, quantity)
+        # Only allow scanning a destination package if this option is enabled.
+        allow_package = self.work.menu.allow_scan_destination_package
+        # If scanning a destination package is allowed,
+        # and the scanned qty isn't equal to the qty todo,
+        # we force the user to scan a package.
+        accept_only_package = allow_package and not self._move_line_full_qty(
+            move_line, quantity
+        )
 
         response = self._set_destination_update_quantity(move_line, quantity, barcode)
         if response:
@@ -1146,6 +1153,11 @@ class ZonePicking(Component):
 
         # When the barcode is a package
         package = search.package_from_scan(barcode)
+        if package and not allow_package:
+            message = self.msg_store.package_not_allowed_scan_location()
+            return self._response_for_set_line_destination(
+                move_line, message=message, qty_done=quantity
+            )
         if package:
             if self._pick_pack_same_time():
                 (
