@@ -31,13 +31,14 @@ class StockReleaseChannel(models.Model):
 
     def button_show_shipment_advice(self):
         self.ensure_one()
+        context = dict(self.env.context, search_default_today=1)
         return {
             "type": "ir.actions.act_window",
             "name": _("Shipment Advice"),
-            "view_mode": "calendar,tree,form",
+            "view_mode": "tree,calendar,form",
             "res_model": self.shipment_advice_ids._name,
             "domain": [("release_channel_id", "=", self.id)],
-            "context": self.env.context,
+            "context": context,
         }
 
     @api.depends("shipment_planning_method", "picking_to_plan_ids")
