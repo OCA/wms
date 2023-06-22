@@ -663,7 +663,12 @@ class DeliveryShipment(Component):
     def _find_move_lines_not_loaded_from_shipment(self, shipment_advice):
         """Returns the move lines not loaded at all from the shipment advice."""
         domain = self._find_move_lines_domain(shipment_advice)
-        domain.append(("qty_done", "=", 0))
+        domain.extend(
+            [
+                ("qty_done", "=", 0),
+                ("picking_id.picking_type_id", "in", self.picking_types.ids),
+            ]
+        )
         return self.env["stock.move.line"].search(domain)
 
     def _find_pickings_not_loaded_from_shipment(self, shipment_advice):
