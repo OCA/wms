@@ -63,6 +63,42 @@ class TestSetQuantity(CommonCase):
             response, next_state="set_quantity", message=expected_message, data=data
         )
 
+    def test_set_quantity_line_done(self):
+        picking = self._setup_picking()
+        move_line = picking.move_line_ids
+        self.service.dispatch(
+            "scan_product",
+            params={"location_id": self.location.id, "barcode": self.product.barcode},
+        )
+        # We process the line correctly, which will mark the line as "done".
+        self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "quantity": move_line.product_uom_qty,
+                "barcode": self.dispatch_location.name,
+            },
+        )
+        self.assertEqual(move_line.state, "done")
+        # If we try to do it again, we're not allowed
+        # and we're notified that the move is alread done.
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "quantity": move_line.product_uom_qty,
+                "barcode": self.product.barcode,
+            },
+        )
+        data = {
+            "move_line": self._data_for_move_line(move_line),
+            "asking_confirmation": False,
+        }
+        expected_message = self.msg_store.move_already_done()
+        self.assert_response(
+            response, next_state="set_quantity", message=expected_message, data=data
+        )
+
     def test_set_quantity_scan_product_prefill_qty_disabled(self):
         # First, select a picking
         picking = self._setup_picking()
