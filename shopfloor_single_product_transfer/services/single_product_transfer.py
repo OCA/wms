@@ -796,6 +796,11 @@ class ShopfloorSingleProductTransfer(Component):
         if not move_line.exists():
             # TODO Should probably return to scan_product or scan_location?
             return self._response_for_set_quantity(move_line)
+
+        self._lock_lines(move_line)
+        if move_line.state == "done":
+            message = self.msg_store.move_already_done()
+            return self._response_for_set_quantity(move_line, message=message)
         self._set_quantity__set_picker_qty(move_line, quantity)
         handlers_by_type = {
             # Increment qty done if a product / lot / packaging is scanned
