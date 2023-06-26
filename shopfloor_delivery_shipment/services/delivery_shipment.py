@@ -198,7 +198,9 @@ class DeliveryShipment(Component):
         priority if any) corresponding to the scanned package and load it.
         If no content is found an error will be returned.
         """
-        move_lines = self._find_move_lines_from_package(shipment_advice, package)
+        move_lines = self._find_move_lines_from_package(
+            shipment_advice, package, picking, location
+        )
         if move_lines:
             # Check transfer status
             message = self._check_picking_status(move_lines.picking_id, shipment_advice)
@@ -250,7 +252,9 @@ class DeliveryShipment(Component):
         priority if any) corresponding to the scanned lot and load it.
         If no move line is found an error will be returned.
         """
-        move_lines = self._find_move_lines_from_lot(shipment_advice, lot)
+        move_lines = self._find_move_lines_from_lot(
+            shipment_advice, lot, picking, location
+        )
         if move_lines:
             # Check transfer status
             message = self._check_picking_status(move_lines.picking_id, shipment_advice)
@@ -314,7 +318,7 @@ class DeliveryShipment(Component):
                 message=self.msg_store.scan_operation_first(),
             )
         move_lines = self._find_move_lines_from_product(
-            shipment_advice, product, picking
+            shipment_advice, product, picking, location
         )
         if move_lines:
             # Check transfer status
@@ -740,17 +744,35 @@ class DeliveryShipment(Component):
             shipment_picking_type_ids=self.picking_types.ids
         )._find_move_lines_domain()  # Defined in `shipment_advice`
 
-    def _find_move_lines_from_package(self, shipment_advice, package):
+    def _find_move_lines_from_package(
+        self, shipment_advice, package, picking, location
+    ):
         """Returns the move line corresponding to `package` for the given shipment."""
         domain = self._find_move_lines_domain(shipment_advice)
         # FIXME should we check also result package here?
         domain.append(("package_id", "=", package.id))
+        if location:
+            domain.append(
+                ("location_id", "child_of", location.id),
+            )
+        if picking:
+            domain.append(
+                ("picking_id", "=", picking.id),
+            )
         return self.env["stock.move.line"].search(domain)
 
-    def _find_move_lines_from_lot(self, shipment_advice, lot):
+    def _find_move_lines_from_lot(self, shipment_advice, lot, picking, location):
         """Returns the move line corresponding to `lot` for the given shipment."""
         domain = self._find_move_lines_domain(shipment_advice)
         domain.append(("lot_id", "=", lot.id))
+        if location:
+            domain.append(
+                ("location_id", "child_of", location.id),
+            )
+        if picking:
+            domain.append(
+                ("picking_id", "=", picking.id),
+            )
         return self.env["stock.move.line"].search(domain)
 
     def _find_move_lines_from_product(
@@ -758,6 +780,7 @@ class DeliveryShipment(Component):
         shipment_advice,
         product,
         picking,
+        location,
         in_package_not_loaded=False,
         in_lot=False,
     ):
@@ -766,8 +789,15 @@ class DeliveryShipment(Component):
         """
         domain = self._find_move_lines_domain(shipment_advice)
         domain.extend(
-            [("product_id", "=", product.id), ("picking_id", "=", picking.id)]
+            [
+                ("product_id", "=", product.id),
+                ("picking_id", "=", picking.id),
+            ]
         )
+        if location:
+            domain.append(
+                ("location_id", "child_of", location.id),
+            )
         if in_package_not_loaded:
             domain.append(
                 ("package_level_id", "!=", False),
