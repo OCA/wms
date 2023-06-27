@@ -173,11 +173,81 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 "picking": self.data.picking(picking),
                 "selected_move_lines": self.data.move_lines(selected_lines),
                 "packing_info": self.service._data_for_packing_info(picking),
-                "no_package_enabled": not self.service.options.get(
-                    "checkout__disable_no_package"
-                ),
+                "allow_with_package": True,
+                "allow_without_package": True,
             },
             message=self.service.msg_store.dest_package_not_valid(pack1),
+        )
+
+    def test_scan_package_action_scan_package_keep_source_package_error_package_process_type(
+        self,
+    ):
+        ppt = "without_package"
+        self.menu.sudo().package_process_type = ppt
+        picking = self._create_picking(
+            lines=[
+                (self.product_a, 10),
+                (self.product_b, 10),
+                (self.product_c, 10),
+                (self.product_d, 10),
+            ]
+        )
+        pack1_moves = picking.move_lines[:3]
+        pack2_moves = picking.move_lines[3:]
+        # put in 2 packs, for this test, we'll work on pack1
+        self._fill_stock_for_moves(pack1_moves, in_package=True)
+        self._fill_stock_for_moves(pack2_moves, in_package=True)
+        picking.action_assign()
+
+        selected_lines = pack1_moves.move_line_ids
+        pack1 = pack1_moves.move_line_ids.package_id
+
+        move_line1, move_line2, move_line3 = selected_lines
+        # We'll put only product A and B in the package
+        move_line1.qty_done = move_line1.product_uom_qty
+        move_line2.qty_done = move_line2.product_uom_qty
+        move_line3.qty_done = 0
+
+        response = self.service.dispatch(
+            "scan_package_action",
+            params={
+                "picking_id": picking.id,
+                "selected_line_ids": selected_lines.ids,
+                # we try to keep the goods in the same package, so we scan the
+                # source package but this isn't allowed as it is not a delivery
+                # package (i.e. having a delivery packaging set)
+                "barcode": pack1.name,
+            },
+        )
+
+        self.assertRecordValues(
+            move_line1,
+            [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
+        )
+        self.assertRecordValues(
+            move_line2,
+            [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
+        )
+        self.assertRecordValues(
+            move_line3,
+            # qty_done was zero so it hasn't been done anyway
+            [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
+        )
+        self.assert_response(
+            response,
+            # go pack to the screen to select lines to put in packages
+            next_state="select_package",
+            data={
+                "picking": self.data.picking(picking),
+                "selected_move_lines": self.data.move_lines(selected_lines),
+                "packing_info": self.service._data_for_packing_info(picking),
+                "allow_with_package": False,
+                "allow_without_package": True,
+            },
+            message=self.service.msg_store.invalid_scanned_checkout_object_wo_package(
+                "package",
+                ppt,
+            ),
         )
 
     def test_scan_package_action_scan_package_error_invalid(self):
@@ -213,6 +283,44 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             response,
             selected_line,
             message=self.service.msg_store.dest_package_not_valid(other_package),
+        )
+
+    def test_scan_package_action_scan_package_error_invalid_package_process_type(self):
+        ppt = "without_package"
+        self.menu.sudo().package_process_type = ppt
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        move = picking.move_lines
+        self._fill_stock_for_moves(move, in_package=True)
+        picking.action_assign()
+
+        selected_line = move.move_line_ids
+        other_package = self.env["stock.quant.package"].create({})
+
+        response = self.service.dispatch(
+            "scan_package_action",
+            params={
+                "picking_id": picking.id,
+                "selected_line_ids": selected_line.ids,
+                "barcode": other_package.name,
+            },
+        )
+
+        self.assertRecordValues(
+            selected_line,
+            [
+                {
+                    "result_package_id": selected_line.package_id.id,
+                    "shopfloor_checkout_done": False,
+                }
+            ],
+        )
+        self._assert_selected_response(
+            response,
+            selected_line,
+            message=self.service.msg_store.invalid_scanned_checkout_object_wo_package(
+                "package", ppt
+            ),
+            allow_with_package=False,
         )
 
     def test_scan_package_action_scan_package_use_existing_package_ok(self):
@@ -434,6 +542,99 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 response["message"],
                 self.msg_store.goods_packed_in(selected_lines.result_package_id),
             )
+
+    def test_scan_package_action_scan_packaging_invalid_package_process_type(
+        self,
+    ):
+        ppt = "without_package"
+        self.menu.sudo().package_process_type = ppt
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        picking.carrier_id = picking.carrier_id.search([], limit=1)
+        pack1_moves = picking.move_lines
+        # put in 2 packs, for this test, we'll work on pack1
+        self._fill_stock_for_moves(pack1_moves, in_package=True)
+        picking.action_assign()
+        selected_lines = pack1_moves.move_line_ids
+        selected_lines.qty_done = selected_lines.product_uom_qty
+
+        packaging = (
+            self.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product Delivery Packaging",
+                    "product_id": selected_lines.product_id.id,
+                    "barcode": "XXX",
+                    "height": 12,
+                    "width": 13,
+                    "packaging_length": 14,
+                }
+            )
+        )
+        response = self.service.dispatch(
+            "scan_package_action",
+            params={
+                "picking_id": picking.id,
+                "selected_line_ids": selected_lines.ids,
+                # create a new package using this packaging
+                "barcode": packaging.barcode,
+            },
+        )
+        self._assert_selected_response(
+            response,
+            selected_lines,
+            message=self.msg_store.invalid_scanned_checkout_object_wo_package(
+                "packaging",
+                ppt,
+            ),
+            allow_with_package=False,
+        )
+
+    def test_scan_package_action_scan_delivery_packaging_invalid_package_process_type(
+        self,
+    ):
+        ppt = "without_package"
+        self.menu.sudo().package_process_type = ppt
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        picking.carrier_id = picking.carrier_id.search([], limit=1)
+        pack1_moves = picking.move_lines
+        # put in 2 packs, for this test, we'll work on pack1
+        self._fill_stock_for_moves(pack1_moves, in_package=True)
+        picking.action_assign()
+        selected_lines = pack1_moves.move_line_ids
+        selected_lines.qty_done = selected_lines.product_uom_qty
+
+        packaging = (
+            self.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "DeliverX",
+                    "barcode": "XXX",
+                    "height": 12,
+                    "width": 13,
+                    "packaging_length": 14,
+                }
+            )
+        )
+        response = self.service.dispatch(
+            "scan_package_action",
+            params={
+                "picking_id": picking.id,
+                "selected_line_ids": selected_lines.ids,
+                # create a new package using this packaging
+                "barcode": packaging.barcode,
+            },
+        )
+        self._assert_selected_response(
+            response,
+            selected_lines,
+            message=self.msg_store.invalid_scanned_checkout_object_wo_package(
+                "delivery_packaging",
+                ppt,
+            ),
+            allow_with_package=False,
+        )
 
     def test_scan_package_action_scan_not_found(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])

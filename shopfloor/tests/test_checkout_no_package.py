@@ -66,8 +66,8 @@ class CheckoutNoPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             },
         )
 
-    def test_no_package_disabled(self):
-        self.service.work.options = {"checkout__disable_no_package": True}
+    def test_without_package_disabled(self):
+        self.menu.sudo().package_process_type = "with_package"
         with self.assertRaises(werkzeug.exceptions.BadRequest) as err:
             self.service.dispatch(
                 "no_package",

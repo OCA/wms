@@ -59,7 +59,8 @@ class CheckoutCommonCase(CommonCase):
                 ],
                 "picking": self._picking_summary_data(picking),
                 "packing_info": "",
-                "no_package_enabled": True,
+                "allow_with_package": True,
+                "allow_without_package": True,
             },
             message={
                 "message_type": "warning",

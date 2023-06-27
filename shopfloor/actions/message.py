@@ -807,3 +807,27 @@ class MessageAction(Component):
             "message_type": "warning",
             "body": _("No line to pack found."),
         }
+
+    def invalid_scanned_checkout_object_wo_package(
+        self, scanned_object, package_process_type
+    ):
+        scanned_object_name = {
+            "package": _("a package"),
+            "packaging": _("a packaging"),
+            "delivery_packaging": _("a delivery packaging"),
+        }.get(scanned_object, _("N/A"))
+
+        selection = self.env["shopfloor.menu"]._fields["package_process_type"].selection
+        ppt_name = None
+        for el in selection:
+            if el[0] == package_process_type:
+                ppt_name = el[1]
+                break
+
+        return {
+            "message_type": "error",
+            "body": _(
+                "You scanned {scanned_object_name} which is not allowed"
+                " with the package process type '{ppt_name}'"
+            ).format(scanned_object_name=scanned_object_name, ppt_name=ppt_name),
+        }

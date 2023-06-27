@@ -31,9 +31,9 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         )
         self._assert_selected(response, selected_lines)
 
-    def test_select_line_no_package_disabled(self):
+    def test_select_line_without_package(self):
         selected_lines = self.moves_pack.move_line_ids
-        self.service.work.options = {"checkout__disable_no_package": True}
+        self.menu.sudo().package_process_type = "without_package"
         response = self.service.dispatch(
             "select_line",
             params={
@@ -41,7 +41,19 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
                 "package_id": selected_lines.package_id.id,
             },
         )
-        self._assert_selected(response, selected_lines, no_package_enabled=False)
+        self._assert_selected(response, selected_lines, allow_with_package=False)
+
+    def test_select_line_with_package(self):
+        selected_lines = self.moves_pack.move_line_ids
+        self.menu.sudo().package_process_type = "with_package"
+        response = self.service.dispatch(
+            "select_line",
+            params={
+                "picking_id": self.picking.id,
+                "package_id": selected_lines.package_id.id,
+            },
+        )
+        self._assert_selected(response, selected_lines, allow_without_package=False)
 
     def test_select_line_move_line_package_ok(self):
         selected_lines = self.moves_pack.move_line_ids

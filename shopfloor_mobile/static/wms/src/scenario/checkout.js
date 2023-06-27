@@ -92,7 +92,7 @@ const Checkout = {
                     :key="make_state_component_key(['detail-picking-select'])"
                     />
                 <div class="button-list button-vertical-list full">
-                    <v-row align="center">
+                    <v-row align="center" v-if="state.data.allow_with_package">
                         <v-col class="text-center" cols="12">
                             <btn-action
                                    @click="state.on_existing_pack"
@@ -100,7 +100,7 @@ const Checkout = {
                                    >Existing pack</btn-action>
                         </v-col>
                     </v-row>
-                    <v-row align="center">
+                    <v-row align="center" v-if="state.data.allow_with_package">
                         <v-col class="text-center" cols="12">
                             <btn-action
                                    @click="state.on_new_pack"
@@ -108,7 +108,7 @@ const Checkout = {
                                    >New pack</btn-action>
                         </v-col>
                     </v-row>
-                    <v-row align="center" v-if="state.data.no_package_enabled">
+                    <v-row align="center" v-if="state.data.allow_without_package">
                         <v-col class="text-center" cols="12">
                             <btn-action
                                    @click="state.on_without_pack"

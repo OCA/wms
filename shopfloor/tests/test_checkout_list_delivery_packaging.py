@@ -112,9 +112,8 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
                     self._move_line_data(ml) for ml in selected_lines.sorted()
                 ],
                 "packing_info": self.service._data_for_packing_info(self.picking),
-                "no_package_enabled": not self.service.options.get(
-                    "checkout__disable_no_package"
-                ),
+                "allow_with_package": True,
+                "allow_without_package": True,
             },
             message=self.service.msg_store.no_delivery_packaging_available(),
         )
