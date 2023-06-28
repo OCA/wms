@@ -413,6 +413,27 @@ to release and of the progress of the released transfers.</p>
 <p>When clicking on the “box” button, transfers are released automatically, to
 reach a total of &lt;Max Transfers to release&gt; (option configured in the channel
 settings).</p>
+<p>The availability of a release channel depends on its state. A release channel
+can be in one of the following states:</p>
+<blockquote>
+<ul class="simple">
+<li>Open: the channel is available and can be used to release transfers. New
+transfer are assigned automatically to this channel.</li>
+<li>Locked: the channel is available but the release of transfers from the channel
+is no more possible. New transfers are still automatically assigned to this</li>
+<li>Asleep: the channel is not available and cannot be used to release
+transfers. It is also no more possible to assign transfers to this channel.</li>
+</ul>
+</blockquote>
+<p>New release channels are by default “Open”. You can change its state by using
+the “Lock” and “Sleep” buttons. When the “Sleep” button is used, in addition to
+the state change, not completed transfers assigned to the channel are unassigned
+from the channel. When the “Lock” button is used, only the state change is changed.
+A locked channel can be unlocked by using the “Unlock” button.
+A asleep channel can be waken up by using the “Wake up” button. When the “Wake up”
+button is used, in addition to the state change, the system looks for pending
+transfers requiring a release and try to assign them to a channel in the
+“Open” or “Locked” state.</p>
 </div>
 <div class="section" id="bug-tracker">
 <h1><a class="toc-backref" href="#id3">Bug Tracker</a></h1>
@@ -428,6 +449,7 @@ If you spotted it first, help us smashing it by providing a detailed and welcome
 <h2><a class="toc-backref" href="#id5">Authors</a></h2>
 <ul class="simple">
 <li>Camptocamp</li>
+<li>ACSONE SA/NV</li>
 </ul>
 </div>
 <div class="section" id="contributors">
@@ -437,6 +459,7 @@ If you spotted it first, help us smashing it by providing a detailed and welcome
 <li>Matthieu Méquignon &lt;<a class="reference external" href="mailto:matthieu.mequignon&#64;camptocamp.com">matthieu.mequignon&#64;camptocamp.com</a>&gt;</li>
 <li>Sébastien Alix &lt;<a class="reference external" href="mailto:sebastien.alix&#64;camptocamp.com">sebastien.alix&#64;camptocamp.com</a>&gt;</li>
 <li>Jacques-Etienne Baudoux &lt;<a class="reference external" href="mailto:je&#64;bcim.be">je&#64;bcim.be</a>&gt;</li>
+<li>Laurent Mignon &lt;<a class="reference external" href="mailto:laurent.mignon&#64;acsone.eu">laurent.mignon&#64;acsone.eu</a>&gt;</li>
 </ul>
 </div>
 <div class="section" id="design">
