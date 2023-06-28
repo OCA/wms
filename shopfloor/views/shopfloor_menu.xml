@@ -159,14 +159,14 @@
                   <field name="allow_return" />
               </group>
               <group
-                    name="allow_scan_destination_package"
-                    attrs="{'invisible': [('allow_scan_destination_package_is_possible', '=', False)]}"
+                    name="allow_alternative_destination_package"
+                    attrs="{'invisible': [('allow_alternative_destination_package_is_possible', '=', False)]}"
                 >
                     <field
-                        name="allow_scan_destination_package_is_possible"
+                        name="allow_alternative_destination_package_is_possible"
                         invisible="1"
                     />
-                    <field name="allow_scan_destination_package" />
+                    <field name="allow_alternative_destination_package" />
                 </group>
             </group>
         </field>
