@@ -663,7 +663,7 @@ const ZonePicking = {
                         // - We only allow scanning locations.
                         // - We allow scanning locations and packages.
                         const is_scan_package_allowed = this.state.data
-                            .allow_scan_destination_package;
+                            .allow_alternative_destination_package;
                         const placeholder = is_scan_package_allowed
                             ? this.state.display_info.scan_placeholder_full
                             : this.state.display_info.scan_placeholder_location;
@@ -684,7 +684,7 @@ const ZonePicking = {
 
                         // Display different placeholder messages (package / location / both).
                         const is_scan_package_allowed = this.state.data
-                            .allow_scan_destination_package;
+                            .allow_alternative_destination_package;
                         const full_qty = this.state.data.move_line.quantity === qty;
 
                         const display_info = this.state.display_info;

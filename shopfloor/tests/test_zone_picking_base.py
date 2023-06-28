@@ -259,7 +259,7 @@ class ZonePickingCommonCase(CommonCase):
             current_zone_location=self.zone_location,
             current_picking_type=self.picking_type,
         )
-        self.menu.sudo().allow_scan_destination_package = True
+        self.menu.sudo().allow_alternative_destination_package = True
 
     def _assert_response_select_zone(self, response, zone_locations, message=None):
         data = {"zones": self.service._data_for_select_zone(zone_locations)}
@@ -381,7 +381,9 @@ class ZonePickingCommonCase(CommonCase):
         expected_move_line = self.data.move_line(move_line, with_picking=True)
         if qty_done is not None:
             expected_move_line["qty_done"] = qty_done
-        allow_scan_destination_package = self.menu.allow_scan_destination_package
+        allow_alternative_destination_package = (
+            self.menu.allow_alternative_destination_package
+        )
         self.assert_response(
             response,
             next_state=state,
@@ -390,7 +392,7 @@ class ZonePickingCommonCase(CommonCase):
                 "picking_type": self.data.picking_type(picking_type),
                 "move_line": expected_move_line,
                 "confirmation_required": confirmation_required,
-                "allow_scan_destination_package": allow_scan_destination_package,
+                "allow_alternative_destination_package": allow_alternative_destination_package,
             },
             message=message,
         )
