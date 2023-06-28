@@ -28,7 +28,27 @@ class ShopfloorSchemaAction(Component):
                     "nullable": False,
                     "required": True,
                 },
+                "loaded_packages_progress_f": {
+                    "type": "float",
+                    "nullable": False,
+                    "required": True,
+                },
+                "loaded_move_lines_progress_f": {
+                    "type": "float",
+                    "nullable": False,
+                    "required": True,
+                },
                 "loaded_progress": {
+                    "type": "string",
+                    "nullable": False,
+                    "required": True,
+                },
+                "loaded_packages_progress": {
+                    "type": "string",
+                    "nullable": False,
+                    "required": True,
+                },
+                "loaded_move_lines_progress": {
                     "type": "string",
                     "nullable": False,
                     "required": True,

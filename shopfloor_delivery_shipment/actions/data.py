@@ -53,7 +53,11 @@ class DataAction(Component):
     def _picking_loaded_parser(self):
         return self._picking_parser + [
             "loaded_progress_f",
+            "loaded_packages_progress_f",
+            "loaded_move_lines_progress_f",
             "loaded_progress",
+            "loaded_packages_progress",
+            "loaded_move_lines_progress",
             "is_fully_loaded_in_shipment:is_fully_loaded",
             "is_partially_loaded_in_shipment:is_partially_loaded",
         ]

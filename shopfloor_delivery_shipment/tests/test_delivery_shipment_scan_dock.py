@@ -58,3 +58,27 @@ class DeliveryShipmentScanDockCase(DeliveryShipmentCommonCase):
             "scan_dock", params={"barcode": self.dock.barcode}
         )
         self.assert_response_scan_document(response, self.shipment)
+
+    def test_scan_dock_with_partially_loaded_transfers(self):
+        package_level = self.picking1.package_level_ids
+        scanned_package = package_level.package_id
+        # Load partially a transfer
+        self.shipment.action_confirm()
+        self.shipment.action_in_progress()
+        response = self.service.dispatch(
+            "scan_document",
+            params={
+                "shipment_advice_id": self.shipment.id,
+                "barcode": scanned_package.name,
+            },
+        )
+        # Scan the dock to check the content to load among partially loaded transfers
+        response = self.service.dispatch(
+            "scan_dock", params={"barcode": self.dock.barcode}
+        )
+        lines_to_load = self.picking1.move_line_ids.filtered(
+            lambda l: l.package_id != scanned_package
+        )
+        self.assert_response_scan_document(
+            response, self.shipment, lines_to_load=lines_to_load
+        )

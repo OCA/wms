@@ -420,7 +420,13 @@ class DeliveryShipment(Component):
         if picking:
             data.update(
                 picking=self.data.picking(picking),
-                content=self._data_for_content_to_load(shipment_advice, picking),
+                content=self._data_for_content_to_load_from_picking(
+                    shipment_advice, picking
+                ),
+            )
+        else:
+            data.update(
+                content=self._data_for_content_to_load_from_pickings(shipment_advice),
             )
         return self._response(next_state="scan_document", data=data, message=message)
 
@@ -459,8 +465,46 @@ class DeliveryShipment(Component):
         }
         return self._response(next_state="validate", data=data, message=message)
 
-    def _data_for_content_to_load(self, shipment_advice, picking):
-        """Return a tuple list of dictionaries where keys are source locations
+    def _data_for_content_to_load_from_pickings(self, shipment_advice):
+        """Return goods to load from transfers partially loaded in a shipment.
+
+        It returns a dict where keys are source locations and values are
+        dictionaries listing package_levels and move_lines that remain to load
+        from transfers partially loaded in a shipment.
+
+        E.g:
+            {
+                "SRC_LOCATION1": {
+                    "package_levels": [{PKG_LEVEL_DATA}, ...],
+                    "move_lines": [{MOVE_LINE_DATA}, ...],
+                },
+                "SRC_LOCATION2": {
+                    ...
+                },
+            }
+        """
+        domain = self._find_move_lines_domain(shipment_advice)
+        # Restrict to lines not loaded
+        domain.insert(0, ("shipment_advice_id", "=", False))
+        # Find lines to load from partially loaded transfers if the shipment
+        # is not planned.
+        if not shipment_advice.planned_move_ids:
+            all_lines_to_load = self.env["stock.move.line"].search(domain)
+            all_pickings = all_lines_to_load.picking_id
+            loaded_lines = self.env["stock.move.line"].search(
+                [
+                    ("picking_id", "in", all_pickings.ids),
+                    ("id", "not in", all_lines_to_load.ids),
+                    ("shipment_advice_id", "!=", False),
+                ]
+            )
+            pickings_partially_loaded = loaded_lines.picking_id
+            domain += [("picking_id", "in", pickings_partially_loaded.ids)]
+        move_lines = self.env["stock.move.line"].search(domain)
+        return self._prepare_data_for_content(move_lines)
+
+    def _data_for_content_to_load_from_picking(self, shipment_advice, picking):
+        """Return a dictionary where keys are source locations
         and values are dictionaries listing package_levels and move_lines
         loaded or to load.
 
@@ -475,11 +519,14 @@ class DeliveryShipment(Component):
                 },
             }
         """
-        data = collections.OrderedDict()
         # Grab move lines to sort, restricted to the current delivery
         move_lines = self._find_move_lines_to_process_from_picking(
             shipment_advice, picking
         )
+        return self._prepare_data_for_content(move_lines)
+
+    def _prepare_data_for_content(self, move_lines):
+        data = collections.OrderedDict()
         package_level_ids = []
         # Sort and group move lines by source location and prepare the data
         for move_line in move_lines.sorted(lambda ml: ml.location_id.name):
@@ -594,34 +641,9 @@ class DeliveryShipment(Component):
 
     def _find_move_lines_domain(self, shipment_advice):
         """Returns the base domain to look for move lines for a given shipment."""
-        domain = [
-            ("state", "in", ("assigned", "partially_available")),
-            ("picking_code", "=", "outgoing"),
-            ("picking_id.picking_type_id", "in", self.picking_types.ids),
-            "|",
-            ("shipment_advice_id", "=", False),
-            ("shipment_advice_id", "=", shipment_advice.id),
-        ]
-        # Shipment with planned content, restrict the search to it
-        if shipment_advice.planned_move_ids:
-            domain.append(("move_id.shipment_advice_id", "=", shipment_advice.id))
-        # Shipment without planned content, search for all unplanned moves
-        else:
-            domain.append(("move_id.shipment_advice_id", "=", False))
-            # Restrict to shipment carrier delivery types (providers)
-            if shipment_advice.carrier_ids:
-                domain.extend(
-                    [
-                        "|",
-                        (
-                            "picking_id.carrier_id.delivery_type",
-                            "in",
-                            shipment_advice.carrier_ids.mapped("delivery_type"),
-                        ),
-                        ("picking_id.carrier_id", "=", False),
-                    ]
-                )
-        return domain
+        return shipment_advice.with_context(
+            shipment_picking_type_ids=self.picking_types.ids
+        )._find_move_lines_domain()  # Defined in `shipment_advice`
 
     def _find_move_lines_from_package(self, shipment_advice, package):
         """Returns the move line corresponding to `package` for the given shipment."""
