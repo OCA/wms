@@ -217,18 +217,7 @@ class ShopfloorSingleProductTransfer(Component):
     def _scan_product__select_move_line(
         self, product, location=None, package=None, lot=None, packaging=None
     ):
-        domain = self._scan_product__select_move_line_domain(
-            product, location=location, package=package, lot=lot
-        )
-        query = self.env["stock.move.line"]._search(domain, limit=1)
-        order_elems = [
-            "stock_move_line__picking_id.user_id",
-            "stock_move_line__picking_id.priority DESC",
-            "stock_move_line__picking_id.scheduled_date ASC",
-            "id DESC",
-        ]
-        query.order = ",".join(order_elems)
-        move_line = self.env["stock.move.line"].browse(query)
+        move_line = self._select_move_line_from_product(product, location, package, lot)
         if move_line:
             stock = self._actions_for("stock")
             if self.work.menu.no_prefill_qty:
@@ -243,6 +232,28 @@ class ShopfloorSingleProductTransfer(Component):
             else:
                 stock.mark_move_line_as_picked(move_line)
             return self._response_for_set_quantity(move_line)
+
+    def _select_move_line_from_product(self, product, location, package, lot):
+        domain = self._scan_product__select_move_line_domain(
+            product, location=location, package=package, lot=lot
+        )
+        # We add a default order by "id" to avoid the _search method
+        # setting up its own order, which will result in an error.
+        query = self.env["stock.move.line"]._search(domain, order="id", limit=1)
+        # After we retrieve the query, we update the order ourselves.
+        order_elems = [
+            "stock_move_line__picking_id.user_id",
+            "stock_move_line__picking_id.priority DESC",
+            "stock_move_line__picking_id.scheduled_date ASC",
+            "id DESC",
+        ]
+        query.order = ",".join(order_elems)
+        query_str, query_params = query.select()
+        query_str += " FOR UPDATE"
+        self.env.cr.execute(query_str, query_params)
+        ml_ids = [row[0] for row in self.env.cr.fetchall()]
+        move_line = self.env["stock.move.line"].browse(ml_ids)
+        return move_line
 
     def _scan_product__check_create_move_line(
         self, product, location=None, package=None, lot=None, packaging=None
