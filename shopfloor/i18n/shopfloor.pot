@@ -36,6 +36,16 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_return
+msgid ""
+"\n"
+"When enabled, you can receive unplanned products that are returned\n"
+"from an existing delivery matched on the origin (SO name).\n"
+"A new move will be added as a return of the delivery,\n"
+"decreasing the delivered quantity of the related SO line.\n"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__multiple_move_single_pack
 msgid ""
 "\n"
@@ -132,6 +142,16 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_move_create
 msgid "Allow Move Creation"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_return_is_possible
+msgid "Allow Return Is Possible"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_return
+msgid "Allow create returns"
 msgstr ""
 
 #. module: shopfloor
@@ -730,6 +750,14 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Operation already processed."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"Operation types for this menu are missing default source and destination "
+"locations."
 msgstr ""
 
 #. module: shopfloor
@@ -1387,6 +1415,12 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "The product/packaging you selected has already been returned."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid ""
 "The quantity scanned for one or more lines cannot be higher than the maximum"
 " allowed."
@@ -1683,6 +1717,12 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "You cannot place it here"
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "You cannot return more quantity than what was initially sent."
 msgstr ""
 
 #. module: shopfloor
