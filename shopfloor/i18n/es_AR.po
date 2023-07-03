@@ -53,6 +53,16 @@ msgstr ""
 "(es decir, +1 Unidad o +1 Caja)\n"
 
 #. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_return
+msgid ""
+"\n"
+"When enabled, you can receive unplanned products that are returned\n"
+"from an existing delivery matched on the origin (SO name).\n"
+"A new move will be added as a return of the delivery,\n"
+"decreasing the delivered quantity of the related SO line.\n"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__multiple_move_single_pack
 msgid ""
 "\n"
@@ -171,6 +181,16 @@ msgstr "Permitir Conseguir Trabajo Es Posible"
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_move_create
 msgid "Allow Move Creation"
 msgstr "Permitir Creación de Movimiento"
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_return_is_possible
+msgid "Allow Return Is Possible"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_return
+msgid "Allow create returns"
+msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_unreserve_other_moves
@@ -787,6 +807,14 @@ msgstr "Tipos de Operación"
 #, python-format
 msgid "Operation already processed."
 msgstr "Operación ya procesada."
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"Operation types for this menu are missing default source and destination "
+"locations."
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1481,6 +1509,12 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "The product/packaging you selected has already been returned."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid ""
 "The quantity scanned for one or more lines cannot be higher than the maximum "
 "allowed."
@@ -1789,6 +1823,12 @@ msgstr "No puede mover esto usando este menú."
 #, python-format
 msgid "You cannot place it here"
 msgstr "No puede colocarlo aquí"
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "You cannot return more quantity than what was initially sent."
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
