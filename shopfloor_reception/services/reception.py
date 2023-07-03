@@ -363,13 +363,11 @@ class Reception(Component):
         if not self.work.menu.allow_return:
             # A return picking has been scanned, but allow rma is disabled.
             return self._scan_document__fallback()
-        pickings = moves.picking_id
-        outgoing_pickings = pickings.filtered(
-            lambda p: (p.picking_type_code == "outgoing")
+        outgoing_moves = moves.filtered(
+            lambda f: (f.picking_id.picking_type_code == "outgoing")
         )
-        # If we find valid pickings for a return, then we create an empty
-        # return picking
-        if outgoing_pickings:
+        # If we find valid moves for a return, then we create an empty return picking
+        if outgoing_moves:
             # But first, check that return types are correctly set up,
             # as we cannot create a return move with empty locations.
             return_types = self.picking_types.filtered(
@@ -378,8 +376,11 @@ class Reception(Component):
             if not return_types:
                 message = self.msg_store.no_default_location_on_picking_type()
                 return self._response_for_select_document(message=message)
+            move_to_return = fields.first(outgoing_moves)
+            picking_to_return = move_to_return.picking_id
+            return_type = fields.first(return_types)
             return_picking = self._scan_document__create_return(
-                fields.first(outgoing_pickings), fields.first(return_types), barcode
+                picking_to_return, return_type, move_to_return.origin
             )
             return self._response_for_select_move(return_picking)
 

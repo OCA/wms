@@ -31,6 +31,7 @@ class CommonCaseReturn(CommonCase):
         ]
         packagings = cls.env["product.packaging"].browse(packaging_ids)
         packagings.write({"qty": 10.0})
+        cls.carrier = cls.env.ref("delivery.delivery_carrier")
 
     @classmethod
     def _shopfloor_user_values(cls):
@@ -56,7 +57,9 @@ class CommonCaseReturn(CommonCase):
         return form.save()
 
     @classmethod
-    def create_delivery(cls):
+    def create_delivery(cls, carrier=None):
+        if carrier:
+            cls.order.set_delivery_line(carrier, 42)
         cls.order.action_confirm()
         cls.cache_existing_record_ids()
         return cls.order.picking_ids

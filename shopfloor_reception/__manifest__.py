@@ -9,7 +9,11 @@
     "maintainers": ["mmequignon", "JuMiSanAr"],
     "license": "AGPL-3",
     "installable": True,
-    "depends": ["shopfloor"],
+    "depends": [
+        "shopfloor",
+        # TODO: Used to parse return barcodes coming from carriers
+        "delivery_carrier_return_barcode_pattern",
+    ],
     "data": [
         "data/shopfloor_scenario_data.xml",
     ],

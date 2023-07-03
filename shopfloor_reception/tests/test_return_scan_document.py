@@ -93,3 +93,30 @@ class TestScanDocumentReturn(CommonCaseReturn):
             next_state="select_move",
             data={"picking": self._data_for_picking_with_moves(return_picking)},
         )
+
+    def test_scan_delivered_order_with_carrier_return_pattern(self):
+        # Same test as above, but add the return barcode pattern on the carrier
+        self.carrier.sudo().write({"return_barcode_pattern": "potato(.*)"})
+        barcode = f"potato{self.order.name}"
+        delivery = self.create_delivery(
+            carrier=self.env.ref("delivery.delivery_carrier")
+        )
+        self.deliver(delivery)
+        # First try, `allow_return` is disabled, we should get a barcode error
+        response = self.service.dispatch("scan_document", params={"barcode": barcode})
+        self.assert_response(
+            response,
+            next_state="select_document",
+            data={"pickings": []},
+            message={"message_type": "error", "body": "Barcode not found"},
+        )
+        # Now, enable `allow_return`
+        self._enable_allow_return()
+        response = self.service.dispatch("scan_document", params={"barcode": barcode})
+        return_picking = self.get_new_pickings()
+        self.assert_return_of(return_picking, self.order.name)
+        self.assert_response(
+            response,
+            next_state="select_move",
+            data={"picking": self._data_for_picking_with_moves(return_picking)},
+        )

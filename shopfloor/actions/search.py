@@ -168,12 +168,18 @@ class SearchAction(Component):
             [("barcode", "=", barcode), ("product_id", "=", False)], limit=1
         )
 
+    def _get_origin_from_barcode(self, barcode):
+        """Returns a list of valid origins for a given barcode."""
+        # Hookable method
+        return [barcode]
+
     def origin_move_from_scan(self, barcode, extra_domain=None):
+        origins = self._get_origin_from_barcode(barcode)
         model = self.env["stock.move"]
         outgoing_move_domain = [
             # We could have the same origin for multiple transfers
             # but we're interested only in the "done" ones.
-            ("origin", "=", barcode),
+            ("origin", "in", origins),
             ("state", "=", "done"),
         ]
         if extra_domain:
