@@ -565,6 +565,15 @@ class MessageAction(Component):
             ).format(lot=lot.name, product=lot.product_id.name),
         }
 
+    def no_default_location_on_picking_type(self):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Operation types for this menu are missing "
+                "default source and destination locations."
+            ),
+        }
+
     def location_src_set_to_sublocation(self, location_src):
         return {
             "message_type": "success",
@@ -592,6 +601,18 @@ class MessageAction(Component):
                 "Not all lines have been processed with full quantity. "
                 "Do you confirm partial operation?"
             ),
+        }
+
+    def move_already_returned(self):
+        return {
+            "message_type": "error",
+            "body": _("The product/packaging you selected has already been returned."),
+        }
+
+    def return_line_invalid_qty(self):
+        return {
+            "message_type": "error",
+            "body": _("You cannot return more quantity than what was initially sent."),
         }
 
     def transfer_no_qty_done(self):

@@ -1,6 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import _
+from odoo import _, fields
+from odoo.tools.float_utils import float_round
 
 from odoo.addons.component.core import Component
 
@@ -13,6 +14,98 @@ class StockAction(Component):
     _name = "shopfloor.stock.action"
     _inherit = "shopfloor.process.action"
     _usage = "stock"
+
+    def _create_return_move__get_max_qty(self, origin_move):
+        """Returns the max returneable qty."""
+        # The max returnable qty is the sent qty minus the already returned qties
+        quantity = origin_move.product_qty
+        for move in origin_move.move_dest_ids:
+            if (
+                move.origin_returned_move_id
+                and move.origin_returned_move_id != origin_move
+            ):
+                continue
+            if move.state in ("partially_available", "assigned"):
+                quantity -= sum(move.move_line_ids.mapped("product_qty"))
+            elif move.state in ("done"):
+                quantity -= move.product_qty
+        return float_round(
+            quantity, precision_rounding=origin_move.product_id.uom_id.rounding
+        )
+
+    def _create_return_move__get_vals(self, return_picking, origin_move):
+        product = origin_move.product_id
+        return_type = return_picking.picking_type_id
+        return {
+            "product_id": product.id,
+            "product_uom": product.uom_id.id,
+            "picking_id": return_picking.id,
+            "state": "draft",
+            "date": fields.Datetime.now(),
+            "location_id": return_picking.location_id.id,
+            "location_dest_id": return_picking.location_dest_id.id,
+            "picking_type_id": return_type.id,
+            "warehouse_id": return_type.warehouse_id.id,
+            "origin_returned_move_id": origin_move.id,
+            "procure_method": "make_to_stock",
+        }
+
+    def _create_return_move__link_to_origin(self, return_move, origin_move):
+        move_orig_to_link = origin_move.move_dest_ids.mapped("returned_move_ids")
+        move_orig_to_link |= origin_move
+        origin_move_dest = origin_move.move_dest_ids.filtered(
+            lambda m: m.state not in ("cancel")
+        )
+        move_orig_to_link |= origin_move_dest.move_orig_ids.filtered(
+            lambda m: m.state not in ("cancel")
+        )
+        move_dest_to_link = origin_move.move_orig_ids.mapped("returned_move_ids")
+        move_dest_orig = origin_move.returned_move_ids.move_orig_ids.filtered(
+            lambda m: m.state not in ("cancel")
+        )
+        move_dest_to_link |= move_dest_orig.move_dest_ids.filtered(
+            lambda m: m.state not in ("cancel")
+        )
+        write_vals = {
+            "move_orig_ids": [(4, m.id) for m in move_orig_to_link],
+            "move_dest_ids": [(4, m.id) for m in move_dest_to_link],
+        }
+        return_move.write(write_vals)
+
+    def create_return_move(self, return_picking, origin_moves):
+        """Creates a return move for a given return picking / move"""
+        # Logic has been copied from
+        # odoo_src/addons/stock/wizard/stock_picking_return.py
+        for origin_move in origin_moves:
+            # If max qty <= 0, it means that everything has been returned already.
+            # Try with the next one from the recordset.
+            max_qty = self._create_return_move__get_max_qty(origin_move)
+            if max_qty > 0:
+                return_move_vals = self._create_return_move__get_vals(
+                    return_picking, origin_move
+                )
+                return_move_vals.update(product_uom_qty=max_qty)
+                return_move = origin_move.copy(return_move_vals)
+                self._create_return_move__link_to_origin(return_move, origin_move)
+                return return_move
+
+    def _create_return_picking__get_vals(self, return_types, origin):
+        return_type = fields.first(return_types)
+        return {
+            "move_lines": [],
+            "picking_type_id": return_type.id,
+            "state": "draft",
+            "origin": origin,
+            "location_id": return_type.default_location_src_id.id,
+            "location_dest_id": return_type.default_location_dest_id.id,
+            "is_shopfloor_created": True,
+        }
+
+    def create_return_picking(self, picking, return_types, origin):
+        # Logic has been copied from
+        # odoo_src/addons/stock/wizard/stock_picking_return.py
+        return_values = self._create_return_picking__get_vals(return_types, origin)
+        return picking.copy(return_values)
 
     def mark_move_line_as_picked(
         self, move_lines, quantity=None, package=None, user=None, check_user=False
