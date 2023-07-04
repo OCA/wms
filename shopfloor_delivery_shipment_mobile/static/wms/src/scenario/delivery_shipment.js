@@ -61,6 +61,7 @@ const DeliveryShipment = {
             <div v-if="state_is('scan_document')" v-for="(value, name, index) in this.state.data.content">
                 <v-card color="blue lighten-1" class="detail v-card mt-5 main mb-2">
                     <v-card-title>{{ name }}</v-card-title>
+                    <v-card-subtitle> {{ package_level_process(value.package_levels) }}</v-card-subtitle>
                 </v-card>
                 <item-detail-card
                     v-for="packlevel in value.package_levels"
@@ -188,13 +189,27 @@ const DeliveryShipment = {
                 fields: [
                     {path: "carrier.name", label: "Carrier"},
                     {
-                        path: "package_level_count",
+                        path: this._picking_options_package_path(picking),
                         label: "Packages",
-                        display_no_value: true,
                     },
-                    {path: "move_line_count", label: "Lines", display_no_value: true},
+                    {
+                        path: this._picking_options_move_line_path(picking),
+                        label: "Lines",
+                    },
                 ],
             };
+        },
+        _picking_options_package_path: function (picking) {
+            return this.filter_state === "lading" &&
+                picking.loaded_packages_progress_f < 1
+                ? "loaded_packages_progress"
+                : "package_level_count";
+        },
+        _picking_options_move_line_path: function (picking) {
+            return this.filter_state === "lading" &&
+                picking.loaded_move_lines_progress_f < 1
+                ? "loaded_move_lines_progress"
+                : "move_line_count";
         },
         pack_options: function (pack) {
             const action = pack.is_done
@@ -211,6 +226,13 @@ const DeliveryShipment = {
         pack_color: function (pack) {
             const color = pack.is_done ? "screen_step_done" : "screen_step_todo";
             return this.utils.colors.color_for(color);
+        },
+        package_level_process(package_levels) {
+            const package_level_count = package_levels.length;
+            const done_package_level_count = package_levels.reduce((acc, next) => {
+                return next.is_done ? acc + 1 : acc;
+            }, 0);
+            return `Progress: ${done_package_level_count} / ${package_level_count}`;
         },
         line_options: function (line) {
             const action =
@@ -429,13 +451,8 @@ const DeliveryShipment = {
                         this.state_set_data({filter_name: scanned.text});
                     },
                     on_back: () => {
-                        this.wait_call(
-                            this.odoo.call("scan_document", {
-                                barcode: "",
-                                shipment_advice_id: this.shipment().id,
-                                picking_id: this.picking("scan_document").id,
-                            })
-                        );
+                        this.state_to("scan_document");
+                        this.reset_notification();
                     },
                     on_back2picking: (picking) => {
                         this.wait_call(
