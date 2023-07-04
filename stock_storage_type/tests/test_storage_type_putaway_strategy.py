@@ -696,3 +696,115 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             int_picking.move_line_ids.mapped("location_dest_id"),
             self.fix_location,
         )
+
+    def test_storage_strategy_with_view(self):
+        """
+        Create a new locations structure:
+            - Stock
+              - Food (View)
+                - Food A (View)
+                  - Pallet 1
+                  - Pallet 2
+                - Food B (View)
+                   - Cardbox 1
+                   - Cardbox 2
+
+        A storage sequence strategy is set on Food (View) to
+        go to Cardboxes (Food B) for package type cardboxes
+
+        A putaway rule is set on Food B to go to Cardbox2 for
+        product
+
+        Check the product goes well to Cardbox2
+        """
+        self.food_view = self.env["stock.location"].create(
+            {
+                "name": "Food View",
+                "location_id": self.warehouse.lot_stock_id.id,
+                "usage": "view",
+            }
+        )
+
+        self.food_pallets = self.env["stock.location"].create(
+            {
+                "name": "Food A",
+                "location_id": self.food_view.id,
+                "usage": "view",
+            }
+        )
+
+        self.food_pallet_1 = self.env["stock.location"].create(
+            {
+                "name": "Food Pallet 1",
+                "location_id": self.food_pallets.id,
+            }
+        )
+        self.food_pallet_2 = self.env["stock.location"].create(
+            {
+                "name": "Food Pallet 2",
+                "location_id": self.food_pallets.id,
+            }
+        )
+
+        self.food_cardboxes = self.env["stock.location"].create(
+            {
+                "name": "Food B",
+                "location_id": self.food_view.id,
+                "storage_category_id": self.env.ref(
+                    "stock_storage_type.storage_category_cardboxes"
+                ).id,
+                "usage": "view",
+            }
+        )
+
+        self.food_cardbox_1 = self.env["stock.location"].create(
+            {
+                "name": "Food Cardbox 1",
+                "location_id": self.food_cardboxes.id,
+            }
+        )
+        self.food_cardbox_2 = self.env["stock.location"].create(
+            {
+                "name": "Food Cardbox 2",
+                "location_id": self.food_cardboxes.id,
+            }
+        )
+
+        self.env["stock.putaway.rule"].create(
+            {
+                "product_id": self.product.id,
+                "location_in_id": self.food_cardboxes.id,
+                "location_out_id": self.food_cardbox_2.id,
+            }
+        )
+
+        self.food_view.pack_putaway_strategy = "none"
+
+        self.env["stock.storage.location.sequence"].create(
+            {
+                "package_type_id": self.cardboxes_package_storage_type.id,
+                "location_id": self.food_cardboxes.id,
+                "sequence": 1,
+            }
+        )
+
+        move = self._create_single_move(self.product)
+        move.location_dest_id = self.food_view
+        move._assign_picking()
+        package = self.env["stock.quant.package"].create(
+            {"product_packaging_id": self.product_lot_cardbox_product_packaging.id}
+        )
+        self._update_qty_in_location(
+            move.location_id, move.product_id, move.product_qty, package=package
+        )
+
+        move._action_assign()
+        move_line = move.move_line_ids
+        package_level = move_line.package_level_id
+
+        self.assertEqual(
+            package_level.location_dest_id,
+            self.food_cardbox_2,
+            "the move line's destination must stay in Stock as we have"
+            " a 'none' strategy on it and it is in the sequence",
+        )
