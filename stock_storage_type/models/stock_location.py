@@ -6,6 +6,7 @@ import logging
 from psycopg2 import sql
 
 from odoo import api, fields, models
+from odoo.fields import Command
 from odoo.tools import float_compare
 
 _logger = logging.getLogger(__name__)
@@ -640,3 +641,95 @@ class StockLocation(models.Model):
         ]
         valid_locations = self.browse(ordered_valid_location_ids)
         return valid_locations
+
+    @api.depends_context("fixed_child_internal_location")
+    def _compute_child_internal_location_ids(self):
+        """
+        This will override the child selection by setting self as
+        the only child.
+
+        TODO: Maybe adding a field on view location in order to compute this
+        without context changing
+        """
+        if self.env.context.get("fixed_child_internal_location"):
+            internal_location_id = self.env.context.get("fixed_child_internal_location")
+            internal_location = self.browse(internal_location_id)
+            if internal_location_id:
+                self.update(
+                    {
+                        "child_internal_location_ids": [
+                            Command.set(internal_location.ids)
+                        ]
+                    }
+                )
+        else:
+            return super()._compute_child_internal_location_ids()
+
+    def _get_stock_storage_type_putaway_rules(
+        self, product, package=None, packaging=None
+    ):
+        """
+        We have retrieved the code from stock module in order to get
+        the evaluated putaway rules on this location in order to determine
+        if we should return self or super().
+        """
+        self = self._check_access_putaway()
+        products = self.env.context.get("products", self.env["product.product"])
+        products |= product
+        # find package type on package or packaging
+        package_type = self.env["stock.package.type"]
+        if package:
+            package_type = package.package_type_id
+        elif packaging:
+            package_type = packaging.package_type_id
+
+        categ = (
+            products.categ_id
+            if len(products.categ_id) == 1
+            else self.env["product.category"]
+        )
+        categs = categ
+        while categ.parent_id:
+            categ = categ.parent_id
+            categs |= categ
+
+        putaway_rules = self.putaway_rule_ids.filtered(
+            lambda rule: (not rule.product_id or rule.product_id in products)
+            and (not rule.category_id or rule.category_id in categs)
+            and (not rule.package_type_ids or package_type in rule.package_type_ids)
+        )
+        return putaway_rules
+
+    def _get_putaway_strategy(
+        self, product, quantity=0, package=None, packaging=None, additional_qty=None
+    ):
+        """
+        As standard Odoo method will return the first real child of a view,
+        this is not convenient as if a storage sequence is set on that view,
+        it won't be applied.
+
+        So, we check if no putaway rule is set on the view, then set the id of
+        the view to context to bypass the child_internal_location_ids field.
+        """
+        if self.usage == "view":
+            putaway_rules = self._get_stock_storage_type_putaway_rules(
+                product=product, package=package, packaging=packaging
+            )
+            if not putaway_rules:
+                self_fixed_child = self.with_context(
+                    fixed_child_internal_location=self.id
+                )
+                return super(StockLocation, self_fixed_child)._get_putaway_strategy(
+                    product,
+                    quantity=quantity,
+                    package=package,
+                    packaging=packaging,
+                    additional_qty=additional_qty,
+                )
+        return super()._get_putaway_strategy(
+            product,
+            quantity=quantity,
+            package=package,
+            packaging=packaging,
+            additional_qty=additional_qty,
+        )
