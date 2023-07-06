@@ -20,18 +20,19 @@ const SingleProductTransfer = {
             />
             <template v-if="state_is('select_product')">
                 <item-detail-card
-                    v-if="display_operations_progress()"
-                    :key="make_state_component_key(['operations-progress', get_select_product_package_or_location_data().id])"
-                    :record="get_select_product_package_or_location_data().operation_progress"
-                    :options="detail_card_operation_progress_options()"
-                    :card_color="detail_card_operation_progress_color()"
-                />
-                <item-detail-card
                     v-if="get_select_product_package_or_location_data()"
                     :key="make_state_component_key(['location-or-package', get_select_product_package_or_location_data().id])"
                     :record="get_select_product_package_or_location_data()"
                     :card_color="utils.colors.color_for('screen_step_done')"
-                />
+                >
+                    <template v-slot:after_details>
+                        <div style="padding:5px 10px" v-if="display_operations_progress()">
+                        <v-progress-linear height="20" color="lime" value="20" style="border-radius:10px; font-size:smaller; font-weight:bold; border: black 1px solid">
+                            <span>Ongoing {{get_select_product_package_or_location_data().operation_progress.done}} / Available: {{get_select_product_package_or_location_data().operation_progress.to_do}}</span>
+                        </v-progress-linear>
+                        </div>
+                    </template>
+                </item-detail-card>
             </template>
             <template v-if="state_is('set_quantity')">
                 <item-detail-card
@@ -172,31 +173,6 @@ const SingleProductTransfer = {
             const operation_progress = this._get_operation_progress_data();
             if (operation_progress) {
                 return operation_progress.to_do > 0;
-            }
-        },
-        detail_card_operation_progress_options: function () {
-            return {
-                no_title: true,
-                fields: [
-                    {
-                        path: "to_do",
-                        klass: "loud",
-                        label: "Available",
-                    },
-                    {
-                        path: "done",
-                        klass: "loud",
-                        label: "Ongoing",
-                    },
-                ],
-            };
-        },
-        detail_card_operation_progress_color: function () {
-            const operation_progress = this._get_operation_progress_data();
-            if (operation_progress.done === operation_progress.to_do) {
-                return this.utils.colors.color_for("screen_step_done");
-            } else {
-                return this.utils.colors.color_for("screen_step_todo");
             }
         },
         _get_operation_progress_data: function () {
