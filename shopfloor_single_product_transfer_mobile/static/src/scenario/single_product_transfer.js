@@ -25,12 +25,12 @@ const SingleProductTransfer = {
                     :record="get_select_product_package_or_location_data()"
                     :card_color="utils.colors.color_for('screen_step_done')"
                 >
-                    <template v-slot:after_details>
-                        <div style="padding:5px 10px" v-if="display_operations_progress()">
-                        <v-progress-linear height="20" color="lime" value="20" style="border-radius:10px; font-size:smaller; font-weight:bold; border: black 1px solid">
-                            <span>Ongoing {{get_select_product_package_or_location_data().operation_progress.done}} / Available: {{get_select_product_package_or_location_data().operation_progress.to_do}}</span>
-                        </v-progress-linear>
-                        </div>
+                    <template v-slot:after_details v-if="display_operations_progress()">
+                        <linear-progress
+                            :done_qty="get_select_product_package_or_location_data().operation_progress.done"
+                            :todo_qty="get_select_product_package_or_location_data().operation_progress.to_do"
+                            :options="linear_progress_options_for_select_product()"
+                        />
                     </template>
                 </item-detail-card>
             </template>
@@ -151,6 +151,13 @@ const SingleProductTransfer = {
                 key_title: "product.display_name",
                 loud_labels: true,
                 fields: [{path: "location_src.name", label: "Source Location"}],
+            };
+        },
+        linear_progress_options_for_select_product: function () {
+            return {
+                done_label: "Ongoing",
+                todo_label: "Available",
+                color: "lime",
             };
         },
         get_select_product_scan_params: function (scanned) {
