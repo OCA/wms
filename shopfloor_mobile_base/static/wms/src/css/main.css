@@ -528,3 +528,10 @@ main.v-content > .v-content__wrap > .header .container {
     animation-direction: normal;
     animation-iteration-count: infinite;
 }
+
+.linear-progress {
+    border-radius: 10px;
+    font-size: smaller;
+    font-weight: bold;
+    border: black 1px solid;
+}
