@@ -76,6 +76,12 @@ const SinglePackTransfer = {
                     :card_color="utils.colors.color_for('screen_step_done')"
                 >
                     <template v-slot:after_details>
+                        <v-card-subtitle>
+                            <span class="font-weight-bold">Weight:</span>
+                            <span>
+                                {{ _get_pack_weight() }}
+                            </span>
+                        </v-card-subtitle>
                         <v-card-text class="details pt-0">
                             <div v-for="product in state.data.products" class="field-detail">
                                 {{ product.display_name}}
@@ -108,6 +114,17 @@ const SinglePackTransfer = {
                 },
             },
         };
+    },
+    methods: {
+        _get_pack_weight: function () {
+            let weight = this.state.data.weight;
+            let uom = this.state.data.weight_uom;
+            if (!weight) {
+                weight = this.state.data.estimated_weight_kg;
+                uom = "kg";
+            }
+            return weight.toFixed(3) + " " + uom;
+        },
     },
 };
 process_registry.add("single_pack_transfer", SinglePackTransfer);
