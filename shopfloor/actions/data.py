@@ -93,13 +93,19 @@ class DataAction(Component):
         if with_packaging:
             parser += self._package_packaging_parser
         data = self._jsonify(record, parser, **kw)
+        qty = len(record.quant_ids)
         # handle special cases
         if data and picking:
-            lines = picking.move_line_ids.filtered(
-                lambda l: l.result_package_id == record
-                and l.state in ["partially_available", "assigned", "done"]
+            move_line_count = self.env["stock.move.line"].search_count(
+                [
+                    ("picking_id.picking_type_id", "=", picking.picking_type_id.id),
+                    ("result_package_id", "=", record.id),
+                    ("state", "in", ["partially_available", "assigned"]),
+                ]
             )
-            data.update({"move_line_count": len(lines)})
+            qty += move_line_count
+            # TODO does this name really makes sense?
+            data.update({"move_line_count": qty})
         return data
 
     def packages(self, records, picking=None, **kw):
