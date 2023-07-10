@@ -29,6 +29,9 @@ class SinglePackTransfer(Component):
         return {
             "id": package_level.id,
             "name": package.name,
+            "weight_uom": package.weight_uom_id.name,
+            "weight": package.pack_weight,
+            "estimated_weight_kg": package.estimated_pack_weight_kg,
             "location_src": self.data.location(package.location_id),
             "location_dest": self.data.location(package_level.location_dest_id),
             "products": self.data.products(move_lines.product_id),
@@ -347,6 +350,13 @@ class SinglePackTransferValidatorResponse(Component):
         return {
             "id": {"required": required, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": required},
+            "weight_uom": {"type": "string", "nullable": False, "required": required},
+            "weight": {"type": "float", "nullable": False, "required": required},
+            "estimated_weight_kg": {
+                "type": "float",
+                "nullable": False,
+                "required": required,
+            },
             "location_src": {"type": "dict", "schema": self.schemas.location()},
             "location_dest": {"type": "dict", "schema": self.schemas.location()},
             "products": {
