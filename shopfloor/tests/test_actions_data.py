@@ -86,7 +86,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         expected = {
             "id": package.id,
             "name": package.name,
-            "move_line_count": 1,
+            "move_line_count": 2,
             "packaging": self._expected_packaging(package.product_packaging_id),
             "storage_type": self._expected_storage_type(package.package_type_id),
             "weight": 20.0,
@@ -203,7 +203,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "package_src": {
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
-                "move_line_count": 0,
+                "move_line_count": 1,
                 "weight": 20.0,
                 "storage_type": None,
             },
@@ -264,14 +264,14 @@ class ActionsDataCase(ActionsDataCaseBase):
             "package_src": {
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
-                "move_line_count": 1,
+                "move_line_count": 2,
                 "weight": 30,
                 "storage_type": None,
             },
             "package_dest": {
                 "id": move_line.result_package_id.id,
                 "name": move_line.result_package_id.name,
-                "move_line_count": 1,
+                "move_line_count": 2,
                 "weight": 0,
                 "storage_type": None,
             },
