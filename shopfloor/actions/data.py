@@ -14,10 +14,15 @@ class DataAction(Component):
         parser = self._location_parser
         data = self._jsonify(record.with_context(location=record.id), parser, **kw)
         if "with_operation_progress" in kw:
+            lines_blacklist = (
+                kw.get("progress_lines_blacklist")
+                or self.env["stock.move.line"].browse()
+            )
             domain = [
                 ("location_id", "=", record.id),
                 ("state", "in", ["partially_available", "assigned"]),
                 ("picking_id.state", "=", "assigned"),
+                ("id", "not in", lines_blacklist.ids),
             ]
             operation_progress = self._get_operation_progress(domain)
             data.update({"operation_progress": operation_progress})
@@ -79,10 +84,15 @@ class DataAction(Component):
         data = self._jsonify(record, parser, **kw)
         # handle special cases
         if "with_operation_progress" in kw:
+            lines_blacklist = (
+                kw.get("progress_lines_blacklist")
+                or self.env["stock.move.line"].browse()
+            )
             domain = [
                 ("result_package_id", "=", record.id),
                 ("state", "in", ["partially_available", "assigned"]),
                 ("picking_id.state", "=", "assigned"),
+                ("id", "not in", lines_blacklist.ids),
             ]
             operation_progress = self._get_operation_progress(domain)
             data.update({"operation_progress": operation_progress})
