@@ -19,6 +19,16 @@ def with_savepoint(method):
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         savepoint = self._actions_for("savepoint").new()
+        # TODO: This wrapper depends on the result of the response
+        # in order to determine whether it should rollback the changes or not.
+        # As the content of the response is generated before rolling back,
+        # there will be cases where the response returned to the frontend
+        # is not in line with the backend.
+        # For now, we are manually modifying the response object before returning
+        # errors that will roll back the transaction
+        # (see "progress_lines_blacklist" mechanism).
+        # However, we should find a better solution for this issue to
+        # make sure the information returned to the frontend is always true.
         response = method(self, *args, **kwargs)
         message_type = response.get("message", {}).get("message_type")
         if message_type in ("error", "warning"):
@@ -62,15 +72,26 @@ class ShopfloorSingleProductTransfer(Component):
         return self._response(next_state="select_location_or_package", message=message)
 
     def _response_for_select_product(
-        self, location=None, package=None, message=None, popup=None
+        self,
+        location=None,
+        package=None,
+        message=None,
+        popup=None,
+        progress_lines_blacklist=None,
     ):
         data = {}
         if location:
             data["location"] = self.data.location(
-                location, with_operation_progress=True
+                location,
+                with_operation_progress=True,
+                progress_lines_blacklist=progress_lines_blacklist,
             )
         if package:
-            data["package"] = self.data.package(package, with_operation_progress=True)
+            data["package"] = self.data.package(
+                package,
+                with_operation_progress=True,
+                progress_lines_blacklist=progress_lines_blacklist,
+            )
         return self._response(
             next_state="select_product", data=data, message=message, popup=popup
         )
@@ -339,6 +360,11 @@ class ShopfloorSingleProductTransfer(Component):
                 location=move_line.location_id,
                 package=move_line.package_id,
                 message=message,
+                # We blacklist the line that has been created
+                # because the transaction will only be rolled back
+                # after the response is generated,
+                # and we do not want this line in the response.
+                progress_lines_blacklist=move_line,
             )
 
     def _scan_product__scan_lot(self, lot, location=None, package=None):
