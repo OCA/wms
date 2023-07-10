@@ -1199,7 +1199,12 @@ class Reception(Component):
         new_move = selected_line.move_id.split_other_move_lines(
             selected_line, intersection=True
         )
-        new_move.extract_and_action_done()
+        if new_move:
+            # A new move is created in case of partial quantity
+            new_move.extract_and_action_done()
+            return
+        # In case of full quantity, post the initial move
+        selected_line.move_id.extract_and_action_done()
 
     def set_destination(
         self, picking_id, selected_line_id, location_name, confirmation=False
