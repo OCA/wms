@@ -748,9 +748,43 @@ class Reception(Component):
             message=message,
         )
 
+    def _align_product_uom_qties(self, move):
+        # This method aligns product uom qties on move lines.
+        # In the shopfloor context, we might have multiple users working at
+        # the same time on the same move. This is done by creating one move line
+        # per user, with shopfloor_user_id = user.
+        # This method ensures that the product_uom_qty reflects what remains to
+        # be done, so we can display coherent numbers on the UI.
+
+        # for a given line, product_uom_qty is computed as this:
+        # remaining_todo = move.product_uom_qty - move.quantity_done
+        # line.product_uom_qty = line.qty_done + remaining_todo
+
+        # However, if the overall qty_done is > to the move's product_uom_qty,
+        # then we're not updating the line's product_uom_qty.
+
+        # TODO, do we need to check move's state?
+        # If move is already done, do not update lines qties
+        # if move.state in ("done", "cancel"):
+        #     return
+
+        qty_todo = move.product_uom_qty
+        qty_done = sum(move.move_line_ids.mapped("qty_done"))
+        rounding = move.product_id.uom_id.rounding
+        compare = float_compare(qty_done, qty_todo, precision_rounding=rounding)
+        if compare < 1:  # If qty done <= qty todo, align qty todo on move lines
+            remaining_todo = qty_todo - qty_done
+            # if we didn't bypass reservation update, the quant reservation
+            # would be reduced as much as the deduced quantity, which is wrong
+            # as we only moved the quantity to a new move line
+            lines = move.move_line_ids.with_context(bypass_reservation_update=True)
+            for line in lines:
+                line.product_uom_qty = line.qty_done + remaining_todo
+
     def _response_for_set_quantity(
         self, picking, line, message=None, asking_confirmation=False
     ):
+        self._align_product_uom_qties(line.move_id)
         return self._response(
             next_state="set_quantity",
             data={
