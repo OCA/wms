@@ -56,12 +56,6 @@ msgid "Chained moves release process"
 msgstr ""
 
 #. module: stock_available_to_promise_release
-#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__city
-#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__city
-msgid "City"
-msgstr ""
-
-#. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_res_company
 msgid "Companies"
 msgstr ""
@@ -232,11 +226,6 @@ msgid "Picking Type"
 msgstr ""
 
 #. module: stock_available_to_promise_release
-#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_tree
-msgid "Postcode"
-msgstr ""
-
-#. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking_type__prevent_new_move_after_release
 msgid "Prevent new move after release"
 msgstr ""
@@ -302,11 +291,6 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_form
 msgid "Shipment date"
-msgstr ""
-
-#. module: stock_available_to_promise_release
-#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__state_id
-msgid "State"
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -482,12 +466,6 @@ msgstr ""
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #, python-format
 msgid "You are not allowed to unrelease this move %(move_name)s."
-msgstr ""
-
-#. module: stock_available_to_promise_release
-#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__zip_code
-#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__zip_code
-msgid "Zip"
 msgstr ""
 
 #. module: stock_available_to_promise_release

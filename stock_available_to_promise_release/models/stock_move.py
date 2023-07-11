@@ -112,12 +112,23 @@ class StockMove(models.Model):
     def _check_unrelease_allowed(self):
         for move in self:
             if not move.unrelease_allowed:
-                raise UserError(
-                    _(
-                        "You are not allowed to unrelease this move %(move_name)s.",
-                        move_name=move.display_name,
-                    )
+                message = _(
+                    "You are not allowed to unrelease this move %(move_name)s.",
+                    move_name=move.display_name,
                 )
+                if move.picking_id:
+                    message += _(
+                        "\n- Picking: %(picking_name)s.",
+                        picking_name=move.picking_id.name,
+                    )
+                if move.move_orig_ids and move.move_orig_ids.picking_id:
+                    message += _(
+                        "\n- Origin picking(s):\n\t -%(picking_names)s.",
+                        picking_names="\n\t- ".join(
+                            move.move_orig_ids.picking_id.mapped("name")
+                        ),
+                    )
+                raise UserError(message)
 
     def _previous_promised_qty_sql_main_query(self):
         return """
