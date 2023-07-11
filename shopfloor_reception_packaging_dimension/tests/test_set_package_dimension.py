@@ -68,25 +68,26 @@ class TestSetPackDimension(CommonCase):
             response, self.picking, selected_move_line, self.product_a_packaging
         )
 
-    # TODO : Have questions on how the lot information is commited by the frontend
-    #
-    # def test_scan_lot_ask_for_dimension(self):
-    #     self.product_a.tracking = "none"
-    #     self.assertTrue(self.product_a.packaging_ids)
-    #     response = self.service.dispatch(
-    #         "set_lot_confirmation_action",
-    #         params={
-    #             "picking_id": self.picking.id,
-    #             "barcode": self.product_a.barcode,
-    #         },
-    #     )
-    #     self.data.picking(self.picking)
-    #     selected_move_line = self.picking.move_line_ids.filtered(
-    #         lambda l: l.product_id == self.product_a
-    #     )
-    #     self._assert_response_set_dimension(
-    #         response, self.picking, selected_move_line, self.product_a_packaging
-    #     )
+    def test_scan_lot_ask_for_dimension(self):
+        self.product_a.tracking = "none"
+        selected_move_line = self.picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        self.assertTrue(self.product_a.packaging_ids)
+        response = self.service.dispatch(
+            "set_lot_confirm_action",
+            params={
+                "picking_id": self.picking.id,
+                "selected_line_id": selected_move_line.id,
+            },
+        )
+        self.data.picking(self.picking)
+        selected_move_line = self.picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        self._assert_response_set_dimension(
+            response, self.picking, selected_move_line, self.product_a_packaging
+        )
 
     def test_set_packaging_dimension(self):
         selected_move_line = self.picking.move_line_ids.filtered(

@@ -1,6 +1,8 @@
 # Copyright 2023 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
+from odoo.osv import expression
+
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 from odoo.addons.shopfloor.utils import to_float
@@ -21,34 +23,32 @@ class Reception(Component):
                 )
         return super()._before_state__set_quantity(picking, line, message=message)
 
+    def _get_domain_packaging_needs_dimension(self):
+        return expression.OR(
+            [
+                [("packaging_length", "=", 0)],
+                [("packaging_length", "=", False)],
+                [("width", "=", 0)],
+                [("width", "=", False)],
+                [("height", "=", 0)],
+                [("height", "=", False)],
+                [("max_weight", "=", 0)],
+                [("max_weight", "=", False)],
+                [("qty", "=", 0)],
+                [("qty", "=", False)],
+                [("barcode", "=", False)],
+            ]
+        )
+
     def _get_next_packaging_to_set_dimension(self, product, previous_packaging=None):
         """Return for a product the next packaging needing dimension to be set."""
         next_packaging_id = previous_packaging.id + 1 if previous_packaging else 0
-        domain = [
+        domain_dimension = self._get_domain_packaging_needs_dimension()
+        domain_packaging_id = [
             ("product_id", "=", product.id),
             ("id", ">=", next_packaging_id),
-            "|",
-            "|",
-            "|",
-            "|",
-            "|",
-            "|",
-            "|",
-            "|",
-            "|",
-            "|",
-            ("packaging_length", "=", 0),
-            ("packaging_length", "=", False),
-            ("width", "=", 0),
-            ("width", "=", False),
-            ("height", "=", 0),
-            ("height", "=", False),
-            ("max_weight", "=", 0),
-            ("max_weight", "=", False),
-            ("qty", "=", 0),
-            ("qty", "=", False),
-            ("barcode", "=", False),
         ]
+        domain = expression.AND([domain_packaging_id, domain_dimension])
         return self.env["product.packaging"].search(domain, order="id", limit=1)
 
     def _response_for_set_packaging_dimension(
