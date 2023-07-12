@@ -43,7 +43,8 @@
 {
     "no_prefill_qty": true,
     "show_oneline_package_content": true,
-    "auto_post_line": true
+    "auto_post_line": true,
+    "scan_location_or_pack_first": true
 }
         </field>
     </record>

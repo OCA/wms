@@ -22,6 +22,7 @@ class CheckoutDoneCase(CheckoutCommonCase):
                 "message_type": "success",
                 "body": "Transfer {} done".format(picking.name),
             },
+            data={"restrict_scan_first": False},
         )
 
 
@@ -68,6 +69,7 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
             response,
             next_state="select_document",
             message=self.service.msg_store.transfer_done_success(self.picking),
+            data={"restrict_scan_first": False},
         )
 
 
@@ -130,4 +132,5 @@ class CheckoutDoneRawUnpackedCase(CheckoutCommonCase):
             response,
             next_state="select_document",
             message=self.service.msg_store.transfer_done_success(picking_done),
+            data={"restrict_scan_first": False},
         )

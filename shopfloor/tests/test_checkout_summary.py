@@ -26,7 +26,7 @@ class CheckoutSummaryCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            data={},
+            data={"restrict_scan_first": False},
             message=self.service.msg_store.stock_picking_not_available(self.picking),
         )
 

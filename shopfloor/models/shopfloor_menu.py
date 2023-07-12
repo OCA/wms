@@ -171,11 +171,12 @@ class ShopfloorMenu(models.Model):
     show_oneline_package_content_is_possible = fields.Boolean(
         compute="_compute_show_oneline_package_content_is_possible"
     )
+    # TODO this field could be renamed
     scan_location_or_pack_first = fields.Boolean(
-        string="Scan first location or pack",
+        string="Restrict scannable barcode at work selection",
         help=(
-            "When selecting work, force the user to first scan a location or pack,"
-            "then the product or lot."
+            "When checked, the user will be restricted by the type of object barcode "
+            " that he can scan to select the document/transfer/move line to work on."
         ),
     )
     scan_location_or_pack_first_is_possible = fields.Boolean(
