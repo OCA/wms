@@ -498,7 +498,7 @@ class TestSetQuantity(CommonCase):
         # We shouldn't be able to process any of those move lines
         error_msg = {
             "message_type": "error",
-            "body": "You cannot pick that much units.",
+            "body": "You cannot process that much units.",
         }
         picking_data = self.data.picking(picking)
         for line, service in line_service_mapping:
@@ -566,10 +566,6 @@ class TestSetQuantity(CommonCase):
             "scan_line",
             params={"picking_id": picking.id, "barcode": self.product_a.barcode},
         )
-        new_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
-            and l.shopfloor_user_id == manager_user
-        )
 
         # Try to process the first line
         response = self.service.dispatch(
@@ -590,5 +586,7 @@ class TestSetQuantity(CommonCase):
             },
         )
         # there should be 3 lines now
-        move_lines = picking.move_line_ids.filtered(lambda l: l.product_id == self.product_a)
+        move_lines = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
         self.assertEqual(len(move_lines), 3)
