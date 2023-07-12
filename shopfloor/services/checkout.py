@@ -72,7 +72,8 @@ class Checkout(Component):
         )
 
     def _response_for_select_document(self, message=None):
-        return self._response(next_state="select_document", message=message)
+        data = {"restrict_scan_first": self.work.menu.scan_location_or_pack_first}
+        return self._response(next_state="select_document", message=message, data=data)
 
     def _response_for_manual_selection(self, message=None):
         pickings = self.env["stock.picking"].search(
@@ -201,9 +202,8 @@ class Checkout(Component):
             "picking",
             "location",
             "package",
-            "product",
             "packaging",
-        )
+        ) + (("product",) if not self.work.menu.scan_location_or_pack_first else ())
         return search.find(
             barcode,
             types=search_types,
@@ -1556,7 +1556,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
         to the next state.
         """
         return {
-            "select_document": {},
+            "select_document": self._schema_for_select_document,
             "manual_selection": self._schema_selection_list,
             "select_line": self._schema_stock_picking_details,
             "select_package": dict(
@@ -1574,6 +1574,16 @@ class ShopfloorCheckoutValidatorResponse(Component):
             "summary": self._schema_summary,
             "change_packaging": self._schema_select_packaging,
             "confirm_done": self._schema_confirm_done,
+        }
+
+    @property
+    def _schema_for_select_document(self):
+        return {
+            "restrict_scan_first": {
+                "type": "boolean",
+                "nullable": False,
+                "required": True,
+            },
         }
 
     def _schema_stock_picking(self, lines_with_packaging=False):
