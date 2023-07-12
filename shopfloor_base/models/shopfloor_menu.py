@@ -24,6 +24,7 @@ class ShopfloorMenu(models.Model):
         readonly=False,
         inverse="_inverse_scenario_id",
     )
+    scenario_key = fields.Char(related="scenario_id.key")
     # TODO: on next versions we could remove this field and drop the compute on m2o.
     # ATM is kept only to have a smooth transition to the m2o field.
     scenario = fields.Char(string="Legacy scenario field")
