@@ -62,12 +62,6 @@ msgid "Chained moves release process"
 msgstr ""
 
 #. module: stock_available_to_promise_release
-#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__city
-#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__city
-msgid "City"
-msgstr "Grad"
-
-#. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_res_company
 msgid "Companies"
 msgstr "Tvrtke"
@@ -244,11 +238,6 @@ msgid "Picking Type"
 msgstr "Tip kretanja"
 
 #. module: stock_available_to_promise_release
-#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_tree
-msgid "Postcode"
-msgstr "Poštanski broj"
-
-#. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking_type__prevent_new_move_after_release
 msgid "Prevent new move after release"
 msgstr ""
@@ -317,11 +306,6 @@ msgstr "Otpusti bazirano na raspoloživom za obećati"
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_form
 msgid "Shipment date"
 msgstr "Datum isporuke"
-
-#. module: stock_available_to_promise_release
-#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__state_id
-msgid "State"
-msgstr "Status"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_release
@@ -497,12 +481,6 @@ msgid "You are not allowed to unrelease this move %(move_name)s."
 msgstr ""
 
 #. module: stock_available_to_promise_release
-#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__zip_code
-#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__zip_code
-msgid "Zip"
-msgstr "Poštanski broj"
-
-#. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
 msgid "days"
 msgstr "dana"
@@ -511,3 +489,15 @@ msgstr "dana"
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
 msgid "minutes"
 msgstr "minuta"
+
+#~ msgid "City"
+#~ msgstr "Grad"
+
+#~ msgid "Postcode"
+#~ msgstr "Poštanski broj"
+
+#~ msgid "State"
+#~ msgstr "Status"
+
+#~ msgid "Zip"
+#~ msgstr "Poštanski broj"
