@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2022 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="stock_storage_category_form" model="ir.ui.view">
+        <field name="name">stock.storage.category.form (in stock_storage_type)</field>
+        <field name="model">stock.storage.category</field>
+        <field name="inherit_id" ref="stock.stock_storage_category_form" />
+        <field name="arch" type="xml">
+            <field name="package_type_id" position="after">
+                <field name="allow_new_product" />
+            </field>
+        </field>
+    </record>
+
+</odoo>

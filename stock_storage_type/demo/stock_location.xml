@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo noupdate="1">
+    <record id="stock_location_cardboxes" model="stock.location">
+        <field name="name">Cardboxes storage area</field>
+        <field
+            name="location_id"
+            model="stock.location"
+            eval="obj().env.ref('stock.warehouse0').lot_stock_id.id"
+        />
+        <field name="storage_category_id" ref="storage_category_cardboxes" />
+        <field name="pack_putaway_strategy">ordered_locations</field>
+    </record>
+    <record id="stock_location_cardboxes_bin_1" model="stock.location">
+        <field name="name">Bin 1</field>
+        <field name="location_id" ref="stock_location_cardboxes" />
+    </record>
+    <record id="stock_location_cardboxes_bin_2" model="stock.location">
+        <field name="name">Bin 2</field>
+        <field name="location_id" ref="stock_location_cardboxes" />
+    </record>
+    <record id="stock_location_cardboxes_bin_3" model="stock.location">
+        <field name="name">Bin 3</field>
+        <field name="location_id" ref="stock_location_cardboxes" />
+    </record>
+    <record id="stock_location_cardboxes_bin_4" model="stock.location">
+        <field name="name">Bin 4</field>
+        <field name="location_id" ref="stock_location_cardboxes" />
+    </record>
+    <record id="stock_location_pallets" model="stock.location">
+        <field name="name">Pallets storage area</field>
+        <field
+            name="location_id"
+            model="stock.location"
+            eval="obj().env.ref('stock.warehouse0').lot_stock_id.id"
+        />
+        <field name="storage_category_id" ref="storage_category_pallets" />
+        <field name="pack_putaway_strategy">ordered_locations</field>
+    </record>
+    <record id="stock_location_pallets_bin_1" model="stock.location">
+        <field name="name">Pallets Bin 1</field>
+        <field name="location_id" ref="stock_location_pallets" />
+    </record>
+    <record id="stock_location_pallets_bin_2" model="stock.location">
+        <field name="name">Pallets Bin 2</field>
+        <field name="location_id" ref="stock_location_pallets" />
+    </record>
+    <record id="stock_location_pallets_bin_3" model="stock.location">
+        <field name="name">Pallets Bin 3</field>
+        <field name="location_id" ref="stock_location_pallets" />
+    </record>
+    <record id="stock_location_pallets_bin_4" model="stock.location">
+        <field name="name">Pallets Bin 4</field>
+        <field name="location_id" ref="stock_location_pallets" />
+    </record>
+    <record id="stock_location_pallets_reserve" model="stock.location">
+        <field name="name">Pallets reserve storage area</field>
+        <field
+            name="location_id"
+            model="stock.location"
+            eval="obj().env.ref('stock.warehouse0').lot_stock_id.id"
+        />
+        <field name="storage_category_id" ref="storage_category_pallets" />
+        <field name="pack_putaway_strategy">ordered_locations</field>
+    </record>
+    <record id="stock_location_pallets_reserve_bin_1" model="stock.location">
+        <field name="name">Pallets Reserve Bin 1</field>
+        <field name="location_id" ref="stock_location_pallets_reserve" />
+    </record>
+    <record id="stock_location_pallets_reserve_bin_2" model="stock.location">
+        <field name="name">Pallets Reserve Bin 2</field>
+        <field name="location_id" ref="stock_location_pallets_reserve" />
+    </record>
+    <record id="stock_location_pallets_reserve_bin_3" model="stock.location">
+        <field name="name">Pallets Reserve Bin 3</field>
+        <field name="location_id" ref="stock_location_pallets_reserve" />
+    </record>
+    <record id="stock_location_pallets_reserve_bin_4" model="stock.location">
+        <field name="name">Pallets Reserve Bin 4</field>
+        <field name="location_id" ref="stock_location_pallets_reserve" />
+    </record>
+    <record id="stock_location_cardboxes_reserve" model="stock.location">
+        <field name="name">Cardboxes reserve storage area</field>
+        <field
+            name="location_id"
+            model="stock.location"
+            eval="obj().env.ref('stock.warehouse0').lot_stock_id.id"
+        />
+        <field name="storage_category_id" ref="storage_category_cardboxes" />
+        <field name="pack_putaway_strategy">ordered_locations</field>
+    </record>
+    <record id="stock_location_cardboxes_reserve_bin_1" model="stock.location">
+        <field name="name">Cardboxes Reserve Bin 1</field>
+        <field name="location_id" ref="stock_location_cardboxes_reserve" />
+    </record>
+    <record id="stock_location_cardboxes_reserve_bin_2" model="stock.location">
+        <field name="name">Cardboxes Reserve Bin 2</field>
+        <field name="location_id" ref="stock_location_cardboxes_reserve" />
+    </record>
+    <record id="stock_location_cardboxes_reserve_bin_3" model="stock.location">
+        <field name="name">Cardboxes Reserve Bin 3</field>
+        <field name="location_id" ref="stock_location_cardboxes_reserve" />
+    </record>
+    <record id="stock_location_cardboxes_reserve_bin_4" model="stock.location">
+        <field name="name">Cardboxes Reserve Bin 4</field>
+        <field name="location_id" ref="stock_location_cardboxes_reserve" />
+    </record>
+</odoo>

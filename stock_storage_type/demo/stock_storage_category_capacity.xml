@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2022 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo noupdate="1">
+    <record id="location_storage_type_pallets" model="stock.storage.category.capacity">
+        <!-- <field name="name">Pallets EUR</field> -->
+        <field name="allow_new_product">empty</field>
+        <field
+            name="storage_category_id"
+            ref="stock_storage_type.storage_category_pallets"
+        />
+        <field name="package_type_id" ref="package_storage_type_pallets" />
+        <field name="quantity">1</field>
+    </record>
+    <record
+        id="location_storage_type_pallets_uk"
+        model="stock.storage.category.capacity"
+    >
+        <!-- <field name="name">Pallets UK</field> -->
+        <field
+            name="storage_category_id"
+            ref="stock_storage_type.storage_category_pallets"
+        />
+        <field name="package_type_id" ref="package_storage_type_pallets_uk" />
+        <field name="quantity">1</field>
+    </record>
+    <record
+        id="location_storage_type_cardboxes"
+        model="stock.storage.category.capacity"
+    >
+        <!-- <field name="name">Cardboxes</field> -->
+        <field
+            name="storage_category_id"
+            ref="stock_storage_type.storage_category_cardboxes"
+        />
+        <field name="package_type_id" ref="package_storage_type_cardboxes" />
+        <field name="quantity">1</field>
+    </record>
+</odoo>

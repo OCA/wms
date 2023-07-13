@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2022 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo noupdate="1">
+    <record id="storage_category_pallets" model="stock.storage.category">
+        <field name="name">Pallets</field>
+    </record>
+    <record id="storage_category_cardboxes" model="stock.storage.category">
+        <field name="name">Cardboxes</field>
+    </record>
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record
+        model="ir.ui.view"
+        id="product_template_form_view_procurement_button_inherit"
+    >
+        <field name="name">product.template_procurement.inherit</field>
+        <field name="model">product.template</field>
+        <field
+            name="inherit_id"
+            ref="stock.product_template_form_view_procurement_button"
+        />
+        <field name="arch" type="xml">
+            <field name="responsible_id" position="before">
+                <field name="package_type_id" groups="stock.group_stock_user" />
+            </field>
+        </field>
+    </record>
+</odoo>

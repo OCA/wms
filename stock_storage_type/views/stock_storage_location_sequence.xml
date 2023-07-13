@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="package_storage_location_tree_view" model="ir.ui.view">
+        <field name="name">package.storage.location.tree.view</field>
+        <field name="model">stock.storage.location.sequence</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle" />
+                <field
+                    name="package_type_id"
+                    readonly="context.get('default_package_type_id', False)"
+                    force_save="1"
+                />
+                <field name="location_id" />
+                <field name="location_putaway_strategy" />
+                <field name="location_sequence_cond_ids" widget="many2many_tags" />
+                <button
+                    string="Show locations"
+                    name="button_show_locations"
+                    type="object"
+                />
+            </tree>
+        </field>
+    </record>
+</odoo>

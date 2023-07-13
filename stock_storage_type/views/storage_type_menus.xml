@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <menuitem
+        id="storage_type_menu"
+        name="Storage Types"
+        parent="stock.menu_stock_config_settings"
+        sequence="9"
+        groups="stock.group_adv_location"
+    />
+    <menuitem
+        id="stock_storage_location_sequence_cond_menu"
+        action="stock_storage_location_sequence_cond_act_window"
+        name="Storage Location Sequence Conditions"
+        parent="storage_type_menu"
+        sequence="13"
+    />
+</odoo>

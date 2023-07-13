@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record model="ir.ui.view" id="stock_package_type_form">
+        <field name="name">stock.package.type.form (in stock_storage_type)</field>
+        <field name="model">stock.package.type</field>
+        <field name="inherit_id" ref="stock.stock_package_type_form" />
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button
+                    string="Put-Away sequence"
+                    class="oe_stat_button"
+                    icon="fa-location-arrow"
+                    name="action_view_storage_locations"
+                    type="object"
+                />
+            </div>
+
+            <group name="storage_categories">
+                <group name="main">
+                    <group name="location_storage_types">
+                        <field name="height_required" />
+                        <field name="barcode" />
+                    </group>
+                    <group name="msg">
+                        <div colspan="2">
+                            <label for="storage_type_message" invisible="1" />
+                            <div>
+                                <field name="storage_type_message" readonly="1" />
+                            </div>
+                        </div>
+                    </group>
+                </group>
+            </group>
+            <xpath
+                expr="//field[@name='storage_category_capacity_ids']/tree/field[@name='storage_category_id']"
+                position="after"
+            >
+                <field name="allow_new_product" />
+            </xpath>
+        </field>
+
+
+    </record>
+
+</odoo>
