@@ -1114,7 +1114,7 @@ class Reception(Component):
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
             )
-        if quantity:
+        if quantity is not None:
             # We set qty_done to be equal to the qty of the picker
             # at the moment of the scan.
             response = self._set_quantity__assign_quantity(
