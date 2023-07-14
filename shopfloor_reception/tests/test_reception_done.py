@@ -45,7 +45,7 @@ class TestReceptionDone(CommonCase):
         self.assert_response(
             response,
             next_state="select_move",
-            data={"picking": self._data_for_picking_with_moves(picking)},
+            data=self._data_for_select_move(picking),
             message={
                 "message_type": "warning",
                 "body": "No quantity has been processed, unable to complete the transfer.",

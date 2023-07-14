@@ -58,7 +58,7 @@ class TestSelectDestPackage(CommonCase):
         self.assert_response(
             response,
             next_state="select_move",
-            data={"picking": self._data_for_picking_with_moves(picking)},
+            data=self._data_for_select_move(picking),
         )
 
     def test_scan_not_empty_package(self):
@@ -127,5 +127,5 @@ class TestSelectDestPackage(CommonCase):
         self.assert_response(
             response,
             next_state="select_move",
-            data={"picking": self._data_for_picking_with_moves(picking)},
+            data=self._data_for_select_move(picking),
         )
