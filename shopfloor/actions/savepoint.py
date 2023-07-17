@@ -4,8 +4,6 @@ import uuid
 
 from psycopg2 import sql
 
-from odoo.sql_db import clear_env, flush_env
-
 from odoo.addons.component.core import Component
 
 
@@ -30,15 +28,15 @@ class Savepoint(object):
     def __init__(self, cr):
         self._cr = cr
         self.name = uuid.uuid1().hex
-        flush_env(self._cr, clear=False)
+        self._cr.flush()
         self._execute("SAVEPOINT {}")
 
     def rollback(self):
-        clear_env(self._cr)
+        self._cr.clear()
         self._execute("ROLLBACK TO SAVEPOINT {}")
 
     def release(self):
-        flush_env(self._cr, clear=False)
+        self._cr.flush()
         self._execute("RELEASE SAVEPOINT {}")
 
     def _execute(self, query):
