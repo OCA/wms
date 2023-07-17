@@ -5,7 +5,7 @@
 from odoo import api, fields, models, tools
 from odoo.tools import DotDict
 
-from odoo.addons.base_rest.tools import _inspect_methods
+from odoo.addons.base_rest.tools import ROUTING_DECORATOR_ATTR, _inspect_methods
 from odoo.addons.component.core import _component_databases
 
 from ..utils import APP_VERSION, RUNNING_ENV
@@ -220,9 +220,9 @@ class ShopfloorApp(models.Model):
         values = []
         root_path = self.api_route.rstrip("/") + "/" + service._usage
         for name, method in _inspect_methods(service.__class__):
-            if not hasattr(method, "routing"):
+            routing = getattr(method, ROUTING_DECORATOR_ATTR, None)
+            if not routing:
                 continue
-            routing = method.routing
             for routes, http_method in routing["routes"]:
                 # TODO: why on base_rest we have this instead of pure method name?
                 # method_name = "{}_{}".format(http_method.lower(), name)

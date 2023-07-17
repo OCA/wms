@@ -86,7 +86,7 @@ class TestShopfloorApp(CommonCase):
             )
 
         expected = sorted([f"{k} ({', '.join(v)})" for k, v in expected.items()])
-        rec.invalidate_cache(["registered_routes"])
+        rec.invalidate_recordset(["registered_routes"])
         self.assertEqual(
             sorted(rec.registered_routes.splitlines()),
             expected,
