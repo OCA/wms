@@ -5,6 +5,7 @@ from odoo_test_helper import FakeModelLoader
 from .test_zone_picking_base import ZonePickingCommonCase
 
 
+# pylint: disable=missing-return
 class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
     """Tests set_line_destination when `pick_pack_same_time` is one
 

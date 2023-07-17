@@ -3,6 +3,8 @@
 
 from .test_location_content_transfer_base import LocationContentTransferCommonCase
 
+# pylint: disable=missing-return
+
 
 class LocationContentTransferMixCase(LocationContentTransferCommonCase):
     """Tests where we mix location content transfer with other scenarios."""
@@ -13,7 +15,9 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         Users = (
             cls.env["res.users"]
             .sudo()
-            .with_context({"no_reset_password": True, "mail_create_nosubscribe": True})
+            .with_context(
+                **{"no_reset_password": True, "mail_create_nosubscribe": True}
+            )
         )
         cls.stock_user2 = Users.create(
             {

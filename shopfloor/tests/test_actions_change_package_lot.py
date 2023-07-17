@@ -5,6 +5,7 @@ from odoo.tests.common import Form
 from .common import CommonCase
 
 
+# pylint: disable=missing-return
 class TestActionsChangePackageLot(CommonCase):
     """Tests covering changing a package on a move line"""
 

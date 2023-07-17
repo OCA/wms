@@ -2,6 +2,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from .test_zone_picking_base import ZonePickingCommonCase
 
+# pylint: disable=missing-return
+
 
 class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
     """Tests for endpoint used from unload_single

@@ -3,6 +3,8 @@
 
 from .test_cluster_picking_base import ClusterPickingCommonCase
 
+# pylint: disable=missing-return
+
 
 class ClusterPickingChangePackLotCase(ClusterPickingCommonCase):
     """Tests covering the /change_pack_lot endpoint

@@ -3,6 +3,7 @@
 from .test_checkout_base import CheckoutCommonCase
 
 
+# pylint: disable=missing-return
 class CheckoutDoneCase(CheckoutCommonCase):
     def test_done_ok(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])

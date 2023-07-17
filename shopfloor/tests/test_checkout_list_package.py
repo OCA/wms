@@ -5,6 +5,8 @@ from odoo import fields
 from .test_checkout_base import CheckoutCommonCase
 from .test_checkout_select_package_base import CheckoutSelectPackageMixin
 
+# pylint: disable=missing-return
+
 
 class SelectDestPackageMixin:
     def _assert_response_select_dest_package(

@@ -8,7 +8,6 @@ class StockLocation(models.Model):
     _inherit = "stock.location"
 
     shopfloor_picking_sequence = fields.Char(
-        string="Shopfloor Picking Sequence",
         help="The picking done in Shopfloor scenarios will respect this order. "
         "The sequence is a char so it can be composed of fields such as "
         "'corridor-rack-side-level'. Pay attention to the padding "

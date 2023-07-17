@@ -2,6 +2,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from .test_checkout_base import CheckoutCommonCase
 
+# pylint: disable=missing-return
+
 
 class CheckoutListStockPickingCase(CheckoutCommonCase):
     def test_list_stock_picking(self):

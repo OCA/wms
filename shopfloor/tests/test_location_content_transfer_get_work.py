@@ -3,6 +3,8 @@
 
 from .test_location_content_transfer_base import LocationContentTransferCommonCase
 
+# pylint: disable=missing-return
+
 
 class TestLocationContentTransferGetWork(LocationContentTransferCommonCase):
     """Tests for getting work

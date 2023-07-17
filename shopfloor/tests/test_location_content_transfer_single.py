@@ -3,6 +3,8 @@
 
 from .test_location_content_transfer_base import LocationContentTransferCommonCase
 
+# pylint: disable=missing-return
+
 
 class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
     """Tests for endpoint used from state start_single

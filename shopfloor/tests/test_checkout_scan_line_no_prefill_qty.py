@@ -2,6 +2,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from .test_checkout_scan_line_base import CheckoutScanLineCaseBase
 
+# pylint: disable=missing-return
+
 
 class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
     @classmethod

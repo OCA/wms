@@ -5,6 +5,7 @@
 from .common import CommonCase
 
 
+# pylint: disable=missing-return
 class TestSearchBaseCase(CommonCase):
     @classmethod
     def setUpClassVars(cls):

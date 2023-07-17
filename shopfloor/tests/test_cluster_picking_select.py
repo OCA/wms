@@ -5,6 +5,8 @@ from odoo import fields
 
 from .test_cluster_picking_base import ClusterPickingCommonCase
 
+# pylint: disable=missing-return
+
 
 class ClusterPickingSelectionCase(ClusterPickingCommonCase):
     """Tests covering the selection of picking batches

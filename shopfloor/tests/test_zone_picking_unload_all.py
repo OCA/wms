@@ -3,6 +3,7 @@
 from .test_zone_picking_base import ZonePickingCommonCase
 
 
+# pylint: disable=missing-return
 class ZonePickingUnloadAllCase(ZonePickingCommonCase):
     """Tests for endpoint used from unload_all
 

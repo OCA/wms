@@ -3,6 +3,8 @@
 
 from .test_checkout_base import CheckoutCommonCase
 
+# pylint: disable=missing-return
+
 
 class CheckoutSummaryCase(CheckoutCommonCase):
     @classmethod

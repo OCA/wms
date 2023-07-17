@@ -3,6 +3,7 @@
 from .test_checkout_base import CheckoutCommonCase
 
 
+# pylint: disable=missing-return
 class CheckoutListSetPackagingCase(CheckoutCommonCase):
     @classmethod
     def setUpClassBaseData(cls):

@@ -3,6 +3,8 @@
 
 from .common import CommonCase, PickingBatchMixin
 
+# pylint: disable=missing-return
+
 
 class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
     @classmethod

@@ -3,6 +3,8 @@
 
 from .test_cluster_picking_base import ClusterPickingCommonCase
 
+# pylint: disable=missing-return
+
 
 class ClusterPickingScanDestinationPackPrefillQtyCase(ClusterPickingCommonCase):
     """Tests covering the /scan_destination_pack endpoint

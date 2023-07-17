@@ -3,6 +3,8 @@
 
 from .test_zone_picking_base import ZonePickingCommonCase
 
+# pylint: disable=missing-return
+
 
 class ZonePickingSelectLineFirstScanLocationCase(ZonePickingCommonCase):
     """Tests for endpoint used from select_line with option 'First scan location'

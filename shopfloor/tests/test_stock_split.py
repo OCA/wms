@@ -3,6 +3,8 @@
 from odoo.tests import tagged
 from odoo.tests.common import SavepointCase
 
+# pylint: disable=missing-return
+
 
 @tagged("post_install", "-at_install")
 class TestStockSplit(SavepointCase):

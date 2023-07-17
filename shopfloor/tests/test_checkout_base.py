@@ -3,6 +3,7 @@
 from .common import CommonCase
 
 
+# pylint: disable=missing-return
 class CheckoutCommonCase(CommonCase):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):

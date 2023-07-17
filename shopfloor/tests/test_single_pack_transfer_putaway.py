@@ -3,6 +3,8 @@
 
 from .test_single_pack_transfer_base import SinglePackTransferCommonBase
 
+# pylint: disable=missing-return
+
 
 class TestSinglePackTransferPutaway(SinglePackTransferCommonBase):
     @classmethod
