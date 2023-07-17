@@ -106,8 +106,8 @@ class StockPicking(models.Model):
         message = _(
             'The backorder <a href="#" '
             'data-oe-model="stock.picking" '
-            'data-oe-id="%d">%s</a> has been created.'
-        ) % (new_picking.id, new_picking.name)
+            'data-oe-id="%(new_picking_id)d">%(new_picking_name)s</a> has been created.'
+        ) % dict(new_picking_id=new_picking.id, new_picking_name=new_picking.name)
         self.message_post(body=message)
         assigned_moves.write({"picking_id": new_picking.id})
         assigned_moves.mapped("move_line_ids").write({"picking_id": new_picking.id})

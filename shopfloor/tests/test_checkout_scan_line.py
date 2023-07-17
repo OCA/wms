@@ -3,6 +3,7 @@
 from .test_checkout_scan_line_base import CheckoutScanLineCaseBase
 
 
+# pylint: disable=missing-return
 class CheckoutScanLineCase(CheckoutScanLineCaseBase):
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):

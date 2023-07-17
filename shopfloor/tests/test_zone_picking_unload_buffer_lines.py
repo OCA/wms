@@ -3,6 +3,7 @@
 from .test_zone_picking_base import ZonePickingCommonCase
 
 
+# pylint: disable=missing-return
 class ZonePickingUnloadBufferLinesCase(ZonePickingCommonCase):
     """Tests buffer lines to unload are retrieved properly.
 

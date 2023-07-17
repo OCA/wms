@@ -3,6 +3,8 @@
 
 from .test_delivery_base import DeliveryCommonCase
 
+# pylint: disable=missing-return
+
 
 class DeliveryScanDeliverCase(DeliveryCommonCase):
     """Tests for /scan_deliver"""

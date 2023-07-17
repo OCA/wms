@@ -3,6 +3,8 @@
 
 from .test_menu_base import CommonMenuCase
 
+# pylint: disable=missing-return
+
 
 class UserCase(CommonMenuCase):
     @classmethod

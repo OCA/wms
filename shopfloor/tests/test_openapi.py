@@ -5,6 +5,8 @@ from odoo.addons.shopfloor_base.tests.common_misc import OpenAPITestMixin
 
 from .common import CommonCase
 
+# pylint: disable=missing-return
+
 
 class TestOpenAPICommonCase(CommonCase, OpenAPITestMixin):
     @classmethod

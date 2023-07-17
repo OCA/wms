@@ -8,6 +8,7 @@ from odoo.tests.common import Form
 from odoo.addons.shopfloor_base.tests.common import CommonCase as BaseCommonCase
 
 
+# pylint: disable=missing-return
 class CommonCase(BaseCommonCase):
     @classmethod
     def setUpShopfloorApp(cls):

@@ -3,6 +3,8 @@
 
 from .test_location_content_transfer_base import LocationContentTransferCommonCase
 
+# pylint: disable=missing-return
+
 
 class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
     """Tests with putaway when using option to ignore unavailable putaway locations"""

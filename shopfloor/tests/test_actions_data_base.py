@@ -7,6 +7,7 @@ from odoo.addons.shopfloor_base.tests.common_misc import ActionsDataTestMixin
 from .common import CommonCase
 
 
+# pylint: disable=missing-return
 class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
     @classmethod
     def setUpClassVars(cls):

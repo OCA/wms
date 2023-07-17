@@ -6,6 +6,7 @@ from .test_checkout_base import CheckoutCommonCase
 from .test_checkout_select_package_base import CheckoutSelectPackageMixin
 
 
+# pylint: disable=missing-return
 class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
     @classmethod
     def _load_test_models(cls):

@@ -5,6 +5,7 @@
 from .common import CommonCase
 
 
+# pylint: disable=missing-return
 class TestActionsStock(CommonCase):
     """Tests covering methods to work on stock operations."""
 

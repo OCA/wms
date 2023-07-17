@@ -3,6 +3,8 @@
 
 from .test_delivery_base import DeliveryCommonCase
 
+# pylint: disable=missing-return
+
 
 class DeliveryListStockPickingCase(DeliveryCommonCase):
     """Tests for /list_stock_picking"""

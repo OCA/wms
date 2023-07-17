@@ -4,6 +4,8 @@
 from odoo import exceptions
 from odoo.tests.common import SavepointCase
 
+# pylint: disable=missing-return
+
 
 class MiscTestCase(SavepointCase):
     tracking_disable = True

@@ -49,10 +49,13 @@ class MessageAction(Component):
     def package_not_allowed_in_src_location(self, barcode, picking_types):
         return {
             "message_type": "error",
-            "body": _("You cannot work on a package (%s) outside of locations: %s")
-            % (
-                barcode,
-                ", ".join(picking_types.mapped("default_location_src_id.name")),
+            "body": _(
+                "You cannot work on a package (%(barcode)s) outside of locations:"
+                " %(names)s"
+            )
+            % dict(
+                barcode=barcode,
+                names=", ".join(picking_types.mapped("default_location_src_id.name")),
             ),
         }
 
@@ -173,8 +176,10 @@ class MessageAction(Component):
     def confirm_location_changed(self, from_location, to_location):
         return {
             "message_type": "warning",
-            "body": _("Confirm location change from %s to %s?")
-            % (from_location.name, to_location.name),
+            "body": _(
+                "Confirm location change from %(location_from)s to " "%(location_to)s?"
+            )
+            % dict(location_from=from_location.name, location_to=to_location.name),
         }
 
     def confirm_pack_moved(self):
@@ -204,9 +209,8 @@ class MessageAction(Component):
     def several_packs_in_location(self, location):
         return {
             "message_type": "warning",
-            "body": _(
-                "Several packages found in %s, please scan a package." % location.name
-            ),
+            "body": _("Several packages found in %(name)s, please scan a package.")
+            % dict(location.name),
         }
 
     def no_package_or_lot_for_barcode(self, barcode):
@@ -270,7 +274,8 @@ class MessageAction(Component):
     def several_lots_in_package(self, package):
         return {
             "message_type": "error",
-            "body": _("Several lots found in %s, please scan the lot." % package.name),
+            "body": _("Several lots found in %(name)s, please scan the lot.")
+            % dict(name=package.name),
         }
 
     def several_move_in_different_location(self):
@@ -290,17 +295,15 @@ class MessageAction(Component):
     def several_products_in_location(self, location):
         return {
             "message_type": "warning",
-            "body": _(
-                "Several products found in %s, please scan a product." % location.name
-            ),
+            "body": _("Several products found in %(name)s, please scan a product.")
+            % dict(location.name),
         }
 
     def several_products_in_package(self, package):
         return {
             "message_type": "error",
-            "body": _(
-                "Several products found in %s, please scan the product." % package.name
-            ),
+            "body": _("Several products found in %(name)s, please scan the product.")
+            % dict(package.name),
         }
 
     def no_product_in_location(self, location):
@@ -433,10 +436,8 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                "{} not found in the current transfer or already in a package.".format(
-                    message_code
-                )
-            ),
+                "{message_code} not found in the current transfer or already in a package."
+            ).format(message_code=message_code),
         }
 
     def packaging_not_found_in_picking(self):

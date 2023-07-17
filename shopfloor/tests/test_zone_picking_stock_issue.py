@@ -3,6 +3,7 @@
 from .test_zone_picking_base import ZonePickingCommonCase
 
 
+# pylint: disable=missing-return
 class ZonePickingStockIssueCase(ZonePickingCommonCase):
     """Tests for endpoint used from stock_issue
 

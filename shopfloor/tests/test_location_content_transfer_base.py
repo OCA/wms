@@ -3,6 +3,8 @@
 
 from .common import CommonCase
 
+# pylint: disable=missing-return
+
 
 class LocationContentTransferCommonCase(CommonCase):
     @classmethod

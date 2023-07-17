@@ -3,6 +3,8 @@
 
 from .test_delivery_base import DeliveryCommonCase
 
+# pylint: disable=missing-return
+
 
 class DeliverySetQtyDoneLineCase(DeliveryCommonCase):
     """Tests for /set_qty_done_line"""

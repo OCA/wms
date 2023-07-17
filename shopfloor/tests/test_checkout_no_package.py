@@ -8,6 +8,7 @@ from .test_checkout_base import CheckoutCommonCase
 from .test_checkout_select_package_base import CheckoutSelectPackageMixin
 
 
+# pylint: disable=missing-return
 class CheckoutNoPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
     @classmethod
     def setUpClassBaseData(cls):

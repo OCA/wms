@@ -3,6 +3,7 @@
 from .test_zone_picking_base import ZonePickingCommonCase
 
 
+# pylint: disable=missing-return
 class ZonePickingSetLineDestinationNoPrefillQtyCase(ZonePickingCommonCase):
     """Tests for endpoint used from set_line_destination
 

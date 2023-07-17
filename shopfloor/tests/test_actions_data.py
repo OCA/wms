@@ -3,6 +3,8 @@
 from .common import PickingBatchMixin
 from .test_actions_data_base import ActionsDataCaseBase
 
+# pylint: disable=missing-return
+
 
 class ActionsDataCase(ActionsDataCaseBase):
     def test_data_packaging(self):

@@ -3,6 +3,8 @@
 
 from .test_cluster_picking_base import ClusterPickingCommonCase
 
+# pylint: disable=missing-return
+
 
 class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
     """Tests covering the /skip_line endpoint"""
