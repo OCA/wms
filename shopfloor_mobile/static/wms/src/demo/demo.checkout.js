@@ -6,19 +6,6 @@
 
 import {demotools} from "/shopfloor_mobile_base/static/wms/src/demo/demo.core.js";
 
-const DEMO_CASE = {
-    by_menu_id: {},
-};
-
-const checkout_menu_case1 = demotools.addAppMenu(
-    {
-        name: "Checkout: case 1",
-        scenario: "checkout",
-        picking_types: [{id: 27, name: "Random type"}],
-    },
-    "co_1"
-);
-
 const select_pack_picking = demotools.makePicking(
     {},
     {lines_count: 5, line_random_pack: true, line_random_dest: true}
@@ -258,6 +245,13 @@ const DEMO_CHECKOUT = {
     },
 };
 
-DEMO_CASE.by_menu_id[checkout_menu_case1] = DEMO_CHECKOUT;
+const menuitem_id = demotools.addAppMenu(
+    {
+        name: "Checkout: case 1",
+        scenario: "checkout",
+        picking_types: [{id: 27, name: "Random type"}],
+    },
+    "co_1"
+);
 
-demotools.add_case("checkout", DEMO_CHECKOUT);
+demotools.add_case("checkout", menuitem_id, DEMO_CHECKOUT);

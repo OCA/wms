@@ -167,11 +167,7 @@ DEMO_CLUSTER_PICKING_2.scan_line = {
     },
 };
 
-const DEMO_CASE = {
-    by_menu_id: {},
-};
-
-const cluster_picking_menu_case1 = demotools.addAppMenu(
+const menu_case1_id = demotools.addAppMenu(
     {
         name: "Cluster picking: case 1",
         scenario: "cluster_picking",
@@ -179,7 +175,7 @@ const cluster_picking_menu_case1 = demotools.addAppMenu(
     },
     "cp_1"
 );
-const cluster_picking_menu_case2 = demotools.addAppMenu(
+const menu_case2_id = demotools.addAppMenu(
     {
         name: "Cluster picking: case 2 (no full bin)",
         scenario: "cluster_picking",
@@ -187,7 +183,6 @@ const cluster_picking_menu_case2 = demotools.addAppMenu(
     },
     "cp_2"
 );
-DEMO_CASE.by_menu_id[cluster_picking_menu_case1] = DEMO_CLUSTER_PICKING_1;
-DEMO_CASE.by_menu_id[cluster_picking_menu_case2] = DEMO_CLUSTER_PICKING_2;
 
-demotools.add_case("cluster_picking", DEMO_CASE);
+demotools.add_case("cluster_picking", menu_case1_id, DEMO_CLUSTER_PICKING_1);
+demotools.add_case("cluster_picking", menu_case2_id, DEMO_CLUSTER_PICKING_2);
