@@ -58,12 +58,13 @@ export class DemoTools {
         ];
     }
 
-    get_case(key) {
-        return this.demo_cases[key];
+    get_case(key, menu_id) {
+        return _.result(this.demo_cases, key + "." + menu_id, {});
     }
 
-    add_case(key, demo_case) {
-        return (this.demo_cases[key] = demo_case);
+    add_case(key, menu_id, demo_case) {
+        if (!this.demo_cases[key]) this.demo_cases[key] = {};
+        return (this.demo_cases[key][menu_id] = demo_case);
     }
 
     index_record(key_path, rec, type) {
@@ -500,7 +501,7 @@ export class DemoTools {
         return profiles;
     }
     getAppMenus() {
-        return this.app_menus;
+        return _.sortBy(this.app_menus, "scenario");
     }
     /**
      *
@@ -522,14 +523,6 @@ export class DemoTools {
         new_item.id = menu_id;
         this.app_menus_by_id[menu_id] = new_item;
 
-        // Find insert index to keep items w/ same scenario grouped
-        let index = 0;
-        this.app_menus.every(function (item, i) {
-            if (item.scenario === new_item.scenario) {
-                index = i;
-                return false;
-            }
-        });
         _.defaults(new_item, {
             lines_count: 0,
             priority_lines_count: 0,
@@ -539,7 +532,7 @@ export class DemoTools {
         if (_.isUndefined(new_item.picking_types)) {
             new_item.picking_types = [{id: 99999999, name: "Fake type"}];
         }
-        this.app_menus.splice(index, 0, new_item);
+        this.app_menus.push(new_item);
         // Return the unique id
         return menu_id;
     }
