@@ -6,19 +6,6 @@
 
 import {demotools} from "/shopfloor_mobile_base/static/wms/src/demo/demo.core.js";
 
-const DEMO_CASE = {
-    by_menu_id: {},
-};
-
-const zone_picking_menu_case1 = demotools.addAppMenu(
-    {
-        name: "Zone picking: case 1",
-        scenario: "zone_picking",
-        picking_types: [{id: 27, name: "Random type"}],
-    },
-    "zp_1"
-);
-
 function _makePickingType() {
     const lines_count = demotools.getRandomInt(10);
     const picking_count = demotools.getRandomInt(10);
@@ -279,6 +266,12 @@ const DEMO_CASE_1 = {
     },
 };
 
-DEMO_CASE.by_menu_id[zone_picking_menu_case1] = DEMO_CASE_1;
-
-demotools.add_case("zone_picking", DEMO_CASE);
+const menuitem_id = demotools.addAppMenu(
+    {
+        name: "Zone picking: case 1",
+        scenario: "zone_picking",
+        picking_types: [{id: 27, name: "Random type"}],
+    },
+    "zp_1"
+);
+demotools.add_case("zone_picking", menuitem_id, DEMO_CASE_1);

@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+ * Copyright 2023 Camptocamp SA (http://www.camptocamp.com)
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
@@ -15,6 +15,14 @@ const move_lines1 = demotools.makePickingLines(
     {},
     {lines_count: 5, line_random_pack: true}
 );
+
+move_lines1.forEach(function (line, i) {
+    if (i % 2 === 0) {
+        if (line.pack) line.pack.has_lq_products = true;
+        else line.has_lq_products = true;
+    }
+});
+
 const select_line_picking = demotools.makePicking(
     {
         move_lines: move_lines1,
@@ -45,7 +53,7 @@ const data_for_select_package = {
 
 const data_for_set_line_qty = _.cloneDeep(data_for_select_package);
 
-const DEMO_CHECKOUT = {
+const DEMO_CHECKOUT_DG = {
     scan_document: {
         PACK1: {
             // No picking
@@ -247,11 +255,11 @@ const DEMO_CHECKOUT = {
 
 const menuitem_id = demotools.addAppMenu(
     {
-        name: "Checkout: case 1",
+        name: "Checkout: DG case",
         scenario: "checkout",
         picking_types: [{id: 27, name: "Random type"}],
     },
-    "co_1"
+    "checkout_dg_1"
 );
 
-demotools.add_case("checkout", menuitem_id, DEMO_CHECKOUT);
+demotools.add_case("checkout", menuitem_id, DEMO_CHECKOUT_DG);

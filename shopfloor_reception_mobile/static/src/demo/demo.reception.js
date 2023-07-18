@@ -5,10 +5,6 @@
 
 import {demotools} from "/shopfloor_mobile_base/static/wms/src/demo/demo.core.js";
 
-const DEMO_CASE = {
-    by_menu_id: {},
-};
-
 let receipt_pickings = [];
 for (let i = 0; i < 10; i++) {
     receipt_pickings.push(
@@ -28,15 +24,6 @@ const data_for_select_document = {
     },
 };
 
-const reception_menu_case1 = demotools.addAppMenu(
-    {
-        name: "Reception",
-        scenario: "reception",
-        picking_types: [{id: 27, name: "Random type"}],
-    },
-    "re_1"
-);
-
 const DEMO_RECEPTION = {
     receipts: function (data) {
         const res = data_for_select_document;
@@ -54,6 +41,12 @@ const DEMO_RECEPTION = {
     },
 };
 
-DEMO_CASE.by_menu_id[reception_menu_case1] = DEMO_RECEPTION;
-
-demotools.add_case("reception", DEMO_CASE);
+const menuitem_id = demotools.addAppMenu(
+    {
+        name: "Reception",
+        scenario: "reception",
+        picking_types: [{id: 27, name: "Random type"}],
+    },
+    "re_1"
+);
+demotools.add_case("reception", menuitem_id, DEMO_RECEPTION);

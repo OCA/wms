@@ -6,10 +6,6 @@
 
 import {demotools} from "/shopfloor_mobile_base/static/wms/src/demo/demo.core.js";
 
-const DEMO_CASE = {
-    by_menu_id: {},
-};
-
 // Case for recover existing work on single move line
 const recover_single_move_line_menu_id = demotools.addAppMenu({
     name: "Loc.Cont.Transfer: recover single line",
@@ -56,7 +52,6 @@ const RECOVER_SINGLE_MOVE_LINE_CASE = {
         },
     },
 };
-DEMO_CASE.by_menu_id[recover_single_move_line_menu_id] = RECOVER_SINGLE_MOVE_LINE_CASE;
 
 // Case for recover existing work on single package level
 const recover_single_package_level_menu_id = demotools.addAppMenu({
@@ -105,9 +100,6 @@ const RECOVER_SINGLE_PACKAGE_LEVEL_CASE = {
         },
     },
 };
-DEMO_CASE.by_menu_id[
-    recover_single_package_level_menu_id
-] = RECOVER_SINGLE_PACKAGE_LEVEL_CASE;
 
 // Case for recover existing work on several lines from the same location
 const recover_move_lines_same_location_menu_id = demotools.addAppMenu({
@@ -169,8 +161,19 @@ const RECOVER_MOVE_LINES_SAME_LOCATION_CASE = {
         },
     },
 };
-DEMO_CASE.by_menu_id[
-    recover_move_lines_same_location_menu_id
-] = RECOVER_MOVE_LINES_SAME_LOCATION_CASE;
 
-demotools.add_case("location_content_transfer", DEMO_CASE);
+demotools.add_case(
+    "location_content_transfer",
+    recover_single_move_line_menu_id,
+    RECOVER_SINGLE_MOVE_LINE_CASE
+);
+demotools.add_case(
+    "location_content_transfer",
+    recover_single_package_level_menu_id,
+    RECOVER_SINGLE_PACKAGE_LEVEL_CASE
+);
+demotools.add_case(
+    "location_content_transfer",
+    recover_move_lines_same_location_menu_id,
+    RECOVER_MOVE_LINES_SAME_LOCATION_CASE
+);
