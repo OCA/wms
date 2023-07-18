@@ -124,7 +124,7 @@ export class OdooMocked extends OdooMixin {
         this.process_menu_id = this.params.headers["SERVICE-CTX-MENU-ID"];
     }
     _set_demo_data() {
-        this.demo_data = demotools.get_case(this.usage);
+        this.demo_data = demotools.get_case(this.usage, this.process_menu_id);
     }
     _call(endpoint_info, method, data) {
         let path = endpoint_info.path;
@@ -147,10 +147,6 @@ export class OdooMocked extends OdooMixin {
             ? data.barcode || data.identifier || data.location_barcode
             : null;
         let demo_data = this.demo_data;
-        if (demo_data.by_menu_id && _.has(demo_data.by_menu_id, this.process_menu_id)) {
-            // Load subset of responses by menu id
-            demo_data = demo_data.by_menu_id[this.process_menu_id];
-        }
         if (_.has(demo_data, barcode)) {
             // Pick a specific case for this barcode
             result = demo_data[barcode];
