@@ -7,13 +7,21 @@
         inherit_id="shopfloor_mobile.shopfloor_app_assets"
     >
         <script id="script_component_picking_select" position="after">
-          <script
+            <t
+                t-set="mod_version"
+                t-value="get_version('shopfloor_dangerous_goods_mobile')"
+            />
+            <script
                 id="script_component_picking_select_dangerous_goods"
-                t-attf-src="/shopfloor_dangerous_goods_mobile/static/wms/src/components/picking_select.js?v=#{app_version}"
+                t-attf-src="/shopfloor_dangerous_goods_mobile/static/wms/src/components/picking_select.js?v=#{mod_version}"
                 type="module"
             />
         </script>
         <link id="link_css_main" position="after">
+            <t
+                t-set="mod_version"
+                t-value="get_version('shopfloor_dangerous_goods_mobile')"
+            />
             <link
                 id="link_css_dangerous_goods"
                 t-attf-href="/shopfloor_dangerous_goods_mobile/static/wms/src/css/dangerous_goods.css?v=#{mod_version}"
