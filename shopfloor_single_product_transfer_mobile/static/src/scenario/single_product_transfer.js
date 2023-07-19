@@ -171,10 +171,10 @@ const SingleProductTransfer = {
             return params;
         },
         get_select_product_package_or_location_data: function () {
-            if (this.state.data.location) {
-                return this.state.data.location;
+            if (this.state.data.package) {
+                return this.state.data.package;
             }
-            return this.state.data.package;
+            return this.state.data.location;
         },
         display_operations_progress: function () {
             const operation_progress = this._get_operation_progress_data();
