@@ -16,12 +16,12 @@ class TestLocationContentTransferScanLocation(LocationContentTransferCommonCase)
             lines=[(cls.product_a, 10), (cls.product_b, 10)]
         )
         cls.picking1.move_type = "one"
-        cls.move1 = cls.picking1.move_lines[0]
+        cls.move1 = cls.picking1.move_ids[0]
         cls._fill_stock_for_moves(cls.move1, in_package=False, location=cls.content_loc)
         cls.picking1.action_assign()
         # Another picking available
         picking2 = cls._create_picking(lines=[(cls.product_c, 5)])
-        cls._fill_stock_for_moves(picking2.move_lines, location=cls.content_loc)
+        cls._fill_stock_for_moves(picking2.move_ids, location=cls.content_loc)
         picking2.action_assign()
 
     def test_lines_returned_by_scan_location(self):

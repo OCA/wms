@@ -12,9 +12,9 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
     def _load_test_models(cls):
         cls.loader = FakeModelLoader(cls.env, cls.__module__)
         cls.loader.backup_registry()
-        from .models import DeliveryCarrierTest, ProductPackagingTest
+        from .models import DeliveryCarrierTest, StockPackageType
 
-        cls.loader.update_registry((DeliveryCarrierTest, ProductPackagingTest))
+        cls.loader.update_registry((DeliveryCarrierTest, StockPackageType))
 
     @classmethod
     def tearDownClass(cls):
@@ -37,7 +37,7 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
         )
         cls.picking.carrier_id = cls.carrier
         cls.packaging_type = (
-            cls.env["product.packaging.type"]
+            cls.env["product.packaging.level"]
             .sudo()
             .create({"name": "Transport Box", "code": "TB", "sequence": 0})
         )
@@ -48,7 +48,7 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
                 {
                     "name": "Box 1",
                     "package_carrier_type": "test",
-                    "packaging_type_id": cls.packaging_type.id,
+                    "packaging_level_id": cls.packaging_type.id,
                     "barcode": "BOX1",
                 }
             )
@@ -60,7 +60,7 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
                 {
                     "name": "Box 2",
                     "package_carrier_type": "test",
-                    "packaging_type_id": cls.packaging_type.id,
+                    "packaging_level_id": cls.packaging_type.id,
                     "barcode": "BOX2",
                 }
             )
@@ -70,7 +70,7 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
         ).sorted("name")
 
     def test_list_delivery_packaging_available(self):
-        self._fill_stock_for_moves(self.picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(self.picking.move_ids, in_package=True)
         self.picking.action_assign()
         selected_lines = self.picking.move_line_ids
         response = self.service.dispatch(
@@ -92,11 +92,11 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
 
     def test_list_delivery_packaging_not_available(self):
         self.delivery_packaging.package_carrier_type = False
-        self._fill_stock_for_moves(self.picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(self.picking.move_ids, in_package=True)
         self.picking.action_assign()
         selected_lines = self.picking.move_line_ids
         # for line in selected_lines:
-        #     line.qty_done = line.product_uom_qty
+        #     line.qty_done = line.reserved_uom_qty
         response = self.service.dispatch(
             "list_delivery_packaging",
             params={

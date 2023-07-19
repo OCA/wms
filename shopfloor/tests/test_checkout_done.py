@@ -7,7 +7,7 @@ from .test_checkout_base import CheckoutCommonCase
 class CheckoutDoneCase(CheckoutCommonCase):
     def test_done_ok(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         # line is done
         picking.move_line_ids.write({"qty_done": 10, "shopfloor_checkout_done": True})
@@ -32,7 +32,7 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
         cls.picking = picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10)]
         )
-        cls._fill_stock_for_moves(picking.move_lines)
+        cls._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         cls.line1 = picking.move_line_ids[0]
         cls.line2 = picking.move_line_ids[1]
@@ -62,7 +62,7 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
         # created for the unprocessed qty.
         self.assertRecordValues(self.picking, [{"state": "done"}])
         self.assertTrue(self.picking.backorder_ids)
-        self.assertEqual(self.picking.backorder_ids.move_line_ids.product_uom_qty, 8)
+        self.assertEqual(self.picking.backorder_ids.move_line_ids.reserved_uom_qty, 8)
 
         self.assert_response(
             response,
@@ -78,7 +78,7 @@ class CheckoutDoneRawUnpackedCase(CheckoutCommonCase):
         cls.picking = picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10)]
         )
-        cls._fill_stock_for_moves(picking.move_lines)
+        cls._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         cls.line1 = picking.move_line_ids[0]
         cls.line2 = picking.move_line_ids[1]

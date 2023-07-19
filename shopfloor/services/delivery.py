@@ -214,7 +214,7 @@ class Delivery(Component):
         for line in lines:
             # note: the package level is automatically set to "is_done" when
             # the qty_done is full
-            line.qty_done = line.product_uom_qty
+            line.qty_done = line.reserved_uom_qty
         picking = fields.first(lines.mapped("picking_id"))
         return self._action_picking_done(picking, force=allow_prepackaged_product)
 
@@ -280,7 +280,7 @@ class Delivery(Component):
         if product_qty:
             domain.extend(
                 [
-                    ("product_qty", ">=", product_qty),
+                    ("reserved_qty", ">=", product_qty),
                 ]
             )
         return domain
@@ -297,7 +297,7 @@ class Delivery(Component):
         if product_qty:
             domain.extend(
                 [
-                    ("product_qty", ">=", product_qty),
+                    ("reserved_qty", ">=", product_qty),
                 ]
             )
         return domain
@@ -386,7 +386,7 @@ class Delivery(Component):
                 )
         # We focus only on lines on which we can increase the 'qty_done'
         lines = lines.filtered(
-            lambda l: (l.qty_done + product_qty) <= l.product_uom_qty
+            lambda l: (l.qty_done + product_qty) <= l.reserved_uom_qty
         )
         # Filter lines to keep only ones from one delivery operation
         # (we do not want to process lines of another delivery operation)
@@ -489,7 +489,7 @@ class Delivery(Component):
             picking._action_done()
             return True
         all_done = False
-        for move in picking.move_lines:
+        for move in picking.move_ids:
             if move.state in ("done", "cancel"):
                 continue
             all_done = move._qty_is_satisfied()

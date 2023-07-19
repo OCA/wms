@@ -17,9 +17,9 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
     def _load_test_models(cls):
         cls.loader = FakeModelLoader(cls.env, cls.__module__)
         cls.loader.backup_registry()
-        from .models import DeliveryCarrierTest, ProductPackagingTest
+        from .models import DeliveryCarrierTest, StockPackageType
 
-        cls.loader.update_registry((DeliveryCarrierTest, ProductPackagingTest))
+        cls.loader.update_registry((DeliveryCarrierTest, StockPackageType))
 
     @classmethod
     def tearDownClass(cls):
@@ -53,7 +53,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         picking_type = self.picking1.picking_type_id
         move_line = self.picking1.move_line_ids
         move_line.location_dest_id = self.shelf1
-        quantity_done = move_line.product_uom_qty
+        quantity_done = move_line.reserved_uom_qty
         previous_qty_done = move_line.qty_done
         # Confirm the destination with the right destination
         response = self.service.dispatch(
@@ -90,7 +90,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "confirmation": True,
             },
         )
@@ -100,7 +100,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         delivery_pkg = move_line.result_package_id
         self.assertNotIn(delivery_pkg, existing_packages)
         self.assertEqual(
-            delivery_pkg.packaging_id, self.carrier.test_default_packaging_id
+            delivery_pkg.product_packaging_id, self.carrier.test_default_packaging_id
         )
         message = self.msg_store.confirm_pack_moved()
         message["body"] += "\n" + self.msg_store.goods_packed_in(delivery_pkg)["body"]
@@ -116,11 +116,11 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         """Scan destination package, no carrier on picking."""
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
-        moves_before = self.picking1.move_lines
+        moves_before = self.picking1.move_ids
         self.assertEqual(len(moves_before), 1)
         self.assertEqual(len(moves_before.move_line_ids), 1)
         move_line = moves_before.move_line_ids
-        quantity_done = move_line.product_uom_qty
+        quantity_done = move_line.reserved_uom_qty
         response = self.service.dispatch(
             "set_destination",
             params={
@@ -145,12 +145,12 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         """Scan destination package, carrier on picking, package invalid."""
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
-        moves_before = self.picking1.move_lines
+        moves_before = self.picking1.move_ids
         self.assertEqual(len(moves_before), 1)
         self.assertEqual(len(moves_before.move_line_ids), 1)
         move_line = moves_before.move_line_ids
         move_line.picking_id.carrier_id = self.carrier
-        quantity_done = move_line.product_uom_qty
+        quantity_done = move_line.reserved_uom_qty
         response = self.service.dispatch(
             "set_destination",
             params={
@@ -175,30 +175,30 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         """Scan destination package, carrier on picking, package valid."""
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
-        moves_before = self.picking1.move_lines
+        moves_before = self.picking1.move_ids
         self.assertEqual(len(moves_before), 1)
         self.assertEqual(len(moves_before.move_line_ids), 1)
         move_line = moves_before.move_line_ids
         move_line.picking_id.carrier_id = self.carrier
-        self.free_package.packaging_id = self.carrier.test_default_packaging_id
+        self.free_package.product_packaging_id = self.carrier.test_default_packaging_id
         response = self.service.dispatch(
             "set_destination",
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "confirmation": True,
             },
         )
         # Check picking data
-        moves_after = self.picking1.move_lines
+        moves_after = self.picking1.move_ids
         self.assertEqual(moves_before, moves_after)
         self.assertRecordValues(
             move_line,
             [
                 {
                     "result_package_id": self.free_package.id,
-                    "product_uom_qty": 10,
+                    "reserved_uom_qty": 10,
                     "qty_done": 10,
                     "shopfloor_user_id": self.env.user.id,
                 },

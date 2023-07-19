@@ -81,14 +81,12 @@ class ShopfloorSchemaDetailAction(Component):
         return schema
 
     def product_supplierinfo(self):
-        schema = self._simple_record()
-        schema.update(
-            {
-                "product_name": {"type": "string", "nullable": True, "required": False},
-                "product_code": {"type": "string", "nullable": True, "required": False},
-            }
-        )
-        return schema
+        return {
+            "id": {"required": True, "type": "integer"},
+            "partner": {"type": "string", "nullable": True, "required": False},
+            "product_name": {"type": "string", "nullable": True, "required": False},
+            "product_code": {"type": "string", "nullable": True, "required": False},
+        }
 
     # TODO
     # def packaging_detail(self):

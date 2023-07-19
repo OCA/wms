@@ -36,7 +36,7 @@ class DataAction(Component):
         operations_done = 0
         for line in lines:
             operations_done += line.qty_done if not line.package_id else 1
-            operations_to_do += line.product_uom_qty if not line.package_id else 1
+            operations_to_do += line.reserved_uom_qty if not line.package_id else 1
         return {
             "done": operations_done,
             "to_do": operations_to_do,
@@ -111,13 +111,13 @@ class DataAction(Component):
             "id",
             "name",
             "shopfloor_weight:weight",
-            ("package_storage_type_id:storage_type", ["id", "name"]),
+            ("package_type_id:storage_type", ["id", "name"]),
         ]
 
     @property
     def _package_packaging_parser(self):
         return [
-            ("packaging_id:packaging", self._packaging_parser),
+            ("product_packaging_id:packaging", self._packaging_parser),
         ]
 
     @ensure_model("product.packaging")
@@ -131,8 +131,8 @@ class DataAction(Component):
     def _packaging_parser(self):
         return [
             "id",
-            ("packaging_type_id:name", lambda rec, fname: rec.packaging_type_id.name),
-            ("packaging_type_id:code", lambda rec, fname: rec.packaging_type_id.code),
+            ("packaging_level_id:name", lambda rec, fname: rec.packaging_level_id.name),
+            ("packaging_level_id:code", lambda rec, fname: rec.packaging_level_id.code),
             "qty",
         ]
 
@@ -149,13 +149,13 @@ class DataAction(Component):
             "id",
             "name",
             (
-                "packaging_type_id:packaging_type",
-                lambda rec, fname: rec.packaging_type_id.display_name,
+                "packaging_level_id:packaging_type",
+                lambda rec, fname: rec.packaging_level_id.display_name,
             ),
             "barcode",
         ]
 
-    @ensure_model("stock.production.lot")
+    @ensure_model("stock.lot")
     def lot(self, record, **kw):
         return self._jsonify(record, self._lot_parser, **kw)
 
@@ -200,7 +200,7 @@ class DataAction(Component):
         return [
             "id",
             "qty_done",
-            "product_uom_qty:quantity",
+            "reserved_uom_qty:quantity",
             ("product_id:product", self._product_parser),
             ("lot_id:lot", self._lot_parser),
             ("location_id:location_src", self._location_parser),
@@ -253,7 +253,7 @@ class DataAction(Component):
                 "location_id:location_src",
                 lambda rec, fname: self.location(
                     fields.first(rec.move_line_ids).location_id
-                    or fields.first(rec.move_ids).location_id
+                    or fields.first(rec.move_lines).location_id
                     or rec.picking_id.location_id
                 ),
             ),

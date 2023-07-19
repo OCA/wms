@@ -21,8 +21,8 @@ class DeliveryCarrierTest(models.Model):
     )
 
 
-class ProductPackagingTest(models.Model):
-    _inherit = "product.packaging"
+class StockPackageType(models.Model):
+    _inherit = "stock.package.type"
 
     package_carrier_type = fields.Selection(
         selection_add=[("test", "TEST")], ondelete={"test": "set default"}

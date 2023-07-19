@@ -38,20 +38,20 @@ class StockMoveLine(models.Model):
         if float_is_zero(self.qty_done, precision_rounding=rounding):
             return self.browse()
         compare = float_compare(
-            self.qty_done, self.product_uom_qty, precision_rounding=rounding
+            self.qty_done, self.reserved_uom_qty, precision_rounding=rounding
         )
         qty_lesser = compare == -1
         qty_greater = compare == 1
         assert not qty_greater, "Quantity done cannot exceed quantity to do"
         if qty_lesser:
-            remaining = self.product_uom_qty - self.qty_done
-            new_line = self.copy({"product_uom_qty": remaining, "qty_done": 0})
+            remaining = self.reserved_uom_qty - self.qty_done
+            new_line = self.copy({"reserved_uom_qty": remaining, "qty_done": 0})
             # if we didn't bypass reservation update, the quant reservation
             # would be reduced as much as the deduced quantity, which is wrong
             # as we only moved the quantity to a new move line
             self.with_context(
                 bypass_reservation_update=True
-            ).product_uom_qty = self.qty_done
+            ).reserved_uom_qty = self.qty_done
             return new_line
         return self.browse()
 
@@ -63,9 +63,9 @@ class StockMoveLine(models.Model):
             values of the copied record
         """
         for picking in self.picking_id:
-            moves_to_extract = new_move = picking.move_lines.browse()
+            moves_to_extract = new_move = picking.move_ids.browse()
             need_backorder = need_split = False
-            for move in picking.move_lines:
+            for move in picking.move_ids:
                 if move.state in ("cancel", "done"):
                     continue
                 if move.state == "confirmed":
@@ -157,7 +157,7 @@ class StockMoveLine(models.Model):
         new_line = self.env["stock.move.line"]
         rounding = self.product_uom_id.rounding
         compare = float_compare(
-            qty_done, self.product_uom_qty, precision_rounding=rounding
+            qty_done, self.reserved_uom_qty, precision_rounding=rounding
         )
         qty_lesser = compare == -1
         qty_greater = compare == 1
@@ -177,8 +177,8 @@ class StockMoveLine(models.Model):
         # split the move line which will be processed later (maybe the user
         # has to pick some goods from another place because the location
         # contained less items than expected)
-        remaining = self.product_uom_qty - quantity_done
-        vals = {"product_uom_qty": remaining, "qty_done": 0}
+        remaining = self.reserved_uom_qty - quantity_done
+        vals = {"reserved_uom_qty": remaining, "qty_done": 0}
         vals.update(split_default_vals)
         new_line = self.copy(vals)
         # if we didn't bypass reservation update, the quant reservation
@@ -186,7 +186,7 @@ class StockMoveLine(models.Model):
         # as we only moved the quantity to a new move line
         self.with_context(
             bypass_reservation_update=True
-        ).product_uom_qty = quantity_done
+        ).reserved_uom_qty = quantity_done
         return new_line
 
     def replace_package(self, new_package):
@@ -265,18 +265,18 @@ class StockMoveLine(models.Model):
 
         available_quantity = quant.quantity - quant.reserved_quantity
         if is_lesser(
-            available_quantity, self.product_qty, quant.product_uom_id.rounding
+            available_quantity, self.reserved_qty, quant.product_uom_id.rounding
         ):
             new_uom_qty = self.product_id.uom_id._compute_quantity(
                 available_quantity, self.product_uom_id, rounding_method="HALF-UP"
             )
-            values["product_uom_qty"] = new_uom_qty
+            values["reserved_uom_qty"] = new_uom_qty
 
         self.write(values)
 
         # try reassign the move in case we had a partial qty, also, it will
         # recreate a package level if it applies
-        if "product_uom_qty" in values:
+        if "reserved_uom_qty" in values:
             # when we change the quantity of the move, the state
             # will still be "assigned" and be skipped by "_action_assign",
             # recompute the state to be "partially_available"

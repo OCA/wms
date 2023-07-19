@@ -663,7 +663,7 @@ class ZonePicking(Component):
         """
         if self.work.menu.no_prefill_qty:
             return qty
-        return move_line.product_uom_qty
+        return move_line.reserved_uom_qty
 
     def _scan_source_product(
         self,
@@ -931,13 +931,13 @@ class ZonePicking(Component):
     def _move_line_compare_qty(self, move_line, qty):
         rounding = move_line.product_uom_id.rounding
         return float_compare(
-            qty, move_line.product_uom_qty, precision_rounding=rounding
+            qty, move_line.reserved_uom_qty, precision_rounding=rounding
         )
 
     def _move_line_full_qty(self, move_line, qty):
         rounding = move_line.product_uom_id.rounding
         return float_is_zero(
-            move_line.product_uom_qty - qty, precision_rounding=rounding
+            move_line.reserved_uom_qty - qty, precision_rounding=rounding
         )
 
     def _set_destination_package(self, move_line, quantity, package):
@@ -968,7 +968,7 @@ class ZonePicking(Component):
         if qty_greater:
             response = self._response_for_set_line_destination(
                 move_line,
-                message=self.msg_store.unable_to_pick_more(move_line.product_uom_qty),
+                message=self.msg_store.unable_to_pick_more(move_line.reserved_uom_qty),
                 qty_done=quantity,
             )
             return (package_changed, response)
@@ -1206,7 +1206,9 @@ class ZonePicking(Component):
         carrier = picking.ship_carrier_id or picking.carrier_id
         if carrier:
             actions = self._actions_for("packaging")
-            if actions.packaging_valid_for_carrier(package.packaging_id, carrier):
+            if actions.packaging_valid_for_carrier(
+                package.product_packaging_id, carrier
+            ):
                 good_for_packing = True
             else:
                 message = self.msg_store.packaging_invalid_for_carrier(
@@ -1230,17 +1232,6 @@ class ZonePicking(Component):
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
-        if not zero:
-            inventory = self._actions_for("inventory")
-            inventory.create_draft_check_empty(
-                move_line.location_id,
-                # FIXME as zero_check is done on the whole location, we should
-                # create an inventory on it without the product critera
-                # => the same applies on "Cluster Picking" scenario
-                # move_line.product_id,
-                move_line.product_id.browse(),  # HACK send an empty recordset
-                ref=self.picking_type.name,
-            )
         return self.list_move_lines()
 
     def _domain_stock_issue_unlink_lines(self, move_line):

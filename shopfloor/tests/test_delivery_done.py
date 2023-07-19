@@ -21,8 +21,8 @@ class DeliveryDoneCase(DeliveryCommonCase):
                 (cls.product_c, 10),
             ]
         )
-        cls.pack1_moves = picking.move_lines[:2]
-        cls.raw_move = cls.picking.move_lines[2]
+        cls.pack1_moves = picking.move_ids[:2]
+        cls.raw_move = cls.picking.move_ids[2]
         cls._fill_stock_for_moves(cls.pack1_moves, in_package=True)
         cls._fill_stock_for_moves(cls.raw_move)
         cls.picking.action_assign()
@@ -45,7 +45,7 @@ class DeliveryDoneCase(DeliveryCommonCase):
         # Do not use the /set_qty_done_line endpoint to set done qties to not
         # update the picking to 'done' state automatically
         for move_line in self.picking.move_line_ids:
-            move_line.qty_done = move_line.product_uom_qty
+            move_line.qty_done = move_line.reserved_uom_qty
         response = self.service.dispatch("done", params={"picking_id": self.picking.id})
         self.assert_response_deliver(
             response,
@@ -102,7 +102,7 @@ class DeliveryDoneCase(DeliveryCommonCase):
             message=self.service.msg_store.transfer_complete(self.picking),
         )
         self.assertEqual(self.picking.state, "done")
-        self.assertEqual(self.picking.move_lines, self.raw_move)
+        self.assertEqual(self.picking.move_ids, self.raw_move)
         backorder = self.picking.backorder_ids
         self.assertTrue(backorder)
         self.assertEqual(self.pack1_moves.picking_id, backorder)

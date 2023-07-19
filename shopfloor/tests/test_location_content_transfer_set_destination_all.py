@@ -36,9 +36,9 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         )
         cls.pickings = picking1 | picking2
         cls._fill_stock_for_moves(
-            picking1.move_lines, in_package=True, location=cls.content_loc
+            picking1.move_ids, in_package=True, location=cls.content_loc
         )
-        cls._fill_stock_for_moves(picking2.move_lines, location=cls.content_loc)
+        cls._fill_stock_for_moves(picking2.move_ids, location=cls.content_loc)
         cls.pickings.action_assign()
         cls._simulate_pickings_selected(cls.pickings)
 
@@ -95,7 +95,7 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         self._update_qty_in_location(self.content_loc, self.product_d, 5)
         self.picking2.action_assign()
         self._simulate_pickings_selected(self.picking2)
-        move_d = self.picking2.move_lines.filtered(
+        move_d = self.picking2.move_ids.filtered(
             lambda m: m.product_id == self.product_d
         )
 
@@ -128,7 +128,7 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         self.assertTrue(self.picking2.backorder_ids)
         self.assertNotEqual(self.picking2.backorder_ids.state, "done")
         self.assertFalse(self.picking2.backorder_ids.user_id)
-        self.assertEqual(self.picking2.backorder_ids.move_lines.product_qty, 5)
+        self.assertEqual(self.picking2.backorder_ids.move_ids.product_qty, 5)
 
     def test_set_destination_all_with_partially_available_move_with_ancestor(self):
         """Scanned destination location valid, but one of the move to process
@@ -143,7 +143,7 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         self.picking2.action_assign()
         self._simulate_pickings_selected(self.picking2)
         # Set an ancestor move on the partially available move
-        move_d = self.picking2.move_lines.filtered(
+        move_d = self.picking2.move_ids.filtered(
             lambda m: m.product_id == self.product_d
         )
         move_d.move_orig_ids |= move_d.copy({"picking_id": False})
@@ -172,8 +172,8 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         # The current picking with the remaining qties is waiting (because of the
         # ancestor move), and other moves are validated in a new one.
         self.assertEqual(self.picking2.state, "waiting")
-        self.assertEqual(self.picking2.move_lines.state, "waiting")
-        self.assertEqual(self.picking2.move_lines.product_qty, 5)
+        self.assertEqual(self.picking2.move_ids.state, "waiting")
+        self.assertEqual(self.picking2.move_ids.product_qty, 5)
         self.assertEqual(self.picking2.backorder_ids.state, "done")
         self.assertEqual(move_d.state, "done")
         self.assertEqual(move_d.product_qty, 5)
@@ -182,7 +182,7 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         """Scanned destination location valid, moves set to done accepted
         and completion info is returned as the next transfer is ready.
         """
-        move = self.picking1.move_lines[0]
+        move = self.picking1.move_ids[0]
         next_move = move.copy(
             {
                 "location_id": move.location_dest_id.id,
@@ -298,7 +298,7 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         # if we have at least one move which does not match the scanned
         # location
         # we forbid the action
-        self.pickings.move_lines[0].location_dest_id = self.shelf1
+        self.pickings.move_ids[0].location_dest_id = self.shelf1
         self.pickings[0].location_dest_id = self.shelf1
         response = self.service.dispatch(
             "set_destination_all",

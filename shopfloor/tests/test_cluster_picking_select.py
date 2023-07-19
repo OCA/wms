@@ -45,7 +45,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
 
     def _add_stock_and_assign_pickings_for_batches(self, batches):
         pickings = batches.mapped("picking_ids")
-        self._fill_stock_for_moves(pickings.mapped("move_lines"))
+        self._fill_stock_for_moves(pickings.mapped("move_ids"))
         pickings.action_assign()
 
     def test_find_batch_in_progress_current_user(self):
@@ -301,10 +301,10 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
             fields.Datetime.end_of(fields.Datetime.today(), "day"), days=2
         )
         # Change dates
-        move1 = picking1.move_lines[0]
+        move1 = picking1.move_ids[0]
         move1_line = move1.move_line_ids[0]
         move1.write({"date": today})
-        (batch.picking_ids.move_lines - move1).write({"date": future})
+        (batch.picking_ids.move_ids - move1).write({"date": future})
 
         move_lines = self.service._lines_for_picking_batch(batch)
         order_mapping = {line: i for i, line in enumerate(move_lines)}
@@ -313,7 +313,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         self.assertEqual(order_mapping[move1_line], 0)
         # swap dates
         move1.write({"date": future})
-        (batch.picking_ids.move_lines - move1).write({"date": today})
+        (batch.picking_ids.move_ids - move1).write({"date": today})
 
         move_lines = self.service._lines_for_picking_batch(batch)
         order_mapping = {line: i for i, line in enumerate(move_lines)}

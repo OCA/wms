@@ -219,7 +219,7 @@ class MenuCountersCommonCase(CommonMenuCase):
         )
         picking1.priority = "0"
         cls._fill_stock_for_moves(
-            picking1.move_lines, in_package=True, location=cls.zone_sublocation1
+            picking1.move_ids, in_package=True, location=cls.zone_sublocation1
         )
 
         cls.picking2 = picking2 = cls._create_picking(
@@ -228,14 +228,14 @@ class MenuCountersCommonCase(CommonMenuCase):
         )
         picking2.priority = "1"
         cls._fill_stock_for_moves(
-            picking2.move_lines, in_lot=True, location=cls.zone_sublocation2
+            picking2.move_ids, in_lot=True, location=cls.zone_sublocation2
         )
 
         cls.picking3 = picking3 = cls._create_picking(
             picking_type=cls.menu1_picking_type, lines=[(cls.product_d, 10)]
         )
         picking3.priority = "0"
-        cls._fill_stock_for_moves(picking3.move_lines, location=cls.zone_sublocation1)
+        cls._fill_stock_for_moves(picking3.move_ids, location=cls.zone_sublocation1)
 
         cls.picking4 = picking4 = cls._create_picking(
             picking_type=cls.menu2_picking_type, lines=[(cls.product_e, 10)]
@@ -248,7 +248,7 @@ class MenuCountersCommonCase(CommonMenuCase):
             lines=[(cls.product_b, 10), (cls.product_f, 10)],
         )
         cls._fill_stock_for_moves(
-            picking5.move_lines, in_package=True, location=cls.zone_sublocation2
+            picking5.move_ids, in_package=True, location=cls.zone_sublocation2
         )
         cls.picking6 = picking6 = cls._create_picking(
             picking_type=cls.menu2_picking_type,

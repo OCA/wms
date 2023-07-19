@@ -21,8 +21,8 @@ class DeliveryResetQtyDonePackCase(DeliveryCommonCase):
                 (cls.product_c, 10),
             ]
         )
-        cls.pack1_moves = picking.move_lines[:2]
-        cls.pack2_move = picking.move_lines[2]
+        cls.pack1_moves = picking.move_ids[:2]
+        cls.pack2_move = picking.move_ids[2]
         cls._fill_stock_for_moves(cls.pack1_moves, in_package=True)
         cls._fill_stock_for_moves(cls.pack2_move, in_package=True)
         picking.action_assign()
@@ -73,7 +73,7 @@ class DeliveryResetQtyDonePackCase(DeliveryCommonCase):
             "set_qty_done_pack",
             params={"package_id": package.id, "picking_id": self.picking.id},
         )
-        self.assertTrue(all(ml.qty_done == ml.product_uom_qty for ml in move_lines))
+        self.assertTrue(all(ml.qty_done == ml.reserved_uom_qty for ml in move_lines))
         # Reset it, no related move lines are "done"
         response = self.service.dispatch(
             "reset_qty_done_pack",

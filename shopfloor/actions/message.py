@@ -210,7 +210,7 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("Several packages found in %(name)s, please scan a package.")
-            % dict(location.name),
+            % dict(name=location.name),
         }
 
     def no_package_or_lot_for_barcode(self, barcode):
@@ -236,7 +236,7 @@ class MessageAction(Component):
     def _wrong_record_msg(self, model_name):
         return {
             "product.product": _("Wrong product."),
-            "stock.production.lot": _("Wrong lot."),
+            "stock.lot": _("Wrong lot."),
             "stock.location": _("Wrong location."),
             "stock.quant.package": _("Wrong pack."),
             "product.packaging": _("Wrong packaging."),
@@ -262,7 +262,7 @@ class MessageAction(Component):
         _logger.warning("`wrong_log` is deprecated, use `wrong_record` instead")
         return {
             "message_type": "error",
-            "body": self._wrong_record_msg("stock.production.lot"),
+            "body": self._wrong_record_msg("stock.lot"),
         }
 
     def several_lots_in_location(self, location):
@@ -296,14 +296,14 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("Several products found in %(name)s, please scan a product.")
-            % dict(location.name),
+            % dict(name=location.name),
         }
 
     def several_products_in_package(self, package):
         return {
             "message_type": "error",
             "body": _("Several products found in %(name)s, please scan the product.")
-            % dict(package.name),
+            % dict(name=package.name),
         }
 
     def no_product_in_location(self, location):

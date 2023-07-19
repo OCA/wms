@@ -16,9 +16,9 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
                 (cls.product_d, 10),
             ]
         )
-        cls.pack1_moves = picking.move_lines[:2]
-        cls.pack2_moves = picking.move_lines[2]
-        cls.raw_move = picking.move_lines[3]
+        cls.pack1_moves = picking.move_ids[:2]
+        cls.pack2_moves = picking.move_ids[2]
+        cls.raw_move = picking.move_ids[3]
         cls._fill_stock_for_moves(cls.pack1_moves, in_package=True)
         cls._fill_stock_for_moves(cls.pack2_moves, in_package=True)
         cls._fill_stock_for_moves(cls.raw_move)

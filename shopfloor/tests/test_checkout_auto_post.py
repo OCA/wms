@@ -9,7 +9,7 @@ class CheckoutAutoPostCase(CheckoutCommonCase):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_b, 20), (self.product_c, 30)]
         )
-        self._fill_stock_for_moves(picking.move_lines)
+        self._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         selected_move_line_a = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
@@ -69,9 +69,9 @@ class CheckoutAutoPostCase(CheckoutCommonCase):
         line_b_in_original_picking = picking.move_line_ids.filtered(
             lambda l: l.product_id == selected_move_line_b.product_id
         )
-        self.assertEqual(line_a_in_original_picking.product_uom_qty, 3)
-        self.assertEqual(line_b_in_original_picking.product_uom_qty, 11)
-        self.assertEqual(selected_move_line_c.product_uom_qty, 30)
+        self.assertEqual(line_a_in_original_picking.reserved_uom_qty, 3)
+        self.assertEqual(line_b_in_original_picking.reserved_uom_qty, 11)
+        self.assertEqual(selected_move_line_c.reserved_uom_qty, 30)
 
         self.assertEqual(line_a_in_original_picking.qty_done, 0)
         self.assertEqual(line_b_in_original_picking.qty_done, 0)

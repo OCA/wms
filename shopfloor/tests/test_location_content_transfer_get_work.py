@@ -56,10 +56,10 @@ class TestLocationContentTransferGetWork(LocationContentTransferCommonCase):
             )
         )
         cls._fill_stock_for_moves(
-            picking1.move_lines, in_package=True, location=cls.content_loc
+            picking1.move_ids, in_package=True, location=cls.content_loc
         )
-        cls._fill_stock_for_moves(picking2.move_lines[0], location=cls.content_loc2)
-        cls._fill_stock_for_moves(picking2.move_lines[1], location=cls.content_loc)
+        cls._fill_stock_for_moves(picking2.move_ids[0], location=cls.content_loc2)
+        cls._fill_stock_for_moves(picking2.move_ids[1], location=cls.content_loc)
         cls.pickings.action_assign()
 
     def _get_location_lines(self, location):
@@ -77,7 +77,7 @@ class TestLocationContentTransferGetWork(LocationContentTransferCommonCase):
     def test_find_work_no_work_found(self):
         """Check the user asked for work but none is found."""
         # Cancel all moves related to the location we work from
-        self.pickings.move_lines.filtered(lambda r: r.state != "done")._action_cancel()
+        self.pickings.move_ids.filtered(lambda r: r.state != "done")._action_cancel()
         response = self.service.dispatch("find_work", params={})
         self.assert_response(
             response,

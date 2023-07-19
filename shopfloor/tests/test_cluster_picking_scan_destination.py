@@ -27,10 +27,10 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             ]
         )
         cls.one_line_picking = cls.batch.picking_ids.filtered(
-            lambda picking: len(picking.move_lines) == 1
+            lambda picking: len(picking.move_ids) == 1
         )
         cls.two_lines_picking = cls.batch.picking_ids.filtered(
-            lambda picking: len(picking.move_lines) == 2
+            lambda picking: len(picking.move_ids) == 2
         )
 
         cls.bin1 = cls.env["stock.quant.package"].create({})
@@ -45,7 +45,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         """
         line = self.batch.picking_ids.move_line_ids[0]
         next_line = self.batch.picking_ids.move_line_ids[1]
-        qty_done = line.product_uom_qty
+        qty_done = line.reserved_uom_qty
         response = self.service.dispatch(
             "scan_destination_pack",
             params={
@@ -81,7 +81,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         )
         # this is the only remaining line to pick
         line = self.two_lines_picking.move_line_ids[1]
-        qty_done = line.product_uom_qty
+        qty_done = line.reserved_uom_qty
         response = self.service.dispatch(
             "scan_destination_pack",
             params={
@@ -115,7 +115,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "move_line_id": line2.id,
                 # this bin is used for the same picking, should be allowed
                 "barcode": self.bin1.name,
-                "quantity": line2.product_uom_qty,
+                "quantity": line2.reserved_uom_qty,
             },
         )
         self.assert_response(
@@ -139,7 +139,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "move_line_id": line.id,
                 # this bin is used for the other picking
                 "barcode": self.bin1.name,
-                "quantity": line.product_uom_qty,
+                "quantity": line.reserved_uom_qty,
             },
         )
         self.assertRecordValues(line, [{"qty_done": 0, "result_package_id": False}])
@@ -170,7 +170,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "move_line_id": line.id,
                 # this bin is used for the other picking
                 "barcode": self.bin1.name,
-                "quantity": line.product_uom_qty,
+                "quantity": line.reserved_uom_qty,
             },
         )
         # Since `multiple_move_single_pack` is enabled, assigning `bin` should be ok
@@ -181,7 +181,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 {
                     "qty_done": 10,
                     "result_package_id": self.bin1.id,
-                    "product_uom_qty": 10,
+                    "reserved_uom_qty": 10,
                 }
             ],
         )
@@ -200,7 +200,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "move_line_id": line.id,
                 # this bin is used for the other picking
                 "barcode": "⌿",
-                "quantity": line.product_uom_qty,
+                "quantity": line.reserved_uom_qty,
             },
         )
         line_data = self._line_data(line)
@@ -224,7 +224,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "picking_batch_id": self.batch.id,
                 "move_line_id": line.id,
                 "barcode": self.bin1.name,
-                "quantity": line.product_uom_qty + 1,
+                "quantity": line.reserved_uom_qty + 1,
             },
         )
         self.assert_response(
@@ -234,7 +234,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             message={
                 "message_type": "error",
                 "body": "You must not pick more than {} units.".format(
-                    line.product_uom_qty
+                    line.reserved_uom_qty
                 ),
             },
         )
@@ -260,7 +260,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "picking_batch_id": self.batch.id,
                 "move_line_id": line.id,
                 "barcode": self.bin1.name,
-                "quantity": line.product_uom_qty - 3,
+                "quantity": line.reserved_uom_qty - 3,
             },
         )
         new_line = self.one_line_picking.move_line_ids - line
@@ -279,11 +279,11 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
 
         self.assertRecordValues(
             line,
-            [{"qty_done": 7, "result_package_id": self.bin1.id, "product_uom_qty": 7}],
+            [{"qty_done": 7, "result_package_id": self.bin1.id, "reserved_uom_qty": 7}],
         )
         self.assertRecordValues(
             new_line,
-            [{"qty_done": 0, "result_package_id": False, "product_uom_qty": 3}],
+            [{"qty_done": 0, "result_package_id": False, "reserved_uom_qty": 3}],
         )
         # the reserved quantity on the quant must stay the same
         self.assertRecordValues(quant, [{"quantity": 40.0, "reserved_quantity": 20.0}])
@@ -306,7 +306,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         location, product, qty = (
             self.zero_check_location,
             line.product_id,
-            line.product_uom_qty,
+            line.reserved_uom_qty,
         )
         self.one_line_picking.do_unreserve()
 
@@ -317,7 +317,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         # qty should be zero and trigger a zero check
         self._update_qty_in_location(location, product, qty)
         # Reserve goods (now the move line has the expected source location)
-        self.one_line_picking.move_lines.location_id = location
+        self.one_line_picking.move_ids.location_id = location
         self.one_line_picking.action_assign()
         line = self.one_line_picking.move_line_ids
         response = self.service.dispatch(
@@ -326,7 +326,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "picking_batch_id": self.batch.id,
                 "move_line_id": line.id,
                 "barcode": self.bin1.name,
-                "quantity": line.product_uom_qty,
+                "quantity": line.reserved_uom_qty,
             },
         )
 
@@ -349,7 +349,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         # so when scan_destination_pack sets the qty_done, the planned
         # qty should be zero and trigger a zero check
         self._update_qty_in_location(
-            line.location_id, line.product_id, line.product_uom_qty
+            line.location_id, line.product_id, line.reserved_uom_qty
         )
         response = self.service.dispatch(
             "scan_destination_pack",
@@ -357,7 +357,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "picking_batch_id": self.batch.id,
                 "move_line_id": line.id,
                 "barcode": self.bin1.name,
-                "quantity": line.product_uom_qty,
+                "quantity": line.reserved_uom_qty,
             },
         )
 

@@ -24,7 +24,7 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
         # => get back on 'unload_single' screen
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         response = self.service.dispatch(
@@ -60,7 +60,7 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
         )
         # wrong package ID, and there is no more move line to process in picking type
         # => get back on 'start' screen
-        self.pickings.move_lines._do_unreserve()
+        self.pickings.move_ids._do_unreserve()
         response = self.service.dispatch(
             "unload_scan_pack",
             params={"package_id": 1234567890, "barcode": "UNKNOWN"},
@@ -77,7 +77,7 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
         # set the destination package
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         response = self.service.dispatch(
@@ -104,7 +104,7 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
         # set the destination package
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         response = self.service.dispatch(

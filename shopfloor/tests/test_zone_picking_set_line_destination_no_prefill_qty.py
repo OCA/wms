@@ -125,7 +125,7 @@ class ZonePickingSetLineDestinationNoPrefillQtyCase(ZonePickingCommonCase):
         """
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
-        move_line = self.picking1.move_lines.move_line_ids
+        move_line = self.picking1.move_ids.move_line_ids
         response = self.service.dispatch(
             "set_destination",
             params={

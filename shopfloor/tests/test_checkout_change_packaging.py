@@ -9,7 +9,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
         pallet_type = (
-            cls.env["product.packaging.type"]
+            cls.env["product.packaging.level"]
             .sudo()
             .create({"name": "Pallet", "code": "P", "sequence": 3})
         )
@@ -18,7 +18,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             .sudo()
             .create(
                 {
-                    "packaging_type_id": pallet_type.id,
+                    "packaging_level_id": pallet_type.id,
                     "name": "Pallet",
                     "barcode": "PPP",
                     "height": 100,
@@ -28,7 +28,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             )
         )
         box_type = (
-            cls.env["product.packaging.type"]
+            cls.env["product.packaging.level"]
             .sudo()
             .create({"name": "Box", "code": "B", "sequence": 2})
         )
@@ -37,7 +37,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             .sudo()
             .create(
                 {
-                    "packaging_type_id": box_type.id,
+                    "packaging_level_id": box_type.id,
                     "name": "Box",
                     "barcode": "BBB",
                     "height": 20,
@@ -47,7 +47,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             )
         )
         inner_box_type = (
-            cls.env["product.packaging.type"]
+            cls.env["product.packaging.level"]
             .sudo()
             .create({"name": "Inner Box", "code": "I", "sequence": 1})
         )
@@ -56,7 +56,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             .sudo()
             .create(
                 {
-                    "packaging_type_id": inner_box_type.id,
+                    "packaging_level_id": inner_box_type.id,
                     "name": "Inner Box",
                     "barcode": "III",
                     "height": 10,
@@ -66,10 +66,10 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             )
         )
         cls.picking = cls._create_picking(lines=[(cls.product_a, 10)])
-        cls._fill_stock_for_moves(cls.picking.move_lines, in_package=True)
+        cls._fill_stock_for_moves(cls.picking.move_ids, in_package=True)
         cls.picking.action_assign()
         cls.package = cls.picking.move_line_ids.result_package_id
-        cls.package.packaging_id = cls.packaging_pallet
+        cls.package.product_packaging_id = cls.packaging_pallet
 
     def test_list_packaging_ok(self):
         response = self.service.dispatch(
@@ -119,7 +119,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             },
         )
         self.assertRecordValues(
-            self.package, [{"packaging_id": self.packaging_inner_box.id}]
+            self.package, [{"product_packaging_id": self.packaging_inner_box.id}]
         )
         self.assert_response(
             response,

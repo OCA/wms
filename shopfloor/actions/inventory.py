@@ -20,24 +20,18 @@ class InventoryAction(Component):
     def inventory_model(self):
         # the _sf_inventory key bypass groups checks,
         # see comment in models/stock_inventory.py
-        return self.env["stock.inventory"].with_context(_sf_inventory=True)
+        return self.env["stock.quant"].with_context(_sf_inventory=True)
 
     def create_draft_check_empty(self, location, product, ref=None):
         """Create a draft inventory for a product with a zero quantity"""
-        if ref:
-            name = _("Zero check issue on location {} ({})").format(location.name, ref)
-        else:
-            name = _("Zero check issue on location {}").format(location.name)
-        return self._create_draft_inventory(location, product, name)
+        return self._create_draft_inventory(location, product)
 
-    def _inventory_exists(
-        self, location, product, package=None, lot=None, states=("draft", "confirm")
-    ):
+    def _inventory_exists(self, location, product, package=None, lot=None):
         """Return if an inventory for location and product exist"""
         domain = [
-            ("location_ids", "=", location.id),
-            ("product_ids", "=", product.id),
-            ("state", "in", states),
+            ("location_id", "=", location.id),
+            ("product_id", "=", product.id),
+            ("inventory_quantity_set", "=", True),
         ]
         if package is not None:
             domain.append(("package_id", "=", package.id))
@@ -45,13 +39,9 @@ class InventoryAction(Component):
             domain.append(("lot_id", "=", lot.id))
         return self.inventory_model.search_count(domain)
 
-    def _create_draft_inventory(self, location, product, name):
+    def _create_draft_inventory(self, location, product):
         return self.inventory_model.sudo().create(
-            {
-                "name": name,
-                "location_ids": [(6, 0, location.ids)],
-                "product_ids": [(6, 0, product.ids)],
-            }
+            {"location_id": location.id, "product_id": product.id}
         )
 
     def create_control_stock(self, location, product, package, lot, name=None):
@@ -61,13 +51,7 @@ class InventoryAction(Component):
         combination of product/package/lot, no inventory is created.
         """
         if not self._inventory_exists(location, product):
-            product_name = self._stock_issue_product_description(product, package, lot)
-
-            if not name:
-                name = _("Control stock issue in location {} for {}").format(
-                    location.name, product_name
-                )
-            self._create_draft_inventory(location, product, name)
+            self._create_draft_inventory(location, product)
 
     def create_stock_issue(self, move, location, package, lot):
         """Create an inventory for a stock issue
@@ -79,7 +63,7 @@ class InventoryAction(Component):
         other_lines = self._stock_issue_get_related_move_lines(
             move, location, package, lot
         )
-        qty_to_keep = sum(other_lines.mapped("product_qty"))
+        qty_to_keep = sum(other_lines.mapped("reserved_qty"))
         self.create_stock_correction(move, location, package, lot, qty_to_keep)
         move._action_assign()
 
@@ -89,8 +73,7 @@ class InventoryAction(Component):
             move, location, package, lot, quantity
         )
         inventory = self.inventory_model.sudo().create(values)
-        inventory.action_start()
-        inventory.action_validate()
+        inventory.action_apply_inventory()
 
     def _stock_issue_get_related_move_lines(self, move, location, package, lot):
         """Lookup for all the other moves lines that match given move line"""
@@ -106,26 +89,12 @@ class InventoryAction(Component):
     def _stock_correction_inventory_values(
         self, move, location, package, lot, line_qty
     ):
-        name = _(
-            "{picking.name} stock correction in location {location.name} "
-            "for {product_desc}"
-        ).format(
-            picking=move.picking_id,
-            location=location,
-            product_desc=self._stock_issue_product_description(
-                move.product_id, package, lot
-            ),
-        )
-        line_values = {
+        return {
             "location_id": location.id,
             "product_id": move.product_id.id,
             "package_id": package.id,
-            "prod_lot_id": lot.id,
-            "product_qty": line_qty,
-        }
-        return {
-            "name": name,
-            "line_ids": [(0, 0, line_values)],
+            "lot_id": lot.id,
+            "inventory_quantity": line_qty,
         }
 
     def _stock_issue_product_description(self, product, package, lot):

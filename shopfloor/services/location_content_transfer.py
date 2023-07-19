@@ -263,7 +263,7 @@ class LocationContentTransfer(Component):
 
         for next_picking in pickings:
             move_lines = next_picking.move_line_ids.filtered(
-                lambda line: line.qty_done < line.product_uom_qty
+                lambda line: line.qty_done < line.reserved_uom_qty
             )
             location = fields.first(move_lines).location_id
             if location:
@@ -766,7 +766,7 @@ class LocationContentTransfer(Component):
         move_line.qty_done = quantity
         remaining_move_line = move_line._split_partial_quantity()
         move_line._extract_in_split_order({"user_id": self.env.uid})
-        remaining_move_line.qty_done = remaining_move_line.product_uom_qty
+        remaining_move_line.qty_done = remaining_move_line.reserved_uom_qty
 
         self._write_destination_on_lines(move_line, scanned_location)
         stock = self._actions_for("stock")

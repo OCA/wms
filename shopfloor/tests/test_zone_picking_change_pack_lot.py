@@ -38,7 +38,7 @@ class ZonePickingChangePackLotCase(ZonePickingCommonCase):
         self._update_qty_in_location(
             move_line.location_id,
             move_line.product_id,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             package=self.free_package,
         )
         # change package
@@ -99,7 +99,7 @@ class ZonePickingChangePackLotCase(ZonePickingCommonCase):
         self._update_qty_in_location(
             move_line.location_id,
             move_line.product_id,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             lot=self.free_lot,
         )
         # change lot

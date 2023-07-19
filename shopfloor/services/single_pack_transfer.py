@@ -212,7 +212,7 @@ class SinglePackTransfer(Component):
                 message=self.msg_store.operation_not_found()
             )
 
-        # Do not use package_level.move_ids, this is only filled in when the
+        # Do not use package_level.move_lines, this is only filled in when the
         # moves have been created from a manually encoded package level, not
         # when a package has been reserved for existing moves
         moves = package_level.move_line_ids.move_id
@@ -274,7 +274,7 @@ class SinglePackTransfer(Component):
             return self._response_for_start(
                 message=self.msg_store.operation_not_found()
             )
-        # package.move_ids may be empty, it seems
+        # package.move_lines may be empty, it seems
         moves = package_level.move_ids | package_level.move_line_ids.move_id
         if "done" in moves.mapped("state"):
             return self._response_for_start(message=self.msg_store.already_done())

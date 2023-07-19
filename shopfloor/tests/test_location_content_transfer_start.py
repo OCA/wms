@@ -48,10 +48,10 @@ class TestLocationContentTransferStart(LocationContentTransferCommonCase):
             )
         )
         cls._fill_stock_for_moves(
-            picking1.move_lines, in_package=True, location=cls.content_loc
+            picking1.move_ids, in_package=True, location=cls.content_loc
         )
-        cls._fill_stock_for_moves(picking2.move_lines[0], location=cls.content_loc)
-        cls._fill_stock_for_moves(picking2.move_lines[1], location=cls.content_loc2)
+        cls._fill_stock_for_moves(picking2.move_ids[0], location=cls.content_loc)
+        cls._fill_stock_for_moves(picking2.move_ids[1], location=cls.content_loc2)
         cls.pickings.action_assign()
         cls.move_lines = cls.pickings.move_line_ids
 
@@ -157,7 +157,7 @@ class TestLocationContentTransferStart(LocationContentTransferCommonCase):
             picking_type=self.wh.pick_type_id, lines=[(self.product_a, 10)]
         )
         self._fill_stock_for_moves(
-            picking_other_type.move_lines, location=self.content_loc
+            picking_other_type.move_ids, location=self.content_loc
         )
         picking_other_type.action_assign()
 
@@ -189,7 +189,7 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
             lines=[(self.product_a, 10), (self.product_b, 10)],
         )
         self._fill_stock_for_moves(
-            picking.move_lines, in_package=True, location=self.content_loc
+            picking.move_ids, in_package=True, location=self.content_loc
         )
         picking.action_assign()
         response = self.service.dispatch(
@@ -216,7 +216,7 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
             lines=[(self.product_a, 10), (self.product_b, 10)],
         )
         self._fill_stock_for_moves(
-            picking.move_lines, in_package=True, location=self.content_loc
+            picking.move_ids, in_package=True, location=self.content_loc
         )
         picking.action_assign()
         # place goods in shelf1 to ensure the original picking can take goods here
@@ -288,7 +288,7 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
             lines=[(self.product_a, 10), (self.product_b, 10)],
         )
         self._fill_stock_for_moves(
-            picking.move_lines, in_package=True, location=self.content_loc
+            picking.move_ids, in_package=True, location=self.content_loc
         )
         picking.action_assign()
         # a user picked qty
@@ -302,7 +302,7 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
         )
         # check that the original moves are still assigned
         self.assertRecordValues(
-            picking.move_lines, [{"state": "assigned"}, {"state": "assigned"}]
+            picking.move_ids, [{"state": "assigned"}, {"state": "assigned"}]
         )
 
     def test_scan_location_create_moves(self):

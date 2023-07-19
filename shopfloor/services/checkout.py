@@ -106,7 +106,7 @@ class Checkout(Component):
 
     def _response_for_select_dest_package(self, picking, move_lines, message=None):
         packages = picking.mapped("move_line_ids.result_package_id").filtered(
-            "packaging_id"
+            "product_packaging_id"
         )
         if not packages:
             # FIXME: do we want to move from 'select_dest_package' to
@@ -275,7 +275,7 @@ class Checkout(Component):
         # The picking should have a move line for the product
         # where qty >= packaging.qty, since it doesn't makes sense
         # to select a move line which have less qty than the packaging
-        line_domain = [("product_uom_qty", ">=", packaging.qty)]
+        line_domain = [("reserved_uom_qty", ">=", packaging.qty)]
         return self._select_document_from_product(product, line_domain=line_domain)
 
     def _select_document_from_none(self, picking, **kw):
@@ -390,7 +390,7 @@ class Checkout(Component):
                 # For prefill quantity we only want to increment one line
                 line.qty_done += prefill_qty
             elif not self.work.menu.no_prefill_qty:
-                line.qty_done = line.product_uom_qty
+                line.qty_done = line.reserved_uom_qty
             line.shopfloor_user_id = self.env.user
 
         picking = lines.mapped("picking_id")
@@ -453,8 +453,8 @@ class Checkout(Component):
             barcode,
             types=search_types,
             handler_kw=dict(
-                lot=dict(products=picking.move_lines.product_id),
-                serial=dict(products=picking.move_lines.product_id),
+                lot=dict(products=picking.move_ids.product_id),
+                serial=dict(products=picking.move_ids.product_id),
             ),
         )
 
@@ -696,7 +696,7 @@ class Checkout(Component):
                 move_line.qty_done = qty_done
                 if new_line:
                     selected_line_ids.append(new_line.id)
-                if qty_done > move_line.product_uom_qty:
+                if qty_done > move_line.reserved_uom_qty:
                     return self._response_for_select_package(
                         picking,
                         self.env["stock.move.line"].browse(selected_line_ids).exists(),
@@ -735,7 +735,7 @@ class Checkout(Component):
         as selected
         """
         return self._change_line_qty(
-            picking_id, selected_line_ids, [move_line_id], lambda l: l.product_uom_qty
+            picking_id, selected_line_ids, [move_line_id], lambda l: l.reserved_uom_qty
         )
 
     def set_custom_qty(self, picking_id, selected_line_ids, move_line_id, qty_done):
@@ -768,7 +768,7 @@ class Checkout(Component):
                 picking.id,
                 selected_lines.ids,
                 switch_lines.ids,
-                lambda l: l.product_uom_qty,
+                lambda l: l.reserved_uom_qty,
             )
 
     def _increment_custom_qty(
@@ -834,7 +834,7 @@ class Checkout(Component):
 
     def _put_lines_in_allowed_package(self, picking, lines_to_pack, package):
         for line in lines_to_pack:
-            if line.qty_done < line.product_uom_qty:
+            if line.qty_done < line.reserved_uom_qty:
                 line._split_partial_quantity_to_be_done(line.qty_done, {})
         lines_to_pack.write(
             {"result_package_id": package.id, "shopfloor_checkout_done": True}
@@ -932,8 +932,8 @@ class Checkout(Component):
             barcode,
             types=search_types,
             handler_kw=dict(
-                lot=dict(products=picking.move_lines.product_id),
-                serial=dict(products=picking.move_lines.product_id),
+                lot=dict(products=picking.move_ids.product_id),
+                serial=dict(products=picking.move_ids.product_id),
             ),
         )
 
@@ -1133,7 +1133,7 @@ class Checkout(Component):
             # Do not allow to proceed if the qty_done of
             # any of the selected lines
             # is higher than the quantity to do.
-            if line.qty_done > line.product_uom_qty:
+            if line.qty_done > line.reserved_uom_qty:
                 return self._response_for_select_package(
                     picking,
                     lines,
@@ -1265,7 +1265,7 @@ class Checkout(Component):
             return self._response_for_summary(
                 picking, message=self.msg_store.record_not_found()
             )
-        package.packaging_id = packaging
+        package.product_packaging_id = packaging
         return self._response_for_summary(
             picking,
             message={
@@ -1341,7 +1341,7 @@ class Checkout(Component):
             return self._response_for_select_document(message=message)
         lines = picking.move_line_ids
         if not confirmation:
-            if not all(line.qty_done == line.product_uom_qty for line in lines):
+            if not all(line.qty_done == line.reserved_uom_qty for line in lines):
                 return self._response_for_summary(
                     picking,
                     need_confirm=True,

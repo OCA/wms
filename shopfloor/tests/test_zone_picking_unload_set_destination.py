@@ -58,7 +58,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         # set the destination package
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         response = self.service.dispatch(
@@ -80,7 +80,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         # set the destination package
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         response = self.service.dispatch(
@@ -107,7 +107,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         # set the destination package
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         response = self.service.dispatch(
@@ -155,7 +155,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         # set the destination package
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         move_line.location_dest_id = packing_sublocation1
@@ -202,7 +202,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         # set the destination package
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         move_line.location_dest_id = packing_sublocation1
@@ -242,7 +242,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         # set the destination package
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         response = self.service.dispatch(
@@ -279,7 +279,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         ):
             self.service._set_destination_package(
                 move_line,
-                move_line.product_uom_qty,
+                move_line.reserved_uom_qty,
                 package_dest,
             )
         free_package_line = move_lines.filtered(
@@ -320,10 +320,10 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
     def test_unload_set_destination_partially_available_backorder(self):
         zone_location = self.zone_location
         picking_type = self.picking_z.picking_type_id
-        self.assertEqual(self.picking_z.move_lines[0].product_uom_qty, 40)
+        self.assertEqual(self.picking_z.move_ids[0].product_uom_qty, 40)
         self.picking_z.action_assign()
         move_line = self.picking_z.move_line_ids
-        self.assertEqual(move_line.product_uom_qty, 32)
+        self.assertEqual(move_line.reserved_uom_qty, 32)
         self.assertEqual(move_line.move_id.state, "partially_available")
         packing_sublocation = (
             self.env["stock.location"]
@@ -339,7 +339,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         # set the destination package
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         response = self.service.dispatch(
@@ -358,7 +358,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         self.assertEqual(backorder, self.picking_z)
         # the backorder contains a new line w/ the rest of the qty
         # that couldn't be processed
-        self.assertEqual(backorder.move_lines[0].product_uom_qty, 8)
+        self.assertEqual(backorder.move_ids[0].product_uom_qty, 8)
         self.assertEqual(backorder.state, "confirmed")
         # the line has been processed
         self.assertEqual(move_line.location_dest_id, packing_sublocation)

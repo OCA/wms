@@ -34,7 +34,7 @@
         # TODO: used for prod lot expire detail info.
         # This must be an optional dep
         "product_expiry",
-        # TODO: used for package.package_storage_type_id detail info.
+        # TODO: used for package.package_type_id detail info.
         # This must be an optional dep
         "stock_storage_type",
         # TODO: used for picking.carrier_id detail info

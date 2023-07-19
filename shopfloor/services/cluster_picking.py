@@ -505,7 +505,7 @@ class ClusterPicking(Component):
         """Returns the quantity to increment depending on no_prefill_qty optione."""
         if self.work.menu.no_prefill_qty:
             return qty
-        return move_line.product_uom_qty
+        return move_line.reserved_uom_qty
 
     def _check_first_scan_location_or_pack_first(
         self, move_line, sublocation=None, location_scanned=False
@@ -743,7 +743,7 @@ class ClusterPicking(Component):
         if qty_check == "greater":
             return self._response_for_scan_destination(
                 move_line,
-                message=self.msg_store.unable_to_pick_more(move_line.product_uom_qty),
+                message=self.msg_store.unable_to_pick_more(move_line.reserved_uom_qty),
                 qty_done=quantity,
             )
 

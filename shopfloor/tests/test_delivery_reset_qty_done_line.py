@@ -21,14 +21,14 @@ class DeliveryResetQtyDoneLineCase(DeliveryCommonCase):
                 (cls.product_c, 10),
             ]
         )
-        cls.pack1_moves = picking.move_lines[:2]
-        cls.raw_move = picking.move_lines[2]
+        cls.pack1_moves = picking.move_ids[:2]
+        cls.raw_move = picking.move_ids[2]
         cls._fill_stock_for_moves(cls.pack1_moves, in_package=True)
         cls._fill_stock_for_moves(cls.raw_move)
         picking.action_assign()
         # Some records not related at all to the processed picking
         cls.free_picking = cls._create_picking(lines=[(cls.product_d, 10)])
-        cls.free_raw_move = cls.free_picking.move_lines[0]
+        cls.free_raw_move = cls.free_picking.move_ids[0]
         cls._fill_stock_for_moves(cls.free_raw_move)
         cls.free_picking.action_assign()
 
@@ -72,7 +72,7 @@ class DeliveryResetQtyDoneLineCase(DeliveryCommonCase):
             "set_qty_done_line",
             params={"move_line_id": move_line.id, "picking_id": self.picking.id},
         )
-        self.assertTrue(move_line.qty_done == move_line.product_uom_qty)
+        self.assertTrue(move_line.qty_done == move_line.reserved_uom_qty)
         # Reset it, no related move lines are "done"
         response = self.service.dispatch(
             "reset_qty_done_line",

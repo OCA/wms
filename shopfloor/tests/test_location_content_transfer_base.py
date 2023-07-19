@@ -52,7 +52,7 @@ class LocationContentTransferCommonCase(CommonCase):
         """
         pickings.user_id = cls.env.uid
         for line in pickings.mapped("move_line_ids"):
-            line.qty_done = line.product_uom_qty
+            line.qty_done = line.reserved_uom_qty
 
     def assert_response_start(self, response, message=None, popup=None):
         self.assert_response(

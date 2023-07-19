@@ -80,7 +80,7 @@ class DataDetailAction(Component):
             ("location_id:location", ["id", "display_name:name"]),
         ]
 
-    @ensure_model("stock.production.lot")
+    @ensure_model("stock.lot")
     def lot_detail(self, record, **kw):
         # Define a new method to not overload the base one which is used in many places
         return self._jsonify(record, self._lot_detail_parser, **kw)
@@ -134,7 +134,7 @@ class DataDetailAction(Component):
             (
                 "product_tmpl_id:manufacturer",
                 lambda rec, fname: self._jsonify(
-                    rec.product_tmpl_id.manufacturer, ["id", "name"]
+                    rec.product_tmpl_id.manufacturer_id, ["id", "name"]
                 ),
             ),
         ]
@@ -147,9 +147,8 @@ class DataDetailAction(Component):
     @property
     def _product_supplierinfo_parser(self):
         return [
-            # supplier.name == partner :/
-            ("id", lambda rec, fname: rec.name.id),
-            ("name", lambda rec, fname: rec.name.name),
+            ("id", lambda rec, fname: rec.partner_id.id),
+            "partner",
             "product_name",
             "product_code",
         ]

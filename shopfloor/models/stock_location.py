@@ -26,7 +26,7 @@ class StockLocation(models.Model):
         return self.env["stock.move.line"].search(
             [
                 ("location_id", "child_of", self.id),
-                ("product_uom_qty", ">", 0),
+                ("reserved_uom_qty", ">", 0),
                 ("state", "not in", ("done", "cancel")),
             ]
         )
@@ -56,7 +56,7 @@ class StockLocation(models.Model):
             move_lines = move_lines.filtered(
                 lambda m: m.state not in ("cancel", "done")
             )
-            move_line_qty_field = "product_uom_qty"
+            move_line_qty_field = "reserved_uom_qty"
         else:
             move_lines = self.env["stock.move.line"].search(
                 [

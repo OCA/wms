@@ -23,8 +23,8 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_b, 10)]
         )
-        move1 = picking.move_lines[0]
-        move2 = picking.move_lines[1]
+        move1 = picking.move_ids[0]
+        move2 = picking.move_ids[1]
         # put the lines in 2 separate packages (only the first line should be selected
         # by the package barcode)
         self._fill_stock_for_moves(move1, in_package=True)
@@ -37,8 +37,8 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_b, 10)]
         )
-        move1 = picking.move_lines[0]
-        move2 = picking.move_lines[1]
+        move1 = picking.move_ids[0]
+        move2 = picking.move_ids[1]
         # put the lines in 2 separate packages (only the first line should be selected
         # by the package barcode)
         self._fill_stock_for_moves(move1, in_package=True)
@@ -52,7 +52,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             lines=[(self.product_a, 10), (self.product_b, 10)]
         )
         # put all the lines in the same source package
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         package = picking.move_line_ids.mapped("package_id")
         self._test_scan_line_ok(package.name, picking.move_line_ids)
@@ -62,7 +62,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             lines=[(self.product_a, 10), (self.product_b, 10)]
         )
         # do not put them in a package, we'll pack units here
-        self._fill_stock_for_moves(picking.move_lines)
+        self._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         # The product a is scanned, so selected and quantity updated
         line_a = picking.move_line_ids.filtered(
@@ -79,7 +79,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_a, 10), (self.product_b, 10)]
         )
-        self._fill_stock_for_moves(picking.move_lines)
+        self._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         # The product a is scanned, so selected and quantity updated
         lines_a = picking.move_line_ids.filtered(
@@ -96,7 +96,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_a, 10), (self.product_b, 10)]
         )
-        self._fill_stock_for_moves(picking.move_lines)
+        self._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         lines_a = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
@@ -114,7 +114,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         picking = self._create_picking(
             lines=[(self.product_a, 1), (self.product_a, 1), (self.product_b, 1)]
         )
-        for move in picking.move_lines:
+        for move in picking.move_ids:
             self._fill_stock_for_moves(move, in_lot=True)
         picking.action_assign()
         first_line = picking.move_line_ids[0]
@@ -125,7 +125,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_b, 10)]
         )
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         # Product_a and product_b are in the same package, when we scan product_a,
         # we expect to work on all the lines of the package. If product_a was in
@@ -151,7 +151,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
 
     def test_scan_line_error_barcode_not_found(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         self._test_scan_line_error(
             picking,
@@ -161,9 +161,9 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
 
     def test_scan_line_error_package_not_in_picking(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking2 = self._create_picking(lines=[(self.product_a, 10)])
-        self._fill_stock_for_moves(picking2.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking2.move_ids, in_package=True)
         (picking | picking2).action_assign()
         package = picking2.move_line_ids.package_id
         # we work with picking, but we scan the package of picking2
@@ -181,7 +181,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
     def test_scan_line_error_product_tracked_by_lot(self):
         self.product_a.tracking = "lot"
         picking = self._create_picking(lines=[(self.product_a, 10)])
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         # product tracked by lot, but we scan the product barcode, user
         # has to scan the lot
@@ -200,8 +200,8 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             # when action_confirm is called, it would merge the moves
             confirm=False,
         )
-        self._fill_stock_for_moves(picking.move_lines[0], in_package=True)
-        self._fill_stock_for_moves(picking.move_lines[1], in_package=True)
+        self._fill_stock_for_moves(picking.move_ids[0], in_package=True)
+        self._fill_stock_for_moves(picking.move_ids[1], in_package=True)
         picking.action_assign()
         self._test_scan_line_error(
             picking,
@@ -221,8 +221,8 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             confirm=False,
         )
         # put the product in one package and the other as unit
-        self._fill_stock_for_moves(picking.move_lines[0], in_package=True)
-        self._fill_stock_for_moves(picking.move_lines[1])
+        self._fill_stock_for_moves(picking.move_ids[0], in_package=True)
+        self._fill_stock_for_moves(picking.move_ids[1])
         picking.action_assign()
         self._test_scan_line_error(
             picking,
@@ -236,7 +236,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
 
     def test_scan_line_error_product_not_in_picking(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         self._test_scan_line_error(
             picking,
@@ -249,9 +249,9 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
 
     def test_scan_line_error_lot_not_in_picking(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])
-        self._fill_stock_for_moves(picking.move_lines, in_lot=True)
+        self._fill_stock_for_moves(picking.move_ids, in_lot=True)
         picking.action_assign()
-        lot = self.env["stock.production.lot"].create(
+        lot = self.env["stock.lot"].create(
             {"product_id": self.product_a.id, "company_id": self.env.company.id}
         )
         self._test_scan_line_error(
@@ -267,11 +267,11 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             confirm=False,
         )
         # we want the same lot to be used in 2 lines with different packages
-        lot = self.env["stock.production.lot"].create(
+        lot = self.env["stock.lot"].create(
             {"product_id": self.product_a.id, "company_id": self.env.company.id}
         )
-        self._fill_stock_for_moves(picking.move_lines[0], in_package=True, in_lot=lot)
-        self._fill_stock_for_moves(picking.move_lines[1], in_package=True, in_lot=lot)
+        self._fill_stock_for_moves(picking.move_ids[0], in_package=True, in_lot=lot)
+        self._fill_stock_for_moves(picking.move_ids[1], in_package=True, in_lot=lot)
         picking.action_assign()
         self._test_scan_line_error(
             picking,
@@ -290,11 +290,11 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             confirm=False,
         )
         # we want the same lot to be used in 2 lines with different packages
-        lot = self.env["stock.production.lot"].create(
+        lot = self.env["stock.lot"].create(
             {"product_id": self.product_a.id, "company_id": self.env.company.id}
         )
-        self._fill_stock_for_moves(picking.move_lines[0], in_package=True, in_lot=lot)
-        self._fill_stock_for_moves(picking.move_lines[1], in_lot=lot)
+        self._fill_stock_for_moves(picking.move_ids[0], in_package=True, in_lot=lot)
+        self._fill_stock_for_moves(picking.move_ids[1], in_lot=lot)
         picking.action_assign()
         self._test_scan_line_error(
             picking,
@@ -310,7 +310,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_b, 10)]
         )
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         # set all lines as done
         picking.move_line_ids.write({"qty_done": 10.0, "shopfloor_checkout_done": True})
@@ -336,8 +336,8 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_b, 10)]
         )
-        move1 = picking.move_lines[0]
-        move2 = picking.move_lines[1]
+        move1 = picking.move_ids[0]
+        move2 = picking.move_ids[1]
         # put the lines in 2 separate packages (only the first line should be selected
         # by the package barcode)
         self._fill_stock_for_moves(move1, in_package=True)

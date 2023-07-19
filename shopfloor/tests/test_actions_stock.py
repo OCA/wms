@@ -17,8 +17,8 @@ class TestActionsStock(CommonCase):
         cls.picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10)], confirm=True
         )
-        cls.move0 = cls.picking.move_lines[0]
-        cls.move1 = cls.picking.move_lines[1]
+        cls.move0 = cls.picking.move_ids[0]
+        cls.move1 = cls.picking.move_ids[1]
         cls._fill_stock_for_moves(cls.move0)
         cls._fill_stock_for_moves(cls.move1)
         cls.picking.action_assign()

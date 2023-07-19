@@ -45,7 +45,7 @@ class ZonePickingSelectLineFirstScanLocationCase(ZonePickingCommonCase):
             lines=[(self.product_b, 12), (self.product_c, 13)]
         )
         self._fill_stock_for_moves(
-            pickingA.move_lines, in_lot=True, location=self.zone_sublocation2
+            pickingA.move_ids, in_lot=True, location=self.zone_sublocation2
         )
         pickingA.action_assign()
         # Scan product B, send sublocation to simulate a previous scan for a location
@@ -75,7 +75,7 @@ class ZonePickingSelectLineFirstScanLocationCase(ZonePickingCommonCase):
         # Picking 1 with one product in a package is already in sub location 1
         pickingA = self._create_picking(lines=[(self.product_a, 13)])
         self._fill_stock_for_moves(
-            pickingA.move_lines[0], in_package=True, location=self.zone_sublocation1
+            pickingA.move_ids[0], in_package=True, location=self.zone_sublocation1
         )
         pickingA.action_assign()
         # Scanning a product after having scan a location (sublocation_id)
@@ -110,7 +110,7 @@ class ZonePickingSelectLineFirstScanLocationCase(ZonePickingCommonCase):
         # Picking 1 with one product in a package is already in sub location 1
         pickingA = self._create_picking(lines=[(self.product_a, 13)])
         self._fill_stock_for_moves(
-            pickingA.move_lines[0], in_package=True, location=self.zone_sublocation1
+            pickingA.move_ids[0], in_package=True, location=self.zone_sublocation1
         )
         pickingA.action_assign()
         response = self.service.dispatch(
@@ -140,7 +140,7 @@ class ZonePickingSelectLineFirstScanLocationCase(ZonePickingCommonCase):
             lines=[(self.product_a, 13), (self.product_b, 5)]
         )
         self._fill_stock_for_moves(
-            pickingA.move_lines, in_package=True, location=self.zone_sublocation1
+            pickingA.move_ids, in_package=True, location=self.zone_sublocation1
         )
         pickingA.action_assign()
         package = pickingA.package_level_ids[0].package_id
@@ -181,7 +181,7 @@ class ZonePickingSelectLineFirstScanLocationCase(ZonePickingCommonCase):
         # Picking 1 with one product in a package is already in sub location 1
         pickingA = self._create_picking(lines=[(self.product_a, 13)])
         self._fill_stock_for_moves(
-            pickingA.move_lines[0], in_package=True, location=self.zone_sublocation1
+            pickingA.move_ids[0], in_package=True, location=self.zone_sublocation1
         )
         pickingA.action_assign()
         # Scanning a product after having scan a location (sublocation_id)

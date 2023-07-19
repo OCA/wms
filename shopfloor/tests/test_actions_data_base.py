@@ -22,14 +22,14 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
         cls.packaging_type = (
-            cls.env["product.packaging.type"]
+            cls.env["product.packaging.level"]
             .sudo()
             .create({"name": "Transport Box", "code": "TB", "sequence": 0})
         )
         cls.packaging = (
             cls.env["product.packaging"]
             .sudo()
-            .create({"name": "Pallet", "packaging_type_id": cls.packaging_type.id})
+            .create({"name": "Pallet", "packaging_level_id": cls.packaging_type.id})
         )
         cls.delivery_packaging = (
             cls.env["product.packaging"]
@@ -37,7 +37,7 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
             .create(
                 {
                     "name": "Pallet",
-                    "packaging_type_id": cls.packaging_type.id,
+                    "packaging_level_id": cls.packaging_type.id,
                     "barcode": "PALCODE",
                 }
             )
@@ -54,16 +54,16 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
         )
         cls.picking.scheduled_date = "2020-08-03"
         # put product A in a package
-        cls.move_a = cls.picking.move_lines[0]
+        cls.move_a = cls.picking.move_ids[0]
         cls._fill_stock_for_moves(cls.move_a, in_package=True)
         # product B has a lot
-        cls.move_b = cls.picking.move_lines[1]
+        cls.move_b = cls.picking.move_ids[1]
         cls._fill_stock_for_moves(cls.move_b, in_lot=True)
         # product C has a lot and package
-        cls.move_c = cls.picking.move_lines[2]
+        cls.move_c = cls.picking.move_ids[2]
         cls._fill_stock_for_moves(cls.move_c, in_package=True, in_lot=True)
         # product D is raw
-        cls.move_d = cls.picking.move_lines[3]
+        cls.move_d = cls.picking.move_ids[3]
         cls._fill_stock_for_moves(cls.move_d)
         (cls.move_a + cls.move_b + cls.move_c + cls.move_d).write({"priority": "1"})
         cls.picking.action_assign()
@@ -74,7 +74,7 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
             .sudo()
             .create(
                 {
-                    "name": cls.supplier.id,
+                    "partner_id": cls.supplier.id,
                     "price": 8.0,
                     "product_code": "VENDOR_CODE_A",
                     "product_id": cls.product_a.id,
@@ -96,7 +96,7 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
             .sudo()
             .create(
                 {
-                    "name": cls.supplier.id,
+                    "partner_id": cls.supplier.id,
                     "price": 12.0,
                     "product_code": "VENDOR_CODE_VARIANT",
                     "product_id": cls.product_a_variant.id,
@@ -145,8 +145,8 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
     def _expected_packaging(self, record, **kw):
         data = {
             "id": record.id,
-            "name": record.packaging_type_id.name,
-            "code": record.packaging_type_id.code,
+            "name": record.packaging_level_id.name,
+            "code": record.packaging_level_id.code,
             "qty": record.qty,
         }
         data.update(kw)
@@ -156,7 +156,7 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
         data = {
             "id": record.id,
             "name": record.name,
-            "packaging_type": record.packaging_type_id.display_name,
+            "packaging_type": record.packaging_level_id.display_name,
             "barcode": record.barcode,
         }
         data.update(kw)
@@ -185,7 +185,7 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
     @classmethod
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
-        cls.lot = cls.env["stock.production.lot"].create(
+        cls.lot = cls.env["stock.lot"].create(
             {"product_id": cls.product_b.id, "company_id": cls.env.company.id}
         )
         cls.package = cls.move_a.move_line_ids.package_id
@@ -225,15 +225,15 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
                     if record.image_128
                     else None,
                     "manufacturer": {
-                        "id": record.manufacturer.id,
-                        "name": record.manufacturer.name,
+                        "id": record.manufacturer_id.id,
+                        "name": record.manufacturer_id.name,
                     }
-                    if record.manufacturer
+                    if record.manufacturer_id
                     else None,
                     "suppliers": [
                         {
-                            "id": v.name.id,
-                            "name": v.name.name,
+                            "id": v.partner_id.id,
+                            "partner": v.partner_id.name,
                             "product_name": None,
                             "product_code": v.product_code,
                         }

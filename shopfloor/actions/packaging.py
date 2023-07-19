@@ -37,7 +37,7 @@ class PackagingAction(Component):
 
     def _package_vals_from_packaging(self, packaging):
         return {
-            "packaging_id": packaging.id,
+            "product_packaging_id": packaging.id,
             "pack_length": packaging.packaging_length,
             "width": packaging.width,
             "height": packaging.height,

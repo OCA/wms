@@ -16,7 +16,7 @@ class ClusterPickingScanLineNoPrefillQtyCase(ClusterPickingLineCommonCase):
         cls.menu.sudo().no_prefill_qty = True
         cls.picking = cls.batch.picking_ids
         cls.line = cls.picking.move_line_ids
-        cls.line.product_uom_qty = 3
+        cls.line.reserved_uom_qty = 3
 
     def _assert_qty_done(self, line, scanned, expected_qty_done):
         batch = line.picking_id.batch_id
