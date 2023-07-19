@@ -292,3 +292,25 @@ class TestSelectLine(CommonCase):
             data={"pickings": self._data_for_pickings(pickings)},
             message={"message_type": "success", "body": message},
         )
+
+    def test_manual_select_move(self):
+        picking = self._create_picking()
+        selected_move = picking.move_lines.filtered(
+            lambda m: m.product_id == self.product_a
+        )
+        response = self.service.dispatch(
+            "manual_select_move",
+            params={"move_id": selected_move.id},
+        )
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        data = self.data.picking(picking)
+        self.assert_response(
+            response,
+            next_state="set_lot",
+            data={
+                "picking": data,
+                "selected_move_line": self.data.move_lines(selected_move_line),
+            },
+        )

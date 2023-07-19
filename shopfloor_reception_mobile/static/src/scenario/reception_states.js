@@ -67,6 +67,7 @@ export const reception_states = function () {
             },
             events: {
                 cancel_picking_line: "on_cancel",
+                select: "on_select",
             },
             on_scan: (barcode) => {
                 this.wait_call(
@@ -80,6 +81,13 @@ export const reception_states = function () {
                 this.wait_call(
                     this.odoo.call("done_action", {
                         picking_id: this.state.data.picking.id,
+                    })
+                );
+            },
+            on_select: (selected) => {
+                this.wait_call(
+                    this.odoo.call("manual_select_move", {
+                        move_id: selected.id,
                     })
                 );
             },
