@@ -1,6 +1,7 @@
 /**
  * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
  * @author Simone Orsi <simahawk@gmail.com>
+ * Copyright 2022 Michael Tietz (MT Software) <mtietz@mt-software.de>
  * License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
  */
 import event_hub from "../services/event_hub.js";
@@ -183,6 +184,7 @@ Vue.component("manual-select", {
                 list_item_component: "list-item",
                 list_item_actions: [],
                 list_item_extra_component: "",
+                list_items_separated: false,
                 selected_event: "select",
                 group_color: "",
                 group_title_default: "",
@@ -237,7 +239,7 @@ Vue.component("manual-select", {
     },
     template: `
     <div :class="klass">
-        <v-card :class="['select-group', opts.card_klass]"
+        <v-card :class="['select-group', opts.list_items_separated ? 'list-items-separated' : '', opts.card_klass]"
             :color="group.group_color || opts.group_color"
             v-for="(group, gindex) in selectable"
             :key="make_component_key([$options._componentTag, 'group', gindex])">
@@ -245,7 +247,7 @@ Vue.component("manual-select", {
             <v-list v-if="has_records">
                 <div :class="['list-item-wrapper', is_selected(rec) ? selected_color_klass(rec) : '']" v-for="(rec, index) in group.records"">
                     <v-list-item :key="make_component_key(['group-rec', gindex, index, rec.id])"
-                                :class="list_item_options.list_item_klass_maker ? list_item_options.list_item_klass_maker(rec) : ''">
+                                :class="[list_item_options.list_item_klass_maker ? list_item_options.list_item_klass_maker(rec) : '', opts.list_items_separated ? 'v-stepper' : '']">
                         <v-list-item-content>
                             <component
                                 :is="opts.list_item_component"
