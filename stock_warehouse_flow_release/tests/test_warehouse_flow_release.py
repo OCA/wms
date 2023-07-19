@@ -1,4 +1,5 @@
 # Copyright 2022 Camptocamp SA
+# Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from odoo.addons.stock_warehouse_flow.tests import common
@@ -55,3 +56,22 @@ class TestWarehouseFlowRelease(common.CommonFlow):
         self.assertEqual(move_pick.state, "done")
         self.assertEqual(move_ship.state, "assigned")
         self._validate_picking(move_ship.picking_id)
+
+    def test_flow_split_release(self):
+        pick_flow = self._get_flow("pick_ship")
+        ship_flow = self._get_flow("ship_only")
+        flows = pick_flow | ship_flow
+        self._prepare_split_test()
+        move = self._run_split_flow()
+        self.assertEqual(len(move), 1)
+        self.assertTrue(move.need_release)
+        self.assertTrue(move.picking_type_id not in flows.to_picking_type_id)
+        moves_before = self.env["stock.move"].search([])
+        move.picking_id.release_available_to_promise()
+        moves_after = self.env["stock.move"].search([])
+        moves = moves_after - moves_before
+        moves = move | moves
+        self.assertEqual(moves.mapped("product_qty"), [4, 1, 4])
+        self.assertEqual(
+            moves.mapped("picking_type_id.code"), ["outgoing", "outgoing", "internal"]
+        )
