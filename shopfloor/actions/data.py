@@ -341,7 +341,11 @@ class DataAction(Component):
         operations_to_do = 0
         operations_done = 0
         for line in lines:
-            operations_done += line.qty_done if not line.package_id else 1
+            is_done = line.qty_done == line.product_uom_qty
+            package_qty_done = 1 if is_done else 0
+            operations_done += (
+                line.qty_done if not line.package_id else package_qty_done
+            )
             operations_to_do += line.product_uom_qty if not line.package_id else 1
         return {
             "done": operations_done,
