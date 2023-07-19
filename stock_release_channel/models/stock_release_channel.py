@@ -649,7 +649,12 @@ class StockReleaseChannel(models.Model):
 
     @staticmethod
     def _pickings_sort_key(picking):
-        return (-int(picking.priority or 1), picking.date_priority, picking.id)
+        return (
+            -int(picking.priority or 1),
+            picking.scheduled_date,
+            picking.date_priority or picking.create_date,
+            picking.id,
+        )
 
     def _get_next_pickings(self):
         return getattr(self, "_get_next_pickings_{}".format(self.auto_release))()
