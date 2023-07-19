@@ -17,7 +17,11 @@ class StockMove(models.Model):
             if not move._apply_flow_on_action_confirm():
                 move_ids_to_confirm.append(move.id)
                 continue
-            move_ids_to_confirm += FLOW._search_and_apply_for_move(move).ids
+            # Do not assign a picking within the _apply_on_move method
+            # because it gets called later from _action_confirm itself
+            move_ids_to_confirm += FLOW._search_and_apply_for_move(
+                move, assign_picking=False
+            ).ids
         moves_to_confirm = self.browse(move_ids_to_confirm)
         return super(StockMove, moves_to_confirm)._action_confirm(
             merge=merge, merge_into=merge_into
