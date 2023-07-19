@@ -83,13 +83,18 @@ class DataAction(Component):
             parser += self._package_packaging_parser
         data = self._jsonify(record, parser, **kw)
         # handle special cases
-        if "with_operation_progress" in kw:
+        progress_package_key = ""
+        if kw.get("with_operation_progress_src"):
+            progress_package_key = "package_id"
+        elif kw.get("with_operation_progress_dest"):
+            progress_package_key = "result_package_id"
+        if progress_package_key:
             lines_blacklist = (
                 kw.get("progress_lines_blacklist")
                 or self.env["stock.move.line"].browse()
             )
             domain = [
-                ("result_package_id", "=", record.id),
+                (progress_package_key, "=", record.id),
                 ("state", "in", ["partially_available", "assigned"]),
                 ("picking_id.state", "=", "assigned"),
                 ("id", "not in", lines_blacklist.ids),
