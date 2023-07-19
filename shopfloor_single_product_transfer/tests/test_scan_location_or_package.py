@@ -117,7 +117,7 @@ class TestScanLocation(CommonCase):
             data={
                 "location": self._data_for_location(package.location_id),
                 "package": self._data_for_package(
-                    package, with_operation_progress=True
+                    package, with_operation_progress_src=True
                 ),
             },
         )

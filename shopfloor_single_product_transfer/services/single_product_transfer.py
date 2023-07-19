@@ -89,7 +89,7 @@ class ShopfloorSingleProductTransfer(Component):
         if package:
             data["package"] = self.data.package(
                 package,
-                with_operation_progress=True,
+                with_operation_progress_src=True,
                 progress_lines_blacklist=progress_lines_blacklist,
             )
         return self._response(
