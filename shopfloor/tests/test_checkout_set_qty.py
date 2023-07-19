@@ -14,8 +14,8 @@ class CheckoutSetQtyCommonCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10), (cls.product_c, 10)]
         )
-        cls.moves_pack1 = picking.move_lines[:2]
-        cls.moves_pack2 = picking.move_lines[2:]
+        cls.moves_pack1 = picking.move_ids[:2]
+        cls.moves_pack2 = picking.move_ids[2:]
         cls._fill_stock_for_moves(cls.moves_pack1, in_package=True)
         cls._fill_stock_for_moves(cls.moves_pack2, in_package=True)
         picking.action_assign()
@@ -30,7 +30,7 @@ class CheckoutSetQtyCommonCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         self.deselected_lines = self.moves_pack2.move_line_ids
         self.service._select_lines(self.selected_lines)
         self.assertTrue(
-            all(line.qty_done == line.product_uom_qty for line in self.selected_lines)
+            all(line.qty_done == line.reserved_uom_qty for line in self.selected_lines)
         )
         self.assertTrue(all(line.qty_done == 0 for line in self.deselected_lines))
 
@@ -53,7 +53,7 @@ class CheckoutResetLineQtyCase(CheckoutSetQtyCommonCase):
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line_to_reset: 0, line_with_qty: line_with_qty.product_uom_qty},
+            {line_to_reset: 0, line_with_qty: line_with_qty.reserved_uom_qty},
         )
 
     def test_reset_line_qty_not_found(self):
@@ -71,7 +71,7 @@ class CheckoutResetLineQtyCase(CheckoutSetQtyCommonCase):
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line: line.product_uom_qty for line in selected_lines},
+            {line: line.reserved_uom_qty for line in selected_lines},
             message={
                 "body": "The record you were working on does not exist anymore.",
                 "message_type": "error",
@@ -119,7 +119,7 @@ class CheckoutSetLineQtyCase(CheckoutSetQtyCommonCase):
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line: line.product_uom_qty for line in selected_lines},
+            {line: line.reserved_uom_qty for line in selected_lines},
             message={
                 "body": "The record you were working on does not exist anymore.",
                 "message_type": "error",
@@ -133,7 +133,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
         line_to_change = selected_lines[0]
         line_keep_qty = selected_lines[1]
         # Process full qty
-        new_qty = line_to_change.product_uom_qty
+        new_qty = line_to_change.reserved_uom_qty
         # we want to check that when we give the package id, we get
         # all its move lines
         response = self.service.dispatch(
@@ -169,7 +169,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line: line.product_uom_qty for line in selected_lines},
+            {line: line.reserved_uom_qty for line in selected_lines},
             message={
                 "body": "The record you were working on does not exist anymore.",
                 "message_type": "error",
@@ -188,7 +188,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
                 "picking_id": self.picking.id,
                 "selected_line_ids": selected_lines.ids,
                 "move_line_id": line1.id,
-                "qty_done": line1.product_uom_qty + 1,
+                "qty_done": line1.reserved_uom_qty + 1,
             },
         )
         self._assert_selected_qties(
@@ -218,7 +218,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line1: line1.product_uom_qty, line2: line2.product_uom_qty},
+            {line1: line1.reserved_uom_qty, line2: line2.reserved_uom_qty},
             message={
                 "body": "Negative quantity not allowed.",
                 "message_type": "error",
@@ -230,7 +230,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
         line_to_change = selected_lines[0]
         line_keep_qty = selected_lines[1]
         # split 1 qty
-        new_qty = line_to_change.product_uom_qty - 1
+        new_qty = line_to_change.reserved_uom_qty - 1
         response = self.service.dispatch(
             "set_custom_qty",
             params={

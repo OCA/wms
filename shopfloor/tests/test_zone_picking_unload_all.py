@@ -29,12 +29,12 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         # set the destination package on lines
         self.service._set_destination_package(
             move_line1,
-            move_line1.product_uom_qty,
+            move_line1.reserved_uom_qty,
             self.free_package,
         )
         self.service._set_destination_package(
             move_line2,
-            move_line2.product_uom_qty,
+            move_line2.reserved_uom_qty,
             another_package,
         )
         # set destination location for all lines in the buffer
@@ -85,12 +85,12 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         # set the destination package on lines
         self.service._set_destination_package(
             move_line1,
-            move_line1.product_uom_qty,
+            move_line1.reserved_uom_qty,
             self.free_package,
         )
         self.service._set_destination_package(
             move_line2,
-            move_line2.product_uom_qty,
+            move_line2.reserved_uom_qty,
             another_package,
         )
         # set an allowed destination location (inside the picking type default
@@ -144,12 +144,12 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         # set the destination package on lines
         self.service._set_destination_package(
             move_line1,
-            move_line1.product_uom_qty,
+            move_line1.reserved_uom_qty,
             self.free_package,
         )
         self.service._set_destination_package(
             move_line2,
-            move_line2.product_uom_qty,
+            move_line2.reserved_uom_qty,
             another_package,
         )
         # set destination location for all lines in the buffer
@@ -191,12 +191,12 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         # set the destination package on lines
         self.service._set_destination_package(
             move_line_g,
-            move_line_g.product_uom_qty,
+            move_line_g.reserved_uom_qty,
             self.free_package,
         )
         self.service._set_destination_package(
             move_line_h,
-            move_line_h.product_uom_qty,
+            move_line_h.reserved_uom_qty,
             another_package,  # partial qty
         )
         # set destination location for all lines in the buffer
@@ -216,8 +216,8 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         backorder = (move_line_g | move_line_h).picking_id.backorder_id
         self.assertEqual(backorder, self.picking6)
         self.assertEqual(backorder.state, "confirmed")
-        self.assertEqual(backorder.move_lines.product_id, self.product_h)
-        self.assertEqual(backorder.move_lines.product_uom_qty, 3)
+        self.assertEqual(backorder.move_ids.product_id, self.product_h)
+        self.assertEqual(backorder.move_ids.reserved_uom_qty, 3)
         self.assertFalse(backorder.move_line_ids)
         # buffer should be empty
         buffer_lines = self.service._find_buffer_move_lines()
@@ -239,7 +239,7 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         # set the destination package on lines
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         response = self.service.dispatch(
@@ -263,7 +263,7 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         # set the destination package on lines
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         response = self.service.dispatch(
@@ -304,7 +304,7 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         # put one line in the buffer
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         response = self.service.dispatch(
@@ -333,7 +333,7 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         ):
             self.service._set_destination_package(
                 move_line,
-                move_line.product_uom_qty,
+                move_line.reserved_uom_qty,
                 package_dest,
             )
         response = self.service.dispatch(

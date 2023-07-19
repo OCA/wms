@@ -4,7 +4,7 @@ from odoo import models
 
 
 class StockInventory(models.Model):
-    _inherit = "stock.inventory"
+    _inherit = "stock.quant"
 
     def user_has_groups(self, groups):
         if self.env.context.get("_sf_inventory"):

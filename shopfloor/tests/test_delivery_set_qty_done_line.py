@@ -20,8 +20,8 @@ class DeliverySetQtyDoneLineCase(DeliveryCommonCase):
                 (cls.product_b, 10),
             ]
         )
-        cls.pack1_move = picking.move_lines[0]
-        cls.raw_move = picking.move_lines[1]
+        cls.pack1_move = picking.move_ids[0]
+        cls.raw_move = picking.move_ids[1]
         cls._fill_stock_for_moves(cls.pack1_move, in_package=True)
         cls._fill_stock_for_moves(cls.raw_move)
         picking.action_assign()

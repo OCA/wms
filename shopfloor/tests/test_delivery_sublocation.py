@@ -20,8 +20,8 @@ class DeliveryScanSublocationCase(DeliveryCommonCase):
                 (cls.product_e, 10),  # E as raw product with a lot
             ]
         )
-        cls.raw_move = picking.move_lines[0]
-        cls.raw_lot_move = picking.move_lines[1]
+        cls.raw_move = picking.move_ids[0]
+        cls.raw_lot_move = picking.move_ids[1]
         cls._fill_stock_for_moves(cls.raw_move)
         cls._fill_stock_for_moves(cls.raw_lot_move, in_lot=True)
         picking.action_assign()
@@ -47,8 +47,8 @@ class DeliveryScanSublocationCase(DeliveryCommonCase):
             ]
         )
         cls.picking_sublocation.location_id = cls.sublocation
-        cls.raw_move_sublocation = cls.picking_sublocation.move_lines[0]
-        cls.raw_lot_move_sublocation = cls.picking_sublocation.move_lines[1]
+        cls.raw_move_sublocation = cls.picking_sublocation.move_ids[0]
+        cls.raw_lot_move_sublocation = cls.picking_sublocation.move_ids[1]
         cls._fill_stock_for_moves(cls.raw_move_sublocation, location=cls.sublocation)
         # Use the same lot on product from both picking
         cls._fill_stock_for_moves(

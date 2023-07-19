@@ -43,7 +43,7 @@ class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
     def test_skip_line(self):
         # put one picking in another location
         self.batch.picking_ids[1].location_id = self.shelf1
-        self.batch.picking_ids[1].move_lines.location_id = self.shelf1
+        self.batch.picking_ids[1].move_ids.location_id = self.shelf1
         # select batch
         self._simulate_batch_selected(self.batch, in_package=True)
 

@@ -52,17 +52,17 @@ class CheckoutListDestPackageCase(
                 (self.product_d, 10),
             ]
         )
-        self._fill_stock_for_moves(picking.move_lines[:2], in_package=True)
-        self._fill_stock_for_moves(picking.move_lines[2], in_package=True)
-        self._fill_stock_for_moves(picking.move_lines[3], in_package=True)
+        self._fill_stock_for_moves(picking.move_ids[:2], in_package=True)
+        self._fill_stock_for_moves(picking.move_ids[2], in_package=True)
+        self._fill_stock_for_moves(picking.move_ids[3], in_package=True)
         picking.action_assign()
         delivery_packaging = self.env.ref(
             "stock_storage_type.product_product_9_packaging_single_bag"
         )
         delivery_package = self.env["stock.quant.package"].create(
-            {"packaging_id": delivery_packaging.id}
+            {"package_type_id": delivery_packaging.id}
         )
-        picking.move_lines[1].move_line_ids.result_package_id = delivery_package
+        picking.move_ids[1].move_line_ids.result_package_id = delivery_package
         response = self.service.dispatch(
             "list_dest_package",
             params={
@@ -83,7 +83,7 @@ class CheckoutListDestPackageCase(
                 (self.product_d, 10),
             ]
         )
-        self._fill_stock_for_moves(picking.move_lines)
+        self._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         self.assertEqual(picking.state, "assigned")
         response = self.service.dispatch(
@@ -112,8 +112,8 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
                 (cls.product_d, 10),
             ]
         )
-        pack1_moves = picking.move_lines[:3]
-        pack2_moves = picking.move_lines[3:]
+        pack1_moves = picking.move_ids[:3]
+        pack2_moves = picking.move_ids[3:]
         # put in 2 packs, for this test, we'll work on pack1
         cls._fill_stock_for_moves(pack1_moves, in_package=True)
         cls._fill_stock_for_moves(pack2_moves, in_package=True)
@@ -125,7 +125,7 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             "stock_storage_type.product_product_9_packaging_single_bag"
         )
         cls.delivery_package = cls.env["stock.quant.package"].create(
-            {"packaging_id": cls.delivery_packaging.id}
+            {"package_type_id": cls.delivery_packaging.id}
         )
         cls.move_line1, cls.move_line2, cls.move_line3 = cls.selected_lines
         # The 'scan_dest_package' and 'set_dest_package' methods can not be
@@ -135,8 +135,8 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
         # them
         cls.move_line1.result_package_id = cls.delivery_package
         # We'll put only product A and B in the destination package
-        cls.move_line1.qty_done = cls.move_line1.product_uom_qty
-        cls.move_line2.qty_done = cls.move_line2.product_uom_qty
+        cls.move_line1.qty_done = cls.move_line1.reserved_uom_qty
+        cls.move_line2.qty_done = cls.move_line2.reserved_uom_qty
         cls.move_line3.qty_done = 0
 
         cls.picking = picking
@@ -264,7 +264,7 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
         )
         # Left quantity to do from line 3
         new_move_line = self.picking.move_line_ids.filtered(
-            lambda line: line.qty_done == 0 and line.product_uom_qty == 7
+            lambda line: line.qty_done == 0 and line.reserved_uom_qty == 7
         )
         self.assertTrue(new_move_line)
         self.assertFalse(new_move_line.shopfloor_checkout_done)
@@ -316,7 +316,7 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
         # the maximum allowed, a message should be displayed
         # and the user shouldn't be allowed to select a package.
         line = fields.first(self.picking.move_line_ids)
-        line.qty_done = line.product_uom_qty + 1
+        line.qty_done = line.reserved_uom_qty + 1
         response = self.service.dispatch(
             "list_dest_package",
             params={

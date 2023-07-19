@@ -15,7 +15,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_b, 10), (self.product_c, 10)]
         )
-        for move_line in picking.move_lines:
+        for move_line in picking.move_ids:
             # put in 3 different packages
             self._fill_stock_for_moves(move_line, in_package=True, in_lot=in_lot)
         picking.action_assign()
@@ -41,18 +41,18 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
     def test_scan_package_action_select_product(self):
         self._test_select_product(
-            lambda l: l.product_id.barcode, lambda l: l.product_uom_qty, lambda __: 0
+            lambda l: l.product_id.barcode, lambda l: l.reserved_uom_qty, lambda __: 0
         )
 
     def test_scan_package_action_deselect_product(self):
         self._test_select_product(
-            lambda l: l.product_id.barcode, lambda __: 0, lambda l: l.product_uom_qty
+            lambda l: l.product_id.barcode, lambda __: 0, lambda l: l.reserved_uom_qty
         )
 
     def test_scan_package_action_select_product_packaging(self):
         self._test_select_product(
             lambda l: l.product_id.packaging_ids.barcode,
-            lambda l: l.product_uom_qty,
+            lambda l: l.reserved_uom_qty,
             lambda __: 0,
         )
 
@@ -60,21 +60,21 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self._test_select_product(
             lambda l: l.product_id.packaging_ids.barcode,
             lambda __: 0,
-            lambda l: l.product_uom_qty,
+            lambda l: l.reserved_uom_qty,
         )
 
     def test_scan_package_action_select_product_lot(self):
         self._test_select_product(
             lambda l: l.lot_id.name,
             lambda __: 0,
-            lambda l: l.product_uom_qty,
+            lambda l: l.reserved_uom_qty,
             in_lot=True,
         )
 
     def test_scan_package_action_deselect_product_lot(self):
         self._test_select_product(
             lambda l: l.lot_id.name,
-            lambda l: l.product_uom_qty,
+            lambda l: l.reserved_uom_qty,
             lambda __: 0,
             in_lot=True,
         )
@@ -84,7 +84,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
     ):
         self.product_a.tracking = tracked_by
         picking = self._create_picking(lines=[(self.product_a, 1)])
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         move_line = picking.move_line_ids
         origin_qty_done = move_line.qty_done
@@ -124,8 +124,8 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 (self.product_d, 10),
             ]
         )
-        pack1_moves = picking.move_lines[:3]
-        pack2_moves = picking.move_lines[3:]
+        pack1_moves = picking.move_ids[:3]
+        pack2_moves = picking.move_ids[3:]
         # put in 2 packs, for this test, we'll work on pack1
         self._fill_stock_for_moves(pack1_moves, in_package=True)
         self._fill_stock_for_moves(pack2_moves, in_package=True)
@@ -136,8 +136,8 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
         move_line1, move_line2, move_line3 = selected_lines
         # We'll put only product A and B in the package
-        move_line1.qty_done = move_line1.product_uom_qty
-        move_line2.qty_done = move_line2.product_uom_qty
+        move_line1.qty_done = move_line1.reserved_uom_qty
+        move_line2.qty_done = move_line2.reserved_uom_qty
         move_line3.qty_done = 0
 
         response = self.service.dispatch(
@@ -182,7 +182,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
     def test_scan_package_action_scan_package_error_invalid(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])
-        move = picking.move_lines
+        move = picking.move_ids
         self._fill_stock_for_moves(move, in_package=True)
         picking.action_assign()
 
@@ -224,8 +224,8 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 (self.product_d, 10),
             ]
         )
-        pack1_moves = picking.move_lines[:3]
-        pack2_moves = picking.move_lines[3:]
+        pack1_moves = picking.move_ids[:3]
+        pack2_moves = picking.move_ids[3:]
         # put in 2 packs, for this test, we'll work on pack1
         self._fill_stock_for_moves(pack1_moves, in_package=True)
         self._fill_stock_for_moves(pack2_moves, in_package=True)
@@ -287,8 +287,8 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 (self.product_d, 10),
             ]
         )
-        pack1_moves = picking.move_lines[:3]
-        pack2_moves = picking.move_lines[3:]
+        pack1_moves = picking.move_ids[:3]
+        pack2_moves = picking.move_ids[3:]
         # put in 2 packs, for this test, we'll work on pack1
         self._fill_stock_for_moves(pack1_moves, in_package=True)
         self._fill_stock_for_moves(pack2_moves, in_package=True)
@@ -299,8 +299,8 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
         move_line1, move_line2, move_line3 = selected_lines
         # we'll put only the first 2 lines (product A and B) in the new package
-        move_line1.qty_done = move_line1.product_uom_qty
-        move_line2.qty_done = move_line2.product_uom_qty
+        move_line1.qty_done = move_line1.reserved_uom_qty
+        move_line2.qty_done = move_line2.reserved_uom_qty
         move_line3.qty_done = 0
 
         packaging = (
@@ -366,7 +366,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
     def test_scan_package_action_scan_packaging_bad_carrier(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])
         picking.carrier_id = picking.carrier_id.search([], limit=1)
-        pack1_moves = picking.move_lines
+        pack1_moves = picking.move_ids
         # put in 2 packs, for this test, we'll work on pack1
         self._fill_stock_for_moves(pack1_moves, in_package=True)
         picking.action_assign()
@@ -437,7 +437,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
     def test_scan_package_action_scan_not_found(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])
-        move = picking.move_lines
+        move = picking.move_ids
         self._fill_stock_for_moves(move, in_package=True)
         picking.action_assign()
         selected_line = move.move_line_ids

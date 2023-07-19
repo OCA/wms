@@ -6,7 +6,7 @@ from .test_checkout_base import CheckoutCommonCase
 class CheckoutScanCase(CheckoutCommonCase):
     def _test_scan_ok(self, barcode_func, in_package=True):
         picking = self._create_picking()
-        self._fill_stock_for_moves(picking.move_lines, in_package=in_package)
+        self._fill_stock_for_moves(picking.move_ids, in_package=in_package)
         picking.action_assign()
         barcode = barcode_func(picking)
         response = self.service.dispatch("scan_document", params={"barcode": barcode})
@@ -54,7 +54,7 @@ class CheckoutScanCase(CheckoutCommonCase):
         # the picking will have one line available, so the endpoint can find
         # something from a location or package but should reject the picking as
         # it is not entirely available
-        self._fill_stock_for_moves(picking.move_lines[0], in_package=True)
+        self._fill_stock_for_moves(picking.move_ids[0], in_package=True)
         picking.action_assign()
         barcode = barcode_func(picking)
         response = self.service.dispatch("scan_document", params={"barcode": barcode})
@@ -83,7 +83,7 @@ class CheckoutScanCase(CheckoutCommonCase):
     def test_scan_document_error_location_not_child_of_type(self):
         picking = self._create_picking()
         picking.location_id = self.dispatch_location
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         response = self.service.dispatch(
             "scan_document", params={"barcode": picking.location_id.barcode}
@@ -96,7 +96,7 @@ class CheckoutScanCase(CheckoutCommonCase):
 
     def _test_scan_document_error_different_picking_type(self, barcode_func):
         picking = self._create_picking(picking_type=self.wh.pick_type_id)
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         barcode = barcode_func(picking)
         response = self.service.dispatch("scan_document", params={"barcode": barcode})
@@ -125,7 +125,7 @@ class CheckoutScanCase(CheckoutCommonCase):
         # know which picking to use
         picking2 = self._create_picking()
         pickings = picking | picking2
-        self._fill_stock_for_moves(pickings.move_lines, in_package=True)
+        self._fill_stock_for_moves(pickings.move_ids, in_package=True)
         pickings.action_assign()
         response = self.service.dispatch(
             "scan_document",
@@ -147,7 +147,7 @@ class CheckoutScanCase(CheckoutCommonCase):
         still be able to find the previous line.
         """
         picking = self._create_picking()
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         package = picking.move_line_ids.package_id
         # The user selects a line, then stops working in the middle of the process

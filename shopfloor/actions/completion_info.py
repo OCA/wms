@@ -27,7 +27,7 @@ class CompletionInfo(Component):
         )
         if not pickings:
             return None
-        next_pickings = pickings.mapped("move_lines.move_dest_ids.picking_id").filtered(
+        next_pickings = pickings.mapped("move_ids.move_dest_ids.picking_id").filtered(
             lambda p: p.state == "assigned"
         )
         if not next_pickings:

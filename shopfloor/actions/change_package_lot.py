@@ -105,7 +105,7 @@ class ChangePackageLot(Component):
                         move_line,
                         message=self.msg_store.cannot_change_lot_already_picked(lot),
                     )
-                available_quantity = sum(unreservable_lines.mapped("product_qty"))
+                available_quantity = sum(unreservable_lines.mapped("reserved_qty"))
                 to_assign_moves = unreservable_lines.move_id
                 # if we leave the package level, it will try to reserve the same
                 # one again
@@ -123,7 +123,7 @@ class ChangePackageLot(Component):
                     move_line.location_id,
                     self.env["stock.quant.package"].browse(),
                     lot,
-                    move_line.product_qty,
+                    move_line.reserved_qty,
                 )
                 inventory.create_control_stock(
                     move_line.location_id,
@@ -142,16 +142,16 @@ class ChangePackageLot(Component):
         if not float_is_zero(
             available_quantity, precision_rounding=product.uom_id.rounding
         ) and is_lesser(
-            available_quantity, move_line.product_qty, product.uom_id.rounding
+            available_quantity, move_line.reserved_qty, product.uom_id.rounding
         ):
             new_uom_qty = product.uom_id._compute_quantity(
                 available_quantity, move_line.product_uom_id, rounding_method="HALF-UP"
             )
-            values["product_uom_qty"] = new_uom_qty
+            values["reserved_uom_qty"] = new_uom_qty
 
         move_line.write(values)
 
-        if "product_uom_qty" in values:
+        if "reserved_uom_qty" in values:
             # when we change the quantity of the move, the state
             # will still be "assigned" and be skipped by "_action_assign",
             # recompute the state to be "partially_available"

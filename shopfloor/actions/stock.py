@@ -18,7 +18,7 @@ class StockAction(Component):
     def _create_return_move__get_max_qty(self, origin_move):
         """Returns the max returneable qty."""
         # The max returnable qty is the sent qty minus the already returned qties
-        quantity = origin_move.product_qty
+        quantity = origin_move.reserved_qty
         for move in origin_move.move_dest_ids:
             if (
                 move.origin_returned_move_id
@@ -26,9 +26,9 @@ class StockAction(Component):
             ):
                 continue
             if move.state in ("partially_available", "assigned"):
-                quantity -= sum(move.move_line_ids.mapped("product_qty"))
+                quantity -= sum(move.move_line_ids.mapped("reserved_qty"))
             elif move.state in ("done"):
-                quantity -= move.product_qty
+                quantity -= move.reserved_qty
         return float_round(
             quantity, precision_rounding=origin_move.product_id.uom_id.rounding
         )
@@ -119,7 +119,7 @@ class StockAction(Component):
                     _("Someone is already working on these transfers")
                 )
         for line in move_lines:
-            qty_done = quantity if quantity is not None else line.product_uom_qty
+            qty_done = quantity if quantity is not None else line.reserved_uom_qty
             line.qty_done = qty_done
             line._split_partial_quantity()
             data = {
@@ -178,7 +178,7 @@ class StockAction(Component):
         """
         moves.split_unavailable_qty()
         for picking in moves.picking_id:
-            moves_todo = picking.move_lines & moves
+            moves_todo = picking.move_ids & moves
             if self._check_backorder(picking, moves_todo):
                 existing_backorders = picking.backorder_ids
                 picking._action_done()
@@ -197,7 +197,7 @@ class StockAction(Component):
               but there are still unavailable moves to process
             - the moves are not linked to unprocessed ancestor moves
         """
-        assigned_moves = picking.move_lines.filtered(lambda m: m.state == "assigned")
+        assigned_moves = picking.move_ids.filtered(lambda m: m.state == "assigned")
         has_ancestors = bool(
             moves.move_orig_ids.filtered(lambda m: m.state not in ("cancel", "done"))
         )

@@ -35,7 +35,7 @@ class ZonePickingUnloadBufferLinesCase(ZonePickingCommonCase):
             )
             self.service._set_destination_package(
                 line,
-                line.product_uom_qty,
+                line.reserved_uom_qty,
                 dest_package,
             )
 
@@ -61,7 +61,7 @@ class ZonePickingUnloadBufferLinesCase(ZonePickingCommonCase):
             )
             self.service._set_destination_package(
                 line,
-                line.product_uom_qty,
+                line.reserved_uom_qty,
                 dest_package,
             )
 
@@ -89,7 +89,7 @@ class ZonePickingUnloadBufferLinesCase(ZonePickingCommonCase):
             )
             self.service._set_destination_package(
                 line,
-                line.product_uom_qty,
+                line.reserved_uom_qty,
                 dest_package,
             )
         # Simulate line from picking1 processed by another user
@@ -99,7 +99,7 @@ class ZonePickingUnloadBufferLinesCase(ZonePickingCommonCase):
             )
             self.service._actions_for("stock").mark_move_line_as_picked(
                 line,
-                line.product_uom_qty,
+                line.reserved_uom_qty,
                 dest_package,
                 user=self.env.ref("base.user_admin"),
             )

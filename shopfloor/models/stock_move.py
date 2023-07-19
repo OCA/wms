@@ -32,10 +32,10 @@ class StockMove(models.Model):
             to_move = other_move_lines
         if other_move_lines or self.state == "partially_available":
             if intersection:
-                qty_to_split = sum(to_move.mapped("product_uom_qty"))
+                qty_to_split = sum(to_move.mapped("reserved_uom_qty"))
             else:
                 qty_to_split = self.product_uom_qty - sum(
-                    move_lines.mapped("product_uom_qty")
+                    move_lines.mapped("reserved_uom_qty")
                 )
             split_move_vals = self._split(qty_to_split)
             split_move = self.create(split_move_vals)
@@ -70,7 +70,7 @@ class StockMove(models.Model):
         picking.ensure_one()
         data = {
             "name": "/",
-            "move_lines": [],
+            "move_ids": [],
             "move_line_ids": [],
             "backorder_id": picking.id,
         }
@@ -101,9 +101,9 @@ class StockMove(models.Model):
         if not moves:
             return False
         for picking in moves.picking_id:
-            moves_todo = picking.move_lines & moves
+            moves_todo = picking.move_ids & moves
             # No need to create a new transfer if we are processing all moves
-            if moves_todo == picking.move_lines:
+            if moves_todo == picking.move_ids:
                 new_picking = picking
             # We process some available moves of the picking, but there are still
             # some other moves to process, then we put the moves to process in

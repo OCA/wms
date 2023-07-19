@@ -52,7 +52,10 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
         """Simulate what would have been done in the previous steps"""
         for line in move_lines:
             line.write(
-                {"qty_done": line.product_uom_qty, "result_package_id": dest_package.id}
+                {
+                    "qty_done": line.reserved_uom_qty,
+                    "result_package_id": dest_package.id,
+                }
             )
 
     def _data_for_batch(self, batch, location, pack=None):

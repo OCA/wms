@@ -30,7 +30,7 @@ class DeliveryListStockPickingCase(DeliveryCommonCase):
     def test_list_stock_picking_ok(self):
         """Picking ready to list."""
         # prepare 1st picking
-        self._fill_stock_for_moves(self.picking1.move_lines)
+        self._fill_stock_for_moves(self.picking1.move_ids)
         self.picking1.action_assign()
         response = self.service.dispatch("list_stock_picking", params={})
         # picking1 only available
@@ -39,7 +39,7 @@ class DeliveryListStockPickingCase(DeliveryCommonCase):
             pickings=self.picking1,
         )
         # prepare 2nd picking
-        self._fill_stock_for_moves(self.picking2.move_lines)
+        self._fill_stock_for_moves(self.picking2.move_ids)
         self.picking2.action_assign()
         response = self.service.dispatch("list_stock_picking", params={})
         # all pickings available

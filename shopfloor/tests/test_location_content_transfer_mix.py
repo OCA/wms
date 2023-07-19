@@ -122,7 +122,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         # Set the destination on the move line
         if not dest_location:
             dest_location = move_line.location_dest_id
-        qty = move_line.product_uom_qty
+        qty = move_line.reserved_uom_qty
         response = self.zp_service.set_destination(
             move_line.id,
             dest_location.barcode,
@@ -153,7 +153,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         # Set the destination
         if set_destination:
             assert response["next_state"] in ("scan_destination_all", "start_single")
-            qty = move_line.product_uom_qty
+            qty = move_line.reserved_uom_qty
             if response["next_state"] == "scan_destination_all":
                 response = service.set_destination_all(
                     pack_location.id, out_location.barcode
@@ -304,12 +304,12 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         pack_first_pallet = pack_move_a.move_line_ids.filtered(
             lambda l: not l.shopfloor_user_id and l.location_id == dest_location1
         )
-        self.assertEqual(pack_first_pallet.product_uom_qty, 6)
+        self.assertEqual(pack_first_pallet.reserved_uom_qty, 6)
         self.assertEqual(pack_first_pallet.qty_done, 0)
         pack_second_pallet = pack_move_a.move_line_ids.filtered(
             lambda l: not l.shopfloor_user_id and l.location_id == dest_location2
         )
-        self.assertEqual(pack_second_pallet.product_uom_qty, 4)
+        self.assertEqual(pack_second_pallet.reserved_uom_qty, 4)
         self.assertEqual(pack_second_pallet.qty_done, 0)
         # Operator-2 with the "location content transfer" scenario scan
         # the location where the first pallet is.
@@ -344,7 +344,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
             message=self.service.msg_store.recovered_previous_session(),
         )
         # Operator-2 finishes its operation regarding the first pallet
-        qty = pack_first_pallet.product_uom_qty
+        qty = pack_first_pallet.reserved_uom_qty
         response = self.service.set_destination_all(
             pack_first_pallet.location_id.id, pack_first_pallet.location_dest_id.barcode
         )
@@ -445,7 +445,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         pack_first_pallet = pack_move_a1.move_line_ids.filtered(
             lambda l: not l.shopfloor_user_id and l.location_id == dest_location1
         )
-        self.assertEqual(pack_first_pallet.product_uom_qty, 6)
+        self.assertEqual(pack_first_pallet.reserved_uom_qty, 6)
         self.assertEqual(pack_first_pallet.qty_done, 0)
         # Operator-2 with the "location content transfer" scenario scan
         # the location where the first pallet is.
@@ -471,7 +471,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         pack_second_pallet = pack_move_a2.move_line_ids.filtered(
             lambda l: not l.shopfloor_user_id and l.location_id == dest_location2
         )
-        self.assertEqual(pack_second_pallet.product_uom_qty, 4)
+        self.assertEqual(pack_second_pallet.reserved_uom_qty, 4)
         self.assertEqual(pack_second_pallet.qty_done, 0)
         # The last action has updated the pack operation (new move line) in the
         # transfer previously processed by Operator-2.
@@ -480,7 +480,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         # Operator-2 finishes its operation regarding the first pallet without
         # any trouble as the processed move line has been put in its own
         # move+transfer
-        qty = pack_first_pallet.product_uom_qty
+        qty = pack_first_pallet.reserved_uom_qty
         response = self.service.set_destination_all(
             pack_first_pallet.location_id.id, pack_first_pallet.location_dest_id.barcode
         )

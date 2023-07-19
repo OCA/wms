@@ -198,18 +198,18 @@ class ZonePickingCommonCase(CommonCase):
         # 1 product in a package available in zone_sublocation1
         cls.picking1 = picking1 = cls._create_picking(lines=[(cls.product_a, 10)])
         cls._fill_stock_for_moves(
-            picking1.move_lines, in_package=True, location=cls.zone_sublocation1
+            picking1.move_ids, in_package=True, location=cls.zone_sublocation1
         )
         # 2 products with lots available in zone_sublocation2
         cls.picking2 = picking2 = cls._create_picking(
             lines=[(cls.product_b, 10), (cls.product_c, 10)]
         )
         cls._fill_stock_for_moves(
-            picking2.move_lines, in_lot=True, location=cls.zone_sublocation2
+            picking2.move_ids, in_lot=True, location=cls.zone_sublocation2
         )
         # 1 product (no package, no lot) available in zone_sublocation3
         cls.picking3 = picking3 = cls._create_picking(lines=[(cls.product_d, 10)])
-        cls._fill_stock_for_moves(picking3.move_lines, location=cls.zone_sublocation3)
+        cls._fill_stock_for_moves(picking3.move_ids, location=cls.zone_sublocation3)
         # 1 product, available in zone_sublocation3 and zone_sublocation4
         # Put product_e quantities in two different source locations to get
         # two stock move lines (6 and 4 to satisfy 10 qties)
@@ -221,7 +221,7 @@ class ZonePickingCommonCase(CommonCase):
             lines=[(cls.product_b, 10), (cls.product_f, 10)]
         )
         cls._fill_stock_for_moves(
-            picking5.move_lines,
+            picking5.move_ids,
             in_package=True,
             same_package=False,
             location=cls.zone_sublocation4,
@@ -239,7 +239,7 @@ class ZonePickingCommonCase(CommonCase):
         cls.free_package = cls.env["stock.quant.package"].create(
             {"name": "FREE_PACKAGE"}
         )
-        cls.free_lot = cls.env["stock.production.lot"].create(
+        cls.free_lot = cls.env["stock.lot"].create(
             {
                 "name": "FREE_LOT",
                 "product_id": cls.product_a.id,

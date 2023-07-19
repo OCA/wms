@@ -142,7 +142,9 @@ class DeliveryCommonCase(CommonCase):
             for qty in qties:
                 expected_qties.append({"qty_done": qty})
         else:
-            expected_qties = [{"qty_done": line.product_uom_qty} for line in move_lines]
+            expected_qties = [
+                {"qty_done": line.reserved_uom_qty} for line in move_lines
+            ]
         self.assertRecordValues(move_lines, expected_qties)
         package_level = move_lines.package_level_id
         if package_level:

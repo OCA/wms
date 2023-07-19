@@ -28,10 +28,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             fields.Datetime.end_of(fields.Datetime.today(), "day"), days=2
         )
         # change date to lines in the same location
-        move1 = self.picking2.move_lines[0]
+        move1 = self.picking2.move_ids[0]
         move1.write({"date": today})
         move1_line = move1.move_line_ids[0]
-        move2 = self.picking2.move_lines[1]
+        move2 = self.picking2.move_ids[1]
         move2.write({"date": future})
         move2_line = move2.move_line_ids[0]
 
@@ -140,7 +140,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         package = self.picking1.move_line_ids.mapped("package_id")[0]
         new_picking = self._create_picking(lines=[(self.product_a, 20)])
         self._fill_stock_for_moves(
-            new_picking.move_lines, in_package=package, location=self.zone_sublocation1
+            new_picking.move_ids, in_package=package, location=self.zone_sublocation1
         )
         new_picking.action_assign()
         response = self.service.dispatch(
@@ -156,7 +156,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             qty_done=10.0,
         )
         # first line done
-        move_line.qty_done = move_line.product_uom_qty
+        move_line.qty_done = move_line.reserved_uom_qty
         # get the next one
         response = self.service.dispatch(
             "scan_source",
@@ -286,7 +286,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         # Add the same product same package in the same location to use as replacement
         picking1b = self._create_picking(lines=[(self.product_a, 10)])
         self._fill_stock_for_moves(
-            picking1b.move_lines, in_package=True, location=self.zone_sublocation1
+            picking1b.move_ids, in_package=True, location=self.zone_sublocation1
         )
         picking1b.action_assign()
         picking1b.action_cancel()
@@ -464,7 +464,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         # So lets add one more lot for that product in same location.
         pick = self._create_picking(lines=[(self.product_c, 10)])
         self._fill_stock_for_moves(
-            pick.move_lines, in_lot=True, location=self.zone_sublocation2
+            pick.move_ids, in_lot=True, location=self.zone_sublocation2
         )
         pick.action_assign()
         response = self.service.dispatch(
@@ -490,7 +490,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         # So lets add one more lot for that product in a different location.
         pick = self._create_picking(lines=[(self.product_c, 10)])
         self._fill_stock_for_moves(
-            pick.move_lines, in_lot=True, location=self.zone_sublocation1
+            pick.move_ids, in_lot=True, location=self.zone_sublocation1
         )
         pick.action_assign()
         lot = self.picking2.move_line_ids.lot_id[0]
@@ -518,7 +518,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         lot = self.picking2.move_line_ids.lot_id[0]
         picking = self._create_picking(lines=[(lot.product_id, 2)])
         self._fill_stock_for_moves(
-            picking.move_lines, in_lot=lot, location=self.zone_sublocation3
+            picking.move_ids, in_lot=lot, location=self.zone_sublocation3
         )
         picking.action_assign()
         response = self.service.dispatch(
@@ -590,7 +590,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         self.service.set_destination(
             move_line.id,
             self.free_package.name,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
         )
         self.assertEqual(move_line.shopfloor_user_id, self.env.user)
         # The second user scans the same source location
@@ -635,7 +635,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
             },
         )
         # unload goods
@@ -667,7 +667,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
                 params={
                     "move_line_id": move_line.id,
                     "barcode": package_dest.name,
-                    "quantity": move_line.product_uom_qty,
+                    "quantity": move_line.reserved_uom_qty,
                 },
             )
         # unload goods

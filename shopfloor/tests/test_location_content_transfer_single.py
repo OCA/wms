@@ -39,14 +39,14 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         )
         cls.pickings = picking1 | picking2
         cls._fill_stock_for_moves(
-            picking1.move_lines, in_package=True, location=cls.content_loc
+            picking1.move_ids, in_package=True, location=cls.content_loc
         )
-        cls.product_d_lot = cls.env["stock.production.lot"].create(
+        cls.product_d_lot = cls.env["stock.lot"].create(
             {"product_id": cls.product_d.id, "company_id": cls.env.company.id}
         )
-        cls._fill_stock_for_moves(picking2.move_lines[0], location=cls.content_loc)
+        cls._fill_stock_for_moves(picking2.move_ids[0], location=cls.content_loc)
         cls._fill_stock_for_moves(
-            picking2.move_lines[1], location=cls.content_loc, in_lot=cls.product_d_lot
+            picking2.move_ids[1], location=cls.content_loc, in_lot=cls.product_d_lot
         )
         cls.pickings.action_assign()
         cls._simulate_pickings_selected(cls.pickings)
@@ -121,7 +121,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
     def test_scan_package_error_wrong_lot(self):
         """Wrong product scanned"""
         lot = (
-            self.env["stock.production.lot"]
+            self.env["stock.lot"]
             .sudo()
             .create(
                 {
@@ -159,7 +159,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         package_level = self.picking1.move_line_ids.package_level_id
         line_product_a = package_level.move_line_ids[0]
         self.product_a.tracking = "lot"
-        line_product_a.lot_id = self.env["stock.production.lot"].create(
+        line_product_a.lot_id = self.env["stock.lot"].create(
             {"product_id": self.product_a.id, "company_id": self.env.company.id}
         )
         # lot of product_a is in the package and anywhere else so it's
@@ -183,7 +183,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         # if we scan product A, we can't know for which package it is
         picking = self._create_picking(lines=[(self.product_a, 10)])
         self._fill_stock_for_moves(
-            picking.move_lines, in_package=True, location=self.content_loc
+            picking.move_ids, in_package=True, location=self.content_loc
         )
         picking.action_assign()
         self._simulate_pickings_selected(picking)
@@ -197,7 +197,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         # add another picking with a raw line with product a,
         # if we scan product A, we can't know which line/package we want
         picking = self._create_picking(lines=[(self.product_a, 10)])
-        self._fill_stock_for_moves(picking.move_lines, location=self.content_loc)
+        self._fill_stock_for_moves(picking.move_ids, location=self.content_loc)
         picking.action_assign()
         self._simulate_pickings_selected(picking)
         self._test_scan_package_nok(
@@ -221,12 +221,12 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         package_level = self.picking1.move_line_ids.package_level_id
         line_product_a = package_level.move_line_ids[0]
         self.product_a.tracking = "lot"
-        line_product_a.lot_id = lot = self.env["stock.production.lot"].create(
+        line_product_a.lot_id = lot = self.env["stock.lot"].create(
             {"product_id": self.product_a.id, "company_id": self.env.company.id}
         )
         picking = self._create_picking(lines=[(self.product_a, 10)])
         self._fill_stock_for_moves(
-            picking.move_lines, in_package=True, in_lot=lot, location=self.content_loc
+            picking.move_ids, in_package=True, in_lot=lot, location=self.content_loc
         )
         picking.action_assign()
         self._simulate_pickings_selected(picking)
@@ -242,12 +242,12 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         package_level = self.picking1.move_line_ids.package_level_id
         line_product_a = package_level.move_line_ids[0]
         self.product_a.tracking = "lot"
-        line_product_a.lot_id = lot = self.env["stock.production.lot"].create(
+        line_product_a.lot_id = lot = self.env["stock.lot"].create(
             {"product_id": self.product_a.id, "company_id": self.env.company.id}
         )
         picking = self._create_picking(lines=[(self.product_a, 10)])
         self._fill_stock_for_moves(
-            picking.move_lines, in_lot=lot, location=self.content_loc
+            picking.move_ids, in_lot=lot, location=self.content_loc
         )
         picking.action_assign()
         self._simulate_pickings_selected(picking)
@@ -365,7 +365,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         """Wrong product scanned"""
         move_line = self.picking2.move_line_ids[0]
         lot = (
-            self.env["stock.production.lot"]
+            self.env["stock.lot"]
             .sudo()
             .create(
                 {
@@ -652,10 +652,10 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
         cls.picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10)]
         )
-        cls.move_product_a = cls.picking.move_lines.filtered(
+        cls.move_product_a = cls.picking.move_ids.filtered(
             lambda m: m.product_id == cls.product_a
         )
-        cls.move_product_b = cls.picking.move_lines.filtered(
+        cls.move_product_b = cls.picking.move_ids.filtered(
             lambda m: m.product_id == cls.product_b
         )
         # Change the initial demand of product_a to get two move lines for
@@ -694,7 +694,7 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
         )
         # Check the picking data
         self.assertFalse(package_level.exists())
-        moves_product_a = self.picking.move_lines.filtered(
+        moves_product_a = self.picking.move_ids.filtered(
             lambda m: m.product_id == self.product_a
         )
         self.assertEqual(len(moves_product_a), 2)
@@ -738,10 +738,10 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
         """Declare a stock out on a move line related to moves containing
         other move lines.
         """
-        self.assertEqual(len(self.picking.move_lines), 2)
+        self.assertEqual(len(self.picking.move_ids), 2)
         self.assertEqual(len(self.move_product_b.move_line_ids), 2)
         move_line = self.move_product_b.move_line_ids.filtered(
-            lambda ml: ml.product_uom_qty == 4  # 4/10 to stock out
+            lambda ml: ml.reserved_uom_qty == 4  # 4/10 to stock out
         )
         self.assertEqual(self.product_b.qty_available, 10)
         response = self.service.dispatch(
@@ -750,7 +750,7 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
         )
         # Check the picking data
         self.assertFalse(move_line.exists())
-        moves_product_b = self.picking.move_lines.filtered(
+        moves_product_b = self.picking.move_ids.filtered(
             lambda m: m.product_id == self.product_b
         )
         self.assertEqual(len(moves_product_b), 2)

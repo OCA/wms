@@ -17,7 +17,7 @@ class StockPackageLevel(models.Model):
 
         Original motivation:
 
-        A package level has a relation to "move_ids" only when the
+        A package level has a relation to "move_lines" only when the
         package level was created first from the UI and it created
         its move.
         When we unlink a package level, it deletes the move it created.

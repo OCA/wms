@@ -14,7 +14,7 @@ class CheckoutListStockPickingCase(CheckoutCommonCase):
         # should not be in list because not assigned:
         self._create_picking()
         to_assign = picking1 | picking2 | picking3
-        self._fill_stock_for_moves(to_assign.move_lines, in_package=True)
+        self._fill_stock_for_moves(to_assign.move_ids, in_package=True)
         to_assign.action_assign()
         response = self.service.dispatch("list_stock_picking", params={})
         expected = {
@@ -32,7 +32,7 @@ class CheckoutSelectCase(CheckoutCommonCase):
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
         cls.picking = cls._create_picking()
-        cls._fill_stock_for_moves(cls.picking.move_lines, in_package=True)
+        cls._fill_stock_for_moves(cls.picking.move_ids, in_package=True)
         cls.picking.action_assign()
 
     def test_select_ok(self):
@@ -69,6 +69,6 @@ class CheckoutSelectCase(CheckoutCommonCase):
 
     def test_select_error_not_allowed(self):
         picking = self._create_picking(picking_type=self.wh.pick_type_id)
-        self._fill_stock_for_moves(picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         self._test_error(picking, "You cannot move this using this menu.")

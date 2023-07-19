@@ -188,7 +188,7 @@ class CommonCase(BaseCommonCase):
             If a boolean true is given, a new package will be created for each move.
         :param same_package:
             modify the behavior of `in_package` to use the same package for all moves.
-        :param in_lot: stock.production.lot record or simple boolean
+        :param in_lot: stock.lot record or simple boolean
             If a lot record is given, it will be used as lot.
             If a boolean true is given, a new lot will be created.
         """
@@ -216,7 +216,7 @@ class CommonCase(BaseCommonCase):
                 if isinstance(in_lot, models.BaseModel):
                     lot = in_lot
                 else:
-                    lot = cls.env["stock.production.lot"].create(
+                    lot = cls.env["stock.lot"].create(
                         {"product_id": product.id, "company_id": cls.env.company.id}
                     )
             if not (in_lot or in_package):
@@ -251,7 +251,7 @@ class CommonCase(BaseCommonCase):
         return package
 
     def _create_lot(self, product):
-        return self.env["stock.production.lot"].create(
+        return self.env["stock.lot"].create(
             {"product_id": product.id, "company_id": self.env.company.id}
         )
 
@@ -277,7 +277,6 @@ class PickingBatchMixin:
             picking_form = Form(cls.env["stock.picking"].sudo())
             picking_form.picking_type_id = cls.picking_type
             picking_form.location_id = cls.stock_location
-            picking_form.location_dest_id = cls.packing_location
             picking_form.origin = "test"
             picking_form.partner_id = cls.customer
             for batch_product in transfer:
@@ -310,7 +309,7 @@ class PickingBatchMixin:
         pickings = batches.mapped("picking_ids")
         if fill_stock:
             cls._fill_stock_for_moves(
-                pickings.mapped("move_lines"), in_package=in_package, in_lot=in_lot
+                pickings.mapped("move_ids"), in_package=in_package, in_lot=in_lot
             )
         pickings.action_assign()
         batches.write({"state": "in_progress", "user_id": cls.env.uid})

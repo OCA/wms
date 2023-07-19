@@ -1,9 +1,10 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# pylint: disable=missing-return
+from markupsafe import Markup
+
 from .common import PickingBatchMixin
 from .test_actions_data_base import ActionsDataCaseBase
-
-# pylint: disable=missing-return
 
 
 class ActionsDataCase(ActionsDataCaseBase):
@@ -59,7 +60,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         self.assertDictEqual(data, expected)
 
     def test_data_lot(self):
-        lot = self.env["stock.production.lot"].create(
+        lot = self.env["stock.lot"].create(
             {
                 "product_id": self.product_b.id,
                 "company_id": self.env.company.id,
@@ -78,18 +79,16 @@ class ActionsDataCase(ActionsDataCaseBase):
 
     def test_data_package(self):
         package = self.move_a.move_line_ids.package_id
-        package.packaging_id = self.packaging.id
-        package.package_storage_type_id = self.storage_type_pallet
+        package.product_packaging_id = self.packaging.id
+        package.package_type_id = self.storage_type_pallet
         data = self.data.package(package, picking=self.picking, with_packaging=True)
         self.assert_schema(self.schema.package(with_packaging=True), data)
         expected = {
             "id": package.id,
             "name": package.name,
             "move_line_count": 1,
-            "packaging": self._expected_packaging(package.packaging_id),
-            "storage_type": self._expected_storage_type(
-                package.package_storage_type_id
-            ),
+            "packaging": self._expected_packaging(package.product_packaging_id),
+            "storage_type": self._expected_storage_type(package.package_type_id),
             "weight": 20.0,
         }
         self.assertDictEqual(data, expected)
@@ -127,7 +126,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "package_level_count": 2,
             "bulk_line_count": 2,
             "name": self.picking.name,
-            "note": "read me",
+            "note": Markup("<p>read me</p>"),
             "origin": "created by test",
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
@@ -150,7 +149,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "package_level_count": 2,
             "bulk_line_count": 2,
             "name": self.picking.name,
-            "note": "read me",
+            "note": Markup("<p>read me</p>"),
             "origin": "created by test",
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
@@ -189,7 +188,7 @@ class ActionsDataCase(ActionsDataCaseBase):
     def test_data_move_line_package(self):
         move_line = self.move_a.move_line_ids
         result_package = self.env["stock.quant.package"].create(
-            {"packaging_id": self.packaging.id}
+            {"product_packaging_id": self.packaging.id}
         )
         move_line.write({"qty_done": 3.0, "result_package_id": result_package.id})
         data = self.data.move_line(move_line)
@@ -198,7 +197,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         expected = {
             "id": move_line.id,
             "qty_done": 3.0,
-            "quantity": move_line.product_uom_qty,
+            "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product(self.product_a),
             "lot": None,
             "package_src": {
@@ -229,7 +228,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         expected = {
             "id": move_line.id,
             "qty_done": 0.0,
-            "quantity": move_line.product_uom_qty,
+            "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product(self.product_b),
             "lot": {
                 "id": move_line.lot_id.id,
@@ -254,7 +253,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         expected = {
             "id": move_line.id,
             "qty_done": 0.0,
-            "quantity": move_line.product_uom_qty,
+            "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product(self.product_c),
             "lot": {
                 "id": move_line.lot_id.id,
@@ -290,7 +289,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         expected = {
             "id": move_line.id,
             "qty_done": 0.0,
-            "quantity": move_line.product_uom_qty,
+            "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product(self.product_d),
             "lot": None,
             "package_src": None,
@@ -309,7 +308,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         expected = {
             "id": move_line.id,
             "qty_done": 0.0,
-            "quantity": move_line.product_uom_qty,
+            "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product(self.product_d),
             "lot": None,
             "package_src": None,

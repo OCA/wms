@@ -25,7 +25,7 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
             ]
         )
 
-        cls.moves = cls.batch.picking_ids.move_lines.sorted("id")
+        cls.moves = cls.batch.picking_ids.move_ids.sorted("id")
         cls.move1, cls.move2, cls.move3, cls.move4, cls.move5 = cls.moves
         cls.batch_other = cls._create_picking_batch(
             [[cls.BatchProduct(product=cls.product_a, quantity=30)]]
@@ -105,7 +105,7 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
                     "location_id": location.id,
                     "product_qty": remaining_qty,
                     "package_id": False,
-                    "prod_lot_id": lot.id if lot else False,
+                    "lot_id": lot.id if lot else False,
                 }
             ],
         )
@@ -243,10 +243,10 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
         )
 
     def test_stock_issue_lot(self):
-        lot_a = self.env["stock.production.lot"].create(
+        lot_a = self.env["stock.lot"].create(
             {"product_id": self.product_a.id, "company_id": self.env.company.id}
         )
-        lot_b = self.env["stock.production.lot"].create(
+        lot_b = self.env["stock.lot"].create(
             {"product_id": self.product_a.id, "company_id": self.env.company.id}
         )
         self._update_qty_in_location(
@@ -370,9 +370,9 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
         new_line, __ = pick_line1._split_qty_to_be_done(1)
         self._set_dest_package_and_done(pick_line1, self.dest_package)
 
-        self.assertEqual(pick_line1.product_qty, 1.0)
-        self.assertEqual(new_line.product_qty, 1.0)
-        self.assertEqual(pick_line2.product_qty, 8.0)
+        self.assertEqual(pick_line1.reserved_qty, 1.0)
+        self.assertEqual(new_line.reserved_qty, 1.0)
+        self.assertEqual(pick_line2.reserved_qty, 8.0)
         # on the third move, the operator can't pick anymore in shelf1
         # because there is nothing inside, they declare a stock issue
         self._stock_issue(new_line, next_line_func=lambda: pick_line2)
@@ -392,7 +392,7 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
         self.assertFalse(new_line.exists())
         # the second line to pick has been raised to 9 instead of 8
         # initially, to compensate the stock out
-        self.assertEqual(pick_line2.product_qty, 9.0)
+        self.assertEqual(pick_line2.reserved_qty, 9.0)
 
         # quant with stock out has been updated
         self.assertEqual(package1.quant_ids.quantity, 1.0)

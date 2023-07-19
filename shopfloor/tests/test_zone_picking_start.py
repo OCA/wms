@@ -30,7 +30,7 @@ class ZonePickingStartCase(ZonePickingCommonCase):
             picking_type=bad_picking_type,
         )
         cls._fill_stock_for_moves(
-            extra_picking.move_lines, in_package=True, location=cls.zone_sublocation1
+            extra_picking.move_ids, in_package=True, location=cls.zone_sublocation1
         )
         cls._update_qty_in_location(cls.zone_sublocation1, cls.product_b, 10)
         extra_picking.action_assign()
@@ -138,7 +138,7 @@ class ZonePickingStartCase(ZonePickingCommonCase):
         # and set the destination package
         self.service._set_destination_package(
             move_line,
-            move_line.product_uom_qty,
+            move_line.reserved_uom_qty,
             self.free_package,
         )
         response = self.service.dispatch("select_zone")

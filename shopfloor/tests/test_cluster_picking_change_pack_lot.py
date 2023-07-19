@@ -74,7 +74,7 @@ class ClusterPickingChangePackLotCase(ClusterPickingCommonCase):
                 {
                     "package_id": new_package.id,
                     "result_package_id": new_package.id,
-                    "product_qty": 10.0,
+                    "reserved_qty": 10.0,
                 }
             ],
         )

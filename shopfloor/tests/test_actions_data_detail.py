@@ -3,6 +3,7 @@
 import base64
 import io
 
+from markupsafe import Markup
 from PIL import Image
 
 from .test_actions_data_base import ActionsDataDetailCaseBase
@@ -23,7 +24,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         move_lines = self.env["stock.move.line"].search(
             [
                 ("location_id", "child_of", location.id),
-                ("product_qty", ">", 0),
+                ("reserved_qty", ">", 0),
                 ("state", "not in", ("done", "cancel")),
             ]
         )
@@ -37,7 +38,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         self.assertDictEqual(data, self._expected_packaging(self.packaging))
 
     def test_data_lot(self):
-        lot = self.env["stock.production.lot"].create(
+        lot = self.env["stock.lot"].create(
             {
                 "product_id": self.product_b.id,
                 "company_id": self.env.company.id,
@@ -63,8 +64,8 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
 
     def test_data_package(self):
         package = self.move_a.move_line_ids.package_id
-        package.packaging_id = self.packaging.id
-        package.package_storage_type_id = self.storage_type_pallet
+        package.product_packaging_id = self.packaging.id
+        package.package_type_id = self.storage_type_pallet
         # package.invalidate_cache()
         data = self.data_detail.package_detail(package, picking=self.picking)
         self.assert_schema(self.schema_detail.package_detail(), data)
@@ -81,7 +82,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             },
             "name": package.name,
             "move_line_count": 1,
-            "packaging": self.data_detail.packaging(package.packaging_id),
+            "packaging": self.data_detail.packaging(package.product_packaging_id),
             "weight": 20.0,
             "pickings": self.data_detail.pickings(pickings),
             "move_lines": self.data_detail.move_lines(lines),
@@ -98,12 +99,12 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         picking.write(
             {
                 "origin": "created by test",
-                "note": "read me",
+                "note": Markup("<p>read me</p>"),
                 "priority": "1",
                 "carrier_id": carrier.id,
             }
         )
-        picking.move_lines.write({"date": "2020-05-13"})
+        picking.move_ids.write({"date": "2020-05-13"})
         data = self.data_detail.picking_detail(picking)
         self.assert_schema(self.schema_detail.picking_detail(), data)
         expected = {
@@ -112,7 +113,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "package_level_count": 2,
             "bulk_line_count": 2,
             "name": picking.name,
-            "note": "read me",
+            "note": Markup("<p>read me</p>"),
             "origin": "created by test",
             "ship_carrier": None,
             "weight": 110.0,
@@ -140,7 +141,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "carrier_id": carrier.id,
             }
         )
-        picking.move_lines.write({"date": "2020-05-13"})
+        picking.move_ids.write({"date": "2020-05-13"})
         data = self.data_detail.picking_detail(picking, with_progress=True)
         self.assert_schema(self.schema_detail.picking_detail(), data)
         expected = {
@@ -149,7 +150,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "package_level_count": 2,
             "bulk_line_count": 2,
             "name": picking.name,
-            "note": "read me",
+            "note": Markup("<p>read me</p>"),
             "origin": "created by test",
             "ship_carrier": None,
             "weight": 110.0,
@@ -170,7 +171,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
     def test_data_move_line_package(self):
         move_line = self.move_a.move_line_ids
         result_package = self.env["stock.quant.package"].create(
-            {"packaging_id": self.packaging.id}
+            {"product_packaging_id": self.packaging.id}
         )
         move_line.write({"qty_done": 3.0, "result_package_id": result_package.id})
         data = self.data_detail.move_line(move_line)
@@ -179,7 +180,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         expected = {
             "id": move_line.id,
             "qty_done": 3.0,
-            "quantity": move_line.product_uom_qty,
+            "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product_detail(product),
             "lot": None,
             "package_src": {
@@ -211,7 +212,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         expected = {
             "id": move_line.id,
             "qty_done": 0.0,
-            "quantity": move_line.product_uom_qty,
+            "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product_detail(product),
             "lot": {
                 "id": move_line.lot_id.id,
@@ -236,7 +237,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         expected = {
             "id": move_line.id,
             "qty_done": 0.0,
-            "quantity": move_line.product_uom_qty,
+            "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product_detail(product),
             "lot": {
                 "id": move_line.lot_id.id,
@@ -273,7 +274,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         expected = {
             "id": move_line.id,
             "qty_done": 0.0,
-            "quantity": move_line.product_uom_qty,
+            "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product_detail(product),
             "lot": None,
             "package_src": None,
@@ -293,7 +294,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         product.sudo().write(
             {
                 "image_128": fake_colored_image(size=(128, 128)),
-                "manufacturer": manuf.id,
+                "manufacturer_id": manuf.id,
             }
         )
         vendor_a = Partner.create({"name": "Supplier A"})
@@ -301,7 +302,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         SupplierInfo = self.env["product.supplierinfo"].sudo()
         SupplierInfo.create(
             {
-                "name": vendor_a.id,
+                "partner_id": vendor_a.id,
                 "product_tmpl_id": product.product_tmpl_id.id,
                 "product_id": product.id,
                 "product_code": "SUPP1",
@@ -309,7 +310,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         )
         SupplierInfo.create(
             {
-                "name": vendor_b.id,
+                "partner_id": vendor_b.id,
                 "product_tmpl_id": product.product_tmpl_id.id,
                 "product_id": product.id,
                 "product_code": "SUPP2",

@@ -12,8 +12,8 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10), (cls.product_c, 10)]
         )
-        cls.moves_pack = picking.move_lines[:2]
-        cls.move_single = picking.move_lines[2:]
+        cls.moves_pack = picking.move_ids[:2]
+        cls.move_single = picking.move_ids[2:]
         cls._fill_stock_for_moves(cls.moves_pack, in_package=True)
         cls._fill_stock_for_moves(cls.move_single)
         picking.action_assign()

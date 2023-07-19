@@ -21,8 +21,8 @@ class CheckoutNoPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
                 (cls.product_d, 10),
             ]
         )
-        cls.pack1_moves = pack1_moves = picking.move_lines[:3]
-        cls.pack2_moves = pack2_moves = picking.move_lines[3:]
+        cls.pack1_moves = pack1_moves = picking.move_ids[:3]
+        cls.pack2_moves = pack2_moves = picking.move_ids[3:]
         # put in 2 packs, for this test, we'll work on pack1
         cls._fill_stock_for_moves(pack1_moves)
         cls._fill_stock_for_moves(pack2_moves)
@@ -33,8 +33,8 @@ class CheckoutNoPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         selected_lines = move_line1 + move_line2
 
         # we'll put only the first 2 lines (product A and B) w/ no package
-        move_line1.qty_done = move_line1.product_uom_qty
-        move_line2.qty_done = move_line2.product_uom_qty
+        move_line1.qty_done = move_line1.reserved_uom_qty
+        move_line2.qty_done = move_line2.reserved_uom_qty
         move_line3.qty_done = 0
         response = self.service.dispatch(
             "no_package",
@@ -84,7 +84,7 @@ class CheckoutNoPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         # the maximum allowed, a message should be displayed
         # and the user shouldn't be allowed to select a package.
         line = fields.first(self.picking.move_line_ids)
-        line.qty_done = line.product_uom_qty + 1
+        line.qty_done = line.reserved_uom_qty + 1
         response = self.service.dispatch(
             "list_dest_package",
             params={

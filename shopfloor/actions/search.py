@@ -141,7 +141,7 @@ class SearchAction(Component):
         )
 
     def lot_from_scan(self, barcode, products=None, limit=1):
-        model = self.env["stock.production.lot"]
+        model = self.env["stock.lot"]
         if not barcode:
             return model.browse()
         domain = [

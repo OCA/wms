@@ -31,11 +31,11 @@ class CheckoutSummaryCase(CheckoutCommonCase):
         )
 
     def test_summary_not_fully_processed(self):
-        self._fill_stock_for_moves(self.picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(self.picking.move_ids, in_package=True)
         self.picking.action_assign()
         # satisfy only few lines
         for ml in self.picking.move_line_ids[:2]:
-            ml.qty_done = ml.product_uom_qty
+            ml.qty_done = ml.reserved_uom_qty
             ml.shopfloor_checkout_done = True
         response = self.service.dispatch(
             "summary", params={"picking_id": self.picking.id}
@@ -50,11 +50,11 @@ class CheckoutSummaryCase(CheckoutCommonCase):
         )
 
     def test_summary_fully_processed(self):
-        self._fill_stock_for_moves(self.picking.move_lines, in_package=True)
+        self._fill_stock_for_moves(self.picking.move_ids, in_package=True)
         self.picking.action_assign()
         # satisfy only all lines
         for ml in self.picking.move_line_ids:
-            ml.qty_done = ml.product_uom_qty
+            ml.qty_done = ml.reserved_uom_qty
             ml.shopfloor_checkout_done = True
         response = self.service.dispatch(
             "summary", params={"picking_id": self.picking.id}

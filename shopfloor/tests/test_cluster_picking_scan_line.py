@@ -91,7 +91,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         line = self.batch.picking_ids.move_line_ids
         # Add another lot for the same product in the location
         location = self.batch.picking_ids.location_id
-        new_lot = self.env["stock.production.lot"].create(
+        new_lot = self.env["stock.lot"].create(
             {"product_id": self.product_a.id, "company_id": self.env.company.id}
         )
         self._update_qty_in_location(location, line.product_id, 2, lot=new_lot)
@@ -301,7 +301,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         location = line.location_id
         # add a 2nd lot in the same location
         lot_2 = (
-            self.env["stock.production.lot"]
+            self.env["stock.lot"]
             .sudo()
             .create(
                 {
@@ -357,7 +357,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         """Wrong product scanned"""
         self._simulate_batch_selected(self.batch, in_package=True)
         lot = (
-            self.env["stock.production.lot"]
+            self.env["stock.lot"]
             .sudo()
             .create(
                 {

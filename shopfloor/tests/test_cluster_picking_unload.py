@@ -27,10 +27,10 @@ class ClusterPickingUnloadingCommonCase(ClusterPickingCommonCase):
         cls._simulate_batch_selected(cls.batch)
 
         cls.one_line_picking = cls.batch.picking_ids.filtered(
-            lambda picking: len(picking.move_lines) == 1
+            lambda picking: len(picking.move_ids) == 1
         )
         cls.two_lines_picking = cls.batch.picking_ids.filtered(
-            lambda picking: len(picking.move_lines) == 2
+            lambda picking: len(picking.move_ids) == 2
         )
         two_lines_product_a = cls.two_lines_picking.move_line_ids.filtered(
             lambda line: line.product_id == cls.product_a
@@ -250,8 +250,8 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         """
         self.batch.picking_ids.do_unreserve()
         location = self.one_line_picking.location_id
-        product = self.one_line_picking.move_lines.product_id
-        qty = self.one_line_picking.move_lines.product_uom_qty
+        product = self.one_line_picking.move_ids.product_id
+        qty = self.one_line_picking.move_ids.product_uom_qty
         self._update_qty_in_location(location, product, qty)
         self.one_line_picking.action_assign()
         # Prepare lines to process
@@ -533,10 +533,10 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         cls.bin1_lines.write({"location_dest_id": cls.packing_a_location.id})
         cls.bin2_lines.write({"location_dest_id": cls.packing_b_location.id})
         cls.one_line_picking = cls.batch.picking_ids.filtered(
-            lambda picking: len(picking.move_lines) == 1
+            lambda picking: len(picking.move_ids) == 1
         )
         cls.two_lines_picking = cls.batch.picking_ids.filtered(
-            lambda picking: len(picking.move_lines) == 2
+            lambda picking: len(picking.move_ids) == 2
         )
 
     def test_unload_scan_destination_ok(self):
@@ -882,9 +882,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
                 "location_dest_id": self.customer_location.id,
             }
         )
-        next_picking.move_lines.write(
-            {"move_orig_ids": [(6, 0, picking.move_lines.ids)]}
-        )
+        next_picking.move_ids.write({"move_orig_ids": [(6, 0, picking.move_ids.ids)]})
         next_picking.action_confirm()
 
         response = self.service.dispatch(

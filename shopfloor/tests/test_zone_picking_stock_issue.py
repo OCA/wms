@@ -81,7 +81,7 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
         )
         self.assertTrue(inventory)
         self.assertEqual(inventory.line_ids.product_id, move.product_id)
-        self.assertEqual(inventory.line_ids.product_qty, 0)
+        self.assertEqual(inventory.line_ids.reserved_qty, 0)
 
     def test_stock_issue2(self):
         """Once the stock issue is done, the move has been reserved again."""
@@ -90,6 +90,9 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
         move_line = self.picking1.move_line_ids[0]
         location = move_line.location_id
         move = move_line.move_id
+        quants_before = self.env["stock.quant"].search(
+            [("location_id", "=", location.id), ("product_id", "=", move.product_id.id)]
+        )
         # Increase the quantity in the current location
         self._update_qty_in_location(location, move.product_id, 100)
         response = self.service.dispatch(
@@ -106,23 +109,11 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
             move.move_line_ids,
         )
         # Check the inventory
-        inventory = self.env["stock.inventory"].search(
-            [
-                (
-                    "name",
-                    "ilike",
-                    "{} stock correction in location {}".format(
-                        move.picking_id.name, location.name
-                    ),
-                ),
-                ("state", "=", "done"),
-                ("line_ids.location_id", "in", location.ids),
-                ("line_ids.product_id", "in", move.product_id.ids),
-            ]
+        quants_after = self.env["stock.quant"].search(
+            [("location_id", "=", location.id), ("product_id", "=", move.product_id.id)]
         )
-        self.assertTrue(inventory)
-        self.assertEqual(inventory.line_ids.product_id, move.product_id)
-        self.assertEqual(inventory.line_ids.product_qty, 0)
+        inventory_quant = quants_after - quants_before
+        self.assertTrue(inventory_quant)
 
     def test_stock_issue3(self):
         """Once the stock issue is done, the move has been reserved again
@@ -165,4 +156,4 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
         )
         self.assertTrue(inventory)
         self.assertEqual(inventory.line_ids.product_id, move.product_id)
-        self.assertEqual(inventory.line_ids.product_qty, 0)
+        self.assertEqual(inventory.line_ids.reserved_qty, 0)

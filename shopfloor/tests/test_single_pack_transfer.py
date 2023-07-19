@@ -483,8 +483,8 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
                 "location_dest_id": self.customer_location.id,
             }
         )
-        next_picking.move_lines.write(
-            {"move_orig_ids": [(6, 0, self.picking.move_lines.ids)]}
+        next_picking.move_ids.write(
+            {"move_orig_ids": [(6, 0, self.picking.move_ids.ids)]}
         )
         next_picking.action_confirm()
 

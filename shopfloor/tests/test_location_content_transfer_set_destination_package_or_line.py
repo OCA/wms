@@ -36,9 +36,9 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         )
         cls.pickings = picking1 | picking2
         cls._fill_stock_for_moves(
-            picking1.move_lines, in_package=True, location=cls.content_loc
+            picking1.move_ids, in_package=True, location=cls.content_loc
         )
-        cls._fill_stock_for_moves(picking2.move_lines, location=cls.content_loc)
+        cls._fill_stock_for_moves(picking2.move_ids, location=cls.content_loc)
         cls.pickings.action_assign()
         cls._simulate_pickings_selected(cls.pickings)
         cls.dest_location = (
@@ -243,7 +243,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             params={
                 "location_id": 1234567890,  # Doesn't exist
                 "move_line_id": move_line.id,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "barcode": "TEST",
             },
         )
@@ -255,7 +255,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": 1234567890,  # Doesn't exist
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "barcode": "TEST",
             },
         )
@@ -274,7 +274,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line.id,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "barcode": "UNKNOWN_LOCATION",
             },
         )
@@ -291,7 +291,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line.id,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "barcode": customer_location.barcode,
             },
         )
@@ -314,7 +314,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line.id,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "barcode": self.shelf2.barcode,
             },
         )
@@ -332,7 +332,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line.id,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "barcode": self.env.ref("stock.stock_location_14").barcode,
             },
         )
@@ -352,7 +352,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line.id,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "barcode": self.dest_location.barcode,
             },
         )
@@ -398,7 +398,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line.id,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "barcode": self.dest_location.barcode,
             },
         )
@@ -433,7 +433,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             lambda m: m.product_id == self.product_c
         )
         move = move_line_c.move_id
-        self.assertEqual(move_line_c.product_uom_qty, 10)
+        self.assertEqual(move_line_c.reserved_uom_qty, 10)
         self.assertEqual(move_line_c.qty_done, 10)
         # Scan partial qty (6/10)
         response = self.service.dispatch(
@@ -441,14 +441,14 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line_c.id,
-                "quantity": move_line_c.product_uom_qty - 4,  # Scan 6 qty
+                "quantity": move_line_c.reserved_uom_qty - 4,  # Scan 6 qty
                 "barcode": self.dest_location.barcode,
             },
         )
         done_picking = original_picking.backorder_ids
         # Check move line data
         self.assertEqual(move_line_c.move_id.product_uom_qty, 6)
-        self.assertEqual(move_line_c.product_uom_qty, 0)
+        self.assertEqual(move_line_c.reserved_uom_qty, 0)
         self.assertEqual(move_line_c.qty_done, 6)
         self.assertEqual(move_line_c.state, "done")
         self.assertEqual(original_picking.backorder_ids, done_picking)
@@ -458,7 +458,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         self.assertEqual(move.state, "assigned")
         self.assertEqual(move.product_id, self.product_c)
         self.assertEqual(move.product_uom_qty, 4)
-        self.assertEqual(move.move_line_ids.product_uom_qty, 4)
+        self.assertEqual(move.move_line_ids.reserved_uom_qty, 4)
         self.assertEqual(move.move_line_ids.qty_done, 4)
         # Check the response
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
@@ -477,14 +477,14 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": remaining_move_line_c.id,
-                "quantity": remaining_move_line_c.product_uom_qty,
+                "quantity": remaining_move_line_c.reserved_uom_qty,
                 "barcode": self.dest_location.barcode,
             },
         )
         done_picking2 = remaining_move_line_c.picking_id
         # Check move line data
         self.assertEqual(remaining_move_line_c.move_id.product_uom_qty, 4)
-        self.assertEqual(remaining_move_line_c.product_uom_qty, 0)
+        self.assertEqual(remaining_move_line_c.reserved_uom_qty, 0)
         self.assertEqual(remaining_move_line_c.qty_done, 4)
         self.assertEqual(remaining_move_line_c.state, "done")
         self.assertTrue(done_picking2 != original_picking)
@@ -492,7 +492,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         # All move lines related to product_c are now done and extracted from
         # the initial transfer
         all_pickings = original_picking | done_picking | done_picking2
-        moves_product_c = all_pickings.move_lines.filtered(
+        moves_product_c = all_pickings.move_ids.filtered(
             lambda m: m.product_id == self.product_c
         )
         moves_product_c_done = all(move.state == "done" for move in moves_product_c)
@@ -510,12 +510,12 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line_d.id,
-                "quantity": move_line_d.product_uom_qty,
+                "quantity": move_line_d.reserved_uom_qty,
                 "barcode": self.dest_location.barcode,
             },
         )
         self.assertEqual(move_line_d.move_id.product_uom_qty, 10)
-        self.assertEqual(move_line_d.product_uom_qty, 0)
+        self.assertEqual(move_line_d.reserved_uom_qty, 0)
         self.assertEqual(move_line_d.qty_done, 10)
         self.assertEqual(move_line_d.state, "done")
         self.assertEqual(original_picking.state, "done")
@@ -547,10 +547,10 @@ class LocationContentTransferSetDestinationXSpecialCase(
         cls.picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10)]
         )
-        cls.move_product_a = cls.picking.move_lines.filtered(
+        cls.move_product_a = cls.picking.move_ids.filtered(
             lambda m: m.product_id == cls.product_a
         )
-        cls.move_product_b = cls.picking.move_lines.filtered(
+        cls.move_product_b = cls.picking.move_ids.filtered(
             lambda m: m.product_id == cls.product_b
         )
         # Change the initial demand of product_a to get two move lines for
@@ -590,7 +590,7 @@ class LocationContentTransferSetDestinationXSpecialCase(
         has to be splitted because it is linked to additional move lines.
         """
         original_picking = self.picking
-        self.assertEqual(len(original_picking.move_lines), 2)
+        self.assertEqual(len(original_picking.move_ids), 2)
         self.assertEqual(len(self.move_product_a.move_line_ids), 2)
         package_level = original_picking.package_level_ids[0]
         response = self.service.dispatch(
@@ -607,10 +607,10 @@ class LocationContentTransferSetDestinationXSpecialCase(
         self.assertEqual(package_level.location_dest_id, self.dest_location)
         for move_line in package_level.move_line_ids:
             self.assertEqual(move_line.location_dest_id, self.dest_location)
-        moves_product_a = original_picking.move_lines.filtered(
+        moves_product_a = original_picking.move_ids.filtered(
             lambda m: m.product_id == self.product_a
         )
-        self.assertEqual(len(original_picking.move_lines), 2)
+        self.assertEqual(len(original_picking.move_ids), 2)
         self.assertEqual(len(moves_product_a), 1)
         for move in moves_product_a:
             self.assertEqual(len(move.move_line_ids), 1)
@@ -634,17 +634,17 @@ class LocationContentTransferSetDestinationXSpecialCase(
         has to be splitted because it is linked to additional move lines.
         """
         original_picking = self.picking
-        self.assertEqual(len(original_picking.move_lines), 2)
+        self.assertEqual(len(original_picking.move_ids), 2)
         self.assertEqual(len(self.move_product_b.move_line_ids), 2)
         move_line = self.move_product_b.move_line_ids.filtered(
-            lambda ml: ml.product_uom_qty == 6
+            lambda ml: ml.reserved_uom_qty == 6
         )
         response = self.service.dispatch(
             "set_destination_line",
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line.id,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "barcode": self.dest_location.barcode,
             },
         )
@@ -654,11 +654,11 @@ class LocationContentTransferSetDestinationXSpecialCase(
         self.assertEqual(done_picking.state, "done")
         self.assertEqual(original_picking.state, "assigned")
         self.assertEqual(move_line.move_id.product_uom_qty, 6)
-        self.assertEqual(move_line.product_uom_qty, 0)
+        self.assertEqual(move_line.reserved_uom_qty, 0)
         self.assertEqual(move_line.qty_done, 6)
         self.assertEqual(move_line.location_dest_id, self.dest_location)
-        self.assertEqual(len(original_picking.move_lines), 2)
-        moves_product_b = original_picking.move_lines.filtered(
+        self.assertEqual(len(original_picking.move_ids), 2)
+        moves_product_b = original_picking.move_ids.filtered(
             lambda m: m.product_id == self.product_b
         )
         self.assertEqual(len(moves_product_b), 1)
@@ -669,12 +669,12 @@ class LocationContentTransferSetDestinationXSpecialCase(
         self.assertEqual(len(move_lines_wo_pkg_states), 1)
         self.assertTrue(all(state == "assigned" for state in move_lines_wo_pkg_states))
         self.assertEqual(move_line.state, "done")
-        remaining_move = original_picking.move_lines.filtered(
+        remaining_move = original_picking.move_ids.filtered(
             lambda m: move_line.move_id != m and m.product_id == self.product_b
         )
         self.assertEqual(remaining_move.state, "assigned")
         self.assertEqual(remaining_move.product_uom_qty, 4)
-        self.assertEqual(remaining_move.move_line_ids.product_uom_qty, 4)
+        self.assertEqual(remaining_move.move_line_ids.reserved_uom_qty, 4)
         self.assertEqual(remaining_move.move_line_ids.qty_done, 4)
         # Check the response
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
@@ -696,7 +696,7 @@ class LocationContentTransferSetDestinationXSpecialCase(
                 params={
                     "location_id": self.content_loc.id,
                     "move_line_id": ml.id,
-                    "quantity": ml.product_uom_qty,
+                    "quantity": ml.reserved_uom_qty,
                     "barcode": self.dest_location.barcode,
                 },
             )
@@ -733,14 +733,14 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         cls.picking_a = picking_a = cls._create_picking(lines=[(cls.product_c, 10)])
         cls.picking_b = picking_b = cls._create_picking(lines=[(cls.product_c, 10)])
         # connect a and b in a chain of moves
-        for move_a in picking_a.move_lines:
-            for move_b in picking_b.move_lines:
+        for move_a in picking_a.move_ids:
+            for move_b in picking_b.move_ids:
                 if move_a.product_id == move_b.product_id:
                     move_a.move_dest_ids = move_b
                     move_b.procure_method = "make_to_order"
 
         cls.pickings = picking_a | picking_b
-        cls._fill_stock_for_moves(picking_a.move_lines, location=cls.content_loc)
+        cls._fill_stock_for_moves(picking_a.move_ids, location=cls.content_loc)
         cls.pickings.action_assign()
 
         cls.dest_location = (
@@ -772,7 +772,7 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         )
         move = move_line_c.move_id
 
-        self.assertEqual(move_line_c.product_uom_qty, 10)
+        self.assertEqual(move_line_c.reserved_uom_qty, 10)
         self.assertEqual(move_line_c.qty_done, 10)
         # Scan partial qty (6/10)
         self.service.dispatch(
@@ -780,7 +780,7 @@ class LocationContentTransferSetDestinationChainSpecialCase(
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line_c.id,
-                "quantity": move_line_c.product_uom_qty - 4,  # Scan 6 qty
+                "quantity": move_line_c.reserved_uom_qty - 4,  # Scan 6 qty
                 "barcode": self.dest_location.barcode,
             },
         )
@@ -788,7 +788,7 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         # Check move line data
         self.assertEqual(picking_b.backorder_ids, done_picking)
         self.assertEqual(move_line_c.move_id.product_uom_qty, 6)
-        self.assertEqual(move_line_c.product_uom_qty, 0)
+        self.assertEqual(move_line_c.reserved_uom_qty, 0)
         self.assertEqual(move_line_c.qty_done, 6)
         self.assertEqual(move_line_c.state, "done")
         # the move has been split
@@ -798,7 +798,7 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         self.assertEqual(move.state, "assigned")
         move_line = move.move_line_ids
         self.assertEqual(move_line.move_id.product_uom_qty, 4)
-        self.assertEqual(move_line.product_uom_qty, 4)
+        self.assertEqual(move_line.reserved_uom_qty, 4)
         self.assertEqual(move_line.qty_done, 4)
 
     def test_set_destination_package_partial_qty_with_move_orig_ids(self):
@@ -813,8 +813,8 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         package1 = self.env["stock.quant.package"].create({})
         package2 = self.env["stock.quant.package"].create({})
         line1 = picking_a.move_line_ids
-        line2 = line1.copy({"product_uom_qty": 4, "qty_done": 4})
-        line1.with_context(bypass_reservation_update=True).product_uom_qty = 6
+        line2 = line1.copy({"reserved_uom_qty": 4, "qty_done": 4})
+        line1.with_context(bypass_reservation_update=True).reserved_uom_qty = 6
         line1.qty_done = 6
         line1.result_package_id = package1
         line2.result_package_id = package2
@@ -828,7 +828,7 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         move_line = picking_b.move_line_ids.filtered(lambda m: m.package_id == package1)
         move = move_line.move_id
 
-        self.assertEqual(move_line.product_uom_qty, 6.0)
+        self.assertEqual(move_line.reserved_uom_qty, 6.0)
         self.assertEqual(move_line.qty_done, 6.0)
         # Scan partial qty (6/10)
         self.service.dispatch(
@@ -842,7 +842,7 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         )
         # Check move line data
         self.assertEqual(move_line.move_id.product_uom_qty, 6)
-        self.assertEqual(move_line.product_uom_qty, 0)
+        self.assertEqual(move_line.reserved_uom_qty, 0)
         self.assertEqual(move_line.qty_done, 6)
         self.assertEqual(move_line.state, "done")
         # the move has been split
@@ -852,5 +852,5 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         self.assertEqual(move.state, "assigned")
         move_line = move.move_line_ids
         self.assertEqual(move_line.move_id.product_uom_qty, 4)
-        self.assertEqual(move_line.product_uom_qty, 4)
+        self.assertEqual(move_line.reserved_uom_qty, 4)
         self.assertEqual(move_line.qty_done, 4)

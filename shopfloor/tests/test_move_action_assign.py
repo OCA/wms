@@ -52,7 +52,7 @@ class TestStockMoveActionAssign(CommonCase):
         self.assertEqual(picking.state, "assigned")
         self.assertEqual(picking.package_level_ids.package_id, package)
 
-        move = picking.move_lines
+        move = picking.move_ids
         line = move.move_line_ids
 
         # we are no longer moving the entire package

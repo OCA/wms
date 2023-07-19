@@ -16,8 +16,8 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
                 (self.product_d, 10),
             ]
         )
-        pack1_moves = picking.move_lines[:3]
-        pack2_moves = picking.move_lines[3:]
+        pack1_moves = picking.move_ids[:3]
+        pack2_moves = picking.move_ids[3:]
         # put in 2 packs, for this test, we'll work on pack1
         self._fill_stock_for_moves(pack1_moves, in_package=True)
         self._fill_stock_for_moves(pack2_moves, in_package=True)
@@ -28,8 +28,8 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
 
         move_line1, move_line2, move_line3 = selected_lines
         # we'll put only the first 2 lines (product A and B) in the new package
-        move_line1.qty_done = move_line1.product_uom_qty
-        move_line2.qty_done = move_line2.product_uom_qty
+        move_line1.qty_done = move_line1.reserved_uom_qty
+        move_line2.qty_done = move_line2.reserved_uom_qty
         move_line3.qty_done = 0
 
         response = self.service.dispatch(
@@ -69,7 +69,7 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
                 (self.product_b, 10),
             ]
         )
-        moves = picking.move_lines
+        moves = picking.move_ids
         self._fill_stock_for_moves(moves, in_package=True)
         picking.action_assign()
         # If the qty_done of a selected line goes beyond
@@ -77,7 +77,7 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         # and the user shouldn't be allowed to select a package.
         selected_lines = moves.move_line_ids
         line = fields.first(selected_lines)
-        line.qty_done = line.product_uom_qty + 1
+        line.qty_done = line.reserved_uom_qty + 1
         response = self.service.dispatch(
             "list_dest_package",
             params={

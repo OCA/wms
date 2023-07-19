@@ -14,9 +14,9 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
             lines=[(cls.product_a, 3), (cls.product_a, 1), (cls.product_b, 10)],
             confirm=False,
         )
-        cls.picking.move_lines._action_confirm(merge=False)
+        cls.picking.move_ids._action_confirm(merge=False)
         cls.picking.action_confirm()
-        for move in cls.picking.move_lines:
+        for move in cls.picking.move_ids:
             cls._fill_stock_for_moves(move, in_lot=True)
         cls.picking.action_assign()
         cls.move_lines = cls.picking.move_line_ids
@@ -52,7 +52,7 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
             lines=[(self.product_a, 10), (self.product_b, 10)]
         )
         # do not put them in a package, we'll pack units here
-        self._fill_stock_for_moves(picking.move_lines)
+        self._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         line_a = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
@@ -66,7 +66,7 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_a, 10), (self.product_b, 10)]
         )
-        self._fill_stock_for_moves(picking.move_lines)
+        self._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         lines_a = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
@@ -80,7 +80,7 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
         picking = self._create_picking(
             lines=[(self.product_a, 1), (self.product_a, 1), (self.product_b, 1)]
         )
-        for move in picking.move_lines:
+        for move in picking.move_ids:
             self._fill_stock_for_moves(move, in_lot=True)
         picking.action_assign()
         first_line = picking.move_line_ids[0]

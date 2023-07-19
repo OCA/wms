@@ -7,7 +7,7 @@ from odoo.addons.component.core import Component
 
 
 class LotHandler(Component):
-    """Scan anything handler for stock.production.lot."""
+    """Scan anything handler for stock.lot."""
 
     _name = "shopfloor.scan.lot.handler"
     _inherit = "shopfloor.scan.anything.handler"
@@ -16,7 +16,7 @@ class LotHandler(Component):
 
     def search(self, identifier):
         res = self._search.find(identifier, types=("lot",))
-        return res.record if res.record else self.env["stock.production.lot"]
+        return res.record if res.record else self.env["stock.lot"]
 
     @property
     def converter(self):

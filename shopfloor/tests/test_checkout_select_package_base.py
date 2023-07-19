@@ -56,7 +56,7 @@ class CheckoutSelectPackageMixin:
         for line in selected_lines - related_lines:
             self.assertEqual(
                 line.qty_done,
-                line.product_uom_qty,
+                line.reserved_uom_qty,
                 "Scanned lines must have their qty done set to the reserved quantity",
             )
         for line in unselected_lines + related_lines:

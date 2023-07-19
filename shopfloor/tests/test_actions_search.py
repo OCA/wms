@@ -57,7 +57,7 @@ class TestSearchCase(TestSearchBaseCase):
 
     def test_search_lot_number_unique(self):
         rec = (
-            self.env["stock.production.lot"]
+            self.env["stock.lot"]
             .sudo()
             .create(
                 {"product_id": self.product_a.id, "company_id": self.env.company.id}
@@ -69,7 +69,7 @@ class TestSearchCase(TestSearchBaseCase):
         self.assertEqual(handler("NONE"), rec.browse())
 
     def test_search_lot_number_shared_with_multiple_products(self):
-        lot_model = self.env["stock.production.lot"].sudo()
+        lot_model = self.env["stock.lot"].sudo()
         lots = (
             lot_model.create(
                 {
@@ -155,7 +155,7 @@ class TestFindCase(TestSearchBaseCase):
 
     def test_find_lot_number_unique(self):
         rec = (
-            self.env["stock.production.lot"]
+            self.env["stock.lot"]
             .sudo()
             .create(
                 {"product_id": self.product_a.id, "company_id": self.env.company.id}
@@ -167,7 +167,7 @@ class TestFindCase(TestSearchBaseCase):
         self.assertEqual(res.record, rec)
 
     def test_find_lot_number_shared_with_multiple_products(self):
-        lot_model = self.env["stock.production.lot"].sudo()
+        lot_model = self.env["stock.lot"].sudo()
         lots = (
             lot_model.create(
                 {

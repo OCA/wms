@@ -27,10 +27,10 @@ class ClusterPickingScanDestinationPackPrefillQtyCase(ClusterPickingCommonCase):
             ]
         )
         cls.one_line_picking = cls.batch.picking_ids.filtered(
-            lambda picking: len(picking.move_lines) == 1
+            lambda picking: len(picking.move_ids) == 1
         )
         cls.two_lines_picking = cls.batch.picking_ids.filtered(
-            lambda picking: len(picking.move_lines) == 2
+            lambda picking: len(picking.move_ids) == 2
         )
 
         cls.bin1 = cls.env["stock.quant.package"].create({})
