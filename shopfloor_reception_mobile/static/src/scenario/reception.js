@@ -252,24 +252,32 @@ const Reception = {
                 identifier: data.picking.name,
             };
         },
+        picking_display_fields: function () {
+            return [
+                {path: "origin", label: "Source Document"},
+                {path: "partner.name", label: "Partner"},
+                {path: "carrier"},
+                {
+                    path: "scheduled_date",
+                    renderer: (rec, field) => {
+                        return (
+                            "Scheduled Date: " +
+                            this.utils.display.render_field_date(rec, field)
+                        );
+                    },
+                },
+            ];
+        },
         operation_options: function () {
             return {
                 title_action_field: {action_val_path: "name"},
-                fields: [
-                    {path: "origin", label: "Source Document"},
-                    {path: "partner.name", label: "Partner"},
-                    {path: "carrier"},
-                    {
-                        path: "scheduled_date",
-                        renderer: (rec, field) => {
-                            return (
-                                "Scheduled Date: " +
-                                this.utils.display.render_field_date(rec, field)
-                            );
-                        },
-                    },
-                ],
+                fields: this.picking_display_fields(),
             };
+        },
+        select_document_display_fields: function () {
+            var fields = this.picking_display_fields();
+            fields.push({path: "move_line_count", label: "Lines"});
+            return fields;
         },
         manual_select_options_for_select_document: function (today_only = false) {
             return {
@@ -285,21 +293,7 @@ const Reception = {
                     title_action_field: {
                         action_val_path: "name",
                     },
-                    fields: [
-                        {path: "origin", label: "Source Document"},
-                        {path: "partner.name", label: "Partner"},
-                        {path: "carrier"},
-                        {
-                            path: "scheduled_date",
-                            renderer: (rec, field) => {
-                                return (
-                                    "Scheduled Date: " +
-                                    this.utils.display.render_field_date(rec, field)
-                                );
-                            },
-                        },
-                        {path: "move_line_count", label: "Lines"},
-                    ],
+                    fields: this.select_document_display_fields(),
                 },
             };
         },
@@ -402,13 +396,27 @@ const Reception = {
                 ],
             };
         },
+        select_dest_package_display_name_values: function (rec) {
+            var values = [];
+            if (rec.origin) {
+                values.push(rec.origin);
+            }
+            if (rec.partner.name) {
+                values.push(rec.partner.name);
+            }
+            return values;
+        },
+        select_dest_package_display_name: function (rec) {
+            var values = this.select_dest_package_display_name_values();
+            return values.join(" - ");
+        },
         picking_detail_options_for_select_dest_package: function () {
             return {
                 fields: [
                     {
                         path: "origin",
                         renderer: (rec, field) => {
-                            return rec.origin + " - " + rec.partner.name;
+                            return this.select_dest_package_display_name(rec);
                         },
                     },
                 ],
