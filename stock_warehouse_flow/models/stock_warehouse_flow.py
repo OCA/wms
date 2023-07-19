@@ -426,14 +426,14 @@ class StockWarehouseFlow(models.Model):
         return self.search(domain)
 
     @api.model
-    def _search_and_apply_for_move(self, move):
+    def _search_and_apply_for_move(self, move, assign_picking=True):
         move.ensure_one()
         flows = self._search_for_move(move)
         if not flows:
             return move
-        return flows.apply_on_move(move)
+        return flows.apply_on_move(move, assign_picking)
 
-    def apply_on_move(self, move):
+    def apply_on_move(self, move, assign_picking=True):
         move_ids = []
         flows = self
         for flow in self:
@@ -444,7 +444,7 @@ class StockWarehouseFlow(models.Model):
             # Try to apply the rest of the flows to the split move
             for split_move in split_moves:
                 move_ids += (flows - flow).apply_on_move(split_move).ids
-            flow._apply_on_move(move)
+            flow._apply_on_move(move, assign_picking)
             return move.browse(move_ids)
         raise UserError(
             _(
@@ -521,7 +521,7 @@ class StockWarehouseFlow(models.Model):
             return self._split_move_simple(move)
         return split_moves
 
-    def _apply_on_move(self, move):
+    def _apply_on_move(self, move, assign_picking=True):
         """Apply the flow configuration on the move."""
         if not self:
             return False
@@ -535,7 +535,8 @@ class StockWarehouseFlow(models.Model):
         )
         move.procure_method = rule.procure_method
         move.rule_id = rule
-        move._assign_picking()
+        if assign_picking:
+            move._assign_picking()
 
     def write(self, vals):
         res = super().write(vals)
