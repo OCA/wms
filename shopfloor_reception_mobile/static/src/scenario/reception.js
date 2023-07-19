@@ -71,13 +71,12 @@ const Reception = {
                 </div>
             </template>
             <template v-if="state_is('select_move')">
-                <item-detail-card
-                    v-for="record in ordered_moves"
-                    :card_color="move_card_color(record)"
-                    :record="record"
-                    :options="picking_detail_options_for_select_move(record)"
-                    :key="make_state_component_key(['reception-moves-select-move', record.id])"
-                />
+                <manual-select
+                    :card_color="utils.colors.color_for('screen_step_done')"
+                    :records="ordered_moves"
+                    :options="picking_detail_options_for_select_move()"
+                    :key="make_state_component_key(['reception', 'manual-select-move'])"
+                 />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
@@ -346,22 +345,31 @@ const Reception = {
         },
         picking_detail_options_for_select_move: function (move) {
             return {
-                key_title: "product.display_name",
-                fields: [
-                    {
-                        path: "product.barcode",
-                        label: "Barcode",
+                show_title: true,
+                showActions: false,
+                list_item_options: {
+                    loud_title: true,
+                    title_action_field: {
+                        action_val_path: "name",
                     },
-                    {
-                        path: "product.supplier_code",
-                        label: "Vendor code",
-                    },
-                    {
-                        path: "quantity_done",
-                        label: "Qty done",
-                        display_no_value: true,
-                    },
-                ],
+                    list_item_klass_maker: this.move_card_color,
+                    key_title: "product.display_name",
+                    fields: [
+                        {
+                            path: "product.barcode",
+                            label: "Barcode",
+                        },
+                        {
+                            path: "product.supplier_code",
+                            label: "Vendor code",
+                        },
+                        {
+                            path: "quantity_done",
+                            label: "Qty done",
+                            display_no_value: true,
+                        },
+                    ],
+                },
             };
         },
         picking_detail_options_for_set_destination: function () {
