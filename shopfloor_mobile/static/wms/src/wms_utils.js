@@ -176,20 +176,38 @@ export class WMSUtils {
         });
         return res;
     }
-
+    /**
+     * Get only the 1st line for each package.
+     *
+     * @param {*} lines: list of move lines
+     * @returns 1 line per package.
+     *
+     * Other lines in the same package are attached to the single line
+     * with special attribute `_pack_lines`.
+     */
+    /**
+     * TODO: this func is used only in `checkout.select_line`
+     * to display only one line list item
+     * when you have multiple lines in the same pack.
+     * It's a bit of an hack and it works because
+     * the checkout endpoints will take care of selecting all the lines
+     * when you scan or tap on the line.
+     * We should probably consider to adopt the same approach of `checkout.summary`
+     * where the lines are explicitly grouped by package and show a dropdown.
+     * The dropdown could be optional.
+     */
     only_one_package(lines) {
+        const grouped = this.group_by_pack(lines);
         const res = [];
-        const pkg_seen = [];
-        lines.forEach(function (line) {
-            if (line.package_dest) {
-                if (!pkg_seen.includes(line.package_dest.id)) {
-                    // Got a pack
-                    res.push(line);
-                    pkg_seen.push(line.package_dest.id);
-                }
+        grouped.forEach(function (group) {
+            if (group.pack) {
+                let single_line = group.records[0];
+                single_line._grouped_by_pack = true;
+                single_line._pack_lines = group.records;
+                res.push(single_line);
             } else {
                 // No pack
-                res.push(line);
+                res.push(...group.records);
             }
         });
         return res;
