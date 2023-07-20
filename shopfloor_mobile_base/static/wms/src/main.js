@@ -147,7 +147,7 @@ new Vue({
     },
     methods: {
         getOdoo: function (odoo_params) {
-            let params = _.defaults({}, odoo_params, {
+            let params = {
                 debug: this.demo_mode,
                 base_url: this.app_info.base_url,
                 headers: {
@@ -155,7 +155,8 @@ new Vue({
                     "APP-VERSION": this.app_info.version,
                     "APP-USER-ID": this.user.id,
                 },
-            });
+            };
+            params = _.merge({}, params, odoo_params);
             let OdooClass = null;
             if (this.demo_mode) {
                 OdooClass = OdooMocked;
