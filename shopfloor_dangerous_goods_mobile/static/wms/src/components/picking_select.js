@@ -12,5 +12,11 @@ Vue.component(
 Vue.component(
     "picking-select-line-content"
 ).extendOptions.methods.get_wrapper_klass = function (record) {
-    return record.has_lq_products ? "has-lq-products" : "";
+    let has_lq = record.has_lq_products;
+    // At this point this line could have been grouped by pack
+    // and we might have sibling lines
+    if (!has_lq && record._grouped_by_pack) {
+        has_lq = _.find(record._pack_lines || [], ["has_lq_products", true]);
+    }
+    return has_lq ? "has-lq-products" : "";
 };
