@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 MT Software
+License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="stock_warehouse_flow_view_form" model="ir.ui.view">
+        <field name="name">stock.warehouse.flow.form</field>
+        <field name="model">stock.warehouse.flow</field>
+        <field
+            name="inherit_id"
+            ref="stock_warehouse_flow.stock_warehouse_flow_view_form"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='qty']" position="after">
+                <field
+                    name="packaging_type_ids"
+                    widget="many2many_tags"
+                    attrs="{'required': [('split_method', '=', 'packaging')], 'invisible': [('split_method', '!=', 'packaging')]}"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -47,6 +47,23 @@
                                 widget="domain"
                                 options="{'model': 'stock.move', 'in_dialog': true}"
                             />
+              <field name="split_method" string="Max quantity multiple" />
+              <label
+                                for="qty"
+                                attrs="{'invisible': [('split_method', '!=', 'simple')]}"
+                            />
+              <div name="qty" class="o_row">
+                  <field
+                                    name="qty"
+                                    attrs="{'required': [('split_method', '=', 'simple')], 'invisible': [('split_method', '!=', 'simple')]}"
+                                />
+                  <field
+                                    name="uom_id"
+                                    options="{'no_open': True, 'no_create': True}"
+                                    groups="uom.group_uom"
+                                    attrs="{'required': [('split_method', '=', 'simple')], 'invisible': [('split_method', '!=', 'simple')]}"
+                                />
+              </div>
             </group>
             <group name="to" string="To">
               <field
