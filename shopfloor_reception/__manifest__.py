@@ -11,7 +11,7 @@
     "installable": True,
     "depends": [
         "shopfloor",
-        # TODO: Used to parse return barcodes coming from carriers
+        # Used to parse return barcodes coming from carriers
         "delivery_carrier_return_barcode_pattern",
     ],
     "data": [

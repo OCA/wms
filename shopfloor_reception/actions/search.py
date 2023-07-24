@@ -9,4 +9,6 @@ class SearchAction(Component):
     _inherit = "shopfloor.search.action"
 
     def _get_origin_from_barcode(self, barcode):
-        return self.env["delivery.carrier"]._get_origin_from_barcode(barcode)
+        if self.work.menu.scenario == "reception":
+            carriers = self.env["delivery.carrier"].search([])
+            return carriers._get_origin_from_barcode(barcode)
