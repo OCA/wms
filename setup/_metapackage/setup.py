@@ -62,6 +62,7 @@ setuptools.setup(
         'odoo14-addon-stock_storage_type_buffer',
         'odoo14-addon-stock_storage_type_putaway_abc',
         'odoo14-addon-stock_warehouse_flow',
+        'odoo14-addon-stock_warehouse_flow_product_packaging',
         'odoo14-addon-stock_warehouse_flow_release',
     ],
     classifiers=[
