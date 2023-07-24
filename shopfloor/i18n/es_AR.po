@@ -1124,6 +1124,11 @@ msgid "Restart the operation, someone has canceled it."
 msgstr "Reinicie la operación, alguien la ha cancelado."
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+msgid "Restrict scannable barcode at work selection"
+msgstr ""
+
+#. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_stock_move_line_detailed_operation_tree
 msgid "SF Priority"
 msgstr "Prioridad del Taller"
@@ -1153,11 +1158,6 @@ msgstr "El mismo paquete {} ya está asignado."
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first_is_possible
 msgid "Scan Location Or Pack First Is Possible"
 msgstr "Escanear Ubicación O Paquete Primero es Posible"
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
-msgid "Scan first location or pack"
-msgstr "Escanear ubicación o paquete primero"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1735,6 +1735,18 @@ msgstr ""
 "creación de un pedido pendiente con las líneas restantes."
 
 #. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+msgid ""
+"When checked, the user will be restricted by the type of object barcode  "
+"that he can scan to select the document/transfer/move line to work on."
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid "When choosing an order to pack, do not allow to scan a product."
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_get_work
 msgid ""
 "When enabled the user will have the option to ask for a task to work on."
@@ -1756,13 +1768,11 @@ msgstr ""
 "Al hacer el picking, evite descargar todo el contenedor cuando esté lleno."
 
 #. module: shopfloor
-#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
 msgid ""
-"When selecting work, force the user to first scan a location or pack,then "
-"the product or lot."
+"When selecting a move line, force the user to first scan a package or a "
+"location and not a product or a lot."
 msgstr ""
-"Cuando seleccione un trabajo, fuerza al usuario a escanear primero una "
-"ubicación o paquete, después el producto o lote."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1898,6 +1908,16 @@ msgstr "{} no encontrado en la transferencia actual o ya está en un paquete."
 #, python-format
 msgid "{} {} put in {}"
 msgstr "{} {} poner en {}"
+
+#~ msgid "Scan first location or pack"
+#~ msgstr "Escanear ubicación o paquete primero"
+
+#~ msgid ""
+#~ "When selecting work, force the user to first scan a location or pack,then "
+#~ "the product or lot."
+#~ msgstr ""
+#~ "Cuando seleccione un trabajo, fuerza al usuario a escanear primero una "
+#~ "ubicación o paquete, después el producto o lote."
 
 #, python-format
 #~ msgid "No line to pack found"
