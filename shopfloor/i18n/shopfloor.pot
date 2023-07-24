@@ -1057,6 +1057,11 @@ msgid "Restart the operation, someone has canceled it."
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+msgid "Restrict scannable barcode at work selection"
+msgstr ""
+
+#. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_stock_move_line_detailed_operation_tree
 msgid "SF Priority"
 msgstr ""
@@ -1085,11 +1090,6 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first_is_possible
 msgid "Scan Location Or Pack First Is Possible"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
-msgid "Scan first location or pack"
 msgstr ""
 
 #. module: shopfloor
@@ -1635,6 +1635,18 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+msgid ""
+"When checked, the user will be restricted by the type of object barcode  "
+"that he can scan to select the document/transfer/move line to work on."
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid "When choosing an order to pack, do not allow to scan a product."
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_get_work
 msgid ""
 "When enabled the user will have the option to ask for a task to work on."
@@ -1653,10 +1665,10 @@ msgid "When picking, prevent unloading the whole bin when full."
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
 msgid ""
-"When selecting work, force the user to first scan a location or pack,then "
-"the product or lot."
+"When selecting a move line, force the user to first scan a package or a "
+"location and not a product or a lot."
 msgstr ""
 
 #. module: shopfloor
