@@ -52,6 +52,7 @@ addon | version | maintainers | summary
 [shopfloor_single_product_transfer](shopfloor_single_product_transfer/) | 14.0.2.1.0 | [![mmequignon](https://github.com/mmequignon.png?size=30px)](https://github.com/mmequignon) | Move an item from one location to another.
 [shopfloor_single_product_transfer_force_package](shopfloor_single_product_transfer_force_package/) | 14.0.1.0.0 | [![JuMiSanAr](https://github.com/JuMiSanAr.png?size=30px)](https://github.com/JuMiSanAr) | Force to select package if location already contains packages.
 [shopfloor_single_product_transfer_mobile](shopfloor_single_product_transfer_mobile/) | 14.0.1.1.0 | [![JuMiSanAr](https://github.com/JuMiSanAr.png?size=30px)](https://github.com/JuMiSanAr) | Mobile frontend for single product transfer scenario
+[shopfloor_single_product_transfer_unique_order_at_location](shopfloor_single_product_transfer_unique_order_at_location/) | 14.0.1.0.0 | [![TDu](https://github.com/TDu.png?size=30px)](https://github.com/TDu) | Prevent to mix sales order on same consolidation location.
 [shopfloor_workstation](shopfloor_workstation/) | 14.0.1.3.0 |  | Manage warehouse workstation with barcode scanners
 [shopfloor_workstation_label_printer](shopfloor_workstation_label_printer/) | 14.0.1.1.0 |  | Adds a label printer configuration to the user and shopfloor workstation.
 [shopfloor_workstation_mobile](shopfloor_workstation_mobile/) | 14.0.1.0.1 |  | Shopfloor mobile app integration for workstation
@@ -74,6 +75,7 @@ addon | version | maintainers | summary
 [stock_storage_type](stock_storage_type/) | 14.0.1.12.0 |  | Manage packages and locations storage types
 [stock_storage_type_buffer](stock_storage_type_buffer/) | 14.0.1.3.0 |  | Exclude storage locations from put-away if their buffer is full
 [stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 14.0.1.0.0 |  | Advanced storage strategy ABC for WMS
+[stock_unique_order_per_location](stock_unique_order_per_location/) | 14.0.1.0.0 | [![TDu](https://github.com/TDu.png?size=30px)](https://github.com/TDu) | Prevent to mix sales order on same consolidation location.
 [stock_warehouse_flow](stock_warehouse_flow/) | 14.0.2.0.0 |  | Configure routing flow for stock moves
 [stock_warehouse_flow_product_packaging](stock_warehouse_flow_product_packaging/) | 14.0.2.0.0 | [![mt-software-de](https://github.com/mt-software-de.png?size=30px)](https://github.com/mt-software-de) | Configure packaging types on routing flows for stock moves
 [stock_warehouse_flow_release](stock_warehouse_flow_release/) | 14.0.2.0.0 |  | Warehouse flows integrated with Operation Release
