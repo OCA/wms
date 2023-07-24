@@ -50,7 +50,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "name": location.name,
             "barcode": location.name,
             "operation_progress": {
-                "done": 18.0,
+                "done": 16.0,
                 "to_do": 165.0,
             },
         }

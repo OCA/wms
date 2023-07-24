@@ -20,17 +20,19 @@ const SingleProductTransfer = {
             />
             <template v-if="state_is('select_product')">
                 <item-detail-card
-                    v-if="state.data.location"
-                    :key="make_state_component_key(['location_src', state.data.location.id])"
-                    :record="state.data.location"
+                    v-if="get_select_product_package_or_location_data()"
+                    :key="make_state_component_key(['location-or-package', get_select_product_package_or_location_data().id])"
+                    :record="get_select_product_package_or_location_data()"
                     :card_color="utils.colors.color_for('screen_step_done')"
-                />
-                <item-detail-card
-                    v-if="state.data.package"
-                    :key="make_state_component_key(['package', state.data.package.id])"
-                    :record="state.data.package"
-                    :card_color="utils.colors.color_for('screen_step_done')"
-                />
+                >
+                    <template v-slot:after_details v-if="display_operations_progress()">
+                        <linear-progress
+                            :done_qty="get_select_product_package_or_location_data().operation_progress.done"
+                            :todo_qty="get_select_product_package_or_location_data().operation_progress.to_do"
+                            :options="linear_progress_options_for_select_product()"
+                        />
+                    </template>
+                </item-detail-card>
             </template>
             <template v-if="state_is('set_quantity')">
                 <item-detail-card
@@ -151,6 +153,13 @@ const SingleProductTransfer = {
                 fields: [{path: "location_src.name", label: "Source Location"}],
             };
         },
+        linear_progress_options_for_select_product: function () {
+            return {
+                done_label: "Ongoing",
+                todo_label: "Available",
+                color: "lime",
+            };
+        },
         get_select_product_scan_params: function (scanned) {
             const params = {
                 barcode: scanned.text,
@@ -160,6 +169,25 @@ const SingleProductTransfer = {
             const state_package = _.result(this.state.data, "package", false);
             params.package_id = state_package.id;
             return params;
+        },
+        get_select_product_package_or_location_data: function () {
+            if (this.state.data.package) {
+                return this.state.data.package;
+            }
+            return this.state.data.location;
+        },
+        display_operations_progress: function () {
+            const operation_progress = this._get_operation_progress_data();
+            if (operation_progress) {
+                return operation_progress.to_do > 0;
+            }
+        },
+        _get_operation_progress_data: function () {
+            return _.result(
+                this.get_select_product_package_or_location_data(),
+                "operation_progress",
+                false
+            );
         },
     },
     data: function () {

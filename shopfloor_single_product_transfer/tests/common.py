@@ -113,12 +113,16 @@ class CommonCase(BaseCommonCase):
     # Data methods
 
     def _data_for_location(self, location):
-        return self.data.location(location)
+        return self.data.location(location, with_operation_progress=True)
 
     def _data_for_move_line(self, move_line):
         return self.data.move_line(move_line)
 
-    def _data_for_package(self, package):
+    def _data_for_package(self, package, with_operation_progress_src=False):
+        if with_operation_progress_src:
+            return self.data.package(
+                package, with_operation_progress_src=with_operation_progress_src
+            )
         return self.data.package(package)
 
     @classmethod
