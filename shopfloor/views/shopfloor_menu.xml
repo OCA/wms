@@ -114,6 +114,25 @@
                 >
                   <field name="scan_location_or_pack_first_is_possible" invisible="1" />
                   <field name="scan_location_or_pack_first" />
+                  <div
+                        class="text-muted"
+                        attrs="{'invisible': [('scenario_key', '!=', 'checkout')]}"
+                    >
+                    When choosing an order to pack, do not allow to scan a product.
+                  </div>
+                  <div
+                        class="text-muted"
+                        attrs="{'invisible': [('scenario_key', '!=', 'zone_picking')]}"
+                    >
+                    When selecting a move line, force the user to first scan a package or a location and not a product or a lot.
+                  </div>
+                  <div
+                        class="text-muted"
+                        attrs="{'invisible': [('scenario_key', '!=', 'cluster_picking')]}"
+                    >
+                    When selecting a move line, force the user to first scan a package or a location and not a product or a lot.
+                  </div>
+
               </group>
               <group
                     name="auto_post_line"
