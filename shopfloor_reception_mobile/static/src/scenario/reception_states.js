@@ -217,7 +217,7 @@ export const reception_states = function () {
                 );
             },
             on_back: () => {
-                this.state_to("set_lot");
+                this.state_to("select_move");
                 this.reset_notification();
             },
         },

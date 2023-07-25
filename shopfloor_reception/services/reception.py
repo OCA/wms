@@ -526,6 +526,13 @@ class Reception(Component):
         if move.product_uom_qty - move.quantity_done < 1 and not line_without_package:
             return self.msg_store.move_already_done()
 
+    def _set_quantity__check_quantity_done(self, selected_line):
+        move = selected_line.move_id
+        max_qty_done = move.product_uom_qty
+        qty_done = sum(move.move_line_ids.mapped("qty_done"))
+        rounding = selected_line.product_uom_id.rounding
+        return float_compare(qty_done, max_qty_done, precision_rounding=rounding)
+
     def _set_quantity__by_product(self, picking, selected_line, product):
         # This is a general rule here. whether the return has been created from
         # shopfloor or not, you cannot return more than what was shipped.
@@ -534,7 +541,6 @@ class Reception(Component):
             "qty_done": selected_line.qty_done,
         }
         is_return_line = bool(selected_line.move_id.origin_returned_move_id)
-        max_qty_done = selected_line.move_id.product_uom_qty
         if product.id != selected_line.product_id.id:
             return self._response_for_set_quantity(
                 picking,
@@ -548,10 +554,7 @@ class Reception(Component):
             # If we have an error, return it, since this is also true for return lines
             if message_type == "error":
                 return response
-            rounding = selected_line.product_uom_id.rounding
-            compare = float_compare(
-                selected_line.qty_done, max_qty_done, precision_rounding=rounding
-            )
+            compare = self._set_quantity__check_quantity_done(selected_line)
             # We cannot set a qty_done superior to what has initally been sent
             if compare == 1:
                 # If so, reset selected_line to its previous state, and return an error
@@ -570,7 +573,6 @@ class Reception(Component):
             "qty_done": selected_line.qty_done,
         }
         is_return_line = bool(selected_line.move_id.origin_returned_move_id)
-        max_qty_done = selected_line.move_id.product_uom_qty
         if packaging.product_id.id != selected_line.product_id.id:
             return self._response_for_set_quantity(
                 picking,
@@ -584,11 +586,7 @@ class Reception(Component):
             # If we have an error, return it, since this is also true for return lines
             if message_type == "error":
                 return response
-            # We cannot set a qty_done superior to what has initally been sent
-            rounding = selected_line.product_uom_id.rounding
-            compare = float_compare(
-                selected_line.qty_done, max_qty_done, precision_rounding=rounding
-            )
+            compare = self._set_quantity__check_quantity_done(selected_line)
             # We cannot set a qty_done superior to what has initally been sent
             if compare == 1:
                 # If so, reset selected_line to its previous state, and return an error
@@ -614,20 +612,11 @@ class Reception(Component):
                     picking, selected_line, message=message
                 )
             quantity = selected_line.qty_done
-            __, qty_check = selected_line._split_qty_to_be_done(
-                quantity,
-                lot_id=False,
-                shopfloor_user_id=False,
-                expiration_date=False,
+            response = self._set_quantity__process__set_qty_and_split(
+                picking, selected_line, quantity
             )
-            if qty_check == "greater":
-                return self._response_for_set_quantity(
-                    picking,
-                    selected_line,
-                    message=self.msg_store.unable_to_pick_more(
-                        selected_line.product_uom_qty
-                    ),
-                )
+            if response:
+                return response
             # If the scanned package has a valid destination,
             # set both package and destination on the package.
             selected_line.result_package_id = package
@@ -748,9 +737,43 @@ class Reception(Component):
             message=message,
         )
 
+    def _align_product_uom_qties(self, move):
+        # This method aligns product uom qties on move lines.
+        # In the shopfloor context, we might have multiple users working at
+        # the same time on the same move. This is done by creating one move line
+        # per user, with shopfloor_user_id = user.
+        # This method ensures that the product_uom_qty reflects what remains to
+        # be done, so we can display coherent numbers on the UI.
+
+        # for a given line, product_uom_qty is computed as this:
+        # remaining_todo = move.product_uom_qty - move.quantity_done
+        # line.product_uom_qty = line.qty_done + remaining_todo
+
+        # However, if the overall qty_done is > to the move's product_uom_qty,
+        # then we're not updating the line's product_uom_qty.
+
+        # TODO, do we need to check move's state?
+        # If move is already done, do not update lines qties
+        # if move.state in ("done", "cancel"):
+        #     return
+
+        qty_todo = move.product_uom_qty
+        qty_done = sum(move.move_line_ids.mapped("qty_done"))
+        rounding = move.product_id.uom_id.rounding
+        compare = float_compare(qty_done, qty_todo, precision_rounding=rounding)
+        if compare < 1:  # If qty done <= qty todo, align qty todo on move lines
+            remaining_todo = qty_todo - qty_done
+            # if we didn't bypass reservation update, the quant reservation
+            # would be reduced as much as the deduced quantity, which is wrong
+            # as we only moved the quantity to a new move line
+            lines = move.move_line_ids.with_context(bypass_reservation_update=True)
+            for line in lines:
+                line.product_uom_qty = line.qty_done + remaining_todo
+
     def _response_for_set_quantity(
         self, picking, line, message=None, asking_confirmation=False
     ):
+        self._align_product_uom_qties(line.move_id)
         return self._response(
             next_state="set_quantity",
             data={
@@ -1091,7 +1114,7 @@ class Reception(Component):
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
             )
-        if quantity:
+        if quantity is not None:
             # We set qty_done to be equal to the qty of the picker
             # at the moment of the scan.
             response = self._set_quantity__assign_quantity(
@@ -1107,6 +1130,28 @@ class Reception(Component):
             )
         return self._response_for_set_quantity(picking, selected_line)
 
+    def _set_quantity__process__set_qty_and_split(self, picking, line, quantity):
+        move = line.move_id
+        sum(move.move_line_ids.mapped("qty_done"))
+        savepoint = self._actions_for("savepoint").new()
+        line.qty_done = quantity
+        compare = self._set_quantity__check_quantity_done(line)
+        if compare == 1:
+            # If move's qty_done > to move's qty_todo, rollback and return an error
+            savepoint.rollback()
+            return self._response_for_set_quantity(
+                picking, line, message=self.msg_store.unable_to_pick_qty()
+            )
+        savepoint.release()
+        # Only if total_qty_done < qty_todo, we split the move line
+        if compare == -1:
+            default_values = {
+                "lot_id": False,
+                "shopfloor_user_id": False,
+                "expiration_date": False,
+            }
+            line._split_qty_to_be_done(quantity, **default_values)
+
     def process_with_existing_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
@@ -1115,18 +1160,11 @@ class Reception(Component):
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
             )
-        __, qty_check = selected_line._split_qty_to_be_done(
-            quantity, lot_id=False, shopfloor_user_id=False, expiration_date=False
+        response = self._set_quantity__process__set_qty_and_split(
+            picking, selected_line, quantity
         )
-        if qty_check == "greater":
-            return self._response_for_set_quantity(
-                picking,
-                selected_line,
-                message=self.msg_store.unable_to_pick_more(
-                    selected_line.product_uom_qty
-                ),
-            )
-        selected_line.qty_done = quantity
+        if response:
+            return response
         return self._response_for_select_dest_package(picking, selected_line)
 
     def process_with_new_pack(self, picking_id, selected_line_id, quantity):
@@ -1137,18 +1175,11 @@ class Reception(Component):
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
             )
-        __, qty_check = selected_line._split_qty_to_be_done(
-            quantity, lot_id=False, shopfloor_user_id=False, expiration_date=False
+        response = self._set_quantity__process__set_qty_and_split(
+            picking, selected_line, quantity
         )
-        if qty_check == "greater":
-            return self._response_for_set_quantity(
-                picking,
-                selected_line,
-                message=self.msg_store.unable_to_pick_more(
-                    selected_line.product_uom_qty
-                ),
-            )
-        selected_line.qty_done = quantity
+        if response:
+            return response
         picking._put_in_pack(selected_line)
         return self._response_for_set_destination(picking, selected_line)
 
@@ -1160,18 +1191,11 @@ class Reception(Component):
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
             )
-        __, qty_check = selected_line._split_qty_to_be_done(
-            quantity, lot_id=False, shopfloor_user_id=False, expiration_date=False
+        response = self._set_quantity__process__set_qty_and_split(
+            picking, selected_line, quantity
         )
-        if qty_check == "greater":
-            return self._response_for_set_quantity(
-                picking,
-                selected_line,
-                message=self.msg_store.unable_to_pick_more(
-                    selected_line.product_uom_qty
-                ),
-            )
-        selected_line.qty_done = quantity
+        if response:
+            return response
         return self._response_for_set_destination(picking, selected_line)
 
     def _post_line(self, selected_line):
@@ -1507,13 +1531,13 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {"set_lot", "set_quantity"}
 
     def _process_with_existing_pack_next_states(self):
-        return {"select_dest_package"}
+        return {"set_quantity", "select_dest_package"}
 
     def _process_with_new_pack_next_states(self):
-        return {"set_destination"}
+        return {"set_quantity", "set_destination"}
 
     def _process_without_pack_next_states(self):
-        return {"set_destination"}
+        return {"set_quantity", "set_destination"}
 
     # SCHEMAS
 

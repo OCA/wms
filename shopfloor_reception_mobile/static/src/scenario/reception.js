@@ -75,7 +75,7 @@ const Reception = {
                     v-for="record in ordered_moves"
                     :card_color="move_card_color(record)"
                     :record="record"
-                    :options="picking_detail_options_for_select_move()"
+                    :options="picking_detail_options_for_select_move(record)"
                     :key="make_state_component_key(['reception-moves-select-move', record.id])"
                 />
                 <div class="button-list button-vertical-list full">
@@ -344,7 +344,7 @@ const Reception = {
                 ],
             };
         },
-        picking_detail_options_for_select_move: function () {
+        picking_detail_options_for_select_move: function (move) {
             return {
                 key_title: "product.display_name",
                 fields: [

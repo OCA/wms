@@ -682,6 +682,12 @@ class MessageAction(Component):
             "body": _("You must not pick more than {} units.").format(quantity),
         }
 
+    def unable_to_pick_qty(self):
+        return {
+            "message_type": "error",
+            "body": _("You cannot process that much units."),
+        }
+
     def lot_replaced_by_lot(self, old_lot, new_lot):
         return {
             "message_type": "success",
