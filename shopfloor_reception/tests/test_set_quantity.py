@@ -201,9 +201,9 @@ class TestSetQuantity(CommonCase):
             self.package_with_location_child_of_dest,
         )
         self.assertEqual(selected_move_line.location_dest_id, self.dispatch_location)
-        data = self.data.picking(picking, with_progress=True)
-        data.update({"moves": self.data.moves(picking.move_lines)})
-        self.assert_response(response, next_state="select_move", data={"picking": data})
+        self.assert_response(
+            response, next_state="select_move", data=self._data_for_select_move(picking)
+        )
 
     def test_scan_package_with_destination_not_child_of_dest_location(self):
         # next step is set_quantity with error
@@ -275,9 +275,9 @@ class TestSetQuantity(CommonCase):
             },
         )
         self.assertEqual(selected_move_line.location_dest_id, self.dispatch_location)
-        data = self.data.picking(picking, with_progress=True)
-        data.update({"moves": self.data.moves(picking.move_lines)})
-        self.assert_response(response, next_state="select_move", data={"picking": data})
+        self.assert_response(
+            response, next_state="select_move", data=self._data_for_select_move(picking)
+        )
 
     def test_scan_location_not_child_of_dest_location(self):
         picking = self._create_picking()

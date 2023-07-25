@@ -35,7 +35,7 @@ class TestSelectDocument(CommonCase):
         self.assert_response(
             response,
             next_state="select_move",
-            data={"picking": self._data_for_picking_with_moves(picking)},
+            data=self._data_for_select_move(picking),
         )
 
     def test_scan_picking_origin_multiple_pickings(self):
@@ -78,7 +78,7 @@ class TestSelectDocument(CommonCase):
         self.assert_response(
             response,
             next_state="select_move",
-            data={"picking": self._data_for_picking_with_moves(picking_today)},
+            data=self._data_for_select_move(picking_today),
         )
 
     def test_scan_picking_origin_one_picking(self):
@@ -92,7 +92,7 @@ class TestSelectDocument(CommonCase):
         self.assert_response(
             response,
             next_state="select_move",
-            data={"picking": self._data_for_picking_with_moves(picking)},
+            data=self._data_for_select_move(picking),
         )
 
     def test_scan_packaging_multiple_pickings(self):

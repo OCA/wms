@@ -65,14 +65,14 @@ class CommonCase(BaseCommonCase):
             res.append(self._data_for_picking_with_line(picking))
         return res
 
-    def _data_for_picking_with_moves(self, picking):
-        picking_data = self._data_for_picking(picking)
+    def _data_for_picking_with_moves(self, picking, with_progress=True):
+        picking_data = self._data_for_picking(picking, with_progress)
         moves_data = self._data_for_moves(picking.move_lines)
         picking_data.update({"moves": moves_data})
         return picking_data
 
-    def _data_for_picking(self, picking):
-        return self.data.picking(picking, with_progress=True)
+    def _data_for_picking(self, picking, with_progress=True):
+        return self.data.picking(picking, with_progress=with_progress)
 
     def _data_for_pickings(self, pickings):
         res = []
@@ -88,6 +88,13 @@ class CommonCase(BaseCommonCase):
         for move in moves:
             res.append(self._data_for_move(move))
         return res
+
+    def _data_for_select_move(self, picking, with_progress=True):
+        picking_data = self._data_for_picking_with_moves(picking, with_progress)
+        data = {
+            "picking": picking_data,
+        }
+        return data
 
     def setUp(self):
         super().setUp()
