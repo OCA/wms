@@ -917,6 +917,11 @@ class Reception(Component):
             return handler(picking, search_result.record)
         return self._scan_line__fallback(picking, barcode)
 
+    def manual_select_move(self, move_id):
+        move = self.env["stock.move"].browse(move_id)
+        picking = move.picking_id
+        return self._scan_line__find_or_create_line(picking, move)
+
     def done_action(self, picking_id, confirmation=False):
         """Mark a picking as done
 
@@ -1362,6 +1367,11 @@ class ShopfloorReceptionValidator(Component):
             "barcode": {"required": True, "type": "string"},
         }
 
+    def manual_select_move(self):
+        return {
+            "move_id": {"required": True, "type": "integer"},
+        }
+
     def set_lot(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
@@ -1659,6 +1669,9 @@ class ShopfloorReceptionValidatorResponse(Component):
         )
 
     def scan_line(self):
+        return self._response_schema(next_states=self._scan_line_next_states())
+
+    def manual_select_move(self):
         return self._response_schema(next_states=self._scan_line_next_states())
 
     def set_lot(self):
