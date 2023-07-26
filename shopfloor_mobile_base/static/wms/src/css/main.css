@@ -457,6 +457,10 @@ main.v-content > .v-content__wrap > .header .container {
     line-height: 1.1rem;
 }
 
+.v-card .v-card__title-smaller {
+    font-size: 0.9rem;
+}
+
 /* TODO: likely to be applied to all */
 .list .v-list-item {
     border-bottom: 1px solid #ccc;
