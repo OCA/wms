@@ -68,47 +68,17 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
         )
 
     def assert_stock_issue_inventories(
-        self, issue_picking, location, product, remaining_qty, lot=None
+        self, location, product, remaining_qty, lot=None
     ):
-        inventories = self.env["stock.inventory"].search([], order="id desc", limit=2)
-        product_desc = product.name
+        domain = [
+            ("location_id", "=", location.id),
+            ("product_id", "=", product.id),
+        ]
         if lot:
-            product_desc = "{} - Lot: {}".format(product_desc, lot.name)
-        self.assertRecordValues(
-            inventories,
-            [
-                {
-                    # this one changed the quantity in the location to
-                    # the quantity of the quant checked above
-                    "state": "done",
-                    "name": "{picking.name} stock correction in"
-                    " location {location.name} for {product_desc}".format(
-                        picking=issue_picking,
-                        location=location,
-                        product_desc=product_desc,
-                    ),
-                },
-                {
-                    # this one is draft and empty, has to be done by a user
-                    "state": "draft",
-                    "name": "Control stock issue in location {} for {}".format(
-                        location.name, product_desc
-                    ),
-                },
-            ],
-        )
-        self.assertRecordValues(
-            inventories[0].line_ids,
-            [
-                {
-                    "product_id": product.id,
-                    "location_id": location.id,
-                    "product_qty": remaining_qty,
-                    "package_id": False,
-                    "lot_id": lot.id if lot else False,
-                }
-            ],
-        )
+            domain.append(("lot_id", "=", lot.id))
+        quant = self.env["stock.quant"].search(domain, order="id desc", limit=1)
+        self.assertEqual(quant.quantity, remaining_qty)
+        self.assertFalse(quant.inventory_quantity_set)
 
     def test_stock_issue_with_other_batch(self):
         self._update_qty_in_location(self.shelf1, self.product_a, 25)
@@ -156,14 +126,13 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
             + sum(
                 self.batch_other.picking_ids.move_line_ids.filtered(
                     lambda l: l.location_id == self.shelf2
-                ).mapped("product_uom_qty")
+                ).mapped("reserved_uom_qty")
             )
         )
         # we should have a quant with 20 quantity and 20 reserved
         # (5 for the other batch and 15 qty_done in this batch)
         self.assert_location_qty_and_reserved(self.shelf2, expected_reserved_qty)
         self.assert_stock_issue_inventories(
-            self.move3.picking_id,
             self.shelf2,
             self.move3.product_id,
             expected_reserved_qty,
@@ -238,9 +207,7 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
         # since we declared the stock issue without picking anything, its
         # quantity should be zero
         self.assert_location_qty_and_reserved(self.shelf2, 0)
-        self.assert_stock_issue_inventories(
-            self.move3.picking_id, self.shelf2, self.move3.product_id, 0
-        )
+        self.assert_stock_issue_inventories(self.shelf2, self.move3.product_id, 0)
 
     def test_stock_issue_lot(self):
         lot_a = self.env["stock.lot"].create(
@@ -305,7 +272,6 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
             self.shelf2, expected_reserved_qty, lot=lot_b
         )
         self.assert_stock_issue_inventories(
-            self.move3.picking_id,
             self.shelf2,
             self.move3.product_id,
             expected_reserved_qty,

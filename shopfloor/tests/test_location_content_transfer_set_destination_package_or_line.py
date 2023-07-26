@@ -52,6 +52,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
                 }
             )
         )
+        cls.warehouse = cls.env.ref("stock.warehouse0")
 
     def test_set_destination_package_wrong_parameters(self):
         """Wrong 'location' and 'package_level_id' parameters, redirect the
@@ -196,6 +197,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         next_move = move.copy(
             {
                 "picking_id": False,
+                "picking_type_id": self.warehouse.out_type_id.id,
                 "location_id": move.location_dest_id.id,
                 "location_dest_id": self.customer_location.id,
                 "move_orig_ids": [(6, 0, move.ids)],
@@ -384,6 +386,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         next_move = move.copy(
             {
                 "picking_id": False,
+                "picking_type_id": self.warehouse.out_type_id.id,
                 "location_id": move.location_dest_id.id,
                 "location_dest_id": self.customer_location.id,
                 "move_orig_ids": [(6, 0, move.ids)],

@@ -284,6 +284,7 @@ class StockMoveLine(models.Model):
 
         # if the new package has less quantities, assign will create new move
         # lines
+        self.move_id._action_confirm()
         self.move_id._action_assign()
 
         # Find other available goods for the lines which were using the

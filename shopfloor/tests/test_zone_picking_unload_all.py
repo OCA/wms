@@ -175,10 +175,10 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
     def test_set_destination_all_partial_qty_done_ok(self):
         zone_location = self.zone_location
         picking_type = self.picking6.picking_type_id
-        move_g = self.picking6.move_lines.filtered(
+        move_g = self.picking6.move_ids.filtered(
             lambda m: m.product_id == self.product_g
         )
-        move_h = self.picking6.move_lines.filtered(
+        move_h = self.picking6.move_ids.filtered(
             lambda m: m.product_id == self.product_h
         )
         self.assertEqual(move_g.state, "assigned")
@@ -217,7 +217,7 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         self.assertEqual(backorder, self.picking6)
         self.assertEqual(backorder.state, "confirmed")
         self.assertEqual(backorder.move_ids.product_id, self.product_h)
-        self.assertEqual(backorder.move_ids.reserved_uom_qty, 3)
+        self.assertEqual(backorder.move_ids.product_uom_qty, 3)
         self.assertFalse(backorder.move_line_ids)
         # buffer should be empty
         buffer_lines = self.service._find_buffer_move_lines()

@@ -25,7 +25,7 @@ class CheckoutSetQtyCommonCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         super().setUp()
         # we assume we have called /select_line on pack one, so by default, we
         # expect the lines for product a and b to have their qty_done set to
-        # their product_uom_qty at the start of the tests
+        # their reserved_uom_qty at the start of the tests
         self.selected_lines = self.moves_pack1.move_line_ids
         self.deselected_lines = self.moves_pack2.move_line_ids
         self.service._select_lines(self.selected_lines)
@@ -96,12 +96,12 @@ class CheckoutSetLineQtyCase(CheckoutSetQtyCommonCase):
                 "move_line_id": line_to_set.id,
             },
         )
-        self.assertEqual(line_to_set.qty_done, line_to_set.product_uom_qty)
+        self.assertEqual(line_to_set.qty_done, line_to_set.reserved_uom_qty)
         self.assertEqual(line_no_qty.qty_done, 0)
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line_to_set: line_to_set.product_uom_qty, line_no_qty: 0},
+            {line_to_set: line_to_set.reserved_uom_qty, line_no_qty: 0},
         )
 
     def test_set_line_qty_not_found(self):
@@ -146,11 +146,11 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             },
         )
         self.assertEqual(line_to_change.qty_done, new_qty)
-        self.assertEqual(line_keep_qty.qty_done, line_keep_qty.product_uom_qty)
+        self.assertEqual(line_keep_qty.qty_done, line_keep_qty.reserved_uom_qty)
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line_to_change: new_qty, line_keep_qty: line_keep_qty.product_uom_qty},
+            {line_to_change: new_qty, line_keep_qty: line_keep_qty.reserved_uom_qty},
         )
 
     def test_set_custom_qty_not_found(self):
@@ -194,7 +194,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line1: line1.product_uom_qty + 1, line2: line2.product_uom_qty},
+            {line1: line1.reserved_uom_qty + 1, line2: line2.reserved_uom_qty},
             message={
                 "body": "Please note that the scanned quantity "
                 "is higher than the maximum allowed.",
@@ -241,7 +241,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             },
         )
         self.assertEqual(line_to_change.qty_done, new_qty)
-        self.assertEqual(line_keep_qty.qty_done, line_keep_qty.product_uom_qty)
+        self.assertEqual(line_keep_qty.qty_done, line_keep_qty.reserved_uom_qty)
         new_lines = [
             x for x in self.moves_pack1.move_line_ids if x not in selected_lines
         ]
@@ -252,6 +252,6 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             self.moves_pack1.move_line_ids,
             {
                 line_to_change: new_qty,
-                line_keep_qty: line_keep_qty.product_uom_qty,
+                line_keep_qty: line_keep_qty.reserved_uom_qty,
             },
         )

@@ -49,7 +49,6 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
         move_line = self.picking1.move_line_ids[0]
-        location = move_line.location_id
         move = move_line.move_id
         response = self.service.dispatch(
             "stock_issue",
@@ -64,24 +63,6 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
             picking_type,
             move_lines,
         )
-        # Check that the inventory exists
-        inventory = self.env["stock.inventory"].search(
-            [
-                (
-                    "name",
-                    "ilike",
-                    "{} stock correction in location {}".format(
-                        move.picking_id.name, location.name
-                    ),
-                ),
-                ("state", "=", "done"),
-                ("line_ids.location_id", "in", location.ids),
-                ("line_ids.product_id", "in", move.product_id.ids),
-            ]
-        )
-        self.assertTrue(inventory)
-        self.assertEqual(inventory.line_ids.product_id, move.product_id)
-        self.assertEqual(inventory.line_ids.reserved_qty, 0)
 
     def test_stock_issue2(self):
         """Once the stock issue is done, the move has been reserved again."""
@@ -122,7 +103,6 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
         zone_location = self.zone_location
         picking_type = self.picking1.picking_type_id
         move_line = self.picking1.move_line_ids[0]
-        location = move_line.location_id
         move = move_line.move_id
         # Put some quantity in another location to get a new reservations from there
         self._update_qty_in_location(self.zone_sublocation2, move.product_id, 10)
@@ -139,21 +119,3 @@ class ZonePickingStockIssueCase(ZonePickingCommonCase):
             picking_type,
             move.move_line_ids,
         )
-        # Check the inventory
-        inventory = self.env["stock.inventory"].search(
-            [
-                (
-                    "name",
-                    "ilike",
-                    "{} stock correction in location {}".format(
-                        move.picking_id.name, location.name
-                    ),
-                ),
-                ("state", "=", "done"),
-                ("line_ids.location_id", "in", location.ids),
-                ("line_ids.product_id", "in", move.product_id.ids),
-            ]
-        )
-        self.assertTrue(inventory)
-        self.assertEqual(inventory.line_ids.product_id, move.product_id)
-        self.assertEqual(inventory.line_ids.reserved_qty, 0)

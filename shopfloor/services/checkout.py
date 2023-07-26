@@ -106,7 +106,7 @@ class Checkout(Component):
 
     def _response_for_select_dest_package(self, picking, move_lines, message=None):
         packages = picking.mapped("move_line_ids.result_package_id").filtered(
-            "product_packaging_id"
+            "package_type_id"
         )
         if not packages:
             # FIXME: do we want to move from 'select_dest_package' to
@@ -812,7 +812,7 @@ class Checkout(Component):
         delivery packaging set on it).
         """
         existing_packages = picking.mapped("move_line_ids.result_package_id").filtered(
-            "packaging_id"
+            "package_type_id"
         )
         return package in existing_packages
 
@@ -977,7 +977,7 @@ class Checkout(Component):
         return self._scan_package_action_from_lot(picking, selection_lines, lot, **kw)
 
     def _scan_package_action_from_package(self, picking, selected_lines, package, **kw):
-        if not package.packaging_id:
+        if not package.package_type_id:
             return self._response_for_select_package(
                 picking,
                 selected_lines,
@@ -1017,15 +1017,12 @@ class Checkout(Component):
         return actions.packaging_valid_for_carrier(packaging, carrier)
 
     def _get_available_delivery_packaging(self, picking):
-        model = self.env["product.packaging"]
+        model = self.env["stock.package.type"]
         carrier = picking.ship_carrier_id or picking.carrier_id
         if not carrier:
             return model.browse()
         return model.search(
-            [
-                ("product_id", "=", False),
-                ("package_carrier_type", "=", carrier.delivery_type or "none"),
-            ],
+            [("package_carrier_type", "=", carrier.delivery_type or "none")],
             order="name",
         )
 
@@ -1054,7 +1051,7 @@ class Checkout(Component):
             return response
         return self._response_for_select_delivery_packaging(picking, delivery_packaging)
 
-    def new_package(self, picking_id, selected_line_ids, packaging_id=None):
+    def new_package(self, picking_id, selected_line_ids, product_packaging_id=None):
         """Add all selected lines in a new package
 
         It creates a new package and set it as the destination package of all
@@ -1072,8 +1069,10 @@ class Checkout(Component):
         if message:
             return self._response_for_select_document(message=message)
         packaging = None
-        if packaging_id:
-            packaging = self.env["product.packaging"].browse(packaging_id).exists()
+        if product_packaging_id:
+            packaging = (
+                self.env["stock.package.type"].browse(product_packaging_id).exists()
+            )
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         return self._create_and_assign_new_packaging(picking, selected_lines, packaging)
 
@@ -1227,7 +1226,7 @@ class Checkout(Component):
         return self._response_for_summary(picking)
 
     def _get_allowed_packaging(self):
-        return self.env["product.packaging"].search([("product_id", "=", False)])
+        return self.env["stock.package.type"].search([])
 
     def list_packaging(self, picking_id, package_id):
         """List the available package types for a package
@@ -1247,7 +1246,7 @@ class Checkout(Component):
         packaging_list = self._get_allowed_packaging()
         return self._response_for_change_packaging(picking, package, packaging_list)
 
-    def set_packaging(self, picking_id, package_id, packaging_id):
+    def set_packaging(self, picking_id, package_id, product_packaging_id):
         """Set a package type on a package
 
         Transitions:
@@ -1260,7 +1259,7 @@ class Checkout(Component):
             return self._response_for_select_document(message=message)
 
         package = self.env["stock.quant.package"].browse(package_id).exists()
-        packaging = self.env["product.packaging"].browse(packaging_id).exists()
+        packaging = self.env["stock.package.type"].browse(product_packaging_id).exists()
         if not (package and packaging):
             return self._response_for_summary(
                 picking, message=self.msg_store.record_not_found()
@@ -1461,7 +1460,11 @@ class ShopfloorCheckoutValidator(Component):
                 "required": True,
                 "schema": {"coerce": to_int, "required": True, "type": "integer"},
             },
-            "packaging_id": {"coerce": to_int, "required": False, "type": "integer"},
+            "product_packaging_id": {
+                "coerce": to_int,
+                "required": False,
+                "type": "integer",
+            },
         }
 
     def no_package(self):
@@ -1512,7 +1515,11 @@ class ShopfloorCheckoutValidator(Component):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "package_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "packaging_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "product_packaging_id": {
+                "coerce": to_int,
+                "required": True,
+                "type": "integer",
+            },
         }
 
     def cancel_line(self):

@@ -145,7 +145,7 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
         return (
             picking.mapped("move_line_ids.package_id")
             | picking.mapped("move_line_ids.result_package_id")
-        ).filtered("packaging_id")
+        ).filtered("package_type_id")
 
     def _assert_package_set(self, response):
         self.assertRecordValues(
