@@ -19,10 +19,12 @@
         "views/res_partner.xml",
         "views/stock_release_channel_views.xml",
         "views/stock_picking_views.xml",
-        "data/stock_release_channel_data.xml",
         "data/queue_job_data.xml",
         "data/ir_cron_data.xml",
         "security/stock_release_channel.xml",
+    ],
+    "demo": [
+        "demo/stock_release_channel.xml",
     ],
     "assets": {
         "web.assets_backend": [
