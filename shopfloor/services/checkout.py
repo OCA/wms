@@ -464,7 +464,9 @@ class Checkout(Component):
             picking, message=self.msg_store.barcode_not_found()
         )
 
-    def _select_lines_from_package(self, picking, selection_lines, package, **kw):
+    def _select_lines_from_package(
+        self, picking, selection_lines, package, prefill_qty=0, **kw
+    ):
         lines = selection_lines.filtered(
             lambda l: l.package_id == package and not l.shopfloor_checkout_done
         )
@@ -478,7 +480,7 @@ class Checkout(Component):
                     ),
                 },
             )
-        self._select_lines(lines)
+        self._select_lines(lines, prefill_qty=prefill_qty)
         if self.work.menu.no_prefill_qty:
             lines = picking.move_line_ids
         return self._response_for_select_package(picking, lines)
@@ -514,7 +516,9 @@ class Checkout(Component):
         elif packages:
             # Select all the lines of the package when we scan a product in a
             # package and we have only one.
-            return self._select_lines_from_package(picking, selection_lines, packages)
+            return self._select_lines_from_package(
+                picking, selection_lines, packages, prefill_qty=prefill_qty
+            )
         else:
             # There is no package on selected lines, so also select all other lines
             # not in a package. But only the quantity on first selected lines
@@ -533,7 +537,9 @@ class Checkout(Component):
             picking, selection_lines, packaging.product_id, prefill_qty=packaging.qty
         )
 
-    def _select_lines_from_lot(self, picking, selection_lines, lot, **kw):
+    def _select_lines_from_lot(
+        self, picking, selection_lines, lot, prefill_qty=1, **kw
+    ):
         lines = selection_lines.filtered(lambda l: l.lot_id == lot)
         if not lines:
             return self._response_for_select_line(
@@ -561,10 +567,10 @@ class Checkout(Component):
             # Select all the lines of the package when we scan a lot in a
             # package and we have only one.
             return self._select_lines_from_package(
-                picking, selection_lines, packages, **kw
+                picking, selection_lines, packages, prefill_qty=prefill_qty, **kw
             )
 
-        self._select_lines(lines, prefill_qty=1)
+        self._select_lines(lines, prefill_qty=prefill_qty)
         return self._response_for_select_package(picking, lines)
 
     def _select_lines_from_serial(self, picking, selection_lines, lot, **kw):
