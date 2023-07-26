@@ -187,7 +187,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         )
         self.assertRecordValues(
             new_line,
-            [{"qty_done": 0, "result_package_id": False, "product_uom_qty": 10}],
+            [{"qty_done": 0, "result_package_id": False, "reserved_uom_qty": 10}],
         )
 
     def test_scan_destination_pack_bin_not_found(self):

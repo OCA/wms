@@ -39,6 +39,18 @@ class InventoryAction(Component):
             domain.append(("lot_id", "=", lot.id))
         return self.inventory_model.search_count(domain)
 
+    def _get_existing_quant(self, location, product, package=None, lot=None):
+        domain = [("location_id", "=", location.id), ("product_id", "=", product.id)]
+        if package is not None:
+            domain.append(("package_id", "=", package.id))
+        else:
+            domain.append(("package_id", "=", False))
+        if lot is not None:
+            domain.append(("lot_id", "=", lot.id))
+        else:
+            domain.append(("lot_id", "=", False))
+        return self.inventory_model.search(domain, limit=1)
+
     def _create_draft_inventory(self, location, product):
         return self.inventory_model.sudo().create(
             {"location_id": location.id, "product_id": product.id}
@@ -69,11 +81,17 @@ class InventoryAction(Component):
 
     def create_stock_correction(self, move, location, package, lot, quantity):
         """Create an inventory with a forced quantity"""
-        values = self._stock_correction_inventory_values(
-            move, location, package, lot, quantity
-        )
-        inventory = self.inventory_model.sudo().create(values)
-        inventory.action_apply_inventory()
+        quant = self._get_existing_quant(location, move.product_id, package, lot)
+        if quant:
+            quant.with_context(
+                inventory_mode=True
+            ).sudo().inventory_quantity_auto_apply = quantity
+        else:
+            self.inventory_model._update_available_quantity(
+                move.product_id, location, quantity, lot_id=lot, package_id=package
+            )
+        # FIXME
+        move.product_id.stock_quant_ids._quant_tasks()
 
     def _stock_issue_get_related_move_lines(self, move, location, package, lot):
         """Lookup for all the other moves lines that match given move line"""

@@ -115,7 +115,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             params={
                 "picking_id": self.picking.id,
                 "package_id": self.package.id,
-                "packaging_id": self.packaging_inner_box.id,
+                "product_packaging_id": self.packaging_inner_box.id,
             },
         )
         self.assertRecordValues(
@@ -140,7 +140,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             params={
                 "picking_id": self.picking.id,
                 "package_id": 0,
-                "packaging_id": self.packaging_inner_box.id,
+                "product_packaging_id": self.packaging_inner_box.id,
             },
         )
         self.assert_response(
@@ -162,7 +162,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             params={
                 "picking_id": self.picking.id,
                 "package_id": self.package.id,
-                "packaging_id": 0,
+                "product_packaging_id": 0,
             },
         )
         self.assert_response(

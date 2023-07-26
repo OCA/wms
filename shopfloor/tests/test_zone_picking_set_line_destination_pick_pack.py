@@ -166,7 +166,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
             picking_type,
             move_line,
             message=self.service.msg_store.packaging_invalid_for_carrier(
-                self.free_package.packaging_id, self.carrier
+                self.free_package.product_packaging_id, self.carrier
             ),
             qty_done=quantity_done,
         )

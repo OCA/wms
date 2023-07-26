@@ -53,8 +53,8 @@ class ActionsDataCase(ActionsDataCaseBase):
             "name": location.name,
             "barcode": location.name,
             "operation_progress": {
-                "done": 18.0,
-                "to_do": 165.0,
+                "done": 2.0,
+                "to_do": 210.0,
             },
         }
         self.assertDictEqual(data, expected)

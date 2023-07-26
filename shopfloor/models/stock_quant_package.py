@@ -70,18 +70,32 @@ class StockQuantPackage(models.Model):
 
         The source location is the current location of the package.
         """
-        quant_values = []
         # sudo and the key in context activate is_inventory_mode on quants
         quants = self.quant_ids.sudo().with_context(inventory_mode=True)
+        quant_model = (
+            self.env["stock.quant"]
+            .sudo()
+            .with_context(inventory_mode=True, _sf_inventory=True)
+        )
         for quant in quants:
-            quantity = quant.quantity
-            quant.inventory_quantity = 0
-            quant_values.append(
-                self._move_package_quant_move_values(quant, dest_location, quantity)
-            )
 
-        quant_model = self.env["stock.quant"].sudo().with_context(inventory_mode=True)
-        quant_model.create(quant_values)
+            quantity = quant.quantity
+            quant_model._update_available_quantity(
+                quant.product_id,
+                quant.location_id,
+                0,
+                lot_id=quant.lot_id,
+                package_id=quant.package_id,
+                owner_id=quant.owner_id,
+            )
+            quant_model._update_available_quantity(
+                quant.product_id,
+                dest_location,
+                quantity,
+                lot_id=quant.lot_id,
+                package_id=quant.package_id,
+                owner_id=quant.owner_id,
+            )
 
     def _move_package_quant_move_values(self, quant, location, quantity):
         return {

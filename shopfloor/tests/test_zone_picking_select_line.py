@@ -180,7 +180,9 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             "scan_source",
             params={"barcode": self.zone_sublocation2.barcode},
         )
-        move_lines = self.picking2.move_line_ids
+        move_lines = self.pickings.move_line_ids.filtered(
+            lambda l: l.location_id == self.zone_sublocation2
+        )
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,

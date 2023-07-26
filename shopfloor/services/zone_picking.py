@@ -1212,7 +1212,7 @@ class ZonePicking(Component):
                 good_for_packing = True
             else:
                 message = self.msg_store.packaging_invalid_for_carrier(
-                    package.packaging_id, carrier
+                    package.product_packaging_id, carrier
                 )
         else:
             message = self.msg_store.picking_without_carrier_cannot_pack(picking)

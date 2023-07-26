@@ -704,29 +704,7 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
         self.assertEqual(len(move_product_a), 1)
         self.assertEqual(move_product_a.state, "assigned")
         self.assertEqual(len(move_product_a.move_line_ids), 1)
-        # Check the inventories
-        stock_issue_inventory = self.env["stock.inventory"].search(
-            [
-                ("line_ids.location_id", "=", self.content_loc.id),
-                ("line_ids.product_id", "=", self.product_a.id),
-                ("state", "=", "done"),
-            ]
-        )
-        self.assertTrue(stock_issue_inventory)
-        stock_issue_inventory_line = stock_issue_inventory.line_ids.filtered(
-            lambda l: l.product_id == self.product_a
-        )
-        #   5/15 remaining
-        self.assertEqual(stock_issue_inventory_line.product_qty, 0)
         self.assertEqual(self.product_a.qty_available, 5)
-        control_inventory = self.env["stock.inventory"].search(
-            [
-                ("location_ids", "in", self.content_loc.id),
-                ("product_ids", "in", self.product_a.id),
-                ("state", "in", ("draft", "confirm")),
-            ]
-        )
-        self.assertTrue(control_inventory)
         # Check the response
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(
@@ -760,30 +738,8 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
         self.assertEqual(len(move_product_b), 1)
         self.assertEqual(move_product_b.state, "assigned")
         self.assertEqual(len(move_product_b.move_line_ids), 1)
-        # Check the inventories
-        stock_issue_inventory = self.env["stock.inventory"].search(
-            [
-                ("line_ids.location_id", "=", self.content_loc.id),
-                ("line_ids.product_id", "=", self.product_b.id),
-                ("state", "=", "done"),
-            ]
-        )
-        self.assertTrue(stock_issue_inventory)
-        stock_issue_inventory_line = stock_issue_inventory.line_ids.filtered(
-            lambda l: l.product_id == self.product_b
-        )
-        #   0/4 remaining in the move line's source location
-        self.assertEqual(stock_issue_inventory_line.product_qty, 0)
-        #   6/10 remaining elsewhere in the stock
+
         self.assertEqual(self.product_b.qty_available, 6)
-        control_inventory = self.env["stock.inventory"].search(
-            [
-                ("location_ids", "in", self.content_loc.id),
-                ("product_ids", "in", self.product_b.id),
-                ("state", "in", ("draft", "confirm")),
-            ]
-        )
-        self.assertTrue(control_inventory)
         # Check the response
         move_lines = self.service._find_transfer_move_lines(self.content_loc)
         self.assert_response_start_single(

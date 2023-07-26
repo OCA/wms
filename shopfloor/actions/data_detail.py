@@ -148,7 +148,7 @@ class DataDetailAction(Component):
     def _product_supplierinfo_parser(self):
         return [
             ("id", lambda rec, fname: rec.partner_id.id),
-            "partner",
+            ("partner_id:partner", lambda rec, fname: rec.partner_id.name),
             "product_name",
             "product_code",
         ]

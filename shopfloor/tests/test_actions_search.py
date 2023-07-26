@@ -25,7 +25,9 @@ class TestSearchCase(TestSearchBaseCase):
 
     def test_search_location_with_limit(self):
         rec = self.customer_location
-        rec2 = self.customer_location.sudo().copy({"barcode": "CUSTOMERS2"})
+        rec2 = self.customer_location.sudo().copy(
+            {"barcode": "CUSTOMERS2", "name": "Customers"}
+        )
         handler = self.search.location_from_scan
         res = handler("Customers", 2)
         self.assertEqual(res, rec + rec2)
@@ -120,7 +122,9 @@ class TestFindCase(TestSearchBaseCase):
 
     def test_find_location_with_limit(self):
         rec = self.customer_location
-        rec2 = self.customer_location.sudo().copy({"barcode": "CUSTOMERS2"})
+        rec2 = self.customer_location.sudo().copy(
+            {"barcode": "CUSTOMERS2", "name": "Customers"}
+        )
         res = self.search.find("Customers", types=("location",))
         self.assertEqual(res.records, None)
         res = self.search.find(

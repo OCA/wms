@@ -75,18 +75,14 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
                 "zero": False,
             },
         )
-        inventory = self.env["stock.inventory"].search(
+        quant = self.env["stock.quant"].search(
             [
-                ("location_ids", "in", self.line.location_id.id),
-                ("product_ids", "in", self.line.product_id.id),
-                ("state", "=", "draft"),
+                ("location_id", "=", self.line.location_id.id),
+                ("product_id", "=", self.line.product_id.id),
+                ("inventory_quantity_set", "=", False),
             ]
         )
-        self.assertTrue(inventory)
-        self.assertEqual(
-            inventory.name,
-            "Zero check issue on location Stock ({})".format(self.picking.name),
-        )
+        self.assertTrue(quant)
         self.assert_response(
             response,
             next_state="start_line",
