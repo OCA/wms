@@ -261,7 +261,7 @@ class Reception(Component):
             # the remaining quantity to do of its move.
             line.product_uom_qty = move.product_uom_qty - move.quantity_done
         else:
-            qty_todo_remaining = move.product_uom_qty - move.quantity_done
+            qty_todo_remaining = max(0, move.product_uom_qty - move.quantity_done)
             values = move._prepare_move_line_vals(quantity=qty_todo_remaining)
             line = self.env["stock.move.line"].create(values)
         return self._scan_line__assign_user(picking, line, qty_done)
