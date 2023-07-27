@@ -14,6 +14,7 @@
     "depends": [
         "partner_tz",
         "stock_release_channel",
+        "stock_available_to_promise_release",
     ],
     "data": [
         "views/stock_release_channel.xml",

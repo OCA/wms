@@ -70,14 +70,7 @@ class StockReleaseChannel(models.Model):
     @api.model
     def assign_release_channel(self, picking):
         res = super().assign_release_channel(picking)
-        # Check if a channel has been assigned to the picking and write scheduled_date
-        # if different to avoid unnecessary write
-        if (
-            picking.release_channel_id
-            and picking.release_channel_id.process_end_date
-            and picking.scheduled_date != picking.release_channel_id.process_end_date
-        ):
-            picking.scheduled_date = picking.release_channel_id.process_end_date
+        picking._after_release_set_expected_date()
         return res
 
     def _field_picking_domains(self):

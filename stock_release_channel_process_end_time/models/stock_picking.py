@@ -59,3 +59,16 @@ class StockPicking(models.Model):
         else:
             operator_inselect = "not inselect" if operator == "=" else "inselect"
         return [("id", operator_inselect, (query, []))]
+
+    def _after_release_set_expected_date(self):
+        res = super()._after_release_set_expected_date()
+        for rec in self:
+            # Check if a channel has been assigned to the picking and write
+            # scheduled_date if different to avoid unnecessary write
+            if (
+                rec.release_channel_id
+                and rec.release_channel_id.process_end_date
+                and rec.scheduled_date != rec.release_channel_id.process_end_date
+            ):
+                rec.scheduled_date = rec.release_channel_id.process_end_date
+        return res
