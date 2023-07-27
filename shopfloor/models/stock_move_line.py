@@ -153,7 +153,8 @@ class StockMoveLine(models.Model):
         :param split_partial: split if qty is less than expected
             otherwise rely on a backorder.
         """
-        assert self.product_uom_qty >= 0, "The demand cannot be negative"
+        if self.product_uom_qty < 0:
+            raise UserError(_("The demand cannot be negative"))
         # store a new line if we have split our line (not enough qty)
         new_line = self.env["stock.move.line"]
         rounding = self.product_uom_id.rounding
