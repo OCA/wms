@@ -93,14 +93,13 @@
                                     name="warehouse_id"
                                     options="{'no_create': True}"
                                 />
-                                <label for="picking_type_ids" colspan="2" />
-                                <field name="picking_type_ids" colspan="2"><tree
-                                        create="0"
-                                    >
-                                    <field name="warehouse_id" />
-                                    <field name="name" />
-                                    <field name="code" />
-                                </tree></field>
+                                <field name="picking_type_ids">
+                                    <tree create="0">
+                                        <field name="warehouse_id" />
+                                        <field name="name" />
+                                        <field name="code" />
+                                    </tree>
+                                </field>
                                 <field
                                     name="rule_domain"
                                     widget="domain"
@@ -108,10 +107,10 @@
                                 />
                                 <field name="partner_ids">
                                     <tree create="0">
-                                    <field name="display_name" />
-                                    <field name="city" />
-                                    <field name="country_id" />
-                                </tree>
+                                        <field name="display_name" />
+                                        <field name="city" />
+                                        <field name="country_id" />
+                                    </tree>
                                 </field>
                                 <field
                                     name="code"
