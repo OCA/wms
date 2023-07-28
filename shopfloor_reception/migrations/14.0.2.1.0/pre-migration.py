@@ -1,14 +1,8 @@
 # Copyright 2023 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
-import logging
 
-_logger = logging.getLogger(__name__)
-
-try:
-    from openupgradelib import openupgrade
-except (ImportError, IOError) as err:
-    _logger.debug(err)
+from openupgradelib import openupgrade
 
 
 def move_fields_to_new_module(cr):
