@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 ACSONE SA/NV
+     Copyright 2023 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="stock_release_channel_form_view">
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_form_view"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="before">
+                <group>
+                    <field name="preparation_plan_ids" widget="many2many_tags" />
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+
+
+</odoo>

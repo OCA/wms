@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo noupdate="1">
+
+    <record model="stock.release.channel" id="stock_release_channel_mon_thu1">
+        <field name="name">Channel 1 (Mon/Thu)</field>
+        <field name="rule_domain">[]</field>
+    </record>
+    <record model="stock.release.channel" id="stock_release_channel_mon_thu2">
+        <field name="name">Channel 2 (Mon/Thu)</field>
+        <field name="rule_domain">[]</field>
+    </record>
+    <record model="stock.release.channel" id="stock_release_channel_tue_fri1">
+        <field name="name">Channel 1 (Tue/Fri)</field>
+        <field name="rule_domain">[]</field>
+    </record>
+    <record model="stock.release.channel" id="stock_release_channel_tue_fri2">
+        <field name="name">Channel 2 (Tue/Fri)</field>
+        <field name="rule_domain">[]</field>
+    </record>
+    <record model="stock.release.channel" id="stock_release_channel_wed1">
+        <field name="name">Channel 1 (Wed)</field>
+        <field name="rule_domain">[]</field>
+    </record>
+    <record model="stock.release.channel" id="stock_release_channel_wed2">
+        <field name="name">Channel 2 (Wed)</field>
+        <field name="rule_domain">[]</field>
+    </record>
+
+</odoo>

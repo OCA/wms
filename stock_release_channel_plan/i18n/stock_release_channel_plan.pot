@@ -1,0 +1,131 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_release_channel_plan
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-07-28 16:02+0000\n"
+"PO-Revision-Date: 2023-07-28 16:02+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_preparation_plan__active
+msgid "Active"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_plan.stock_release_channel_preparation_plan_form_view
+msgid "Archived"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_plan.stock_release_channel_plan_wizard_launch_form_view
+msgid "Cancel"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_plan.stock_release_channel_plan_wizard_launch_form_view
+msgid "Confirm"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_plan_wizard_launch__create_uid
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_preparation_plan__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_plan_wizard_launch__create_date
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_preparation_plan__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_plan_wizard_launch__display_name
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_preparation_plan__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_plan_wizard_launch__id
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_preparation_plan__id
+msgid "ID"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_plan_wizard_launch____last_update
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_preparation_plan____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_plan_wizard_launch__write_uid
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_preparation_plan__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_plan_wizard_launch__write_date
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_preparation_plan__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_plan.stock_release_channel_preparation_plan_form_view
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_plan.stock_release_channel_preparation_plan_tree_view
+msgid "Launch"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_preparation_plan__name
+msgid "Name"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_plan_wizard_launch__preparation_plan_id
+msgid "Preparation Plan"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.actions.act_window,name:stock_release_channel_plan.stock_release_channel_preparation_plan_act_window
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel__preparation_plan_ids
+#: model:ir.ui.menu,name:stock_release_channel_plan.stock_release_channel_preparation_plan_menu
+msgid "Preparation Plans"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_plan.stock_release_channel_preparation_plan_form_view
+msgid "Preparation plan"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_preparation_plan__release_channel_ids
+msgid "Release channels"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model,name:stock_release_channel_plan.model_stock_release_channel_plan_wizard_launch
+msgid "Stock Release Channel Plan Launch Wizard"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model,name:stock_release_channel_plan.model_stock_release_channel_preparation_plan
+msgid "Stock Release Channel Preparation Plan"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model,name:stock_release_channel_plan.model_stock_release_channel
+msgid "Stock Release Channels"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.actions.act_window,name:stock_release_channel_plan.stock_release_channel_plan_wizard_launch_act_window
+msgid "Wake-up Release Channels"
+msgstr ""
