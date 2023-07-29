@@ -64,7 +64,7 @@ class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
         previous_priority = loc1_lines[0].shopfloor_priority
         self._skip_line(loc1_lines[0], loc1_lines[1])
         self.assertEqual(loc1_lines[0].shopfloor_priority, previous_priority + 1)
-        loc1_lines.invalidate_cache(["shopfloor_postponed"])
+        loc1_lines.invalidate_recordset(["shopfloor_postponed"])
         self.assertTrue(loc1_lines[0].shopfloor_postponed)
 
         # 2nd line, next is 1st from 2nd location
@@ -74,7 +74,7 @@ class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
         self.assertEqual(
             loc1_lines[1].shopfloor_priority, loc1_lines[0].shopfloor_priority + 1
         )
-        loc1_lines.invalidate_cache(["shopfloor_postponed"])
+        loc1_lines.invalidate_recordset(["shopfloor_postponed"])
         self.assertTrue(loc1_lines[1].shopfloor_postponed)
 
         # 3rd line, next is 4th
@@ -83,7 +83,7 @@ class ClusterPickingSkipLineCase(ClusterPickingCommonCase):
         self.assertEqual(
             loc2_lines[0].shopfloor_priority, loc1_lines[1].shopfloor_priority + 1
         )
-        loc1_lines.invalidate_cache(["shopfloor_postponed"])
+        loc1_lines.invalidate_recordset(["shopfloor_postponed"])
         self.assertTrue(loc2_lines[0].shopfloor_postponed)
 
 

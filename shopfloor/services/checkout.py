@@ -161,7 +161,7 @@ class Checkout(Component):
                 "package": self.data.package(
                     package, picking=picking, with_packaging=True
                 ),
-                "packaging": self.data.packaging_list(packaging_list.sorted()),
+                "packaging": self.data.delivery_packaging_list(packaging_list.sorted()),
             },
         )
 
@@ -1579,7 +1579,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
             "select_dest_package": self._schema_select_package,
             "select_delivery_packaging": self._schema_select_delivery_packaging,
             "summary": self._schema_summary,
-            "change_packaging": self._schema_select_packaging,
+            "change_packaging": self._schema_select_delivery_packaging,
             "confirm_done": self._schema_confirm_done,
         }
 

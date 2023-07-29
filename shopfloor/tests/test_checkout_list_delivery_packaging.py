@@ -9,6 +9,18 @@ from .test_checkout_select_package_base import CheckoutSelectPackageMixin
 # pylint: disable=missing-return
 class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
     @classmethod
+    def setUpClass(cls):
+        try:
+            super().setUpClass()
+        except BaseException:
+            # ensure that the registry is restored in case of error in setUpClass
+            # since tearDownClass is not called in this case and our _load_test_models
+            # loads fake models
+            if hasattr(cls, "loader"):
+                cls.loader.restore_registry()
+            raise
+
+    @classmethod
     def _load_test_models(cls):
         cls.loader = FakeModelLoader(cls.env, cls.__module__)
         cls.loader.backup_registry()
@@ -42,25 +54,23 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
             .create({"name": "Transport Box", "code": "TB", "sequence": 0})
         )
         cls.delivery_packaging1 = (
-            cls.env["product.packaging"]
+            cls.env["stock.package.type"]
             .sudo()
             .create(
                 {
                     "name": "Box 1",
                     "package_carrier_type": "test",
-                    "packaging_level_id": cls.packaging_type.id,
                     "barcode": "BOX1",
                 }
             )
         )
         cls.delivery_packaging2 = (
-            cls.env["product.packaging"]
+            cls.env["stock.package.type"]
             .sudo()
             .create(
                 {
                     "name": "Box 2",
                     "package_carrier_type": "test",
-                    "packaging_level_id": cls.packaging_type.id,
                     "barcode": "BOX2",
                 }
             )

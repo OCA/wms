@@ -77,7 +77,7 @@ class CheckoutNoPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
                     "selected_line_ids": self.pack1_moves.move_line_ids.ids,
                 },
             )
-            self.assertEqual(err.name, "`checkout.no_package` endpoint is not enabled")
+            self.assertEqual(repr(err), "`checkout.no_package` endpoint is not enabled")
 
     def test_set_dest_package_error_qty_done_above(self):
         # If the qty_done of a selected line goes beyond

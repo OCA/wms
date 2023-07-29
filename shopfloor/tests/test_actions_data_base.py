@@ -32,12 +32,12 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
             .create({"name": "Pallet", "packaging_level_id": cls.packaging_type.id})
         )
         cls.delivery_packaging = (
-            cls.env["product.packaging"]
+            cls.env["stock.package.type"]
             .sudo()
             .create(
                 {
                     "name": "Pallet",
-                    "packaging_level_id": cls.packaging_type.id,
+                    "package_carrier_type": "none",
                     "barcode": "PALCODE",
                 }
             )
@@ -105,8 +105,8 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
                 }
             )
         )
-        cls.product_a_variant.flush()
-        cls.product_a_vendor.flush()
+        cls.product_a_variant.flush_recordset()
+        cls.product_a_vendor.flush_recordset()
 
     def _expected_location(self, record, **kw):
         data = {
@@ -156,7 +156,7 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
         data = {
             "id": record.id,
             "name": record.name,
-            "packaging_type": record.packaging_level_id.display_name,
+            "packaging_type": record.package_carrier_type,
             "barcode": record.barcode,
         }
         data.update(kw)

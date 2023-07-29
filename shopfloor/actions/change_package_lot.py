@@ -205,7 +205,7 @@ class ChangePackageLot(Component):
         except exceptions.UserError as err:
             return response_error_func(
                 move_line,
-                message=self.msg_store.package_change_error(package, err.name),
+                message=self.msg_store.package_change_error(package, err.args[0]),
             )
 
         if previous_package:

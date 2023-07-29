@@ -14,6 +14,18 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
     """
 
     @classmethod
+    def setUpClass(cls):
+        try:
+            super().setUpClass()
+        except BaseException:
+            # ensure that the registry is restored in case of error in setUpClass
+            # since tearDownClass is not called in this case and our _load_test_models
+            # loads fake models
+            if hasattr(cls, "loader"):
+                cls.loader.restore_registry()
+            raise
+
+    @classmethod
     def _load_test_models(cls):
         cls.loader = FakeModelLoader(cls.env, cls.__module__)
         cls.loader.backup_registry()
@@ -31,8 +43,17 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         super().setUpClassBaseData(*args, **kwargs)
         cls._load_test_models()
         cls.carrier = cls.env["delivery.carrier"].search([], limit=1)
+        delivery_packaging_type = (
+            cls.env["stock.package.type"]
+            .sudo()
+            .create({"name": "TEST DEFAULT", "package_carrier_type": "test"})
+        )
         default_pkging = (
-            cls.env["product.packaging"].sudo().create({"name": "TEST DEFAULT"})
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {"name": "TEST DEFAULT", "package_type_id": delivery_packaging_type.id}
+            )
         )
         cls.carrier.sudo().write(
             {

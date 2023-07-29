@@ -1,13 +1,13 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo.tests import tagged
-from odoo.tests.common import SavepointCase
+from odoo.tests.common import TransactionCase
 
 # pylint: disable=missing-return
 
 
 @tagged("post_install", "-at_install")
-class TestStockSplit(SavepointCase):
+class TestStockSplit(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super(TestStockSplit, cls).setUpClass()

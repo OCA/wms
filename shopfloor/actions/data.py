@@ -136,7 +136,7 @@ class DataAction(Component):
             "qty",
         ]
 
-    @ensure_model("product.packaging")
+    @ensure_model("stock.package.type")
     def delivery_packaging(self, record, **kw):
         return self._jsonify(record, self._delivery_packaging_parser, **kw)
 
@@ -148,10 +148,7 @@ class DataAction(Component):
         return [
             "id",
             "name",
-            (
-                "packaging_level_id:packaging_type",
-                lambda rec, fname: rec.packaging_level_id.display_name,
-            ),
+            "package_carrier_type:packaging_type",
             "barcode",
         ]
 
