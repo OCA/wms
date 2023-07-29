@@ -1165,7 +1165,7 @@ class ClusterPicking(Component):
             batch.state = "done"
             # Unassign not validated pickings from the batch, they will be
             # processed in another batch automatically later on
-            all_pickings.invalidate_cache(["state"])
+            all_pickings.invalidate_recordset(["state"])
             pickings_not_done = all_pickings.filtered(lambda p: p.state != "done")
             pickings_not_done.batch_id = False
             return self._response_for_start(

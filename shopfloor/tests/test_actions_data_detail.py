@@ -66,7 +66,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         package = self.move_a.move_line_ids.package_id
         package.product_packaging_id = self.packaging.id
         package.package_type_id = self.storage_type_pallet
-        # package.invalidate_cache()
+        # package.invalidate_recordset()
         data = self.data_detail.package_detail(package, picking=self.picking)
         self.assert_schema(self.schema_detail.package_detail(), data)
 

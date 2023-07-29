@@ -11,7 +11,10 @@ class PackagingAction(Component):
     _usage = "packaging"
 
     def packaging_valid_for_carrier(self, packaging, carrier):
-        return packaging.package_carrier_type in ("none", carrier.delivery_type)
+        return packaging.package_type_id.package_carrier_type in (
+            "none",
+            carrier.delivery_type,
+        )
 
     def create_delivery_package(self, carrier):
         default_packaging = self._get_default_packaging(carrier)

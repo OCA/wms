@@ -132,7 +132,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         )
         self.batch1.write({"state": "in_progress", "user_id": self.env.uid})
         self.batch2.write(
-            {"state": "in_progress", "user_id": self.env.ref("base.user_demo")}
+            {"state": "in_progress", "user_id": self.env.ref("base.user_demo").id}
         )
         self.batch3.write({"state": "draft", "user_id": False})
 
@@ -230,7 +230,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         """Select a draft that does not exist"""
         self._add_stock_and_assign_pickings_for_batches(self.batch1)
         self.batch1.write(
-            {"state": "in_progress", "user_id": self.env.ref("base.user_demo")}
+            {"state": "in_progress", "user_id": self.env.ref("base.user_demo").id}
         )
         # Simulate the client selecting the batch in a list
         response = self.service.dispatch(

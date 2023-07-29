@@ -872,7 +872,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             "cancel", params={"package_level_id": package_level_b.id}
         )
         self.assertRecordValues(move_b, [{"state": "cancel"}])
-        picking.invalidate_cache(["state"])
+        picking.invalidate_recordset(["state"])
         self.assertRecordValues(picking, [{"state": "cancel"}])
 
     def test_cancel_already_done(self):

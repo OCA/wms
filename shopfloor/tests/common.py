@@ -31,7 +31,16 @@ class CommonCase(BaseCommonCase):
     @classmethod
     def _shopfloor_user_values(cls):
         vals = super()._shopfloor_user_values()
-        vals["groups_id"] = [(6, 0, [cls.env.ref("stock.group_stock_user").id])]
+        vals["groups_id"] = [
+            (
+                6,
+                0,
+                [
+                    cls.env.ref("stock.group_stock_user").id,
+                    cls.env.ref("stock.group_stock_multi_locations").id,
+                ],
+            )
+        ]
         return vals
 
     @classmethod
