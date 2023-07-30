@@ -71,6 +71,17 @@ class Checkout(Component):
             message=message,
         )
 
+    def _response_for_select_child_location(self, picking, message=None):
+        return self._response(
+            next_state="select_child_location",
+            data={
+                "picking": self._data_for_stock_picking(
+                    picking, done=True, with_lines=False, with_location=True
+                ),
+            },
+            message=message,
+        )
+
     def _response_for_select_document(self, message=None):
         data = {"restrict_scan_first": self.work.menu.scan_location_or_pack_first}
         return self._response(next_state="select_document", message=message, data=data)
@@ -315,17 +326,22 @@ class Checkout(Component):
     def _data_for_delivery_packaging(self, packaging, **kw):
         return self.data.delivery_packaging_list(packaging, **kw)
 
-    def _data_for_stock_picking(self, picking, done=False):
+    def _data_for_stock_picking(
+        self, picking, done=False, with_lines=True, with_location=False
+    ):
         data = self.data.picking(picking)
         line_picker = self._lines_checkout_done if done else self._lines_to_pack
-        data.update(
-            {
-                "move_lines": self._data_for_move_lines(
-                    self._lines_prepare(picking, line_picker(picking)),
-                    with_packaging=done,
-                )
-            }
-        )
+        if with_lines:
+            data.update(
+                {
+                    "move_lines": self._data_for_move_lines(
+                        self._lines_prepare(picking, line_picker(picking)),
+                        with_packaging=done,
+                    )
+                }
+            )
+        if with_location:
+            data.update({"location_dest": self.data.location(picking.location_dest_id)})
         return data
 
     def _lines_checkout_done(self, picking):
@@ -1340,6 +1356,7 @@ class Checkout(Component):
         * summary: in case of error
         * select_document: after done, goes back to start
         * confirm_done: confirm a partial
+        * select_child_location: there are child destination locations
         """
         picking = self.env["stock.picking"].browse(picking_id)
         message = self._check_picking_status(picking)
@@ -1362,8 +1379,54 @@ class Checkout(Component):
                         "body": _("Remaining raw product not packed, proceed anyway?"),
                     },
                 )
-        stock = self._actions_for("stock")
         lines_done = self._lines_checkout_done(picking)
+        dest_location = picking.location_dest_id
+        child_locations = self.env["stock.location"].search(
+            [("id", "child_of", dest_location.id), ("usage", "!=", "view")]
+        )
+        if len(child_locations) > 0 and child_locations != dest_location:
+            return self._response_for_select_child_location(
+                picking,
+            )
+        stock = self._actions_for("stock")
+        stock.validate_moves(lines_done.move_id)
+        return self._response_for_select_document(
+            message=self.msg_store.transfer_done_success(lines_done.picking_id)
+        )
+
+    def scan_dest_location(self, picking_id, barcode):
+        """Select a location destination
+
+        When setting the move as done, if the destination location
+        has children locations, ask the user to scan one of them.
+
+        Transitions:
+        * select_document: after done, goes back to start
+        * select_child_location: in case of error
+        """
+        picking = self.env["stock.picking"].browse(picking_id)
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_select_document(message=message)
+        search = self._actions_for("search")
+        scanned_location = search.location_from_scan(barcode)
+        if not scanned_location:
+            return self._response_for_select_child_location(
+                picking,
+                message=self.msg_store.location_not_found(),
+            )
+        allowed_locations = self.env["stock.location"].search(
+            [("id", "child_of", picking.location_dest_id.id), ("usage", "!=", "view")]
+        )
+        if scanned_location not in allowed_locations:
+            return self._response_for_select_child_location(
+                picking,
+                message=self.msg_store.dest_location_not_allowed(),
+            )
+        lines_done = self._lines_checkout_done(picking)
+        for line in lines_done:
+            line.update({"location_dest_id": scanned_location.id})
+        stock = self._actions_for("stock")
         stock.validate_moves(lines_done.move_id)
         return self._response_for_select_document(
             message=self.msg_store.transfer_done_success(lines_done.picking_id)
@@ -1545,6 +1608,12 @@ class ShopfloorCheckoutValidator(Component):
             "confirmation": {"type": "boolean", "nullable": True, "required": False},
         }
 
+    def scan_dest_location(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "barcode": {"required": True, "type": "string"},
+        }
+
 
 class ShopfloorCheckoutValidatorResponse(Component):
     """Validators for the Checkout endpoints responses"""
@@ -1580,6 +1649,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
             "summary": self._schema_summary,
             "change_packaging": self._schema_select_packaging,
             "confirm_done": self._schema_confirm_done,
+            "select_child_location": self._schema_select_child_location,
         }
 
     @property
@@ -1622,6 +1692,12 @@ class ShopfloorCheckoutValidatorResponse(Component):
     @property
     def _schema_confirm_done(self):
         return self._schema_stock_picking(lines_with_packaging=True)
+
+    @property
+    def _schema_select_child_location(self):
+        return {
+            "picking": {"type": "dict", "schema": self.schemas.picking()},
+        }
 
     @property
     def _schema_selection_list(self):
@@ -1765,4 +1841,11 @@ class ShopfloorCheckoutValidatorResponse(Component):
         return self._response_schema(next_states={"summary", "select_line"})
 
     def done(self):
-        return self._response_schema(next_states={"summary", "confirm_done"})
+        return self._response_schema(
+            next_states={"summary", "confirm_done", "select_child_location"}
+        )
+
+    def scan_dest_location(self):
+        return self._response_schema(
+            next_states={"confirm_done", "select_document", "select_child_location"}
+        )
