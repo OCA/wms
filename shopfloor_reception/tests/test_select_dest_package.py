@@ -15,6 +15,11 @@ class TestSelectDestPackage(CommonCase):
                 "packaging_id": cls.product_a_packaging.id,
             }
         )
+        cls.input_sublocation = (
+            cls.env["stock.location"]
+            .sudo()
+            .create({"name": "Input A", "location_id": cls.input_location.id})
+        )
 
     def test_scan_new_package(self):
         picking = self._create_picking()
@@ -114,6 +119,7 @@ class TestSelectDestPackage(CommonCase):
         different_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_b
         )
+        self.package.location_id = self.input_sublocation
         different_move_line.result_package_id = self.package
         response = self.service.dispatch(
             "select_dest_package",
@@ -124,6 +130,7 @@ class TestSelectDestPackage(CommonCase):
             },
         )
         self.assertEqual(selected_move_line.result_package_id.name, self.package.name)
+        self.assertEqual(selected_move_line.location_dest_id, self.input_sublocation)
         self.assert_response(
             response,
             next_state="select_move",

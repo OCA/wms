@@ -597,38 +597,48 @@ class Reception(Component):
                 )
         return response
 
-    def _set_quantity__by_package(self, picking, selected_line, package):
-        pack_location = package.location_id
-        if pack_location:
-            (
-                move_dest_location_ok,
-                pick_type_dest_location_ok,
-            ) = self._check_location_ok(pack_location, selected_line, picking)
-            if not (move_dest_location_ok or pick_type_dest_location_ok):
-                # If the scanned package has a location that isn't a child
-                # of the move dest, return an error
-                message = self.msg_store.dest_location_not_allowed()
-                return self._response_for_set_quantity(
-                    picking, selected_line, message=message
-                )
-            quantity = selected_line.qty_done
-            response = self._set_quantity__process__set_qty_and_split(
-                picking, selected_line, quantity
-            )
-            if response:
-                return response
-            # If the scanned package has a valid destination,
-            # set both package and destination on the package.
-            selected_line.result_package_id = package
-            selected_line.location_dest_id = pack_location
+    def _set_package_on_move_line(self, picking, line, package):
+        """Assign a package already on a move line.
 
+        If the package is already at a location :
+            * check the location is valid
+            * Split the move if doing a partial quantity
+
+        On error, return to the set quantity screen.
+
+        """
+        pack_location = package.location_id
+        if not pack_location:
+            line.result_package_id = package
+            return None
+        (
+            move_dest_location_ok,
+            pick_type_dest_location_ok,
+        ) = self._check_location_ok(pack_location, line, picking)
+        if not (move_dest_location_ok or pick_type_dest_location_ok):
+            # Package location is not a child of the move destination
+            message = self.msg_store.dest_location_not_allowed()
+            return self._response_for_set_quantity(picking, line, message=message)
+        quantity = line.qty_done
+        response = self._set_quantity__process__set_qty_and_split(
+            picking, line, quantity
+        )
+        if response:
+            return response
+        # If the scanned package has a valid destination,
+        # set both package and destination on the package.
+        line.result_package_id = package
+        line.location_dest_id = pack_location
+
+    def _set_quantity__by_package(self, picking, selected_line, package):
+        response = self._set_package_on_move_line(picking, selected_line, package)
+        if response:
+            return response
+        if package.location_id:
             response = self._post_line(selected_line)
             if response:
                 return response
             return self._response_for_select_move(picking)
-        # Scanned package has no location, move to the location selection
-        # screen
-        selected_line.result_package_id = package
         return self._response_for_set_destination(picking, selected_line)
 
     def _set_quantity__by_location(self, picking, selected_line, location):
@@ -1335,7 +1345,9 @@ class Reception(Component):
                     selected_line,
                     message=self.msg_store.package_not_empty(package),
                 )
-            selected_line.result_package_id = package
+            response = self._set_package_on_move_line(picking, selected_line, package)
+            if response:
+                return response
             response = self._post_line(selected_line)
             if response:
                 return response
