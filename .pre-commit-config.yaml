@@ -88,6 +88,8 @@ repos:
     rev: v8.24.0
     hooks:
       - id: eslint
+        # Useless for external libs
+        exclude: ^shopfloor_mobile/static/wms/src/.*
         verbose: true
         args:
           - --color

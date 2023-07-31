@@ -298,9 +298,8 @@ const ClusterPicking = {
                     },
                     enter: () => {
                         // TODO: shalle we hook v-model for qty input straight to the state data?
-                        this.scan_destination_qty = this.state_get_data(
-                            "start_line"
-                        ).quantity;
+                        this.scan_destination_qty =
+                            this.state_get_data("start_line").quantity;
                     },
                     on_qty_edit: (qty) => {
                         this.scan_destination_qty = parseInt(qty, 10);

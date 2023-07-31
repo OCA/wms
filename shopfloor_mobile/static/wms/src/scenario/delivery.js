@@ -313,9 +313,8 @@ const Delivery = {
                     },
                     visible_records: (records) => {
                         const self = this;
-                        let visible_records = this.utils.wms.order_picking_by_completeness(
-                            records
-                        );
+                        let visible_records =
+                            this.utils.wms.order_picking_by_completeness(records);
                         if (this.state.data.filtered) {
                             visible_records = _.filter(visible_records, function (rec) {
                                 return rec.name.search(self.state.data.filtered) > 0;

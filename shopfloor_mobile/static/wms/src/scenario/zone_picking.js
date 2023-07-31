@@ -670,9 +670,11 @@ const ZonePicking = {
                     on_qty_update: (qty) => {
                         this.scan_destination_qty = parseInt(qty, 10);
                         if (this.state.data.move_line.quantity != qty) {
-                            this.state.display_info.scan_placeholder = this.state.display_info.scan_placeholder_partial;
+                            this.state.display_info.scan_placeholder =
+                                this.state.display_info.scan_placeholder_partial;
                         } else {
-                            this.state.display_info.scan_placeholder = this.state.display_info.scan_placeholder_full;
+                            this.state.display_info.scan_placeholder =
+                                this.state.display_info.scan_placeholder_full;
                         }
                     },
                     on_scan: (scanned) => {
