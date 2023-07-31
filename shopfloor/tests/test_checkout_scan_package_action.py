@@ -1,8 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from itertools import product
-
-import mock
+from unittest import mock
 
 from .test_checkout_base import CheckoutCommonCase
 from .test_checkout_select_package_base import CheckoutSelectPackageMixin
