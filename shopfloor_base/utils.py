@@ -115,3 +115,22 @@ def load_components_without_registry(env, *component_classes):
         return []
     work = WorkContext(model_name=rest_service._name, collection=collection)
     return [comp(work) for comp in component_classes]
+
+
+def purge_endpoints(env, service_usage):
+    """Remove stale services' endpoints routes.
+
+    When scenario are removed (eg: module uninstalled)
+    their routes must be cleaned up.
+    You can use this function to easily clean them for all apps.
+
+    Motivation: registered routes for a given app are taken
+    from the endpoint_route table via `route_group`.
+    As the table is populated dynamically with registered components
+    when a component is removed there's no direct update to the table.
+    Hence, is the responsibility of the dev to take care of the cleanup.
+    """
+    apps = env["shopfloor.app"].search([])
+    for app in apps:
+        route = app.api_url_for_service(service_usage)
+        env.cr.execute("DELETE FROM endpoint_route WHERE route like %s", (f"{route}%",))
