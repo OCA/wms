@@ -3,7 +3,7 @@
 {
     "name": "Shopfloor - Delivery with shipment advice",
     "summary": "Manage delivery process with shipment advices",
-    "version": "14.0.1.3.0",
+    "version": "14.0.1.4.0",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
@@ -19,4 +19,6 @@
     ],
     "data": ["data/shopfloor_scenario_data.xml", "views/shopfloor_menu.xml"],
     "demo": ["demo/shopfloor_profile_demo.xml", "demo/shopfloor_menu_demo.xml"],
+    "post_init_hook": "post_init_hook",
+    "uninstall_hook": "uninstall_hook",
 }
