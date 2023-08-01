@@ -17,4 +17,6 @@
         "demo/stock_picking_type_demo.xml",
         "demo/shopfloor_menu_demo.xml",
     ],
+    "post_init_hook": "post_init_hook",
+    "uninstall_hook": "uninstall_hook",
 }
