@@ -4,8 +4,8 @@
 from odoo import api, fields, models
 
 
-class StockLocationRoute(models.Model):
-    _inherit = "stock.location.route"
+class StockRoute(models.Model):
+    _inherit = "stock.route"
 
     flow_id = fields.Many2one(
         comodel_name="stock.warehouse.flow",

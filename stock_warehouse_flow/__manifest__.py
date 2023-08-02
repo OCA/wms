@@ -6,7 +6,7 @@
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "category": "Warehouse Management",
-    "version": "14.0.2.0.0",
+    "version": "16.0.1.0.0",
     "license": "AGPL-3",
     "depends": [
         # core
@@ -20,7 +20,7 @@
     ],
     "data": [
         "security/ir.model.access.csv",
-        "views/stock_location_route.xml",
+        "views/stock_route.xml",
         "views/stock_warehouse_flow.xml",
         "views/stock_warehouse.xml",
         "views/delivery_carrier.xml",

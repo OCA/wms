@@ -31,7 +31,7 @@
     <field name="sequence_prefix">NORMAL</field>
     <field
             name="carrier_ids"
-            eval="[(6, 0, [ref('delivery.normal_delivery_carrier')])]"
+            eval="[(6, 0, [ref('delivery.delivery_local_delivery')])]"
         />
   </record>
 
