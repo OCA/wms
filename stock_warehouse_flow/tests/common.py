@@ -3,10 +3,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from odoo import fields
-from odoo.tests.common import SavepointCase
+from odoo.tests.common import TransactionCase
 
 
-class CommonFlow(SavepointCase):
+class CommonFlow(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -67,7 +67,7 @@ class CommonFlow(SavepointCase):
 
     def _validate_picking(self, picking):
         for move_line in picking.move_line_ids:
-            move_line.qty_done = move_line.product_uom_qty
+            move_line.qty_done = move_line.reserved_uom_qty
         picking._action_done()
 
     def _prepare_split_test(self, qty=None):

@@ -99,7 +99,7 @@ class StockWarehouseFlow(models.Model):
         )
     )
     delivery_route_id = fields.Many2one(
-        comodel_name="stock.location.route",
+        comodel_name="stock.route",
         string="Delivery Route",
         ondelete="set null",
         readonly=True,
@@ -111,7 +111,7 @@ class StockWarehouseFlow(models.Model):
         string="Rules",
     )
     impacted_route_ids = fields.One2many(
-        comodel_name="stock.location.route",
+        comodel_name="stock.route",
         compute="_compute_impacted_route_ids",
         string="Impacted Routes",
     )
@@ -144,7 +144,6 @@ class StockWarehouseFlow(models.Model):
         ),
     )
     qty = fields.Float(
-        "Qty",
         default=0,
         help="If a qty is set the flow can be applied on moves "
         "where the move's qty >= the qty set on the flow\n",
@@ -366,7 +365,7 @@ class StockWarehouseFlow(models.Model):
                 "sequence": 1000,
             }
         )
-        self.delivery_route_id = self.env["stock.location.route"].create(vals)
+        self.delivery_route_id = self.env["stock.route"].create(vals)
         # Subscribe the route to the warehouse
         if self.delivery_route_id.warehouse_selectable:
             self.warehouse_id.route_ids |= self.delivery_route_id

@@ -16,18 +16,24 @@
                         attrs="{'invisible': [('active', '=', True)]}"
                     />
           <div class="oe_title">
-              <label for="name" class="oe_edit_only" />
-              <h1><field name="name" placeholder="Flow Name" /></h1>
+            <label for="name" />
+            <h1>
+              <field name="name" placeholder="Flow Name" />
+            </h1>
           </div>
           <group>
-            <group name="info" colspan="4" col="4">
-              <field
-                                name="warehouse_id"
-                                attrs="{'readonly': [('delivery_route_id', '!=', False)]}"
-                            />
-              <field name="sequence" />
-              <field name="active" invisible="1" />
-              <field name="company_id" invisible="1" />
+            <group name="info" colspan="4">
+              <group>
+                <field
+                                    name="warehouse_id"
+                                    attrs="{'readonly': [('delivery_route_id', '!=', False)]}"
+                                />
+              </group>
+              <group>
+                <field name="sequence" />
+                <field name="active" invisible="1" />
+                <field name="company_id" invisible="1" />
+              </group>
             </group>
             <group name="from" string="From">
               <field name="from_picking_type_id" />
@@ -35,11 +41,10 @@
                                 colspan="2"
                                 attrs="{'invisible': [('from_picking_type_id', '=', False)]}"
                             >
-                <span style="width: 4em;" />
-                =>
-                <field name="from_location_src_id" nolabel="1" />
-                to
-                <field name="from_location_dest_id" nolabel="1" />
+                <span class="text-muted"> => </span>
+                <field name="from_location_src_id" nolabel="1" class="oe_inline" />
+                <span class="text-muted"> to </span>
+                <field name="from_location_dest_id" nolabel="1" class="oe_inline" />
               </div>
               <field name="carrier_ids" widget="many2many_tags" />
               <field
@@ -53,11 +58,11 @@
                                 attrs="{'invisible': [('split_method', '!=', 'simple')]}"
                             />
               <div name="qty" class="o_row">
-                  <field
+                <field
                                     name="qty"
                                     attrs="{'required': [('split_method', '=', 'simple')], 'invisible': [('split_method', '!=', 'simple')]}"
                                 />
-                  <field
+                <field
                                     name="uom_id"
                                     options="{'no_open': True, 'no_create': True}"
                                     groups="uom.group_uom"
@@ -113,7 +118,7 @@
                   <field name="action" />
                   <field name="picking_type_id" />
                   <field name="location_src_id" />
-                  <field name="location_id" />
+                  <field name="location_dest_id" />
                   <field name="group_id" />
                 </tree>
               </field>
@@ -195,18 +200,18 @@
         <field name="carrier_ids" />
         <filter string="Archived" name="inactive" domain="[('active','=',False)]" />
         <group expand='0' string='Group by...'>
-            <filter
+          <filter
                         string='Warehouse'
                         name="groupby_warehouse"
                         context="{'group_by': 'warehouse_id'}"
                         groups="stock.group_stock_multi_warehouses"
                     />
-            <filter
+          <filter
                         string='From operation type'
                         name="groupby_from_picking_type"
                         context="{'group_by': 'from_picking_type_id'}"
                     />
-            <filter
+          <filter
                         string='To operation type'
                         name="groupby_to_picking_type"
                         context="{'group_by': 'to_picking_type_id'}"
