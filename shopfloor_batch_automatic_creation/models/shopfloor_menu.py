@@ -24,22 +24,16 @@ class ShopfloorMenu(models.Model):
         help="If enabled, transfers will be grouped by commercial entity."
         "This could mix priorities and will ignore the constraints to apply.",
     )
-    batch_create_max_picking = fields.Integer(
-        string="Max transfers",
-        default=0,
-        help="Maximum number of transfers to add in an automatic batch."
-        " 0 means no limit.",
+    batch_maximum_number_of_preparation_lines = fields.Integer(
+        default=20,
+        string="Maximum number of preparation lines for the batch",
+        required=True,
     )
-    batch_create_max_volume = fields.Float(
-        string="Max volume (m³)",
-        default=0,
-        digits=(8, 4),
-        help="Maximum volume in cubic meters of goods in transfers to"
-        " add in an automatic batch. 0 means no limit.",
-    )
-    batch_create_max_weight = fields.Float(
-        string="Max Weight (kg)",
-        default=0,
-        help="Maximum weight in kg of goods in transfers to add"
-        " in an automatic batch. 0 means no limit.",
+    stock_device_type_ids = fields.Many2many(
+        comodel_name="stock.device.type",
+        relation="shopfloor_menu_device_type_rel",
+        column1="shopfloor_menu_id",
+        column2="device_type_id",
+        string="Default device types",
+        help="Default list of eligible device types when creating a batch transfer",
     )

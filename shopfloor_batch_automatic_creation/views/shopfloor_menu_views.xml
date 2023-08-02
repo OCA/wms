@@ -16,23 +16,26 @@
                         attrs="{'invisible': [('batch_create', '=', False)]}"
                     />
                     <field
-                        name="batch_create_max_picking"
-                        attrs="{
-                          'invisible': ['|', ('batch_create', '=', False), ('batch_group_by_commercial_partner', '=', True)],
-                        }"
+                        name="batch_maximum_number_of_preparation_lines"
+                        attrs="{'invisible': [('batch_create', '=', False)]}"
+                    />
+
+                    <label
+                        for="stock_device_type_ids"
+                        colspan="4"
+                        attrs="{'invisible': [('batch_create', '=', False)]}"
                     />
                     <field
-                        name="batch_create_max_volume"
-                        attrs="{
-                          'invisible': ['|', ('batch_create', '=', False), ('batch_group_by_commercial_partner', '=', True)],
-                        }"
-                    />
-                    <field
-                        name="batch_create_max_weight"
-                        attrs="{
-                          'invisible': ['|', ('batch_create', '=', False), ('batch_group_by_commercial_partner', '=', True)],
-                        }"
-                    />
+                        name="stock_device_type_ids"
+                        nolabel="1"
+                        colspan="4"
+                        attrs="{'invisible': [('batch_create', '=', False)]}"
+                    >
+                        <tree>
+                            <field name="name" />
+                            <field name="sequence" />
+                        </tree>
+                    </field>
                 </group>
             </group>
         </field>

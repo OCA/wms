@@ -1,6 +1,8 @@
 # Copyright 2020 Camptocamp
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+# pylint: disable=missing-return
+
 from odoo.addons.shopfloor.tests.common import CommonCase
 from odoo.addons.stock.models.stock_move import PROCUREMENT_PRIORITIES
 
@@ -33,8 +35,19 @@ class TestBatchCreate(CommonCase):
             lines=[(cls.product_a, 10), (cls.product_b, 10)]
         )
         cls.pickings = cls.picking1 + cls.picking2 + cls.picking3 + cls.picking4
-        cls._fill_stock_for_moves(cls.pickings.move_lines)
+        cls._fill_stock_for_moves(cls.pickings.move_ids)
         cls.pickings.action_assign()
+        cls.device = cls.env["stock.device.type"].create(
+            {
+                "name": "device",
+                "min_volume": 0,
+                "max_volume": 1000,
+                "max_weight": 1000,
+                "nbr_bins": 20,
+                "sequence": 1,
+            }
+        )
+        cls.menu.sudo().stock_device_type_ids = cls.device
 
     def setUp(self):
         super().setUp()
@@ -45,11 +58,19 @@ class TestBatchCreate(CommonCase):
             self.auto_batch = work.component(usage="picking.batch.auto.create")
 
     def test_create_batch(self):
-        batch = self.auto_batch.create_batch(self.picking_type)
+        batch = self.auto_batch.create_batch(
+            self.picking_type,
+            stock_device_types=self.device,
+            maximum_number_of_preparation_lines=20,
+        )
         self.assertEqual(batch.picking_ids, self.pickings)
 
     def test_create_batch_max_pickings(self):
-        batch = self.auto_batch.create_batch(self.picking_type, max_pickings=3)
+        batch = self.auto_batch.create_batch(
+            self.picking_type,
+            stock_device_types=self.device,
+            maximum_number_of_preparation_lines=6,
+        )
         self.assertEqual(
             batch.picking_ids, self.picking1 + self.picking2 + self.picking3
         )
@@ -57,15 +78,23 @@ class TestBatchCreate(CommonCase):
     def test_create_batch_priority(self):
         self.picking2.priority = PRIORITY_URGENT
         self.picking3.priority = PRIORITY_URGENT
-        batch = self.auto_batch.create_batch(self.picking_type, max_pickings=3)
+        batch = self.auto_batch.create_batch(
+            self.picking_type,
+            stock_device_types=self.device,
+            maximum_number_of_preparation_lines=6,
+        )
         # even if we don't reach the max picking, we should not mix the priorities
         # to make delivery of higher priorities faster
         self.assertEqual(batch.picking_ids, self.picking2 + self.picking3)
 
     def test_create_batch_user(self):
-        (self.picking1 + self.picking4).user_id = False
+        (self.picking1 + self.picking4).user_id = self.env.ref("base.user_demo")
         (self.picking2 + self.picking3).user_id = self.env.user
-        batch = self.auto_batch.create_batch(self.picking_type, max_pickings=3)
+        batch = self.auto_batch.create_batch(
+            self.picking_type,
+            stock_device_types=self.device,
+            maximum_number_of_preparation_lines=6,
+        )
         # when we have users on pickings, we select only those for the batch
         self.assertEqual(batch.picking_ids, self.picking2 + self.picking3)
 
@@ -78,11 +107,17 @@ class TestBatchCreate(CommonCase):
         # picking
         self.product_c.weight = 2
         self.product_d.weight = 2
-
+        self.pickings.move_ids._cal_move_weight()
+        self.pickings._cal_weight()
         # with a max weight of 40, we can take the first picking, but the
         # second one would exceed the max, the third can be added because it's
         # still in the limit
-        batch = self.auto_batch.create_batch(self.picking_type, max_weight=40)
+        self.device.max_weight = 40
+        batch = self.auto_batch.create_batch(
+            self.picking_type,
+            stock_device_types=self.device,
+            maximum_number_of_preparation_lines=20,
+        )
         self.assertEqual(batch.picking_ids, self.picking1 + self.picking3)
 
     def test_create_batch_max_weight_all_exceed(self):
@@ -99,10 +134,14 @@ class TestBatchCreate(CommonCase):
         self.product_c.weight = 1
         self.product_d.weight = 1
 
-        # with a max weight of 10, we can normally take no picking, but as we
-        # need to process them we take at least the first one.
-        batch = self.auto_batch.create_batch(self.picking_type, max_weight=10)
-        self.assertEqual(batch.picking_ids, self.picking1)
+        # with a max weight of 10, we can normally take no picking
+        self.device.max_weight = 10
+        batch = self.auto_batch.create_batch(
+            self.picking_type,
+            stock_device_types=self.device,
+            maximum_number_of_preparation_lines=20,
+        )
+        self.assertFalse(batch.picking_ids)
 
     def test_create_batch_max_volume(self):
         # each picking has 2 lines of 10 units, set volume of 0.1m3 per unit,
@@ -113,11 +152,17 @@ class TestBatchCreate(CommonCase):
         # per picking
         self.product_c.volume = 0.2
         self.product_d.volume = 0.2
-
+        self.pickings.move_ids._compute_volume()
+        self.pickings._compute_volume()
         # with a max volume of 4, we can take the first picking, but the
         # second one would exceed the max, the third can be added because it's
         # still in the limit
-        batch = self.auto_batch.create_batch(self.picking_type, max_volume=4)
+        self.device.max_volume = 4
+        batch = self.auto_batch.create_batch(
+            self.picking_type,
+            stock_device_types=self.device,
+            maximum_number_of_preparation_lines=20,
+        )
         self.assertEqual(batch.picking_ids, self.picking1 + self.picking3)
 
     def test_create_batch_max_volume_all_exceed(self):
@@ -133,60 +178,19 @@ class TestBatchCreate(CommonCase):
         self.product_b.volume = 0.1
         self.product_c.volume = 0.1
         self.product_d.volume = 0.1
-
-        # with a max volume of 1, we can normally take no picking, but as we
-        # need to process them we take at least the first one.
-        batch = self.auto_batch.create_batch(self.picking_type, max_volume=1)
-        self.assertEqual(batch.picking_ids, self.picking1)
-
-    def test_volume(self):
-        # varying volumes because of the packing
-        volume_1 = 0.1
-        volume_2 = 0.25
-        volume_4 = 0.6
-        self.product_a.volume = 0.1
-        cm_uom = self.env.ref("uom.product_uom_cm")
-        self.env["product.packaging"].sudo().create(
-            {
-                "name": "pair",
-                "product_id": self.product_a.id,
-                "qty": 2,
-                "height": 100,
-                "width": 100,
-                "packaging_length": volume_2 * 100,
-                "length_uom_id": cm_uom.id,
-            }
+        self.pickings.move_ids._compute_volume()
+        self.pickings._compute_volume()
+        # with a max volume of 1, we can normally take no picking
+        self.device.max_volume = 1
+        batch = self.auto_batch.create_batch(
+            self.picking_type,
+            stock_device_types=self.device,
+            maximum_number_of_preparation_lines=20,
         )
-        self.env["product.packaging"].sudo().create(
-            {
-                "name": "double pairs",
-                "product_id": self.product_a.id,
-                "qty": 4,
-                "height": 100,
-                "width": 100,
-                "packaging_length": volume_4 * 100,
-                "length_uom_id": cm_uom.id,
-            }
-        )
-        # fmt: off
-        quantity = (
-            1  # unit,
-            + 1 * 2  # 1 * pair
-            + 5 * 4  # 5 * double pairs
-        )
-        expected_volume = (
-            1 * volume_1
-            + 1 * volume_2
-            + 5 * volume_4
-        )
-        # fmt: on
-        picking = self._create_picking(lines=[(self.product_a, quantity)])
-        volume = self.auto_batch._picking_volume(picking)
-        self.assertEqual(volume, expected_volume)
+        self.assertFalse(batch.picking_ids)
 
     def test_cluster_picking_select(self):
         self.menu.sudo().batch_create = True
-        self.menu.sudo().batch_create_max_picking = 2
 
         response = self.service.dispatch("find_batch")
         batch = self.picking1.batch_id
@@ -225,16 +229,20 @@ class TestBatchCreate(CommonCase):
                 "is_company": False,
             }
         )
-        self.picking1.write(
-            {"priority": PRIORITY_NORMAL, "partner_id": partner1_contact.id}
-        )
-        self.picking2.write(
-            {"priority": PRIORITY_NORMAL, "partner_id": partner2_contact.id}
-        )
-        self.picking3.write(
-            {"priority": PRIORITY_URGENT, "partner_id": partner2_contact.id}
-        )
+        self.picking1.write({"partner_id": partner1_contact.id})
+        self.picking2.write({"partner_id": partner2_contact.id})
+        self.picking3.write({"partner_id": partner2_contact.id})
         batch = self.auto_batch.create_batch(
-            self.picking_type, group_by_commercial_partner=True
+            self.picking_type,
+            stock_device_types=self.device,
+            maximum_number_of_preparation_lines=20,
+            group_by_commercial_partner=True,
+        )
+        self.assertEqual(batch.picking_ids, self.picking1)
+        batch = self.auto_batch.create_batch(
+            self.picking_type,
+            stock_device_types=self.device,
+            maximum_number_of_preparation_lines=20,
+            group_by_commercial_partner=True,
         )
         self.assertEqual(batch.picking_ids, self.picking2 | self.picking3)

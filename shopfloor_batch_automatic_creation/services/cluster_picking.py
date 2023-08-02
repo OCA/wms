@@ -20,7 +20,7 @@ class ClusterPicking(Component):
         return auto_batch.create_batch(
             self.picking_types,
             group_by_commercial_partner=menu.batch_group_by_commercial_partner,
-            max_pickings=menu.batch_create_max_picking,
-            max_volume=menu.batch_create_max_volume,
-            max_weight=menu.batch_create_max_weight,
+            maximum_number_of_preparation_lines=menu.batch_maximum_number_of_preparation_lines,
+            stock_device_types=menu.stock_device_type_ids,
+            shopfloor_menu=menu,
         )
