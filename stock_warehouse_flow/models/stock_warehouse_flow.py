@@ -13,6 +13,10 @@ from odoo.tools.safe_eval import safe_eval
 logger = logging.getLogger(__name__)
 
 
+class ForceRollback(Exception):
+    pass
+
+
 class StockWarehouseFlow(models.Model):
     _name = "stock.warehouse.flow"
     _description = "Stock Warehouse Routing Flow"
@@ -342,14 +346,16 @@ class StockWarehouseFlow(models.Model):
                         }
                     )
                 wh_vals["out_type_id"] = self.to_picking_type_id.id
-                self.warehouse_id.write(wh_vals)
+                self.warehouse_id.with_context(do_not_check_quant=True).write(wh_vals)
                 vals = self.warehouse_id.delivery_route_id.copy_data()[0]
-                raise Exception()
-        except Exception:
+                raise ForceRollback()
+
+        except ForceRollback:
             logger.info(
                 f"Routing flow {self.name}: delivery route data generated "
                 f"from WH {self.warehouse_id.name}"
             )
+
         vals.update(
             {
                 "name": f"{self.warehouse_id.name}: {self.name}",
