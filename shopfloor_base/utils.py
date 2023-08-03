@@ -117,7 +117,7 @@ def load_components_without_registry(env, *component_classes):
     return [comp(work) for comp in component_classes]
 
 
-def purge_endpoints(env, service_usage):
+def purge_endpoints(env, service_usage, endpoint=None):
     """Remove stale services' endpoints routes.
 
     When scenario are removed (eg: module uninstalled)
@@ -132,5 +132,6 @@ def purge_endpoints(env, service_usage):
     """
     apps = env["shopfloor.app"].search([])
     for app in apps:
-        route = app.api_url_for_service(service_usage)
+        route = app.api_url_for_service(service_usage, endpoint=endpoint)
+        route = route + ("/" if not endpoint else "")
         env.cr.execute("DELETE FROM endpoint_route WHERE route like %s", (f"{route}%",))
