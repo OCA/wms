@@ -43,7 +43,7 @@ class ZonePickingCompleteMixPackageFluxCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": quantity_done,
-                "confirmation": True,
+                "confirmation": self.packing_location.barcode,
                 "handle_complete_mix_pack": True,
             },
         )

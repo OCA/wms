@@ -332,13 +332,13 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             picking_type=self.picking_type,
             move_lines=move_lines,
             message=self.service.msg_store.package_different_change(),
-            confirmation_required=True,
+            confirmation_required=package1b.name,
         )
         self.assertEqual(self.picking1.package_level_ids[0].package_id, package1)
         # 2nd scan
         response = self.service.dispatch(
             "scan_source",
-            params={"barcode": package1b.name, "confirmation": True},
+            params={"barcode": package1b.name, "confirmation": package1b.name},
         )
         self.assert_response_set_line_destination(
             response,

@@ -164,7 +164,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             params={
                 "package_id": self.free_package.id,
                 "barcode": packing_sublocation2.barcode,
-                "confirmation": True,
+                "confirmation": packing_sublocation2.barcode,
             },
         )
         # Response has already been tested in the test above
@@ -219,7 +219,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             message=self.service.msg_store.confirm_location_changed(
                 packing_sublocation1, packing_sublocation2
             ),
-            confirmation_required=True,
+            confirmation_required=packing_sublocation2.barcode,
         )
 
     def test_unload_set_destination_ok_buffer_empty(self):
@@ -248,7 +248,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             params={
                 "package_id": self.free_package.id,
                 "barcode": packing_sublocation.barcode,
-                "confirmation": True,
+                "confirmation": packing_sublocation.barcode,
             },
         )
         # check data
@@ -345,7 +345,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
             params={
                 "package_id": self.free_package.id,
                 "barcode": packing_sublocation.barcode,
-                "confirmation": True,
+                "confirmation": packing_sublocation.barcode,
             },
         )
         # check data
