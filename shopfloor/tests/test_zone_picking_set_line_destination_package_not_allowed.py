@@ -30,7 +30,7 @@ class ZonePickingSetLineDestinationPackageNotAllowedCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": move_line.product_uom_qty,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         self.assert_response_set_line_destination(
@@ -55,7 +55,7 @@ class ZonePickingSetLineDestinationPackageNotAllowedCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": 1.0,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         move_lines = self.service._find_location_move_lines()
@@ -80,7 +80,7 @@ class ZonePickingSetLineDestinationPackageNotAllowedCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": move_line.product_uom_qty,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         move_lines = self.service._find_location_move_lines()
