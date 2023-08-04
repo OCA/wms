@@ -20,7 +20,7 @@ class TestStart(CommonCase):
         response = self.service.dispatch("start")
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         message = {
             "message_type": "info",

@@ -57,7 +57,7 @@ class TestSetQuantity(CommonCase):
         expected_message = {"message_type": "error", "body": "Barcode not found"}
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(
             response, next_state="set_quantity", message=expected_message, data=data
@@ -92,7 +92,7 @@ class TestSetQuantity(CommonCase):
         )
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         expected_message = self.msg_store.move_already_done()
         self.assert_response(
@@ -121,7 +121,7 @@ class TestSetQuantity(CommonCase):
         )
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
         # However, we prevent the user to post the line if qty_done > qty_todo
@@ -135,7 +135,7 @@ class TestSetQuantity(CommonCase):
         )
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         expected_message = {
             "message_type": "error",
@@ -168,7 +168,7 @@ class TestSetQuantity(CommonCase):
             )
             data = {
                 "move_line": self._data_for_move_line(move_line),
-                "asking_confirmation": False,
+                "asking_confirmation": None,
             }
             self.assert_response(response, next_state="set_quantity", data=data)
             self.assertEqual(move_line.qty_done, expected_qty)
@@ -183,7 +183,7 @@ class TestSetQuantity(CommonCase):
         )
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
         # However, we prevent the user to post the line if qty_done > qty_todo
@@ -197,7 +197,7 @@ class TestSetQuantity(CommonCase):
         )
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         expected_message = {
             "message_type": "error",
@@ -228,7 +228,7 @@ class TestSetQuantity(CommonCase):
         # expected qty_done on move line is 6.0
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
         self.assertEqual(move_line.qty_done, 6.0)
@@ -244,7 +244,7 @@ class TestSetQuantity(CommonCase):
         # Expected qty_done is 11.0
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
         self.assertEqual(move_line.qty_done, 11.0)
@@ -271,7 +271,7 @@ class TestSetQuantity(CommonCase):
         )
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
         # However, we shouldn't be able to confirm (scan a location)
@@ -286,7 +286,7 @@ class TestSetQuantity(CommonCase):
         )
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         expected_message = self.msg_store.unable_to_pick_more(10.0)
         self.assert_response(
@@ -317,7 +317,7 @@ class TestSetQuantity(CommonCase):
             )
             data = {
                 "move_line": self._data_for_move_line(move_line),
-                "asking_confirmation": False,
+                "asking_confirmation": None,
             }
             self.assert_response(response, next_state="set_quantity", data=data)
             self.assertEqual(move_line.qty_done, expected_qty)
@@ -332,7 +332,7 @@ class TestSetQuantity(CommonCase):
         )
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
         # However, we shouldn't be able to confirm (scan a location)
@@ -347,7 +347,7 @@ class TestSetQuantity(CommonCase):
         )
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         expected_message = self.msg_store.unable_to_pick_more(10.0)
         self.assert_response(
@@ -374,7 +374,7 @@ class TestSetQuantity(CommonCase):
         )
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
         self.assertEqual(move_line.qty_done, 15.0)
@@ -390,7 +390,7 @@ class TestSetQuantity(CommonCase):
         )
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         expected_message = self.msg_store.unable_to_pick_more(10.0)
         self.assert_response(
@@ -461,7 +461,7 @@ class TestSetQuantity(CommonCase):
         self.assertEqual(move_line.qty_done, 10.0)
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
         response = self.service.dispatch(
@@ -487,19 +487,19 @@ class TestSetQuantity(CommonCase):
         )
         move_line = picking.move_line_ids
         # Then try to scan wrong_location
-        wrong_location = self.env.ref("stock.stock_location_14")
+        wrong_location = self.customer_location
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
                 "quantity": move_line.qty_done,
-                "barcode": wrong_location.name,
+                "barcode": wrong_location.barcode,
             },
         )
         expected_message = {"message_type": "error", "body": "You cannot place it here"}
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(
             response, next_state="set_quantity", message=expected_message, data=data
@@ -520,7 +520,7 @@ class TestSetQuantity(CommonCase):
         params = {
             "selected_line_id": move_line.id,
             "quantity": move_line.qty_done,
-            "barcode": self.dispatch_location.name,
+            "barcode": self.dispatch_location.barcode,
         }
         response = self.service.dispatch("set_quantity", params=params)
         expected_message = {
@@ -532,18 +532,54 @@ class TestSetQuantity(CommonCase):
         }
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": True,
+            "asking_confirmation": self.dispatch_location.barcode,
         }
         self.assert_response(
             response, next_state="set_quantity", message=expected_message, data=data
         )
-        # Now, calling the same endpoint with confirm=True should be ok
-        params["confirmation"] = True
+        # Now, calling the same endpoint with the confirmation set is ok
+        params["confirmation"] = self.dispatch_location.barcode
         response = self.service.dispatch("set_quantity", params=params)
         expected_message = self.service.msg_store.transfer_done_success(
             move_line.picking_id
         )
         data = {"location": self._data_for_location(location)}
+        self.assert_response(
+            response, next_state="select_product", message=expected_message, data=data
+        )
+
+    def test_set_quantity_confirm_with_different_barcode(self):
+        picking = self._setup_picking()
+        self.menu.sudo().allow_alternative_destination = True
+        # Change the destination on the move_line
+        move_line = picking.move_line_ids
+        move_line.location_dest_id = self.env.ref("stock.stock_location_14")
+        params = {
+            "selected_line_id": move_line.id,
+            "quantity": move_line.qty_done,
+            "barcode": self.dispatch_location.barcode,
+        }
+        # Setting the confirmation to another location barcode
+        params["confirmation"] = self.dispatch_location.barcode + "DIFF"
+        response = self.service.dispatch("set_quantity", params=params)
+        # Confirmation is asked again for new location scanned
+        message = self.service.msg_store.confirm_location_changed(
+            move_line.location_dest_id, self.dispatch_location
+        )
+        data = {
+            "move_line": self._data_for_move_line(move_line),
+            "asking_confirmation": self.dispatch_location.barcode,
+        }
+        self.assert_response(
+            response, next_state="set_quantity", message=message, data=data
+        )
+        # Confirming the location with the same location
+        params["confirmation"] = self.dispatch_location.barcode
+        response = self.service.dispatch("set_quantity", params=params)
+        expected_message = self.service.msg_store.transfer_done_success(
+            move_line.picking_id
+        )
+        data = {"location": self._data_for_location(self.location)}
         self.assert_response(
             response, next_state="select_product", message=expected_message, data=data
         )

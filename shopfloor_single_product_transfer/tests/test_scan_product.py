@@ -114,7 +114,7 @@ class TestScanProduct(CommonCase):
         self.assertTrue(move_line.picking_id.user_id)
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
 
@@ -161,7 +161,7 @@ class TestScanProduct(CommonCase):
         self.assertEqual(move_line.product_qty, 10.0)
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
 
@@ -218,7 +218,7 @@ class TestScanProduct(CommonCase):
         self.assertEqual(move_line.product_qty, 10.0)
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
 
@@ -258,7 +258,7 @@ class TestScanProduct(CommonCase):
         self.assertTrue(move_line.picking_id.user_id)
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
 
@@ -301,7 +301,7 @@ class TestScanProduct(CommonCase):
         self.assertTrue(move_line.picking_id.user_id)
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
 
@@ -355,7 +355,7 @@ class TestScanProduct(CommonCase):
         self.assertEqual(move_line.product_qty, 10.0)
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
 
@@ -400,7 +400,7 @@ class TestScanProduct(CommonCase):
         self.assertTrue(move_line)
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
 
@@ -425,7 +425,7 @@ class TestScanProduct(CommonCase):
         self.assertTrue(move_line)
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
 
@@ -508,6 +508,6 @@ class TestScanProduct(CommonCase):
         self.assertTrue(move_line.picking_id.user_id)
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
