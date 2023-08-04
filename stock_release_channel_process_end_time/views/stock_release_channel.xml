@@ -13,18 +13,21 @@
             ref="stock_release_channel.stock_release_channel_form_view"
         />
         <field name="arch" type="xml">
-            <field name="release_forbidden" position="after">
-                <field name="process_end_time_can_edit" invisible="1" />
+
+            <xpath expr="//notebook" position="before">
+                <group>
+                    <field name="process_end_time_can_edit" invisible="1" />
                 <field
-                    name="process_end_time"
-                    widget="float_time"
-                    attrs="{'readonly': [('process_end_time_can_edit', '=', False)]}"
-                />
+                        name="process_end_time"
+                        widget="float_time"
+                        attrs="{'readonly': [('process_end_time_can_edit', '=', False)]}"
+                    />
                 <field
-                    name="process_end_date"
-                    attrs="{'readonly': [('process_end_time_can_edit', '=', False)]}"
-                />
-            </field>
+                        name="process_end_date"
+                        attrs="{'readonly': [('process_end_time_can_edit', '=', False)]}"
+                    />
+                </group>
+            </xpath>
         </field>
     </record>
 
