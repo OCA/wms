@@ -60,12 +60,12 @@ Vue.component("detail-transfer", {
                 },
                 {path: "lot.name", label: "Lot", action_val_path: "lot.name"},
                 {
-                    path: "product.qty_reserved",
+                    path: "quantity",
                     label: "Qty reserved",
                     render_component: "packaging-qty-picker-display",
                     render_props: function (record) {
                         return self.utils.wms.move_line_qty_picker_props(record, {
-                            qtyInit: record.product.qty_reserved,
+                            qtyInit: record.quantity,
                         });
                     },
                 },
