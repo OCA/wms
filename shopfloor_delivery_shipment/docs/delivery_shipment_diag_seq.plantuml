@@ -27,7 +27,7 @@ scan_dock -> scan_document: **/scan_dock(barcode)**
 
 == /scan_dock (without available shipment) ==
 scan_dock -> scan_dock: **/scan_dock(barcode)**\n(asking for confirmation to create a new shipment)
-scan_dock -> scan_document: **/scan_dock(barcode, confirmation=True)**
+scan_dock -> scan_document: **/scan_dock(barcode, confirmation=barcode)**
 
 == /scan_document ==
 scan_document -> scan_document: **/scan_document**(shipment_advice_id, barcode, picking_id=None, location_id=None)

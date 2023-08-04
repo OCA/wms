@@ -29,11 +29,12 @@ class DeliveryShipmentScanDockCase(DeliveryShipmentCommonCase):
         self.assert_response_scan_dock(
             response,
             message=self.service.msg_store.scan_dock_again_to_confirm(self.dock),
-            confirmation_required=True,
+            confirmation_required=self.dock.barcode,
         )
         # Second scan to confirm
         response = self.service.dispatch(
-            "scan_dock", params={"barcode": self.dock.barcode, "confirmation": True}
+            "scan_dock",
+            params={"barcode": self.dock.barcode, "confirmation": self.dock.barcode},
         )
         new_shipment = self.env["shipment.advice"].search(
             [("state", "=", "in_progress"), ("dock_id", "=", self.dock.id)],
@@ -41,6 +42,29 @@ class DeliveryShipmentScanDockCase(DeliveryShipmentCommonCase):
             order="create_date DESC",
         )
         self.assert_response_scan_document(response, new_shipment)
+
+    def test_scan_dock_create_shipment_confirmation_not_same_dock(self):
+        self.menu.sudo().allow_shipment_advice_create = True
+        # First scan, a confirmation is required to create a new shipment
+        response = self.service.dispatch(
+            "scan_dock", params={"barcode": self.dock.barcode}
+        )
+        self.assert_response_scan_dock(
+            response,
+            message=self.service.msg_store.scan_dock_again_to_confirm(self.dock),
+            confirmation_required=self.dock.barcode,
+        )
+        # Then scan a different dock barcode whith the confirmation of the previous dock
+        response = self.service.dispatch(
+            "scan_dock",
+            params={"barcode": self.dock2.barcode, "confirmation": self.dock.barcode},
+        )
+        # Return a confirmation for the last dock scanned
+        self.assert_response_scan_dock(
+            response,
+            message=self.service.msg_store.scan_dock_again_to_confirm(self.dock2),
+            confirmation_required=self.dock2.barcode,
+        )
 
     def test_scan_dock_with_planned_content_ok(self):
         self._plan_records_in_shipment(self.shipment, self.pickings)

@@ -19,6 +19,7 @@ class DeliveryShipmentCommonCase(common.CommonCase):
         cls.picking_type.sudo().show_entire_packs = True
         cls.dock = cls.env.ref("shipment_advice.stock_dock_demo")
         cls.dock.sudo().barcode = "DOCK"
+        cls.dock2 = cls.dock.sudo().copy({"barcode": "DOCK2"})
 
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
@@ -93,7 +94,7 @@ class DeliveryShipmentCommonCase(common.CommonCase):
         return self.service._data_for_stock_picking(picking)
 
     def assert_response_scan_dock(
-        self, response, message=None, confirmation_required=False
+        self, response, message=None, confirmation_required=None
     ):
         data = {
             "confirmation_required": confirmation_required,

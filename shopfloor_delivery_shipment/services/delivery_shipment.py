@@ -71,7 +71,12 @@ class DeliveryShipment(Component):
                 if not confirmation:
                     return self._response_for_scan_dock(
                         message=self.msg_store.scan_dock_again_to_confirm(dock),
-                        confirmation_required=True,
+                        confirmation_required=barcode,
+                    )
+                if confirmation != barcode:
+                    return self._response_for_scan_dock(
+                        message=self.msg_store.scan_dock_again_to_confirm(dock),
+                        confirmation_required=barcode,
                     )
                 shipment_advice = self._create_shipment_advice_from_dock(dock)
             return self._response_for_scan_document(shipment_advice)
@@ -478,7 +483,7 @@ class DeliveryShipment(Component):
             message=self.msg_store.shipment_validated(shipment_advice)
         )
 
-    def _response_for_scan_dock(self, message=None, confirmation_required=False):
+    def _response_for_scan_dock(self, message=None, confirmation_required=None):
         """Transition to the 'scan_dock' state.
 
         The client screen invite the user to scan a dock to find or create an
@@ -867,10 +872,9 @@ class ShopfloorDeliveryShipmentValidator(Component):
         return {
             "barcode": {"required": True, "type": "string"},
             "confirmation": {
-                "coerce": to_bool,
                 "required": False,
                 "nullable": True,
-                "type": "boolean",
+                "type": "string",
             },
         }
 
@@ -983,7 +987,7 @@ class ShopfloorDeliveryShipmentValidatorResponse(Component):
     def _schema_scan_dock(self):
         return {
             "confirmation_required": {
-                "type": "boolean",
+                "type": "string",
                 "nullable": True,
                 "required": False,
             },
