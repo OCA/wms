@@ -76,7 +76,7 @@ addon | version | maintainers | summary
 [stock_storage_type_buffer](stock_storage_type_buffer/) | 14.0.1.3.0 |  | Exclude storage locations from put-away if their buffer is full
 [stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 14.0.1.0.0 |  | Advanced storage strategy ABC for WMS
 [stock_unique_order_per_location](stock_unique_order_per_location/) | 14.0.1.0.0 | [![TDu](https://github.com/TDu.png?size=30px)](https://github.com/TDu) | Prevent to mix sales order on same consolidation location.
-[stock_warehouse_flow](stock_warehouse_flow/) | 14.0.2.0.0 |  | Configure routing flow for stock moves
+[stock_warehouse_flow](stock_warehouse_flow/) | 14.0.2.0.1 |  | Configure routing flow for stock moves
 [stock_warehouse_flow_product_packaging](stock_warehouse_flow_product_packaging/) | 14.0.2.0.0 | [![mt-software-de](https://github.com/mt-software-de.png?size=30px)](https://github.com/mt-software-de) | Configure packaging types on routing flows for stock moves
 [stock_warehouse_flow_release](stock_warehouse_flow_release/) | 14.0.2.0.0 |  | Warehouse flows integrated with Operation Release
 
