@@ -17,6 +17,6 @@ class ShopfloorSingleProductTransfer(Component):
         ):
             message = self.msg_store.location_requires_package()
             return self._response_for_set_quantity(
-                move_line, message=message, asking_confirmation=False
+                move_line, message=message, asking_confirmation=None
             )
         return super()._set_quantity__check_location(move_line, location, confirmation)
