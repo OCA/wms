@@ -107,7 +107,7 @@ class TestSingleProductTransferNoMixSetQuantity(CommonCase):
         expected_message = {"message_type": "error", "body": "You cannot place it here"}
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         self.assert_response(
             response, next_state="set_quantity", message=expected_message, data=data
