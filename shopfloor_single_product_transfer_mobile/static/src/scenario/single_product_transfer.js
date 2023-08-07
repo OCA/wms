@@ -239,9 +239,7 @@ const SingleProductTransfer = {
                         this.state.data.quantity = qty;
                     },
                     on_scan: (scanned) => {
-                        const confirmation = this.state.data.asking_confirmation
-                            ? true
-                            : false;
+                        const confirmation = this.state.data.asking_confirmation || "";
                         this.wait_call(
                             this.odoo.call("set_quantity", {
                                 selected_line_id: this.state.data.move_line.id,
