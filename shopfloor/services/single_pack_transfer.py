@@ -41,9 +41,9 @@ class SinglePackTransfer(Component):
     def _response_for_start(self, message=None, popup=None):
         return self._response(next_state="start", message=message, popup=popup)
 
-    def _response_for_confirm_start(self, package_level, message=None):
+    def _response_for_confirm_start(self, package_level, message=None, barcode=""):
         data = self._data_after_package_scanned(package_level)
-        data["confirmation_required"] = True
+        data["confirmation_required"] = barcode
         return self._response(
             next_state="start",
             data=data,
@@ -51,7 +51,7 @@ class SinglePackTransfer(Component):
         )
 
     def _response_for_scan_location(
-        self, package_level, message=None, confirmation_required=False
+        self, package_level, message=None, confirmation_required=None
     ):
         data = self._data_after_package_scanned(package_level)
         data["confirmation_required"] = confirmation_required
@@ -61,7 +61,7 @@ class SinglePackTransfer(Component):
             message=message,
         )
 
-    def _scan_source(self, barcode, confirmation=False):
+    def _scan_source(self, barcode, confirmation=None):
         """Search a package"""
         search = self._actions_for("search")
         location = search.location_from_scan(barcode)
@@ -93,7 +93,7 @@ class SinglePackTransfer(Component):
 
         return (None, package)
 
-    def start(self, barcode, confirmation=False):
+    def start(self, barcode, confirmation=None):
         picking_types = self.picking_types
         message, package = self._scan_source(barcode, confirmation)
         if message:
@@ -164,9 +164,11 @@ class SinglePackTransfer(Component):
                 message=self.msg_store.no_putaway_destination_available()
             )
 
-        if package_level.is_done and not confirmation:
+        if package_level.is_done and confirmation != barcode:
             return self._response_for_confirm_start(
-                package_level, message=self.msg_store.already_running_ask_confirmation()
+                package_level,
+                message=self.msg_store.already_running_ask_confirmation(),
+                barcode=barcode,
             )
         if not package_level.is_done:
             package_level.is_done = True
@@ -205,7 +207,7 @@ class SinglePackTransfer(Component):
     def _is_move_state_valid(self, moves):
         return all(move.state != "cancel" for move in moves)
 
-    def validate(self, package_level_id, location_barcode, confirmation=False):
+    def validate(self, package_level_id, location_barcode, confirmation=None):
         """Validate the transfer"""
         search = self._actions_for("search")
 
@@ -235,12 +237,12 @@ class SinglePackTransfer(Component):
                 package_level, message=self.msg_store.dest_location_not_allowed()
             )
 
-        if not confirmation and self.is_dest_location_to_confirm(
+        if confirmation != location_barcode and self.is_dest_location_to_confirm(
             package_level.location_dest_id, scanned_location
         ):
             return self._response_for_scan_location(
                 package_level,
-                confirmation_required=True,
+                confirmation_required=location_barcode,
                 message=self.msg_store.confirm_location_changed(
                     package_level.location_dest_id, scanned_location
                 ),
@@ -309,7 +311,7 @@ class SinglePackTransferValidator(Component):
     def start(self):
         return {
             "barcode": {"type": "string", "nullable": False, "required": True},
-            "confirmation": {"type": "boolean", "required": False},
+            "confirmation": {"type": "string", "required": False},
         }
 
     def cancel(self):
@@ -321,7 +323,7 @@ class SinglePackTransferValidator(Component):
         return {
             "package_level_id": {"coerce": to_int, "required": True, "type": "integer"},
             "location_barcode": {"type": "string", "nullable": False, "required": True},
-            "confirmation": {"type": "boolean", "required": False},
+            "confirmation": {"type": "string", "required": False},
         }
 
 
@@ -380,7 +382,7 @@ class SinglePackTransferValidatorResponse(Component):
     def _schema_confirmation_required(self):
         return {
             "confirmation_required": {
-                "type": "boolean",
+                "type": "string",
                 "nullable": True,
                 "required": False,
             },
