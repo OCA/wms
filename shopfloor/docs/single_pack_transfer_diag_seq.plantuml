@@ -23,14 +23,14 @@ header <img:oca_logo.png>
 title <size:35>Single Pack Transfer scenario</size>
 
 == /start ==
-start -> scan_location: **/start**(barcode[pack|location], confirmation=False)
-start -> start: **/start**(barcode[pack|location], confirmation=False)
+start -> scan_location: **/start**(barcode[pack|location], confirmation=None)
+start -> start: **/start**(barcode[pack|location], confirmation=None)
 
 == /cancel ==
 scan_location -> start: **/cancel**(package_level_id)
 
 == /validate ==
-scan_location -> scan_location: **/validate**(package_level_id, location_barcode, confirmation=False)
-scan_location -> start: **/validate**(package_level_id, location_barcode, confirmation=False)
+scan_location -> scan_location: **/validate**(package_level_id, location_barcode, confirmation=None)
+scan_location -> start: **/validate**(package_level_id, location_barcode, confirmation=None)
 
 @enduml
