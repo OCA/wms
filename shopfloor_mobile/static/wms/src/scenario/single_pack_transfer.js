@@ -24,7 +24,7 @@ export var SinglePackStatesMixin = {
                         this.wait_call(
                             this.odoo.call("start", {
                                 barcode: scanned.text,
-                                confirmation: data.confirmation_required,
+                                confirmation: data.confirmation_required || "",
                             })
                         );
                     },
@@ -43,7 +43,7 @@ export var SinglePackStatesMixin = {
                                 package_level_id: data.id,
                                 location_barcode: scanned.text,
                                 confirmation:
-                                    confirmation || data.confirmation_required,
+                                    confirmation || data.confirmation_required || "",
                             })
                         );
                     },
