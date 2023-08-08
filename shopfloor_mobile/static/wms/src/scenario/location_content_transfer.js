@@ -271,7 +271,7 @@ const LocationContentTransfer = {
                             this.odoo.call("set_destination_all", {
                                 location_id: data.location.id,
                                 barcode: scanned.text,
-                                confirmation: data.confirmation_required,
+                                confirmation: data.confirmation_required || "",
                             })
                         );
                     },
@@ -334,7 +334,7 @@ const LocationContentTransfer = {
                                 package_level_id: data.package_level.id,
                                 location_id: data.package_level.location_src.id,
                                 barcode: scanned.text,
-                                confirmation: data.confirmation_required,
+                                confirmation: data.confirmation_required || "",
                             };
                         } else {
                             endpoint = "set_destination_line";
@@ -342,7 +342,7 @@ const LocationContentTransfer = {
                                 move_line_id: data.move_line.id,
                                 location_id: data.move_line.location_src.id,
                                 barcode: scanned.text,
-                                confirmation: data.confirmation_required,
+                                confirmation: data.confirmation_required || "",
                                 quantity: this.scan_destination_qty,
                             };
                         }
