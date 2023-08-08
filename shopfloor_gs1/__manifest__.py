@@ -13,6 +13,13 @@
     "maintainers": ["simahawk", "sebalix"],
     "license": "AGPL-3",
     "depends": ["shopfloor"],
-    "external_dependencies": {"python": ["biip==2.3.0"]},
+    "external_dependencies": {
+        "python": [
+            # >= 2.3.0 required to use 'GS1Message.parse_hri' method
+            # and next version 3.0.0 has been refactored bringing
+            # incompatibility issues (to check later).
+            "biip==2.3.0"
+        ]
+    },
     "data": [],
 }
