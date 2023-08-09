@@ -5,9 +5,11 @@
         <field name="model">shopfloor.menu</field>
         <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_form_view" />
         <field name="arch" type="xml">
-            <group name="options" position="inside">
+            <group name="options" position="after">
+
                 <group
                     name="batch_create"
+                    string="Batch Creation"
                     attrs="{'invisible': [('scenario', '!=', 'cluster_picking')]}"
                 >
                     <field name="batch_create" />
@@ -22,18 +24,17 @@
 
                     <label
                         for="stock_device_type_ids"
-                        colspan="4"
+                        colspan="2"
                         attrs="{'invisible': [('batch_create', '=', False)]}"
                     />
                     <field
                         name="stock_device_type_ids"
                         nolabel="1"
-                        colspan="4"
+                        colspan="2"
                         attrs="{'invisible': [('batch_create', '=', False)]}"
                     >
                         <tree>
                             <field name="name" />
-                            <field name="sequence" />
                         </tree>
                     </field>
                 </group>
