@@ -6,22 +6,39 @@
 
 import {demotools} from "/shopfloor_mobile_base/static/wms/src/demo/demo.core.js";
 
+const shuffle_dg_flag = (lines) => {
+    lines.forEach(function (line, i) {
+        if (i % 2 === 0) {
+            if (line.package_dest) line.package_dest.has_lq_products = true;
+            else line.has_lq_products = true;
+        }
+    });
+};
+
 const select_pack_picking = demotools.makePicking(
     {},
     {lines_count: 5, line_random_pack: true, line_random_dest: true}
 );
+shuffle_dg_flag(select_pack_picking.move_lines);
 
 const move_lines1 = demotools.makePickingLines(
     {},
     {lines_count: 5, line_random_pack: true}
 );
 
-move_lines1.forEach(function (line, i) {
-    if (i % 2 === 0) {
-        if (line.pack) line.pack.has_lq_products = true;
-        else line.has_lq_products = true;
-    }
+shuffle_dg_flag(move_lines1);
+
+// Simulate case of 2 lines in the same pack w/ the 2nd having DG
+const pack = demotools.makePack({name: "DGBOX"});
+const new_line1 = demotools.makeMoveLine({package_dest: pack});
+const new_line2 = demotools.makeMoveLine({
+    package_dest: pack,
+    location_src: new_line1.location_src,
 });
+new_line1.has_lq_products = false;
+new_line2.has_lq_products = true;
+move_lines1.push(new_line1);
+move_lines1.push(new_line2);
 
 const select_line_picking = demotools.makePicking(
     {
@@ -74,7 +91,7 @@ const DEMO_CHECKOUT_DG = {
     select: {
         next_state: "select_line",
         data: {
-            select_line: {picking: select_line_picking},
+            select_line: {picking: select_line_picking, group_lines_by_location: true},
         },
     },
     scan_package_action: function (data) {
