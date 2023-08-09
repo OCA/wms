@@ -415,7 +415,7 @@ const ClusterPicking = {
                                 picking_batch_id: this.current_batch().id,
                                 package_id: null, // FIXME: where does it come from? backend data?
                                 barcode: scanned.text,
-                                confirmation: true,
+                                confirmation: this.state.data.confirmation || "",
                             })
                         );
                     },
