@@ -593,7 +593,7 @@ const ZonePicking = {
         scan_source(barcode) {
             let data = {
                 barcode: barcode,
-                confirmation: this.state.data.confirmation_required,
+                confirmation: this.state.data.confirmation_required || "",
             };
             if (this.state_is("select_line") && this.state.data.product) {
                 data.product_id = this.state.data.product.id;
@@ -841,7 +841,7 @@ const ZonePicking = {
                                 move_line_id: data.move_line.id,
                                 barcode: scanned.text,
                                 quantity: quantity,
-                                confirmation: data.confirmation_required,
+                                confirmation: data.confirmation_required || "",
                                 // package_id: data.is_complete_mix_pack ? data.move_line.package_src.id : null,
                                 handle_complete_mix_pack: data.handle_complete_mix_pack,
                             })
@@ -871,7 +871,8 @@ const ZonePicking = {
                         this.wait_call(
                             this.odoo.call("set_destination_all", {
                                 barcode: scanned.text,
-                                confirmation: this.state.data.confirmation_required,
+                                confirmation:
+                                    this.state.data.confirmation_required || "",
                             })
                         );
                     },
@@ -903,7 +904,8 @@ const ZonePicking = {
                             this.odoo.call("unload_set_destination", {
                                 package_id: this.state.data.move_line.package_dest.id,
                                 barcode: scanned.text,
-                                confirmation: this.state.data.confirmation_required,
+                                confirmation:
+                                    this.state.data.confirmation_required || "",
                             })
                         );
                     },
