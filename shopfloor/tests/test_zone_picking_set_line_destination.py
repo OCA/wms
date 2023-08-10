@@ -580,6 +580,41 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             message=self.service.msg_store.confirm_pack_moved(),
         )
 
+    def test_set_same_destination_package_different_picking_type(self):
+        self.menu.sudo().write({"multiple_move_single_pack": True})
+        picking_type1 = self.picking1.picking_type_id
+        self._update_qty_in_location(
+            picking_type1.default_location_src_id, self.product_a, 100
+        )
+        picking_type = picking_type1.sudo().copy(
+            {"name": "test", "shopfloor_menu_ids": False}
+        )
+        picking = self._create_picking(
+            picking_type=picking_type, lines=[(self.product_a, 10)]
+        )
+        self.assertEqual(picking.picking_type_id, picking_type)
+        picking.action_assign()
+        move_line = picking.move_line_ids
+        move_line.result_package_id = self.free_package.id
+        self.assertEqual(self.free_package.planned_move_line_ids, move_line)
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "move_line_id": move_line.id,
+                "barcode": self.free_package.name,
+                "quantity": move_line.product_uom_qty,
+                "confirmation": False,
+            },
+        )
+        self.assertEqual(
+            response["message"],
+            {
+                "body": "Package FREE_PACKAGE contains already lines"
+                " from a different operation type test",
+                "message_type": "warning",
+            },
+        )
+
     def test_set_destination_location_zero_quantity(self):
         """Scanned barcode is the destination location.
 

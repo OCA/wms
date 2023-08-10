@@ -940,25 +940,34 @@ class ZonePicking(Component):
             move_line.product_uom_qty - qty, precision_rounding=rounding
         )
 
-    def _set_destination_package(self, move_line, quantity, package):
-        package_changed = False
-        response = None
+    def _is_package_not_valid(self, package):
+        message = False
         # A valid package is:
         # * an empty package
         # * not used as destination for another move line
+        # * not contains move lines with different operation type
         if not self._is_package_empty(package):
+            message = self.msg_store.package_not_empty(package)
+        elif package.planned_move_line_ids:
+            if not self.work.menu.multiple_move_single_pack:
+                message = self.msg_store.package_already_used(package)
+            else:
+                for line in package.planned_move_line_ids:
+                    if line.picking_id.picking_type_id.id in self.picking_types.ids:
+                        continue
+                    message = self.msg_store.package_different_picking_type(
+                        package, line.picking_id.picking_type_id
+                    )
+                    break
+        return message
+
+    def _set_destination_package(self, move_line, quantity, package):
+        package_changed = False
+        response = None
+        package_invalid_message = self._is_package_not_valid(package)
+        if package_invalid_message:
             response = self._response_for_set_line_destination(
-                move_line,
-                message=self.msg_store.package_not_empty(package),
-                qty_done=quantity,
-            )
-            return (package_changed, response)
-        multiple_move_allowed = self.work.menu.multiple_move_single_pack
-        if package.planned_move_line_ids and not multiple_move_allowed:
-            response = self._response_for_set_line_destination(
-                move_line,
-                message=self.msg_store.package_already_used(package),
-                qty_done=quantity,
+                move_line, message=package_invalid_message, qty_done=quantity
             )
             return (package_changed, response)
         # the quantity done is set to the passed quantity
