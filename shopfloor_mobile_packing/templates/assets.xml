@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 ACSONE SA/NV
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+  <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_mobile.shopfloor_app_assets"
+    >
+    <script id="script_scenario_cluster_picking" position="after">
+      <script
+                id="script_translations"
+                t-attf-src="/shopfloor_mobile_packing/static/src/js/translation_registry.js?v=#{mod_version}"
+                type="module"
+            />
+      <script
+                id="script_component_batch_picking_line_detail"
+                t-attf-src="/shopfloor_mobile_packing/static/src/js/components/pack_picking_detail.js?v=#{mod_version}"
+                type="module"
+            />
+      <script
+                id="script_scenario_cluster_picking_packing"
+                t-attf-src="/shopfloor_mobile_packing/static/src/js/cluster-picking.js?v=#{mod_version}"
+                type="module"
+            />
+    </script>
+  </template>
+</odoo>
