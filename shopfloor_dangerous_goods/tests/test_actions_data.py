@@ -62,7 +62,6 @@ class ActionsDataBase(ActionsDataCaseBase):
         expected = {
             "id": package.id,
             "name": package.name,
-            "move_line_count": 2,
             "packaging": self._expected_packaging(package.packaging_id),
             "storage_type": self._expected_storage_type(
                 package.package_storage_type_id
