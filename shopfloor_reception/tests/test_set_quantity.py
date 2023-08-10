@@ -62,7 +62,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
-                "confirmation_required": False,
+                "confirmation_required": None,
             },
         )
 
@@ -89,7 +89,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
-                "confirmation_required": False,
+                "confirmation_required": None,
             },
         )
 
@@ -115,7 +115,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
-                "confirmation_required": False,
+                "confirmation_required": None,
             },
         )
         # Scan again, and ensure qty increments
@@ -167,7 +167,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
-                "confirmation_required": False,
+                "confirmation_required": None,
             },
         )
         # Scan again, and ensure qty increments
@@ -227,7 +227,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
-                "confirmation_required": False,
+                "confirmation_required": None,
             },
             message={"message_type": "error", "body": "You cannot place it here"},
         )
@@ -300,7 +300,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
-                "confirmation_required": False,
+                "confirmation_required": None,
             },
             message={"message_type": "error", "body": "You cannot place it here"},
         )
@@ -328,7 +328,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
-                "confirmation_required": False,
+                "confirmation_required": None,
             },
             message={"message_type": "error", "body": "You cannot place it here"},
         )
@@ -355,7 +355,7 @@ class TestSetQuantity(CommonCase):
             data={
                 "picking": picking_data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
-                "confirmation_required": True,
+                "confirmation_required": "FooBar",
             },
             message={
                 "message_type": "warning",
@@ -368,7 +368,7 @@ class TestSetQuantity(CommonCase):
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
                 "barcode": "FooBar",
-                "confirmation": True,
+                "confirmation": "FooBar",
             },
         )
         self.assertEqual(selected_move_line.result_package_id.name, "FooBar")
@@ -380,6 +380,52 @@ class TestSetQuantity(CommonCase):
                 "picking": picking_data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
             },
+        )
+
+    def test_reception_set_quantity_confirm_new_package_with_other_new_pack(self):
+        picking = self._create_picking()
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        selected_move_line.shopfloor_user_id = self.env.uid
+        # Scan new pack 1
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "barcode": "Pack1",
+            },
+        )
+        data = {
+            "picking": self.data.picking(picking),
+            "selected_move_line": self.data.move_lines(selected_move_line),
+            "confirmation_required": "Pack1",
+        }
+        # System ask for confimation for Pack 1
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data=data,
+            message=self.msg_store.create_new_pack_ask_confirmation("Pack1"),
+        )
+        # Scan new pack 2
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "barcode": "Pack2",
+                "confirmation": "Pack1",
+            },
+        )
+        # System ask for confimation for Pack 2
+        data["confirmation_required"] = "Pack2"
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data=data,
+            message=self.msg_store.create_new_pack_ask_confirmation("Pack2"),
         )
 
     @classmethod
@@ -516,7 +562,7 @@ class TestSetQuantity(CommonCase):
                 data={
                     "picking": picking_data,
                     "selected_move_line": self.data.move_lines(line),
-                    "confirmation_required": False,
+                    "confirmation_required": None,
                 },
                 message=error_msg,
             )
