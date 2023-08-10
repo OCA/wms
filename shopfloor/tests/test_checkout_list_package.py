@@ -28,7 +28,9 @@ class SelectDestPackageMixin:
                 "picking": picking_data,
                 "packages": [
                     self._package_data(
-                        package.with_context(picking_id=picking.id), picking
+                        package.with_context(picking_id=picking.id),
+                        picking,
+                        with_package_move_line_count=True,
                     )
                     for package in packages
                 ],
