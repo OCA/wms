@@ -256,12 +256,12 @@ class Reception(Component):
                 )
             )
         )
-        if line:
-            # The line quantity to do needs to correspond to
-            # the remaining quantity to do of its move.
-            line.product_uom_qty = move.product_uom_qty - move.quantity_done
-        else:
-            qty_todo_remaining = max(0, move.product_uom_qty - move.quantity_done)
+        if not line:
+            qty_todo_remaining = max(
+                0,
+                move.product_uom_qty
+                - sum(move.move_line_ids.mapped("product_uom_qty")),
+            )
             values = move._prepare_move_line_vals(quantity=qty_todo_remaining)
             line = self.env["stock.move.line"].create(values)
         return self._scan_line__assign_user(picking, line, qty_done)
@@ -751,7 +751,7 @@ class Reception(Component):
             message=message,
         )
 
-    def _align_product_uom_qties(self, move):
+    def _align_display_product_uom_qty(self, line, response):
         # This method aligns product uom qties on move lines.
         # In the shopfloor context, we might have multiple users working at
         # the same time on the same move. This is done by creating one move line
@@ -770,19 +770,18 @@ class Reception(Component):
         # If move is already done, do not update lines qties
         # if move.state in ("done", "cancel"):
         #     return
-
+        move = line.move_id
         qty_todo = move.product_uom_qty
         qty_done = sum(move.move_line_ids.mapped("qty_done"))
         rounding = move.product_id.uom_id.rounding
         compare = float_compare(qty_done, qty_todo, precision_rounding=rounding)
-        if compare < 1:  # If qty done <= qty todo, align qty todo on move lines
+        if compare < 1:  # If qty done < qty todo, align qty todo in the response
             remaining_todo = qty_todo - qty_done
-            # if we didn't bypass reservation update, the quant reservation
-            # would be reduced as much as the deduced quantity, which is wrong
-            # as we only moved the quantity to a new move line
-            lines = move.move_line_ids.with_context(bypass_reservation_update=True)
-            for line in lines:
-                line.product_uom_qty = line.qty_done + remaining_todo
+            line_todo = line.qty_done + remaining_todo
+            response["data"]["set_quantity"]["selected_move_line"][0][
+                "quantity"
+            ] = line_todo
+        return response
 
     def _before_state__set_quantity(self, picking, line, message=None):
         # Used by inherting module  see shopfloor_reception_packaging_dimension
@@ -791,8 +790,7 @@ class Reception(Component):
     def _response_for_set_quantity(
         self, picking, line, message=None, asking_confirmation=None
     ):
-        self._align_product_uom_qties(line.move_id)
-        return self._response(
+        response = self._response(
             next_state="set_quantity",
             data={
                 "selected_move_line": self._data_for_move_lines(line),
@@ -801,6 +799,7 @@ class Reception(Component):
             },
             message=message,
         )
+        return self._align_display_product_uom_qty(line, response)
 
     def _response_for_set_destination(self, picking, line, message=None):
         return self._response(

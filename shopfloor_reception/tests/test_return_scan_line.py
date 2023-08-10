@@ -88,15 +88,18 @@ class TestScanLineReturn(CommonCaseReturn):
                 "barcode": self.product_a_packaging.barcode,
             },
         )
-        data = self.data.picking(return_picking)
         selected_move_line = self.get_new_move_lines()
+        move_line_data = self.data.move_lines(selected_move_line)
+        move_line_data[0]["quantity"] = 20.0
+        # Displayed qtu todo is modified by _align_display_product_uom_qty
+        data = self.data.picking(return_picking)
         self.assert_response(
             response,
             next_state="set_quantity",
             data={
                 "confirmation_required": None,
                 "picking": data,
-                "selected_move_line": self.data.move_lines(selected_move_line),
+                "selected_move_line": move_line_data,
             },
         )
         self.assertEqual(selected_move_line.qty_done, self.product_a_packaging.qty)
