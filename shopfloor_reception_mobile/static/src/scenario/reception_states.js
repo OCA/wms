@@ -183,7 +183,7 @@ export const reception_states = function () {
                         selected_line_id: this.line_being_handled.id,
                         quantity: this.scan_destination_qty,
                         barcode: barcode.text,
-                        confirmation: this.state.data.confirmation_required,
+                        confirmation: this.state.data.confirmation_required || "",
                     })
                 );
             },
@@ -240,6 +240,7 @@ export const reception_states = function () {
                         picking_id: this.state.data.picking.id,
                         selected_line_id: this.line_being_handled.id,
                         location_name: location.text,
+                        // FIXME if it is always set to true, it is not really used ?
                         confirmation: true,
                     })
                 );
