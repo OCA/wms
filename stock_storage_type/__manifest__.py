@@ -1,5 +1,5 @@
-# Copyright 2019-2021 Camptocamp SA
-# Copyright 2019-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+# Copyright 2019 Camptocamp SA
+# Copyright 2019 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 {
     "name": "Stock Storage Type",
@@ -9,6 +9,7 @@
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
+    "maintainers": ["jbaudoux"],
     "license": "AGPL-3",
     "application": False,
     "installable": True,
