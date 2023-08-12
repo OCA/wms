@@ -514,7 +514,9 @@ class StockMove(models.Model):
         super()._assign_picking_post_process(new)
         priorities = self.mapped("move_dest_ids.picking_id.priority")
         if priorities:
-            self.picking_id.write({"priority": max(priorities)})
+            self.picking_id.with_context(tracking_disable=True).write(
+                {"priority": max(priorities)}
+            )
 
     def _get_chained_moves_iterator(self, chain_field):
         """Return an iterator on the moves of the chain.

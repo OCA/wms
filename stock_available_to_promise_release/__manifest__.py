@@ -6,6 +6,7 @@
     "version": "14.0.2.1.1",
     "summary": "Release Operations based on available to promise",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
+    "maintainers": ["jbaudoux"],
     "website": "https://github.com/OCA/wms",
     "category": "Stock Management",
     "depends": ["stock"],
