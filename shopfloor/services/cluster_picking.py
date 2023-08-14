@@ -411,14 +411,14 @@ class ClusterPicking(Component):
         return data
 
     def unassign(self, picking_batch_id):
-        """Unassign and reset to draft a started picking batch
+        """cancel
 
         Transitions:
         * "start" to work on a new batch
         """
         batch = self.env["stock.picking.batch"].browse(picking_batch_id)
         if batch.exists():
-            batch.write({"state": "draft", "user_id": False})
+            batch.action_cancel()
         return self._response_for_start()
 
     def scan_line(self, picking_batch_id, move_line_id, barcode, sublocation_id=None):
