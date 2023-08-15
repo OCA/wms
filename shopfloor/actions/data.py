@@ -40,8 +40,7 @@ class DataAction(Component):
             ("barcode", lambda rec, fname: rec[fname] if rec[fname] else rec.name),
         ]
 
-    @ensure_model("stock.picking")
-    def picking(self, record, **kw):
+    def _get_picking_parser(self, record, **kw):
         parser = self._picking_parser
         # progress is a heavy computed field,
         # and it may reduce performance significatively
@@ -49,7 +48,11 @@ class DataAction(Component):
         # Thus, we make it optional.
         if "with_progress" in kw:
             parser.append("progress")
-        return self._jsonify(record, parser, **kw)
+        return parser
+
+    @ensure_model("stock.picking")
+    def picking(self, record, **kw):
+        return self._jsonify(record, self._get_picking_parser(record, **kw), **kw)
 
     def pickings(self, record, **kw):
         return self.picking(record, multi=True)
