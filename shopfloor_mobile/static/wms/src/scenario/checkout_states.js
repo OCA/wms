@@ -63,7 +63,8 @@ export const checkout_states = function ($instance) {
                     $instance.odoo.call("scan_line", {
                         picking_id: $instance.state.data.picking.id,
                         barcode: scanned.text,
-                        confirm_pack_all: $instance.state.data.need_confirm_pack_all,
+                        confirm_pack_all:
+                            $instance.state.data.need_confirm_pack_all || "",
                     })
                 );
             },
