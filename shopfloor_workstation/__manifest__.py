@@ -4,7 +4,7 @@
 {
     "name": "Shopfloor Workstation",
     "summary": "Manage warehouse workstation with barcode scanners",
-    "version": "14.0.1.3.0",
+    "version": "14.0.1.3.1",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
