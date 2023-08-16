@@ -22,7 +22,7 @@ Available addons
 addon | version | maintainers | summary
 --- | --- | --- | ---
 [stock_available_to_promise_release](stock_available_to_promise_release/) | 16.0.2.1.0 |  | Release Operations based on available to promise
-[stock_dynamic_routing](stock_dynamic_routing/) | 16.0.1.0.1 |  | Dynamic routing of stock moves
+[stock_dynamic_routing](stock_dynamic_routing/) | 16.0.1.0.2 |  | Dynamic routing of stock moves
 [stock_picking_completion_info](stock_picking_completion_info/) | 16.0.1.0.1 |  | Display on current document completion information according to next operations
 [stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 16.0.1.0.0 |  | Define different shipping policies according to picking type
 [stock_release_channel](stock_release_channel/) | 16.0.2.4.0 | [![sebalix](https://github.com/sebalix.png?size=30px)](https://github.com/sebalix) | Manage workload in WMS with release channels
