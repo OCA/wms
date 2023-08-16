@@ -14,4 +14,6 @@
     "depends": ["shopfloor", "base_report_to_printer"],
     "demo": ["demo/shopfloor_workstation_demo.xml"],
     "data": ["security/ir.model.access.csv", "views/shopfloor_workstation.xml"],
+    "post_init_hook": "post_init_hook",
+    "uninstall_hook": "uninstall_hook",
 }

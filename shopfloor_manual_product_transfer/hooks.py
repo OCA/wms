@@ -7,7 +7,7 @@ from odoo import SUPERUSER_ID, api
 
 from odoo.addons.shopfloor_base.utils import purge_endpoints, register_new_services
 
-from .services.single_product_transfer import ShopfloorSingleProductTransfer as Service
+from .services.manual_product_transfer import ManualProductTransfer as Service
 
 _logger = logging.getLogger(__file__)
 
