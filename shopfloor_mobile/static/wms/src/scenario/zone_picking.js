@@ -640,6 +640,30 @@ const ZonePicking = {
             }
             return false;
         },
+        all_lines_with_package: function () {
+            const move_lines = this.state.data.move_lines;
+            if (!move_lines) {
+                return false;
+            }
+            for (let line_id = 0; line_id < move_lines.length; line_id++) {
+                if (!move_lines[line_id].package_src) {
+                    return false;
+                }
+            }
+            return true;
+        },
+        any_line_with_lot: function () {
+            const move_lines = this.state.data.move_lines;
+            if (!move_lines) {
+                return false;
+            }
+            for (let line_id = 0; line_id < move_lines.length; line_id++) {
+                if (move_lines[line_id].lot) {
+                    return true;
+                }
+            }
+            return false;
+        },
     },
     computed: {
         sort_lines_by_btn_label() {
@@ -737,16 +761,36 @@ const ZonePicking = {
                         title: "Select move",
                         scan_placeholder: () => {
                             const sublocation = this.state.data.sublocation;
-                            if (
-                                this.state.data.scan_location_or_pack_first &&
-                                !sublocation
-                            ) {
-                                return "Scan location / pack";
+                            const pack = this.state.data.package;
+                            if (this.state.data.scan_location_or_pack_first) {
+                                if (!pack && this.all_lines_with_package()) {
+                                    return "Scan pack";
+                                }
+                                if (!sublocation && !pack) {
+                                    return "Scan location / pack";
+                                }
+                                if (this.any_line_with_lot()) {
+                                    return "Scan product / lot";
+                                }
+                                return "Scan product";
                             }
                             if (sublocation) {
-                                return "Scan product / lot / package";
+                                if (pack) {
+                                    if (this.any_line_with_lot()) {
+                                        return "Scan product / lot";
+                                    }
+                                    return "Scan product";
+                                } else {
+                                    if (this.any_line_with_lot()) {
+                                        return "Scan pack / product / lot";
+                                    }
+                                    return "Scan pack / product";
+                                }
                             }
-                            return "Scan location / pack / product / lot";
+                            if (this.any_line_with_lot()) {
+                                return "Scan location / pack / product / lot";
+                            }
+                            return "Scan location / pack / product";
                         },
                     },
                     events: {
