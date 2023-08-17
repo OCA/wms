@@ -636,7 +636,7 @@ class ZonePicking(Component):
                 message = self.msg_store.several_products_in_package(package)
             if packaging.package_has_several_lots(package):
                 message = self.msg_store.several_lots_in_package(package)
-            if message:
+            if message or self.work.menu.no_prefill_qty:
                 return (
                     self._list_move_lines(
                         self.zone_location,

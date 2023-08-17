@@ -34,8 +34,13 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         )
 
     def test_scan_source_barcode_package_no_prefill(self):
-        """When a package is scanned, qty_done in response is False."""
+        """When a package is scanned.
+
+        The user is required to scan a product.
+        Then redirected to the next screen, qty_done in response is False.
+        """
         package = self.picking1.package_level_ids[0].package_id
+        # Scan package with one product
         response = self.service.dispatch(
             "scan_source",
             params={"barcode": package.name},
@@ -45,12 +50,24 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         )
         move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
         move_line = move_lines[0]
+        self.assert_response_select_line(
+            response,
+            self.zone_location,
+            self.picking1.picking_type_id,
+            move_lines,
+            package=package,
+        )
+        # Scan the product
+        response = self.service.dispatch(
+            "scan_source",
+            params={"barcode": move_line.product_id.barcode},
+        )
         self.assert_response_set_line_destination(
             response,
             zone_location=self.zone_location,
             picking_type=self.picking_type,
             move_line=move_line,
-            qty_done=False,
+            qty_done=1.0,
         )
 
     def test_scan_source_barcode_product_no_prefill(self):
