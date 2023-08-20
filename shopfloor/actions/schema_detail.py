@@ -16,6 +16,28 @@ class ShopfloorSchemaDetailAction(Component):
                     "required": True,
                 },
                 "reserved_move_lines": self._schema_list_of(self.move_line()),
+                "products": self._schema_list_of(self.location_product()),
+            }
+        )
+        return schema
+
+    def location_product(self):
+        schema = self.product()
+        schema.update(
+            {
+                "quantity": {"type": "float", "required": True},
+                "lots": self._schema_list_of(self.location_lot()),
+            }
+        )
+        return schema
+
+    def location_lot(self):
+        schema = self.lot()
+        schema.update(
+            {
+                "removal_date": {"type": "string", "nullable": True, "required": False},
+                "expire_date": {"type": "string", "nullable": True, "required": False},
+                "quantity": {"type": "float", "required": True},
             }
         )
         return schema
