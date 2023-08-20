@@ -66,6 +66,7 @@ class DataDetailAction(Component):
         return self._lot_parser + [
             "removal_date",
             "expiration_date:expire_date",
+            ("product_id:product_name", lambda rec, fname: rec.product_id.display_name),
         ]
 
     @ensure_model("stock.picking")
@@ -170,12 +171,32 @@ class DataDetailAction(Component):
         return self._product_parser + [
             ("image_128:image", self._product_image_url),
             (
+                "stock_quant_ids:locations",
+                lambda record, fname: self._locations_for_product(record),
+            ),
+            (
                 "product_tmpl_id:manufacturer",
                 lambda rec, fname: self._jsonify(
                     rec.product_tmpl_id.manufacturer_id, ["id", "name"]
                 ),
             ),
         ]
+
+    def _get_product_locations(self, record):
+        # Retrieve all products -- maybe more than one location
+        product_template = record.product_tmpl_id
+        products = product_template.product_variant_ids
+        quants = self.env["stock.quant"].search(
+            [("product_id", "in", products.ids), ("location_id.usage", "=", "internal")]
+        )
+        return quants.location_id
+
+    def _locations_for_product(self, record):
+        res = []
+        for location in self._get_product_locations(record):
+            loc = self.location_detail(location)
+            res.append(loc)
+        return res
 
     def _product_image_url(self, record, field_name):
         if not record[field_name]:
