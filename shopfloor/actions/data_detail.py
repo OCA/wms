@@ -1,5 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+from collections import defaultdict
+
 from odoo.tools.float_utils import float_round
 
 from odoo.addons.component.core import Component
@@ -25,9 +27,45 @@ class DataDetailAction(Component):
         return self._location_parser + [
             "complete_name",
             (
+                "quant_ids:products",
+                lambda record, fname: self._location_content(record),
+            ),
+            (
                 "reserved_move_line_ids:reserved_move_lines",
                 lambda record, fname: self.move_lines(record[fname]),
             ),
+        ]
+
+    def _location_content(self, record):
+        res = []
+        product_qties = defaultdict(lambda: defaultdict(lambda: 0))
+        for quant in record.quant_ids:
+            product_qties[quant.product_id][quant.lot_id] += quant.quantity
+        for product, quants_qty in product_qties.items():
+            val = self.product(product)
+            lots = []
+            val["lots"] = lots
+            qty_total = 0
+            for lot, qty in quants_qty.items():
+                qty_total += qty
+                if not lot:
+                    continue
+                lot_val = self._location_lot(lot)
+                lot_val["quantity"] = qty
+                lots.append(lot_val)
+            val["quantity"] = qty_total
+            res.append(val)
+        return res
+
+    def _location_lot(self, record, **kw):
+        # Define a new method to not overload the base one which is used in many places
+        return self._jsonify(record, self._location_lot_detail_parser, **kw)
+
+    @property
+    def _location_lot_detail_parser(self):
+        return self._lot_parser + [
+            "removal_date",
+            "expiration_date:expire_date",
         ]
 
     @ensure_model("stock.picking")
