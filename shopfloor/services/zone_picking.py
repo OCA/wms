@@ -594,11 +594,12 @@ class ZonePicking(Component):
         package = search.package_from_scan(barcode)
         if not package:
             return response, message
-        if not package.location_id.is_sublocation_of(self.zone_location):
-            # Package is not in an allowed location
-            response = self._list_move_lines(self.zone_location)
-            message = self.msg_store.location_not_allowed()
-            return response, message
+        if package.location_id:
+            if not package.location_id.is_sublocation_of(self.zone_location):
+                # Package is not in an allowed location
+                response = self._list_move_lines(self.zone_location)
+                message = self.msg_store.location_not_allowed()
+                return response, message
 
         move_lines = self._find_location_move_lines(
             locations=sublocation, package=package
