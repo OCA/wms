@@ -276,6 +276,28 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             location_first=False,
         )
 
+    def test_scan_source_empty_package(self):
+        """Scan source: scanned an empty package."""
+        pack_empty = self.env["stock.quant.package"].create({})
+        response = self.service.dispatch(
+            "scan_source",
+            params={"barcode": pack_empty.name},
+        )
+        move_lines = self.service._find_location_move_lines(
+            locations=self.zone_location
+        )
+        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        self.assert_response_select_line(
+            response,
+            zone_location=self.zone_location,
+            picking_type=self.picking_type,
+            move_lines=move_lines,
+            message=self.service.msg_store.package_has_no_product_to_take(
+                pack_empty.name
+            ),
+            location_first=False,
+        )
+
     def test_scan_source_barcode_package_can_replace_in_line(self):
         """Scan source: scanned package has no related line but can replace
         next step 'select_line' expected with confirmation required set.
