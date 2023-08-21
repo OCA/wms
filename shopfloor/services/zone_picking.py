@@ -974,6 +974,7 @@ class ZonePicking(Component):
             )
             return (package_changed, response)
         stock = self._actions_for("stock")
+        self._lock_lines(move_line)
         try:
             stock.mark_move_line_as_picked(
                 move_line, quantity, package, check_user=True
