@@ -1,0 +1,2 @@
+from . import test_single_pack_transfer_force_package
+from . import test_zone_picking_force_package
