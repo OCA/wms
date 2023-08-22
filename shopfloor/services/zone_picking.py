@@ -899,10 +899,11 @@ class ZonePicking(Component):
         # if `confirmation is True
         # Ask confirmation to the user if the scanned location is not in the
         # expected ones but is valid (in picking type's default destination)
-        if not self.is_dest_location_valid(move_line.move_id, location):
+        message = self._validate_destination(location, move_line.move_id)
+        if message:
             response = self._response_for_set_line_destination(
                 move_line,
-                message=self.msg_store.dest_location_not_allowed(),
+                message=message,
                 qty_done=quantity,
             )
             return (location_changed, response)
@@ -1535,17 +1536,17 @@ class ZonePicking(Component):
         message = None
         buffer_lines = self._find_buffer_move_lines()
         if location:
-            error = None
             location_dest = buffer_lines.mapped("location_dest_id")
             # check if move lines share the same destination
             if len(location_dest) != 1:
-                error = self.msg_store.lines_different_dest_location()
+                message = self.msg_store.lines_different_dest_location()
             # check if the scanned location is allowed
             moves = buffer_lines.mapped("move_id")
-            if not self.is_dest_location_valid(moves, location):
-                error = self.msg_store.location_not_allowed()
-            if error:
-                return self._set_destination_all_response(buffer_lines, message=error)
+            if not message:
+                message = self._validate_destination(location, moves)
+
+            if message:
+                return self._set_destination_all_response(buffer_lines, message=message)
             # check if the destination location is not the expected one
             #   - OK if the scanned destination is a child of the current
             #     destination set on buffer lines
@@ -1570,6 +1571,11 @@ class ZonePicking(Component):
         else:
             message = self.msg_store.no_location_found()
         return self._set_destination_all_response(buffer_lines, message=message)
+
+    def _validate_destination(self, location, moves):
+        if not self.is_dest_location_valid(moves, location):
+            return self.msg_store.dest_location_not_allowed()
+        return None
 
     def _write_destination_on_lines(self, lines, location):
         self._lock_lines(lines)

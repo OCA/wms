@@ -252,7 +252,7 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             zone_location,
             picking_type,
             buffer_lines,
-            message=self.service.msg_store.location_not_allowed(),
+            message=self.service.msg_store.dest_location_not_allowed(),
         )
 
     def test_set_destination_all_location_not_found(self):
