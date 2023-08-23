@@ -30,14 +30,14 @@ scan_dock -> scan_dock: **/scan_dock(barcode)**\n(asking for confirmation to cre
 scan_dock -> scan_document: **/scan_dock(barcode, confirmation=True)**
 
 == /scan_document ==
-scan_document -> scan_document: **/scan_document**(shipment_advice_id, barcode, picking_id=None)
-scan_document -> loading_list: **/scan_document**(shipment_advice_id, barcode, picking_id=None)
+scan_document -> scan_document: **/scan_document**(shipment_advice_id, barcode, picking_id=None, location_id=None)
+scan_document -> loading_list: **/scan_document**(shipment_advice_id, barcode, picking_id=None, location_id=None)
 
 == /unload_move_line ==
-scan_document -> scan_document: **/unload_move_line**(shipment_advice_id, move_line_id)
+scan_document -> scan_document: **/unload_move_line**(shipment_advice_id, move_line_id, location_id=None)
 
 == /unload_package_level ==
-scan_document -> scan_document: **/unload_package_level**(shipment_advice_id, package_level_id)
+scan_document -> scan_document: **/unload_package_level**(shipment_advice_id, package_level_id, location_id=None)
 
 == /loading_list ==
 scan_document -> loading_list: **/loading_list**(shipment_advice_id)

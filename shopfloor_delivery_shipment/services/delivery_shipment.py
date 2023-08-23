@@ -56,6 +56,9 @@ class DeliveryShipment(Component):
           without planned moves)
         * scan_dock: no shipment advice found
         """
+        if not barcode:
+            # End point called with the back button
+            return self._response_for_scan_dock()
         search = self._actions_for("search")
         dock = search.dock_from_scan(barcode)
         if dock:
@@ -74,15 +77,17 @@ class DeliveryShipment(Component):
             return self._response_for_scan_document(shipment_advice)
         return self._response_for_scan_dock(message=self.msg_store.barcode_not_found())
 
-    def scan_document(self, shipment_advice_id, barcode, picking_id=None):
-        """Scan an operation, a package, a product or a lot.
+    def scan_document(
+        self, shipment_advice_id, barcode, picking_id=None, location_id=None
+    ):
+        """Scan an operation or location; a package, a product or a lot.
 
-        If an operation is scanned, reload the screen with the related planned
-        content or full content of this operation for this shipment advice.
+        If an operation or a location is scanned, reload the screen with the related planned
+        content or full content of this operation/location for this shipment advice.
 
         If a package, a product or a lot is scanned, it will be loaded in the
         current shipment advice and the screen will be reloaded with the related
-        operation listing its planned or full content.
+        current location or operation listing its planned or full content.
 
         If all the planned content (if any) has been loaded, redirect the user
         to the next state 'loading_list'.
@@ -112,7 +117,18 @@ class DeliveryShipment(Component):
                 return self._response_for_scan_document(
                     shipment_advice, message=message
                 )
+        location = None
+        if location_id:
+            # Filtering location the user is working from.
+            location = self.env["stock.location"].browse(location_id).exists()
+        if not barcode:
+            # End point called with the back button
+            return self._response_for_scan_document(shipment_advice, picking, location)
         search = self._actions_for("search")
+        # Look for a location
+        scanned_location = search.location_from_scan(barcode)
+        if scanned_location:
+            return self._scan_location(shipment_advice, scanned_location)
         # Look for an operation
         scanned_picking = search.picking_from_scan(barcode)
         if scanned_picking:
@@ -120,7 +136,9 @@ class DeliveryShipment(Component):
         # Look for a package
         scanned_package = search.package_from_scan(barcode)
         if scanned_package:
-            return self._scan_package(shipment_advice, scanned_package)
+            return self._scan_package(
+                shipment_advice, scanned_package, picking, location
+            )
         # Look for a lot (restricted to the relevant products as a lot number
         # can be shared by different products)
         move_lines = self.env["stock.move.line"].search(
@@ -128,16 +146,28 @@ class DeliveryShipment(Component):
         )
         scanned_lot = search.lot_from_scan(barcode, products=move_lines.product_id)
         if scanned_lot:
-            return self._scan_lot(shipment_advice, scanned_lot)
+            return self._scan_lot(shipment_advice, scanned_lot, picking, location)
         scanned_product = search.product_from_scan(barcode)
         if not scanned_product:
             packaging = search.packaging_from_scan(barcode)
             scanned_product = packaging.product_id
         if scanned_product:
-            return self._scan_product(shipment_advice, scanned_product, picking)
+            return self._scan_product(
+                shipment_advice, scanned_product, picking, location
+            )
         return self._response_for_scan_document(
-            shipment_advice, picking, message=self.msg_store.barcode_not_found()
+            shipment_advice,
+            picking,
+            location=location,
+            message=self.msg_store.barcode_not_found(),
         )
+
+    def _scan_location(self, shipment_advice, location):
+        """Return the planned or available content of the scanned location."""
+        if not self.is_src_location_valid(location):
+            message = self.msg_store.location_not_allowed()
+            return self._response_for_scan_document(shipment_advice, message=message)
+        return self._response_for_scan_document(shipment_advice, location=location)
 
     def _scan_picking(self, shipment_advice, picking):
         """Return the planned or available content of the scanned delivery for
@@ -161,20 +191,24 @@ class DeliveryShipment(Component):
                 )
         return self._response_for_scan_document(shipment_advice, picking)
 
-    def _scan_package(self, shipment_advice, package):
+    def _scan_package(self, shipment_advice, package, picking, location):
         """Load the package in the shipment advice.
 
         Find the package level or move line (of the planned shipment advice in
         priority if any) corresponding to the scanned package and load it.
         If no content is found an error will be returned.
         """
-        move_lines = self._find_move_lines_from_package(shipment_advice, package)
+        move_lines = self._find_move_lines_from_package(
+            shipment_advice, package, picking, location
+        )
         if move_lines:
             # Check transfer status
             message = self._check_picking_status(move_lines.picking_id, shipment_advice)
             if message:
                 return self._response_for_scan_document(
-                    shipment_advice, message=message
+                    shipment_advice,
+                    location=location,
+                    message=message,
                 )
             # Check that the product isn't already loaded
             package_level = move_lines.package_level_id
@@ -182,6 +216,7 @@ class DeliveryShipment(Component):
                 return self._response_for_scan_document(
                     shipment_advice,
                     move_lines.picking_id,
+                    location=location,
                     message=self.msg_store.package_already_loaded_in_shipment(
                         package, shipment_advice
                     ),
@@ -191,30 +226,41 @@ class DeliveryShipment(Component):
             return self._response_for_scan_document_or_loading_list(
                 shipment_advice,
                 move_lines.picking_id,
+                location=location,
             )
-        message = self.msg_store.unable_to_load_package_in_shipment(
-            package, shipment_advice
-        )
-        if shipment_advice.planned_move_ids:
+        message = None
+        if location:
+            message = self.msg_store.package_not_found_in_location(package, location)
+        elif picking:
+            message = self.msg_store.package_not_found_in_picking(package, picking)
+        elif shipment_advice.planned_move_ids:
             message = self.msg_store.package_not_planned_in_shipment(
                 package, shipment_advice
             )
-        return self._response_for_scan_document(shipment_advice, message=message)
+        else:
+            message = self.msg_store.unable_to_load_package_in_shipment(
+                package, shipment_advice
+            )
+        return self._response_for_scan_document(
+            shipment_advice, picking, location, message
+        )
 
-    def _scan_lot(self, shipment_advice, lot):
+    def _scan_lot(self, shipment_advice, lot, picking, location):
         """Load the lot in the shipment advice.
 
         Find the first move line (of the planned shipment advice in
         priority if any) corresponding to the scanned lot and load it.
         If no move line is found an error will be returned.
         """
-        move_lines = self._find_move_lines_from_lot(shipment_advice, lot)
+        move_lines = self._find_move_lines_from_lot(
+            shipment_advice, lot, picking, location
+        )
         if move_lines:
             # Check transfer status
             message = self._check_picking_status(move_lines.picking_id, shipment_advice)
             if message:
                 return self._response_for_scan_document(
-                    shipment_advice, message=message
+                    shipment_advice, location=location, message=message
                 )
             # Check that the lot doesn't belong to a package
             package_levels_not_loaded = move_lines.package_level_id.filtered(
@@ -227,6 +273,7 @@ class DeliveryShipment(Component):
                     message=self.msg_store.lot_owned_by_packages(
                         package_levels_not_loaded.package_id
                     ),
+                    location=location,
                 )
             # Check that the lot isn't already loaded
             if move_lines._is_loaded_in_shipment():
@@ -236,19 +283,29 @@ class DeliveryShipment(Component):
                     message=self.msg_store.lot_already_loaded_in_shipment(
                         lot, shipment_advice
                     ),
+                    location=location,
                 )
             # Load the lot
             move_lines._load_in_shipment(shipment_advice)
             return self._response_for_scan_document_or_loading_list(
-                shipment_advice,
-                move_lines.picking_id,
+                shipment_advice, move_lines.picking_id, location=location
             )
-        message = self.msg_store.unable_to_load_lot_in_shipment(lot, shipment_advice)
-        if shipment_advice.planned_move_ids:
+        message = None
+        if location:
+            message = self.msg_store.lot_not_found_in_location(lot, location)
+        elif picking:
+            message = self.msg_store.lot_not_found_in_picking(lot, picking)
+        elif shipment_advice.planned_move_ids:
             message = self.msg_store.lot_not_planned_in_shipment(lot, shipment_advice)
-        return self._response_for_scan_document(shipment_advice, message=message)
+        else:
+            message = self.msg_store.unable_to_load_lot_in_shipment(
+                lot, shipment_advice
+            )
+        return self._response_for_scan_document(
+            shipment_advice, picking, location, message
+        )
 
-    def _scan_product(self, shipment_advice, product, picking):
+    def _scan_product(self, shipment_advice, product, picking, location):
         """Load the product in the shipment advice.
 
         Find the first move line (of the planned shipment advice in
@@ -261,7 +318,7 @@ class DeliveryShipment(Component):
                 message=self.msg_store.scan_operation_first(),
             )
         move_lines = self._find_move_lines_from_product(
-            shipment_advice, product, picking
+            shipment_advice, product, picking, location
         )
         if move_lines:
             # Check transfer status
@@ -317,16 +374,24 @@ class DeliveryShipment(Component):
                 shipment_advice,
                 move_lines.picking_id,
             )
-        message = self.msg_store.unable_to_load_product_in_shipment(
-            product, shipment_advice
-        )
-        if shipment_advice.planned_move_ids:
+        message = None
+        if location:
+            message = self.msg_store.product_not_found_in_location_or_transfer(
+                product, location, picking
+            )
+        elif shipment_advice.planned_move_ids:
             message = self.msg_store.product_not_planned_in_shipment(
                 product, shipment_advice
             )
-        return self._response_for_scan_document(shipment_advice, message=message)
+        else:
+            message = self.msg_store.unable_to_load_product_in_shipment(
+                product, shipment_advice
+            )
+        return self._response_for_scan_document(
+            shipment_advice, picking, location, message
+        )
 
-    def unload_move_line(self, shipment_advice_id, move_line_id):
+    def unload_move_line(self, shipment_advice_id, move_line_id, location_id=None):
         """Unload a move line from a shipment advice.
 
         Transitions:
@@ -341,11 +406,19 @@ class DeliveryShipment(Component):
             return self._response_for_scan_dock(
                 message=self.msg_store.record_not_found()
             )
+        location = None
+        if location_id:
+            # Filtering location the user is working from.
+            location = self.env["stock.location"].browse(location_id).exists()
         # Unload the move line
         move_line._unload_from_shipment()
-        return self._response_for_scan_document(shipment_advice, move_line.picking_id)
+        return self._response_for_scan_document(
+            shipment_advice, move_line.picking_id, location=location
+        )
 
-    def unload_package_level(self, shipment_advice_id, package_level_id):
+    def unload_package_level(
+        self, shipment_advice_id, package_level_id, location_id=None
+    ):
         """Unload a package level from a shipment advice.
 
         Transitions:
@@ -362,10 +435,14 @@ class DeliveryShipment(Component):
             return self._response_for_scan_dock(
                 message=self.msg_store.record_not_found()
             )
+        location = None
+        if location_id:
+            # Filtering location the user is working from.
+            location = self.env["stock.location"].browse(location_id).exists()
         # Unload the package level
         package_level._unload_from_shipment()
         return self._response_for_scan_document(
-            shipment_advice, package_level.picking_id
+            shipment_advice, package_level.picking_id, location=location
         )
 
     def loading_list(self, shipment_advice_id):
@@ -413,11 +490,21 @@ class DeliveryShipment(Component):
         data = {"confirmation_required": confirmation_required}
         return self._response(next_state="scan_dock", data=data, message=message)
 
-    def _response_for_scan_document(self, shipment_advice, picking=None, message=None):
+    def _response_for_scan_document(
+        self, shipment_advice, picking=None, location=None, message=None
+    ):
         data = {
             "shipment_advice": self.data.shipment_advice(shipment_advice),
         }
-        if picking:
+        # The filter on location takes priority on the picking filter
+        if location:
+            data.update(
+                location=self.data.location(location),
+                content=self._data_for_content_to_load_from_picking(
+                    shipment_advice, location=location
+                ),
+            )
+        elif picking:
             data.update(
                 picking=self.data.picking(picking),
                 content=self._data_for_content_to_load_from_picking(
@@ -439,7 +526,7 @@ class DeliveryShipment(Component):
         return self._response(next_state="loading_list", data=data, message=message)
 
     def _response_for_scan_document_or_loading_list(
-        self, shipment_advice, picking, message=None
+        self, shipment_advice, picking, message=None, location=None
     ):
         """Route on 'scan_document' or 'loading_list' states.
 
@@ -454,7 +541,7 @@ class DeliveryShipment(Component):
                 message=self.msg_store.shipment_planned_content_fully_loaded(),
             )
         return self._response_for_scan_document(
-            shipment_advice, picking, message=message
+            shipment_advice, picking, location=location, message=message
         )
 
     def _response_for_validate(self, shipment_advice, message=None):
@@ -503,7 +590,9 @@ class DeliveryShipment(Component):
         move_lines = self.env["stock.move.line"].search(domain)
         return self._prepare_data_for_content(move_lines)
 
-    def _data_for_content_to_load_from_picking(self, shipment_advice, picking):
+    def _data_for_content_to_load_from_picking(
+        self, shipment_advice, picking=None, location=None
+    ):
         """Return a dictionary where keys are source locations
         and values are dictionaries listing package_levels and move_lines
         loaded or to load.
@@ -520,9 +609,12 @@ class DeliveryShipment(Component):
             }
         """
         # Grab move lines to sort, restricted to the current delivery
-        move_lines = self._find_move_lines_to_process_from_picking(
-            shipment_advice, picking
-        )
+        if picking:
+            move_lines = self._find_move_lines_to_process_from_picking(
+                shipment_advice, picking
+            )
+        elif location:
+            move_lines = self._find_move_lines_from_location(shipment_advice, location)
         return self._prepare_data_for_content(move_lines)
 
     def _prepare_data_for_content(self, move_lines):
@@ -615,6 +707,13 @@ class DeliveryShipment(Component):
         shipment_advice.action_in_progress()
         return shipment_advice
 
+    def _find_move_lines_from_location(self, shipment_advice, location):
+        """Returns the move line corresponding to `location` for the given shipment."""
+        location.ensure_one()
+        domain = self._find_move_lines_domain(shipment_advice)
+        domain.append(("location_id", "child_of", location.id))
+        return self.env["stock.move.line"].search(domain)
+
     def _find_move_lines_to_process_from_picking(self, shipment_advice, picking):
         """Returns the moves to load or unload for the given shipment and delivery.
 
@@ -645,17 +744,35 @@ class DeliveryShipment(Component):
             shipment_picking_type_ids=self.picking_types.ids
         )._find_move_lines_domain()  # Defined in `shipment_advice`
 
-    def _find_move_lines_from_package(self, shipment_advice, package):
+    def _find_move_lines_from_package(
+        self, shipment_advice, package, picking, location
+    ):
         """Returns the move line corresponding to `package` for the given shipment."""
         domain = self._find_move_lines_domain(shipment_advice)
         # FIXME should we check also result package here?
         domain.append(("package_id", "=", package.id))
+        if location:
+            domain.append(
+                ("location_id", "child_of", location.id),
+            )
+        if picking:
+            domain.append(
+                ("picking_id", "=", picking.id),
+            )
         return self.env["stock.move.line"].search(domain)
 
-    def _find_move_lines_from_lot(self, shipment_advice, lot):
+    def _find_move_lines_from_lot(self, shipment_advice, lot, picking, location):
         """Returns the move line corresponding to `lot` for the given shipment."""
         domain = self._find_move_lines_domain(shipment_advice)
         domain.append(("lot_id", "=", lot.id))
+        if location:
+            domain.append(
+                ("location_id", "child_of", location.id),
+            )
+        if picking:
+            domain.append(
+                ("picking_id", "=", picking.id),
+            )
         return self.env["stock.move.line"].search(domain)
 
     def _find_move_lines_from_product(
@@ -663,6 +780,7 @@ class DeliveryShipment(Component):
         shipment_advice,
         product,
         picking,
+        location,
         in_package_not_loaded=False,
         in_lot=False,
     ):
@@ -671,8 +789,15 @@ class DeliveryShipment(Component):
         """
         domain = self._find_move_lines_domain(shipment_advice)
         domain.extend(
-            [("product_id", "=", product.id), ("picking_id", "=", picking.id)]
+            [
+                ("product_id", "=", product.id),
+                ("picking_id", "=", picking.id),
+            ]
         )
+        if location:
+            domain.append(
+                ("location_id", "child_of", location.id),
+            )
         if in_package_not_loaded:
             domain.append(
                 ("package_level_id", "!=", False),
@@ -763,6 +888,12 @@ class ShopfloorDeliveryShipmentValidator(Component):
                 "nullable": True,
                 "type": "integer",
             },
+            "location_id": {
+                "coerce": to_int,
+                "required": False,
+                "nullable": True,
+                "type": "integer",
+            },
         }
 
     def unload_move_line(self):
@@ -773,6 +904,12 @@ class ShopfloorDeliveryShipmentValidator(Component):
                 "type": "integer",
             },
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "location_id": {
+                "coerce": to_int,
+                "required": False,
+                "nullable": True,
+                "type": "integer",
+            },
         }
 
     def unload_package_level(self):
@@ -785,6 +922,12 @@ class ShopfloorDeliveryShipmentValidator(Component):
             "package_level_id": {
                 "coerce": to_int,
                 "required": True,
+                "type": "integer",
+            },
+            "location_id": {
+                "coerce": to_int,
+                "required": False,
+                "nullable": True,
                 "type": "integer",
             },
         }
@@ -850,6 +993,7 @@ class ShopfloorDeliveryShipmentValidatorResponse(Component):
     def _schema_scan_document(self):
         shipment_schema = self.schemas.shipment_advice()
         picking_schema = self.schemas.picking()
+        location_schema = self.schemas.location()
         return {
             "shipment_advice": {
                 "type": "dict",
@@ -863,6 +1007,7 @@ class ShopfloorDeliveryShipmentValidatorResponse(Component):
                 # TODO
                 # "schema": shipment_schema,
             },
+            "location": {"type": "dict", "nullable": True, "schema": location_schema},
         }
 
     @property

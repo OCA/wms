@@ -50,10 +50,18 @@ const DeliveryShipment = {
                 />
 
             <item-detail-card
+                v-if="state_is('scan_document') && !_.isEmpty(filter_location())"
+                :key="make_state_component_key(['delivery-shipment-location', filter_location().id])"
+                :record="state.data.location"
+                :options="{title_icon: 'mdi-filter-outline', main: true, key_title: 'name'}"
+                :card_color="utils.colors.color_for('screen_step_done')"
+                />
+
+            <item-detail-card
                 v-if="!_.isEmpty(picking())"
                 :key="make_state_component_key(['delivery-shipment-pick', picking().id])"
                 :record="picking()"
-                :options="{main: true, key_title: 'name', title_action_field: {path: 'name', action_val_path: 'name'}}"
+                :options="{main: true, title_icon: 'mdi-filter-outline', key_title: 'name', title_action_field: {path: 'name', action_val_path: 'name'}}"
                 :card_color="utils.colors.color_for('screen_step_done')"
                 />
 
@@ -151,6 +159,18 @@ const DeliveryShipment = {
                 return {};
             }
             return data.picking;
+        },
+        filter_location: function (from_state = "") {
+            var data = {};
+            if (from_state) {
+                data = this.state_get_data(from_state);
+            } else {
+                data = this.state.data;
+            }
+            if (_.isEmpty(data.location)) {
+                return {};
+            }
+            return data.location;
         },
         pickings: function () {
             if (this.filter_state === "dock" && !_.isEmpty(this.state.data.on_dock)) {
@@ -264,6 +284,7 @@ const DeliveryShipment = {
                 this.odoo.call("unload_move_line", {
                     shipment_advice_id: this.shipment().id,
                     move_line_id: line.id,
+                    location_id: this.filter_location().id,
                 })
             );
         },
@@ -272,6 +293,7 @@ const DeliveryShipment = {
                 this.odoo.call("unload_package_level", {
                     shipment_advice_id: this.shipment().id,
                     package_level_id: pack.id,
+                    location_id: this.filter_location().id,
                 })
             );
         },
@@ -412,27 +434,40 @@ const DeliveryShipment = {
                 },
                 scan_document: {
                     display_info: {
-                        title: "Scan some shipment's content",
+                        title: "Scan some shipment's content or a location",
                         scan_placeholder: () => {
                             if (_.isEmpty(this.picking())) {
-                                return "Scan a lot, a pack or an operation";
+                                return "Scan a lot, a pack, an operation or a location";
                             } else {
-                                return "Scan a lot, a product, a pack or an operation";
+                                return "Scan a lot, a product, a pack, an operation or a location";
                             }
                         },
                     },
                     on_scan: (scanned) => {
-                        this.wait_call(
-                            this.odoo.call("scan_document", {
-                                barcode: scanned.text,
-                                shipment_advice_id: this.shipment().id,
-                                picking_id: this.picking().id,
-                            })
-                        );
+                        const data = {
+                            barcode: scanned.text,
+                            shipment_advice_id: this.shipment().id,
+                            picking_id: this.picking().id,
+                            location_id: this.filter_location().id,
+                        };
+                        this.wait_call(this.odoo.call("scan_document", data));
                     },
                     on_back: () => {
-                        this.state_to("init");
-                        this.reset_notification();
+                        if (
+                            _.isEmpty(this.filter_location()) &&
+                            _.isEmpty(this.picking())
+                        ) {
+                            // No filtering back to scan_dock
+                            this.wait_call(this.odoo.call("scan_dock", {barcode: ""}));
+                        } else {
+                            // Stay on scan_document but without filtering
+                            this.wait_call(
+                                this.odoo.call("scan_document", {
+                                    barcode: "",
+                                    shipment_advice_id: this.shipment().id,
+                                })
+                            );
+                        }
                     },
                     on_go2loading_list: () => {
                         this.wait_call(
@@ -451,8 +486,13 @@ const DeliveryShipment = {
                         this.state_set_data({filter_name: scanned.text});
                     },
                     on_back: () => {
-                        this.state_to("scan_document");
-                        this.reset_notification();
+                        const data = {
+                            barcode: "",
+                            shipment_advice_id: this.shipment().id,
+                            picking_id: this.picking("scan_document").id,
+                            location_id: this.filter_location("scan_document").id,
+                        };
+                        this.wait_call(this.odoo.call("scan_document", data));
                     },
                     on_back2picking: (picking) => {
                         this.wait_call(

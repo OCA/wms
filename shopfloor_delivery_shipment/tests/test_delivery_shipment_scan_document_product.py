@@ -51,6 +51,7 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
         self.assert_response_scan_document(
             response,
             self.shipment,
+            picking=self.picking1,
             message=self.service.msg_store.product_not_planned_in_shipment(
                 scanned_product, self.shipment
             ),
@@ -213,6 +214,7 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
         self.assert_response_scan_document(
             response,
             self.shipment,
+            picking=self.picking1,
             message=self.service.msg_store.unable_to_load_product_in_shipment(
                 scanned_product, self.shipment
             ),

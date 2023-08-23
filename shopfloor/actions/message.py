@@ -429,6 +429,16 @@ class MessageAction(Component):
             "body": _("No transfer found for this product."),
         }
 
+    def product_not_found_in_location_or_transfer(self, product, location, picking):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Product {} not found in location {} or transfer {}.".format(
+                    product.name, location.name, picking.name
+                )
+            ),
+        }
+
     def x_not_found_or_already_in_dest_package(self, message_code):
         return {
             "message_type": "warning",
@@ -506,6 +516,20 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("No transfer found for this lot."),
+        }
+
+    def lot_not_found_in_location(self, lot, location):
+        return {
+            "message_type": "error",
+            "body": _("Lot {} not found in location {}").format(
+                lot.name, location.name
+            ),
+        }
+
+    def lot_not_found_in_picking(self, lot, picking):
+        return {
+            "message_type": "error",
+            "body": _("Lot {} not found in transfer {}").format(lot.name, picking.name),
         }
 
     def batch_transfer_complete(self):
@@ -720,6 +744,22 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Package {} cannot be used: {} ").format(package.name, error_msg),
+        }
+
+    def package_not_found_in_location(self, package, location):
+        return {
+            "message_type": "error",
+            "body": _("Package {} not found in location {}").format(
+                package.name, location.name
+            ),
+        }
+
+    def package_not_found_in_picking(self, package, picking):
+        return {
+            "message_type": "error",
+            "body": _("Package {} not found in transfer {}").format(
+                package.name, picking.name
+            ),
         }
 
     def cannot_change_lot_already_picked(self, lot):
