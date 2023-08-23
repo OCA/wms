@@ -102,7 +102,7 @@ class DataAction(Component):
             ]
             operation_progress = self._get_operation_progress(domain)
             data.update({"operation_progress": operation_progress})
-        if data and picking:
+        if kw.get("with_package_move_line_count") and data and picking:
             move_line_count = self.env["stock.move.line"].search_count(
                 [
                     ("picking_id.picking_type_id", "=", picking.picking_type_id.id),

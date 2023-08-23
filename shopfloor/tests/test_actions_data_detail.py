@@ -80,7 +80,6 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "name": package.location_id.display_name,
             },
             "name": package.name,
-            "move_line_count": 2,
             "packaging": self.data_detail.packaging(package.packaging_id),
             "weight": 20.0,
             "pickings": self.data_detail.pickings(pickings),
@@ -90,6 +89,11 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "name": self.storage_type_pallet.name,
             },
         }
+        self.assertDictEqual(data, expected)
+        data = self.data_detail.package_detail(
+            package, picking=self.picking, with_package_move_line_count=True
+        )
+        expected.update({"move_line_count": 2})
         self.assertDictEqual(data, expected)
 
     def test_data_picking(self):
@@ -185,14 +189,12 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "package_src": {
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
-                "move_line_count": 1,
                 "weight": 20.0,
                 "storage_type": None,
             },
             "package_dest": {
                 "id": result_package.id,
                 "name": result_package.name,
-                "move_line_count": 1,
                 "weight": 6.0,
                 "storage_type": None,
             },
@@ -201,6 +203,10 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "priority": "1",
             "progress": 30.0,
         }
+        self.assertDictEqual(data, expected)
+        data = self.data_detail.move_line(move_line, with_package_move_line_count=True)
+        expected["package_src"]["move_line_count"] = 1
+        expected["package_dest"]["move_line_count"] = 1
         self.assertDictEqual(data, expected)
 
     def test_data_move_line_lot(self):
@@ -247,14 +253,12 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "package_src": {
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
-                "move_line_count": 2,
                 "weight": 30.0,
                 "storage_type": None,
             },
             "package_dest": {
                 "id": move_line.result_package_id.id,
                 "name": move_line.result_package_id.name,
-                "move_line_count": 2,
                 "weight": 0.0,
                 "storage_type": None,
             },
@@ -263,6 +267,10 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "priority": "1",
             "progress": 0.0,
         }
+        self.assertDictEqual(data, expected)
+        data = self.data_detail.move_line(move_line, with_package_move_line_count=True)
+        expected["package_src"]["move_line_count"] = 2
+        expected["package_dest"]["move_line_count"] = 2
         self.assertDictEqual(data, expected)
 
     def test_data_move_line_raw(self):
