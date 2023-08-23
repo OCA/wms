@@ -126,6 +126,14 @@ class MessageAction(Component):
             "body": _("Package {} is already used.").format(package.name),
         }
 
+    def package_different_picking_type(self, package, picking_type):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "Package {} contains already lines from a different operation type {}"
+            ).format(package.name, picking_type.name),
+        }
+
     def dest_package_required(self):
         return {
             "message_type": "warning",
