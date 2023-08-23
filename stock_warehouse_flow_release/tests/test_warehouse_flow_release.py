@@ -35,7 +35,10 @@ class TestWarehouseFlowRelease(common.CommonFlow):
         self.assertNotEqual(move.picking_type_id, to_picking_type)
         # Now when releasing this move, the picking type update is happening
         # (and will create chained moves if any as well)
+        picking = move.picking_id
         move.picking_id.release_available_to_promise()
+        self.assertNotEqual(move.picking_id, picking)
+        self.assertTrue(move.picking_id)
         # Check we got pick+ship moves instead of one ship_only move
         move_ship = move
         self.assertRecordValues(
