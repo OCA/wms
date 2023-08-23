@@ -158,6 +158,16 @@
                   <field name="allow_return_is_possible" invisible="1" />
                   <field name="allow_return" />
               </group>
+              <group
+                    name="allow_alternative_destination_package"
+                    attrs="{'invisible': [('allow_alternative_destination_package_is_possible', '=', False)]}"
+                >
+                    <field
+                        name="allow_alternative_destination_package_is_possible"
+                        invisible="1"
+                    />
+                    <field name="allow_alternative_destination_package" />
+                </group>
             </group>
         </field>
     </record>

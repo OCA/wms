@@ -228,6 +228,9 @@ class ZonePicking(Component):
         data = self._data_for_move_line(move_line)
         data["move_line"].update(kw)
         data["confirmation_required"] = confirmation_required
+        data[
+            "allow_alternative_destination_package"
+        ] = self.work.menu.allow_alternative_destination_package
         return self._response(
             next_state="set_line_destination", data=data, message=message
         )
@@ -1097,12 +1100,12 @@ class ZonePicking(Component):
 
         pkg_moved = False
         search = self._actions_for("search")
-        accept_only_package = not self._move_line_full_qty(move_line, quantity)
+
+        moving_full_quantity = self._move_line_full_qty(move_line, quantity)
 
         response = self._set_destination_update_quantity(move_line, quantity, barcode)
         if response:
             return response
-
         if quantity <= 0:
             message = self.msg_store.picking_zero_quantity()
             return self._response_for_set_line_destination(
@@ -1112,8 +1115,9 @@ class ZonePicking(Component):
             )
 
         extra_message = ""
-        if not accept_only_package:
-            # When the barcode is a location
+        if moving_full_quantity:
+            # When the barcode is a location,
+            # only allow it if moving the full qty.
             location = search.location_from_scan(barcode)
             if location:
                 if self._pick_pack_same_time():
@@ -1147,6 +1151,28 @@ class ZonePicking(Component):
         # When the barcode is a package
         package = search.package_from_scan(barcode)
         if package:
+
+            if not moving_full_quantity and move_line.package_id == package:
+                # Check we're not using the source package as transfer package.
+                message = self.msg_store.dest_package_not_valid(package)
+                return self._response_for_set_line_destination(
+                    move_line, message=message, qty_done=quantity
+                )
+
+            allow_alternative_package = (
+                self.work.menu.allow_alternative_destination_package
+            )
+            if (
+                not allow_alternative_package
+                and move_line.result_package_id
+                and move_line.result_package_id != package
+            ):
+                # Check whether the user can move a whole package to a different package.
+                message = self.msg_store.package_transfer_not_allowed_scan_location()
+                return self._response_for_set_line_destination(
+                    move_line, message=message, qty_done=quantity
+                )
+
             if self._pick_pack_same_time():
                 (
                     good_for_packing,
@@ -1166,7 +1192,7 @@ class ZonePicking(Component):
         message = None
 
         if not pkg_moved and not package:
-            if accept_only_package:
+            if not moving_full_quantity:
                 message = self.msg_store.package_not_found_for_barcode(barcode)
             else:
                 # we don't know if user wanted to scan a location or a package
@@ -1901,6 +1927,11 @@ class ShopfloorZonePickingValidatorResponse(Component):
             },
             "product_id": {
                 "type": "integer",
+                "nullable": True,
+                "required": False,
+            },
+            "allow_alternative_destination_package": {
+                "type": "boolean",
                 "nullable": True,
                 "required": False,
             },
