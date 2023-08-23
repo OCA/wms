@@ -118,7 +118,8 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         picking.action_assign()
         first_line = picking.move_line_ids[0]
         lot = first_line.lot_id
-        self._test_scan_line_ok(lot.name, first_line)
+        related_lines = picking.move_line_ids - first_line
+        self._test_scan_line_ok(lot.name, first_line, related_lines)
 
     def test_scan_line_product_in_one_package_all_package_lines_ok(self):
         picking = self._create_picking(
