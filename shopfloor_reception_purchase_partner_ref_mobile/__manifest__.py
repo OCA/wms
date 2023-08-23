@@ -1,7 +1,7 @@
 {
     "name": "Shopfloor Reception Purchase Partner Ref Mobile",
     "summary": "Adds the purchase partner ref field to shopfloor reception scenario",
-    "version": "14.0.1.0.0",
+    "version": "14.0.1.1.0",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
     "author": "MT Software, Odoo Community Association (OCA)",
