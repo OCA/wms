@@ -510,13 +510,17 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
     def test_storage_strategy_sequence_condition(self):
         """If a condition is not met on storage location sequence, it's ignored"""
         move = self._create_single_move(self.product)
-        move._assign_picking()
+        move2 = self._create_single_move(self.product2)
+        (move | move2)._assign_picking()
         original_location_dest = move.location_dest_id
         package = self.env["stock.quant.package"].create(
             {"product_packaging_id": self.product_lot_cardbox_product_packaging.id}
         )
         self._update_qty_in_location(
             move.location_id, move.product_id, move.product_qty, package=package
+        )
+        self._update_qty_in_location(
+            move2.location_id, move2.product_id, move2.product_qty, package=package
         )
 
         # configure a new sequence with none in the parent location
@@ -544,7 +548,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             }
         )
 
-        move._action_assign()
+        (move | move2)._action_assign()
         move_line = move.move_line_ids
         package_level = move_line.package_level_id
 
