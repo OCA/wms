@@ -334,16 +334,16 @@ class StockLocation(models.Model):
         package_storage_type = False
         if quant:
             package_storage_type = quant.package_id.package_storage_type_id
-            _logger.debug(
-                "Computing putaway for pack %s (%s)"
-                % (quant.package_id.name, quant.package_id)
-            )
         # I'm not sure about this. I had to add the line, because there is a
         # second call to get_putaway_strategy which is made a 'leaf' location
         # as putaway_location which does not match the package storage type in
         # the project. This could be caused by another module, I'm not sure...
         if not package_storage_type:
             return putaway_location
+        _logger.debug(
+            "Computing putaway for pack %s (%s)"
+            % (quant.package_id.name, quant.package_id)
+        )
         dest_location = putaway_location or self
         _logger.debug("putaway location: %s", dest_location.name)
         package_locations = self.env["stock.storage.location.sequence"].search(
