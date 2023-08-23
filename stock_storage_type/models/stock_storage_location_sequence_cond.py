@@ -57,7 +57,7 @@ class StockStorageLocationSequenceCond(models.Model):
         * storage_location_sequence
         * condition
         * putaway_location
-        * quant
+        * quant (recordset)
         * product
         * env
         * datetime
@@ -112,13 +112,13 @@ class StockStorageLocationSequenceCond(models.Model):
                 "Condition %s not met:\n"
                 "* putaway sequence: %s\n"
                 "* putaway location: %s\n"
-                "* quant: %s\n"
+                "* quants: %s\n"
                 "* product: %s\n"
                 % (
                     self.name,
                     storage_location_sequence.id,
                     putaway_location.name,
-                    quant.id,
+                    quant.ids,
                     product.display_name,
                 )
             )
