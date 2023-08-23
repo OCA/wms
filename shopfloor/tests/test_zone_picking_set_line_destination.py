@@ -642,7 +642,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             qty_done=move_line.product_uom_qty,
         )
 
-    def test_set_destination_error_concurent_work(self):
+    def test_set_destination_package_error_concurent_work(self):
         """Scanned barcode is the destination package.
 
         Move line is already being worked on by someone else
@@ -658,6 +658,40 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
+                "quantity": move_line.product_uom_qty,
+                "confirmation": False,
+            },
+        )
+        # Check response
+        self.assert_response_set_line_destination(
+            response,
+            zone_location,
+            picking_type,
+            move_line,
+            message={
+                "message_type": "error",
+                "body": "Someone is already working on these transfers",
+            },
+            qty_done=move_line.product_uom_qty,
+        )
+
+    def test_set_destination_location_error_concurent_work(self):
+        """Scanned barcode is the destination location.
+
+        Move line is already being worked on by someone else
+        """
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        picking_type.sudo().shopfloor_zero_check = True
+        self.assertEqual(len(self.picking1.move_line_ids), 1)
+        move_line = self.picking1.move_line_ids
+        move_line.picking_id.user_id = self.shopfloor_manager
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "move_line_id": move_line.id,
+                "package_id": self.free_package.id,
+                "barcode": self.packing_location.barcode,
                 "quantity": move_line.product_uom_qty,
                 "confirmation": False,
             },

@@ -128,6 +128,10 @@ class DataAction(Component):
             "name",
             "shopfloor_weight:weight",
             ("package_storage_type_id:storage_type", ["id", "name"]),
+            (
+                "quant_ids:total_quantity",
+                lambda rec, fname: sum(rec.quant_ids.mapped("quantity")),
+            ),
         ]
 
     @property
