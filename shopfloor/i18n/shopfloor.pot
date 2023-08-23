@@ -1367,6 +1367,12 @@ msgid "The content of {} cannot be transferred with this scenario."
 msgstr ""
 
 #. module: shopfloor
+#: code:addons/shopfloor/models/stock_move_line.py:0
+#, python-format
+msgid "The demand cannot be negative"
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/services/cluster_picking.py:0
 #, python-format
 msgid "The destination bin {} is not empty, please take another."
