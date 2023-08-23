@@ -3,7 +3,7 @@
 {
     "name": "Shopfloor Purchase Base",
     "summary": "Module for Shopfloor Purchase Data connection",
-    "version": "14.0.1.0.0",
+    "version": "14.0.1.1.0",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
     "author": "MT Software, Odoo Community Association (OCA)",
