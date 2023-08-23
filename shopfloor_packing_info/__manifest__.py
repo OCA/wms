@@ -3,7 +3,7 @@
 {
     "name": "Shopfloor Packing Info",
     "summary": "Allows to predefine packing information messages per partner.",
-    "version": "14.0.1.0.1",
+    "version": "14.0.1.1.0",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
