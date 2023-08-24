@@ -427,7 +427,7 @@ const DeliveryShipment = {
                             this.odoo.call("scan_dock", {
                                 barcode: scanned.text,
                                 confirmation:
-                                    this.state.data.confirmation_required || false,
+                                    this.state.data.confirmation_required || "",
                             })
                         );
                     },
