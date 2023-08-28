@@ -32,6 +32,8 @@ class TestSetDestination(CommonCase):
             },
         )
         self.assertEqual(selected_move_line.location_dest_id, self.shelf2)
+        data = self.data.picking(picking, with_progress=True)
+        data.update({"moves": self._data_for_moves(picking.move_lines)})
         self.assert_response(
             response, next_state="select_move", data=self._data_for_select_move(picking)
         )
@@ -79,6 +81,8 @@ class TestSetDestination(CommonCase):
             },
         )
         self.assertEqual(selected_move_line.location_dest_id, self.dispatch_location)
+        data = self.data.picking(picking, with_progress=True)
+        data.update({"moves": self._data_for_moves(picking.move_lines)})
         self.assert_response(
             response, next_state="select_move", data=self._data_for_select_move(picking)
         )
@@ -129,7 +133,7 @@ class TestSetDestination(CommonCase):
         # and dest package & dest location are set,
         # a line with 3 demand will be automatically extracted
         # in a new picking, which will be marked as done.
-        self.service.dispatch(
+        response = self.service.dispatch(
             "set_destination",
             params={
                 "picking_id": picking.id,
@@ -153,3 +157,21 @@ class TestSetDestination(CommonCase):
         self.assertEqual(line_in_picking.product_uom_qty, 7)
         self.assertEqual(line_in_picking.qty_done, 0)
         self.assertEqual(picking.state, "assigned")
+
+        # In the response, we should find
+        # the qty done corresponding to the related backorder.
+        data = self.data.picking(picking, with_progress=True)
+        data.update({"moves": self._data_for_moves(picking.move_lines)})
+        move_data = {}
+        for move in data["moves"]:
+            if move["product"]["name"] == "Product A":
+                move_data = move
+                break
+        self.assertEqual(move_data["quantity_done"], 3)
+        self.assert_response(
+            response,
+            next_state="select_move",
+            data={
+                "picking": data,
+            },
+        )

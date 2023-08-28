@@ -245,8 +245,8 @@ class DataAction(Component):
                     ("product_id", "=", record.product_id.id),
                 ]
             )
-            qty_done = sum(related_moves.mapped("quantity_done"))
-            data.update({"backorders_quantity_done": qty_done})
+            backorders_qty_done = sum(related_moves.mapped("quantity_done"))
+            data["quantity_done"] += backorders_qty_done
         return data
 
     def moves(self, records, **kw):

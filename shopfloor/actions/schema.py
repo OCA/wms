@@ -66,7 +66,6 @@ class ShopfloorSchemaAction(Component):
             "location_src": self._schema_dict_of(self.location()),
             "location_dest": self._schema_dict_of(self.location()),
             "progress": {"type": "float", "nullable": True},
-            "backorders_quantity_done": {"type": "float", "nullable": True},
         }
 
     def product(self):
