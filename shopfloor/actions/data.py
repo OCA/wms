@@ -236,7 +236,18 @@ class DataAction(Component):
     def move(self, record, **kw):
         record = record.with_context(location=record.location_id.id)
         parser = self._move_parser
-        return self._jsonify(record, parser)
+        data = self._jsonify(record, parser)
+        if kw.get("auto_post_enabled"):
+            # Return the quantities done for the related backorders.
+            related_moves = self.env["stock.move"].search(
+                [
+                    ("picking_id.backorder_id", "=", record.picking_id.id),
+                    ("product_id", "=", record.product_id.id),
+                ]
+            )
+            qty_done = sum(related_moves.mapped("quantity_done"))
+            data.update({"backorders_quantity_done": qty_done})
+        return data
 
     def moves(self, records, **kw):
         return [self.move(rec, **kw) for rec in records]
