@@ -745,9 +745,9 @@ class DeliveryShipment(Component):
 
     def _find_move_lines_domain(self, shipment_advice):
         """Returns the base domain to look for move lines for a given shipment."""
-        return shipment_advice.with_context(
-            shipment_picking_type_ids=self.picking_types.ids
-        )._find_move_lines_domain()  # Defined in `shipment_advice`
+        return shipment_advice._find_move_lines_domain(
+            self.picking_types
+        )  # Defined in `shipment_advice`
 
     def _find_move_lines_from_package(
         self, shipment_advice, package, picking, location
