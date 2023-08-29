@@ -40,6 +40,8 @@ class CheckoutScanPackageActionCaseNoPrefillQty(
         """Scan a product which is present in two lines.
 
         Only one line should have its quantity incremented.
+        If one line has been fully processed,
+        then the second line will have its quantity incremented.
 
         """
         picking = self._create_picking(
@@ -63,6 +65,20 @@ class CheckoutScanPackageActionCaseNoPrefillQty(
             move_lines,
             {move_lines[0]: 1, move_lines[1]: 0},
         )
+
+        # First line is fully processed,
+        # so we expect the second line to be incremented.
+        move_lines[0].qty_done = 3.0
+        self.service.dispatch(
+            "scan_package_action",
+            params={
+                "picking_id": picking.id,
+                "selected_line_ids": move_lines.ids,
+                "barcode": self.product_a.barcode,
+            },
+        )
+        self.assertEqual(move_lines[0].qty_done, 3.0)
+        self.assertEqual(move_lines[1].qty_done, 1.0)
 
     def test_scan_package_action_scan_lot_to_increment_qty(self):
         """ """
