@@ -462,10 +462,10 @@ class StockMove(models.Model):
             )
         self.env["procurement.group"].run_defer(procurement_requests)
 
-        released_moves._after_release_assign_moves()
-        released_moves._after_release_update_chain()
+        assigned_moves = released_moves._after_release_assign_moves()
+        assigned_moves._after_release_update_chain()
 
-        return released_moves
+        return assigned_moves
 
     def _before_release(self):
         """Hook that aims to be overridden."""
@@ -491,6 +491,7 @@ class StockMove(models.Model):
             ).ids
         moves = self.browse(move_ids)
         moves._action_assign()
+        return moves
 
     def _release_split(self, remaining_qty):
         """Split move and put remaining_qty to a backorder move."""
