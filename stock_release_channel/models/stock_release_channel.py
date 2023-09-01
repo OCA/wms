@@ -467,6 +467,8 @@ class StockReleaseChannel(models.Model):
                 raise exceptions.ValidationError(msg)
 
     def _prepare_domain(self):
+        if not self.rule_domain:
+            return []
         domain = safe_eval(self.rule_domain) or []
         return domain
 
