@@ -63,6 +63,16 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_alternative_destination_package
+msgid ""
+"\n"
+"When moving a whole package, the user normally scans\n"
+"a destination location.\n"
+"If enabled, they will also be allowed\n"
+"to scan a destination package.\n"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__multiple_move_single_pack
 msgid ""
 "\n"
@@ -168,6 +178,11 @@ msgid "Allow Alternative Destination Is Possible"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination_package_is_possible
+msgid "Allow Alternative Destination Package Is Possible"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_force_reservation_is_possible
 msgid "Allow Force Reservation Is Possible"
 msgstr "Permitir Forzar Reserva es Posible"
@@ -190,6 +205,11 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_return
 msgid "Allow create returns"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination_package
+msgid "Allow to change the destination package"
 msgstr ""
 
 #. module: shopfloor
@@ -582,6 +602,18 @@ msgstr "El Lote {} es para otro producto."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "Lot {} not found in location {}"
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Lot {} not found in transfer {}"
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "Lot {} replaced by lot {}."
 msgstr "Lote {} reemplazado por lote {}."
 
@@ -877,6 +909,12 @@ msgid "Package {} cannot be used: {} "
 msgstr "El Paquete {} no puede ser usado: {} "
 
 #. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Package {} contains already lines from a different operation type {}"
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/models/stock_move_line.py:0
 #, python-format
 msgid ""
@@ -920,6 +958,18 @@ msgstr "El Paquete {} no está vacío."
 #, python-format
 msgid "Package {} is not in the current transfer."
 msgstr "El Paquete {} no está en la transferencia actual."
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Package {} not found in location {}"
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Package {} not found in transfer {}"
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1081,6 +1131,12 @@ msgid "Product {} found in multiple locations. Scan your location first."
 msgstr ""
 "El Producto {} se ha encontrado en múltiples ubicaciones. Escanée su "
 "ubicación primero."
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Product {} not found in location {} or transfer {}."
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
@@ -1456,6 +1512,12 @@ msgid "The content of {} cannot be transferred with this scenario."
 msgstr "El contenido de {} no se puede transferir con este escenario."
 
 #. module: shopfloor
+#: code:addons/shopfloor/models/stock_move_line.py:0
+#, python-format
+msgid "The demand cannot be negative"
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/services/cluster_picking.py:0
 #, python-format
 msgid "The destination bin {} is not empty, please take another."
@@ -1675,6 +1737,14 @@ msgstr "Transferencia {} realizada"
 #, python-format
 msgid "Transfer {} is not available."
 msgstr "Transferencia {} no está disponible."
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"Transferring to a different package is not allowed, please scan a location "
+"instead."
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
