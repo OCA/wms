@@ -73,12 +73,17 @@ class StockPicking(models.Model):
         return (
             self.env["stock.release.channel"]
             .search(self._get_release_channel_possible_candidate_domain())
-            .sorted(key=lambda r: (not bool(r.partner_ids), r.sequence))
+            .sorted(
+                key=lambda r, p=self: (
+                    not bool(p.partner_id in r.partner_ids),
+                    r.sequence,
+                )
+            )
         )
 
     def _get_release_channel_possible_candidate_domain(self):
         self.ensure_one()
-        return [
+        domain = [
             ("state", "!=", "asleep"),
             "|",
             ("picking_type_ids", "=", False),
@@ -86,7 +91,13 @@ class StockPicking(models.Model):
             "|",
             ("warehouse_id", "=", False),
             ("warehouse_id", "=", self.picking_type_id.warehouse_id.id),
-            "|",
-            ("partner_ids", "=", False),
-            ("partner_ids", "in", self.partner_id.ids),
         ]
+        if self.partner_id.stock_release_channel_ids:
+            domain.extend(
+                [
+                    "|",
+                    ("partner_ids", "=", False),
+                    ("id", "in", self.partner_id.stock_release_channel_ids.ids),
+                ]
+            )
+        return domain
