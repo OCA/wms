@@ -772,15 +772,22 @@ class Reception(Component):
         #     return
         move = line.move_id
         qty_todo = move.product_uom_qty
-        qty_done = sum(move.move_line_ids.mapped("qty_done"))
-        rounding = move.product_id.uom_id.rounding
-        compare = float_compare(qty_done, qty_todo, precision_rounding=rounding)
-        if compare < 1:  # If qty done < qty todo, align qty todo in the response
-            remaining_todo = qty_todo - qty_done
-            line_todo = line.qty_done + remaining_todo
-            response["data"]["set_quantity"]["selected_move_line"][0][
-                "quantity"
-            ] = line_todo
+        other_lines_qty_done = 0.0
+        move_uom = move.product_uom
+        for move_line in (move.move_line_ids - line):
+            # Use move's uom
+            line_uom = move_line.product_uom_id
+            other_lines_qty_done += line_uom._compute_quantity(
+                move_line.qty_done, move_line.product_uom_id, round=False
+            )
+        remaining_todo = qty_todo - other_lines_qty_done
+        # Change back to line uom
+        line_todo = line.product_uom_id._compute_quantity(
+            remaining_todo, move_uom, round=False
+        )
+        response["data"]["set_quantity"]["selected_move_line"][0][
+            "quantity"
+        ] = line_todo
         return response
 
     def _before_state__set_quantity(self, picking, line, message=None):
@@ -1244,14 +1251,17 @@ class Reception(Component):
     def _auto_post_line(self, selected_line):
         # If user only processed 1/5 and is the only one working on the move,
         # then selected_line is the only one related to this move.
-        # In such case, we must ensure there's another move line with the remaining
+        # In such case, we must ensure there's another move with the remaining
         # quantity to do, so selected_line is extracted in a new move as expected.
         if selected_line.product_uom_qty:
             selected_line.product_uom_qty = 0
         move = selected_line.move_id
-        if selected_line.qty_done == move.product_uom_qty:
+        move_quantity = move.product_uom._compute_quantity(
+            move.product_uom_qty, selected_line.product_uom_id
+        )
+        if selected_line.qty_done == move_quantity:
             # In case of full quantity, post the initial move
-            selected_line.move_id.extract_and_action_done()
+            return selected_line.move_id.extract_and_action_done()
         split_move_vals = move._split(selected_line.qty_done)
         new_move = move.create(split_move_vals)
         new_move.move_line_ids = selected_line
