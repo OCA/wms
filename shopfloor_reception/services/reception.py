@@ -1242,15 +1242,26 @@ class Reception(Component):
         )
 
     def _auto_post_line(self, selected_line):
-        new_move = selected_line.move_id.split_other_move_lines(
-            selected_line, intersection=True
-        )
-        if new_move:
-            # A new move is created in case of partial quantity
-            new_move.extract_and_action_done()
-            return
-        # In case of full quantity, post the initial move
-        selected_line.move_id.extract_and_action_done()
+        # If user only processed 1/5 and is the only one working on the move,
+        # then selected_line is the only one related to this move.
+        # In such case, we must ensure there's another move line with the remaining
+        # quantity to do, so selected_line is extracted in a new move as expected.
+        if selected_line.product_uom_qty:
+            selected_line.product_uom_qty = 0
+        move = selected_line.move_id
+        if selected_line.qty_done == move.product_uom_qty:
+            # In case of full quantity, post the initial move
+            selected_line.move_id.extract_and_action_done()
+        split_move_vals = move._split(selected_line.qty_done)
+        new_move = move.create(split_move_vals)
+        new_move.move_line_ids = selected_line
+        new_move._action_confirm(merge=False)
+        new_move._recompute_state()
+        new_move._action_assign()
+        lock = self._actions_for("lock")
+        lock.for_update(move)
+        move._recompute_state()
+        new_move.extract_and_action_done()
 
     def set_destination(
         self, picking_id, selected_line_id, location_name, confirmation=False
