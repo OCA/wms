@@ -12,8 +12,8 @@ class StockReleaseChannel(models.Model):
     _inherit = "stock.release.channel"
 
     process_end_time = fields.Float(
-        help="Fill in this to indicates when this channel release process would"
-        "be ended. This information will be used to compute the channel pickings"
+        help="Fill in this to indicates when this channel release process would "
+        "be ended. This information will be used to compute the channel pickings "
         "scheduled date at channel awaking.",
     )
     process_end_time_tz = fields.Selection(
@@ -64,7 +64,7 @@ class StockReleaseChannel(models.Model):
         company_tz = self.env.company.partner_id.tz
         for channel in self:
             channel.process_end_time_tz = (
-                channel.warehouse_id.partner_id.tz or company_tz or False
+                channel.warehouse_id.partner_id.tz or company_tz or "UTC"
             )
 
     @api.model

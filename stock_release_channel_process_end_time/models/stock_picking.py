@@ -11,7 +11,7 @@ class StockPicking(models.Model):
     schedule_date_prior_to_channel_process_end_date_search = fields.Boolean(
         store=False,
         search="_search_schedule_date_prior_to_channel_process_end_date",
-        help="Technical field to search on not processed pickings where the scheduled"
+        help="Technical field to search on not processed pickings where the scheduled "
         "date is prior to the process end date of available channels.",
     )
 
