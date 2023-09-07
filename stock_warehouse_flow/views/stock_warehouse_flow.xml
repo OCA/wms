@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+  <record id="stock_warehouse_flow_view_form" model="ir.ui.view">
+    <field name="name">stock.warehouse.flow.form</field>
+    <field name="model">stock.warehouse.flow</field>
+    <field name="arch" type="xml">
+      <form string="Warehouse Flow">
+        <sheet>
+          <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}"
+                    />
+          <div class="oe_title">
+            <label for="name" />
+            <h1>
+              <field name="name" placeholder="Flow Name" />
+            </h1>
+          </div>
+          <group>
+            <group name="info" colspan="4">
+              <group>
+                <field
+                                    name="warehouse_id"
+                                    attrs="{'readonly': [('delivery_route_id', '!=', False)]}"
+                                />
+              </group>
+              <group>
+                <field name="sequence" />
+                <field name="active" invisible="1" />
+                <field name="company_id" invisible="1" />
+              </group>
+            </group>
+            <group name="from" string="From">
+              <field name="from_picking_type_id" />
+              <div
+                                colspan="2"
+                                attrs="{'invisible': [('from_picking_type_id', '=', False)]}"
+                            >
+                <span class="text-muted"> => </span>
+                <field name="from_location_src_id" nolabel="1" class="oe_inline" />
+                <span class="text-muted"> to </span>
+                <field name="from_location_dest_id" nolabel="1" class="oe_inline" />
+              </div>
+              <field name="carrier_ids" widget="many2many_tags" />
+              <field
+                                name="move_domain"
+                                widget="domain"
+                                options="{'model': 'stock.move', 'in_dialog': true}"
+                            />
+              <field name="split_method" string="Max quantity multiple" />
+              <label
+                                for="qty"
+                                attrs="{'invisible': [('split_method', '!=', 'simple')]}"
+                            />
+              <div name="qty" class="o_row">
+                <field
+                                    name="qty"
+                                    attrs="{'required': [('split_method', '=', 'simple')], 'invisible': [('split_method', '!=', 'simple')]}"
+                                />
+                <field
+                                    name="uom_id"
+                                    options="{'no_open': True, 'no_create': True}"
+                                    groups="uom.group_uom"
+                                    attrs="{'required': [('split_method', '=', 'simple')], 'invisible': [('split_method', '!=', 'simple')]}"
+                                />
+              </div>
+            </group>
+            <group name="to" string="To">
+              <field
+                                name="delivery_steps"
+                                attrs="{'invisible': [('delivery_route_id', '!=', False)]}"
+                            />
+              <field
+                                name="sequence_prefix"
+                                attrs="{'invisible': [('delivery_route_id', '!=', False)], 'required': [('delivery_route_id', '=', False)]}"
+                            />
+              <field
+                                name="delivery_route_id"
+                                attrs="{'invisible': [('delivery_route_id', '=', False)]}"
+                            />
+              <field
+                                name="to_picking_type_id"
+                                attrs="{'invisible': [('delivery_route_id', '=', False)]}"
+                            />
+              <field
+                                name="to_output_stock_loc_id"
+                                attrs="{
+                'readonly': [('delivery_route_id', '!=', False)],
+                'invisible': [('delivery_steps', '=', 'ship_only')],
+                }"
+                            />
+              <field
+                                name="warning"
+                                class="alert alert-warning"
+                                role="alert"
+                                attrs="{'invisible': [('warning', '=', False)]}"
+                                nolabel="1"
+                                colspan="2"
+                            />
+              <button
+                                name="action_generate_route"
+                                type="object"
+                                string="Generate route"
+                                class="oe_highlight"
+                                attrs="{'invisible': [('delivery_route_id', '!=', False)]}"
+                            />
+            </group>
+          </group>
+          <notebook>
+            <page string="Rules" name="rules">
+              <field name="rule_ids" nolabel="1">
+                <tree>
+                  <field name="action" />
+                  <field name="picking_type_id" />
+                  <field name="location_src_id" />
+                  <field name="location_dest_id" />
+                  <field name="group_id" />
+                </tree>
+              </field>
+            </page>
+            <page string="Impacted routes" name="impacted_routes">
+              <field name="impacted_route_ids" nolabel="1">
+                <tree>
+                  <field name="name" />
+                </tree>
+              </field>
+            </page>
+            <page
+                            string="Technical Information"
+                            name="technical_info"
+                            groups="base.group_no_one"
+                        >
+              <group>
+                <group string="Locations" name="locations">
+                  <field
+                                        name="pack_stock_loc_id"
+                                        attrs="{
+                      'readonly': [('delivery_route_id', '!=', False)],
+                      'invisible': [('delivery_steps', '!=', 'pick_pack_ship')],
+                    }"
+                                    />
+                  <field
+                                        name="output_stock_loc_id"
+                                        attrs="{'invisible': [('output_stock_loc_id', '=', False)]}"
+                                    />
+                </group>
+                <group string="Operation Types" name="picking_types">
+                  <field
+                                        name="pick_type_id"
+                                        attrs="{
+                      'readonly': [('delivery_route_id', '!=', False)],
+                      'invisible': [('delivery_steps', '=', 'ship_only')],
+                    }"
+                                    />
+                  <field
+                                        name="pack_type_id"
+                                        attrs="{
+                      'readonly': [('delivery_route_id', '!=', False)],
+                      'invisible': [('delivery_steps', '!=', 'pick_pack_ship')],
+                    }"
+                                    />
+                  <field name="out_type_id" />
+                </group>
+              </group>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="stock_warehouse_flow_view_tree" model="ir.ui.view">
+    <field name="name">stock.warehouse.flow.tree</field>
+    <field name="model">stock.warehouse.flow</field>
+    <field name="arch" type="xml">
+      <tree decoration-warning="warning">
+        <field name="warehouse_id" />
+        <field name="name" />
+        <field name="from_picking_type_id" />
+        <field name="move_domain" />
+        <field name="carrier_ids" widget="many2many_tags" />
+        <field name="to_picking_type_id" />
+        <field name="warning" invisible="1" />
+      </tree>
+    </field>
+  </record>
+
+  <record id="stock_warehouse_flow_view_search" model="ir.ui.view">
+    <field name="name">stock.warehouse.flow.search</field>
+    <field name="model">stock.warehouse.flow</field>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <search string="Routing Flows">
+        <field name="name" />
+        <field name="carrier_ids" />
+        <filter string="Archived" name="inactive" domain="[('active','=',False)]" />
+        <group expand='0' string='Group by...'>
+          <filter
+                        string='Warehouse'
+                        name="groupby_warehouse"
+                        context="{'group_by': 'warehouse_id'}"
+                        groups="stock.group_stock_multi_warehouses"
+                    />
+          <filter
+                        string='From operation type'
+                        name="groupby_from_picking_type"
+                        context="{'group_by': 'from_picking_type_id'}"
+                    />
+          <filter
+                        string='To operation type'
+                        name="groupby_to_picking_type"
+                        context="{'group_by': 'to_picking_type_id'}"
+                    />
+        </group>
+      </search>
+    </field>
+  </record>
+
+  <record id="stock_warehouse_flow_action" model="ir.actions.act_window">
+    <field name="name">Routing Flows</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">stock.warehouse.flow</field>
+    <field name="view_id" ref="stock_warehouse_flow_view_tree" />
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">
+        Create a new Routing Flow
+      </p>
+    </field>
+  </record>
+
+  <menuitem
+        id="stock_warehouse_flow_menu"
+        parent="stock.menu_warehouse_config"
+        action="stock_warehouse_flow_action"
+    />
+
+</odoo>
