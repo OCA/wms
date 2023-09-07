@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-09-07 18:37+0000\n"
+"PO-Revision-Date: 2023-09-07 21:37+0000\n"
 "Last-Translator: Ivorra78 <informatica@totmaterial.es>\n"
 "Language-Team: none\n"
 "Language: es\n"
@@ -275,27 +275,27 @@ msgstr "En curso Transferencias relacionadas"
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_lock_allowed
 msgid "Is Action Lock Allowed"
-msgstr "¿Está permitido el bloqueo de acciones?"
+msgstr "Está permitido el bloqueo de acciones"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_sleep_allowed
 msgid "Is Action Sleep Allowed"
-msgstr "¿Está permitida la acción de dormir?"
+msgstr "Está permitida la acción de dormir"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_unlock_allowed
 msgid "Is Action Unlock Allowed"
-msgstr "¿Está permitido el desbloqueo de acciones?"
+msgstr "Está permitido el desbloqueo de acciones"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_wake_up_allowed
 msgid "Is Action Wake Up Allowed"
-msgstr "¿Está permitida la Acción Despertar?"
+msgstr "Está permitida la Acción Despertar"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_release_allowed
 msgid "Is Release Allowed"
-msgstr "¿Está permitida la liberación?"
+msgstr "Está permitida la liberación"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__last_done_picking_date_done
@@ -747,8 +747,10 @@ msgid ""
 "You cannot release delivery of the channel %s because it has been forbidden "
 "in the release channel configuration"
 msgstr ""
+"No puede liberar la entrega del canal %s porque se ha prohibido en la "
+"configuración del canal de liberación"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "name"
-msgstr ""
+msgstr "nombre"
