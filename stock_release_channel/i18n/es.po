@@ -6,13 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-09-07 18:37+0000\n"
+"Last-Translator: Ivorra78 <informatica@totmaterial.es>\n"
 "Language-Team: none\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
@@ -20,26 +22,30 @@ msgid ""
 "<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Release\" "
 "title=\"Automatic Release\"/>"
 msgstr ""
+"<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Release\" title="
+"\"Automatic Release\"/>"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Details\" title=\"Details\"/>"
 msgstr ""
+"<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Details\" title="
+"\"Details\"/>"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "<span class=\"middle_title\">To Do Situation</span>"
-msgstr ""
+msgstr "<span class=\"middle_title\">Situación por hacer</span>"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "<span>Actions</span>"
-msgstr ""
+msgstr "<span>Acciones</span>"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "<span>Transfers</span>"
-msgstr ""
+msgstr "<span>Transferencias</span>"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
@@ -47,54 +53,56 @@ msgid ""
 "<strong>Last Transfer</strong>\n"
 "                                                <br/>"
 msgstr ""
+"<strong>Última Transferencia</strong>\n"
+"                                                <br/>"
 
 #. module: stock_release_channel
 #. odoo-python
 #: code:addons/stock_release_channel/models/stock_release_channel.py:0
 #, python-format
 msgid "Action 'Lock' is not allowed for channel %(name)s."
-msgstr ""
+msgstr "La acción 'Bloquear' no está permitida para el canal %(name)s."
 
 #. module: stock_release_channel
 #. odoo-python
 #: code:addons/stock_release_channel/models/stock_release_channel.py:0
 #, python-format
 msgid "Action 'Sleep' is not allowed for channel %(name)s."
-msgstr ""
+msgstr "La acción 'Dormir' no está permitida para el canal %(name)s."
 
 #. module: stock_release_channel
 #. odoo-python
 #: code:addons/stock_release_channel/models/stock_release_channel.py:0
 #, python-format
 msgid "Action 'Unlock' is not allowed for channel %(name)s."
-msgstr ""
+msgstr "La acción 'Desbloquear' no está permitida para el canal %(name)s."
 
 #. module: stock_release_channel
 #. odoo-python
 #: code:addons/stock_release_channel/models/stock_release_channel.py:0
 #, python-format
 msgid "Action 'Wake Up' is not allowed for channel %(name)s."
-msgstr ""
+msgstr "La acción 'Despertar' no está permitida para el canal %(name)s."
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__active
 msgid "Active"
-msgstr ""
+msgstr "Activo"
 
 #. module: stock_release_channel
 #: model_terms:ir.actions.act_window,help:stock_release_channel.stock_release_channel_config_act_window
 msgid "Add a Release Channel"
-msgstr ""
+msgstr "Agregar un canal de lanzamiento"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_chain_done
 msgid "All Done Related Transfers"
-msgstr ""
+msgstr "Todas las transferencias relacionadas realizadas"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_move_all
 msgid "All Moves (Estimate)"
-msgstr ""
+msgstr "Todos los movimientos (estimación)"
 
 #. module: stock_release_channel
 #. odoo-python
@@ -102,132 +110,134 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_chain
 #, python-format
 msgid "All Related Transfers"
-msgstr ""
+msgstr "Todas las transferencias relacionadas"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
 msgid "All Total"
-msgstr ""
+msgstr "Todo total"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_all
 msgid "All Transfers"
-msgstr ""
+msgstr "Todas las transferencias"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__picking_chain_ids
 msgid "All transfers required to bring goods to the deliveries."
 msgstr ""
+"Todas las transferencias necesarias para llevar las mercancías a las "
+"entregas."
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_search_view
 msgid "Archived"
-msgstr ""
+msgstr "Archivado"
 
 #. module: stock_release_channel
 #: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__state__asleep
 msgid "Asleep"
-msgstr ""
+msgstr "Dormido"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_search_view
 msgid "Aslepp"
-msgstr ""
+msgstr "Dormido"
 
 #. module: stock_release_channel
 #: model:ir.actions.server,name:stock_release_channel.model_stock_release_channel_action_assign_pickings
 msgid "Assign Pickings"
-msgstr ""
+msgstr "Asignar Recogidas"
 
 #. module: stock_release_channel
 #. odoo-python
 #: code:addons/stock_release_channel/models/stock_picking.py:0
 #, python-format
 msgid "Assign release channel on %s"
-msgstr ""
+msgstr "Asignar canal de liberación en %s"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
 msgid "Assigned Total"
-msgstr ""
+msgstr "Asignado Total"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_move_assigned
 msgid "Available Moves (Estimate)"
-msgstr ""
+msgstr "Movimientos Disponibles (Estimación)"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_assigned
 msgid "Available Transfers"
-msgstr ""
+msgstr "Transferencias Disponibles"
 
 #. module: stock_release_channel
 #: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__release_mode__batch
 msgid "Batch (Manual)"
-msgstr ""
+msgstr "Lote (Manual)"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__batch_mode
 msgid "Batch Mode"
-msgstr ""
+msgstr "Modo por lotes"
 
 #. module: stock_release_channel
 #. odoo-python
 #: code:addons/stock_release_channel/models/stock_release_channel.py:0
 #, python-format
 msgid "Channel %(name)s has no validated transfer yet."
-msgstr ""
+msgstr "El canal %(name)s aún no tiene transferencia validada."
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__color
 msgid "Color"
-msgstr ""
+msgstr "Color"
 
 #. module: stock_release_channel
 #: model:ir.model,name:stock_release_channel.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "Contacto"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Creado por"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Creado el"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Mostrar Nombre"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__rule_domain
 msgid "Domain"
-msgstr ""
+msgstr "Dominio"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__rule_domain
 msgid "Domain based on Transfers, filter for entering the channel."
-msgstr ""
+msgstr "Dominio basado en Transferencias, filtro para entrar en el canal."
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Done Today"
-msgstr ""
+msgstr "Hecho hoy"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
 msgid "Done Today Total"
-msgstr ""
+msgstr "Total hecho hoy"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
 msgid "Enter Python code here."
-msgstr ""
+msgstr "Introduce aquí el código Python."
 
 #. module: stock_release_channel
 #. odoo-python
@@ -238,128 +248,131 @@ msgid ""
 " %(name)s \n"
 "(%(error)s)"
 msgstr ""
+"Error al evaluar el código del canal:\n"
+" %(name)s \n"
+"(%(error)s)"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__release_forbidden
 msgid "Forbid to release this channel"
-msgstr ""
+msgstr "Prohibido liberar este canal"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_full_progress
 msgid "Full Progress"
-msgstr ""
+msgstr "Progreso completo"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__id
 msgid "ID"
-msgstr ""
+msgstr "ID (identificación)"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_chain_in_progress
 msgid "In progress Related Transfers"
-msgstr ""
+msgstr "En curso Transferencias relacionadas"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_lock_allowed
 msgid "Is Action Lock Allowed"
-msgstr ""
+msgstr "¿Está permitido el bloqueo de acciones?"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_sleep_allowed
 msgid "Is Action Sleep Allowed"
-msgstr ""
+msgstr "¿Está permitida la acción de dormir?"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_unlock_allowed
 msgid "Is Action Unlock Allowed"
-msgstr ""
+msgstr "¿Está permitido el desbloqueo de acciones?"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_wake_up_allowed
 msgid "Is Action Wake Up Allowed"
-msgstr ""
+msgstr "¿Está permitida la Acción Despertar?"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_release_allowed
 msgid "Is Release Allowed"
-msgstr ""
+msgstr "¿Está permitida la liberación?"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__last_done_picking_date_done
 msgid "Last Done Picking Date Done"
-msgstr ""
+msgstr "Última fecha de recogida Hecho"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__last_done_picking_name
 msgid "Last Done Picking Name"
-msgstr ""
+msgstr "Nombre de la última selección realizada"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__last_done_picking_id
 msgid "Last Done Transfer"
-msgstr ""
+msgstr "Última transferencia realizada"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Última Modificación el"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Actualizado por Última vez por"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Última Actualización el"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Late"
-msgstr ""
+msgstr "Tarde"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_move_late
 msgid "Late Moves (Estimate)"
-msgstr ""
+msgstr "Movimientos tardíos (Estimación)"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
 msgid "Late Total"
-msgstr ""
+msgstr "Total de retraso"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_late
 msgid "Late Transfers"
-msgstr ""
+msgstr "Transferencias tardías"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Lines]"
-msgstr ""
+msgstr "Líneas]"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Lock"
-msgstr ""
+msgstr "Bloquear"
 
 #. module: stock_release_channel
 #: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__state__locked
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_search_view
 msgid "Locked"
-msgstr ""
+msgstr "Bloqueado"
 
 #. module: stock_release_channel
 #: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__batch_mode__max
 msgid "Max"
-msgstr ""
+msgstr "Máx"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__max_batch_mode
 msgid "Max Transfers to release"
-msgstr ""
+msgstr "Transferencias máximas a liberar"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__batch_mode
@@ -367,33 +380,35 @@ msgid ""
 "Max: release N transfers to have a configured max of X deliveries in "
 "progress."
 msgstr ""
+"Max: libera N transferencias para tener un máximo configurado de X entregas "
+"en curso."
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_move_done
 msgid "Moves Done Today (Estimate)"
-msgstr ""
+msgstr "Movimientos Realizados hoy (Estimación)"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__name
 msgid "Name"
-msgstr ""
+msgstr "Nombre"
 
 #. module: stock_release_channel
 #. odoo-python
 #: code:addons/stock_release_channel/models/stock_release_channel.py:0
 #, python-format
 msgid "No Max transfers to release is configured."
-msgstr ""
+msgstr "No se ha configurado el número máximo de transferencias a liberar."
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.view_picking_internal_search
 msgid "No Release Channel"
-msgstr ""
+msgstr "Sin canal de liberación"
 
 #. module: stock_release_channel
 #: model_terms:ir.actions.act_window,help:stock_release_channel.stock_release_channel_act_window
 msgid "No Release Channel configured"
-msgstr ""
+msgstr "No hay ningún canal de lanzamiento configurado"
 
 #. module: stock_release_channel
 #. odoo-python
@@ -401,85 +416,85 @@ msgstr ""
 #: code:addons/stock_release_channel/tests/common.py:0
 #, python-format
 msgid "Nothing in the queue!"
-msgstr ""
+msgstr "¡No hay nada en la cola!"
 
 #. module: stock_release_channel
 #: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__state__open
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_search_view
 msgid "Open"
-msgstr ""
+msgstr "Abrir"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__picking_type_ids
 msgid "Operation Types"
-msgstr ""
+msgstr "Tipos de operación"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
 msgid "Options"
-msgstr ""
+msgstr "Opciones"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Overall Progress"
-msgstr ""
+msgstr "Progreso general"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__partner_ids
 msgid "Partners"
-msgstr ""
+msgstr "Socios"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__picking_chain_ids
 msgid "Picking Chain"
-msgstr ""
+msgstr "Cadena de recogida"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Priority"
-msgstr ""
+msgstr "Prioridad"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_move_priority
 msgid "Priority Moves (Estimate)"
-msgstr ""
+msgstr "Movimientos prioritarios ( Estimación)"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
 msgid "Priority Total"
-msgstr ""
+msgstr "Prioridad Total"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_priority
 msgid "Priority Transfers"
-msgstr ""
+msgstr "Transferencias prioritarias"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__code
 msgid "Python Code"
-msgstr ""
+msgstr "Código Python"
 
 #. module: stock_release_channel
 #: model:ir.actions.server,name:stock_release_channel.ir_cron_stock_picking_assign_release_channel_ir_actions_server
 #: model:ir.cron,cron_name:stock_release_channel.ir_cron_stock_picking_assign_release_channel
 msgid "Re-assign release channel"
-msgstr ""
+msgstr "Reasignar canal de liberación"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
 msgid "Related Done Total"
-msgstr ""
+msgstr "Total hecho relacionado"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
 msgid "Related In Progress Total"
-msgstr ""
+msgstr "Total relacionado En curso"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_picking__release_channel_id
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.view_picking_internal_search
 msgid "Release Channel"
-msgstr ""
+msgstr "Canal de liberación"
 
 #. module: stock_release_channel
 #: model:ir.actions.act_window,name:stock_release_channel.stock_release_channel_act_window
@@ -490,104 +505,106 @@ msgstr ""
 #: model:ir.ui.menu,name:stock_release_channel.stock_release_channel_menu
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.res_partner_form_view
 msgid "Release Channels"
-msgstr ""
+msgstr "Canales de liberación"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__release_mode
 msgid "Release Mode"
-msgstr ""
+msgstr "Modo de liberación"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_move_release_ready
 msgid "Release Ready Moves (Estimate)"
-msgstr ""
+msgstr "Movimientos de liberación ( Estimación)"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
 msgid "Release Ready Total"
-msgstr ""
+msgstr "Liberación Lista Total"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_release_ready
 msgid "Release Ready Transfers"
-msgstr ""
+msgstr "Transferencias listas para la liberación"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_move_released
 msgid "Released Moves (Estimate)"
-msgstr ""
+msgstr "Movimientos liberados (estimación)"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
 msgid "Released Total"
-msgstr ""
+msgstr "Liberado Total"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_released
 msgid "Released Transfers"
-msgstr ""
+msgstr "Transferencias liberadas"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
 msgid "Selection criteria"
-msgstr ""
+msgstr "Criterios de selección"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__sequence
 msgid "Sequence"
-msgstr ""
+msgstr "Secuencia"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Settings"
-msgstr ""
+msgstr "Configuraciones"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Sleep"
-msgstr ""
+msgstr "Dormir"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__state
 msgid "State"
-msgstr ""
+msgstr "Estado"
 
 #. module: stock_release_channel
 #: model:ir.model,name:stock_release_channel.model_stock_move
 msgid "Stock Move"
-msgstr ""
+msgstr "Movimiento de Existencias"
 
 #. module: stock_release_channel
 #: model:ir.model,name:stock_release_channel.model_stock_release_channel
 msgid "Stock Release Channels"
-msgstr ""
+msgstr "Canales de liberación de existencias"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_action_lock_allowed
 msgid "Technical field to check if the action 'Lock' is allowed."
-msgstr ""
+msgstr "Campo técnico para comprobar si la acción 'Bloquear' está permitida."
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_release_allowed
 msgid ""
 "Technical field to check if the action 'Release Next Batch' is allowed."
 msgstr ""
+"Campo técnico para comprobar si la acción 'Liberar siguiente lote' está "
+"permitida."
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_action_sleep_allowed
 msgid "Technical field to check if the action 'Sleep' is allowed."
-msgstr ""
+msgstr "Campo técnico para comprobar si la acción 'Dormir' está permitida."
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_action_unlock_allowed
 msgid "Technical field to check if the action 'Unlock' is allowed."
-msgstr ""
+msgstr "Campo técnico para comprobar si la acción 'Desbloquear' está permitida."
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_action_wake_up_allowed
 msgid "Technical field to check if the action 'Wake Up' is allowed."
-msgstr ""
+msgstr "Campo técnico para comprobar si la acción 'Despertar' está permitida."
 
 #. module: stock_release_channel
 #. odoo-python
@@ -595,14 +612,14 @@ msgstr ""
 #, python-format
 msgid ""
 "The number of released transfers in progress is already at the maximum."
-msgstr ""
+msgstr "El número de transferencias liberadas en curso ya está al máximo."
 
 #. module: stock_release_channel
 #. odoo-python
 #: code:addons/stock_release_channel/models/stock_release_channel.py:0
 #, python-format
 msgid "The release of pickings is not allowed for channel %(name)s."
-msgstr ""
+msgstr "La liberación de recogidas no está permitida para el canal %(name)s."
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__state
@@ -612,94 +629,101 @@ msgid ""
 " * Locked: Release operations are forbidden. (Assignement processes are still working)\n"
 "* Asleep: Assigned pickings not processed are unassigned from the release channel.\n"
 msgstr ""
+"El estado permite controlar la disponibilidad del canal de liberación.\n"
+"* Abierto: La asignación de picking manual y automático a la liberación es "
+"efectiva y se permiten las operaciones de liberación.\n"
+" * Bloqueado: Las operaciones de liberación están prohibidas. (Los procesos "
+"de asignación siguen funcionando)\n"
+"* Dormido: Las recogidas asignadas no procesadas se desasignan del canal de "
+"liberación.\n"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__count_picking_full_progress
 msgid "The total number of pickings to achieve 100% of progress."
-msgstr ""
+msgstr "El número total de recogidas para alcanzar el 100% de progreso."
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "To Do"
-msgstr ""
+msgstr "Para hacer"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "To Release"
-msgstr ""
+msgstr "Para liberar"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "To Ship"
-msgstr ""
+msgstr "Para enviar"
 
 #. module: stock_release_channel
 #: model:ir.model,name:stock_release_channel.model_stock_picking
 msgid "Transfer"
-msgstr ""
+msgstr "Transferencia"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__picking_ids
 msgid "Transfers"
-msgstr ""
+msgstr "Transferencias"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_done
 msgid "Transfers Done Today"
-msgstr ""
+msgstr "Transferencias realizadas hoy"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Transfers Progress"
-msgstr ""
+msgstr "Progreso de las transferencias"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.view_picking_internal_search
 msgid "Transfers that couldn't be assigned in a release channel"
-msgstr ""
+msgstr "Transferencias que no pudieron asignarse en un canal de liberación"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Unlock"
-msgstr ""
+msgstr "Desbloquear"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Waiting"
-msgstr ""
+msgstr "Esperando"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_move_waiting
 msgid "Waiting Moves (Estimate)"
-msgstr ""
+msgstr "Movimientos en espera ( Estimación)"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
 msgid "Waiting Total"
-msgstr ""
+msgstr "Total en espera"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__count_picking_waiting
 msgid "Waiting Transfers"
-msgstr ""
+msgstr "Transferencias en espera"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Wake Up"
-msgstr ""
+msgstr "Despertar"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__warehouse_id
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_search_view
 msgid "Warehouse"
-msgstr ""
+msgstr "Almacén"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__warehouse_id
 msgid "Warehouse for which this channel is relevant"
-msgstr ""
+msgstr "Almacén para el que este canal es relevante"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__max_batch_mode
@@ -707,11 +731,13 @@ msgid ""
 "When clicking on the package icon, it releases X transfers minus  on-going "
 "ones not shipped (X - Waiting). This field defines X."
 msgstr ""
+"Al hacer clic en el icono del paquete, se liberan X transferencias menos las "
+"que están en curso y no se han enviado (X - En espera). Este campo define X."
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__code
 msgid "Write Python code to filter out pickings."
-msgstr ""
+msgstr "Escribe código Python para filtrar las selecciones."
 
 #. module: stock_release_channel
 #. odoo-python
