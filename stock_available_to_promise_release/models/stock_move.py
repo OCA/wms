@@ -452,8 +452,11 @@ class StockMove(models.Model):
     def _after_release_assign_moves(self):
         move_ids = []
         for origin_moves in self._get_chained_moves_iterator("move_orig_ids"):
-            move_ids += origin_moves.ids
-        self.env["stock.move"].browse(move_ids)._action_assign()
+            move_ids += origin_moves.filtered(
+                lambda m: m.state not in ("cancel", "done")
+            ).ids
+        moves = self.browse(move_ids)
+        moves._action_assign()
 
     def _release_split(self, remaining_qty):
         """Split move and create a new picking for it.
