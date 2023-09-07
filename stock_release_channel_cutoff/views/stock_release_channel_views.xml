@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="stock_release_channel_form_view" model="ir.ui.view">
+        <field name="name">stock.release.channel.form.inherited</field>
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel_process_end_time.stock_release_channel_form_view"
+        />
+        <field name="arch" type="xml">
+            <field name="process_end_time" position="before">
+                <field
+                    name="cutoff_time"
+                    widget="float_time"
+                    attrs="{'readonly': [('process_end_time_can_edit', '=', False)]}"
+                />
+            </field>
+        </field>
+    </record>
+    <record id="stock_release_channel_kanban_view" model="ir.ui.view">
+        <field name="name">stock.release.channel.kanban.inherited</field>
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel_process_end_time.stock_release_channel_kanban_view"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='is_release_allowed']" position="after">
+                <field name="cutoff_time" />
+                <field name="cutoff_warning" />
+            </xpath>
+            <xpath expr="//field[@name='process_end_time']" position="before">
+                <field
+                    class="badge rounded-pill bg-o-color-1 text-white mb4"
+                    name="cutoff_time"
+                    widget="float_time"
+                    attrs="{'invisible': [('cutoff_warning', '=', True)]}"
+                />
+                <field
+                    class="badge rounded-pill bg-danger text-white mb4"
+                    name="cutoff_time"
+                    widget="float_time"
+                    attrs="{'invisible': [('cutoff_warning', '=', False)]}"
+                />
+                    -
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
