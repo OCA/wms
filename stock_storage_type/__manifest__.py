@@ -4,7 +4,7 @@
 {
     "name": "Stock Storage Type",
     "summary": "Manage packages and locations storage types",
-    "version": "16.0.1.0.1",
+    "version": "16.0.1.0.2",
     "development_status": "Beta",
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",
