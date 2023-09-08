@@ -28,7 +28,7 @@ addon | version | maintainers | summary
 [stock_release_channel](stock_release_channel/) | 16.0.2.4.1 | [![sebalix](https://github.com/sebalix.png?size=30px)](https://github.com/sebalix) | Manage workload in WMS with release channels
 [stock_release_channel_auto_release](stock_release_channel_auto_release/) | 16.0.1.0.1 |  | Add an automatic release mode to the release channel
 [stock_release_channel_batch_mode_commercial_partner](stock_release_channel_batch_mode_commercial_partner/) | 16.0.1.0.1 |  | Release pickings into channels by batch of same commercial entity
-[stock_storage_type](stock_storage_type/) | 16.0.1.0.1 |  | Manage packages and locations storage types
+[stock_storage_type](stock_storage_type/) | 16.0.1.0.2 |  | Manage packages and locations storage types
 [stock_warehouse_flow](stock_warehouse_flow/) | 16.0.1.0.0 |  | Configure routing flow for stock moves
 
 [//]: # (end addons)
