@@ -666,13 +666,15 @@ class ShopfloorSingleProductTransfer(Component):
         # backorder, which should not be the case.
         # See if there's a way to identify the moves
         # generated through this mechanism and avoid creating them.
-        move_line._split_partial_quantity()
+        new_move_line = move_line._split_partial_quantity()
         new_move = move_line.move_id.split_other_move_lines(
             move_line, intersection=True
         )
         if new_move:
             # A new move is created in case of partial quantity
             new_move.extract_and_action_done()
+            stock = self._actions_for("stock")
+            stock.unmark_move_line_as_picked(new_move_line)
             return
         # In case of full quantity, post the initial move
         move_line.move_id.extract_and_action_done()
