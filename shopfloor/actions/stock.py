@@ -197,11 +197,15 @@ class StockAction(Component):
               but there are still unavailable moves to process
             - the moves are not linked to unprocessed ancestor moves
         """
-        assigned_moves = picking.move_lines.filtered(lambda m: m.state == "assigned")
+        all_picking_moves = picking.move_lines.filtered(
+            lambda m: m.state not in ["cancel", "done"]
+        )
+        if all_picking_moves == moves:
+            return True
         has_ancestors = bool(
             moves.move_orig_ids.filtered(lambda m: m.state not in ("cancel", "done"))
         )
-        return moves == assigned_moves and not has_ancestors
+        return not has_ancestors
 
     def put_package_level_in_move(self, package_level):
         """Ensure to put the package level in its own move.
