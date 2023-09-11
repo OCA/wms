@@ -246,7 +246,7 @@ class Checkout(Component):
     def _select_document_from_package(self, package, **kw):
         pickings = package.move_line_ids.filtered(
             lambda ml: ml.state not in ("cancel", "done")
-        ).mapped("picking_id")
+        ).picking_id
         if len(pickings) > 1:
             # Filter only if we find several pickings to narrow the
             # selection to one of the good type. If we have one picking
@@ -257,9 +257,7 @@ class Checkout(Component):
             pickings = pickings.filtered(
                 lambda p: p.picking_type_id in self.picking_types
             )
-        if len(pickings) == 1:
-            picking = pickings
-        return self._select_picking(picking, "select_document")
+        return self._select_picking(fields.first(pickings), "select_document")
 
     def _select_document_from_product(self, product, line_domain=None, **kw):
         line_domain = line_domain or []
