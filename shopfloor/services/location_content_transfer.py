@@ -828,9 +828,10 @@ class LocationContentTransfer(Component):
         splits the move to have no side-effect on the other package levels/move
         lines.
 
-        It unreserves the move, create an inventory at 0 in the move's source
-        location, create a second draft inventory (if none exists) to check later.
-        Finally, it cancels the move.
+        If the move has been created by the shopfloor user it will be canceled
+        otherwise it is unreserved.
+        Then create an inventory at 0 in the move's source location, create a
+        second draft inventory (if none exists) to check later.
 
         Transitions:
         * start: no more content to move
@@ -855,17 +856,23 @@ class LocationContentTransfer(Component):
             # We need to set qty_done at 0 because otherwise
             # the move_line will not be deleted
             package_move.move_line_ids.write({"qty_done": 0})
-            package_move._do_unreserve()
-            package_move._recompute_state()
+            package = package_level.package_id
+            if (
+                self.is_allow_move_create()
+                and self.env.user == package_move.picking_id.create_uid
+            ):
+                # Owned by the user deleting the move
+                package_move._action_cancel()
+            else:
+                # Not owned only unreserved
+                package_move._do_unreserve()
+                package_move._recompute_state()
             # Create an inventory at 0 in the move's source location
-            inventory.create_stock_issue(
-                package_move, location, package_level.package_id, lot
-            )
+            inventory.create_stock_issue(package_move, location, package, lot)
             # Create a draft inventory to control stock
             inventory.create_control_stock(
-                location, package_move.product_id, package_level.package_id, lot
+                location, package_move.product_id, package, lot
             )
-            package_move._action_cancel()
         # remove the package level (this is what does the `picking.do_unreserve()`
         # method, but here we want to unreserve+unlink this package alone)
         assert package_level.state == "draft", "Package level has to be in draft"
@@ -889,9 +896,10 @@ class LocationContentTransfer(Component):
         splits the move to have no side-effect on the other package levels/move
         lines.
 
-        It unreserves the move, create an inventory at 0 in the move's source
-        location, create a second draft inventory (if none exists) to check later.
-        Finally, it cancels the move.
+        If the move has been created by the shopfloor user it will be canceled
+        otherwise it will be unreserved.
+        Then an inventory is created at 0 in the move's source location,
+        create a second draft inventory (if none exists) to check later.
 
         Transitions:
         * start: no more content to move
@@ -913,15 +921,19 @@ class LocationContentTransfer(Component):
         # We need to set qty_done at 0 because otherwise
         # the move_line will not be deleted
         move_line.qty_done = 0
-        move._do_unreserve()
-        move._recompute_state()
+        if self.is_allow_move_create() and self.env.user == move.picking_id.create_uid:
+            # Owned by the user deleting the move
+            move._action_cancel()
+        else:
+            # Not owned unreserve
+            move._do_unreserve()
+            move._recompute_state()
         # Create an inventory at 0 in the move's source location
         inventory.create_stock_issue(move, move_line_src_location, package, lot)
         # Create a draft inventory to control stock
         inventory.create_control_stock(
             move_line_src_location, move.product_id, package, lot
         )
-        move._action_cancel()
         move_lines = self._find_transfer_move_lines(location)
         return self._response_for_start_single(move_lines.mapped("picking_id"))
 
