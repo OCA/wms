@@ -690,7 +690,6 @@ class ShopfloorSingleProductTransfer(Component):
     def _set_quantity__by_location_handlers(self):
         return [
             self._set_quantity__check_location,
-            self._set_quantity__post_move,
         ]
 
     def _set_quantity__by_location(self, move_line, location, confirmation=False):
@@ -706,6 +705,7 @@ class ShopfloorSingleProductTransfer(Component):
         )
         if response:
             return response
+        return self._set_quantity__post_move(move_line, location)
 
     def _set_quantity__by_package(self, move_line, package, confirmation=False):
         # We're about to leave the `set_quantity` screen.
@@ -720,8 +720,10 @@ class ShopfloorSingleProductTransfer(Component):
             response = self._use_handlers(
                 handlers, move_line, location, confirmation=confirmation
             )
+            if response:
+                return response
             move_line.result_package_id = package
-            return response
+            return self._set_quantity__post_move(move_line, location)
         # Else, go to `set_location` screen
         move_line.result_package_id = package
         return self._response_for_set_location(move_line, package)
