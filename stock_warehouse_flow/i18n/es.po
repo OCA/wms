@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-09-07 21:37+0000\n"
-"Last-Translator: Ivorra78 <informatica@totmaterial.es>\n"
+"PO-Revision-Date: 2023-09-11 13:54+0000\n"
+"Last-Translator: Javier Sanchez <jsanchezdeavila@gmail.com>\n"
 "Language-Team: none\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -217,64 +217,64 @@ msgstr ""
 #. module: stock_warehouse_flow
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
 msgid "Operation Types"
-msgstr ""
+msgstr "Tipos de Operación"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__out_type_id
 msgid "Out Type"
-msgstr ""
+msgstr "Tipo de Salida"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__delivery_steps
 msgid "Outgoing Shipments"
-msgstr ""
+msgstr "Envíos Salientes"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__delivery_steps
 msgid "Outgoing route to follow"
-msgstr ""
+msgstr "Ruta de salida a seguir"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__output_stock_loc_id
 msgid "Output Location"
-msgstr ""
+msgstr "Ubicación de Salida"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__pack_type_id
 msgid "Pack Type"
-msgstr ""
+msgstr "Tipo de Paquete"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields.selection,name:stock_warehouse_flow.selection__stock_warehouse_flow__delivery_steps__pick_pack_ship
 msgid "Pack goods, send goods in output and then deliver (3 steps)"
-msgstr ""
+msgstr "Empaquetar, mover a salida y enviar (3 pasos)"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__pack_stock_loc_id
 msgid "Packing Location"
-msgstr ""
+msgstr "Ubicación de Packing"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__pick_type_id
 msgid "Pick Type"
-msgstr ""
+msgstr "Tipo de Pick"
 
 #. module: stock_warehouse_flow
 #. odoo-python
 #: code:addons/stock_warehouse_flow/models/stock_warehouse_flow.py:0
 #, python-format
 msgid "Please set the uom field in addition to the qty field"
-msgstr ""
+msgstr "Por favor, establezca la unidad de medida junto con el campo cantidad"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__qty
 msgid "Qty"
-msgstr ""
+msgstr "Cant."
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_route__flow_id
 msgid "Routing Flow"
-msgstr ""
+msgstr "Flujo de Ruta"
 
 #. module: stock_warehouse_flow
 #: model:ir.actions.act_window,name:stock_warehouse_flow.stock_warehouse_flow_action
@@ -283,18 +283,18 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.view_delivery_carrier_form
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.view_warehouse
 msgid "Routing Flows"
-msgstr ""
+msgstr "Flujos de Ruta"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_delivery_carrier__flow_ids
 msgid "Routing flows"
-msgstr ""
+msgstr "Flujos de ruta"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__rule_ids
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
 msgid "Rules"
-msgstr ""
+msgstr "Reglas"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__out_type_id
@@ -302,6 +302,8 @@ msgid ""
 "Same than 'To operation type' field, displayed here to get a global overview"
 " of the flow configuration."
 msgstr ""
+"Igual que el campo 'A tipo de operación', mostrado aquí para tener una "
+"visión general de la configuración del flujo."
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__output_stock_loc_id
@@ -309,88 +311,94 @@ msgid ""
 "Same than 'To output location' field, displayed here to get a global "
 "overview of the flow configuration."
 msgstr ""
+"Igual que el campo 'A ubicación de salida', mostrado aquí para tener una "
+"visión general de la configuración del flujo."
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields.selection,name:stock_warehouse_flow.selection__stock_warehouse_flow__delivery_steps__pick_ship
 msgid "Send goods in output and then deliver (2 steps)"
-msgstr ""
+msgstr "Enviar productos a salida y luego entregar (2 pasos)"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__sequence
 msgid "Sequence"
-msgstr ""
+msgstr "Secuencia"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__sequence_prefix
 msgid "Sequence Prefix"
-msgstr ""
+msgstr "Prefijo para Secuencia"
 
 #. module: stock_warehouse_flow
 #: model:ir.model,name:stock_warehouse_flow.model_delivery_carrier
 msgid "Shipping Methods"
-msgstr ""
+msgstr "Métodos de Envío"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields.selection,name:stock_warehouse_flow.selection__stock_warehouse_flow__split_method__simple
 msgid "Simple"
-msgstr ""
+msgstr "Sencillo"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__split_method
 msgid ""
 "Simple => move will be split by the qty of the flow or a multiple of it"
 msgstr ""
+"Simple => el movimiento será desglosado en la cantidad del flujo o un "
+"múltiplo de él"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__move_domain
 msgid "Source Routing Domain"
-msgstr ""
+msgstr "Dominio para Rutas Origen"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__split_method
 msgid "Split method"
-msgstr ""
+msgstr "Método de desglose"
 
 #. module: stock_warehouse_flow
 #: model:ir.model,name:stock_warehouse_flow.model_stock_move
 msgid "Stock Move"
-msgstr ""
+msgstr "Movimiento de Stock"
 
 #. module: stock_warehouse_flow
 #: model:ir.model,name:stock_warehouse_flow.model_stock_warehouse_flow
 msgid "Stock Warehouse Routing Flow"
-msgstr ""
+msgstr "Flujo de Enrutado del Almacén de Stock"
 
 #. module: stock_warehouse_flow
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
 msgid "Technical Information"
-msgstr ""
+msgstr "Información Técnica"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__company_id
 msgid "The company is automatically set from your user preferences."
 msgstr ""
+"La compañía se establece automáticamente en base a tus preferencias de "
+"usuario."
 
 #. module: stock_warehouse_flow
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
 msgid "To"
-msgstr ""
+msgstr "A"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__to_picking_type_id
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_search
 msgid "To operation type"
-msgstr ""
+msgstr "A tipo de operación"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__to_output_stock_loc_id
 msgid "To output location"
-msgstr ""
+msgstr "A ubicación de salida"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__uom_id
 msgid "Uom"
-msgstr ""
+msgstr "UdM"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__sequence_prefix
@@ -398,25 +406,27 @@ msgid ""
 "Used to generate the default prefix of new operation types. (e.g. 'DG' => "
 "'WH/OUT/DG/')"
 msgstr ""
+"Se usa para generar el prefijo predeterminado de los nuevos tipos de "
+"operación (p. ej. 'DG' => 'WH/OUT/DG/')"
 
 #. module: stock_warehouse_flow
 #: model:ir.model,name:stock_warehouse_flow.model_stock_warehouse
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__warehouse_id
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_search
 msgid "Warehouse"
-msgstr ""
+msgstr "Almacén"
 
 #. module: stock_warehouse_flow
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
 msgid "Warehouse Flow"
-msgstr ""
+msgstr "Flujo de Almacén"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__warning
 msgid "Warning"
-msgstr ""
+msgstr "Aviso"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__carrier_ids
 msgid "With carriers"
-msgstr ""
+msgstr "Con los transportistas"
