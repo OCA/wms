@@ -750,6 +750,8 @@ class TestSetQuantity(CommonCase):
             message=expected_message,
             popup=expected_popup,
         )
+        # We moved 10 units to an existing package
+        self.assertEqual(package.quant_ids.quantity, 20.0)
         self.assertEqual(package, move_line.result_package_id)
 
     def test_set_quantity_scan_package_empty(self):
