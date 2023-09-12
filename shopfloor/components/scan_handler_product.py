@@ -16,6 +16,8 @@ class ProductHandler(Component):
 
     def search(self, identifier):
         res = self._search.find(identifier, types=("product", "packaging"))
+        if res.record and res.type == "packaging":
+            return res.record.product_id
         return res.record if res.record else self.env["product.product"]
 
     @property
