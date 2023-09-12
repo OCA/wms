@@ -47,3 +47,10 @@ class ScanAnythingCase(ActionsDataDetailCaseBase, ScanAnythingTestMixin):
         identifier = record.name
         data = self.data_detail.picking_detail(record)
         self._test_response_ok(rec_type, data, identifier)
+
+    def test_scan_packaging(self):
+        record = self.product_a_packaging
+        rec_type = "product"
+        identifier = record.barcode
+        data = self.data_detail.product_detail(record.product_id)
+        self._test_response_ok(rec_type, data, identifier)
