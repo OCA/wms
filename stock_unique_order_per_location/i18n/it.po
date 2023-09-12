@@ -6,52 +6,55 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-09-20 04:45+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: stock_unique_order_per_location
 #: model:ir.model.fields,field_description:stock_unique_order_per_location.field_stock_move_line__display_name
 #: model:ir.model.fields,field_description:stock_unique_order_per_location.field_stock_picking_type__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: stock_unique_order_per_location
 #: model:ir.model.fields,field_description:stock_unique_order_per_location.field_stock_picking_type__same_next_picking
 msgid "Do not mix sources at destination"
-msgstr ""
+msgstr "Non mescolare sorgenti alla destinazione"
 
 #. module: stock_unique_order_per_location
 #: model:ir.model.fields,field_description:stock_unique_order_per_location.field_stock_move_line__id
 #: model:ir.model.fields,field_description:stock_unique_order_per_location.field_stock_picking_type__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: stock_unique_order_per_location
 #: model:ir.model.fields,field_description:stock_unique_order_per_location.field_stock_move_line____last_update
 #: model:ir.model.fields,field_description:stock_unique_order_per_location.field_stock_picking_type____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Ultima modifica il"
 
 #. module: stock_unique_order_per_location
 #: model:ir.model,name:stock_unique_order_per_location.model_stock_picking_type
 msgid "Picking Type"
-msgstr ""
+msgstr "Tipologia prelievo"
 
 #. module: stock_unique_order_per_location
 #: model:ir.model,name:stock_unique_order_per_location.model_stock_move_line
 msgid "Product Moves (Stock Move Line)"
-msgstr ""
+msgstr "Movimenti prodotto (riga movimento di magazzino)"
 
 #. module: stock_unique_order_per_location
 #: code:addons/stock_unique_order_per_location/models/stock_move_line.py:0
 #, python-format
 msgid "The location(s) {} can only accept goods for the same sales order."
 msgstr ""
+"L'ubicazione {} può accettare prodotti solo per lo stesso ordine di vendita."
 
 #. module: stock_unique_order_per_location
 #: model:ir.model.fields,help:stock_unique_order_per_location.field_stock_picking_type__same_next_picking
@@ -60,3 +63,7 @@ msgid ""
 " reserved only by the next picking. This ensures that you do not mix "
 "different sales order on the destination location"
 msgstr ""
+"Quando selezionata, l'ubicazione destinazione deve essere o vuota o "
+"contenere quantità riservate solo dal prelievo successivo. Questo assicura "
+"che non si mescolino ordini di vendita diversi per l'ubicazione di "
+"destinazione"
