@@ -6,51 +6,55 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-09-20 04:45+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: stock_warehouse_flow_product_packaging
 #: model:ir.model.fields.selection,name:stock_warehouse_flow_product_packaging.selection__stock_warehouse_flow__split_method__packaging
 msgid "By Product Packaging"
-msgstr ""
+msgstr "Imballaggio del prodotto secondario"
 
 #. module: stock_warehouse_flow_product_packaging
 #: model:ir.model.fields,field_description:stock_warehouse_flow_product_packaging.field_stock_warehouse_flow__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: stock_warehouse_flow_product_packaging
 #: model:ir.model.fields,field_description:stock_warehouse_flow_product_packaging.field_stock_warehouse_flow__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: stock_warehouse_flow_product_packaging
 #: model:ir.model.fields,field_description:stock_warehouse_flow_product_packaging.field_stock_warehouse_flow____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Ultima modifica il"
 
 #. module: stock_warehouse_flow_product_packaging
 #: model:ir.model.fields,field_description:stock_warehouse_flow_product_packaging.field_stock_warehouse_flow__packaging_type_ids
 msgid "Packaging types"
-msgstr ""
+msgstr "Tipo imballaggio"
 
 #. module: stock_warehouse_flow_product_packaging
 #: model:ir.model.fields,help:stock_warehouse_flow_product_packaging.field_stock_warehouse_flow__split_method
 msgid ""
 "Simple => move will be split by the qty of the flow or a multiple of it"
 msgstr ""
+"Semplice => il movimento verrà diviso per la quantità del flusso o un suo "
+"multiplo"
 
 #. module: stock_warehouse_flow_product_packaging
 #: model:ir.model.fields,field_description:stock_warehouse_flow_product_packaging.field_stock_warehouse_flow__split_method
 msgid "Split method"
-msgstr ""
+msgstr "Metodo di divisione"
 
 #. module: stock_warehouse_flow_product_packaging
 #: model:ir.model,name:stock_warehouse_flow_product_packaging.model_stock_warehouse_flow
 msgid "Stock Warehouse Routing Flow"
-msgstr ""
+msgstr "Flusso inoltro giacenza magazzino"
