@@ -6,44 +6,46 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-09-20 04:45+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: shopfloor_base_multicompany
 #: model:ir.model,name:shopfloor_base_multicompany.model_shopfloor_app
 msgid "A Shopfloor application"
-msgstr ""
+msgstr "Una applicazione di reparto"
 
 #. module: shopfloor_base_multicompany
 #: model:ir.model.fields,field_description:shopfloor_base_multicompany.field_shopfloor_app__company_ids
 msgid "Allowed companies"
-msgstr ""
+msgstr "Aziende abilitate"
 
 #. module: shopfloor_base_multicompany
 #: code:addons/shopfloor_base_multicompany/services/service.py:0
 #, python-format
 msgid "Current user belongs to a company that is not allowed on this app."
-msgstr ""
+msgstr "L'utente attuale appartiene ad una azienda non abilitata in questa app."
 
 #. module: shopfloor_base_multicompany
 #: model:ir.model.fields,field_description:shopfloor_base_multicompany.field_shopfloor_app__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: shopfloor_base_multicompany
 #: model:ir.model.fields,field_description:shopfloor_base_multicompany.field_shopfloor_app__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: shopfloor_base_multicompany
 #: model:ir.model.fields,field_description:shopfloor_base_multicompany.field_shopfloor_app____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Ultima modifica il"
 
 #. module: shopfloor_base_multicompany
 #: model:ir.model.fields,help:shopfloor_base_multicompany.field_shopfloor_app__company_ids
@@ -51,8 +53,10 @@ msgid ""
 "Limit access to this app only to selected companies' users. If a non "
 "authorized user calls an endpoint of this app, an exception will be raised."
 msgstr ""
+"Limita l'accesso a qesta app solo agli utenti delle aziende selezionate. Se "
+"un utente non atorizzato chiama questa app si genererà una eccezine."
 
 #. module: shopfloor_base_multicompany
 #: model:ir.model.fields,field_description:shopfloor_base_multicompany.field_shopfloor_app__must_validate_company
 msgid "Must Validate Company"
-msgstr ""
+msgstr "Bisogna convalidare l'azienda"
