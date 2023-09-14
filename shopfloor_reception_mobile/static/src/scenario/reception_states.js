@@ -171,6 +171,7 @@ export const reception_states = function () {
             events: {
                 qty_edit: "on_qty_edit",
                 go_back: "on_back",
+                cancel: "on_cancel",
             },
             on_qty_edit: (qty) => {
                 this.scan_destination_qty = parseInt(qty, 10);
@@ -188,14 +189,12 @@ export const reception_states = function () {
                 );
             },
             on_cancel: () => {
-                // TODO: this endpoing is currently missing in the backend,
-                // and it's currently in the roadmap.
-                // Once it's implemented, uncomment this call.
-                // this.wait_call(
-                //     this.odoo.call("cancel", {
-                //         package_level_id: this.state.data.id,
-                //     })
-                // );
+                this.wait_call(
+                    this.odoo.call("set_quantity__cancel_action", {
+                        picking_id: this.state.data.picking.id,
+                        selected_line_id: this.line_being_handled.id,
+                    })
+                );
             },
             on_add_to_existing_pack: () => {
                 this.wait_call(
