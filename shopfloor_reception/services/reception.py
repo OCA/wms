@@ -1164,6 +1164,22 @@ class Reception(Component):
             )
         return self._response_for_set_quantity(picking, selected_line)
 
+    def set_quantity__cancel_action(self, picking_id, selected_line_id):
+        picking = self.env["stock.picking"].browse(picking_id)
+        selected_line = self.env["stock.move.line"].browse(selected_line_id)
+        message = self._check_picking_status(picking)
+        if message:
+            return self._response_for_set_quantity(
+                picking, selected_line, message=message
+            )
+        if selected_line.exists():
+            if selected_line.product_uom_qty:
+                stock = self._actions_for("stock")
+                stock.unmark_move_line_as_picked(selected_line)
+            else:
+                selected_line.unlink()
+        return self._response_for_select_move(picking)
+
     def _set_quantity__process__set_qty_and_split(self, picking, line, quantity):
         move = line.move_id
         sum(move.move_line_ids.mapped("qty_done"))
@@ -1442,6 +1458,16 @@ class ShopfloorReceptionValidator(Component):
             "confirmation": {"type": "string", "nullable": True},
         }
 
+    def set_quantity__cancel_action(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "selected_line_id": {
+                "coerce": to_int,
+                "type": "integer",
+                "required": True,
+            },
+        }
+
     def process_with_existing_pack(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
@@ -1573,6 +1599,9 @@ class ShopfloorReceptionValidatorResponse(Component):
     def _set_quantity_next_states(self):
         return {"set_quantity", "select_move", "set_destination"}
 
+    def _set_quantity__cancel_action_next_states(self):
+        return {"set_quantity", "select_move"}
+
     def _set_destination_next_states(self):
         return {"set_destination", "select_move"}
 
@@ -1654,6 +1683,16 @@ class ShopfloorReceptionValidatorResponse(Component):
         }
 
     @property
+    def _schema_set_quantity__cancel_action(self):
+        return {
+            "selected_move_line": {
+                "type": "list",
+                "schema": {"type": "dict", "schema": self.schemas.move_line()},
+            },
+            "picking": {"type": "dict", "schema": self.schemas.picking()},
+        }
+
+    @property
     def _schema_set_destination(self):
         return {
             "selected_move_line": {
@@ -1729,6 +1768,11 @@ class ShopfloorReceptionValidatorResponse(Component):
 
     def set_quantity(self):
         return self._response_schema(next_states=self._set_quantity_next_states())
+
+    def set_quantity__cancel_action(self):
+        return self._response_schema(
+            next_states=self._set_quantity__cancel_action_next_states()
+        )
 
     def process_with_existing_pack(self):
         return self._response_schema(
