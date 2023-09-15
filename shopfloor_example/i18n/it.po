@@ -1,0 +1,76 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_example
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#. module: shopfloor_example
+#: model:ir.model,name:shopfloor_example.model_shopfloor_app
+msgid "A Shopfloor application"
+msgstr ""
+
+#. module: shopfloor_example
+#: model:ir.model.fields,field_description:shopfloor_example.field_shopfloor_app__category
+msgid "Category"
+msgstr ""
+
+#. module: shopfloor_example
+#: model:ir.model.fields,field_description:shopfloor_example.field_shopfloor_app__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: shopfloor_example
+#: model:ir.model.fields.selection,name:shopfloor_example.selection__shopfloor_app__category__example
+msgid "Example"
+msgstr ""
+
+#. module: shopfloor_example
+#: model:shopfloor.app,short_name:shopfloor_example.app_demo_api_key
+msgid "Example - api key auth"
+msgstr ""
+
+#. module: shopfloor_example
+#: model:shopfloor.app,short_name:shopfloor_example.app_demo_user
+msgid "Example - user auth"
+msgstr ""
+
+#. module: shopfloor_example
+#: model:ir.model.fields,field_description:shopfloor_example.field_shopfloor_app__id
+msgid "ID"
+msgstr ""
+
+#. module: shopfloor_example
+#: model:ir.model.fields,field_description:shopfloor_example.field_shopfloor_app____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: shopfloor_example
+#: model:shopfloor.menu,name:shopfloor_example.shopfloor_menu_partners_demo
+#: model:shopfloor.scenario,name:shopfloor_example.shopfloor_scenario_partners_demo
+msgid "Manage partners"
+msgstr ""
+
+#. module: shopfloor_example
+#: model:shopfloor.profile,name:shopfloor_example.shopfloor_profile_partner_manager_demo
+msgid "Partner manager"
+msgstr ""
+
+#. module: shopfloor_example
+#: model:shopfloor.app,name:shopfloor_example.app_demo_api_key
+msgid "Shopfloor Example - api key auth"
+msgstr ""
+
+#. module: shopfloor_example
+#: model:shopfloor.app,name:shopfloor_example.app_demo_user
+msgid "Shopfloor Example - user auth"
+msgstr ""
