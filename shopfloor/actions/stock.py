@@ -185,7 +185,7 @@ class StockAction(Component):
             if self._check_backorder(picking, moves_todo):
                 existing_backorder_ids += picking.backorder_ids.ids
                 pickings_to_validate_ids.append(picking.id)
-            elif moves_todo != picking.move_lines:
+            else:
                 new_picking = moves_todo._extract_in_split_order()
                 if new_picking.state != "assigned":
                     raise UserError(_("Internal Error. Split order is not available"))
@@ -203,15 +203,25 @@ class StockAction(Component):
 
         We want to create a normal backorder if:
 
-            - the moves are equal to all available moves of the current picking
-              but there are still unavailable moves to process
-            - the moves are not linked to unprocessed ancestor moves
+            - the moves are equal to all reserved moves of the current picking
+            - the unavailable moves are not linked to unprocessed ancestor moves
         """
-        assigned_moves = picking.move_lines.filtered(lambda m: m.state == "assigned")
-        has_ancestors = bool(
-            moves.move_orig_ids.filtered(lambda m: m.state not in ("cancel", "done"))
+        available_moves = picking.move_lines.filtered(
+            lambda m: m.state in ("partially_available", "assigned")
         )
-        return moves == assigned_moves and not has_ancestors
+        if moves != available_moves:
+            return False
+        unavailable_moves = picking.move_lines.filtered(
+            lambda m: m.state in ("waiting", "confirmed", "partially_available")
+        )
+        has_ancestors = bool(
+            unavailable_moves.move_orig_ids.filtered(
+                lambda m: m.state not in ("cancel", "done")
+            )
+        )
+        if has_ancestors:
+            return False
+        return True
 
     def put_package_level_in_move(self, package_level):
         """Ensure to put the package level in its own move.
