@@ -257,12 +257,7 @@ class Reception(Component):
             )
         )
         if not line:
-            qty_todo_remaining = max(
-                0,
-                move.product_uom_qty
-                - sum(move.move_line_ids.mapped("product_uom_qty")),
-            )
-            values = move._prepare_move_line_vals(quantity=qty_todo_remaining)
+            values = move._prepare_move_line_vals()
             line = self.env["stock.move.line"].create(values)
         return self._scan_line__assign_user(picking, line, qty_done)
 
@@ -1249,6 +1244,7 @@ class Reception(Component):
         return self._response_for_set_destination(picking, selected_line)
 
     def _post_line(self, selected_line):
+        selected_line.product_uom_qty = selected_line.qty_done
         if (
             selected_line.picking_id.is_shopfloor_created
             and self.work.menu.allow_return
