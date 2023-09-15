@@ -138,3 +138,30 @@ class CommonCase(BaseCommonCase):
             ],
             order="scheduled_date ASC",
         )
+
+    def assertMessage(self, response, expected_message):
+        message = response.get("message")
+        for key, value in expected_message.items():
+            self.assertEqual(message.get(key), value)
+
+    @classmethod
+    def _get_move_ids_from_response(cls, response):
+        state = response.get("next_state")
+        data = response["data"][state]
+        picking_data = data.get("pickings") or [data.get("picking")]
+        moves_data = []
+        for picking in picking_data:
+            moves_data.extend(picking["moves"])
+        return [move["id"] for move in moves_data]
+
+    def _get_service_for_user(self, user):
+        user_env = self.env(user=user)
+        return self.get_service(
+            "reception", menu=self.menu, profile=self.profile, env=user_env
+        )
+
+    @classmethod
+    def _shopfloor_manager_values(cls):
+        vals = super()._shopfloor_manager_values()
+        vals["groups_id"] = [(6, 0, [cls.env.ref("stock.group_stock_user").id])]
+        return vals
