@@ -62,6 +62,9 @@ class ReleaseChannelEndDateCase(ChannelReleaseCase):
 
     @freeze_time("2023-01-27 10:00:00")
     def test_picking_scheduled_date(self):
+        self.env["ir.config_parameter"].sudo().set_param(
+            "stock_release_channel_process_end_time.update_scheduled_date", True
+        )
         # Remove existing jobs as some already exists to assign pickings to channel
         jobs_before = self.env["queue.job"].search([])
         jobs_before.unlink()
