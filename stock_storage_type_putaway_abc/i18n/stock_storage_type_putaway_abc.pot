@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 14.0\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -36,42 +36,24 @@ msgid "Display Abc Storage"
 msgstr ""
 
 #. module: stock_storage_type_putaway_abc
-#: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_product_template__display_name
-#: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_stock_location__display_name
-msgid "Display Name"
-msgstr ""
-
-#. module: stock_storage_type_putaway_abc
-#: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_product_template__id
-#: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_stock_location__id
-msgid "ID"
-msgstr ""
-
-#. module: stock_storage_type_putaway_abc
 #: model:ir.model,name:stock_storage_type_putaway_abc.model_stock_location
 msgid "Inventory Locations"
 msgstr ""
 
 #. module: stock_storage_type_putaway_abc
-#: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_product_template____last_update
-#: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_stock_location____last_update
-msgid "Last Modified on"
+#: model:ir.model,name:stock_storage_type_putaway_abc.model_product_template
+msgid "Product"
 msgstr ""
 
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_stock_location__pack_putaway_strategy
-msgid "Packs Put-Away Strategy"
-msgstr ""
-
-#. module: stock_storage_type_putaway_abc
-#: model:ir.model,name:stock_storage_type_putaway_abc.model_product_template
-msgid "Product Template"
+msgid "Put-Away Strategy"
 msgstr ""
 
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model.fields,help:stock_storage_type_putaway_abc.field_stock_location__pack_putaway_strategy
 msgid ""
-"This defines the storage strategy to use when packs are put away in this location.\n"
-"None: when a pack is moved to this location, it will not be put away any further.\n"
-"Ordered Children Locations: when a pack is moved to this location, a suitable location will be searched in its children locations according to the restrictions defined on their respective location storage types."
+"This defines the storage strategy based on package type to use when a product or package is put away in this location.\n"
+"None: when moved to this location, it will not be put away any further.\n"
+"Ordered Children Locations: when moved to this location, a suitable location will be searched in its children locations according to the restrictions defined on their respective location storage types."
 msgstr ""
