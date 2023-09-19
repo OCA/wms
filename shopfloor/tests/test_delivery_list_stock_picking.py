@@ -47,3 +47,8 @@ class DeliveryListStockPickingCase(DeliveryCommonCase):
             response,
             pickings=self.picking1 + self.picking2,
         )
+        # Cancel picking2
+        self.picking2.action_cancel()
+        response = self.service.dispatch("list_stock_picking", params={})
+        # Only picking1 is available
+        self.assert_response_manual_selection(response, pickings=self.picking1)
