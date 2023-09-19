@@ -803,6 +803,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
         package_level = self._simulate_started(self.pack_a)
+        self.menu.sudo().allow_move_create = True
         self.env.user = self.shopfloor_manager
         self.assertTrue(package_level.is_done)
 
@@ -816,8 +817,8 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         )
         self.assertRecordValues(move, [{"state": "assigned"}])
         self.assertRecordValues(picking, [{"state": "assigned"}])
-        self.assertRecordValues(package_level, [{"is_done": False}])
-
+        self.assertTrue(move.move_line_ids.exists())
+        self.assertFalse(move.move_line_ids.shopfloor_user_id)
         self.assert_response(
             response,
             next_state="start",
@@ -841,6 +842,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         * The package level has is_done to False
         * The move and picking are canceled.
         """
+        self.menu.sudo().allow_move_create = True
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
         package_level = self._simulate_started(self.pack_a)
