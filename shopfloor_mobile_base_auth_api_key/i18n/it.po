@@ -6,50 +6,52 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-09-20 17:48+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: shopfloor_mobile_base_auth_api_key
 #: model:ir.model,name:shopfloor_mobile_base_auth_api_key.model_shopfloor_app
 msgid "A Shopfloor application"
-msgstr ""
+msgstr "Una applicazione di reparto"
 
 #. module: shopfloor_mobile_base_auth_api_key
 #: model:ir.model.fields,field_description:shopfloor_mobile_base_auth_api_key.field_shopfloor_app__auth_api_key_group_ids
 msgid "Allowed API key groups"
-msgstr ""
+msgstr "Consenti gruppi chiavi API"
 
 #. module: shopfloor_mobile_base_auth_api_key
 #: model:ir.model.fields,field_description:shopfloor_mobile_base_auth_api_key.field_shopfloor_app__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: shopfloor_mobile_base_auth_api_key
 #: model:ir.model.fields,field_description:shopfloor_mobile_base_auth_api_key.field_shopfloor_app__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: shopfloor_mobile_base_auth_api_key
 #: model:ir.model.fields,field_description:shopfloor_mobile_base_auth_api_key.field_shopfloor_app____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Ultima modifica il"
 
 #. module: shopfloor_mobile_base_auth_api_key
 #: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base_auth_api_key.shopfloor_app_form_view
 msgid "Manage groups"
-msgstr ""
+msgstr "Gestione gruppi"
 
 #. module: shopfloor_mobile_base_auth_api_key
 #: model:shopfloor.app,name:shopfloor_mobile_base_auth_api_key.app_demo1
 msgid "Shopfloor Demo (api key auth)"
-msgstr ""
+msgstr "Demo reparto (autoriz. chiave API)"
 
 #. module: shopfloor_mobile_base_auth_api_key
 #: model:shopfloor.app,short_name:shopfloor_mobile_base_auth_api_key.app_demo1
 msgid "demo api key"
-msgstr ""
+msgstr "Chiave API demo"
