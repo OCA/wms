@@ -14,6 +14,7 @@
     "depends": [
         # OCA/wms
         "shopfloor",
+        "shopfloor_shipment_advice",
         # OCA/stock-logistics-transport
         "shipment_advice",
     ],
