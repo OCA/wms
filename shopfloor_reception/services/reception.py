@@ -136,8 +136,12 @@ class Reception(Component):
             )
         return self._response_for_select_move(picking)
 
-    def _response_for_select_move(self, picking, message=None):
+    def _response_for_select_move_get_data(self, picking):
         data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
+        return data
+
+    def _response_for_select_move(self, picking, message=None, **kwargs):
+        data = self._response_for_select_move_get_data(picking, **kwargs)
         return self._response(next_state="select_move", data=data, message=message)
 
     def _response_for_confirm_done(self, picking, message=None):
@@ -1666,7 +1670,7 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {
             "picking": self.schemas._schema_dict_of(
                 self._schema_stock_picking_with_lines(), required=True
-            )
+            ),
         }
 
     @property
