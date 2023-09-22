@@ -28,4 +28,5 @@ class MrpSubcontractingCommon(Common):
             wiz_form = tests.Form(production)
             wiz = wiz_form.save()
             wiz.qty_producing = wiz.product_qty
+            wiz._onchange_producing()
             wiz.subcontracting_record_component()
