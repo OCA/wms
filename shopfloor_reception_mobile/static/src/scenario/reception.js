@@ -28,8 +28,8 @@ const Reception = {
             />
             <template v-if="state_is('select_move')">
                 <item-detail-card
-                    :record="state.data.picking"
-                    :options="operation_options()"
+                    :record="select_move_from_record()"
+                    :options="select_move_from_record_options()"
                     :card_color="utils.colors.color_for('screen_step_done')"
                     :key="make_state_component_key(['reception-picking-item-detail', state.data.picking.id])"
                 />
@@ -224,8 +224,11 @@ const Reception = {
         line_being_handled: function () {
             return this.state.data.selected_move_line[0] || {};
         },
+        moves_to_select: function () {
+            return _.result(this.state, "data.picking.moves", []);
+        },
         ordered_moves: function () {
-            const moves = _.result(this.state, "data.picking.moves", []);
+            const moves = this.moves_to_select;
             if (_.isEmpty(moves)) {
                 return;
             }
@@ -270,11 +273,20 @@ const Reception = {
                 },
             ];
         },
-        operation_options: function () {
+        select_move_from_record: function () {
+            return this.state.data.picking;
+        },
+        select_move_from_record_options: function () {
             return {
                 title_action_field: {action_val_path: "name"},
                 fields: this.picking_display_fields(),
             };
+        },
+        select_move_from_record_key: function () {
+            return this.make_state_component_key([
+                "reception-select-move-from-record",
+                this.state.data.picking.id,
+            ]);
         },
         select_document_display_fields: function () {
             var fields = this.picking_display_fields();

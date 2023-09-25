@@ -18,7 +18,9 @@ export const reception_states = function () {
         select_document: {
             display_info: {
                 title: "Choose an operation",
-                scan_placeholder: "Scan document / product / package",
+                scan_placeholder: () => {
+                    return "Scan document / product / package";
+                },
             },
             events: {
                 select: "on_select",
