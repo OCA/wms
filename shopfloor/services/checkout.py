@@ -968,6 +968,18 @@ class Checkout(Component):
             ),
         )
 
+    def _find_line_to_increment(self, product_lines):
+        """Find which line should have its qty incremented.
+
+        Return the first line for the scanned product
+        which still has some qty todo.
+        If none are found, return the first line for that product.
+        """
+        return next(
+            (line for line in product_lines if line.qty_done < line.product_uom_qty),
+            fields.first(product_lines),
+        )
+
     def _scan_package_action_from_product(
         self, picking, selected_lines, product, packaging=None, **kw
     ):
@@ -983,7 +995,7 @@ class Checkout(Component):
             return self._increment_custom_qty(
                 picking,
                 selected_lines,
-                fields.first(product_lines),
+                self._find_line_to_increment(product_lines),
                 quantity_increment,
             )
         return self._switch_line_qty_done(picking, selected_lines, product_lines)
@@ -999,7 +1011,7 @@ class Checkout(Component):
         lot_lines = selected_lines.filtered(lambda l: l.lot_id == lot)
         if self.work.menu.no_prefill_qty:
             return self._increment_custom_qty(
-                picking, selected_lines, fields.first(lot_lines), 1
+                picking, selected_lines, self._find_line_to_increment(lot_lines), 1
             )
         return self._switch_line_qty_done(picking, selected_lines, lot_lines)
 
