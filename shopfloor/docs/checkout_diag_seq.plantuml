@@ -1,7 +1,7 @@
 # Diagram to generate with PlantUML (https://plantuml.com/)
 #
 #   $ sudo apt install plantuml
-#   $ plantuml delivery_diag_seq.plantuml
+#   $ plantuml checkout_diag_seq.plantuml
 #
 
 @startuml
@@ -56,6 +56,9 @@ summary -> select_line: **/cancel_line**(picking_id, package_id=None, line_id=No
 
 == /done ==
 summary -> select_document: **/done(picking_id)**
+summary -> select_child_location: **/done(picking_id)**
 
+== /scan_dest_location ==
+select_child_location -> select_document: **/scan_dest_location(picking_id, barcode)**
 
 @enduml
