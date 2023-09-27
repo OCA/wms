@@ -27,3 +27,9 @@ class MessageAction(Component):
                 shipment.name
             ),
         }
+
+    def shipment_not_found(self):
+        return {
+            "message_type": "error",
+            "body": _("The shipment does not exist any more."),
+        }
