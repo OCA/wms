@@ -64,7 +64,9 @@ class StockPicking(models.Model):
         enabled_update_scheduled_date = bool(
             self.env["ir.config_parameter"]
             .sudo()
-            .get_param("stock_release_channel_process_end_time.update_scheduled_date")
+            .get_param(
+                "stock_release_channel_process_end_time.stock_release_use_channel_end_date"
+            )
         )
         res = super()._after_release_set_expected_date()
         for rec in self:
