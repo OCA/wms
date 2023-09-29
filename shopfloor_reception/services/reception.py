@@ -137,7 +137,9 @@ class Reception(Component):
         return self._response_for_select_move(picking)
 
     def _response_for_select_move_get_data(self, picking):
-        data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
+        data = {}
+        if picking:
+            data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
         return data
 
     def _response_for_select_move(self, picking, message=None, **kwargs):
@@ -923,7 +925,7 @@ class Reception(Component):
         """
         return self._response_for_manual_selection()
 
-    def scan_line(self, picking_id, barcode):
+    def scan_line(self, picking_id, barcode, **kwargs):
         """Scan a product or a packaging
 
         input:
@@ -1669,7 +1671,7 @@ class ShopfloorReceptionValidatorResponse(Component):
     def _schema_select_move(self):
         return {
             "picking": self.schemas._schema_dict_of(
-                self._schema_stock_picking_with_lines(), required=True
+                self._schema_stock_picking_with_lines(), required=False
             ),
         }
 
