@@ -71,13 +71,16 @@ export const reception_states = function () {
                 cancel_picking_line: "on_cancel",
                 select: "on_select",
             },
+            get_odoo_call_data: () => {
+                const picking = this.state.data.picking;
+                return {
+                    picking_id: picking ? picking.id : null,
+                };
+            },
             on_scan: (barcode) => {
-                this.wait_call(
-                    this.odoo.call("scan_line", {
-                        picking_id: this.state.data.picking.id,
-                        barcode: barcode.text,
-                    })
-                );
+                const data = this.state.get_odoo_call_data();
+                data.barcode = barcode.text;
+                this.wait_call(this.odoo.call("scan_line", data));
             },
             on_mark_as_done: () => {
                 this.wait_call(

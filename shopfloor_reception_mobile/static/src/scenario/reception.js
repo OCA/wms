@@ -31,7 +31,7 @@ const Reception = {
                     :record="select_move_from_record()"
                     :options="select_move_from_record_options()"
                     :card_color="utils.colors.color_for('screen_step_done')"
-                    :key="make_state_component_key(['reception-picking-item-detail', state.data.picking.id])"
+                    :key="select_move_from_record_key()"
                 />
             </template>
             <template v-if="state_is('select_document')">
@@ -80,7 +80,7 @@ const Reception = {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="state.on_mark_as_done">Mark as Done</btn-action>
+                            <btn-action v-if="state.data.picking" @click="state.on_mark_as_done">Mark as Done</btn-action>
                         </v-col>
                     </v-row>
                 </div>
