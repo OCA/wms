@@ -70,6 +70,7 @@ const ReceptionShipmentAdvice = process_registry.extend("reception", {
     "methods._get_states": function () {
         let states = reception_states.bind(this)();
         const placeholder = states.select_document.display_info.scan_placeholder();
+        const get_odoo_call_data = states.select_move.get_odoo_call_data;
         states["manual_selection_shipment"] = {
             title: "Choose a shipment",
             events: {
@@ -91,6 +92,15 @@ const ReceptionShipmentAdvice = process_registry.extend("reception", {
         };
         states.select_document.display_info.scan_placeholder = () => {
             return placeholder + " / dock";
+        };
+        /* Extension of existing states function */
+        states.select_move.get_odoo_call_data = () => {
+            const data = get_odoo_call_data();
+            const shipment = this.state.data.shipment;
+            if (shipment) {
+                data.shipment_id = shipment.id;
+            }
+            return data;
         };
         return states;
     },
