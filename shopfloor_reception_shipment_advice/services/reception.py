@@ -1,6 +1,9 @@
 # Copyright 2023 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo import fields
+
+from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
 
@@ -41,12 +44,14 @@ class Reception(Component):
         return res
 
     def _response_for_select_move_get_data(self, picking, **kwargs):
-        data = super()._response_for_select_move_get_data(picking)
+        data = {}
+        if picking:
+            data = super()._response_for_select_move_get_data(picking)
         if "shipment" in kwargs.keys():
             data["shipment"] = self.data_detail.shipment_advice_detail(
                 kwargs["shipment"]
             )
-            # data.pop("picking", None)
+            data.pop("picking", None)
         return data
 
     def _response_for_manual_selection_shipment(self, dock):
@@ -64,6 +69,65 @@ class Reception(Component):
             ],
         }
         return self._response(next_state="manual_selection_shipment", data=data)
+
+    def _scan_line_shipment__by_product(self, shipment, product):
+        moves = shipment.planned_move_ids.filtered(lambda m: m.product_id == product)
+        # TODO probably should check if still all available...
+        move = fields.first(moves)
+        message = self._check_move_available(move, "product")
+        picking = move.picking_id
+        if message:
+            return self._response_for_select_move(
+                picking, message=message, shipment=shipment
+            )
+        return self._scan_line__find_or_create_line(picking, move)
+
+    def _scan_line_shipment__by_packaging(self, shipment, packaging):
+        moves = shipment.planned_move_ids.filtered(
+            lambda m: packaging in m.product_id.packaging_ids
+        )
+        # TODO probably should check if still all available...
+        move = fields.first(moves)
+        message = self._check_move_available(move, "product")
+        picking = move.picking_id
+        if message:
+            return self._response_for_select_move(
+                picking, message=message, shipment=shipment
+            )
+        return self._scan_line__find_or_create_line(picking, move)
+
+    def scan_line(self, picking_id, barcode, **kwargs):
+        if "shipment_id" not in kwargs:
+            return super().scan_line(picking_id, barcode, **kwargs)
+        shipment = self.env["shipment.advice"].browse(kwargs["shipment_id"])
+        # check shipment status ?
+        if not shipment:
+            return super().scan_line(picking_id, barcode, **kwargs)
+        handlers_by_type = {
+            "product": self._scan_line_shipment__by_product,
+            "packaging": self._scan_line_shipment__by_packaging,
+            # "lot": self._scan_line__by_lot,
+        }
+        search = self._actions_for("search")
+        search_result = search.find(barcode, handlers_by_type.keys())
+        # Fallback handler, returns a barcode not found error
+        handler = handlers_by_type.get(search_result.type)
+        if handler:
+            return handler(shipment, search_result.record)
+        # return self._scan_line__fallback(picking, barcode)
+        message = self.msg_store.barcode_not_found()
+        return self._response_for_select_move(None, shipment=shipment, message=message)
+
+
+class ShopfloorReceptionValidator(Component):
+    _inherit = "shopfloor.reception.validator"
+
+    def scan_line(self):
+        res = super().scan_line()
+        res["shipment_id"] = {"coerce": to_int, "required": False, "type": "integer"}
+        res["picking_id"]["required"] = False
+        res["picking_id"]["nullable"] = True
+        return res
 
 
 class ShopfloorReceptionValidatorResponse(Component):

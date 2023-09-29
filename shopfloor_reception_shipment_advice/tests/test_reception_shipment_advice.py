@@ -69,9 +69,12 @@ class ShopfloorReceptionShipmentAdvice(CommonCase, Common):
             message=self.service.msg_store.shipment_nothing_to_unload(shipment),
         )
 
-    def _data_for_shipment(self, picking, shipment=None):
-        data = self._data_for_select_move(picking)
+    def _data_for_shipment(self, picking=None, shipment=None):
+        data = {}
+        if picking:
+            data = self._data_for_select_move(picking)
         if shipment:
+            data.pop("picking", None)
             data["shipment"] = self.data_detail.shipment_advice_detail(shipment)
         return data
 
@@ -103,4 +106,83 @@ class ShopfloorReceptionShipmentAdvice(CommonCase, Common):
             data=self._data_for_shipment(
                 shipment.planned_picking_ids, shipment=shipment
             ),
+        )
+
+    def test_scan_line_barcode_not_found(self):
+        shipment = self.shipment_advice_in
+        response = self.service.dispatch(
+            "scan_line",
+            params={"picking_id": None, "shipment_id": shipment.id, "barcode": "NOPE"},
+        )
+        self.assert_response(
+            response,
+            next_state="select_move",
+            data=self._data_for_shipment(shipment=shipment),
+            message={"message_type": "error", "body": "Barcode not found"},
+        )
+
+    def test_scan_line_barcode_product(self):
+        shipment = self.shipment_advice_in
+        self.picking.action_confirm()
+        self._plan_records_in_shipment(shipment, self.picking)
+        product = self.picking.move_lines.product_id
+        product.barcode = "BARCODE-01"
+        selected_move_line = fields.first(
+            self.picking.move_line_ids.filtered(lambda l: l.product_id == product)
+        )
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": None,
+                "shipment_id": shipment.id,
+                "barcode": "BARCODE-01",
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data={
+                "picking": self.data.picking(self.picking),
+                "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": False,
+            },
+        )
+
+    def test_scan_line_barcode_packaging(self):
+        shipment = self.shipment_advice_in
+        self.picking.action_confirm()
+        self._plan_records_in_shipment(shipment, self.picking)
+        product = self.picking.move_lines.product_id
+        packaging = self.product_a_packaging = (
+            self.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "Box",
+                    "product_id": product.id,
+                    "barcode": "ProductTestBox",
+                    "qty": 3.0,
+                }
+            )
+        )
+        product.barcode = "BARCODE-01"
+        selected_move_line = fields.first(
+            self.picking.move_line_ids.filtered(lambda l: l.product_id == product)
+        )
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": None,
+                "shipment_id": shipment.id,
+                "barcode": packaging.barcode,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data={
+                "picking": self.data.picking(self.picking),
+                "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": False,
+            },
         )
