@@ -3,6 +3,7 @@
  * License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
  **/
 
+import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
 import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
 import {reception_states} from "/shopfloor_reception_mobile/static/src/scenario/reception_states.js";
 
@@ -48,6 +49,36 @@ const new_template =
 
 const ReceptionShipmentAdvice = process_registry.extend("reception", {
     template: new_template,
+
+    "methods._get_odoo_params": function () {
+        const params = this.$super(ScenarioBaseMixin)._get_odoo_params();
+        const shipment = this._get_current_shipment();
+        if (_.isUndefined(params.headers)) {
+            params.headers = {};
+        }
+        if (!_.isEmpty(shipment)) {
+            _.defaults(params.headers, this._get_reception_headers(shipment.id));
+        }
+        return params;
+    },
+    "methods._get_reception_headers": function (shipment_id) {
+        const res = {};
+        if (_.isInteger(shipment_id)) {
+            res["SERVICE-CTX-SHIPMENT-ID"] = shipment_id;
+        }
+        return res;
+    },
+    "methods._get_current_shipment": function () {
+        if (["select_document", "manual_selection"].includes(this.current_state_key)) {
+            return {};
+        }
+        const data = this.state_get_data("select_move");
+        if (_.isEmpty(data) || _.isEmpty(data.shipment)) {
+            return {};
+        }
+        return data.shipment;
+    },
+
     /* Added function for the new state : manual_selection_shipment */
     "methods.dock_available_shipments": function () {
         return this.state.data.shipments;
