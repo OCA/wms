@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-09-21 13:36+0000\n"
+"PO-Revision-Date: 2023-10-09 07:59+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -36,7 +36,7 @@ msgstr "ABC caotico"
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_stock_location__display_abc_storage
 msgid "Display Abc Storage"
-msgstr "Visualizza soccaggio ABC"
+msgstr "Visualizza stoccaggio ABC"
 
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model,name:stock_storage_type_putaway_abc.model_stock_location
