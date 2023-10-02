@@ -11,7 +11,8 @@ class ClusterPicking(Component):
         batch = super()._select_a_picking_batch(batches)
         if not batch and self.work.menu.batch_create:
             batch = self._batch_auto_create()
-            batch.write({"user_id": self.env.uid, "state": "in_progress"})
+        if batch:
+            batch.action_confirm()
         return batch
 
     def _batch_auto_create(self):
